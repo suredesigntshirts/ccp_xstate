@@ -153,3 +153,45 @@ test('no-self-edit: release.mjs only writes git objects and refs in the repo it 
   assert.deepEqual(wrote, [], 'outside .git, nothing in the working tree is written');
   assert.deepEqual(writesUnder(trace, [join(w.home, '.claude')]), []);
 });
+
+// Added at 278e45d: a release is now a branch release/harness-v<x.y.z> (the proxy drops tag pushes), so the same
+// guarantees are re-proved for the branch path.
+test('no-self-edit: release.mjs branch --push writes only git refs, and pushes release/harness-v<x.y.z> to origin', { skip: !hasStrace && 'strace missing' }, () => {
+  const w = world();
+  const trace = join(w.t, 'branch.trace');
+  const c = join(w.t, 'rel');
+  execFileSync('git', ['clone', '-q', w.origin, c]);
+  writeFileSync(join(c, 'plugins', 'harness', 'NEW.txt'), 'x');
+  git(c, 'add', '-A');
+  git(c, 'commit', '-q', '-m', 'plugin change');
+  git(c, 'push', '-q', 'origin', 'HEAD:main');
+  const sha = git(c, 'rev-parse', 'HEAD');
+  const r = spawnSync('strace', ['-f', '-qq', '-s', '300', '-o', trace, '-e', 'trace=file,desc,process', process.execPath, join(c, 'scripts', 'release', 'release.mjs'), 'branch', '--push'], { cwd: c, env: { PATH: process.env.PATH, HOME: w.home, RELEASE_SHA: sha }, encoding: 'utf8', timeout: 30000 });
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(git(w.origin, 'rev-parse', 'refs/heads/release/harness-v0.1.0'), sha, 'branch pushed at the sha (manifest 0.1.0 > tag 0.0.5 + 1)');
+  assert.deepEqual(writesUnder(trace, [c]).filter((l) => !/\/\.git\//.test(l)), [], 'outside .git, nothing is written');
+  assert.deepEqual(writesUnder(trace, [join(w.home, '.claude')]), []);
+});
+
+test('no-self-edit: setup.sh beside a live Claude, with the newest release only a branch, leaves the plugin untouched; without Claude it installs that branch', { skip: !hasStrace && 'strace missing' }, () => {
+  const w = world();
+  assert.equal(spawnSync('bash', [w.setup], { env: runSetup(w) }).status, 0);
+  assert.equal(manifestVersion(w.dest), '0.0.5');
+  git(w.origin, 'branch', 'release/harness-v9.1.0', 'main');
+  const before = snap(w.dest);
+  const claude = spawn(process.execPath, ['-e', 'setInterval(()=>{},1000)'], { env: { HOME: w.home, PATH: process.env.PATH } });
+  try {
+    const trace = join(w.t, 'br-running.trace');
+    traced(trace, 'bash', [w.setup], runSetup(w, { CLAUDE_PID: String(claude.pid) }));
+    assert.match(readFileSync(join(w.t, 'setup.log'), 'utf8'), /plugin not replaced: Claude Code/);
+    assert.deepEqual(writesUnder(trace, [w.dest, w.dest + '.old']), []);
+    assert.deepEqual(snap(w.dest), before);
+    assert.equal(manifestVersion(w.dest), '0.0.5');
+    const control = join(w.t, 'br-control.trace');
+    traced(control, 'bash', [w.setup], runSetup(w));
+    assert.ok(writesUnder(control, [w.dest]).length > 0);
+    assert.equal(manifestVersion(w.dest), '9.1.0', 'a release branch is picked up as the newest release');
+  } finally {
+    claude.kill();
+  }
+});
