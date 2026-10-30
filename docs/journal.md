@@ -71,6 +71,7 @@ after a newer one.
 | `ci.result` | A CI run finished on a sha | `github`, the run id |
 | `page.refresh` | A page was published or refreshed | `artifact`, the page url |
 | `wake` | Something started a turn: a hearth wake, a subagent's report, a task notification or a typed prompt | `claude-code`, the prompt id |
+| `tripwire` | A PR passed its round limit | `github`, `<owner/repo>#<pr>` |
 
 Payload fields per kind are set by the item that first writes that kind (the two `session.*` kinds are below); the envelope above is what every reader
 can rely on. Engine transitions arrive in stage 3 as `engine.transition`, with the transition id and the causing
@@ -157,6 +158,37 @@ thread, `source` is `git` and the release branch (or the sha when nothing was re
 Claude-Session; the thread journals it. From `.github/workflows/release.yml`, `source` is `github` and the run id,
 `session` the run's URL, and the row is in the tag's annotation and the run's summary. `payload`: `workflow` (`release`), `sha`, `result` (`released` or `skipped`), `reason`, `tag`, `version`,
 `previous` (the newest release before it, or null) and `changed` (the released files that changed).
+
+## Derived views
+
+`packages/journal/src/derive/` holds pure functions over rows (plan items obs-person-attention and
+obs-time-and-rework). Each reads rows and writes nothing, counts a row read twice once, and names the rows (or PRs) each
+output came from. `packages/journal/bin/derive.js time|rework|overhead` runs them from the command line. What each
+counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
+
+- **`time.js`**: per session, working time (a turn from its wake to its Stop row, a tool call or hook run for its
+  `ms`, a subagent from spawn to finish) and every gap between, labelled by the wake whose turn ends it: `person`
+  (`mention`, `decision-chosen`, `prompt`), `ci` (`external-event`), `wake` (any other reason), `rebuild` (from a
+  SessionStart inside the gap to that wake) or `unknown` (no wake, no reason, or the turn before never closed). A gap
+  is never working, and working plus each waiting kind plus unknown is the session's wall-clock time.
+- **`rework.js`**: per PR, pushes (commits CI ran on), red pushes, red runs, rounds (a new one at each push after a red
+  one, a merge commit staying in its round) and replans (other PRs labelled `replan` naming the same item), from
+  `ci.result` rows. `tripwires()` gives the `tripwire` rows to append: one per PR and limit, when rounds pass the
+  item's `step_back.max_rounds` (default 2). Before the engine, rounds are per PR, not per item.
+- **`overhead.js`**: tokens (`turn.usage` and `agent.finish`) on harness work against product work. A session's
+  tokens split by the share of changed lines, over the PRs its commits name it on, in the paths
+  `packages/journal/harness-paths.json` lists (`<owner>/<repo>/<glob>`). A session with no PR is unattributed.
+
+### PR check rows
+
+`derive.js rework` reads each PR from GitHub REST (the PR, its commits, each commit's check runs, its files) and makes
+one `ci.result` row per completed check run, `id` `github-check-run-<run id>`, `at` the run's completion, `source`
+`github` and the run id. `payload`: `workflow` (the check's name), `repo`, `pr`, `sha`, `merge` (the commit has two
+parents), `result` (the run's conclusion), `startedAt`, `completedAt`, `item` (the PR's `Item:` line, else its
+branch's last segment) and `labels`. With `--append` it adds the rows the journal file lacks, and the new tripwires.
+
+`tripwire` payload: `repo`, `pr`, `rounds`, `limit`, `item` and `inputs` (the `ci.result` row ids counted). The
+tripwire only records; acting on it is the engine's job.
 
 ## Adding a kind
 
