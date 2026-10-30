@@ -251,6 +251,29 @@ branch's last segment) and `labels`. With `--append` it adds the rows the journa
 `tripwire` payload: `repo`, `pr`, `rounds`, `limit`, `item` and `inputs` (the `ci.result` row ids counted). The
 tripwire only records; acting on it is the engine's job.
 
+## The observe page
+
+`plugins/harness/pages/observe/` (plan item obs-page) is the person's live page over the journal, published as a
+claude.ai artifact: https://claude.ai/artifact/GEVcccpqcToRUb7EhTG4B3. For everything, a UTC day, a thread or a session
+it shows tokens by agent (`turn.usage` for the main session, `agent.finish` per subagent), time by kind (the time
+view's totals), what was refused with its rule and whether it was retried, and what was asked of the person (the
+attention view's cards, posts, messages, taps and waits). It shows its own release, the newest release that wrote
+rows, the newest row's time and when it last read.
+
+- `data.js` is the data layer, pure functions over rows; `page.html` is the page. `build.mjs` inlines `data.js` and
+  the derived views it uses into `observe.html`, the file that is published, so the page runs the code the tests run.
+  A test fails when `observe.html` is stale. Rebuild with `node plugins/harness/pages/observe/build.mjs --release
+  x.y.z` and republish that file with the capabilities `files` (`{ project: <this project's chan id> }`), `db` and
+  `user`.
+- It reads `harness/journal/**/*.jsonl` through the artifact's `files` capability, once after the page loads and on
+  each Refresh. Nothing runs on a timer.
+- Each read writes one `page.refresh` row to the page's own store (collection `refresh`, read with ArtifactData),
+  since `files` can only read. The row is a journal row, session `page-observe`, `source` `artifact` and the page url;
+  `payload`: `page`, `ms` (reading and deriving), `rows`, `files`, `bad` (unreadable lines), `newestAt`, `scope` and
+  `viewer` (the viewer's opaque id). Why: `plan/decisions/2026-10-30-obs-page.md`.
+- `test/browser-check.mjs <folder>` opens `observe.html` in Chromium with a stand-in viewer serving `<folder>` as
+  the project's files, presses Refresh and prints what the page shows and the rows it recorded.
+
 ## Adding a kind
 
 1. Add it to `KINDS` in `packages/journal/src/kinds.js` (dotted lower-case words). `append()` refuses kinds not on
