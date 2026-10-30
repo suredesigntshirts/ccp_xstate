@@ -5,6 +5,9 @@ One line each: what, why, which item waits. Threads add to this; the person clea
 - Pick the product repo for the first real issue (plan item first-real-issue). Stage s4 waits; s0-s3 run without it.
 - Protect `main`: require the `ci / test` and `verdict / gates` checks before merge (repo settings). Until then the
   gates are red marks threads respect, not a lock (plan item repo-skeleton).
+- Optional: add an `ANTHROPIC_API_KEY` repo secret if you want the clean-room job to start a real headless `claude -p`
+  session. Without it the job runs the plugin's hooks with no model, which tests the install the same way
+  (plan item clean-room-install-test; `2026-10-30-clean-room-hooks-without-model.md`).
 - Thread branches are named `claude/...` by the environment, so threads can't follow CLAUDE.md's `<kind>/<item-id>`
   branch rule; they name the item in the PR body instead. Change the environment if you want the branch rule kept
   (plan item repo-skeleton).

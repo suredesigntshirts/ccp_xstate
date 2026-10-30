@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PLUGIN, RULES, context, fakeRepo, runHook, setup, snapshot, temp, writeSettings } from './helpers.mjs';
 import { readFile } from '../../../packages/journal/src/index.js';
@@ -18,6 +18,14 @@ setup(home);
 const INSTALLED = join(home, '.claude', 'skills', 'ccp-harness');
 const INSTALLED_HOOK = join(INSTALLED, 'scripts', 'session-start.mjs');
 const settings = () => JSON.parse(readFileSync(join(home, '.claude', 'settings.json'), 'utf8'));
+
+// A copy of the installed plugin without the file `gone`, for the files check (plan item clean-room-install-test).
+function brokenCopy(gone) {
+  const root = join(temp('broken'), 'ccp-harness');
+  cpSync(INSTALLED, root, { recursive: true });
+  rmSync(join(root, gone));
+  return join(root, 'scripts', 'session-start.mjs');
+}
 
 // An installed project: a harness folder with the marker and the journal root, made by the real install script.
 function project() {
@@ -64,7 +72,7 @@ test('rows: an installed session writes one fingerprint and one passing self-che
   const dir = project();
   const r = runHook(INSTALLED_HOOK, { env: { HOME: home, CCP_HARNESS_DIR: dir, CCP_REPO: fakeRepo({ tags: ['0.1.0'] }) }, input: INPUT });
   assert.equal(r.status, 0);
-  assert.match(context(r.stdout), /^ccp-harness 0\.1\.0: self-check passed \(6 of 6 checks\)\.$/);
+  assert.match(context(r.stdout), /^ccp-harness 0\.1\.0: self-check passed \(7 of 7 checks\)\.$/);
   const [fp, sc] = rows(dir);
   assert.equal(fp.kind, 'session.fingerprint');
   assert.equal(fp.session, 'test-session-1');
@@ -78,7 +86,7 @@ test('rows: an installed session writes one fingerprint and one passing self-che
   assert.equal(sc.kind, 'session.selfcheck');
   assert.equal(sc.payload.passed, true);
   assert.deepEqual(sc.payload.checks.map((c) => [c.id, c.status]),
-    [['settings', 'pass'], ['rules', 'pass'], ['depth', 'pass'], ['copy', 'pass'], ['release', 'pass'], ['journal', 'pass']]);
+    [['settings', 'pass'], ['rules', 'pass'], ['depth', 'pass'], ['files', 'pass'], ['copy', 'pass'], ['release', 'pass'], ['journal', 'pass']]);
 });
 
 // Each case breaks one thing and expects exactly that check to fail, named in one sentence in the session's line.
@@ -97,6 +105,11 @@ const ONE_FAILING = [
     id: 'copy',
     hook: REPO_HOOK,
     says: /The plugin runs from .*plugins\/harness, which is not an installed release copy/
+  },
+  {
+    id: 'files',
+    hook: brokenCopy('scripts/notice-behind.mjs'),
+    says: /The plugin at .* is missing scripts\/notice-behind\.mjs \(needed by hooks\/hooks\.json\)/
   },
   {
     id: 'release',
@@ -125,6 +138,34 @@ for (const c of ONE_FAILING) {
   });
 }
 
+test('files: a copy missing a module the hook itself imports still names it, exits 0 and journals nothing', () => {
+  for (const gone of ['scripts/fingerprint.mjs', 'scripts/host.mjs', 'scripts/selfcheck.mjs']) {
+    const dir = project();
+    const r = runHook(brokenCopy(gone), { env: { HOME: home, CCP_HARNESS_DIR: dir, CCP_REPO: fakeRepo({ tags: ['0.1.0'] }) }, input: INPUT });
+    assert.equal(r.status, 0);
+    assert.match(context(r.stdout), new RegExp(`^ccp-harness: self-check FAILED\\. The plugin at .* is missing ${gone.replace('.', '\\.')}, so the session-start self-check could not run`));
+    assert.equal(existsSync(join(dir, 'journal', 'sessions', 'test-session-1.jsonl')), false);
+  }
+});
+
+test('files: the repo plugin needs its hooks, skill and journal files, and none is missing', async () => {
+  const { neededFiles } = await import('../scripts/fingerprint.mjs');
+  const { checked, missing } = neededFiles(PLUGIN);
+  assert.deepEqual(missing, []);
+  const installed = neededFiles(INSTALLED, true);
+  assert.deepEqual(installed.missing, []);
+  assert.ok(checked >= 8 && installed.checked > checked, `checked ${checked}, installed ${installed.checked}`);
+});
+
+test('files: a copy that lost a journal file fails files naming it, and the journal check says why the rows are lost', () => {
+  const dir = project();
+  const r = runHook(brokenCopy('lib/journal/src/kinds.js'), { env: { HOME: home, CCP_HARNESS_DIR: dir, CCP_REPO: fakeRepo({ tags: ['0.1.0'] }) }, input: INPUT });
+  assert.equal(r.status, 0);
+  const line = context(r.stdout);
+  assert.match(line, /is missing lib\/journal\/src\/kinds\.js \(needed by lib\/journal\/src\/index\.js\)/);
+  assert.match(line, /The journal at .* could not be written/);
+});
+
 test('rows: no settings file fails the settings check and says the setup script did not run', () => {
   const dir = project();
   const h = join(temp('home'), 'home');
@@ -148,7 +189,7 @@ test('rows: an unreachable origin leaves the release unchecked, not failed', () 
   const repo = fakeRepo();
   execFileSync('git', ['-C', repo, 'remote', 'set-url', 'origin', join(repo, 'nowhere.git')]);
   const r = runHook(INSTALLED_HOOK, { env: { HOME: home, CCP_HARNESS_DIR: dir, CCP_REPO: repo }, input: INPUT });
-  assert.match(context(r.stdout), /self-check passed \(5 of 6 checks\)\. Not checked: The newest release could not be read/);
+  assert.match(context(r.stdout), /self-check passed \(6 of 7 checks\)\. Not checked: The newest release could not be read/);
   const [, sc] = rows(dir);
   assert.equal(sc.payload.checks.find((c) => c.id === 'release').status, 'unknown');
 });

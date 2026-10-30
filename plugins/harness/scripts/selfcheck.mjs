@@ -31,6 +31,13 @@ export const CHECKS = {
     return fail('depth', `Subagent depth is ${depth ?? 'unset (1)'}, not ${WANT_DEPTH}, so subagents can't start their own subagents.`);
   },
 
+  files(f) {
+    const { checked, missing } = f.files;
+    if (!missing.length) return pass('files', `all ${checked} files the plugin's hooks and skills need are present`);
+    const list = missing.map((m) => `${m.file} (needed by ${m.by})`).join(', ');
+    return fail('files', `The plugin at ${f.plugin.root} is missing ${list}, so part of it can't run; a new thread gets a fresh copy of the release, and if it is missing there too the release itself is broken.`);
+  },
+
   copy(f) {
     if (f.plugin.installed && !f.pluginIsLink && !f.pluginInRepo) return pass('copy', `running the installed copy at ${f.plugin.root}`);
     return fail('copy', `The plugin runs from ${f.plugin.root}, which is not an installed release copy, so edits to the repo could change it under a running session.`);
