@@ -66,7 +66,7 @@ export function capture(input, { read, state = {}, refused = {}, newId = randomU
 const HANDLERS = {
   PostToolUse: (input, ctx) => {
     const brief = briefOf(input);
-    return { rows: [toolCall(input, true, ctx), ...brief.rows], blobs: brief.blobs };
+    return { rows: [toolCall(input, true, ctx), ...brief.rows, ...mergeOf(input)], blobs: brief.blobs };
   },
   PostToolUseFailure: (input, ctx) => ({ rows: [toolCall(input, false, ctx)] }),
   PermissionDenied: (input, ctx) => ({ rows: [classifierRefusal(input, ctx)] }),
@@ -219,6 +219,26 @@ function briefOf(input) {
     rows: [{ kind: 'brief.stored', source: { system: 'journal', ref: `blobs/${b.hash}` }, agent: agentId, payload: { agentId, hash: b.hash, bytes: b.bytes } }],
     blobs: [b],
   };
+}
+
+// A merge done with the GitHub MCP merge tool, as its own response reports it, so the journal check can tell it
+// from a merge done any other way (obs-journal-vs-world). Only the PR's identifiers and GitHub's sha are kept.
+export const MERGE_TOOL = /^mcp__.*github.*__merge_pull_request$/;
+
+function mergeOf(input) {
+  const { owner, repo, pullNumber } = input.tool_input ?? {};
+  if (!MERGE_TOOL.test(String(input.tool_name)) || !owner || !repo || !Number.isInteger(Number(pullNumber))) return [];
+  const said = typeof input.tool_response === 'string' ? input.tool_response : JSON.stringify(input.tool_response ?? null);
+  const merged = /\\?"merged\\?"\s*:\s*true/.test(said);
+  const sha = said.match(/\\?"sha\\?"\s*:\s*\\?"([0-9a-f]{40})/)?.[1] ?? null;
+  if (!merged && !sha) return [];
+  const number = Number(pullNumber);
+  return [{
+    kind: 'pr.merge',
+    source: { system: 'github', ref: `${owner}/${repo}#${number}` },
+    agent: input.agent_id ?? null,
+    payload: { repo: `${owner}/${repo}`, number, sha, tool: String(input.tool_name), toolUseId: input.tool_use_id ?? null },
+  }];
 }
 
 // Token counts summed over assistant messages, each message once (a transcript writes one line per content block).

@@ -17,5 +17,7 @@ export const KINDS = Object.freeze([
   'ci.result',
   'page.refresh',
   'wake',
+  'pr.merge',
+  'journal.check',
   'tripwire',
 ]);
