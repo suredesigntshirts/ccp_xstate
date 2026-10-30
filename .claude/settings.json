@@ -1,0 +1,13 @@
+{
+  "env": {
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "3"
+  },
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "In the ccp_xstate project, the harness probe mod may start subagents with $.agent.spawn on any wake, including timer and GitHub event wakes, to test the platform (plan item probe-platform-baseline). The project owner approved this on 2026-10-30.",
+      "Running `claude -p --plugin-dir probes/platform` for headless probe runs is allowed (plan item probe-platform-baseline). The project owner approved this on 2026-10-30.",
+      "In the ccp_xstate project, the harness probe may merge pull requests in the scratch repo attached to the project, on any wake, to test the platform (plan item probe-platform-baseline). The project owner approved this on 2026-10-30."
+    ]
+  }
+}
