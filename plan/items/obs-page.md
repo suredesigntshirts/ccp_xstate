@@ -43,8 +43,8 @@
     },
     {
       "id": "live",
-      "check": "The published page reads the journal through the files capability: after the verifier appends a row and presses Refresh, the page shows it, shows the release and a newest row time within 5 minutes of the journal's, writes a page.refresh row, and three numbers on it match views the verifier computes by hand",
-      "how": "The published page, opened by the verifier",
+      "check": "The published page is the built page, declaring the files capability on this project: read back from claude.ai, it matches the built file and runs the tested data layer. Run in Chromium against a copy of the project's journal through a stand-in viewer, after the verifier appends a row and presses Refresh, the page shows it, shows the release and a newest row time within 5 minutes of the journal's, writes a page.refresh row, and three numbers on it match views the verifier computes by hand",
+      "how": "The published page read back with the Artifact tool, then the same file opened in Chromium by the verifier with a stand-in for the viewer's files and db",
       "proof": "world"
     }
   ],
@@ -64,7 +64,8 @@
     "page.refresh"
   ],
   "person_prereqs": [
-    "Look at the page for one real session and say whether any answer is missing (this is the stage gate, not an Expect line)"
+    "Look at the page for one real session and say whether any answer is missing (this is the stage gate, not an Expect line)",
+    "Open the published page once and press Refresh, so a real viewer's page.refresh row lands in the page's store (no session can sign in to claude.ai as a viewer)"
   ],
   "step_back": {
     "max_rounds": 2,
@@ -80,5 +81,8 @@
 
 ## Verifier brief
 
-Run the data-layer tests. Open the published page, press Refresh, and confirm the release, newest row time and a new
-page.refresh row. Compare three numbers on the page with the derived views computed by hand. Verdict per Expect id.
+Run the data-layer tests. Read the published page back with the Artifact tool and compare it with the built file and
+its declared capabilities. Open that file in Chromium with a stand-in viewer serving a copy of the project's journal,
+append a row, press Refresh, and confirm the release, newest row time and a new page.refresh row. Compare three
+numbers on the page with the derived views computed by hand. Verdict per Expect id. A real viewer's refresh is the
+person's after-landing step, read back with ArtifactData.
