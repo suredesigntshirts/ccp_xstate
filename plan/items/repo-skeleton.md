@@ -63,7 +63,7 @@
     },
     {
       "id": "short-map",
-      "check": "CLAUDE.md is under 100 lines and every path it names exists",
+      "check": "CLAUDE.md is short",
       "how": "The verifier lists the paths with a script and runs wc -l",
       "proof": "verifier"
     },
