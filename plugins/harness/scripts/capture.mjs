@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { gate, journal, journalDir, pluginRoot, release, sessionFile, sessionName, stdin } from './host.mjs';
-import { EVENTS, capture, read } from './capture-rows.mjs';
+import { EVENTS, capture, handedBack, read } from './capture-rows.mjs';
 
 const WATCHDOG_MS = 3000;
 
@@ -73,8 +73,11 @@ function store(dir, { hash, text }) {
 }
 
 // Claude Code can still be writing a subagent's last lines when SubagentStop runs (seen 2026-10-30: the hand-back
-// line landed 20 ms after the hook read the file). This waits until the file has stopped growing for `quiet` ms.
+// line landed 20 ms after the hook read the file). This waits until the file ends with the hand-back's result, or,
+// for an agent that never hands back, until it has stopped growing for `quiet` ms.
+const TAIL = 64 * 1024;
 async function settle(path, { quiet = 150, max = 2000 } = {}) {
+  const done = () => handedBack(read(path, { from: null, cap: TAIL })?.text ?? '');
   const size = () => {
     try {
       return statSync(path).size;
@@ -85,7 +88,7 @@ async function settle(path, { quiet = 150, max = 2000 } = {}) {
   const until = Date.now() + max;
   let last = size();
   let since = Date.now();
-  while (Date.now() < until && Date.now() - since < quiet) {
+  while (!done() && Date.now() < until && Date.now() - since < quiet) {
     await new Promise((ok) => setTimeout(ok, 25));
     const now = size();
     if (now !== last) [last, since] = [now, Date.now()];
