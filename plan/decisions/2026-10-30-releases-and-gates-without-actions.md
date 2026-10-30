@@ -24,3 +24,12 @@
    from another session, stays the check that counts. When Actions runs again, CI is the rule again.
 
 Getting Actions back (minutes, or making the repos public) is in `waiting-for-person.md`.
+
+## Correction, 16:46Z
+
+Actions was not out of minutes in ccp_xstate. No runs started on PR #19 from 12:19Z to 16:30Z because the PR had a
+merge conflict, and `pull_request` workflows don't run on a conflicted PR. Once the conflict was resolved, `ci` and
+`verdict` ran at 16:37Z, and on PR #19's merge (7d6b0b4) `release.yml` tagged `harness-v0.1.0` while this thread
+pushed `release/harness-v0.1.0`, both at the same sha. So CI stays the merge rule, and decision 2 applies only when
+a PR's workflows really can't start (for example if the minutes do run out). Decision 1 stands: threads still can't
+push tags.
