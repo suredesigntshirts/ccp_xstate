@@ -61,7 +61,7 @@ after a newer one.
 | `agent.spawn` | A subagent started | `claude-code`, the spawning tool use id |
 | `agent.finish` | A subagent finished, with its result size and status | `claude-code`, the spawning tool use id |
 | `turn.usage` | Tokens and time for one turn | `claude-code`, the message id |
-| `refusal` | A refused call, permission, push or gate, with the text | the refusing system, its id for the call |
+| `refusal` | A refused call, permission, push or gate, with its rule and a hash of its text | the refusing system, its id for the call |
 | `hook.run` | A hook ran: event, duration, outcome | `hook`, the hook event and call id |
 | `person.message` | The person wrote in a thread or chat | `hearth`, the message id |
 | `person.tap` | The person tapped a card option | `hearth`, the card's message id |
@@ -113,6 +113,42 @@ sha256 and a size. The only text kept is a subagent's brief and final answer, ea
 
 `agent.spawn` and `agent.finish` take `source.ref` from the spawning tool use id in the subagent's `meta.json`. The
 brief is the first line of the subagent's transcript; the Agent call returns it too, which is where `brief.stored` comes from.
+
+## Refusal rows
+
+The capture hook (plan item obs-refusal-log) writes a `refusal` row to the session's file for every refused call. How
+each refusal reaches it (probed 2026-10-30, Claude Code 2.1.314):
+
+- **Auto mode classifier:** the PermissionDenied hook fires, with the tool, its input and `reason`, the rule as the
+  classifier names it, such as `[Self-Modification]`. The full text the model saw doesn't reach the hook. Captured live.
+- **A hook's denial** (PreToolUse `permissionDecision: deny`, or a blocking exit) and **a permission rule's denial**
+  fire no hook: the call never runs, so neither PostToolUse, PostToolUseFailure nor PermissionDenied sees it. The model
+  gets an error tool_result, `PreToolUse:<tool> hook error: <reason>` or `Permission to use <tool> with ... has been
+  denied.`, so the Stop and SubagentStop handlers find these in the transcript they already read, at the end of the
+  turn or the agent. A person declining a prompt (`The user doesn't want to proceed ...`) counts as a permission
+  refusal the same way.
+
+`source` is `{ system, ref }`: `hook` for a hook's denial, else `claude-code`, and the refused tool use id. `at` is the
+refusal's own time, from the transcript for the ones found there. `agent` is the subagent whose call was refused, or
+null. `payload`:
+
+| Field | What |
+|---|---|
+| `source` | `classifier`, `hook` or `permission` |
+| `rule` | The classifier's `reason`; for a hook, the name its reason starts with (`<rule>: why`, as our hooks write them), else `<event> hook`; for a permission, `deny rule` or `person declined` |
+| `textHash` | sha256 of the refusal text the model saw, or null for a classifier refusal (its text doesn't reach the hook). The text itself is never kept: a permission denial's text holds the command, and a hook's may |
+| `actionHash` | sha256 of the tool name and its input, without a top-level `description` (the model's label, reworded freely). Two calls of the same action share it |
+| `tool` | The refused tool's name |
+| `retryOf` | The id of the latest earlier refusal in this session with the same `actionHash`, or null |
+| `outcome` | `denied`: the refused call did not run |
+
+A row is never changed after it is written, so whether a refusal was retried and how that ended is read forward: a
+later `refusal` whose `retryOf` is this row's id was refused again; a later `tool.call` whose `payload.retryOf` is this
+row's id ran (`ok` says whether it succeeded). `tool.call` carries `retryOf` only when its action had been refused
+before. A hook or permission refusal is journalled only at the turn's end, so a call that runs later in that same turn
+doesn't link to it; a classifier refusal links at once. The session's refusals so far (`actionHash` to row id) are
+kept in `$CCP_HARNESS_STATE/refusals-<session>.jsonl`, append-only, so each hook run can link without reading the
+journal.
 
 ## Release rows
 
