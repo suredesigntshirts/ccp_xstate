@@ -162,3 +162,29 @@ test('a background agent whose transcript is not written yet still gets its brie
   assert.equal(call.blobs[0].hash, sha256('do the thing'));
   assert.ok(!JSON.stringify(call.rows).includes('do the thing'));
 });
+
+// obs-journal-vs-world: a merge with the GitHub MCP merge tool journals a pr.merge row, from the response the tool
+// gave on 2026-10-30 (scratch PR 11), so the journal check can tell it from a merge done any other way.
+test('pr.merge: the MCP merge tool makes a pr.merge row from its own response', () => {
+  const input = {
+    hook_event_name: 'PostToolUse', session_id: 's', tool_use_id: 'toolu_01NwGZhPAEckkCo9WNvfHhms',
+    tool_name: 'mcp__github__merge_pull_request',
+    tool_input: { owner: 'suredesigntshirts', repo: 'ccp_xstate_scratch', pullNumber: 11, merge_method: 'squash' },
+    tool_response: [{ type: 'text', text: '{"sha":"ec58ae8d47798a6184078e8d86c935b58f67bcd2","merged":true,"message":"Pull Request successfully merged"}' }],
+  };
+  const { rows } = capture(input, { read: reader() });
+  assert.deepEqual(rows.map((r) => r.kind), ['tool.call', 'pr.merge']);
+  assert.deepEqual(rows[1], {
+    kind: 'pr.merge',
+    source: { system: 'github', ref: 'suredesigntshirts/ccp_xstate_scratch#11' },
+    agent: null,
+    payload: {
+      repo: 'suredesigntshirts/ccp_xstate_scratch', number: 11, sha: 'ec58ae8d47798a6184078e8d86c935b58f67bcd2',
+      tool: 'mcp__github__merge_pull_request', toolUseId: 'toolu_01NwGZhPAEckkCo9WNvfHhms',
+    },
+  });
+  const refused = { ...input, tool_response: [{ type: 'text', text: 'Pull Request is not mergeable' }] };
+  assert.deepEqual(capture(refused, { read: reader() }).rows.map((r) => r.kind), ['tool.call']);
+  const other = { ...input, tool_name: 'mcp__github__pull_request_read' };
+  assert.deepEqual(capture(other, { read: reader() }).rows.map((r) => r.kind), ['tool.call']);
+});

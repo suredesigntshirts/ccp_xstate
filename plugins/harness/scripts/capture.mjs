@@ -4,7 +4,7 @@
 // any brief or answer under <journal>/blobs/<sha256> once, then appends a hook.run row with its own time.
 // Like every hook here it does nothing elsewhere, prints nothing, swallows every failure and always exits 0. Its
 // watchdog ends it within 3 s, inside the hook's 5 s timeout, after journalling hook.run with timedOut true.
-import { mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { performance } from 'node:perf_hooks';
@@ -16,6 +16,33 @@ const WATCHDOG_MS = 3000;
 /** This session's capture state (where the last Stop stopped reading the transcript): never under the plugin root. */
 const statePath = (session, env = process.env) =>
   join(env.CCP_HARNESS_STATE || join(tmpdir(), 'ccp-harness'), `capture-${sessionFile(session)}`.replace(/\.jsonl$/, '.json'));
+
+// This session's refusals so far, one { hash, id } line each (plan item obs-refusal-log), so a later call of the same
+// action links back by retryOf. Lines are only ever appended, so the async tool-call hooks can read it while
+// PermissionDenied or Stop adds to it.
+const refusedPath = (session, env = process.env) =>
+  join(env.CCP_HARNESS_STATE || join(tmpdir(), 'ccp-harness'), `refusals-${sessionFile(session)}`);
+const REFUSAL_AWARE = ['PostToolUse', 'PostToolUseFailure', 'PermissionDenied', 'SubagentStop', 'Stop'];
+
+function loadRefused(path) {
+  const refused = {};
+  try {
+    for (const line of readFileSync(path, 'utf8').split('\n')) {
+      try {
+        const { hash, id } = JSON.parse(line);
+        if (hash && id) refused[hash] = id;
+      } catch {}
+    }
+  } catch {}
+  return refused;
+}
+
+function noteRefused(path, rows) {
+  const lines = rows.filter((r) => r.kind === 'refusal').map((r) => `${JSON.stringify({ hash: r.payload.actionHash, id: r.id })}\n`);
+  if (!lines.length) return;
+  mkdirSync(dirname(path), { recursive: true });
+  appendFileSync(path, lines.join(''));
+}
 
 function loadState(path) {
   try {
@@ -100,9 +127,12 @@ try {
   // which a hearthbot call's card.posted row reads (capture-rows.mjs, personOf and posted).
   const usesState = event === 'Stop' || event === 'UserPromptSubmit';
   const before = usesState || event === 'PostToolUse' ? loadState(where) : {};
-  const { rows, blobs, state } = capture(input, { read, state: before });
+  const refusals = refusedPath(session);
+  const refused = REFUSAL_AWARE.includes(event) ? loadRefused(refusals) : {};
+  const { rows, blobs, state } = capture(input, { read, state: before, refused });
   for (const b of blobs) store(join(journalDir(), 'blobs'), b);
   for (const row of rows) append(path, { ...base, ...row });
+  noteRefused(refusals, rows);
   if (usesState && state !== before) saveState(where, state);
   done(false);
 } catch {}

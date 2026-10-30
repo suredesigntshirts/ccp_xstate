@@ -61,7 +61,7 @@ after a newer one.
 | `agent.spawn` | A subagent started | `claude-code`, the spawning tool use id |
 | `agent.finish` | A subagent finished, with its result size and status | `claude-code`, the spawning tool use id |
 | `turn.usage` | Tokens and time for one turn | `claude-code`, the message id |
-| `refusal` | A refused call, permission, push or gate, with the text | the refusing system, its id for the call |
+| `refusal` | A refused call, permission, push or gate, with its rule and a hash of its text | the refusing system, its id for the call |
 | `hook.run` | A hook ran: event, duration, outcome | `hook`, the hook event and call id |
 | `person.message` | The person wrote in a thread or chat | `hearth`, the message id |
 | `person.tap` | The person tapped a card option | `hearth`, the card's message id |
@@ -72,6 +72,8 @@ after a newer one.
 | `ci.result` | A CI run finished on a sha | `github`, the run id |
 | `page.refresh` | A page was published or refreshed | `artifact`, the page url |
 | `wake` | Something started a turn: a hearth wake, a subagent's report, a task notification or a typed prompt | `claude-code`, the prompt id |
+| `pr.merge` | A PR merged by a journalled merge, as the merge's own response reports it | `github`, `owner/repo#number` |
+| `journal.check` | The journal check ran: what it compared and the counts it found | `journal-check`, the inputs it compared |
 
 Payload fields per kind are set by the item that first writes that kind (the two `session.*` kinds are below); the envelope above is what every reader
 can rely on. Engine transitions arrive in stage 3 as `engine.transition`, with the transition id and the causing
@@ -105,6 +107,7 @@ sha256 and a size. The only text kept is a subagent's brief and final answer, ea
 |---|---|---|
 | PostToolUse, PostToolUseFailure | `tool.call` | `tool`, `inputHash` (sha256 of the input's JSON), `inputBytes`, `ms` (Claude Code's `duration_ms`), `ok` (false from PostToolUseFailure) |
 | SubagentStart | `agent.spawn` | `agentId`, `type`, `model` (null: the start doesn't say; `agent.finish` has the served one), `briefHash` (null with a placeholder when a background agent's transcript is not written yet), `depth` |
+| PostToolUse of the GitHub MCP merge tool (`mcp__*github*__merge_pull_request`), when its response says merged | `pr.merge` | `repo` (`owner/name`), `number`, `sha` (the merge commit GitHub returned, or null), `tool`, `toolUseId`. These identifiers are the one exception to keeping no tool input |
 | PostToolUse of the Agent tool | `brief.stored` | `agentId` (from the call's result), `hash`, `bytes` of the prompt it was given; `source.ref` is `blobs/<hash>` |
 | SubagentStop | `agent.finish` | `agentId`, `type`, `model`, `ms` (first to last line of its transcript), `tokens` (`input`, `output`, `cacheRead`, `cacheCreation`, summed over its messages), `resultHash` |
 | SubagentStop | `result.stored` | `agentId`, `hash`, `bytes`: its SubagentHandback message, else its last text |
@@ -139,6 +142,74 @@ checklist updates and reactions the session makes are not posts.
 person's messages and taps, the cards and posts, open cards and card waits (tap `sentAt` minus the card row's `at`),
 each card with its post, tap and wait, and posts (posts and cards) per thread-hour and project-hour, flagged over
 the caps of 20 per thread and 60 per project (ledger L-message-caps). A message seen on two wakes counts once by its id.
+
+## The journal check
+
+`packages/journal/bin/journal-check.js` (plan item obs-journal-vs-world) compares the journal with facts from
+outside it and lists what doesn't match (ledger L-checks-against-world). It reads and never repairs: a gap stays a
+gap until a separate, explicit command writes a labelled placeholder row.
+
+```
+node packages/journal/bin/journal-check.js --journal <session file> --events <event log>
+node packages/journal/bin/journal-check.js --journal <journal root> --repo <owner/name> [--since <ISO time>]
+```
+
+- **Session diff** (`--events`, with `--session <file>` when `--journal` is the root). The event log is the
+  session's own record of its tool calls: `list_events` pages saved as JSON or JSONL, or a Claude Code transcript
+  (its `subagents/` folder is read too). It lists every call that ran with no `tool.call` row, and every
+  `tool.call` row inside the log's time span whose tool use id the log doesn't have. Calls Claude Code answered
+  without running (a `<tool_use_error>` result, such as a blocked `sleep`) and calls with no result yet are shown
+  but not counted: no hook fires for them. `list_events` is an MCP tool, so the session saves its pages to a file
+  first; a cloud session's local transcript is under `~/.claude/projects/`.
+- **Merge diff** (`--repo`, repeatable). It asks GitHub's REST API for the repo's closed PRs (through the session's
+  proxy, which Node needs `NODE_USE_ENV_PROXY` for; the command sets it) or reads saved responses with `--prs`. It
+  lists every PR merged since `--since` (default: the journal's first row) with no `pr.merge` row naming it, with
+  its head and merge shas, and every `pr.merge` row GitHub shows unmerged or merged at another sha. A merge made
+  through the REST API, the web UI or `git push` has no `pr.merge` row, so it is listed (case
+  C-merge-outside-host-detected). Until the engine's merge effect exists, a merge with the GitHub MCP merge tool
+  in a session that captures counts as journalled.
+- `--record <file>` appends a `journal.check` row: `payload` has `ok`, `since`, `journal`, the counts (`calls`,
+  `callRows`, `missing`, `notRun`, `pending`, `unfoundCalls`, `outside`, `merges`, `mergeRows`, `unexplained`,
+  `unfoundMerges`) and `badLines`, the journal lines it couldn't read.
+- Exit 0 when nothing is listed, 1 when something is, 2 when it couldn't run. `--json` prints the whole result.
+
+`list_events` retention is unknown, so run the session diff soon after a session ends.
+
+## Refusal rows
+
+The capture hook (plan item obs-refusal-log) writes a `refusal` row to the session's file for every refused call. How
+each refusal reaches it (probed 2026-10-30, Claude Code 2.1.314):
+
+- **Auto mode classifier:** the PermissionDenied hook fires, with the tool, its input and `reason`, the rule as the
+  classifier names it, such as `[Self-Modification]`. The full text the model saw doesn't reach the hook. Captured live.
+- **A hook's denial** (PreToolUse `permissionDecision: deny`, or a blocking exit) and **a permission rule's denial**
+  fire no hook: the call never runs, so neither PostToolUse, PostToolUseFailure nor PermissionDenied sees it. The model
+  gets an error tool_result, `PreToolUse:<tool> hook error: <reason>` or `Permission to use <tool> with ... has been
+  denied.`, so the Stop and SubagentStop handlers find these in the transcript they already read, at the end of the
+  turn or the agent. A person declining a prompt (`The user doesn't want to proceed ...`) counts as a permission
+  refusal the same way.
+
+`source` is `{ system, ref }`: `hook` for a hook's denial, else `claude-code`, and the refused tool use id. `at` is the
+refusal's own time, from the transcript for the ones found there. `agent` is the subagent whose call was refused, or
+null. `payload`:
+
+| Field | What |
+|---|---|
+| source | `classifier`, `hook` or `permission` |
+| rule | The classifier's `reason`; for a hook, the name its reason starts with (`<rule>: why`, as our hooks write them), else `<event> hook`; for a permission, `deny rule` or `person declined` |
+| textHash | sha256 of the refusal text the model saw, or null for a classifier refusal (its text doesn't reach the hook). The text itself is never kept: a permission denial's text holds the command, and a hook's may |
+| actionHash | sha256 of the tool name and its input, without a top-level `description` (the model's label, reworded freely). Two calls of the same action share it |
+| tool | The refused tool's name |
+| retryOf | The id of the latest earlier refusal in this session with the same `actionHash`, or null |
+| outcome | `denied`: the refused call did not run |
+
+A row is never changed after it is written, so whether a refusal was retried and how that ended is read forward: a
+later `refusal` whose `retryOf` is this row's id was refused again; a later `tool.call` whose `payload.retryOf` is this
+row's id ran (`ok` says whether it succeeded). `tool.call` carries `retryOf` only when its action had been refused
+before. A hook or permission refusal is journalled only at the turn's end, so a call that runs later in that same turn
+doesn't link to it; a classifier refusal links at once. The session's refusals so far (`actionHash` to row id) are
+kept in `$CCP_HARNESS_STATE/refusals-<session>.jsonl`, append-only, so each hook run can link without reading the
+journal.
 
 ## Release rows
 

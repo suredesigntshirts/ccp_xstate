@@ -13,3 +13,6 @@ One line each: what, why, which item waits. Threads add to this; the person clea
   (plan item repo-skeleton).
 - Should the v2 plugin's SessionStart hook also write the repo's settings into `~/.claude/settings.json` (taking effect from the next resume), or only check and report? A thread can't do it for itself: tried 11:34Z, refused [Self-Modification]. Until you choose, setup-script/env-bootstrap build the check only (plan/research/platform-baseline.md, "Setup script vs SessionStart").
 - Mods a thread writes load only after you answer "Turn on the mods Claude writes in this session?" in that session. So engine-host ships as an installed plugin (plan/decisions/2026-10-30-setup-script-vs-sessionstart.md); installing it to the account is yours when engine-host is ready.
+- Optional: let threads read ccp_machine's GitHub REST (attach ccp_machine to the project, or allow api.github.com for it).
+  Threads can clone it, but the proxy refuses its REST (403), so no thread can read #72's check runs. Until then the
+  rework view is proved on this repo's PRs (plan item obs-time-and-rework; `2026-10-30-obs-time-and-rework.md`).

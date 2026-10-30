@@ -46,7 +46,7 @@
     },
     {
       "id": "rework",
-      "check": "For real ccp_machine PRs (#72 and two others the verifier picks), derived rounds and red CI runs equal what GitHub's commits and check runs show",
+      "check": "For real PRs in this repo (#14, which went red seven times, and two others the verifier picks), derived rounds and red CI runs equal what GitHub's commits and check runs show. ccp_machine #72 is checked the same way once its REST is reachable from a thread",
       "how": "The verifier compares the view with GitHub REST",
       "proof": "world"
     },
