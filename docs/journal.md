@@ -66,6 +66,7 @@ after a newer one.
 | `person.message` | The person wrote in a thread or chat | `hearth`, the message id |
 | `person.tap` | The person tapped a card option | `hearth`, the card's message id |
 | `card.posted` | A decision or draft card was posted | `hearth`, the card's message id |
+| `post.sent` | The session posted a message to the person in a thread | `hearth`, the message id |
 | `brief.stored` | A brief handed to a session or subagent was stored | the store, the brief's path or id |
 | `result.stored` | A session's or subagent's result was stored | the store, the result's path or id |
 | `ci.result` | A CI run finished on a sha | `github`, the run id |
@@ -116,6 +117,31 @@ sha256 and a size. The only text kept is a subagent's brief and final answer, ea
 
 `agent.spawn` and `agent.finish` take `source.ref` from the spawning tool use id in the subagent's `meta.json`. The
 brief is the first line of the subagent's transcript; the Agent call returns it too, which is where `brief.stored` comes from.
+
+## Person rows
+
+The capture hook (plan item obs-person-attention, `plugins/harness/scripts/capture-rows.mjs`, `personOf` and
+`posted`) writes these alongside the capture rows. What the person did arrives as a hearth wake, read at
+UserPromptSubmit; what the session put in front of them is its own hearthbot tool call, read at PostToolUse. No row
+holds what anyone wrote: text is kept as a sha256 and a size.
+
+| Hook | Kind | `payload` |
+|---|---|---|
+| UserPromptSubmit | `person.message` | `thread` (the wake's thread ts), `messageId`, `reason` (the wake's reason, such as `mention`), `trigger`, `surface`, `sentAt` (the platform's time), `authorId`, `hash`, `bytes`. One per `from="human"` message in the wake; a message with no id gets a placeholder |
+| UserPromptSubmit | `person.tap` | `thread`, `cardId` (the wake's `decision_id` note), `option` (`A`, `B`, ...), `optionIndex`, `sentAt`, `authorId`. A `decision-chosen` wake makes this instead of a `person.message`; `source.ref` is the card id |
+| PostToolUse of `request_decision` or `post_widget` | `card.posted` | `thread`, `cardId` (the call's `message_id`), `card` (`decision` or `widget`), `options` (how many), `recommended`, `inputHash`, `inputBytes` |
+| PostToolUse of `post_message` | `post.sent` | `thread` (the call's `thread_id`), `messageId`, `hash`, `bytes` of the text, `attached` (how many outputs) |
+
+A card's thread is the thread of the last wake the session saw, kept in capture's state file, since
+`request_decision` returns only the card id. Messages a coordinator relays (`<cited author="user">`) are copies and
+make no row. What this misses: the person's messages in the project chat reach the coordinator, which runs no hooks;
+a card a mod posts through `$.mcp.call` is no tool call, so it has no `card.posted` (its tap still has a row); and
+checklist updates and reactions the session makes are not posts.
+
+`packages/journal/src/derive/attention.js` reads these rows into the attention view: per UTC day and per thread the
+person's messages and taps, the cards and posts, open cards and card waits (tap `sentAt` minus the card row's `at`),
+each card with its post, tap and wait, and posts (posts and cards) per thread-hour and project-hour, flagged over
+the caps of 20 per thread and 60 per project (ledger L-message-caps). A message seen on two wakes counts once by its id.
 
 ## The journal check
 
