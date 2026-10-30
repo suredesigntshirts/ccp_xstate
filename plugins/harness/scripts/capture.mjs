@@ -96,8 +96,10 @@ try {
   };
   if (event === 'SubagentStop' && input.agent_transcript_path) await settle(input.agent_transcript_path);
   const where = statePath(session);
-  const usesState = event === 'Stop';
-  const before = usesState ? loadState(where) : {};
+  // Stop keeps where it stopped reading the transcript; UserPromptSubmit keeps the thread the session was woken in,
+  // which a hearthbot call's card.posted row reads (capture-rows.mjs, personOf and posted).
+  const usesState = event === 'Stop' || event === 'UserPromptSubmit';
+  const before = usesState || event === 'PostToolUse' ? loadState(where) : {};
   const { rows, blobs, state } = capture(input, { read, state: before });
   for (const b of blobs) store(join(journalDir(), 'blobs'), b);
   for (const row of rows) append(path, { ...base, ...row });
