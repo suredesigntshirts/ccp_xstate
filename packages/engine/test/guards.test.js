@@ -25,6 +25,7 @@ const holding = (conditions) =>
   conditions.reduce((scope, c) => {
     if (typeof c === 'string') return put(scope, c, 'x');
     if ('is' in c) return put(scope, c.path, c.is);
+    if ('in' in c) return put(scope, c.path, c.in[0]);
     if ('same' in c) return put(put(scope, c.path, 's'), c.same, 's');
     if ('below' in c) return put(scope, c.path, c.below - 1);
     throw new Error(`unknown condition ${JSON.stringify(c)}`);

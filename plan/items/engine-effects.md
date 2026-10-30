@@ -4,7 +4,7 @@
   "title": "Do every outside action as a host effect: merge, post, card, timer",
   "stage": "s3-engine-skeleton",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Merging, posting, cards and timers happen only as host effects keyed by effect id. Merge uses the GitHub merge tool at verdict.sha exactly, and any merge done another way is caught by the journal check.",
   "why": "In v1, agents called gh directly and gates parsed Bash to guess intent: 73 denials for about 4 catches. GitHub's agentic workflows make agents read-only and route writes through declared outputs. v2 does the same with host effects.",
   "serves": [

@@ -30,7 +30,8 @@ const USAGE = `usage: journal-check.js --journal <root or file> [--session <sess
   --prs       GitHub's closed-PR responses saved as JSON, instead of asking GitHub (an array of PRs, or an object
               keyed by owner/name)
   --since     only merges and pr.merge rows from this time (default: the journal's first row)
-  --record    append a journal.check row with the counts to this journal file`;
+  --record    append a journal.check row with the counts to this journal file
+  --host      fail on any merge the host's merge effect didn't make (they are always listed)`;
 
 function fail(message) {
   console.error(`journal-check: ${message}\n\n${USAGE}`);
@@ -48,6 +49,7 @@ try {
       prs: { type: 'string' },
       since: { type: 'string' },
       record: { type: 'string' },
+      host: { type: 'boolean', default: false },
       json: { type: 'boolean', default: false },
       help: { type: 'boolean', default: false },
     },
@@ -131,7 +133,7 @@ try {
     }
     merges = checkMerges({ rows: journal.rows, prs, repos: args.repo, since });
   }
-  const result = { session, merges, bad, since };
+  const result = { session, merges, bad, since, host: args.host };
   const ok = clean(result);
   if (args.record) {
     append(args.record, {

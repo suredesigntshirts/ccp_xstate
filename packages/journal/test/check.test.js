@@ -94,6 +94,32 @@ test('merge-diff: a pr.merge row GitHub does not bear out is listed', () => {
   ]);
 });
 
+// The host's merge effect ending done (plan item engine-effects, packages/engine/src/effects/merge.js).
+const hostMerge = (number, sha, at = '2026-10-30T18:14:00.000Z') => ({
+  ...row('engine.effect', `it-${number}:7.merge`, {
+    effect: `it-${number}:7.merge`, type: 'run', phase: 'done', transition: `it-${number}#7`, actor: 'merge',
+    outcome: { ref: `${REPO}#${number}`, repo: REPO, number, head: 'a'.repeat(40), sha }, rule: null, reason: null,
+  }, at),
+  source: { system: 'engine', ref: `it-${number}:7.merge` }, item: `it-${number}`,
+});
+
+test('outside-merge: every merge the host merge effect did not make is listed, even one a pr.merge row explains', () => {
+  const since = '2026-10-30T16:00:00Z';
+  const rows = [merge(11, 'ec58ae8d47798a6184078e8d86c935b58f67bcd2'), hostMerge(9, prs.find((p) => p.number === 9).sha)];
+  const got = checkMerges({ rows, prs, repos: [REPO], since });
+  assert.deepEqual(got.outsideHost.map((p) => p.number), [11, 8, 7]);
+  assert.deepEqual(got.unexplained.map((p) => p.number), [8, 7]);
+  assert.equal(got.hostRows, 1);
+  assert.deepEqual(got.unfound, []);
+  assert.equal(clean({ merges: { ...got, unexplained: [] } }), true, 'listed, not failed, without host');
+  assert.equal(clean({ merges: { ...got, unexplained: [] }, host: true }), false);
+});
+
+test('outside-merge: a host merge row GitHub merged at another sha is not borne out', () => {
+  const got = checkMerges({ rows: [hostMerge(9, 'f'.repeat(40))], prs, repos: [REPO], since: '2026-10-30T16:00:00Z' });
+  assert.deepEqual(got.unfound.map((r) => r.ref), [`${REPO}#9`]);
+});
+
 test('the command: reports, exits 1 on a gap, and records a journal.check row with the counts', () => {
   const dir = temp();
   const journal = join(dir, 'session.jsonl');
@@ -111,7 +137,7 @@ test('the command: reports, exits 1 on a gap, and records a journal.check row wi
   assert.equal(rows[0].kind, 'journal.check');
   assert.deepEqual(rows[0].payload, {
     ok: false, since: '2026-10-30T16:00:00Z', journal, calls: 4, callRows: 1, missing: 1, notRun: 1, pending: 1,
-    unfoundCalls: 0, outside: 0, merges: 4, mergeRows: 1, unexplained: 3, unfoundMerges: 0, badLines: 0,
+    unfoundCalls: 0, outside: 0, merges: 4, mergeRows: 1, hostMerges: 0, unexplained: 3, outsideHost: 4, unfoundMerges: 0, badLines: 0,
   });
 });
 

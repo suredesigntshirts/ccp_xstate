@@ -30,7 +30,7 @@
       "invoke": {
         "id": "build",
         "src": "build",
-        "input": { "issue": "context.issue", "brief": "context.briefs.builder", "verdict": "context.verdict" },
+        "input": { "issue": "context.issue", "brief": "context.briefs.builder", "verdict": "context.verdict", "failure": "context.failure" },
         "onDone": {
           "target": "verifying",
           "actions": [{ "type": "set", "params": { "pr": "event.output.pr" } }, { "type": "inc", "params": "builds" }]
@@ -52,7 +52,13 @@
         ],
         "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
       },
-      "on": { "pr.pushed": { "target": "verifying", "reenter": true, "actions": [{ "type": "set", "params": { "pr.headSha": "event.headSha" } }] } }
+      "on": {
+        "pr.pushed": { "target": "verifying", "reenter": true, "actions": [{ "type": "set", "params": { "pr.headSha": "event.headSha" } }] },
+        "github.check_run.completed": [
+        { "target": "building", "guard": "redOnHead", "description": "a check went red on the PR's head, with a build left: build again with the check as the failure", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] },
+        { "target": "replanning", "guard": "redOnHead", "description": "a check went red with no build left", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] }
+      ]
+      }
     },
     "awaitingMerge": {
       "meta": { "needs": ["verifiedHead"] },
@@ -66,7 +72,13 @@
         ],
         "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
       },
-      "on": { "pr.pushed": { "target": "verifying", "actions": [{ "type": "set", "params": { "pr.headSha": "event.headSha" } }] } }
+      "on": {
+        "pr.pushed": { "target": "verifying", "actions": [{ "type": "set", "params": { "pr.headSha": "event.headSha" } }] },
+        "github.check_run.completed": [
+        { "target": "building", "guard": "redOnHead", "description": "a check went red on the PR's head, with a build left: build again with the check as the failure", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] },
+        { "target": "replanning", "guard": "redOnHead", "description": "a check went red with no build left", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] }
+      ]
+      }
     },
     "merging": {
       "meta": { "needs": ["verifiedHead", "approved"] },
@@ -109,7 +121,8 @@
       "approved": [{ "path": "context.decision.choice", "is": "approve" }],
       "replan": [{ "path": "event.output.choice", "is": "replan" }, "event.output.why"],
       "drop": [{ "path": "event.output.choice", "is": "drop" }],
-      "isMerged": ["context.merge.sha"]
+      "isMerged": ["context.merge.sha"],
+      "redOnHead": [{ "path": "event.conclusion", "in": ["failure", "timed_out"] }, { "path": "event.head_sha", "same": "context.pr.headSha" }]
     },
     "delays": { "buildTimeout": 3600000 },
     "input": {
@@ -124,7 +137,12 @@
       }
     },
     "events": {
-      "pr.pushed": { "type": "object", "required": ["headSha"], "properties": { "headSha": { "$ref": "#sha" } } }
+      "pr.pushed": { "type": "object", "required": ["headSha"], "properties": { "headSha": { "$ref": "#sha" } } },
+      "github.check_run.completed": {
+        "type": "object",
+        "required": ["check", "conclusion", "head_sha"],
+        "properties": { "check": { "type": "string", "minLength": 1 }, "conclusion": { "type": "string" }, "head_sha": { "$ref": "#sha" } }
+      }
     },
     "actors": {
       "brief": {

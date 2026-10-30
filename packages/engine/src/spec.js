@@ -6,7 +6,7 @@
 // - Context ops. Actions are { type: "set", params: { "<context path>": <path or value> } } and
 //   { type: "inc", params: "<context path>" }. Nothing else writes context.
 // - Guards. meta.guards names lists of conditions that must all hold: a path that must be present,
-//   { path, is: literal }, { path, same: otherPath } or { path, below: number }.
+//   { path, is: literal }, { path, in: [literals] }, { path, same: otherPath } or { path, below: number }.
 // - Needs. A state's meta.needs names the guards that must hold to enter it. Every transition into the
 //   state checks them, together with its own guard, against the context as the transition's actions
 //   leave it. So no state is ever entered without what it needs, and the JSON says what that is.
@@ -55,6 +55,7 @@ const holds = (condition, scope) => {
   if (typeof condition === 'string') return present(get(scope, condition));
   const value = get(scope, condition.path);
   if ('is' in condition) return value === condition.is;
+  if ('in' in condition) return condition.in.includes(value);
   if ('same' in condition) return present(value) && value === get(scope, condition.same);
   if ('below' in condition) return typeof value === 'number' && value < condition.below;
   throw new Error(`unknown condition ${JSON.stringify(condition)}`);

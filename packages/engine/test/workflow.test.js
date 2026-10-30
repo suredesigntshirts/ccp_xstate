@@ -42,8 +42,8 @@ test('context changes only through set and inc', () => {
   assert.deepEqual([...new Set(actions.map((a) => a.type))].sort(), ['inc', 'set']);
 });
 
-test('every guard condition is a path, or a path with one of is, same or below', () => {
-  const ops = ['is', 'same', 'below'];
+test('every guard condition is a path, or a path with one of is, in, same or below', () => {
+  const ops = ['is', 'in', 'same', 'below'];
   const odd = Object.entries(itemSpec.meta.guards).flatMap(([name, conditions]) =>
     conditions.filter((c) => typeof c !== 'string' && !(typeof c.path === 'string' && Object.keys(c).length === 2 && ops.some((op) => op in c))).map(() => name));
   assert.deepEqual(odd, []);
