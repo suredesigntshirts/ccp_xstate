@@ -6,8 +6,16 @@
   "status": "draft",
   "goal": "A fresh Claude Project installs the v2 plugin from this repo alone, and every session starts with its tools, rules and versions checked and recorded.",
   "gate": [
-    { "id": "fresh-install", "check": "A new thread in a new project with only this repo installs the plugin and passes its start-of-session self-check", "how": "The self-check's report in that thread, plus the recorded fingerprint" },
-    { "id": "no-self-edit", "check": "Updating the plugin never needs a thread to edit the plugin or settings it is running", "how": "An update from version N to N+1 lands through a version bump and the next session reports N+1" }
+    {
+      "id": "fresh-install",
+      "check": "A new thread in the v2 project installs the plugin and writes its fingerprint and self-check rows",
+      "how": "The two rows in the journal"
+    },
+    {
+      "id": "one-sitting",
+      "check": "Every allow rule and setting the thin path needs was placed in one sitting with one rebuild",
+      "how": "plan/decisions/person-setup-sitting.md"
+    }
   ]
 }
 ```

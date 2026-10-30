@@ -56,9 +56,13 @@ for (const p of mdFiles('stages')) {
   if (h.id !== basename(p, '.md')) fail(p, `id ${h.id} must equal the file name`);
   if (typeof h.order !== 'number') fail(p, 'order must be a number');
   if (empty(h.gate)) fail(p, 'a stage needs an exit gate');
+  for (const k of ['title', 'goal']) if (typeof h[k] !== 'string' || !h[k]) fail(p, `a stage needs ${k}`);
+  for (const [i, g] of (h.gate ?? []).entries())
+    for (const k of ['id', 'check', 'how']) if (!g?.[k]) fail(p, `gate[${i}] needs ${k}`);
   stages.set(h.id, h);
 }
 
+const isLive = (i) => !['split', 'merged', 'dropped', 'parked'].includes(i.status);
 const items = new Map();
 for (const p of mdFiles('items')) {
   const h = head(p);
@@ -79,6 +83,10 @@ for (const it of items.values()) {
   }
   for (const r of it.replaced_by ?? []) if (!items.has(r)) fail(at, `replaced by unknown item ${r}`);
   if (it.status === 'split' && empty(it.replaced_by)) fail(at, 'a split item names replaced_by');
+  if (it.status === 'merged' && !items.has(it.merged_into)) fail(at, 'a merged item names an existing merged_into');
+  if (['dropped', 'parked'].includes(it.status) && empty(it.why)) fail(at, `a ${it.status} item says why`);
+  if (isLive(it)) for (const d of it.depends_on ?? [])
+    if (items.has(d) && !isLive(items.get(d))) fail(at, `live item depends on ${d}, which is ${items.get(d).status}`);
   for (const l of it.serves ?? []) if (!ledger.has(l)) fail(at, `serves unknown ledger row ${l}`);
   for (const c of it.cases ?? []) if (!cases.has(c)) fail(at, `names unknown case ${c}`);
   if (it.status === 'ready')
@@ -102,10 +110,11 @@ if (process.argv.includes('--order')) {
   const byStage = [...stages.values()].sort((a, b) => a.order - b.order);
   for (const st of byStage) {
     console.log(`\n${st.id}: ${st.title}`);
-    const mine = [...items.values()].filter((i) => i.stage === st.id);
+    const mine = [...items.values()].filter((i) => i.stage === st.id && isLive(i));
     let left = mine.filter((i) => !done.has(i.id));
     while (left.length) {
-      const next = left.find((i) => (i.depends_on ?? []).every((d) => done.has(d) || items.get(d)?.stage !== st.id)) ?? left[0];
+      const next = left.find((i) => (i.depends_on ?? []).every((d) => done.has(d) || items.get(d)?.stage !== st.id));
+      if (!next) { fail(st.id, `no order exists for ${left.map((i) => i.id).join(', ')}`); break; }
       console.log(`  ${next.id.padEnd(32)} ${next.kind.padEnd(9)} ${next.status.padEnd(7)} after: ${(next.depends_on ?? []).join(', ') || '-'}`);
       done.add(next.id);
       left = left.filter((i) => i !== next);
@@ -115,14 +124,15 @@ if (process.argv.includes('--order')) {
 
 // --coverage lists ledger rows no item serves (rows whose fate is drop are exempt).
 if (process.argv.includes('--coverage')) {
-  const served = new Set([...items.values()].flatMap((i) => i.serves ?? []));
-  const dropped = new Set(mdFiles('ledger').flatMap((p) =>
-    [...readFileSync(join(root, p), 'utf8').matchAll(/^### (L-[a-z0-9-]+)\n[\s\S]*?\*\*Fate:\*\* drop/gm)].map((m) => m[1])));
+  const served = new Set([...items.values()].filter(isLive).flatMap((i) => i.serves ?? []));
+  // Split each ledger file into rows at its headings, so a row's fate is read from that row only.
+  const dropped = new Set(mdFiles('ledger').flatMap((p) => readFileSync(join(root, p), 'utf8').split(/^(?=### L-)/m)
+    .filter((row) => /^\*\*Fate:\*\* drop/m.test(row)).map((row) => row.match(/^### (L-[a-z0-9-]+)/)?.[1]).filter(Boolean)));
   const unserved = [...ledger].filter((l) => !served.has(l) && !dropped.has(l));
   console.log(unserved.length ? `ledger rows no item serves:\n  ${unserved.join('\n  ')}` : 'every ledger row is served');
 }
 
-const live = [...items.values()].filter((i) => !['split', 'dropped'].includes(i.status));
+const live = [...items.values()].filter(isLive);
 console.log(`${stages.size} stages, ${items.size} items (${live.length} live), ${ledger.size} ledger rows, ${cases.size} cases`);
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
 console.log('plan ok');

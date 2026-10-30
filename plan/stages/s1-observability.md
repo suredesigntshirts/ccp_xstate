@@ -1,16 +1,18 @@
 ```json
 {
   "id": "s1-observability",
-  "title": "See where time, tokens and refusals go",
+  "title": "Record every call as it happens",
   "order": 1,
   "status": "draft",
-  "goal": "Every tool call, token, refusal and wait is recorded as it happens, tagged with its session, agent and (once items exist) item and step, and a page shows it.",
+  "goal": "Every tool call, subagent, wake and turn usage, plus each worker brief and result, is in the journal while the session runs, attributed to session and agent. Views and pages wait for the widen stage.",
   "gate": [
-    { "id": "live-journal", "check": "A session's events are in the journal while it runs, with no salvage step", "how": "Compare a test session's journal with its list_events log: every tool call present" },
-    { "id": "answers", "check": "The page answers: where did the tokens go, where did the time go, what was refused and why", "how": "The person reads the page for one real session and names no missing answer" }
+    {
+      "id": "live-journal",
+      "check": "A test session's journal holds a row for every tool call in the session's own log, with no salvage step",
+      "how": "A fixture compare in obs-live-capture's tests, plus one real session compared by hand"
+    }
   ]
 }
 ```
-
-Observability comes before the engine so the engine's own build can be measured, and so v1 and v2 can be
-compared on the same numbers.
+Thin on purpose: capture now, views later. The person asked for observability before the XState work; this is the
+part of it every later item needs. Derived views and the page move to s4b-widen (plan-review finding 1).

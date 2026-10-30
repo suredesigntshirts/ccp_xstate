@@ -79,3 +79,33 @@
 **Lesson:** The platform caps messages (about 20 per thread and 60 per project per hour, verified by the person).
 **Evidence:** Library: skills-sources memory.
 **Fate:** measure. The host counts its own posts and stays under the caps.
+
+### L-spawn-ignores-cwd
+**Lesson:** A mod's `$.agent.spawn` ignores cwd (Claude Code 2.1.312), so an agent's working folder must be set by its brief.
+**Evidence:** Observed building ccp_machine PR #110 (28 Oct).
+**Fate:** test. probe-platform-baseline re-checks it, and engine-actors gives each actor its folder through the brief.
+
+### L-headless-spawn-needs-live-turn
+**Lesson:** In `claude -p`, mod spawns need a live main turn; a hook has about a 10-second budget, but `$.process.run` time doesn't count.
+**Evidence:** PR #110's headless runs (28 Oct).
+**Fate:** design. Verifier briefs that run headless sessions keep the main turn alive until spawned agents answer.
+
+### L-mods-never-store-dollar
+**Lesson:** A mod must never store or pass its `$` handle, run `claude plugin validate`, and check the plugin tests' rules before relying on `$.fs`.
+**Evidence:** The XState plan doc's "Mod rules" (28 Oct).
+**Fate:** design. A lint test in the plugin package.
+
+### L-threads-cannot-start-threads
+**Lesson:** Only the coordinator starts threads, so a thread-hosted harness uses subagents for workers, or asks the coordinator.
+**Evidence:** Audit R7, corrected: subagents were available and unused; threads can't start threads.
+**Fate:** design. Actors are subagents. Thread actors wait until a real item needs one.
+
+### L-review-footer
+**Lesson:** The session proxy appends a footer to every PR review, so any check reading a review body must allow it.
+**Evidence:** ccp_machine#61 (PR #66, two FAILs) after the first real PR hit the gate.
+**Fate:** design. The verdict gate reads the review's state and sha, and treats the footer as a named constant.
+
+### L-v1-gates-block-v2
+**Lesson:** v1's hooks refuse v2 work done in v1's project (its merge gate refused PR #110, which had no v1 item).
+**Evidence:** 28 Oct 18:50, PR #110 left unmerged.
+**Fate:** setup. v2 runs in its own project, whose environment doesn't load v1's plugin.

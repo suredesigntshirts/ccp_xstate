@@ -64,3 +64,8 @@
 **Lesson:** Every message and tap from the person is recorded. Reactions before the log began were lost.
 **Evidence:** The person's ask, 27 Oct 02:12. Kept in v1 at Library: harness/ledger/person/interactions.jsonl.
 **Fate:** measure.
+
+### L-pages-round-budget
+**Lesson:** Page work expands without bound: PR #110, built to prove the XState skeleton, spent 17 of its 23 commits on inspector polish rounds and review-lens agents, and was never merged.
+**Evidence:** git log of ccp_machine branch claude/project-thread-3kdqwr (plan-review finding 10).
+**Fate:** design. Pages come after a real item, carry a round budget, and get polish rounds only when the person asks.

@@ -5,34 +5,94 @@
   "stage": "s0-environment",
   "kind": "build",
   "status": "ready",
-  "outcome": "A JSON Schema and a tiny append library define the journal: append-only JSONL, one writer per file, every row versioned and attributed, with upcasting on read.",
+  "outcome": "A JSON Schema and a tiny append library define the journal: append-only JSONL, one writer per file (a session file, or an item file owned by one thread), every row carrying a version and its source.",
   "why": "v1's store had no schema version, so every format or rule change broke replay, and joining histories took about 15 PRs. Observability, the engine and the pages all read this format, so it comes first and is versioned from row one.",
-  "serves": ["L-version-event-schema", "L-library-mount-slow", "L-record-route-at-write", "L-placeholders-labelled", "L-older-writer-refused", "L-one-history", "L-effects-acked-once"],
-  "depends_on": ["repo-skeleton"],
+  "serves": [
+    "L-version-event-schema",
+    "L-library-mount-slow",
+    "L-record-route-at-write",
+    "L-placeholders-labelled",
+    "L-older-writer-refused",
+    "L-one-history",
+    "L-effects-acked-once"
+  ],
+  "depends_on": [
+    "repo-skeleton"
+  ],
   "inputs": [
-    { "ref": "plan/ledger/data.md", "what": "What v1's store got wrong" },
-    { "ref": "v1 packages/harness/spec/history.schema.json", "what": "v1's history row format, the closest prior art" }
+    {
+      "ref": "plan/ledger/data.md",
+      "what": "What v1's store got wrong"
+    },
+    {
+      "ref": "v1 packages/harness/spec/history.schema.json",
+      "what": "v1's history row format, the closest prior art"
+    }
   ],
   "outputs": [
-    { "ref": "packages/journal/schema/row.schema.json", "what": "Row envelope: v, id, at, kind, source {system, ref}, session, agent, item, state, release, payload" },
-    { "ref": "packages/journal/src/", "what": "append(row) to <root>/<session>.jsonl (one writer per file), read(root) merging files by time, upcast(row) per version, refuse writes from an older release" },
-    { "ref": "docs/journal.md", "what": "The kinds vocabulary (session.fingerprint, tool.call, agent.spawn, agent.finish, turn.usage, refusal, hook.run, person.message, person.tap, card.posted, brief.stored, result.stored, ci.result, page.refresh) and how to add a kind" }
+    {
+      "ref": "packages/journal/schema/row.schema.json",
+      "what": "Row envelope: v, id, at, kind, source {system, ref}, session, agent, item, state, release, payload"
+    },
+    {
+      "ref": "packages/journal/src/",
+      "what": "append(row) to one known file; readFile(path) reads one known file; readAll(root) for offline tools only, never on a hook path; refuse writes from an older release"
+    },
+    {
+      "ref": "docs/journal.md",
+      "what": "The kinds vocabulary (session.fingerprint, tool.call, agent.spawn, agent.finish, turn.usage, refusal, hook.run, person.message, person.tap, card.posted, brief.stored, result.stored, ci.result, page.refresh) and how to add a kind"
+    }
   ],
   "expect": [
-    { "id": "schema-tests", "check": "Rows of every kind validate; a row missing source or v fails", "how": "npm test -w packages/journal" },
-    { "id": "one-writer", "check": "Two sessions appending at once never interleave within a file, and read() returns both in time order", "how": "A test with two writers on a temp folder" },
-    { "id": "upcast", "check": "A v1-shaped row is upcast on read and the file on disk is unchanged", "how": "A test hashes the file before and after read" },
-    { "id": "older-writer", "check": "A writer whose release is older than the newest row's release is refused, naming both versions", "how": "Test for case C-older-writer-refused" },
-    { "id": "no-scan-on-append", "check": "append() opens exactly one file and lists no folder", "how": "A test counts fs calls with a stub" }
+    {
+      "id": "schema-tests",
+      "check": "Rows of every kind validate; a row missing source or v fails",
+      "how": "npm test -w packages/journal"
+    },
+    {
+      "id": "one-writer",
+      "check": "Two sessions appending at once never interleave within a file, and read() returns both in time order",
+      "how": "A test with two writers on a temp folder"
+    },
+    {
+      "id": "older-writer",
+      "check": "A writer whose release is older than the newest row's release is refused, naming both versions",
+      "how": "Test for case C-older-writer-refused"
+    },
+    {
+      "id": "no-scan-on-append",
+      "check": "append() opens exactly one file and lists no folder",
+      "how": "A test counts fs calls with a stub"
+    }
   ],
-  "cases": ["C-older-writer-refused"],
-  "concepts": { "adds": ["journal row", "row kind", "upcaster"], "budget": 3 },
-  "non_goals": ["No engine events yet (engine rows get kinds in stage 3)", "No v1 history import (parity stage, optional)", "No database"],
-  "records": ["Defines the record names every other item uses"],
+  "cases": [
+    "C-older-writer-refused"
+  ],
+  "concepts": {
+    "adds": [
+      "journal row",
+      "row kind"
+    ],
+    "budget": 2
+  },
+  "non_goals": [
+    "No engine events yet (engine rows get kinds in stage 3)",
+    "No v1 history import (parity stage, optional)",
+    "No database",
+    "No upcaster until the first version bump needs one"
+  ],
+  "records": [
+    "Defines the record names every other item uses"
+  ],
   "person_prereqs": [],
-  "step_back": { "max_rounds": 2, "max_tokens": 2000000 },
+  "step_back": {
+    "max_rounds": 2,
+    "max_tokens": 2000000
+  },
   "verifier": "A separate subagent on a different model, using the Verifier brief below.",
-  "risks": ["Where the journal lives in a fresh project (the Library folder chosen at install) is decided in plugin-install"]
+  "risks": [
+    "Where the journal lives in a fresh project (the Library folder chosen at install) is decided in plugin-install"
+  ]
 }
 ```
 

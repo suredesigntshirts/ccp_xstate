@@ -38,9 +38,14 @@
 ### L-xstate-version
 **Lesson:** XState 5 is stable. XState 6 brings durable execution, schemas and Stately Agent, but is alpha. v1's spec loaded on both.
 **Evidence:** 5.33.3 pinned. 6.0.0-alpha.70 loads the spec (26 Oct). @statelyai/agent 2.0 needs 6.
-**Fate:** design. Pick with a probe: write the workflow format so it loads on both, and choose the runtime when the engine stage starts.
+**Fate:** design. Pin 5.33.3, which PR #110 ran end to end with restore and stale-run refusal. A v6 spike is parked (probe-xstate-runtime) until durable execution is needed.
 
 ### L-dynamic-workflows-limits
 **Lesson:** Claude Code dynamic workflows have no mid-run input and resume only within one session, so they can't hold a long flow with human gates. They do fit one fan-out stage.
 **Evidence:** Library: external-docs/code.claude.com/docs/en/workflows.md, compared in the XState doc's "Second pass".
 **Fate:** design. XState holds the long flow. A workflow or SDK `query()` may be the executor for one stage, behind the same output schema.
+
+### L-first-item-is-product
+**Lesson:** The first real item must be product work, or the harness measures itself and calls it progress.
+**Evidence:** The first plan draft took its first real issue from ccp_xstate itself, which its own overhead rule scores as 100% harness (plan-review finding 2). v1's late days were mostly harness work about the harness.
+**Fate:** design. The first real issue and the toy run come from a product repo the person picks.

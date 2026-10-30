@@ -55,3 +55,15 @@
 ### C-stand-in-picks-legal-event
 **From:** L-stand-in-decides.
 **Given** a waiting state with a card under a grant, **when** the stand-in answers with an event that isn't legal in that state, **then** it is refused. A legal answer is journalled with the grant that covered it.
+
+### C-two-hosts-one-item
+**From:** plan-review finding 4; L-library-mount-slow (writes seen about 40 seconds late).
+**Given** an item owned by one thread, **when** another session's host receives an event for it, **then** it doesn't apply it; the event is journalled as forwarded or refused, and no effect runs twice.
+
+### C-builder-cannot-change-own-workflow
+**From:** L-builder-supplies-gate-inputs; audit R2 (the gated party changed its own rules).
+**Given** an item in progress, **when** its builder changes the item's workflow selection or the workflow file it runs, **then** the item keeps running the workflow and hash recorded when it was filed.
+
+### C-red-ci-back-to-building
+**From:** audit "what held": CI failures sent items back three times before merge.
+**Given** an item whose PR's CI goes red, **then** it can't reach merging, and it returns to building with the failing check as input.
