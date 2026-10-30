@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { REPO, RULES, setup, snapshot, temp } from '../plugins/harness/test/helpers.mjs';
+import { REPO, RULES, TEST_REF, setup, snapshot, temp } from '../plugins/harness/test/helpers.mjs';
 
 const fresh = () => {
   const home = join(temp('home'), 'home');
@@ -46,7 +46,7 @@ test('copy-not-link: the installed plugin is a copy of a commit, not the working
   assert.equal(lstatSync(dest).isSymbolicLink(), false);
   for (const p of Object.keys(snapshot(dest))) assert.equal(lstatSync(p).isSymbolicLink(), false, p);
   const release = JSON.parse(readFileSync(join(dest, 'release.json'), 'utf8'));
-  const head = execFileSync('git', ['-C', REPO, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  const head = execFileSync('git', ['-C', REPO, 'rev-parse', TEST_REF], { encoding: 'utf8' }).trim();
   assert.equal(release.tag, null);
   assert.equal(release.commit, head);
   assert.equal(release.version, JSON.parse(readFileSync(join(dest, '.claude-plugin', 'plugin.json'), 'utf8')).version);

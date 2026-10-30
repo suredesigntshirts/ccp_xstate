@@ -15,10 +15,14 @@ export const temp = (name) => mkdtempSync(join(tmpdir(), `ccp-harness-${name}-`)
 
 const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 
-/** Runs the real setup script with HOME at `home`, installing HEAD without fetching tags. Returns the log text. */
+// The commit setup.sh installs in tests: the working tree as a commit (git stash create) when it has changes,
+// else HEAD, so an uncommitted change is tested too.
+export const TEST_REF = execFileSync('git', ['-C', REPO, 'stash', 'create'], { encoding: 'utf8' }).trim() || 'HEAD';
+
+/** Runs the real setup script with HOME at `home`, installing TEST_REF without fetching tags. Returns the log text. */
 export function setup(home, extraEnv = {}) {
   const log = join(home, '..', `setup-${Date.now()}-${Math.random()}.log`);
-  execFileSync('bash', [SETUP], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: log, CCP_SETUP_FETCH: '0', CCP_SETUP_REF: 'HEAD', ...extraEnv } });
+  execFileSync('bash', [SETUP], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: log, CCP_SETUP_FETCH: '0', CCP_SETUP_REF: TEST_REF, ...extraEnv } });
   return readFileSync(log, 'utf8');
 }
 

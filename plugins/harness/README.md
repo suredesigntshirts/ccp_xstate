@@ -50,4 +50,5 @@ check is a new thread, which gets a new container where the setup script runs.
 ## Tests
 
 `test/` here and `test/setup.test.mjs` at the root run the real setup script into temp HOMEs and the hook as Claude
-Code runs it. The setup tests install the committed HEAD (`CCP_SETUP_REF=HEAD`), so commit before running them.
+Code runs it. The tests install the working tree as a commit (`git stash create`, else HEAD) through `CCP_SETUP_REF`, so an
+uncommitted change is what they test.
