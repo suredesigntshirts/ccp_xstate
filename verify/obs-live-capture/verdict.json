@@ -1,0 +1,51 @@
+{
+  "item": "obs-live-capture",
+  "verified_sha": "2cc1a1e291466c7c178f82cbdace03b32f358b9a",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5JqKM7EU4b9iF9dFTx#agent=verifier-obs-live-capture",
+    "model": "claude-sonnet-5-5"
+  },
+  "results": [
+    {
+      "id": "complete",
+      "status": "MET",
+      "command": "node --test verify/obs-live-capture/capture.test.mjs (fixture recorded by claude -p 2.1.314 with the PR plugin and a tee hook; truth taken from the transcripts)",
+      "excerpt": "8 tool_use blocks in the parent and subagent transcripts; 7 ran and 7 tool.call rows have exactly those tool_use ids, none extra, none duplicated. The 8th was blocked by Claude Code (standalone sleep) before any hook fired, so no hook-based capture can see it (noted, not counted).",
+      "mutation": "plugins/harness/scripts/capture-rows.mjs PostToolUse handler: skipped the tool.call row when tool_name is Read",
+      "red_test": "verify \"complete: one tool.call per tool call that ran, none extra\" and builder \"complete: the handlers make the expected rows\" both went red (7 failures in all)"
+    },
+    {
+      "id": "attributed",
+      "status": "MET",
+      "command": "node --test verify/obs-live-capture/capture.test.mjs; live journal of the recorded session",
+      "excerpt": "Live journal: subagent Bash and SubagentHandback rows carry agent ac494d5ec29b99e44, the parent Bash x3, Read and Agent rows carry null; test compares every row to the transcript the tool_use came from."
+    },
+    {
+      "id": "no-content",
+      "status": "MET",
+      "command": "grep -rl sk_test_VERIFY_8f3a91c2d7 <harness dir> (live run) and node --test verify/obs-live-capture/capture.test.mjs",
+      "excerpt": "The secret was in a parent Bash input. grep over the whole journal dir (rows and blobs) found 0 files. Rows hold inputHash = sha256(JSON of tool_input) and inputBytes; the test also checks no row holds any string input field longer than 6 chars."
+    },
+    {
+      "id": "blobs",
+      "status": "MET",
+      "command": "node --test verify/obs-live-capture/capture.test.mjs (sha256 recomputed from the Agent call prompt and the SubagentHandback message in the transcripts)",
+      "excerpt": "agent.spawn.briefHash = brief.stored.hash = sha256(brief); agent.finish.resultHash = result.stored.hash = sha256(answer); live run had exactly 2 files in blobs/, named by hash; replaying every event a second time through the real hook left them unchanged."
+    },
+    {
+      "id": "cheap",
+      "status": "NOT MET",
+      "command": "node --test verify/obs-live-capture/capture.test.mjs (fixture run) versus hook.run rows in two real claude -p sessions",
+      "excerpt": "Fixture run through the real hook: median 42 ms, max 59-62 ms (passes). But in the two real sessions the hook.run payload.ms median was 60 ms both times (54-73 and 54-85 ms): over the 50 ms median the line states. The fixture run is run on an idle machine, so it understates what a live session pays.",
+      "mutation": "plugins/harness/scripts/capture.mjs: added a 120 ms busy-wait at start-up",
+      "red_test": "builder \"cheap: hook.run rows show at most 50 ms median...\" (median 158 ms) and verify \"cheap (fixture run)\" (median 162) went red"
+    },
+    {
+      "id": "live",
+      "status": "MET",
+      "command": "claude -p --plugin-dir plugins/harness in a harness folder, polled with grep -c tool.call on the session file every 2 s while it ran; run once in the scratchpad and once with the journal and cwd on /mnt/project-files/verify-obs-live-capture/ (removed after); compared each row.at to the tool_result timestamp in the session transcript",
+      "excerpt": "Poll counts rose during the run (0,1,2,5,6,6...,7; the sleep-bridged last call was visible before the process exited). Every row.at was 7-72 ms BEFORE its tool_result entry in the transcript (the Agent call row came at its completion, 3.7 s after the tool_use because the call ran that long). Same on the network mount."
+    }
+  ],
+  "summary": "Used: headless claude -p 2.1.314 with --plugin-dir, three real sessions. Doubt on live: it was a headless session in this container, not a session in the v2 project judged against list_events; the transcript timestamps stand in for list_events, and the harness dir was put on the project network mount to include its latency. cheap is NOT MET on real-session evidence: median hook.run ms 60 in live sessions vs 42 in the fixture run. Known gap: a call Claude Code blocks before any hook (standalone sleep) gets no row."
+}
