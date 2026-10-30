@@ -4,9 +4,9 @@
 // becomes a null or an 'unknown', never a throw.
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { lstatSync, readdirSync, readFileSync, realpathSync } from 'node:fs';
+import { existsSync, lstatSync, readdirSync, readFileSync, realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { release, repoDir } from './host.mjs';
 
 export const DEPTH_ENV = 'CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH';
@@ -88,6 +88,49 @@ function inside(child, parent) {
   }
 }
 
+// A file reference the plugin's code makes to another of its files: a relative static or dynamic import, or a
+// new URL(..., import.meta.url).
+const CODE_REF = /(?:\bfrom\s*|\bimport\s*\(\s*|\bnew URL\(\s*)(['"])(\.{1,2}\/[^'"]+)\1/g;
+
+/**
+ * The files the plugin needs and which of them are missing: { checked, missing: [{ file, by }] }, paths relative to
+ * `root`. It starts from what Claude Code reads (plugin.json, hooks.json and each command in it, each skill and the
+ * scripts it names), plus the bundled journal in an installed copy, and follows every relative import from there.
+ * A file deleted from the plugin, or lost from an installed copy, is named here (plan item clean-room-install-test).
+ */
+export function neededFiles(root, installed = false) {
+  const missing = [], seen = new Set();
+  const read = (path) => {
+    try {
+      return readFileSync(path, 'utf8');
+    } catch {
+      return '';
+    }
+  };
+  const need = (path, by) => {
+    const file = relative(root, path);
+    if (seen.has(file)) return;
+    seen.add(file);
+    if (!existsSync(path)) return missing.push({ file, by });
+    if (/\.(mjs|js)$/.test(path)) for (const m of read(path).matchAll(CODE_REF)) need(resolve(dirname(path), m[2]), file);
+  };
+  need(join(root, '.claude-plugin', 'plugin.json'), 'Claude Code');
+  const hooks = join(root, 'hooks', 'hooks.json');
+  need(hooks, 'Claude Code');
+  for (const m of read(hooks).matchAll(/\$\{CLAUDE_PLUGIN_ROOT\}\/([^"\s\\]+)/g)) need(join(root, m[1]), 'hooks/hooks.json');
+  let skills = [];
+  try {
+    skills = readdirSync(join(root, 'skills')).toSorted();
+  } catch {}
+  for (const name of skills) {
+    const skill = join(root, 'skills', name, 'SKILL.md');
+    need(skill, 'Claude Code');
+    for (const m of read(skill).matchAll(/<this skill's base directory>\/([^"\s`]+)/g)) need(resolve(dirname(skill), m[1]), relative(root, skill));
+  }
+  if (installed) need(join(root, 'lib', 'journal', 'src', 'index.js'), 'scripts/host.mjs');
+  return { checked: seen.size, missing };
+}
+
 /** Everything the fingerprint and the self-check need, from the hook's input and the machine. */
 export async function collect({ input = {}, env = process.env, root, home = env.HOME || homedir() } = {}) {
   const plugin = release(root);
@@ -107,6 +150,7 @@ export async function collect({ input = {}, env = process.env, root, home = env.
     home,
     repo,
     plugin,
+    files: neededFiles(plugin.root, plugin.installed),
     pluginIsLink: link,
     pluginInRepo: inside(plugin.root, repo),
     latest,
