@@ -91,6 +91,13 @@ version on origin, or `none` or `unknown`), `settings` (`present`, `missing` or 
 with status `pass`, `fail` or `unknown`. An unknown doesn't fail the check. A failure's `detail` is one plain
 sentence saying what is wrong and what to do. The ids: `settings`, `rules`, `depth`, `copy`, `release`, `journal`.
 
+## Release rows
+
+`.github/workflows/release.yml` (plan item self-update-by-version) makes one `ci.result` row per push to `main` and
+puts it in the release tag's annotation and the run's summary. `source` is `github` and the run id, `session` is the
+run's URL. `payload`: `workflow` (`release`), `sha`, `result` (`released` or `skipped`), `reason`, `tag`, `version`,
+`previous` (the newest release before it, or null) and `changed` (the released files that changed).
+
 ## Adding a kind
 
 1. Add it to `KINDS` in `packages/journal/src/kinds.js` (dotted lower-case words). `append()` refuses kinds not on

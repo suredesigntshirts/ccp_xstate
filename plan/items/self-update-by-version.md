@@ -4,7 +4,7 @@
   "title": "Update the harness by releasing a version, never by editing the running plugin",
   "stage": "s0-environment",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A merged plugin change becomes a numbered release, the next session in the project loads it, and its fingerprint shows the new release; no session edits the plugin it runs.",
   "why": "Auto mode refuses a thread editing the plugin or settings it runs, and plugins load only at session start. So self-update has to be a release that the next session picks up, with the fingerprint proving it. The person chose full observability and environment before XState (30 Oct), so this lands in stage 0.",
   "serves": [

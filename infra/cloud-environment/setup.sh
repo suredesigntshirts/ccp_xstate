@@ -8,6 +8,11 @@
 #    when there is no release yet, at ~/.claude/skills/ccp-harness, where Claude Code loads it as a plugin. It is
 #    extracted from git, never linked to the working tree, so editing plugins/ changes nothing a session runs.
 #    packages/journal is bundled at lib/journal, and release.json says what the copy was built from.
+#    The copy's plugin.json carries the release's version (the tag is the version; plan item self-update-by-version).
+#    Run from inside a Claude Code session with that session's HOME, it leaves the installed copy alone, because a
+#    session must never edit the plugin it runs (ledger L-no-self-modification); the next container gets the update.
+# 0. Before all that, fast-forwards the clone to origin/main when that is safe: tracked files clean, and HEAD is a
+#    branch tracking origin/main or detached at an ancestor of it. Otherwise it leaves the clone and says why.
 # 3. Logs the names of the environment variables, never their values.
 # Running it again gives the same ~/.claude files. Log: $CCP_SETUP_LOG (default /tmp/ccp-xstate-setup.log).
 # Tests only: CCP_SETUP_FETCH=0 skips fetching release tags from origin, and CCP_SETUP_REF installs that ref
@@ -19,6 +24,25 @@ dest="$HOME/.claude/skills/$plugin"
 {
   echo "== setup start $(date -u +%Y-%m-%dT%H:%M:%SZ) repo $(git -C "$repo" log --oneline -1 2>&1)"
   mkdir -p "$HOME/.claude/skills"
+
+  # 0. Fast-forward a clean clone.
+  if [ "${CCP_SETUP_FETCH:-1}" != 0 ]; then
+    g() { git -C "$repo" "$@"; }
+    branch=$(g symbolic-ref -q --short HEAD)
+    if [ -n "$(g status --porcelain --untracked-files=no)" ]; then
+      echo "clone not fast-forwarded: it has uncommitted changes"
+    elif [ -n "$branch" ] && [ "$(g rev-parse --abbrev-ref "$branch@{upstream}" 2>/dev/null)" != origin/main ]; then
+      echo "clone not fast-forwarded: branch $branch does not track origin/main"
+    elif ! timeout 20 git -C "$repo" fetch -q origin main 2>&1; then
+      echo "clone not fast-forwarded: git fetch origin main failed"
+    elif ! g merge-base --is-ancestor HEAD FETCH_HEAD; then
+      echo "clone not fast-forwarded: HEAD is not an ancestor of origin/main"
+    elif [ -n "$branch" ]; then
+      g merge -q --ff-only FETCH_HEAD && echo "clone fast-forwarded: $branch at $(g rev-parse --short HEAD)"
+    else
+      g checkout -q --detach FETCH_HEAD && echo "clone fast-forwarded: detached at $(g rev-parse --short HEAD)"
+    fi
+  fi
 
   # 1. Settings.
   python3 - "$repo/.claude/settings.json" "$HOME/.claude/settings.json" <<'PY'
@@ -61,15 +85,29 @@ PY
 import json, os, sys
 root, tag, commit = sys.argv[1], sys.argv[2] or None, sys.argv[3]
 files = sorted(os.path.relpath(os.path.join(d, f), root) for d, _, fs in os.walk(root) for f in fs)
-manifest = json.load(open(os.path.join(root, '.claude-plugin', 'plugin.json')))
+path = os.path.join(root, '.claude-plugin', 'plugin.json')
+manifest = json.load(open(path))
+if tag:
+    manifest['version'] = tag[len('harness-v'):]
+    with open(path, 'w') as f:
+        json.dump(manifest, f, indent=2)
+        f.write('\n')
 with open(os.path.join(root, 'release.json'), 'w') as f:
     json.dump({'name': manifest['name'], 'version': manifest['version'], 'tag': tag, 'commit': commit, 'files': files}, f, indent=2)
     f.write('\n')
 print('plugin', manifest['name'], manifest['version'], 'from', tag or 'HEAD (no release tag yet)', commit[:12], '-', len(files), 'files')
 PY
-    rm -rf "$dest.old"
-    [ -e "$dest" ] || [ -L "$dest" ] && mv "$dest" "$dest.old"
-    mv "$work/out" "$dest" && rm -rf "$dest.old" && echo "installed $dest"
+    running=""
+    if [ -n "$CLAUDE_PID" ] && [ -r "/proc/$CLAUDE_PID/environ" ]; then
+      running=$(tr '\0' '\n' < "/proc/$CLAUDE_PID/environ" | sed -n 's/^HOME=//p' | head -1)
+    fi
+    if [ -n "$running" ] && [ "$running" = "$HOME" ] && [ -e "$dest" ]; then
+      echo "plugin not replaced: Claude Code (pid $CLAUDE_PID) is running from this HOME and may run $dest; the next container installs it"
+    else
+      rm -rf "$dest.old"
+      [ -e "$dest" ] || [ -L "$dest" ] && mv "$dest" "$dest.old"
+      mv "$work/out" "$dest" && rm -rf "$dest.old" && echo "installed $dest"
+    fi
   else
     echo "plugin not installed: could not extract plugins/harness at ${ref}"
   fi
