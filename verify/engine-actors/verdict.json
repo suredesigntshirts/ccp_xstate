@@ -1,6 +1,6 @@
 {
   "item": "engine-actors",
-  "verified_sha": "2fbce741ca00cdfa18b5ddbaee40e78e88ea457d",
+  "verified_sha": "8864fa0200ffa01c095bce75df8ce21223190a51",
   "verifier": {
     "session": "https://claude.ai/code/session_01KfkB5FFmAjGNGDNY1q92cG#agent=verifier-engine-actors",
     "model": "claude-sonnet-5-5"
@@ -30,7 +30,7 @@
       "id": "github-fact",
       "status": "MET",
       "command": "real headless `claude -p --plugin-dir plugins/harness --permission-mode auto` runs (claude 2.1.314) on item va2 (quick-fix) with scratch repo clone and ccp_xstate_scratch PR #20 (head b7a9153721bfa3e71970dd2e8236b9e52998eb55); evidence in verify/engine-actors/evidence/. Case C-claimed-pr-not-on-github: the toy builder (run va2:1.build) returned (1) a made-up PR .../pull/9999, (2) the real PR .../pull/20 with head 2222..., then (3) the real head. Offline: node --test verify/engine-actors/actors.test.mjs with a local REST server.",
-      "excerpt": "Refusals (rule github-fact, journalled): \"result.pr: https://github.com/suredesigntshirts/ccp_xstate_scratch/pull/9999: GitHub shows no such PR\" and \"result.pr: GitHub shows .../pull/20 at head b7a9153721bfa3e71970dd2e8236b9e52998eb55, not the claimed 2222222222222222222222222222222222222222\". No engine.transition between those rows and the accepted return (state \"building\" on the refusal rows); only the real head was stored and the item moved to verifying. Caveat/bug: a build result whose url is not shaped /pull/N (e.g. https://example.com/not-a-pr) is accepted without any GitHub check (claimedPrs requires /pull/\\d+; schema only requires a string), see test `finding:`; the Expect as written (a claimed PR) holds."
+      "excerpt": "Refusals (rule github-fact, journalled): \"result.pr: https://github.com/suredesigntshirts/ccp_xstate_scratch/pull/9999: GitHub shows no such PR\" and \"result.pr: GitHub shows .../pull/20 at head b7a9153721bfa3e71970dd2e8236b9e52998eb55, not the claimed 2222222222222222222222222222222222222222\". No engine.transition between those rows and the accepted return (state \"building\" on the refusal rows); only the real head was stored and the item moved to verifying. Re-checked at 8864fa0: claimedPrs now treats any {url, headSha} as a claim; a non-PR url (https://example.com/not-a-pr, .../issues/5) is refused as github-fact \"is not a GitHub PR URL\" and the item stays in building (test \"a build result whose url is not shaped /pull/N is refused\"). The world run was at 2fbce74; the change touches only claimedPrs, so it was not re-run."
     },
     {
       "id": "own-folder",

@@ -107,14 +107,16 @@ test('github-fact: made-up PR, real PR at the wrong head, wrong branch: refused 
   }
 });
 
-test('finding: a build result whose url is not shaped /pull/N skips the GitHub check (schema only asks for a string)', async () => {
+test('a build result whose url is not shaped /pull/N is refused as github-fact, and the item stays in building', async () => {
   const root = await building();
   const gh = await fakeGitHub();
   try {
-    const got = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(HEAD, 'https://example.com/not-a-pr', 'anything'), github: gh.client });
-    // Recorded as an observed gap, not as intended behaviour: if the builder closes it, this flips to a refusal.
-    assert.ok(got.accepted || got.refused.rule === 'github-fact', JSON.stringify(got));
-    console.log('non-PR url outcome:', got.accepted ? 'ACCEPTED unchecked' : `refused ${got.refused.rule}`);
+    for (const url of ['https://example.com/not-a-pr', 'https://github.com/o/r/issues/5']) {
+      const got = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(HEAD, url, 'anything'), github: gh.client });
+      assert.equal(got.refused?.rule, 'github-fact', JSON.stringify(got));
+      assert.match(got.refused.reason, /is not a GitHub PR URL/);
+    }
+    assert.equal(stateOf(root), 'building');
   } finally {
     await gh.close();
   }
