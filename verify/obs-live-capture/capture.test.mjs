@@ -4,13 +4,13 @@
 // the builder's expected rows.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { capture, read } from '../../plugins/harness/scripts/capture-rows.mjs';
+import { capture, handedBack, read } from '../../plugins/harness/scripts/capture-rows.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIX = join(HERE, 'fixture');
@@ -164,4 +164,31 @@ test('cheap (fixture run): median hook.run ms minus a bare node start <= 50 ms, 
   assert.ok(med(ms) - med(base) <= 50, msg);
   assert.ok(ms[Math.ceil(0.95 * ms.length) - 1] <= 200, msg);
   console.log(msg);
+});
+
+// SubagentStop's early exit (b95097e): the hook may stop waiting only when the transcript ends with the result of the
+// agent's own SubagentHandback call. Written by the verifier after a mutation that ignored the id match survived.
+test('early settle: a tail ending in another call\'s result is not a hand-back, and a late hand-back is still captured', async () => {
+  const lines = readFileSync(join(FIX, 'session', 'subagents', SUB), 'utf8').trim().split('\n');
+  const swapped = lines.map((l, i) => (i === lines.length - 1 ? l.replace(/"tool_use_id":"[^"]+"/, '"tool_use_id":"toolu_other"') : l));
+  assert.equal(handedBack(lines.join('\n')), true);
+  assert.equal(handedBack(swapped.join('\n')), false, 'the hand-back call is there but the last result is not its own');
+  // Real hook, transcript cut before the hand-back call, which lands 120 ms after the hook starts (the live race).
+  const dir = mkdtempSync(join(tmpdir(), 'verify-late-'));
+  execFileSync(process.execPath, [join(PLUGIN, 'scripts', 'install.mjs')], { env: { PATH: process.env.PATH, CCP_HARNESS_DIR: dir } });
+  const sub = join(dir, 'agent.jsonl');
+  writeFileSync(sub, `${lines.slice(0, 4).join('\n')}\n`);
+  const ev = events(FIX).find((e) => e.hook_event_name === 'SubagentStop');
+  ev.agent_transcript_path = sub;
+  const env = { PATH: process.env.PATH, CCP_HARNESS_DIR: dir, CCP_HARNESS_STATE: join(dir, 'state') };
+  setTimeout(() => appendFileSync(sub, `${lines.slice(4).join('\n')}\n`), 120);
+  const child = spawn(process.execPath, [join(PLUGIN, 'scripts', 'capture.mjs')], { env });
+  child.stdin.end(JSON.stringify(ev));
+  assert.equal(await new Promise((ok) => child.on('close', ok)), 0);
+  const rows = jsonl(join(dir, 'journal', 'sessions', `${ev.session_id}.jsonl`));
+  const fin = rows.find((x) => x.kind === 'agent.finish');
+  const answer = JSON.parse(lines[4]).message.content.find((c) => c.name === 'SubagentHandback').input.message;
+  assert.equal(rows.find((x) => x.kind === 'result.stored')?.payload.hash, sha(answer));
+  assert.equal(fin.payload.resultHash, sha(answer));
+  assert.ok(fin.payload.tokens.output > 0);
 });
