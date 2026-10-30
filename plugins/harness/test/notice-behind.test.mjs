@@ -81,3 +81,10 @@ test('no-self-edit: the notice hook writes nothing under the plugin root it runs
   assert.ok(r.stdout);
   assert.deepEqual(snapshot(INSTALLED), before);
 });
+
+test('behind-notice: a newer release published as a branch release/harness-v<x.y.z> is noticed too', () => {
+  const dir = project(), state = temp('state');
+  const repo = fakeRepo({ tags: [VERSION] });
+  execFileSync('git', ['-C', repo, 'push', '-q', 'origin', 'HEAD:refs/heads/release/harness-v0.9.1']);
+  assert.match(prompt({ dir, state, repo }), /but 0\.9\.1 \(harness-v0\.9\.1\) is out/);
+});

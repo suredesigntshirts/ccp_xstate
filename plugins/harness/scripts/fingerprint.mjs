@@ -32,16 +32,17 @@ export async function claudeVersion(ms = 1000) {
 }
 
 /**
- * The newest release tag on the repo's origin: { state: 'found', tag, version }, { state: 'none' } when origin has
- * no release tag, or { state: 'unknown' } when origin can't be asked within `ms`.
+ * The newest release on the repo's origin, a tag harness-v<x.y.z> or a branch release/harness-v<x.y.z>:
+ * { state: 'found', tag, version } (tag is the release's name), { state: 'none' } when origin has no release, or
+ * { state: 'unknown' } when origin can't be asked within `ms`.
  */
 export async function latestRelease(repo, ms = 2000) {
   const out = await Promise.race([
-    run('git', ['-C', repo, 'ls-remote', '--tags', 'origin', `refs/tags/${TAG_PREFIX}*`], ms),
+    run('git', ['-C', repo, 'ls-remote', 'origin', `refs/tags/${TAG_PREFIX}*`, `refs/heads/release/${TAG_PREFIX}*`], ms),
     new Promise((ok) => setTimeout(ok, ms + 100, null).unref())
   ]);
   if (out === null) return { state: 'unknown' };
-  const versions = [...out.matchAll(new RegExp(`refs/tags/${TAG_PREFIX}(\\d+\\.\\d+\\.\\d+)$`, 'gm'))].map((m) => m[1]);
+  const versions = [...out.matchAll(new RegExp(`refs/(?:tags|heads/release)/${TAG_PREFIX}(\\d+\\.\\d+\\.\\d+)$`, 'gm'))].map((m) => m[1]);
   if (!versions.length) return { state: 'none' };
   const newest = versions.sort(byVersion).at(-1);
   return { state: 'found', tag: `${TAG_PREFIX}${newest}`, version: newest };

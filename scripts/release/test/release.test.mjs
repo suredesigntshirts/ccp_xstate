@@ -1,12 +1,13 @@
 // The release rules (scripts/release/release.mjs), run against temp git repos.
-// Expect line release (plan item self-update-by-version): a push touching the plugin makes a higher tag, others don't.
+// Expect line release (plan item self-update-by-version): a merge touching the plugin makes a higher release (a tag or
+// a release/ branch), others don't.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { compare, newestTag, nextVersion, plan, row, tag } from '../release.mjs';
+import { branch, compare, newestTag, nextVersion, plan, row, tag } from '../release.mjs';
 import { validate } from '../../../packages/journal/src/index.js';
 
 const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
@@ -123,5 +124,46 @@ test('release: the next version is always above the newest', () => {
     }
   }
   assert.equal(nextVersion(null, '0.1.0'), '0.1.0');
-  assert.deepEqual(newestTag(['harness-v0.9.0', 'harness-v0.10.0', 'other', 'harness-vx']), { tag: 'harness-v0.10.0', version: '0.10.0' });
+  assert.deepEqual(newestTag(['harness-v0.9.0', 'harness-v0.10.0', 'other', 'harness-vx']), { tag: 'harness-v0.10.0', version: '0.10.0', ref: 'harness-v0.10.0' });
+});
+
+const releases = (cwd) => git(cwd, 'for-each-ref', '--format=%(refname)', 'refs/tags/harness-v*', 'refs/heads/release/harness-v*').split('\n').filter(Boolean);
+
+test('release: a thread release is a branch release/harness-v<x.y.z>, pushed to origin with its ci.result row', () => {
+  const cwd = repo('0.1.0');
+  const before = git(cwd, 'rev-parse', 'HEAD');
+  write(cwd, 'plugins/harness/scripts/a.mjs', 'x');
+  const sha = commit(cwd, 'x');
+  const d = plan({ cwd, sha, before });
+  const r = branch(d, { cwd, push: true, env: { CLAUDE_CODE_REMOTE_SESSION_ID: 'cse_01Ab' } });
+  assert.deepEqual(validate(r), []);
+  assert.deepEqual(r.source, { system: 'git', ref: 'release/harness-v0.1.0' });
+  assert.equal(r.session, 'https://claude.ai/code/session_01Ab');
+  assert.match(git(cwd, 'ls-remote', 'origin'), new RegExp(`^${sha}\\s+refs/heads/release/harness-v0\\.1\\.0$`, 'm'));
+  assert.deepEqual(releases(cwd), ['refs/heads/release/harness-v0.1.0']);
+});
+
+test('release: tags and release branches count as one series; the next is above both, and none is made twice', () => {
+  const cwd = repo('0.1.0');
+  const step = (path, make) => {
+    const before = git(cwd, 'rev-parse', 'HEAD');
+    write(cwd, path, String(Math.random()));
+    const d = plan({ cwd, sha: commit(cwd, path), before });
+    make(d, { cwd, env: {} });
+    return d;
+  };
+  assert.equal(step('plugins/harness/a.mjs', branch).tag, 'harness-v0.1.0');
+  assert.equal(step('plugins/harness/a.mjs', tag).tag, 'harness-v0.1.1');
+  assert.equal(step('packages/journal/src/index.js', branch).tag, 'harness-v0.1.2');
+  assert.equal(step('docs/a.md', branch).release, false);
+  const head = git(cwd, 'rev-parse', 'HEAD');
+  write(cwd, 'plugins/harness/b.mjs', 'b');
+  const sha = commit(cwd, 'b');
+  tag(plan({ cwd, sha, before: head }), { cwd, env: {} });
+  const again = plan({ cwd, sha });
+  assert.equal(again.release, false);
+  assert.match(again.reason, /already released as harness-v0\.1\.3/);
+  // origin's release branches, as a fetch leaves them, count too
+  git(cwd, 'update-ref', 'refs/remotes/origin/release/harness-v0.4.0', sha);
+  assert.equal(plan({ cwd, sha: head }).latest, '0.4.0');
 });

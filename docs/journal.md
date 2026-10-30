@@ -93,9 +93,10 @@ sentence saying what is wrong and what to do. The ids: `settings`, `rules`, `dep
 
 ## Release rows
 
-`.github/workflows/release.yml` (plan item self-update-by-version) makes one `ci.result` row per push to `main` and
-puts it in the release tag's annotation and the run's summary. `source` is `github` and the run id, `session` is the
-run's URL. `payload`: `workflow` (`release`), `sha`, `result` (`released` or `skipped`), `reason`, `tag`, `version`,
+`scripts/release/release.mjs` (plan item self-update-by-version) makes one `ci.result` row per release run. From a
+thread, `source` is `git` and the release branch (or the sha when nothing was released) and `session` the thread's
+Claude-Session; the thread journals it. From `.github/workflows/release.yml`, `source` is `github` and the run id,
+`session` the run's URL, and the row is in the tag's annotation and the run's summary. `payload`: `workflow` (`release`), `sha`, `result` (`released` or `skipped`), `reason`, `tag`, `version`,
 `previous` (the newest release before it, or null) and `changed` (the released files that changed).
 
 ## Adding a kind

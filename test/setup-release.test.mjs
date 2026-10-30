@@ -127,3 +127,16 @@ test('no-self-edit: setup leaves the plugin alone while Claude Code runs from th
     claude.kill();
   }
 });
+
+test('release: a release branch on origin counts like a tag, and the newer of the two by version is installed', () => {
+  const cwd = clone(['0.2.0']);
+  const sha = advance(cwd);
+  const origin = git(cwd, 'remote', 'get-url', 'origin');
+  execFileSync('git', ['--git-dir', origin, 'update-ref', 'refs/heads/release/harness-v0.2.1', sha]);
+  const r = run(cwd);
+  assert.equal(r.release.tag, 'harness-v0.2.1');
+  assert.equal(r.manifest.version, '0.2.1');
+  assert.equal(r.release.commit, sha);
+  execFileSync('git', ['--git-dir', origin, 'update-ref', 'refs/tags/harness-v0.10.0', sha]);
+  assert.equal(run(cwd).manifest.version, '0.10.0');
+});

@@ -39,7 +39,7 @@ export const CHECKS = {
   release(f) {
     const mine = f.plugin.version;
     if (f.latest.state === 'unknown') return unknown('release', `The newest release could not be read from origin in time, so release ${mine} was not compared with it.`);
-    if (f.latest.state === 'none') return unknown('release', `Origin has no harness release tag yet, so release ${mine} (commit ${f.plugin.commit ?? 'unknown'}) was not compared with one.`);
+    if (f.latest.state === 'none') return unknown('release', `Origin has no harness release yet, so release ${mine} (commit ${f.plugin.commit ?? 'unknown'}) was not compared with one.`);
     if (byVersion(mine, f.latest.version) < 0) {
       return fail('release', `This session runs release ${mine} but ${f.latest.version} is out, so it runs older code; a new thread will load the newer release.`);
     }
