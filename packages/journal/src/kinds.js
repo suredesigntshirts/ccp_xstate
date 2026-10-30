@@ -20,4 +20,5 @@ export const KINDS = Object.freeze([
   'wake',
   'pr.merge',
   'journal.check',
+  'tripwire',
 ]);
