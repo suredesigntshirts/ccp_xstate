@@ -22,7 +22,9 @@ const sha16 = (text) => createHash('sha256').update(text).digest('hex').slice(0,
  */
 export function wakesIn(text) {
   const wakes = [];
-  for (const [, head, body] of String(text).matchAll(/<wake ([^>]*)>([\s\S]*?)<\/wake>/g)) {
+  // Only a wake that starts a line counts. The platform writes its envelopes at column zero; text an agent wrote that
+  // reaches a prompt (a subagent's report) is indented by the harness, so a wake-shaped line inside it is not read.
+  for (const [, head, body] of String(text).matchAll(/(?:^|\n)<wake ([^>]*)>([\s\S]*?)<\/wake>/g)) {
     const { reason = null, 'current-time': currentTime = null } = attrs(head);
     const github = [...body.matchAll(/<event ([^>]*)>([\s\S]*?)<\/event>/g)]
       .map(([, eventHead, eventBody]) => ({ ...attrs(eventHead), json: eventBody.replace(/<!--[\s\S]*?-->/g, '').trim() }))
@@ -40,12 +42,12 @@ export function wakesIn(text) {
     wakes.push({ reason, currentTime, github, notes, tasks: tasksIn(body) });
   }
   // A task notification can arrive outside any <wake> (a subagent's report), so it is read from the whole text.
-  if (!wakes.length && /<task-notification>/.test(text)) wakes.push({ reason: 'task-notification', currentTime: null, github: [], notes: {}, tasks: tasksIn(text) });
+  if (!wakes.length && /(?:^|\n)<task-notification>/.test(text)) wakes.push({ reason: 'task-notification', currentTime: null, github: [], notes: {}, tasks: tasksIn(text) });
   return wakes;
 }
 
 const tasksIn = (text) =>
-  [...String(text).matchAll(/<task-notification>([\s\S]*?)<\/task-notification>/g)].map(([, body]) => ({
+  [...String(text).matchAll(/(?:^|\n)\s{0,2}<task-notification>([\s\S]*?)<\/task-notification>/g)].map(([, body]) => ({
     id: body.match(/<task-id>([^<]*)<\/task-id>/)?.[1]?.trim() ?? null,
     status: body.match(/<status>([^<]*)<\/status>/)?.[1]?.trim() ?? null
   }));
@@ -64,10 +66,12 @@ const tasksIn = (text) =>
  * A run is found by the ref its run effect's outcome recorded (the card id, the task id). A tap or task that matches
  * no run of this item offers nothing.
  */
-export function inputsOfWake(host, text, { now = null } = {}) {
+export function inputsOfWake(host, text, { now = new Date().toISOString() } = {}) {
   const inputs = [];
   for (const wake of wakesIn(text)) {
-    const at = wake.currentTime ? new Date(wake.currentTime).toISOString() : (now ?? new Date().toISOString());
+    // A wake's time never runs ahead of this host's clock, so no envelope can make a timer due early.
+    const stated = Date.parse(wake.currentTime);
+    const at = new Date(Number.isNaN(stated) ? Date.parse(now) : Math.min(stated, Date.parse(now))).toISOString();
     for (const { kind, json, data } of wake.github) {
       if (!kind || !data || typeof data !== 'object') continue;
       inputs.push({ event: { ...data, type: `github.${kind}` }, source: { system: 'github', ref: `${kind} ${sha16(`${kind}\n${json}`)}` }, at });

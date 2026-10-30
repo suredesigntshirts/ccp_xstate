@@ -29,3 +29,24 @@
   mount hasn't shown the first row yet but the file exists, the item counts as owned by someone else.
 - **Not observed live.** This thread's container resumed the 16:46Z snapshot with ccp-harness 0.1.0 (see the s1 gate,
   PR #39), so its own tool calls were not captured. The world proof (two sessions on the Library mount) runs headless.
+
+## Round 2, after the verifier's NOT MET on no-agent-events
+
+The verifier showed `bin/host.js wake` read a wake from any text on stdin: a Bash result holding a wake-shaped string
+with a far-future `current-time` fired the build timer. Fixed at the root, in where wake text may come from:
+
+- **Only the platform's envelopes.** `wake` reads a UserPromptSubmit prompt, or a ReadNotifications result's
+  notifications whose `origin` is `github_webhook`, and nothing from any other tool. `wakesIn` reads only a `<wake>`
+  that starts a line: the platform writes envelopes at column zero, and the harness indents a subagent's report, so
+  a wake quoted inside agent text is not read.
+- **A wake can't move the clock.** Its `current-time` is capped at the host's own clock, so no envelope makes a
+  timer due early.
+- **What stays open, on purpose:** an agent with a shell can still run `bin/host.js` with stdin it typed, just as it
+  can append journal rows by hand. No tool or file the agent is given sets a source, but every agent acts as the same
+  account with the same shell (ledger L-same-account-everywhere). The toy run's check that every transition's source
+  is a wake, completion or timer, and the journal check against the world, are what catch a hand-typed one.
+- **A refused source stays seen.** A GitHub event the workflow didn't take is the same fact if GitHub redelivers it,
+  so the redelivery is a duplicate. A new fact (a new push, a new check run) has a new source.
+- **quick-fix takes no GitHub event yet.** `pr.pushed` has no wake that makes it; engine-effects maps red CI and
+  pushes to workflow events.
+- `bin/host.js` prints a journal refusal (an older writer) as one line and exits 2.

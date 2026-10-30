@@ -6,9 +6,11 @@
 //   host.js show  --item <id> --workflow <name> [--root <dir>]
 //
 // wake reads a Claude Code hook's input on stdin: UserPromptSubmit (the wake is its prompt) or PostToolUse of
-// ReadNotifications (the wakes are in its result). The session is the hook input's session_id. Nothing on the
-// command line can name an event or its source: those come only from the wake text. No effect handlers run here yet
-// (engine-effects and engine-actors add them), so effects stay pending and are printed.
+// ReadNotifications, where only notifications GitHub's webhook delivered are read. Any other tool's output is
+// ignored, whatever it contains. The session is the hook input's session_id. Nothing on the command line can name an
+// event or its source: those come only from the wake text. What this cannot stop: an agent with a shell can run this
+// command with stdin it typed, as it can append rows by hand (ledger L-same-account-everywhere); the decision says so.
+// No effect handlers run here yet (engine-effects and engine-actors add them), so effects stay pending and are printed.
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { loadWorkflow } from '../src/index.js';
@@ -30,10 +32,18 @@ const { positionals: [command], values: opts } = parseArgs({
 const manifestRelease = () =>
   JSON.parse(readFileSync(new URL('../../../plugins/harness/.claude-plugin/plugin.json', import.meta.url), 'utf8')).version;
 
-// Every string inside a hook input's prompt or tool result, joined: a ReadNotifications result holds its wakes as
-// strings nested in JSON.
-const textsOf = (value) =>
-  typeof value === 'string' ? [value] : value && typeof value === 'object' ? Object.values(value).flatMap(textsOf) : [];
+// The wake text a hook input carries: a UserPromptSubmit's prompt, or the bodies of the GitHub notifications in a
+// ReadNotifications result. Nothing else.
+const wakeTextOf = (hook) => {
+  if (hook.hook_event_name === 'UserPromptSubmit') return typeof hook.prompt === 'string' ? hook.prompt : '';
+  if (hook.hook_event_name !== 'PostToolUse' || hook.tool_name !== 'ReadNotifications') return '';
+  const notifications = hook.tool_response?.notifications;
+  if (!Array.isArray(notifications)) return '';
+  return notifications
+    .filter((n) => n?.origin === 'github_webhook' && typeof n.content === 'string')
+    .map((n) => n.content)
+    .join('\n');
+};
 
 const fail = (message) => {
   console.error(`host: ${message}`);
@@ -50,11 +60,14 @@ let inputs = [];
 if (command === 'wake') {
   const hook = JSON.parse(readFileSync(0, 'utf8'));
   session = hook.session_id;
-  const text = textsOf(hook.hook_event_name === 'PostToolUse' ? hook.tool_response : hook.prompt).join('\n');
+  const text = wakeTextOf(hook);
   inputs = (host) => inputsOfWake(host, text);
 }
 if (!session && command !== 'show') fail('no session: start takes --session, wake reads session_id from the hook input');
 
+// A refusal from the journal (an older writer, say) is printed as one line, not a stack.
+process.on('uncaughtException', (error) => fail(error.message));
+process.on('unhandledRejection', (error) => fail(error?.message ?? String(error)));
 const host = restore({ root: opts.root, item: opts.item, spec, session: session ?? 'show', release });
 if (command === 'start') {
   if (!opts.input) fail('start needs --input');
