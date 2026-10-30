@@ -12,6 +12,11 @@
       "how": "obs-journal-vs-world run on one real session in the v2 project reports 0 missing calls"
     },
     {
+      "id": "person-rows",
+      "check": "In a thread running the release that carries obs-person-attention, every message and tap the person made there is a row in the live journal",
+      "how": "A session other than the thread's counts them with read_thread and against that thread's person.message and person.tap rows"
+    },
+    {
       "id": "answers",
       "check": "The person reads the observe page for the sessions that built this stage and names no missing answer",
       "how": "The person's reply, recorded in plan/decisions/"
