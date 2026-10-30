@@ -16,6 +16,7 @@ const sessionsDir = fx('pf/harness/journal/sessions');
 const load = (skip = []) => readdirSync(sessionsDir).filter((n) => n.endsWith('.jsonl') && !skip.includes(n))
   .flatMap((n) => readFileSync(join(sessionsDir, n), 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)));
 const fmtMs = (ms) => { if (!ms) return '0s'; const s = Math.round(ms / 1000); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60; return h ? `${h}h ${m}m` : m ? `${m}m ${r}s` : `${r}s`; };
+const files = (skip) => readdirSync(sessionsDir).filter((n) => n.endsWith('.jsonl') && !skip.includes(n)).length;
 const n = (x) => x.toLocaleString('en-US');
 const json = (p) => JSON.parse(readFileSync(fx(p), 'utf8'));
 
@@ -46,21 +47,21 @@ test('real journal copy: the page showed my counts (rows, wall clock, tokens, re
   const m = mine(load(['fixture-rich.jsonl']));
   const { shown, refreshes, errors } = json('browser-check.json');
   assert.deepEqual(errors, []);
-  assert.equal(shown['read'].startsWith(`${m.rows} rows in 13 files`), true, shown.read);
+  assert.equal(shown['read'].startsWith(`${m.rows} rows in ${files(['fixture-rich.jsonl'])} files`), true, shown.read);
   assert.equal(shown['time-wall'], m.wall);
   assert.equal(shown['tokens-total'], `${n(m.tokens)} tokens`);
   assert.equal(shown['refusals-count'], `${m.refusals} refused`);
   assert.match(shown['asks-cards'], new RegExp(`^${m.cards} cards?,`));
   assert.equal(shown['newest'], m.newest.replace('T', ' ').slice(0, 19));
-  assert.equal(shown['page-release'], '0.1.8');
-  assert.equal(shown['release'], '0.1.8');
+  assert.equal(shown['page-release'], '0.1.9');
+  assert.equal(shown['release'], '0.1.9');
   assert.equal(refreshes.length, 2); // one read on load, one on pressing Refresh
   for (const r of refreshes) {
     assert.equal(r.kind, 'page.refresh');
     assert.equal(r.payload.rows, m.rows);
     assert.equal(r.payload.newestAt, m.newest);
     assert.equal(typeof r.payload.ms, 'number');
-    assert.equal(r.release, '0.1.8');
+    assert.equal(r.release, '0.1.9');
   }
 });
 
@@ -73,7 +74,7 @@ test('journal with the builder rich fixture added: tokens, refusals, cards and w
   assert.equal(m.refusals, 1);
   assert.equal(shown['asks-cards'].split(',')[0], `${m.cards} card`);
   assert.equal(shown['time-wall'], m.wall);
-  assert.equal(shown['read'].startsWith(`${m.rows} rows in 14 files`), true);
+  assert.equal(shown['read'].startsWith(`${m.rows} rows in ${files([])} files`), true);
   assert.equal(refreshes.at(-1).payload.rows, m.rows);
 });
 
@@ -81,5 +82,5 @@ test('the published page contains the built file byte for byte and declares the 
   const pub = readFileSync(fx('published-index.html'), 'utf8');
   const built = readFileSync(join(here, '../../plugins/harness/pages/observe/observe.html'), 'utf8');
   assert.ok(pub.includes(built.trim()));
-  assert.match(pub, /PAGE_RELEASE = "0\.1\.8"/);
+  assert.match(pub, /PAGE_RELEASE = "0\.1\.9"/);
 });
