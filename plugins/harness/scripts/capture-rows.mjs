@@ -2,12 +2,12 @@
 // makes out. They write nothing themselves; capture.mjs appends what they return, and the tests replay a recorded
 // session through them. Rows carry hashes and sizes of what a tool was given, never the input itself; the only
 // text kept is a subagent's brief and final answer, stored as blobs by content hash. docs/journal.md, "Capture
-// rows", says what each row holds.
-import { createHash } from 'node:crypto';
+// rows" and "Refusal rows", says what each row holds; refusals are plan item obs-refusal-log.
+import { createHash, randomUUID } from 'node:crypto';
 import { closeSync, fstatSync, openSync, readSync } from 'node:fs';
 
 /** The hook events capture listens to. hooks/hooks.json registers capture.mjs on each. */
-export const EVENTS = Object.freeze(['PostToolUse', 'PostToolUseFailure', 'SubagentStart', 'SubagentStop', 'UserPromptSubmit', 'Stop']);
+export const EVENTS = Object.freeze(['PostToolUse', 'PostToolUseFailure', 'PermissionDenied', 'SubagentStart', 'SubagentStop', 'UserPromptSubmit', 'Stop']);
 
 // A transcript can be large; capture never reads more than this much of one.
 export const READ_CAP = 8 * 1024 * 1024;
@@ -40,30 +40,45 @@ const bytes = (text) => Buffer.byteLength(text);
 const blob = (text) => ({ hash: sha256(text), bytes: bytes(text), text });
 
 /**
+ * The hash two calls share when they are the same tool with the same input: how a retry is recognised. A top-level
+ * `description` (Bash's, the Agent tool's) is the model's label for the call, reworded freely, so it is left out
+ * (seen live 2026-10-30: the same command retried under a new description).
+ */
+export function actionHash(tool, input) {
+  const plain = input !== null && typeof input === 'object' && !Array.isArray(input);
+  const { description, ...rest } = plain ? input : {};
+  return sha256(JSON.stringify([String(tool), plain ? rest : input ?? null]));
+}
+
+/**
  * The rows and blobs for one hook input. `read` is read() above, or a stand-in for tests; `state` is this session's
  * capture state ({ transcriptAt }: how far the last Stop read the transcript), which the Stop handler advances.
- * Returns { rows, blobs, state }; each row has kind, source, agent, payload and maybe placeholder.
+ * `refused` maps the actionHash of each action this session already had refused to that refusal row's id; `newId`
+ * makes a refusal row's id, so a later row can link to it. Returns { rows, blobs, state }; each row has kind,
+ * source, agent, payload and maybe placeholder, id and at.
  */
-export function capture(input, { read, state = {} } = {}) {
+export function capture(input, { read, state = {}, refused = {}, newId = randomUUID } = {}) {
   const handler = HANDLERS[input?.hook_event_name];
   if (!handler) return { rows: [], blobs: [], state };
-  return { blobs: [], state, ...handler(input, { read, state }) };
+  return { blobs: [], state, ...handler(input, { read, state, refused: { ...refused }, newId }) };
 }
 
 const HANDLERS = {
-  PostToolUse: (input) => {
+  PostToolUse: (input, ctx) => {
     const brief = briefOf(input);
-    return { rows: [toolCall(input, true), ...brief.rows], blobs: brief.blobs };
+    return { rows: [toolCall(input, true, ctx), ...brief.rows], blobs: brief.blobs };
   },
-  PostToolUseFailure: (input) => ({ rows: [toolCall(input, false)] }),
+  PostToolUseFailure: (input, ctx) => ({ rows: [toolCall(input, false, ctx)] }),
+  PermissionDenied: (input, ctx) => ({ rows: [classifierRefusal(input, ctx)] }),
   SubagentStart: spawn,
   SubagentStop: finish,
   UserPromptSubmit: (input) => ({ rows: [wake(input)] }),
   Stop: usage,
 };
 
-function toolCall(input, ok) {
+function toolCall(input, ok, { refused }) {
   const given = JSON.stringify(input.tool_input ?? null);
+  const retryOf = refused[actionHash(input.tool_name, input.tool_input)];
   return {
     kind: 'tool.call',
     source: { system: 'claude-code', ref: input.tool_use_id ?? `${input.hook_event_name} ${input.tool_name}` },
@@ -74,8 +89,77 @@ function toolCall(input, ok) {
       inputBytes: bytes(given),
       ms: Number.isFinite(input.duration_ms) ? input.duration_ms : null,
       ok,
+      ...(retryOf ? { retryOf } : {}),
     },
   };
+}
+
+// A refusal row. `refused` is updated, so a second refusal of the same action in one batch links to the first.
+function refusal({ source, rule, text, tool, input, ref, agent, at }, { refused, newId }) {
+  const hash = actionHash(tool, input);
+  const id = newId();
+  const row = {
+    id,
+    ...(at ? { at } : {}),
+    kind: 'refusal',
+    source: { system: source === 'hook' ? 'hook' : 'claude-code', ref },
+    agent,
+    payload: { source, rule, textHash: text ? sha256(text) : null, actionHash: hash, tool: String(tool), retryOf: refused[hash] ?? null, outcome: 'denied' },
+  };
+  refused[hash] = id;
+  return row;
+}
+
+// PermissionDenied fires only for an auto mode classifier refusal (checked in Claude Code 2.1.314). Its `reason` is
+// the rule, such as "[Self-Modification]"; the full text the model saw doesn't reach the hook.
+const classifierRefusal = (input, ctx) => refusal({
+  source: 'classifier',
+  rule: typeof input.reason === 'string' ? input.reason : null,
+  text: null,
+  tool: input.tool_name,
+  input: input.tool_input,
+  ref: input.tool_use_id ?? `PermissionDenied ${input.tool_name}`,
+  agent: input.agent_id ?? null,
+}, ctx);
+
+// A hook's or a permission rule's denial fires no hook at all: the call never runs, so neither PostToolUse,
+// PostToolUseFailure nor PermissionDenied sees it (probed 2026-10-30, Claude Code 2.1.314). The model gets an error
+// tool_result whose text says which, so Stop and SubagentStop find them in the transcript. A classifier refusal is
+// left to PermissionDenied. Rows keep the rule's name and a hash of the text, never the text: a permission denial's
+// text holds the command, and a hook's may.
+const HOOK_DENIAL = /^(\w+):(\S+) hook error: (?:\[[^\]\n]*\]: )?([\s\S]*)$/;
+const PERMISSION_DENIAL = /^Permission to (?:use|read|edit) [\s\S]* has been denied\.$/;
+const PERSON_DECLINED = /^The user doesn't want to proceed with this tool use/;
+
+/** { source, rule } for a tool_result's error text that is a hook or permission denial, else null. */
+export function denialOf(text) {
+  const hook = text.match(HOOK_DENIAL);
+  if (hook) {
+    // Our hooks name their rule first, "<rule>: why"; a reason with no such name keeps only the hook event.
+    const name = hook[3].match(/^\s*([\w.@/[\]-]{1,80}):\s/)?.[1];
+    return { source: 'hook', rule: name ?? `${hook[1]} hook` };
+  }
+  if (PERMISSION_DENIAL.test(text)) return { source: 'permission', rule: 'deny rule' };
+  if (PERSON_DECLINED.test(text)) return { source: 'permission', rule: 'person declined' };
+  return null;
+}
+
+// The hook and permission refusals in transcript entries, in order, each matched to the tool_use it refused.
+function refusalsIn(entries, agent, ctx) {
+  const uses = new Map();
+  const rows = [];
+  for (const e of entries) {
+    for (const c of Array.isArray(e.message?.content) ? e.message.content : []) {
+      if (e.type === 'assistant' && c.type === 'tool_use') uses.set(c.id, c);
+      if (e.type !== 'user' || c.type !== 'tool_result' || !c.is_error) continue;
+      const text = textOf(c.content).trim();
+      const denial = denialOf(text);
+      const use = uses.get(c.tool_use_id);
+      if (!denial || !use) continue;
+      rows.push(refusal({ ...denial, text, tool: use.name, input: use.input, ref: c.tool_use_id, agent, at: e.timestamp }, ctx));
+    }
+  }
+  return rows;
 }
 
 // A subagent's own files sit beside its parent's transcript: <transcript without .jsonl>/subagents/agent-<id>.*
@@ -172,7 +256,7 @@ function answer(entries, input) {
 }
 
 // SubagentStop: time, tokens and answer come from the agent's own transcript.
-function finish(input, { read }) {
+function finish(input, { read, refused, newId }) {
   const agentId = input.agent_id;
   const m = meta(input, read);
   const path = input.agent_transcript_path ?? agentFile(input, '.jsonl');
@@ -202,6 +286,7 @@ function finish(input, { read }) {
     },
     ...(got ? {} : { placeholder: 'the subagent transcript was not readable at SubagentStop' }),
   });
+  rows.push(...refusalsIn(entries, agentId, { refused, newId }));
   return { rows, blobs };
 }
 
@@ -226,7 +311,7 @@ function wake(input) {
 
 // Stop: the tokens of the turn are the main transcript's assistant messages since the last Stop. Cost and the
 // 5-hour and 7-day usage windows reach no hook, so they stay null and the row says so.
-function usage(input, { read, state }) {
+function usage(input, { read, state, refused, newId }) {
   const from = Number.isInteger(state.transcriptAt) ? state.transcriptAt : null;
   const got = input.transcript_path && read(input.transcript_path, { from, cap: READ_CAP });
   // Only whole lines count, so a line still being written is read at the next Stop.
@@ -242,7 +327,7 @@ function usage(input, { read, state }) {
       placeholder: got
         ? 'cost and the 5-hour and 7-day usage windows do not reach a hook'
         : 'the transcript was not readable at Stop, and cost and usage windows do not reach a hook',
-    }],
+    }, ...refusalsIn(entries, null, { refused, newId })],
     state: got ? { ...state, transcriptAt: got.start + bytes(whole) } : state,
   };
 }
