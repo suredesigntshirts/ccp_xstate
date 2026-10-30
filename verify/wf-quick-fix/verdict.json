@@ -1,6 +1,6 @@
 {
   "item": "wf-quick-fix",
-  "verified_sha": "fc5e45a2702cb21be912a982a4c128f3fc44a92a",
+  "verified_sha": "99b0e74150dd7de76daf5ce4430a867bdd2bfc8e",
   "verifier": {
     "session": "https://claude.ai/code/session_01KfkB5HZRbfGRGcZb4ar2mX#agent=verifier-wf-quick-fix",
     "model": "claude-sonnet-5-5"
@@ -10,13 +10,13 @@
       "id": "cases",
       "status": "MET",
       "command": "node --test verify/wf-quick-fix/cases.test.mjs (own tests from plan/cases/work-item.md) ; npm test",
-      "excerpt": "ok 1-4 C-verdict-on-old-head (x2), C-push-after-pass, C-second-fail-replans; ok 5 C-missing-expect-fails-closed; # pass 7 (re-run at fc5e45a) # fail 0. Full npm test: # tests 85 # pass 85 # fail 0. PASS for A with head B never reaches awaitingMerge/merging; push in awaitingMerge returns to verifying for B; second FAIL goes to replanning with no third build spawn; replan without a why stays in replanning; startRefusal refuses empty/absent expect naming it."
+      "excerpt": "ok 1-4 C-verdict-on-old-head (x2), C-push-after-pass, C-second-fail-replans; ok 5 C-missing-expect-fails-closed; # pass 7 (re-run at 99b0e74) # fail 0. Full npm test: # tests 138 # pass 138 # fail 0. PASS for A with head B never reaches awaitingMerge/merging; push in awaitingMerge returns to verifying for B; second FAIL goes to replanning with no third build spawn; replan without a why stays in replanning; startRefusal refuses empty/absent expect naming it."
     },
     {
       "id": "fail-closed",
       "status": "MET",
       "command": "own per-guard absent-field check + buildsLeft null/string/NaN test in cases.test.mjs; mutation: packages/engine/src/spec.js 'below' -> return !(value >= condition.below); node --test packages/engine/test/guards.test.js verify/wf-quick-fix/cases.test.mjs; git checkout",
-      "excerpt": "At fc5e45a all 10 guards fail on an empty scope and on each read field absent. buildsLeft now also fails on null, '1' and NaN (below holds only for a number). Mutation made buildsLeft pass on absent/null: 'not ok fail-closed: buildsLeft fails when any field it reads is absent' in guards.test.js plus my buildsLeft test went red; reverted. Dropping present() in 'same' stays green (masked by the 'is PASS' sibling, equivalent)."
+      "excerpt": "At 99b0e74 all 10 guards fail on an empty scope and on each read field absent. buildsLeft now also fails on null, '1' and NaN (below holds only for a number). Mutation made buildsLeft pass on absent/null: 'not ok fail-closed: buildsLeft fails when any field it reads is absent' in guards.test.js plus my buildsLeft test went red; reverted. Dropping present() in 'same' stays green (masked by the 'is PASS' sibling, equivalent)."
     },
     {
       "id": "pinned",
@@ -26,9 +26,9 @@
     },
     {
       "id": "replays-110",
-      "status": "NOT MET",
-      "command": "find/grep for journal*.jsonl and {seq,event,hash} entries in the read-only clone of ccp_machine claude/project-thread-3kdqwr (HEAD 1dc495e); not run: ccp_machine code (auto mode refused it twice)",
-      "excerpt": "No committed journal recorded by #110's headless run. packages/orchestrator has only src/journal.js (the writer), no journal.jsonl; the only .jsonl files are unrelated harness fixtures (packages/harness/test/fixtures/*, scripts/history/recovered/dogfood2.jsonl) and library eval catalogs, none from the orchestrator's item machine. The builder's replay.test.js replays journals the builder produced, which is builder proof, not a world-recorded journal. Needs a real headless run of #110 to record one."
+      "status": "MET",
+      "command": "cmp packages/engine/test/fixtures/110-demo/journal.jsonl demo110/item/journal.jsonl; node --test verify/wf-quick-fix/replays-110.test.mjs (replay() of the fixture, plus a changed-target and a changed-entry mutation)",
+      "excerpt": "Fixture is byte-identical to the journal the real claude -p run wrote (cmp: IDENTICAL; 6 entries, each with #110's hash). replay() over the ported workflow throws on no hash mismatch and ends state done, merge.sha 1ede7999..., verdict PASS sha 53eb9a6a... = pr.headSha, matching out.log's final output; hashOf(final) equals the last recorded hash 8ef1786d4350. Mutation: verifying.onDone[0].target -> replanning in a copy: replay throws 'replays to ..., not ...: the workflow changed'. Altering a journal entry's verdict also throws. ok 1-3, # pass 3."
     }
   ]
 }
