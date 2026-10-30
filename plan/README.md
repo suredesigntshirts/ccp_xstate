@@ -18,6 +18,7 @@ plan/
   ledger/            what v1 taught us, one row per lesson (L-... ids)
   cases/             real situations v1 handled, which v2 must pass (C-... ids)
   research/          what we read before deciding, with sources
+  decisions/         the person's choices, in their words
 ```
 
 ## How an item is written
@@ -55,6 +56,8 @@ The plan will change. These rules keep a change to one file plus edges:
 - **To add a stage,** write its file and give it an `order` between two existing ones (use decimals,
   such as 2.5).
 - Run `node plan/check.mjs` after any change. It refuses unknown ids, cycles, an item that depends on a
+  later stage, and a `ready` item with an empty field. `--order` prints the items in build order, and
+  `--coverage` lists ledger rows no item serves.
   later stage, and a `ready` item with an empty field.
 
 ## Status

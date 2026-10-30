@@ -96,6 +96,32 @@ const visit = (id, trail) => {
 };
 for (const id of items.keys()) visit(id, []);
 
+// --order prints the items stage by stage, each after what it depends on.
+if (process.argv.includes('--order')) {
+  const done = new Set();
+  const byStage = [...stages.values()].sort((a, b) => a.order - b.order);
+  for (const st of byStage) {
+    console.log(`\n${st.id}: ${st.title}`);
+    const mine = [...items.values()].filter((i) => i.stage === st.id);
+    let left = mine.filter((i) => !done.has(i.id));
+    while (left.length) {
+      const next = left.find((i) => (i.depends_on ?? []).every((d) => done.has(d) || items.get(d)?.stage !== st.id)) ?? left[0];
+      console.log(`  ${next.id.padEnd(32)} ${next.kind.padEnd(9)} ${next.status.padEnd(7)} after: ${(next.depends_on ?? []).join(', ') || '-'}`);
+      done.add(next.id);
+      left = left.filter((i) => i !== next);
+    }
+  }
+}
+
+// --coverage lists ledger rows no item serves (rows whose fate is drop are exempt).
+if (process.argv.includes('--coverage')) {
+  const served = new Set([...items.values()].flatMap((i) => i.serves ?? []));
+  const dropped = new Set(mdFiles('ledger').flatMap((p) =>
+    [...readFileSync(join(root, p), 'utf8').matchAll(/^### (L-[a-z0-9-]+)\n[\s\S]*?\*\*Fate:\*\* drop/gm)].map((m) => m[1])));
+  const unserved = [...ledger].filter((l) => !served.has(l) && !dropped.has(l));
+  console.log(unserved.length ? `ledger rows no item serves:\n  ${unserved.join('\n  ')}` : 'every ledger row is served');
+}
+
 const live = [...items.values()].filter((i) => !['split', 'dropped'].includes(i.status));
 console.log(`${stages.size} stages, ${items.size} items (${live.length} live), ${ledger.size} ledger rows, ${cases.size} cases`);
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
