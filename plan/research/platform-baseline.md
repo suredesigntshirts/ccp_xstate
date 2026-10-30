@@ -32,7 +32,7 @@ happened without the rules too, so a refusal may not survive the rules. The rebu
 | `$.agent.spawn` honours `cwd` (L-spawn-ignores-cwd) | **Doesn't hold.** Asked for `/tmp/probe-cwd-target`, the subagent's `pwd` was the parent's `/tmp`, twice (runs 1 and 2). What works instead: subagents start in the session's working folder (the live thread's `pwd` followed the session's current directory), so name the folder in the brief and have the agent `cd` there. | runs 1-2 lines `"label":"cwd"`; smallest repro in the README |
 | How a classifier refusal shows to the model and hooks | **To the model:** a tool_result error, "Permission for this action was denied by the Claude Code auto mode classifier. Reason: [Category]. ..." **To settings hooks:** no PostToolUse fires for the denied call; the debug log has `Auto mode classifier blocked action: [Category]`. **To a mod:** untested. Both deliberate refusals happened in the outer thread before the mod was loaded, and the child never started. A non-classifier block (Claude Code's own `sleep` guard) reaches a mod's `tool.call` as `isError: true` with the text, `deny` unset. | `fixtures/refusals/` (two refusals, debug log excerpt); run 2 line `probe:"tool-refusal"` |
 | Retrying after a refusal reads as a bypass (L-retries-look-like-bypass) | Not re-tested. The second refusal ([Self-Modification]) was a different action with the intent stated; it was refused too. Stopped there. | `fixtures/refusals/2026-10-30-self-modification-outer.json` |
-| Subagent depth (L-subagent-depth) | **Holds.** With `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1` (this container's value) a subagent has no Agent tool. With `=3` in the env of a `claude -p` child, three levels ran (`nested-3-ok`). | `fixtures/runs/2026-10-30-results.jsonl` runs 3 and 5 |
+| Subagent depth (L-subagent-depth) | **Unclear at 1, holds at 3.** With `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1` (this container's value) the builder saw a subagent with no Agent tool in 2 of 2 runs (run 3, and a 10:27Z rerun where `=0` gave the Agent tool and `nested-ok`), but the verifier's 3 reruns at `=1` got a second level that answered `nested-ok`. With `=3`, three levels ran (`nested-3-ok`). Don't rely on the default: set the value explicitly and have the self-check spawn one nested agent. | `fixtures/runs/2026-10-30-results.jsonl` runs 3 and 5, `fixtures/runs/2026-10-30-depth-rerun.txt`, verifier notes in `verify/probe-platform-baseline/verdict.json` |
 | SessionStart settings hook budget (L-hook-time-budget) | **No timeout set: at least 70 s;** the session waited the full 70 s before starting. **`timeout: 5`: killed at 5 s** (4 ticks, no end line). | runs 3-5 log (70 s), `fixtures/runs/2026-10-30-run-6-configured-timeouts.jsonl` |
 | PreToolUse settings hook budget | **No timeout set: at least 20 s,** the tool waited. **`timeout: 5`: killed at 5 s.** | runs 1-2 log (20 s), run 6 log |
 | A mod hook's budget | **Declared 10,000 ms** (`next.budget` read `{ms: 10000}`), but a 15 s busy loop in `turn.start` was **not** aborted (`next.signal.aborted` stayed false) and its later `$` calls (two spawns, a timer) still ran. The turn did not wait for it: the model's first tool call came 2 s in. Treat 10 s as a soft budget on `turn.start`; don't put work there that the turn needs. | runs 1-2 log `probe:"mod-budget"` |
@@ -75,3 +75,16 @@ on main; the probe found nothing that needs more. One-line summary of each:
 7. In ccp_xstate_scratch, threads may open, push to, make red, merge, revert and close scratch PRs on any wake.
 
 None of these were in force during the probe. They take effect only after the person rebuilds the environment.
+
+## Verdict and what is left
+
+The independent verifier (verify/probe-platform-baseline/verdict.json, at 4239dac) marked 6 Expect lines MET
+(versions, mcp-from-mod, self-edit, cwd, rerunnable, negative-evidence) and 5 NOT MET. The item is not done, so this
+PR is not merged (plan/README.md, "How slop is kept out"). Each open line and what closes it:
+
+- **idle-spawn, idle-merge:** answered with no allow rule in force, not under the pre-placed rule the line names.
+  Rerun the two wake probes (README) in a fresh thread after the environment rebuild. Needs the person.
+- **page-reads-journal:** needs a project member to open the probe page once. Needs the person.
+- **hooks-see-refusals:** the mod side is untested. Rerun in that same fresh thread with the mod loaded: one
+  deliberate refusal inside the thread, not a `claude -p` child (the outer classifier refuses the child's prompt).
+- **depth-and-budgets:** depth 1 gave conflicting results (above). Rerun after the rebuild, when depth should be 3.
