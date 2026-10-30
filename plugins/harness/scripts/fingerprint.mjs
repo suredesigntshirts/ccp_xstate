@@ -42,10 +42,27 @@ export async function latestRelease(repo, ms = 2000) {
     new Promise((ok) => setTimeout(ok, ms + 100, null).unref())
   ]);
   if (out === null) return { state: 'unknown' };
-  const versions = [...out.matchAll(new RegExp(`refs/(?:tags|heads/release)/${TAG_PREFIX}(\\d+\\.\\d+\\.\\d+)$`, 'gm'))].map((m) => m[1]);
-  if (!versions.length) return { state: 'none' };
-  const newest = versions.sort(byVersion).at(-1);
-  return { state: 'found', tag: `${TAG_PREFIX}${newest}`, version: newest };
+  // Each version's commit: a branch's sha, or a tag's peeled (^{}) sha, which ls-remote lists after the tag's own.
+  const commits = new Map();
+  for (const m of out.matchAll(new RegExp(`^([0-9a-f]{40})\\trefs/(?:tags|heads/release)/${TAG_PREFIX}(\\d+\\.\\d+\\.\\d+)(\\^\\{\\})?$`, 'gm'))) {
+    if (m[3] || !commits.has(m[2])) commits.set(m[2], m[1]);
+  }
+  if (!commits.size) return { state: 'none' };
+  const newest = [...commits.keys()].sort(byVersion).at(-1);
+  return { state: 'found', tag: `${TAG_PREFIX}${newest}`, version: newest, commit: commits.get(newest) };
+}
+
+/**
+ * Whether commit `mine` already contains commit `release` (git merge-base --is-ancestor in `repo`): true, false, or
+ * null when either is unknown or git can't tell in time. An install of a commit that is not itself a release (a PR's
+ * merge commit, say) carries the manifest's version, which can be below a release it already contains.
+ */
+export async function contains(repo, mine, release, ms = 1000) {
+  if (!mine || !release) return null;
+  return new Promise((ok) => {
+    execFile('git', ['-C', repo, 'merge-base', '--is-ancestor', release, mine], { timeout: ms, stdio: 'ignore' },
+      (err) => ok(!err ? true : err.code === 1 ? false : null));
+  });
 }
 
 export function byVersion(a, b) {
@@ -136,6 +153,7 @@ export async function collect({ input = {}, env = process.env, root, home = env.
   const plugin = release(root);
   const repo = repoDir(env);
   const [claude, latest] = await Promise.all([claudeVersion(), latestRelease(repo)]);
+  if (latest.state === 'found') latest.contained = await contains(repo, plugin.commit, latest.commit);
   const user = readJson(join(home, '.claude', 'settings.json'));
   const repoSettings = readJson(join(repo, '.claude', 'settings.json'));
   let link = false;

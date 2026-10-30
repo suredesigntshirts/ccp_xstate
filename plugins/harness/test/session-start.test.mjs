@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { PLUGIN, RULES, context, fakeRepo, runHook, setup, snapshot, temp, writeSettings } from './helpers.mjs';
+import { PLUGIN, REPO, RULES, TEST_REF, context, fakeRepo, runHook, setup, snapshot, temp, writeSettings } from './helpers.mjs';
 import { readFile } from '../../../packages/journal/src/index.js';
 
 const INPUT = { session_id: 'test-session-1', cwd: '/tmp', hook_event_name: 'SessionStart', source: 'startup' };
@@ -192,6 +192,28 @@ test('rows: an unreachable origin leaves the release unchecked, not failed', () 
   assert.match(context(r.stdout), /self-check passed \(6 of 7 checks\)\. Not checked: The newest release could not be read/);
   const [, sc] = rows(dir);
   assert.equal(sc.payload.checks.find((c) => c.id === 'release').status, 'unknown');
+});
+
+test('release: an install whose commit already contains the newest release passes, though its version is lower', () => {
+  // A repo sharing this clone's objects, whose origin's newest release (9.9.9) is the installed commit's parent.
+  const dir = temp('contains');
+  const origin = join(dir, 'origin.git'), repo = join(dir, 'clone');
+  const rev = (r) => execFileSync('git', ['-C', REPO, 'rev-parse', r], { encoding: 'utf8' }).trim();
+  const objects = `${execFileSync('git', ['-C', REPO, 'rev-parse', '--path-format=absolute', '--git-common-dir'], { encoding: 'utf8' }).trim()}/objects\n`;
+  execFileSync('git', ['init', '-q', '--bare', origin]);
+  execFileSync('git', ['init', '-q', repo]);
+  writeFileSync(join(origin, 'objects', 'info', 'alternates'), objects);
+  writeFileSync(join(repo, '.git', 'objects', 'info', 'alternates'), objects);
+  execFileSync('git', ['-C', origin, 'update-ref', 'refs/heads/release/harness-v9.9.9', rev(`${TEST_REF}^`)]);
+  execFileSync('git', ['-C', repo, 'remote', 'add', 'origin', origin]);
+  const run = (r) => runHook(INSTALLED_HOOK, { env: { HOME: home, CCP_HARNESS_DIR: project(), CCP_REPO: repo }, input: INPUT });
+  let r = run();
+  assert.match(context(r.stdout), /self-check passed/);
+  assert.doesNotMatch(context(r.stdout), /9\.9\.9 is out/);
+  // The same release on a commit the install does not contain is newer code, and fails.
+  execFileSync('git', ['-C', origin, 'update-ref', 'refs/heads/release/harness-v9.9.9', execFileSync('git', ['-C', REPO, 'commit-tree', '-m', 'elsewhere', `${rev(TEST_REF)}^{tree}`], { encoding: 'utf8' }).trim()]);
+  r = run();
+  assert.match(context(r.stdout), /This session runs release 0\.1\.0 but 9\.9\.9 is out/);
 });
 
 test('the install script makes the journal root and the marker once, and a second run changes nothing', () => {
