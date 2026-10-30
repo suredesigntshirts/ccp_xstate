@@ -25,3 +25,5 @@
 - **Tests on pure transitions:** XState's `initialTransition`/`transition` over the machine, with completion
   events built by hand (`xstate.done.actor.<id>`). The fail-closed test is built from each guard's own conditions,
   one test per guard, so a guard added later is covered without a new test.
+- **`below` holds only for a number.** #110's `value < below` held for `null` (`null < 2`), so `buildsLeft` passed
+  with `builds: null`. The verifier found it; every other condition already treated null as absent.

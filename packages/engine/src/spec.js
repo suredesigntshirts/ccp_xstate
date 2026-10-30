@@ -56,7 +56,7 @@ const holds = (condition, scope) => {
   const value = get(scope, condition.path);
   if ('is' in condition) return value === condition.is;
   if ('same' in condition) return present(value) && value === get(scope, condition.same);
-  if ('below' in condition) return value < condition.below;
+  if ('below' in condition) return typeof value === 'number' && value < condition.below;
   throw new Error(`unknown condition ${JSON.stringify(condition)}`);
 };
 

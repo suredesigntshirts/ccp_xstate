@@ -40,3 +40,10 @@ for (const [name, conditions] of Object.entries(workflow.meta.guards)) {
     assert.deepEqual(failing(workflow, [name], {}), [name], `${name} with an empty scope`);
   });
 }
+
+test('fail-closed: a below condition fails on null or a non-number, not only on absent', () => {
+  for (const builds of [null, '0', undefined]) {
+    assert.deepEqual(failing(workflow, ['buildsLeft'], { context: { builds } }), ['buildsLeft'], `builds ${builds}`);
+  }
+  assert.deepEqual(failing(workflow, ['buildsLeft'], { context: { builds: 1 } }), []);
+});
