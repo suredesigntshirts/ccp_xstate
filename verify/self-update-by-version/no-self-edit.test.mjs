@@ -55,6 +55,11 @@ function world() {
   const t = tmp('world');
   const origin = join(t, 'origin.git'), clone = join(t, 'clone'), home = join(t, 'home');
   execFileSync('git', ['clone', '-q', '--bare', REPO, origin]);
+  // A clone of this repo carries whatever releases it has seen (a thread's clone has harness-v0.1.0 since 16:45Z,
+  // CI's shallow checkout has none), so drop them: the world's releases are only the ones each test makes.
+  for (const ref of git(origin, 'for-each-ref', '--format=%(refname)', 'refs/tags/harness-v*', 'refs/heads/release/').split('\n').filter(Boolean)) {
+    git(origin, 'update-ref', '-d', ref);
+  }
   git(origin, 'branch', '-f', 'main', 'HEAD');
   git(origin, 'symbolic-ref', 'HEAD', 'refs/heads/main');
   git(origin, 'tag', 'harness-v0.0.5', 'main');
