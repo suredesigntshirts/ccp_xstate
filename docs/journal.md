@@ -168,11 +168,12 @@ node packages/journal/bin/journal-check.js --journal <journal root> --repo <owne
   lists every PR merged since `--since` (default: the journal's first row) with no `pr.merge` row naming it, with
   its head and merge shas, and every `pr.merge` row GitHub shows unmerged or merged at another sha. A merge made
   through the REST API, the web UI or `git push` has no `pr.merge` row, so it is listed (case
-  C-merge-outside-host-detected). Until the engine's merge effect exists, a merge with the GitHub MCP merge tool
-  in a session that captures counts as journalled.
+  C-merge-outside-host-detected). A merge with the GitHub MCP merge tool in a session that captures counts as
+  journalled, but every merge the host's merge effect didn't make (an `engine.effect` row, actor `merge`, phase
+  `done`) is also listed as not made by the host, and `--host` fails on it (plan item engine-effects).
 - `--record <file>` appends a `journal.check` row: `payload` has `ok`, `since`, `journal`, the counts (`calls`,
-  `callRows`, `missing`, `notRun`, `pending`, `unfoundCalls`, `outside`, `merges`, `mergeRows`, `unexplained`,
-  `unfoundMerges`) and `badLines`, the journal lines it couldn't read.
+  `callRows`, `missing`, `notRun`, `pending`, `unfoundCalls`, `outside`, `merges`, `mergeRows`, `hostMerges`,
+  `unexplained`, `outsideHost`, `unfoundMerges`) and `badLines`, the journal lines it couldn't read.
 - Exit 0 when nothing is listed, 1 when something is, 2 when it couldn't run. `--json` prints the whole result.
 
 `list_events` retention is unknown, so run the session diff soon after a session ends.
@@ -308,7 +309,9 @@ A `not-owner` row, and a `refused` row for an item that hasn't started, go to th
 the state that started it was left. `payload`: `effect`, `type` (`run`, `stop`, `timer`, `cancel`), `phase` (`start`,
 then `done`, `refused`, `failed` or `unknown`), `transition` (the transition that asked for it), `actor` (a run's
 actor), `timer` and `due` (a timer's), `outcome` (what the handler reported, such as the card or task id it made),
-`rule` (what refused it) and `reason`. An effect that has ended is never run again. One that started and never ended
+`rule` (what refused it) and `reason`. A merge's `done` outcome is `{ ref, repo, number, head, sha }`: `owner/repo#n`,
+the verified head it merged at and GitHub's merge sha. A card's is `{ ref, choices }`, a post's `{ ref }` and a
+timer's `{ ref, due }` (plan item engine-effects). An effect that has ended is never run again. One that started and never ended
 (the host stopped mid-effect) is looked up with its handler's `find()`, or journalled `unknown` and left alone.
 
 ## Adding a kind

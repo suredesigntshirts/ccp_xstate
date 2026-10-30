@@ -147,7 +147,8 @@ export function persist(host, rows) {
  * Carry out the effects not yet ended, once each by effect id, with handlers keyed by effect type: { run, stop,
  * timer, cancel }, each { start(effect) -> outcome, find?(effect) -> outcome or null }. An outcome is {} or
  * { ref, output, source, choices } when the effect worked, or { refused: { rule, text } } when something refused it.
- * An effect whose type has no handler stays pending for a host that has one.
+ * An effect whose type has no handler, or whose handler's handles?(effect) says no, stays pending for a host that
+ * has one. The handlers for merge, card, post and timer are in effects/ (plan item engine-effects).
  *
  * An effect that started and never ended (the host stopped mid-effect) is not started again blindly: find() asks the
  * world whether it happened. With no find(), it is journalled unknown and left alone. A refused effect is journalled
@@ -170,7 +171,7 @@ export async function runEffects(host, handlers = {}) {
   for (const { effect, phase } of [...host.effects.values()]) {
     if (TERMINAL.includes(phase)) continue;
     const handler = handlers[effect.type];
-    if (!handler) continue;
+    if (!handler || (handler.handles && !handler.handles(effect))) continue;
     if (effect.type === 'run' && !host.runs.has(effect.id)) continue; // already finished or stopped
 
     let outcome;

@@ -10,12 +10,15 @@
 // ignored, whatever it contains. The session is the hook input's session_id. Nothing on the command line can name an
 // event or its source: those come only from the wake text. What this cannot stop: an agent with a shell can run this
 // command with stdin it typed, as it can append rows by hand (ledger L-same-account-everywhere); the decision says so.
-// No effect handlers run here yet (engine-effects and engine-actors add them), so effects stay pending and are printed.
+// Effects run with the handlers in src/effects (plan item engine-effects): merges, over GitHub REST. A command has no
+// way into the thread and no clock to wake it, so cards, posts and timers, and the agents engine-actors starts, stay
+// pending and are printed; a timer's due time is there for the session to schedule its wake.
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { loadWorkflow } from '../src/index.js';
 import { restore, offer, pending } from '../src/host.js';
 import { inputsOfWake } from '../src/wake.js';
+import { github, handlers } from '../src/effects/index.js';
 
 const { positionals: [command], values: opts } = parseArgs({
   allowPositionals: true,
@@ -73,7 +76,8 @@ if (command === 'start') {
   if (!opts.input) fail('start needs --input');
   inputs = [{ event: { type: 'xstate.init', input: JSON.parse(opts.input) }, source: { system: 'claude-code', ref: session } }];
 }
-const results = command === 'show' ? [] : await offer(host, typeof inputs === 'function' ? inputs(host) : inputs);
+const effects = { run: handlers({ github: github() }).run };
+const results = command === 'show' ? [] : await offer(host, typeof inputs === 'function' ? inputs(host) : inputs, effects);
 console.log(JSON.stringify({
   item: opts.item,
   owner: host.owner,

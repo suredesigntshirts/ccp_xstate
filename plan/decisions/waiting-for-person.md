@@ -21,3 +21,7 @@ One line each: what, why, which item waits. Threads add to this; the person clea
   thread has ever run capture. Stage s1's gate waits on it (`2026-10-30-s1-observability-gate.md`).
 - Open the observe page (https://claude.ai/artifact/GEVcccpqcToRUb7EhTG4B3) after the re-save and a thread or two, press
   Refresh, and say whether any answer is missing. That is s1's `answers` check, and obs-page's after-landing step.
+- Add the allow rule engine-effects names: "The host may merge a PR at the verified head (`expectedHeadSha` = the
+  verdict's sha) after an independent PASS and green CI" to the repo's autoMode.allow (a settings change). The host's
+  merge effect runs without it today, inside its own process; the rule covers a session running `bin/host.js` by Bash
+  (`2026-10-30-engine-effects.md`).

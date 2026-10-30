@@ -122,30 +122,47 @@ export const prOf = (repo, pr) => ({
 export const mergeKey = (repo, number) => `${String(repo).toLowerCase()}#${number}`;
 
 /**
+ * The host's merge effects that ended done, as merge rows: { id, at, repo, number, sha }. These are the only merges
+ * the host made (plan item engine-effects, packages/engine/src/effects/merge.js).
+ */
+export const hostMerges = (rows) =>
+  rows
+    .filter((r) => r.kind === 'engine.effect' && r.payload?.actor === 'merge' && r.payload?.phase === 'done' && r.payload?.outcome?.repo)
+    .map((r) => ({ id: r.id, at: r.at, repo: r.payload.outcome.repo, number: r.payload.outcome.number, sha: r.payload.outcome.sha ?? null, item: r.item }));
+
+/**
  * The merge diff. `prs` are the closed PRs GitHub returned for `repos`, as prOf() makes them; `rows` the journal
- * rows. A merge is explained by a pr.merge row naming its repo and number. Returns the merges since `since` with no
- * such row (unexplained), and the pr.merge rows since `since` for those repos that GitHub doesn't show as merged, or
- * shows merged at another sha (unfound).
+ * rows. A merge is explained by a pr.merge row or a host merge effect naming its repo and number. Returns the merges
+ * since `since` with neither (unexplained), the merges the host's merge effect didn't make, whatever else journalled
+ * them (outsideHost, case C-merge-outside-host-detected), and the rows since `since` for those repos that GitHub
+ * doesn't show as merged, or shows merged at another sha (unfound).
  */
 export function checkMerges({ rows, prs, repos, since = null }) {
   const after = (at) => !since || time(at) >= time(since);
   const watched = new Set(repos.map((r) => r.toLowerCase()));
-  const mergeRows = rows.filter((r) => r.kind === 'pr.merge' && watched.has(String(r.payload?.repo).toLowerCase()));
-  const byKey = new Map(mergeRows.map((r) => [mergeKey(r.payload.repo, r.payload.number), r]));
+  const mine = (repo) => watched.has(String(repo).toLowerCase());
+  const mergeRows = rows
+    .filter((r) => r.kind === 'pr.merge' && mine(r.payload?.repo))
+    .map((r) => ({ id: r.id, at: r.at, repo: r.payload.repo, number: r.payload.number, sha: r.payload.sha ?? null }));
+  const hostRows = hostMerges(rows).filter((r) => mine(r.repo));
+  const keys = (list) => new Set(list.map((r) => mergeKey(r.repo, r.number)));
+  const byHost = keys(hostRows);
+  const byAny = new Set([...keys(mergeRows), ...byHost]);
   const merged = prs.filter((p) => p.mergedAt && after(p.mergedAt));
-  const unexplained = merged.filter((p) => !byKey.has(mergeKey(p.repo, p.number)));
+  const unexplained = merged.filter((p) => !byAny.has(mergeKey(p.repo, p.number)));
+  const outsideHost = merged.filter((p) => !byHost.has(mergeKey(p.repo, p.number)));
   const onGitHub = new Map(prs.filter((p) => p.mergedAt).map((p) => [mergeKey(p.repo, p.number), p]));
   const unfound = [];
-  for (const row of mergeRows) {
+  for (const row of [...mergeRows, ...hostRows]) {
     if (!after(row.at)) continue;
-    const pr = onGitHub.get(mergeKey(row.payload.repo, row.payload.number));
-    const ref = `${row.payload.repo}#${row.payload.number}`;
+    const pr = onGitHub.get(mergeKey(row.repo, row.number));
+    const ref = `${row.repo}#${row.number}`;
     if (!pr) unfound.push({ id: row.id, ref, at: row.at, why: 'GitHub shows no merge of this PR' });
-    else if (row.payload.sha && pr.sha && row.payload.sha !== pr.sha) {
-      unfound.push({ id: row.id, ref, at: row.at, why: `GitHub merged it as ${pr.sha}, the row says ${row.payload.sha}` });
+    else if (row.sha && pr.sha && row.sha !== pr.sha) {
+      unfound.push({ id: row.id, ref, at: row.at, why: `GitHub merged it as ${pr.sha}, the row says ${row.sha}` });
     }
   }
-  return { merges: merged.length, rows: mergeRows.length, unexplained, unfound };
+  return { merges: merged.length, rows: mergeRows.length, hostRows: hostRows.length, unexplained, outsideHost, unfound };
 }
 
 /** The counts a journal.check row carries. */
@@ -163,15 +180,21 @@ export function counts({ session, merges }) {
     ...(merges && {
       merges: merges.merges,
       mergeRows: merges.rows,
+      hostMerges: merges.hostRows,
       unexplained: merges.unexplained.length,
+      outsideHost: merges.outsideHost.length,
       unfoundMerges: merges.unfound.length,
     }),
   };
 }
 
-/** True when the check found nothing missing or unexplained. Calls no hook could see don't count against it. */
-export const clean = ({ session, merges, bad = [] }) =>
-  !bad.length && !session?.missing.length && !session?.unfound.length && !merges?.unexplained.length && !merges?.unfound.length;
+/**
+ * True when the check found nothing missing or unexplained. Calls no hook could see don't count against it. With
+ * host, a merge the host's merge effect didn't make counts against it too.
+ */
+export const clean = ({ session, merges, bad = [], host = false }) =>
+  !bad.length && !session?.missing.length && !session?.unfound.length && !merges?.unexplained.length && !merges?.unfound.length &&
+  !(host && merges?.outsideHost.length);
 
 /** The report as plain lines. */
 export function report({ session, merges, bad = [] }) {
@@ -190,9 +213,12 @@ export function report({ session, merges, bad = [] }) {
     if (session.outside) out.push(`  ${session.outside} tool.call rows fall outside the event log's time span (not judged).`);
   }
   if (merges) {
-    out.push(`GitHub: ${merges.merges} merged PRs, ${merges.rows} pr.merge rows.`);
+    const line = (p) => `    ${p.repo}#${p.number}  merged ${p.mergedAt}  head ${p.head}  merge ${p.sha}  ${p.title ?? ''}`;
+    out.push(`GitHub: ${merges.merges} merged PRs, ${merges.rows} pr.merge rows, ${merges.hostRows} host merge effects.`);
     out.push(`  ${merges.unexplained.length} merges with no journal row${merges.unexplained.length ? ':' : '.'}`);
-    for (const p of merges.unexplained) out.push(`    ${p.repo}#${p.number}  merged ${p.mergedAt}  head ${p.head}  merge ${p.sha}  ${p.title ?? ''}`);
+    for (const p of merges.unexplained) out.push(line(p));
+    out.push(`  ${merges.outsideHost.length} merges not made by the host's merge effect (unverified)${merges.outsideHost.length ? ':' : '.'}`);
+    for (const p of merges.outsideHost) out.push(line(p));
     out.push(`  ${merges.unfound.length} pr.merge rows GitHub doesn't bear out${merges.unfound.length ? ':' : '.'}`);
     for (const r of merges.unfound) out.push(`    row ${r.id}  ${r.ref}  ${r.why}`);
   }
