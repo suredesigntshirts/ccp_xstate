@@ -4,7 +4,7 @@
   "title": "Give the person one live page that answers where time, tokens and refusals went",
   "stage": "s1-observability",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A published page reads the journal live and answers, for a day or a thread: where the tokens went, where the time went, what was refused and why, and what was asked of the person. It shows the release and refresh time.",
   "why": "v1's pages went stale for days and were rebuilt by hand. The person wants pages current while they look, with a refresh button and refresh timing recorded. PR #110 itself drifted into 17 commits of page polish, so this page has a hard round budget and no polish rounds without a person ask.",
   "serves": [
