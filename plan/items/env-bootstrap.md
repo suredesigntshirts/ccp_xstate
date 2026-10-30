@@ -4,7 +4,7 @@
   "title": "Install the plugin from the repo, gate it per project, and start every session with a fingerprint and a self-check",
   "stage": "s0-environment",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A stub pasted into the project's environment runs the repo's setup script, which installs the released plugin and v2's allow rules. The plugin does nothing until installed in a project, and every session in an installed project starts by journalling a fingerprint row and a short self-check.",
   "why": "Repo settings and skills don't load in Projects threads, rules must exist before a session starts, a pasted full script goes stale, and v1 lost hours to stale installs and rules that hadn't loaded. These three pieces only make sense together, so they are one PR (plan-review finding 1c).",
   "serves": [
