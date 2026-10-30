@@ -41,6 +41,12 @@ can't do them. Each is in `waiting-for-person.md`.
   Recommendation for when they choose: a small, real issue in a product repo, not ccp_xstate, so it counts as
   product work. Stages s0 to s3 don't need it.
 
+## Update, 16:55Z
+
+Since this was written the person placed rules 4 to 7 (commit a86614d, 10:03Z) and saved the setup script
+twice; new containers have all seven rules and depth 3. The product repo is still not chosen. The s0 `one-sitting`
+gate is judged in `2026-10-30-one-sitting-gate.md`: not passed.
+
 ## What this means for the plan
 
 The item is marked `done`: the stand-in answers are recorded, and every hands-on step is logged for the person
