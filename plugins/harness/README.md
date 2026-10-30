@@ -7,10 +7,17 @@ Code loads it as `ccp-harness@skills-dir`. Editing this folder changes nothing a
 
 ## Releases
 
-A release is a tag `harness-v<x.y.z>` whose `x.y.z` is the version in `.claude-plugin/plugin.json` (and
-`package.json`). The setup script installs the newest tag by version; with no tag it installs the clone's HEAD and
-says so. The copy carries `release.json`: name, version, tag, commit and its file list. `packages/journal` is bundled
-into the copy at `lib/journal`. Making tags on merge is plan item self-update-by-version.
+A release is `harness-v<x.y.z>`, made by `scripts/release/release.mjs` after a merge to `main` that changes what a
+session runs: `plugins/harness/` or `packages/journal/`, tests aside. The thread that merged pushes it as a branch
+`release/harness-v<x.y.z>` (`node scripts/release/release.mjs branch --push`), because the git proxy drops tag pushes
+from threads; `.github/workflows/release.yml` makes the same release as a tag when Actions runs. Both count as one
+series, so whichever comes second makes nothing. The version only rises: the newest release's patch + 1, or
+`.claude-plugin/plugin.json`'s version when that is higher. No commit is made; the script prints a `ci.result`
+journal row (a tag also carries it in its annotation). The setup script installs the newest release by version,
+tag or branch, and writes its version into the copy's `plugin.json`; with none it installs the clone's HEAD and says
+so. The copy carries `release.json`: name, version, tag, commit and its file list. `packages/journal` is bundled
+into the copy at `lib/journal`. A running session never changes its copy: a new release reaches the next session
+(plan item self-update-by-version, plan/decisions/2026-10-30-self-update-by-version.md).
 
 ## The gate
 
@@ -40,12 +47,20 @@ Then it tells the session one line: `ccp-harness 0.1.0 (harness-v0.1.0): self-ch
 | `rules` | an `autoMode.allow` rule in the repo's `.claude/settings.json` (`$CCP_REPO`, default `/home/user/ccp_xstate`) isn't in `~/.claude/settings.json` |
 | `depth` | `env.CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` in `~/.claude/settings.json` isn't `3` |
 | `copy` | the plugin runs from somewhere other than an installed copy (no `release.json`, a link, or inside the repo) |
-| `release` | a newer `harness-v*` tag is on origin (`git ls-remote`, 2 s cap; unreachable is `unknown`, not a failure) |
+| `release` | a newer release (`harness-v*` tag or `release/harness-v*` branch) is on origin (`git ls-remote`, 2 s cap; unreachable is `unknown`, not a failure) |
 | `journal` | the rows could not be appended |
 
 The check only reports. It never writes settings: a session placing its own rules is what ledger
 L-rules-before-session warns of (plan/decisions/2026-10-30-setup-script-vs-sessionstart.md). The remedy for a failed
 check is a new thread, which gets a new container where the setup script runs.
+
+## UserPromptSubmit
+
+`scripts/notice-behind.mjs`, timeout 5 s, its own watchdog at 3 s. In an installed project, at most once per 30
+minutes per session, it asks origin for the newest release (tag or `release/` branch) (`git ls-remote`, 2 s cap). When that is above
+the release this copy runs, the session is told: `ccp-harness: this session runs release 0.1.0, but 0.1.1
+(harness-v0.1.1) is out. ...` and that a new thread runs it. It writes only its timestamp, under
+`$CCP_HARNESS_STATE` (default `$TMPDIR/ccp-harness`), never under the plugin root.
 
 ## Tests
 

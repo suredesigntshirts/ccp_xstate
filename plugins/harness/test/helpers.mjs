@@ -17,7 +17,17 @@ const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { encodi
 
 // The commit setup.sh installs in tests: the working tree as a commit (git stash create) when it has changes,
 // else HEAD, so an uncommitted change is tested too.
-export const TEST_REF = execFileSync('git', ['-C', REPO, 'stash', 'create'], { encoding: 'utf8' }).trim() || 'HEAD';
+// Test files run in parallel and each makes it, and `git stash create` can find another's index.lock, so it retries.
+export const TEST_REF = (() => {
+  for (let i = 0; ; i++) {
+    try {
+      return execFileSync('git', ['-C', REPO, 'stash', 'create'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim() || 'HEAD';
+    } catch (error) {
+      if (i >= 20) throw error;
+      execFileSync('sleep', ['0.2']);
+    }
+  }
+})();
 
 /** Runs the real setup script with HOME at `home`, installing TEST_REF without fetching tags. Returns the log text. */
 export function setup(home, extraEnv = {}) {

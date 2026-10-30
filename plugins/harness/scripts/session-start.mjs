@@ -6,7 +6,7 @@
 // It must never get in the session's way: it swallows every failure, always exits 0, and a watchdog ends it
 // within about 4 s, inside the hook's 5 s timeout.
 import { join } from 'node:path';
-import { gate, journal, journalDir, pluginRoot, sessionFile, sessionName } from './host.mjs';
+import { gate, journal, journalDir, pluginRoot, sessionFile, sessionName, stdin } from './host.mjs';
 import { collect, fingerprint } from './fingerprint.mjs';
 import { selfcheck, summary } from './selfcheck.mjs';
 
@@ -47,11 +47,3 @@ try {
   say(`ccp-harness: the session-start self-check crashed (${error.message}), so nothing was journalled for this session.`);
 }
 
-// The hook's input, or '' when it is not all there within `ms` (a hook must not wait on its stdin).
-function stdin(ms) {
-  return new Promise((ok) => {
-    let text = '';
-    setTimeout(() => ok(text), ms).unref();
-    process.stdin.setEncoding('utf8').on('data', (d) => (text += d)).on('end', () => ok(text)).on('error', () => ok(''));
-  });
-}

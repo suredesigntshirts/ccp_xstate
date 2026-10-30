@@ -73,3 +73,12 @@ export function sessionName(input = {}, env = process.env) {
 
 /** The session's journal file name: its id reduced to safe characters. */
 export const sessionFile = (session) => `${String(session).replace(/^https:\/\/claude\.ai\/code\//, '').replace(/[^A-Za-z0-9_-]/g, '_')}.jsonl`;
+
+// The hook's input, or '' when it is not all there within `ms` (a hook must not wait on its stdin).
+export function stdin(ms) {
+  return new Promise((ok) => {
+    let text = '';
+    setTimeout(() => ok(text), ms).unref();
+    process.stdin.setEncoding('utf8').on('data', (d) => (text += d)).on('end', () => ok(text)).on('error', () => ok(''));
+  });
+}
