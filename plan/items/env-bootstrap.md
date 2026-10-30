@@ -21,7 +21,6 @@
     "L-no-self-modification"
   ],
   "depends_on": [
-    "no-such-item",
     "repo-skeleton",
     "journal-schema",
     "person-setup-sitting"
