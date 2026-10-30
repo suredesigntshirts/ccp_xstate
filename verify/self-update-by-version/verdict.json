@@ -1,0 +1,31 @@
+{
+  "item": "self-update-by-version",
+  "verified_sha": "488ce9167b010d98463c75474228e4f2073ba5ac",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5JPJv6zwE7Yjrmanu9#agent=verifier",
+    "model": "claude-sonnet-5-5"
+  },
+  "summary": "All three Expect lines hold at 488ce91. npm test passed (83 tests before adding mine) and plan/check.mjs printed 'plan ok'. release: proved on the real scratch repo with two PRs merged from fresh branches off origin/main; the README-only merge ran the release workflow green and made no tag, the plugins/harness merge made harness-v0.1.1 at the merge sha. behind-notice: two separate mutations each turned a named test red. no-self-edit: I traced every write by reading the code and by strace-ing the real scripts; none is under the plugin root, and four new tests in verify/self-update-by-version/no-self-edit.test.mjs pass. No real release fingerprint rows exist in ccp_xstate yet (after_landing). Observation, not a failure: setup.sh and notice-behind.mjs write outside the plugin root only (settings.json, the clone, a temp timestamp); if CLAUDE_PLUGIN_ROOT were pointed into the git clone (a --plugin-dir run), the clone fast-forward would write under it, but the installed layout does not do that and CLAUDE_PID guards the installed copy.",
+  "results": [
+    {
+      "id": "release",
+      "status": "MET",
+      "command": "In /home/user/ccp_xstate_scratch: branches verify/non-plugin (append to README.md) and verify/plugin (append to plugins/harness/README.md) pushed off origin/main; PRs #5 and #6 on suredesigntshirts/ccp_xstate_scratch merged with mcp__github__merge_pull_request in that order; then mcp__github__actions_list list_workflow_runs release.yml and mcp__github__list_tags after each. Also read .github/workflows/release.yml and scripts/release/release.mjs.",
+      "excerpt": "Before: tags = [harness-v0.1.0]. After PR #5 (merge 3455f26, README only): release run #2 completed/success, tags still only harness-v0.1.0 (no new tag). After PR #6 (merge 662b2eb, plugins/harness/README.md): release run #3 completed/success, tags = [harness-v0.1.1 @ 662b2eb105eb523ef6e44a8bb9ae1a40392f7a5f, harness-v0.1.0 @ 668af82]. Version only rises: nextVersion() returns newest tag patch+1 or the manifest version only if higher, plan() throws 'refused' if the result is not above the newest tag, already-tagged shas are skipped, the base is the newest tag so a missed release is made by the next push, and the workflow serialises runs (concurrency group release, no cancel)."
+    },
+    {
+      "id": "behind-notice",
+      "status": "MET",
+      "command": "node --test plugins/harness/test/notice-behind.test.mjs (5 pass at head); then mutated plugins/harness/scripts/notice-behind.mjs twice with sed and reran, reverting with git checkout each time",
+      "excerpt": "Head: 5 pass, 0 fail. Mutation 1 left the file with the interval check removed; mutation 2 left the file with the version comparison removed. Each gave 4 pass, 1 fail. Tree clean after revert.",
+      "mutation": "(1) notice-behind.mjs: replaced 'Date.now() - last < INTERVAL_MS' with 'false' so the 30-minute throttle never applies; (2) replaced 'byVersion(mine.version, latest.version) >= 0' with 'false' so the notice is also said on the newest release",
+      "red_test": "(1) 'behind-notice: a session on an older release is told once, then not again within 30 minutes'; (2) 'behind-notice: nothing is said on the newest release, with no release, or when origin cannot be reached'"
+    },
+    {
+      "id": "no-self-edit",
+      "status": "MET",
+      "command": "Read every write in release.mjs (git tag/push only, no file writes), notice-behind.mjs (mkdir, write and rename of a timestamp under CCP_HARNESS_STATE or os.tmpdir()/ccp-harness) and setup.sh (clone ff-merge, ~/.claude/settings.json, mktemp work dir, and the plugin install into ~/.claude/skills/ccp-harness, skipped when /proc/$CLAUDE_PID/environ HOME equals HOME). Then node --test verify/self-update-by-version/no-self-edit.test.mjs, which runs strace -f on the real scripts and looks at write-like syscalls (open with write flags, mkdir, rename, unlink, rmdir, symlink, link, truncate, chmod, utimensat) against the plugin root.",
+      "excerpt": "4 tests pass. (a) setup.sh with a stand-in Claude (same HOME, CLAUDE_PID set), a newer tag and a newer origin/main: log 'plugin not replaced: Claude Code (pid N) is running from this HOME', 'clone fast-forwarded', zero write syscalls under the plugin root or its .old, plugin root byte and mtime snapshot identical, version still 0.0.5; control run without a running Claude shows writes under the root and installs 9.0.0, so the detector works. (b) a Claude in another HOME does not block the install. (c) notice-behind.mjs run from the installed copy while behind prints the 0.0.9 notice and has zero write syscalls under the plugin root; its only write is the timestamp in the state dir. (d) release.mjs tag writes only inside .git of the repo it runs in (made harness-v0.1.0 from manifest 0.1.0) and nothing under HOME/.claude."
+    }
+  ]
+}
