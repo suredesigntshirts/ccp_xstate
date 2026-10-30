@@ -70,6 +70,7 @@ after a newer one.
 | `result.stored` | A session's or subagent's result was stored | the store, the result's path or id |
 | `ci.result` | A CI run finished on a sha | `github`, the run id |
 | `page.refresh` | A page was published or refreshed | `artifact`, the page url |
+| `wake` | Something started a turn: a hearth wake, a subagent's report, a task notification or a typed prompt | `claude-code`, the prompt id |
 
 Payload fields per kind are set by the item that first writes that kind (the two `session.*` kinds are below); the envelope above is what every reader
 can rely on. Engine transitions arrive in stage 3 as `engine.transition`, with the transition id and the causing
@@ -90,6 +91,28 @@ version on origin, or `none` or `unknown`), `settings` (`present`, `missing` or 
 `session.selfcheck` payload: `passed` (false when any check failed) and `checks`, a list of `{ id, status, detail }`
 with status `pass`, `fail` or `unknown`. An unknown doesn't fail the check. A failure's `detail` is one plain
 sentence saying what is wrong and what to do. The ids: `settings`, `rules`, `depth`, `copy`, `release`, `journal`.
+
+## Capture rows
+
+The harness plugin's capture hook (plan item obs-live-capture, `plugins/harness/scripts/capture.mjs`) writes these to the
+session's file as they happen, in a project that installed the harness. Every row's `agent` is the subagent it is
+about, or null for the main session. No row holds what a tool was given or what anyone wrote: inputs are kept as a
+sha256 and a size. The only text kept is a subagent's brief and final answer, each stored once as
+`<journal root>/blobs/<sha256>` and linked by hash.
+
+| Hook | Kind | `payload` |
+|---|---|---|
+| PostToolUse, PostToolUseFailure | `tool.call` | `tool`, `inputHash` (sha256 of the input's JSON), `inputBytes`, `ms` (Claude Code's `duration_ms`), `ok` (false from PostToolUseFailure) |
+| SubagentStart | `agent.spawn` | `agentId`, `type`, `model` (null: the start doesn't say; `agent.finish` has the served one), `briefHash`, `depth` |
+| SubagentStart | `brief.stored` | `agentId`, `hash`, `bytes`; `source.ref` is `blobs/<hash>` |
+| SubagentStop | `agent.finish` | `agentId`, `type`, `model`, `ms` (first to last line of its transcript), `tokens` (`input`, `output`, `cacheRead`, `cacheCreation`, summed over its messages), `resultHash` |
+| SubagentStop | `result.stored` | `agentId`, `hash`, `bytes`: its SubagentHandback message, else its last text |
+| UserPromptSubmit | `wake` | `reason` (the hearth wake's reason, `agent-message`, `task-notification` or `prompt`), `source` (`hearth`, `subagent`, `claude-code` or `user`), `hash`, `bytes` |
+| Stop | `turn.usage` | `tokens` (as above, for the main transcript's messages since the last Stop), `messages`, `models`, and `cost`, `fiveHour`, `sevenDay` as null with a `placeholder`: no hook receives them |
+| each of the above | `hook.run` | `name` (`capture <event>`), `ms` (since the hook's process started), `timedOut` |
+
+`agent.spawn` and `agent.finish` take `source.ref` from the spawning tool use id in the subagent's `meta.json`. The
+brief is the first line of the subagent's transcript, which Claude Code writes before SubagentStart runs.
 
 ## Release rows
 

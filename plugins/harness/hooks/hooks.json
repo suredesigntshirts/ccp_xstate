@@ -1,5 +1,5 @@
 {
-  "description": "SessionStart: in a project that installed the harness, journal a fingerprint row and a self-check row and say in one line whether the check passed. UserPromptSubmit: at most every 30 minutes, say when a newer release is out. Elsewhere, or with CCP_HARNESS_DISABLED=1, nothing.",
+  "description": "SessionStart: in a project that installed the harness, journal a fingerprint row and a self-check row and say in one line whether the check passed. UserPromptSubmit: at most every 30 minutes, say when a newer release is out. Capture (UserPromptSubmit, PostToolUse, PostToolUseFailure, SubagentStart, SubagentStop, Stop): journal a row per wake, tool call, subagent start and finish and turn, silently. Elsewhere, or with CCP_HARNESS_DISABLED=1, nothing.",
   "hooks": {
     "SessionStart": [
       {
@@ -18,6 +18,66 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/notice-behind.mjs\"",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
             "timeout": 5
           }
         ]
