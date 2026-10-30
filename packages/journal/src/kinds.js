@@ -12,8 +12,13 @@ export const KINDS = Object.freeze([
   'person.message',
   'person.tap',
   'card.posted',
+  'post.sent',
   'brief.stored',
   'result.stored',
   'ci.result',
   'page.refresh',
+  'wake',
+  'pr.merge',
+  'journal.check',
+  'tripwire',
 ]);

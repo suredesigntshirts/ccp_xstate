@@ -4,7 +4,7 @@
   "title": "Record every refusal with its rule, its retry and how it ended",
   "stage": "s1-observability",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Each auto mode or hook refusal becomes a refusal row naming its source, rule, a hash of the refused action, whether it was retried and the outcome.",
   "why": "Refusals cost v1 the most time and were never counted. Without the action hash, v1 couldn't even tell true catches from false ones.",
   "serves": [

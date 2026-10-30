@@ -4,7 +4,7 @@
   "title": "Measure what the harness asks of the person",
   "stage": "s1-observability",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Every message and tap from the person, every card and post to them, and how long each card waited is in the journal.",
   "why": "The person's attention is the system's constraint. v1 recorded the person's messages but couldn't say what each item cost them, or how long work waited on them.",
   "serves": [
@@ -53,10 +53,13 @@
     },
     {
       "id": "rows-real",
-      "check": "For the person-setup-sitting thread, every message and tap the person made there appears as a row",
-      "how": "The verifier counts them with read_thread and compares",
+      "check": "For the wf-quick-fix thread, every message and tap the person made there appears as a row when that thread's recorded wakes are run through the capture hook",
+      "how": "The verifier counts the person's messages and taps with read_thread, reads the thread session's wakes with list_events, runs each through the PR's capture.mjs, and compares",
       "proof": "world"
     }
+  ],
+  "after_landing": [
+    "Moved out of Expect by replan (plan/decisions/2026-10-30-obs-person-attention-rows-real.md): in the first thread after the release carrying this item, every message and tap the person makes there appears as a row in the live journal, counted with read_thread. The s1 gate checks it."
   ],
   "cases": [],
   "concepts": {

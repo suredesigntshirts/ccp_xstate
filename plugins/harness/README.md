@@ -62,6 +62,35 @@ the release this copy runs, the session is told: `ccp-harness: this session runs
 (harness-v0.1.1) is out. ...` and that a new thread runs it. It writes only its timestamp, under
 `$CCP_HARNESS_STATE` (default `$TMPDIR/ccp-harness`), never under the plugin root.
 
+## Capture
+
+`scripts/capture.mjs` (plan item obs-live-capture), timeout 5 s, its own watchdog at 3 s, on UserPromptSubmit,
+PostToolUse, PostToolUseFailure, PermissionDenied, SubagentStart, SubagentStop and Stop. On PostToolUse, PostToolUseFailure and SubagentStop
+it is `async`: Claude Code starts it and goes on without waiting, so a tool call is never held up by it (a node process
+takes about 40 ms idle and 60 ms under load, mostly its own start). On SubagentStop it first waits until the subagent's
+transcript ends with its hand-back's result, or, for an agent that never hands back, until it stops growing (150 ms
+quiet, 2 s at most), because Claude Code can still be writing the last lines.
+UserPromptSubmit, SubagentStart and Stop run in line: they come once a turn or once an agent, and an async Stop hook
+was lost when a headless session exited straight after it. In an installed project it appends a row per
+wake, tool call, subagent start and finish and turn to `journal/sessions/<session>.jsonl`, stores each subagent's
+brief and final answer once under `journal/blobs/<sha256>`, and ends with a `hook.run` row giving its own time. It
+prints nothing. The rows are in `docs/journal.md`, "Capture rows"; the handlers are in `scripts/capture-rows.mjs`, and
+the tests replay a recorded session (`test/fixtures/capture/`, remade by its `make.mjs`) through them. The Stop
+handler keeps how far it read the transcript under `$CCP_HARNESS_STATE`, never under the plugin root.
+
+It is a settings hook, not a mod: mods load only after the person turns them on for each session, and hooks carry
+every field the rows need (plan/decisions/2026-10-30-capture-by-hooks.md).
+
+### Refusals
+
+Capture also journals a `refusal` row for every refused call (plan item obs-refusal-log; `docs/journal.md`, "Refusal
+rows"). An auto mode classifier refusal comes live on PermissionDenied, which it handles in line. A hook's or a
+permission rule's denial fires no hook, so the Stop and SubagentStop handlers find them in the transcript. A later call
+of the same action (same tool and input, minus its `description`) links back to the refusal by `retryOf`; the session's
+refusals so far are kept under `$CCP_HARNESS_STATE` for that. `test/fixtures/refusals/deny-hook/` is a test plugin
+whose PreToolUse hook denies any Bash command containing `ccp-refusal-probe`: load it with `--plugin-dir` beside this
+one to see a hook denial journalled.
+
 ## Tests
 
 `test/` here and `test/setup.test.mjs` at the root run the real setup script into temp HOMEs and the hook as Claude

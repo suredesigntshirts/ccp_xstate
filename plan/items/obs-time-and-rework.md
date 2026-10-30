@@ -4,7 +4,7 @@
   "title": "Show where wall-clock time goes, how much is rework, and what the harness costs itself",
   "stage": "s1-observability",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Derived views over the journal answer: time working versus waiting (on the person, CI, a wake, a rebuild); rounds, red CI pushes and replans per PR; and tokens spent on harness work against product work. A tripwire row fires when a PR passes its round limit.",
   "why": "PR #72 ran five rounds before the person noticed, and much of v1's effort went into its own bookkeeping without anyone seeing the ratio.",
   "serves": [
@@ -46,7 +46,7 @@
     },
     {
       "id": "rework",
-      "check": "For real ccp_machine PRs (#72 and two others the verifier picks), derived rounds and red CI runs equal what GitHub's commits and check runs show",
+      "check": "For real PRs in this repo (#14, which went red seven times, and two others the verifier picks), derived rounds and red CI runs equal what GitHub's commits and check runs show. ccp_machine #72 is checked the same way once its REST is reachable from a thread",
       "how": "The verifier compares the view with GitHub REST",
       "proof": "world"
     },
