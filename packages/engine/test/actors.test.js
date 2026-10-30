@@ -195,6 +195,8 @@ test('github-fact: a claimed PR GitHub doesn\'t show, or shows at another head, 
     assert.match(missing.refused.reason, /pull\/99: GitHub shows no such PR/);
     const moved = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(OTHER), github: gh.client });
     assert.equal(moved.refused.reason, `result.pr: GitHub shows ${URL_} at head ${HEAD}, not the claimed ${OTHER}`);
+    const notPr = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(HEAD, 'https://example.com/not-a-pr'), github: gh.client });
+    assert.equal(notPr.refused.reason, 'result.pr.url "https://example.com/not-a-pr" is not a GitHub PR URL', 'no shape of url skips GitHub');
     const branch = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(HEAD, URL_, 'build/y'), github: gh.client });
     assert.match(branch.refused.reason, /on branch build\/x, not the claimed build\/y/);
     const host = restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' });

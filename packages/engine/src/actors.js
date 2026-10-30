@@ -372,10 +372,11 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   return { accepted: { run: run.run, hash } };
 }
 
-// Every { url, headSha } object in a result that claims a PR: `pr` at the top (quick-fix's build) or anywhere below.
+// Every { url, headSha } object in a result: a claim of a PR at a head, `pr` at the top (quick-fix's build) or anywhere
+// below. A url that isn't a GitHub PR's is still a claim, and is refused for it, so no shape of url skips GitHub.
 function claimedPrs(value, path = 'result') {
   if (!value || typeof value !== 'object') return [];
-  const here = typeof value.url === 'string' && typeof value.headSha === 'string' && /\/pull\/\d+/.test(value.url) ? [{ path, pr: value }] : [];
+  const here = typeof value.url === 'string' && typeof value.headSha === 'string' ? [{ path, pr: value }] : [];
   return [...here, ...Object.entries(value).flatMap(([k, v]) => claimedPrs(v, `${path}.${k}`))];
 }
 
