@@ -1,5 +1,5 @@
 {
-  "description": "SessionStart: in a project that installed the harness, journal a fingerprint row and a self-check row and say in one line whether the check passed. UserPromptSubmit: at most every 30 minutes, say when a newer release is out. Capture (UserPromptSubmit, PostToolUse, PostToolUseFailure, SubagentStart, SubagentStop, Stop): journal a row per wake, tool call, subagent start and finish and turn, silently. Elsewhere, or with CCP_HARNESS_DISABLED=1, nothing.",
+  "description": "SessionStart: in a project that installed the harness, journal a fingerprint row and a self-check row and say in one line whether the check passed. UserPromptSubmit: at most every 30 minutes, say when a newer release is out. Capture (UserPromptSubmit, PostToolUse, PostToolUseFailure, SubagentStart, SubagentStop, Stop): journal a row per wake, tool call, subagent start and finish and turn, silently; on tool calls and subagent stops it runs in the background (async), so nothing waits for it. Elsewhere, or with CCP_HARNESS_DISABLED=1, nothing.",
   "hooks": {
     "SessionStart": [
       {
@@ -34,7 +34,8 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
-            "timeout": 5
+            "timeout": 5,
+            "async": true
           }
         ]
       }
@@ -45,7 +46,8 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
-            "timeout": 5
+            "timeout": 5,
+            "async": true
           }
         ]
       }
@@ -67,7 +69,8 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
-            "timeout": 5
+            "timeout": 5,
+            "async": true
           }
         ]
       }

@@ -24,8 +24,18 @@ needs a mod (engine-host), it can import `capture-rows.mjs`, whose handlers take
 **Why:** the hooks carry every field the rows need and run without the person, so the "fallback" covers everything;
 a mod would add a second path that only runs where the person has switched mods on.
 
-**What it costs:** one node process per tool call (about 40 ms measured on the project files mount, median, from
-process start), and cost and the 5-hour and 7-day usage windows, which reach no hook. `turn.usage` carries them as
+**Async on tool calls.** The PostToolUse and PostToolUseFailure capture hooks are declared `"async": true`. A probe on 2.1.314 (a PostToolUse hook doing `sleep 3`
+marked async) showed the next tool call start 1.1 s after the previous one ended, not 3 s, while the hook still
+finished and wrote. The verifier measured capture's own run at a 60 ms median in live sessions (42 ms in the idle
+fixture run), of which about 22 ms is node starting. Run in line, that would put 60 ms on every call, over the item's
+50 ms; run async, the call doesn't wait for it, and `hook.run`'s `ms` is the background run's length, not time added
+to the call. Rows still land within milliseconds of the call (the verifier saw 7 to 72 ms). SubagentStop is async too, because it waits for the subagent's transcript to settle: in a live run the hook read
+the file 20 ms before the hand-back line was written, and lost the answer and the last message's tokens.
+UserPromptSubmit, SubagentStart and Stop stay in line: with all of them async, a
+headless `claude -p` session exited before its final Stop hook wrote `turn.usage`. A tool call made just before a
+headless session exits can lose its row the same way; a thread's session stays up, so this is a headless-only edge.
+
+**What it costs:** one background node process per tool call, and cost and the 5-hour and 7-day usage windows, which reach no hook. `turn.usage` carries them as
 null with a placeholder. Reversible: a mod can replace the hook entry at any time.
 
 **Where:** the entry and handlers sit in `scripts/` beside the other hooks, not in a `hooks/capture/` folder as the

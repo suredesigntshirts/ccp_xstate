@@ -99,13 +99,16 @@ test('the hook journals the expected rows and stores each blob once, as files na
   assert.deepEqual(snapshot(blobDir), before, 'a second run changed a stored blob');
 });
 
-test('cheap: hook.run rows show at most 50 ms median and 200 ms p95 per capture run', () => {
-  const rows = runFixture(project()).filter((r) => r.kind === 'hook.run');
+test('cheap: hook.run rows show at most 50 ms median and 200 ms p95 per tool call', () => {
+  const all = runFixture(project()).filter((r) => r.kind === 'hook.run');
   const handled = events().filter((e) => EVENTS.includes(e.hook_event_name));
-  assert.equal(rows.length, handled.length, 'one hook.run per handled event, none for events capture ignores');
+  assert.equal(all.length, handled.length, 'one hook.run per handled event, none for events capture ignores');
+  assert.ok(all.every((r) => r.payload.timedOut === false));
+  // Per tool call: SubagentStop waits for the transcript to settle, in the background, once an agent.
+  const rows = all.filter((r) => r.payload.name.startsWith('capture PostToolUse'));
+  assert.equal(rows.length, 5);
   const ms = rows.map((r) => r.payload.ms).sort((a, b) => a - b);
   const at = (q) => ms[Math.min(ms.length - 1, Math.ceil(q * ms.length) - 1)];
-  assert.ok(rows.every((r) => r.payload.timedOut === false));
   assert.ok(at(0.5) <= 50, `median ${at(0.5)} ms`);
   assert.ok(at(0.95) <= 200, `p95 ${at(0.95)} ms`);
 });
@@ -138,10 +141,10 @@ test('wakes are told apart without keeping their text', () => {
   assert.deepEqual(wakeOf('fix the bug'), { reason: 'prompt', source: 'user' });
 });
 
-test('hooks.json runs capture on every event it handles', () => {
+test('hooks.json runs capture on every event it handles, in the background (async) on tool calls and subagent stops', () => {
   const hooks = JSON.parse(readFileSync(join(PLUGIN, 'hooks', 'hooks.json'), 'utf8')).hooks;
   for (const event of EVENTS) {
-    assert.ok(hooks[event].some((g) => g.hooks.some((h) => h.command.includes('scripts/capture.mjs') && h.timeout === 5)), event);
+    assert.ok(hooks[event].some((g) => g.hooks.some((h) => h.command.includes('scripts/capture.mjs') && h.timeout === 5 && (h.async === true) === ['PostToolUse', 'PostToolUseFailure', 'SubagentStop'].includes(event))), event);
   }
 });
 
