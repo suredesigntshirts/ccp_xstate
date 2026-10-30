@@ -314,6 +314,26 @@ the verified head it merged at and GitHub's merge sha. A card's is `{ ref, choic
 timer's `{ ref, due }` (plan item engine-effects). An effect that has ended is never run again. One that started and never ended
 (the host stopped mid-effect) is looked up with its handler's `find()`, or journalled `unknown` and left alone.
 
+## Actor rows
+
+The engine's actor runs (plan item engine-actors, `packages/engine/src/actors.js`) write these to the item's own file,
+beside its engine rows, with `item` and the `state` the run was started in. A run's folder is
+`<journal root>/items/<item>/runs/<seq>.<invoke>/`: `brief.md`, `context.md`, `run.json`, `spawn.json` (the Agent call
+that started it), `agent.json` (the agent bound to it) and `result.json` (its accepted result). Brief and result texts
+are blobs, `<journal root>/blobs/<sha256>`, as capture stores them.
+
+| When | Kind | `payload` |
+|---|---|---|
+| A run is prepared (its brief), or a `brief` actor's result is accepted (each brief it returned, fixed before any build starts) | `brief.stored` | `run`, `actor`, `role` (the actor, or `builder`/`verifier` for returned briefs), `hash`, `bytes`; a prepared run also has `contextHash` and `worktree` |
+| The harness binds an agent to the run its Agent call started | `agent.spawn` | `agentId`, `type`, `run`, `actor`, `briefHash`, `worktree`, `via` (`start`: found at SubagentStart; `meta`: from the agent's meta.json at its first call), `hookSession` |
+| A return or bind the actor hook refused | `refusal` | `source` `hook`, `rule` (`wrong-caller`, `schema`, `github-fact`, `already-returned`, `unknown-run`), `reason` (names the missing field or fact), `run`, `actor`, `caller`, `tool`, `textHash`, `outcome` `denied` |
+| A return passed every check | `result.stored` | `run`, `actor`, `agentId`, `hash`, `bytes`, `toolUseId` |
+
+The completion an accepted result makes is an `engine.transition` whose source is `harness` and `return <tool use id>`.
+An invoked actor's `tool.call` rows (capture, session file) also carry `paths`: the file a file tool named, the
+folder a search ran in, or the folder a shell command ran from. They are the one piece of a tool's input a row keeps,
+and only for an agent bound to a run, so the journal shows where each actor worked.
+
 ## Adding a kind
 
 1. Add it to `KINDS` in `packages/journal/src/kinds.js` (dotted lower-case words). `append()` refuses kinds not on

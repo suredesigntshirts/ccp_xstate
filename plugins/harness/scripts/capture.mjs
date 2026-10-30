@@ -4,7 +4,7 @@
 // any brief or answer under <journal>/blobs/<sha256> once, then appends a hook.run row with its own time.
 // Like every hook here it does nothing elsewhere, prints nothing, swallows every failure and always exits 0. Its
 // watchdog ends it within 3 s, inside the hook's 5 s timeout, after journalling hook.run with timedOut true.
-import { appendFileSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { performance } from 'node:perf_hooks';
@@ -132,7 +132,9 @@ try {
   const before = usesState || event === 'PostToolUse' ? loadState(where) : {};
   const refusals = refusedPath(session);
   const refused = REFUSAL_AWARE.includes(event) ? loadRefused(refusals) : {};
-  const { rows, blobs, state } = capture(input, { read, state: before, refused });
+  // An invoked actor's agent is bound to its run by the actor hook (actors.mjs), in <journal>/actors/agents/.
+  const actor = (agentId) => existsSync(join(journalDir(), 'actors', 'agents', `${String(agentId).replace(/[^A-Za-z0-9._-]/g, '_')}.json`));
+  const { rows, blobs, state } = capture(input, { read, state: before, refused, actor });
   for (const b of blobs) store(join(journalDir(), 'blobs'), b);
   for (const row of rows) append(path, { ...base, ...row });
   noteRefused(refusals, rows);

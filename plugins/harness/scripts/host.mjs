@@ -82,3 +82,14 @@ export function stdin(ms) {
     process.stdin.setEncoding('utf8').on('data', (d) => (text += d)).on('end', () => ok(text)).on('error', () => ok(''));
   });
 }
+
+/**
+ * The engine library (packages/engine/src), for the actor hooks: bundled at lib/engine in an installed copy when the
+ * setup script bundles it, else packages/engine beside the plugin in the repo, else the repo clone's.
+ */
+export async function engine(file, root = pluginRoot(), env = process.env) {
+  const places = [join(root, 'lib', 'engine', 'src'), join(root, '..', '..', 'packages', 'engine', 'src'), join(repoDir(env), 'packages', 'engine', 'src')];
+  const dir = places.find((p) => existsSync(join(p, file)));
+  if (!dir) throw new Error(`no engine library at ${places.join(', ')}`);
+  return import(join(dir, file));
+}

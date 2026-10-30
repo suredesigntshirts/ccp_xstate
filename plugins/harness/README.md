@@ -16,7 +16,7 @@ series, so whichever comes second makes nothing. The version only rises: the new
 journal row (a tag also carries it in its annotation). The setup script installs the newest release by version,
 tag or branch, and writes its version into the copy's `plugin.json`; with none it installs the clone's HEAD and says
 so. The copy carries `release.json`: name, version, tag, commit and its file list. `packages/journal` is bundled
-into the copy at `lib/journal`. A running session never changes its copy: a new release reaches the next session
+into the copy at `lib/journal`, and `packages/engine/src` at `lib/engine/src` for the actor hooks. A running session never changes its copy: a new release reaches the next session
 (plan item self-update-by-version, plan/decisions/2026-10-30-self-update-by-version.md).
 
 ## The gate
@@ -96,3 +96,11 @@ one to see a hook denial journalled.
 `test/` here and `test/setup.test.mjs` at the root run the real setup script into temp HOMEs and the hook as Claude
 Code runs it. The tests install the working tree as a commit (`git stash create`, else HEAD) through `CCP_SETUP_REF`, so an
 uncommitted change is what they test.
+
+## Actors
+
+`scripts/actors.mjs` (plan item engine-actors) starts, binds, confines and checks the agents a workflow invokes, on
+PreToolUse, SubagentStart, UserPromptSubmit and PostToolUse of Agent; the logic is `packages/engine/src/actors.js`
+(`packages/engine/README.md`, "Actors"). `.mcp.json` registers one MCP server, `harness`
+(`scripts/return-tool.mjs`), with one tool, `return`. The hook checks every call before it reaches the server; the
+server only answers whether the hook stored that result, so a return with the hook absent is never accepted.
