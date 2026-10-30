@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readFileSync, readdirSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -142,10 +142,26 @@ test('the real hook: rows match the replay, blobs are named by sha256 and stored
   assert.ok(dir);
 });
 
-test('cheap (fixture run): hook.run rows median <= 50 ms and p95 <= 200 ms', () => {
-  const { read1 } = runHook();
+// "Adds" per the decision plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md: hook.run ms is
+// performance.now() at the end of the hook, so it counts Node's own start. The same figure for a bare `node`
+// (a .mjs that only prints Math.round(performance.now())) is the baseline, measured here on the same machine; the
+// median difference is what capture adds. The 95th percentile stays an absolute bar on the raw ms.
+test('cheap (fixture run): median hook.run ms minus a bare node start <= 50 ms, raw p95 <= 200 ms', () => {
+  const { dir, read1 } = runHook();
   const ms = read1().rows.filter((r) => r.kind === 'hook.run').map((r) => r.payload.ms).sort((a, b) => a - b);
   assert.ok(ms.length >= 10);
-  assert.ok(ms[Math.floor(ms.length / 2)] <= 50, `median ${ms[Math.floor(ms.length / 2)]}`);
-  assert.ok(ms[Math.ceil(0.95 * ms.length) - 1] <= 200);
+  const bare = join(dir, 'bare.mjs');
+  writeFileSync(bare, 'process.stdout.write(String(Math.round(performance.now())));\n');
+  const base = [];
+  for (let i = 0; i < Math.max(ms.length, 15); i++) {
+    const r = spawnSync(process.execPath, [bare], { env: { PATH: process.env.PATH }, encoding: 'utf8' });
+    assert.equal(r.status, 0);
+    base.push(Number(r.stdout));
+  }
+  base.sort((a, b) => a - b);
+  const med = (a) => a[Math.floor(a.length / 2)];
+  const msg = `hook median ${med(ms)} ms (n=${ms.length}), bare node median ${med(base)} ms (n=${base.length}), adds ${med(ms) - med(base)} ms; hook p95 ${ms[Math.ceil(0.95 * ms.length) - 1]} ms`;
+  assert.ok(med(ms) - med(base) <= 50, msg);
+  assert.ok(ms[Math.ceil(0.95 * ms.length) - 1] <= 200, msg);
+  console.log(msg);
 });

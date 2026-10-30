@@ -1,51 +1,51 @@
 {
   "item": "obs-live-capture",
-  "verified_sha": "5cfc9415f16afc0449e61d6094f77d37c40ca22b",
+  "verified_sha": "550417f7d133defe48c37e068e56cd8020a5c2b6",
   "verifier": {
-    "session": "https://claude.ai/code/session_01KfkB5JqKM7EU4b9iF9dFTx#agent=verifier-obs-live-capture",
+    "session": "https://claude.ai/code/session_01KfkB5HGCWKXZyinsGeEAUT#agent=verifier-cheap",
     "model": "claude-sonnet-5-5"
   },
   "results": [
     {
       "id": "complete",
       "status": "MET",
-      "command": "node --test verify/obs-live-capture/capture.test.mjs (fixture recorded by claude -p 2.1.314 with the PR plugin and a tee hook; truth taken from the transcripts)",
-      "excerpt": "8 tool_use blocks in the parent and subagent transcripts; 7 ran and 7 tool.call rows have exactly those tool_use ids, none extra, none duplicated. The 8th was blocked by Claude Code (standalone sleep) before any hook fired, so no hook-based capture can see it (noted, not counted).",
-      "mutation": "plugins/harness/scripts/capture-rows.mjs PostToolUse handler: skipped the tool.call row when tool_name is Read",
-      "red_test": "verify \"complete: one tool.call per tool call that ran, none extra\" and builder \"complete: the handlers make the expected rows\" both went red (7 failures in all)"
+      "command": "node --test verify/obs-live-capture/capture.test.mjs (7 pass at 550417f; full npm test 200/200 after npm ci); fixture recorded by claude -p 2.1.314, truth from the transcripts",
+      "excerpt": "Re-run at 550417f: \"complete: one tool.call per tool call that ran, none extra\" and \"the real hook: rows match the replay\" pass. 7 ran calls, 7 tool.call rows with exactly those tool_use ids; the blocked 8th fires no hook (noted). Fresh live run (haiku, 3 Bash + Agent + 1 subagent Bash): 5 tool.call rows, one per call.",
+      "mutation": "plugins/harness/scripts/capture-rows.mjs toolCall(): returned no rows when tool_name is Read (redone at 550417f, reverted with git checkout)",
+      "red_test": "builder \"complete: the handlers make the expected rows, one tool.call per tool call and none extra\" and verify \"complete: one tool.call per tool call that ran, none extra\" went red (9 failures across both files)"
     },
     {
       "id": "attributed",
       "status": "MET",
-      "command": "node --test verify/obs-live-capture/capture.test.mjs; live journal of the recorded session",
-      "excerpt": "Live journal: subagent Bash and SubagentHandback rows carry agent ac494d5ec29b99e44, the parent Bash x3, Read and Agent rows carry null; test compares every row to the transcript the tool_use came from."
+      "command": "node --test verify/obs-live-capture/capture.test.mjs (7 pass at 550417f; full npm test 200/200 after npm ci); fresh live claude -p session in a temp CCP_HARNESS_DIR",
+      "excerpt": "Live journal agents for tool.call rows in order: null, null, null, null (the Agent call), a95ae304dac491487 (the subagent Bash). Fixture test compares every row with the transcript it came from; passes."
     },
     {
       "id": "no-content",
       "status": "MET",
-      "command": "grep -rl sk_test_VERIFY_8f3a91c2d7 <harness dir> (live run) and node --test verify/obs-live-capture/capture.test.mjs",
-      "excerpt": "The secret was in a parent Bash input. grep over the whole journal dir (rows and blobs) found 0 files. Rows hold inputHash = sha256(JSON of tool_input) and inputBytes; the test also checks no row holds any string input field longer than 6 chars."
+      "command": "node --test verify/obs-live-capture/capture.test.mjs (7 pass at 550417f; full npm test 200/200 after npm ci); grep -rl \"echo sub\" <live journal dir>",
+      "excerpt": "Fixture test: secret sk_test_VERIFY_8f3a91c2d7 in a parent Bash input is in no row and no blob; rows hold inputHash/inputBytes only. Live run: the subagent prompt text \"echo sub\" appears in exactly one file, the blob, in no row."
     },
     {
       "id": "blobs",
       "status": "MET",
-      "command": "node --test verify/obs-live-capture/capture.test.mjs (sha256 recomputed from the Agent call prompt and the SubagentHandback message in the transcripts)",
-      "excerpt": "agent.spawn.briefHash = brief.stored.hash = sha256(brief); agent.finish.resultHash = result.stored.hash = sha256(answer); live run had exactly 2 files in blobs/, named by hash; replaying every event a second time through the real hook left them unchanged. Re-checked at 5cfc941 with 3 live foreground-subagent sessions: result.stored hash = sha256 of the SubagentHandback text, blob present, tokens non-zero (the SubagentStop settle wait works)."
+      "command": "node --test verify/obs-live-capture/capture.test.mjs (7 pass at 550417f; full npm test 200/200 after npm ci); live run: sha256sum of each file in blobs/ vs brief.stored / result.stored rows",
+      "excerpt": "Live: blobs/ has exactly 2 files; names equal sha256 of \"Run echo sub with Bash and reply with the word done\" (7a96dc10...) and of \"done\" (a4c3ed04...); brief.stored.hash and result.stored.hash equal those. Fixture test: agent.spawn.briefHash = sha256(brief), agent.finish.resultHash = sha256(answer), second delivery leaves blobs unchanged. Caveat: in 3 live runs agent.spawn.briefHash was null (the SubagentStart transcript is not written yet; docs/journal.md says so); the brief is linked by brief.stored."
     },
     {
       "id": "cheap",
       "status": "MET",
-      "command": "node --test verify/obs-live-capture/capture.test.mjs (fixture run); then 9 paired claude -p sessions with the plugin vs without it (six sequential Bash calls each), timing each call and the gap to the next from the session transcript; plus a plugin copy with the async capture hooks removed (6 pairs)",
-      "excerpt": "Fixture run through the real hook: median 42 ms, p95 under 200. Added time per tool call, measured in real sessions: call duration (tool_use to tool_result) median 610 ms with the plugin vs 606 without (p95 713 vs 739, n=54 each). Gap from result to the next tool_use is dominated by model latency and noisy (with 1748 vs without 1256 median in one batch; 841 with capture vs 1685 with the capture hooks removed in another), so no capture cost is visible. hook.run ms in live sessions: median 65, p95 84 (n=72), but that is now the background run length, not time on the call. 9 live sessions: every one has all its tool.call rows and its turn.usage.",
-      "mutation": "plugins/harness/scripts/capture.mjs: added a 120 ms busy-wait at start-up (at 5cfc941)",
-      "red_test": "builder \"cheap: hook.run rows show at most 50 ms median...\" and verify \"cheap (fixture run)\" went red (median ~160 ms)"
+      "command": "node --test verify/obs-live-capture/capture.test.mjs (7 pass at 550417f; full npm test 200/200 after npm ci); new test \"cheap (fixture run): median hook.run ms minus a bare node start <= 50 ms, raw p95 <= 200 ms\"",
+      "excerpt": "Median hook.run ms minus the median of a bare node (.mjs printing Math.round(performance.now()), 15 samples, same machine, same test). Three runs: hook 38 / bare 22 / adds 16 ms; 37 / 21 / 16; 36 / 21 / 15 (n=14 hook runs). Raw p95 188-196 ms (n=14 so it is the max; under 200 but with little margin on a slow runner). Judged sound: hook.run ms counts from process start, so subtracting a bare start leaves capture's own work, which is what \"adds\" means; async hooks (decision capture-by-hooks) add nothing to a call's wait, shown earlier as 610 vs 606 ms per call. Doubt: a bare node does not load any ES modules, so module loading counts as capture's (conservative); the builder test plugins/harness/test/capture.test.mjs still uses the absolute 50 ms on 5 PostToolUse rows and passes here.",
+      "mutation": "plugins/harness/scripts/capture.mjs: 80 ms busy-wait before done(false), at 550417f, reverted with git checkout",
+      "red_test": "verify \"cheap (fixture run): median hook.run ms minus a bare node start <= 50 ms, raw p95 <= 200 ms\" went red: hook median 120 ms, bare 21 ms, adds 99 ms, p95 294 ms"
     },
     {
       "id": "live",
       "status": "MET",
-      "command": "claude -p --plugin-dir plugins/harness in a harness folder, polled with grep -c tool.call on the session file every 2 s while it ran; run once in the scratchpad and once with the journal and cwd on /mnt/project-files/verify-obs-live-capture/ (removed after); compared each row.at to the tool_result timestamp in the session transcript",
-      "excerpt": "Poll counts rose during the run (0,1,2,5,6,6...,7; the sleep-bridged last call was visible before the process exited). Every row.at was 7-72 ms BEFORE its tool_result entry in the transcript (the Agent call row came at its completion, 3.7 s after the tool_use because the call ran that long). Same on the network mount."
+      "command": "claude -p --plugin-dir plugins/harness --allowedTools \"Bash(echo:*) Bash(sleep:*) Agent\" --model haiku, cwd and CCP_HARNESS_DIR in a temp folder; grep -c tool.call on the session file every 2 s while it ran; then compared each tool.call row.at with the tool_result timestamp in the session transcript under ~/.claude/projects",
+      "excerpt": "Poll counts while the process was still running: 0,0,1,1,1,1,2,4,5 (the 6 s sleep spanned the 1->2 step). Each row.at was 41-63 ms AFTER its tool_result timestamp (54, 59, 63, 41, 54 ms), far under 2 s, subagent call included. Now async hooks, so rows follow the result slightly; the earlier verdict saw them before it. Not run: a session in the v2 project and list_events; transcript timestamps stand in, as in the previous verdict."
     }
   ],
-  "summary": "Re-verified at 5cfc941 (async capture on PostToolUse, PostToolUseFailure, SubagentStop). cheap judged MET: the line is about time added to a tool call, async hooks add none, and I measured it: call duration 610 vs 606 ms median with and without the plugin; hook.run.ms (median 65 live) no longer measures added time but the fixture-run figure the line names is 42 ms. Doubts: (1) the item text names hook.run rows as the method, and those rows stay above 50 ms in live sessions; (2) per-call gap measurements are noisy from model latency, so they only show that no cost is visible, not a bound of a few ms; (3) a headless session exiting right after a call can lose an async row (builder documents it; 9 of 9 live sessions here lost none). live: headless claude -p in this container (once with journal and cwd on the project mount), not a session in the v2 project, with transcript timestamps standing in for list_events; it was run at 2cc1a1e, and I did not redo the poll at 5cfc941 (the change touches only hook async flags and the SubagentStop read). Known gap: a call Claude Code blocks before any hook (standalone sleep) gets no row."
+  "summary": "Re-verified at 550417f (the cheap test now measures what capture adds). cheap: judged MET under the decision reading: median hook.run ms minus a bare node start is 15-16 ms (limit 50); the mutation (80 ms wait) gives 99 ms and goes red. Doubts: raw p95 is the max of 14 runs at 188-196 ms vs the 200 bar, thin margin on slow runners; the builder-side cheap test still uses the old absolute bar on PostToolUse rows. live: headless claude -p in a temp folder, not the v2 project. Live agent.spawn.briefHash is null (documented); brief.stored carries the link."
 }
