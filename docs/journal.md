@@ -71,6 +71,8 @@ after a newer one.
 | `ci.result` | A CI run finished on a sha | `github`, the run id |
 | `page.refresh` | A page was published or refreshed | `artifact`, the page url |
 | `wake` | Something started a turn: a hearth wake, a subagent's report, a task notification or a typed prompt | `claude-code`, the prompt id |
+| `pr.merge` | A PR merged by a journalled merge, as the merge's own response reports it | `github`, `owner/repo#number` |
+| `journal.check` | The journal check ran: what it compared and the counts it found | `journal-check`, the inputs it compared |
 
 Payload fields per kind are set by the item that first writes that kind (the two `session.*` kinds are below); the envelope above is what every reader
 can rely on. Engine transitions arrive in stage 3 as `engine.transition`, with the transition id and the causing
@@ -104,6 +106,7 @@ sha256 and a size. The only text kept is a subagent's brief and final answer, ea
 |---|---|---|
 | PostToolUse, PostToolUseFailure | `tool.call` | `tool`, `inputHash` (sha256 of the input's JSON), `inputBytes`, `ms` (Claude Code's `duration_ms`), `ok` (false from PostToolUseFailure) |
 | SubagentStart | `agent.spawn` | `agentId`, `type`, `model` (null: the start doesn't say; `agent.finish` has the served one), `briefHash` (null with a placeholder when a background agent's transcript is not written yet), `depth` |
+| PostToolUse of the GitHub MCP merge tool (`mcp__*github*__merge_pull_request`), when its response says merged | `pr.merge` | `repo` (`owner/name`), `number`, `sha` (the merge commit GitHub returned, or null), `tool`, `toolUseId`. These identifiers are the one exception to keeping no tool input |
 | PostToolUse of the Agent tool | `brief.stored` | `agentId` (from the call's result), `hash`, `bytes` of the prompt it was given; `source.ref` is `blobs/<hash>` |
 | SubagentStop | `agent.finish` | `agentId`, `type`, `model`, `ms` (first to last line of its transcript), `tokens` (`input`, `output`, `cacheRead`, `cacheCreation`, summed over its messages), `resultHash` |
 | SubagentStop | `result.stored` | `agentId`, `hash`, `bytes`: its SubagentHandback message, else its last text |
@@ -113,6 +116,38 @@ sha256 and a size. The only text kept is a subagent's brief and final answer, ea
 
 `agent.spawn` and `agent.finish` take `source.ref` from the spawning tool use id in the subagent's `meta.json`. The
 brief is the first line of the subagent's transcript; the Agent call returns it too, which is where `brief.stored` comes from.
+
+## The journal check
+
+`packages/journal/bin/journal-check.js` (plan item obs-journal-vs-world) compares the journal with facts from
+outside it and lists what doesn't match (ledger L-checks-against-world). It reads and never repairs: a gap stays a
+gap until a separate, explicit command writes a labelled placeholder row.
+
+```
+node packages/journal/bin/journal-check.js --journal <session file> --events <event log>
+node packages/journal/bin/journal-check.js --journal <journal root> --repo <owner/name> [--since <ISO time>]
+```
+
+- **Session diff** (`--events`, with `--session <file>` when `--journal` is the root). The event log is the
+  session's own record of its tool calls: `list_events` pages saved as JSON or JSONL, or a Claude Code transcript
+  (its `subagents/` folder is read too). It lists every call that ran with no `tool.call` row, and every
+  `tool.call` row inside the log's time span whose tool use id the log doesn't have. Calls Claude Code answered
+  without running (a `<tool_use_error>` result, such as a blocked `sleep`) and calls with no result yet are shown
+  but not counted: no hook fires for them. `list_events` is an MCP tool, so the session saves its pages to a file
+  first; a cloud session's local transcript is under `~/.claude/projects/`.
+- **Merge diff** (`--repo`, repeatable). It asks GitHub's REST API for the repo's closed PRs (through the session's
+  proxy, which Node needs `NODE_USE_ENV_PROXY` for; the command sets it) or reads saved responses with `--prs`. It
+  lists every PR merged since `--since` (default: the journal's first row) with no `pr.merge` row naming it, with
+  its head and merge shas, and every `pr.merge` row GitHub shows unmerged or merged at another sha. A merge made
+  through the REST API, the web UI or `git push` has no `pr.merge` row, so it is listed (case
+  C-merge-outside-host-detected). Until the engine's merge effect exists, a merge with the GitHub MCP merge tool
+  in a session that captures counts as journalled.
+- `--record <file>` appends a `journal.check` row: `payload` has `ok`, `since`, `journal`, the counts (`calls`,
+  `callRows`, `missing`, `notRun`, `pending`, `unfoundCalls`, `outside`, `merges`, `mergeRows`, `unexplained`,
+  `unfoundMerges`) and `badLines`, the journal lines it couldn't read.
+- Exit 0 when nothing is listed, 1 when something is, 2 when it couldn't run. `--json` prints the whole result.
+
+`list_events` retention is unknown, so run the session diff soon after a session ends.
 
 ## Refusal rows
 
