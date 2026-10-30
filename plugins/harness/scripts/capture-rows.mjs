@@ -2,7 +2,9 @@
 // makes out. They write nothing themselves; capture.mjs appends what they return, and the tests replay a recorded
 // session through them. Rows carry hashes and sizes of what a tool was given, never the input itself; the only
 // text kept is a subagent's brief and final answer, stored as blobs by content hash. docs/journal.md, "Capture
-// rows" and "Refusal rows", says what each row holds; refusals are plan item obs-refusal-log.
+// rows", "Refusal rows" and "Person rows", says what each row holds; refusals are plan item obs-refusal-log. The
+// person rows (plan item obs-person-attention) come from two paths: what the person did arrives as a hearth wake, and
+// what the session put in front of them is its own hearthbot tool call.
 import { createHash, randomUUID } from 'node:crypto';
 import { closeSync, fstatSync, openSync, readSync } from 'node:fs';
 
@@ -52,7 +54,8 @@ export function actionHash(tool, input) {
 
 /**
  * The rows and blobs for one hook input. `read` is read() above, or a stand-in for tests; `state` is this session's
- * capture state ({ transcriptAt }: how far the last Stop read the transcript), which the Stop handler advances.
+ * capture state ({ transcriptAt, thread }: how far the last Stop read the transcript, which the Stop handler advances,
+ * and the thread of the last hearth wake, which UserPromptSubmit sets).
  * `refused` maps the actionHash of each action this session already had refused to that refusal row's id; `newId`
  * makes a refusal row's id, so a later row can link to it. Returns { rows, blobs, state }; each row has kind,
  * source, agent, payload and maybe placeholder, id and at.
@@ -66,13 +69,19 @@ export function capture(input, { read, state = {}, refused = {}, newId = randomU
 const HANDLERS = {
   PostToolUse: (input, ctx) => {
     const brief = briefOf(input);
-    return { rows: [toolCall(input, true, ctx), ...brief.rows, ...mergeOf(input)], blobs: brief.blobs };
+    return { rows: [toolCall(input, true, ctx), ...brief.rows, ...mergeOf(input), ...posted(input, ctx.state)], blobs: brief.blobs };
   },
   PostToolUseFailure: (input, ctx) => ({ rows: [toolCall(input, false, ctx)] }),
   PermissionDenied: (input, ctx) => ({ rows: [classifierRefusal(input, ctx)] }),
   SubagentStart: spawn,
   SubagentStop: finish,
-  UserPromptSubmit: (input) => ({ rows: [wake(input)] }),
+  UserPromptSubmit: (input, { state }) => {
+    const prompt = typeof input.prompt === 'string' ? input.prompt : '';
+    const person = personOf(prompt);
+    // A thread's session is bound to its thread; the card and post rows of later tool calls take it from here.
+    const next = person.thread && person.thread !== state.thread ? { ...state, thread: person.thread } : state;
+    return { rows: [wake(input), ...person.rows], state: next };
+  },
   Stop: usage,
 };
 
@@ -350,4 +359,96 @@ function usage(input, { read, state, refused, newId }) {
     }, ...refusalsIn(entries, null, { refused, newId })],
     state: got ? { ...state, transcriptAt: got.start + bytes(whole) } : state,
   };
+}
+
+// Person rows. A hearth wake is XML-like text with entity-escaped attribute values and bodies.
+const unescape = (text) => text.replace(/&(#(\d+)|#x([0-9a-f]+)|amp|lt|gt|quot|apos);/gi, (all, _, dec, hex) =>
+  dec ? String.fromCodePoint(Number(dec)) : hex ? String.fromCodePoint(parseInt(hex, 16))
+    : { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" }[all.slice(1, -1).toLowerCase()]);
+
+const attrs = (text) => Object.fromEntries([...text.matchAll(/([\w-]+)="([^"]*)"/g)].map(([, k, v]) => [k, unescape(v)]));
+
+/**
+ * What the person did, from one wake's text: { thread, rows }. Each message from="human" is a person.message, except
+ * on a decision-chosen wake, where it is the platform's record of a tap and becomes one person.tap naming the card
+ * (the decision_id note) and the option. Text the person wrote is kept as a hash and a size, never itself. Messages a
+ * coordinator relays (<cited author="user">) are copies of messages recorded where they were written, so they make
+ * no row here.
+ */
+export function personOf(prompt) {
+  const open = prompt.match(/<wake ([^>]*)>/);
+  if (!open) return { thread: null, rows: [] };
+  const reason = attrs(open[1]).reason ?? null;
+  const thread = prompt.match(/<thread ts="([^"]+)"/)?.[1] ?? null;
+  const notes = Object.fromEntries([...prompt.matchAll(/<system-note>([\w-]+)=([^<\s]*)<\/system-note>/g)].map(([, k, v]) => [k, unescape(v)]));
+  const rows = [];
+  for (const [, head, body] of prompt.matchAll(/<message ([^>]*)>([\s\S]*?)<\/message>/g)) {
+    const a = attrs(head);
+    if (a.from !== 'human') continue;
+    const sentAt = a['sent-at'] ?? null;
+    const authorId = a['author-id'] ?? null;
+    if (reason === 'decision-chosen' && notes.decision_id) {
+      const index = Number.parseInt(notes.option_index, 10);
+      rows.push({
+        kind: 'person.tap',
+        source: { system: 'hearth', ref: notes.decision_id },
+        agent: null,
+        payload: { thread, cardId: notes.decision_id, option: notes.option ?? null, optionIndex: Number.isInteger(index) ? index : null, sentAt, authorId },
+      });
+      continue;
+    }
+    const text = unescape(body);
+    rows.push({
+      kind: 'person.message',
+      source: { system: 'hearth', ref: a.id ?? `${reason ?? 'wake'} ${sentAt ?? ''}`.trim() },
+      agent: null,
+      payload: { thread, messageId: a.id ?? null, reason, trigger: a.trigger === 'true', surface: a.surface ?? null, sentAt, authorId, hash: sha256(text), bytes: bytes(text) },
+      ...(a.id ? {} : { placeholder: 'the wake gave this message no id' }),
+    });
+  }
+  return { thread, rows };
+}
+
+// The hearthbot tools that put something in front of the person: a decision or draft card, or a post that notifies.
+// Claude Code names an MCP tool mcp__<server>__<tool>; a plugin's copy of the server adds its own prefix.
+const HEARTH_TOOL = /^mcp__(?:.*[_-])?hearthbot__(request_decision|post_widget|post_message)$/;
+
+// An MCP tool's result reaches PostToolUse as its content blocks (seen 2026-10-30 on Claude Code 2.1.314); hearthbot
+// answers with one text block of JSON such as {"message_id":"cmsg_…","thread_id":"cmsg_…"}.
+function resultOf(response) {
+  const blocks = Array.isArray(response) ? response : Array.isArray(response?.content) ? response.content : null;
+  const text = blocks ? textOf(blocks) : typeof response === 'string' ? response : null;
+  if (text === null) return response && typeof response === 'object' ? response : {};
+  try {
+    const parsed = JSON.parse(text);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+/** card.posted or post.sent for one successful hearthbot call, with the thread the session was last woken in. */
+export function posted(input, state = {}) {
+  const tool = String(input.tool_name ?? '').match(HEARTH_TOOL)?.[1];
+  if (!tool) return [];
+  const result = resultOf(input.tool_response);
+  const id = typeof result.message_id === 'string' ? result.message_id : null;
+  const thread = (typeof result.thread_id === 'string' ? result.thread_id : null) ?? state.thread ?? null;
+  const given = JSON.stringify(input.tool_input ?? null);
+  const base = {
+    source: { system: 'hearth', ref: id ?? input.tool_use_id ?? `PostToolUse ${input.tool_name}` },
+    agent: input.agent_id ?? null,
+    ...(id ? {} : { placeholder: `the ${tool} result named no message id` }),
+  };
+  if (tool === 'post_message') {
+    const text = typeof input.tool_input?.text === 'string' ? input.tool_input.text : '';
+    const attached = Array.isArray(input.tool_input?.attached_outputs) ? input.tool_input.attached_outputs.length : 0;
+    return [{ ...base, kind: 'post.sent', payload: { thread, messageId: id, hash: sha256(text), bytes: bytes(text), attached } }];
+  }
+  const options = Array.isArray(input.tool_input?.options) ? input.tool_input.options.length : null;
+  return [{
+    ...base,
+    kind: 'card.posted',
+    payload: { thread, cardId: id, card: tool === 'request_decision' ? 'decision' : 'widget', options, recommended: Number.isInteger(input.tool_input?.recommended) ? input.tool_input.recommended : null, inputHash: sha256(given), inputBytes: bytes(given) },
+  }];
 }

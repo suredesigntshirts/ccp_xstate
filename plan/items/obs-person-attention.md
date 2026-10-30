@@ -4,7 +4,7 @@
   "title": "Measure what the harness asks of the person",
   "stage": "s1-observability",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Every message and tap from the person, every card and post to them, and how long each card waited is in the journal.",
   "why": "The person's attention is the system's constraint. v1 recorded the person's messages but couldn't say what each item cost them, or how long work waited on them.",
   "serves": [
