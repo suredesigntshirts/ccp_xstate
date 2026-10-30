@@ -27,3 +27,6 @@
   one test per guard, so a guard added later is covered without a new test.
 - **`below` holds only for a number.** #110's `value < below` held for `null` (`null < 2`), so `buildsLeft` passed
   with `builds: null`. The verifier found it; every other condition already treated null as absent.
+- **#110's journal is a committed fixture** (`packages/engine/test/fixtures/110-demo/`). No recorded run existed on
+  any ccp_machine branch. The person approved running #110's real demo in this thread (2026-10-30 16:54Z) after auto
+  mode had refused it unasked, and the recording is kept so no later item needs to run ccp_machine again.
