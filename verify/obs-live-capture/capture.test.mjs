@@ -4,13 +4,13 @@
 // the builder's expected rows.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readFileSync, readdirSync } from 'node:fs';
+import { appendFileSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { capture, read } from '../../plugins/harness/scripts/capture-rows.mjs';
+import { capture, handedBack, read } from '../../plugins/harness/scripts/capture-rows.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIX = join(HERE, 'fixture');
@@ -142,10 +142,53 @@ test('the real hook: rows match the replay, blobs are named by sha256 and stored
   assert.ok(dir);
 });
 
-test('cheap (fixture run): hook.run rows median <= 50 ms and p95 <= 200 ms', () => {
-  const { read1 } = runHook();
+// "Adds" per the decision plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md: hook.run ms is
+// performance.now() at the end of the hook, so it counts Node's own start. The same figure for a bare `node`
+// (a .mjs that only prints Math.round(performance.now())) is the baseline, measured here on the same machine; the
+// median difference is what capture adds. The 95th percentile stays an absolute bar on the raw ms.
+test('cheap (fixture run): median hook.run ms minus a bare node start <= 50 ms, raw p95 <= 200 ms', () => {
+  const { dir, read1 } = runHook();
   const ms = read1().rows.filter((r) => r.kind === 'hook.run').map((r) => r.payload.ms).sort((a, b) => a - b);
   assert.ok(ms.length >= 10);
-  assert.ok(ms[Math.floor(ms.length / 2)] <= 50, `median ${ms[Math.floor(ms.length / 2)]}`);
-  assert.ok(ms[Math.ceil(0.95 * ms.length) - 1] <= 200);
+  const bare = join(dir, 'bare.mjs');
+  writeFileSync(bare, 'process.stdout.write(String(Math.round(performance.now())));\n');
+  const base = [];
+  for (let i = 0; i < Math.max(ms.length, 15); i++) {
+    const r = spawnSync(process.execPath, [bare], { env: { PATH: process.env.PATH }, encoding: 'utf8' });
+    assert.equal(r.status, 0);
+    base.push(Number(r.stdout));
+  }
+  base.sort((a, b) => a - b);
+  const med = (a) => a[Math.floor(a.length / 2)];
+  const msg = `hook median ${med(ms)} ms (n=${ms.length}), bare node median ${med(base)} ms (n=${base.length}), adds ${med(ms) - med(base)} ms; hook p95 ${ms[Math.ceil(0.95 * ms.length) - 1]} ms`;
+  assert.ok(med(ms) - med(base) <= 50, msg);
+  assert.ok(ms[Math.ceil(0.95 * ms.length) - 1] <= 200, msg);
+  console.log(msg);
+});
+
+// SubagentStop's early exit (b95097e): the hook may stop waiting only when the transcript ends with the result of the
+// agent's own SubagentHandback call. Written by the verifier after a mutation that ignored the id match survived.
+test('early settle: a tail ending in another call\'s result is not a hand-back, and a late hand-back is still captured', async () => {
+  const lines = readFileSync(join(FIX, 'session', 'subagents', SUB), 'utf8').trim().split('\n');
+  const swapped = lines.map((l, i) => (i === lines.length - 1 ? l.replace(/"tool_use_id":"[^"]+"/, '"tool_use_id":"toolu_other"') : l));
+  assert.equal(handedBack(lines.join('\n')), true);
+  assert.equal(handedBack(swapped.join('\n')), false, 'the hand-back call is there but the last result is not its own');
+  // Real hook, transcript cut before the hand-back call, which lands 120 ms after the hook starts (the live race).
+  const dir = mkdtempSync(join(tmpdir(), 'verify-late-'));
+  execFileSync(process.execPath, [join(PLUGIN, 'scripts', 'install.mjs')], { env: { PATH: process.env.PATH, CCP_HARNESS_DIR: dir } });
+  const sub = join(dir, 'agent.jsonl');
+  writeFileSync(sub, `${lines.slice(0, 4).join('\n')}\n`);
+  const ev = events(FIX).find((e) => e.hook_event_name === 'SubagentStop');
+  ev.agent_transcript_path = sub;
+  const env = { PATH: process.env.PATH, CCP_HARNESS_DIR: dir, CCP_HARNESS_STATE: join(dir, 'state') };
+  setTimeout(() => appendFileSync(sub, `${lines.slice(4).join('\n')}\n`), 120);
+  const child = spawn(process.execPath, [join(PLUGIN, 'scripts', 'capture.mjs')], { env });
+  child.stdin.end(JSON.stringify(ev));
+  assert.equal(await new Promise((ok) => child.on('close', ok)), 0);
+  const rows = jsonl(join(dir, 'journal', 'sessions', `${ev.session_id}.jsonl`));
+  const fin = rows.find((x) => x.kind === 'agent.finish');
+  const answer = JSON.parse(lines[4]).message.content.find((c) => c.name === 'SubagentHandback').input.message;
+  assert.equal(rows.find((x) => x.kind === 'result.stored')?.payload.hash, sha(answer));
+  assert.equal(fin.payload.resultHash, sha(answer));
+  assert.ok(fin.payload.tokens.output > 0);
 });

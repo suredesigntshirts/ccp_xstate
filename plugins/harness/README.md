@@ -67,8 +67,9 @@ the release this copy runs, the session is told: `ccp-harness: this session runs
 `scripts/capture.mjs` (plan item obs-live-capture), timeout 5 s, its own watchdog at 3 s, on UserPromptSubmit,
 PostToolUse, PostToolUseFailure, PermissionDenied, SubagentStart, SubagentStop and Stop. On PostToolUse, PostToolUseFailure and SubagentStop
 it is `async`: Claude Code starts it and goes on without waiting, so a tool call is never held up by it (a node process
-takes about 40 ms idle and 60 ms under load, mostly its own start). On SubagentStop it first waits for the subagent's
-transcript to stop growing (150 ms quiet, 2 s at most), because Claude Code can still be writing the last lines.
+takes about 40 ms idle and 60 ms under load, mostly its own start). On SubagentStop it first waits until the subagent's
+transcript ends with its hand-back's result, or, for an agent that never hands back, until it stops growing (150 ms
+quiet, 2 s at most), because Claude Code can still be writing the last lines.
 UserPromptSubmit, SubagentStart and Stop run in line: they come once a turn or once an agent, and an async Stop hook
 was lost when a headless session exited straight after it. In an installed project it appends a row per
 wake, tool call, subagent start and finish and turn to `journal/sessions/<session>.jsonl`, stores each subagent's

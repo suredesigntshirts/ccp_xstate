@@ -7,7 +7,7 @@ import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PLUGIN, runHook, snapshot, temp } from './helpers.mjs';
 import { FIXTURE, events, expected, reader } from './capture-fixture.mjs';
-import { EVENTS, capture, sha256, wakeOf } from '../scripts/capture-rows.mjs';
+import { EVENTS, capture, handedBack, sha256, wakeOf } from '../scripts/capture-rows.mjs';
 import { readFile } from '../../../packages/journal/src/index.js';
 
 const HOOK = join(PLUGIN, 'scripts', 'capture.mjs');
@@ -111,6 +111,16 @@ test('cheap: hook.run rows show at most 50 ms median and 200 ms p95 per tool cal
   const at = (q) => ms[Math.min(ms.length - 1, Math.ceil(q * ms.length) - 1)];
   assert.ok(at(0.5) <= 50, `median ${at(0.5)} ms`);
   assert.ok(at(0.95) <= 200, `p95 ${at(0.95)} ms`);
+});
+
+test('SubagentStop stops waiting once the transcript ends with the hand-back result, and only then', () => {
+  const dir = join(FIXTURE, 'session', 'subagents');
+  const text = readFileSync(join(dir, readdirSync(dir).find((n) => n.endsWith('.jsonl'))), 'utf8');
+  const kept = text.trim().split('\n');
+  assert.equal(handedBack(text), true);
+  assert.equal(handedBack(kept.slice(0, -1).join('\n')), false, 'the hand-back call without its result is not the end');
+  assert.equal(handedBack(kept.filter((l) => !l.includes('SubagentHandback')).join('\n')), false, 'another tool result is not the end');
+  assert.equal(handedBack(''), false);
 });
 
 test('inert: with no install marker the hook writes nothing and prints nothing', () => {
