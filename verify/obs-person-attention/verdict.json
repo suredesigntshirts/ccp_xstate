@@ -1,0 +1,39 @@
+{
+  "item": "obs-person-attention",
+  "verified_sha": "0f7f5be2f129a022aa9ad773bde68f35dcf50076",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5JBWkhsCp3CSZ8X2Sm#agent=verifier-obs-person-attention",
+    "model": "claude-sonnet-5-5"
+  },
+  "results": [
+    {
+      "id": "rows",
+      "status": "MET",
+      "command": "node --test verify/obs-person-attention/person.test.mjs (runs the real hook plugins/harness/scripts/capture.mjs after install.mjs, temp CCP_HARNESS_DIR/CCP_HARNESS_STATE, CLAUDE_CODE_REMOTE_SESSION_ID empty). Fixture: tap wake pulled by the verifier from session_01KfkB5HZRbfGRGcZb4ar2mX via list_events (decision-chosen, 16:54:27Z); mention wake 3 s later with its text replaced by a placeholder; card PostToolUse written from the card id the tap names.",
+      "excerpt": "6 tests pass. Message wake, request_decision call, tap wake in that order gave exactly 1 person.message (id ...NzCoefJg..., thread ...8VmmfRj9...), 1 card.posted (cardId ...7oo3Bm18..., thread taken from the last wake), 1 person.tap (cardId same, option A, optionIndex 0, sentAt 2026-10-30T16:54:27Z); card and tap source.ref equal the card id; the tap wake made no person.message; no row holds the person's text or the card's question; attention() joins them into one card with the tap time. The builder's tap-wake.txt is byte-identical to the source envelope apart from a trailing newline. Caveat: the card.posted thread comes from the preceding wake (request_decision returns no thread), so a card posted in a session never woken in that thread would have a null thread."
+    },
+    {
+      "id": "wait",
+      "status": "MET",
+      "command": "node --test plugins/harness/test/person.test.mjs packages/journal/test/attention.test.js (12 pass); then mutated attention.js",
+      "excerpt": "Unmutated: 12 of 12 pass. With wait broken, 4 tests go red.",
+      "mutation": "packages/journal/src/derive/attention.js: card.waitMs = tappedAt - postedAt + 1000",
+      "red_test": "attention.test.js 'wait: a card waits from its post to its tap' (also 'counts: per day...', 'attentionOf reads every journal file...', and person.test.mjs 'the hook journals message, card and tap linked by the card id, with the card wait from post to tap')"
+    },
+    {
+      "id": "caps",
+      "status": "MET",
+      "command": "same run; two mutations",
+      "excerpt": "Unmutated: pass. Both mutations turned the caps test red; restored afterwards (git status clean apart from verify/obs-person-attention/).",
+      "mutation": "packages/journal/src/derive/attention.js: (1) over: posts > caps.thread changed to >=; (2) CAPS.thread 20 changed to 25",
+      "red_test": "attention.test.js 'caps: an hour with more than 20 posts in one thread is flagged, 20 is not' (red under both)"
+    },
+    {
+      "id": "rows-real",
+      "status": "NOT MET",
+      "command": "mcp__hearthbot__read_thread on cmsg_01VhYV3jhQ9s4qrrh2th12sNUeSynB7fUUFibBPeu8KuzG (oldest first, has_more false); ls and grep -c person. over /mnt/project-files/harness/journal/sessions/ (9 files)",
+      "excerpt": "read_thread shows 7 messages, every one author agent (status checklists, a PR summary, a coordinator message received); no message or tap by the person. The expected row count is 0 and the journal has 0 person.* rows, so the counts agree, but only vacuously. The sitting ran 10:24-10:29Z; the harness was installed at 12:12Z, the earliest journal row is 16:44Z, and no journal file belongs to that thread's session. So it says nothing about whether capture records the person's messages or taps. The nearest real evidence is the 16:54Z tap and mention in the wf-quick-fix thread, which the person.* rows should have covered, but that session is also absent from the journal (no card.posted, person.* in any of the 9 files; the installed release is 0.1.0, which predates the build). Not shown: that real person actions in a live thread become rows. Needs a thread run after the release carrying this PR is installed, where the person sends a message and taps a card, then count again."
+    }
+  ],
+  "summary": "rows, wait, caps MET. rows-real NOT MET because the named thread holds no person action to count and predates capture, and the live journal has zero person rows from any session; the live path (UserPromptSubmit wake to person row) is proven against a real envelope but not against a live run after release."
+}
