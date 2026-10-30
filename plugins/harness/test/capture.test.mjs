@@ -99,8 +99,12 @@ test('the hook journals the expected rows and stores each blob once, as files na
   assert.deepEqual(snapshot(blobDir), before, 'a second run changed a stored blob');
 });
 
-test('cheap: hook.run rows show at most 50 ms median and 200 ms p95 per tool call', () => {
-  const all = runFixture(project()).filter((r) => r.kind === 'hook.run');
+// hook.run ms counts from the hook process's start, so it holds Node's own start, which grows when the suite runs
+// in parallel on a busy runner. What capture adds is the median minus a bare node start measured the same way, here
+// and now (plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md); p95 stays an absolute bar.
+test('cheap: hook.run rows show at most 50 ms median over a bare node start and 200 ms p95 per tool call', () => {
+  const dir = project();
+  const all = runFixture(dir).filter((r) => r.kind === 'hook.run');
   const handled = events().filter((e) => EVENTS.includes(e.hook_event_name));
   assert.equal(all.length, handled.length, 'one hook.run per handled event, none for events capture ignores');
   assert.ok(all.every((r) => r.payload.timedOut === false));
@@ -109,7 +113,12 @@ test('cheap: hook.run rows show at most 50 ms median and 200 ms p95 per tool cal
   assert.equal(rows.length, 5);
   const ms = rows.map((r) => r.payload.ms).sort((a, b) => a - b);
   const at = (q) => ms[Math.min(ms.length - 1, Math.ceil(q * ms.length) - 1)];
-  assert.ok(at(0.5) <= 50, `median ${at(0.5)} ms`);
+  const bare = join(dir, 'bare.mjs');
+  writeFileSync(bare, 'process.stdout.write(String(Math.round(performance.now())));\n');
+  const starts = Array.from({ length: 15 }, () => Number(execFileSync(process.execPath, [bare], { env: { PATH: process.env.PATH }, encoding: 'utf8' })))
+    .sort((a, b) => a - b);
+  const node = starts[Math.floor(starts.length / 2)];
+  assert.ok(at(0.5) - node <= 50, `median ${at(0.5)} ms, of which a bare node start is ${node} ms`);
   assert.ok(at(0.95) <= 200, `p95 ${at(0.95)} ms`);
 });
 
