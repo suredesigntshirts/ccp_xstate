@@ -4,7 +4,7 @@
   "title": "Set up the repo so every later item has one way to test, check and find things",
   "stage": "s0-environment",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "ccp_xstate main has workspaces, node:test, CI running the tests and the plan check, a short CLAUDE.md that maps into docs/, and branch rules.",
   "why": "Every item needs the same test and CI path. A short CLAUDE.md that points into docs keeps standing knowledge checkable instead of one drifting file. Until v2 runs its own items, the plan items are built by hand, so CI is the only thing holding the verify-before-merge rule (plan-review finding 11).",
   "serves": [
