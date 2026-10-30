@@ -1,0 +1,48 @@
+{
+  "item": "engine-host",
+  "verified_sha": "42e6db0c9aad2e96cce9e241570ccdd07c65df95",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5HsRaH5LqFzSrzABpr#agent=verifier-engine-host",
+    "model": "claude-sonnet-5-5"
+  },
+  "results": [
+    {
+      "id": "duplicate",
+      "status": "MET",
+      "command": "node --test verify/engine-host/host.test.mjs",
+      "excerpt": "duplicate (a): same wake twice in one hook and again after restart -> outcomes [applied, duplicate], then [duplicate]; one side effect, run effect rows [start, done]. duplicate (b): real child process exits 9 mid-effect after side effect logged; two restarts without find() never repeat it (rows [start, unknown]); with find() it completes with 0 new starts. Mutating host.js to skip the duplicate check turned my test 'duplicate (a)' red."
+    },
+    {
+      "id": "stale",
+      "status": "MET",
+      "command": "node --test verify/engine-host/host.test.mjs",
+      "excerpt": "After a pr.pushed re-entered verifying, the old run's PASS completion (live host and restored host, no-run, forged run id) gave outcome 'stale', transition null, reason 'run ... is not in flight'; snapshot hash unchanged; the current run's completion still applied (awaitingMerge)."
+    },
+    {
+      "id": "refused-effect",
+      "status": "MET",
+      "command": "node --test verify/engine-host/host.test.mjs",
+      "excerpt": "Build handler returned refused{rule:'auto-mode: Self-Modification'}: one engine.effect row phase=refused with that rule, state replanning with failure naming the rule; builds counter stayed 1 across 3 restored hosts and a re-offer. A thrown error is also run once and steps back."
+    },
+    {
+      "id": "replay",
+      "status": "MET",
+      "command": "node --test packages/engine/test/host.test.js (clean), then with host.js mutated",
+      "excerpt": "Builder test 'replaying an item's journal rebuilds its snapshot exactly' green on clean code (back.snapshot hash == live hash == last journalled hash); my test replay (extra) also compares hashes. With the mutation the builder test went red (4 of 10 host tests failed, including this one).",
+      "mutation": "packages/engine/src/host.js restore(): appended .slice(0, -1) to the sorted applied-transition list so the last applied row is not replayed (reverted afterwards; git diff clean)",
+      "red_test": "packages/engine/test/host.test.js: \"replaying an item's journal rebuilds its snapshot exactly\""
+    },
+    {
+      "id": "no-agent-events",
+      "status": "NOT MET",
+      "command": "node --test verify/engine-host/plugin-tools.test.mjs; node verify/engine-host/forge-probe.mjs",
+      "excerpt": "Plugin side holds: plugins/harness registers no MCP server, tool, agent or command (no .mcp.json, plugin.json has only name/version/description/author), one skill (install) and hooks, and nothing in it references the engine host, so there is no tool to call. But the host's own entry point does not hold: packages/engine/bin/host.js `wake` takes the wake text from stdin JSON and does not check hook.tool_name. forge-probe.mjs feeds a PostToolUse of the Bash tool whose stdout merely contains '<wake reason=\"timer\" current-time=\"2099-...\">' and the item goes building -> replanning with a transition whose source is {system:'timer'}. The same path gives github-sourced events from any tool output, and session_id (the owner check) and start's --session are whatever the caller types. So an agent that can run the CLI, or a hook wired to PostToolUse of any tool, can set an event's source."
+    },
+    {
+      "id": "one-owner",
+      "status": "MET",
+      "command": "two real `claude -p --session-id` runs on /mnt/project-files/engine-host-verify/run1; A ran host.js start via Bash, B got the check_run wake as its prompt and a UserPromptSubmit hook (--settings) ran host.js wake with B's real session_id",
+      "excerpt": "A (2d81c006) -> outcome applied, owner 2d81c006. B (ad925f17) -> outcome 'not-owner', reason 'own-1 is owned by 2d81c006-...'. The refusal row is in sessions/ad925f17-....jsonl (engine.transition, outcome not-owner); items/own-1.jsonl still has 1 row, 0 mentioning B. Copies in verify/engine-host/one-owner-evidence/."
+    }
+  ]
+}
