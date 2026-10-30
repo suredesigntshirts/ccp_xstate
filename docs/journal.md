@@ -75,10 +75,11 @@ after a newer one.
 | `pr.merge` | A PR merged by a journalled merge, as the merge's own response reports it | `github`, `owner/repo#number` |
 | `journal.check` | The journal check ran: what it compared and the counts it found | `journal-check`, the inputs it compared |
 | `tripwire` | A PR passed its round limit | `github`, `<owner/repo>#<pr>` |
+| `engine.transition` | An event offered to an item's workflow, and whether the host applied it | the event's source: `github`, `hearth`, `claude-code`, `timer` or `engine`, and its id there |
+| `engine.effect` | A host effect starting or ending | `engine`, the effect id |
 
 Payload fields per kind are set by the item that first writes that kind (the two `session.*` kinds are below); the envelope above is what every reader
-can rely on. Engine transitions arrive in stage 3 as `engine.transition`, with the transition id and the causing
-call or completion id recorded at write time (L-record-route-at-write).
+can rely on.
 
 ## Session rows
 
@@ -273,6 +274,42 @@ rows, the newest row's time and when it last read.
   `viewer` (the viewer's opaque id). Why: `plan/decisions/2026-10-30-obs-page.md`.
 - `test/browser-check.mjs <folder>` opens `observe.html` in Chromium with a stand-in viewer serving `<folder>` as
   the project's files, presses Refresh and prints what the page shows and the rows it recorded.
+
+## Engine rows
+
+The engine host (plan item engine-host, `packages/engine/src/host.js`) writes these to the item's own file,
+`<journal root>/items/<item>.jsonl`. The session that started the item owns that file and is its only writer; its
+first row creates the file exclusively. `restore()` reads that one file by its path and never lists a folder
+(L-library-mount-slow). `item` is the item id and `state` the item's state (as JSON) after the row.
+
+`engine.transition`: one row per event offered to the item, applied or not. `source` is where the event came from,
+recorded at write time (L-record-route-at-write): `github` and a hash of the GitHub event's kind and JSON (so a
+redelivery has the same source), `hearth` and the card id for a tap, `claude-code` and the task id for a worker's
+failure (or the session id for the start), `timer` and the timer id, or `engine` and the effect id for what an
+effect reported. A source already offered is a duplicate. `id` is the transition id, `<item>#<seq>`, on an applied row.
+
+| Field | What |
+|---|---|
+| transition | `<item>#<seq>` when applied, else null |
+| seq | The transition's place in the item, from 0 (the start), or null when not applied |
+| outcome | `applied`, `duplicate` (that source was already offered), `stale` (a completion from a run no longer in flight, or a timer no longer set), `refused` (the workflow doesn't take it now, or its payload fails the schema) or `not-owner` |
+| reason | Why it wasn't applied, or null |
+| workflow | The workflow's id |
+| event | The event as offered; replay applies it again |
+| run | The run effect id a completion answers, or null |
+| from | The state before (as JSON), on an applied row |
+| hash | `hashOf` the snapshot after, on an applied row; restore checks each one |
+
+A `not-owner` row, and a `refused` row for an item that hasn't started, go to the offering session's own file
+(`sessions/<session>.jsonl`), since only the owner writes the item's file.
+
+`engine.effect`: a row when an effect starts and one when it ends. Effect ids name the effect for good:
+`<item>:<seq>.<invoke id>` for a run, `<item>:<seq>.<timer id>` for a timer, with `:stop` or `:cancel` added when
+the state that started it was left. `payload`: `effect`, `type` (`run`, `stop`, `timer`, `cancel`), `phase` (`start`,
+then `done`, `refused`, `failed` or `unknown`), `transition` (the transition that asked for it), `actor` (a run's
+actor), `timer` and `due` (a timer's), `outcome` (what the handler reported, such as the card or task id it made),
+`rule` (what refused it) and `reason`. An effect that has ended is never run again. One that started and never ended
+(the host stopped mid-effect) is looked up with its handler's `find()`, or journalled `unknown` and left alone.
 
 ## Adding a kind
 

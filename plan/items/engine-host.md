@@ -4,7 +4,7 @@
   "title": "Run a workflow file: restore, take one event from its source, run effects once, persist",
   "stage": "s3-engine-skeleton",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "The host turns each wake (GitHub event, card tap, timer, worker completion) into one event for one item, applies it to that item's workflow, runs the resulting effects exactly once by effect id, and journals the transition with its source and transition id.",
   "why": "v1 asked agents to report what happened, then checked who sent it. The host makes the machine start the work and hear results from their sources, so there is nothing to attest. PR #110 already ran this shape headlessly.",
   "serves": [
