@@ -275,6 +275,19 @@ function answer(entries, input) {
   return handback ?? (typeof input.last_assistant_message === 'string' ? input.last_assistant_message : null) ?? last;
 }
 
+/**
+ * True when a transcript's tail ends with the result of the agent's SubagentHandback call: the last line Claude Code
+ * writes for an agent that handed back, so nothing more is coming. `text` is the file's tail; its first line may be cut.
+ */
+export function handedBack(text) {
+  const entries = lines(text);
+  const last = entries.at(-1);
+  const result = last?.type === 'user' && Array.isArray(last.message?.content) ? last.message.content.find((c) => c.type === 'tool_result') : null;
+  if (!result) return false;
+  return entries.some((e) => e.type === 'assistant' && Array.isArray(e.message?.content) &&
+    e.message.content.some((c) => c.type === 'tool_use' && c.name === 'SubagentHandback' && c.id === result.tool_use_id));
+}
+
 // SubagentStop: time, tokens and answer come from the agent's own transcript.
 function finish(input, { read, refused, newId }) {
   const agentId = input.agent_id;

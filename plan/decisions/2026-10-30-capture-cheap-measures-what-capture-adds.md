@@ -35,3 +35,10 @@ on any machine.
 50, instead of about 38 ms total against 50). Tool-call capture runs async (plan/decisions/2026-10-30-capture-by-hooks.md),
 and the obs-live-capture verifier measured 610 ms against 606 ms per call with and without the plugin, so the time a
 call actually waits was never near the limit. Reversible: the test can go back to the absolute bar at any time.
+
+**Then the p95 went red on CI** (206 ms against 200, run 41111180678). With 14 hook runs the 95th percentile is the
+slowest one, SubagentStop, which waited for 150 ms of quiet on the subagent's transcript even when the transcript
+was already complete. That wait was real waste, so it is cut: SubagentStop now stops waiting as soon as the
+transcript ends with the result of the agent's SubagentHandback call, the last line Claude Code writes for it, and
+keeps the 150 ms quiet wait only for an agent that never hands back. The fixture's SubagentStop went from about
+190 ms to about 40 ms here. The 200 ms p95 bar stays as it was.
