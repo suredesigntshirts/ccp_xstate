@@ -93,7 +93,7 @@ test('a journal file\'s text parses to rows, and torn lines are counted, not dro
 });
 
 test('a page.refresh row is a valid journal row with its duration and row count', () => {
-  const row = refreshRow({ id: 'r1', at: '2026-10-30T19:00:00.000Z', url: 'https://claude.ai/code/artifact/x', ms: 412, rows: 26, files: 3, bad: 0, newestAt: '2026-10-30T18:18:26.574Z', release: '0.1.8', scope: { day: '2026-10-30' }, viewer: null });
+  const row = refreshRow({ id: 'r1', at: '2026-10-30T19:00:00.000Z', url: 'https://claude.ai/code/artifact/x', ms: 412, rows: 26, files: 3, bad: 0, newestAt: '2026-10-30T18:18:26.574Z', release: '0.1.9', scope: { day: '2026-10-30' }, viewer: null });
   assert.deepEqual(validate(row), []);
   assert.equal(row.kind, 'page.refresh');
   assert.deepEqual(row.source, { system: 'artifact', ref: 'https://claude.ai/code/artifact/x' });
