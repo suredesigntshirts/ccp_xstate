@@ -2,11 +2,11 @@
 {
   "id": "self-update-by-version",
   "title": "Update the harness by releasing a version, never by editing the running plugin",
-  "stage": "s4b-widen",
+  "stage": "s0-environment",
   "kind": "build",
-  "status": "draft",
+  "status": "ready",
   "outcome": "A merged plugin change becomes a numbered release, the next session in the project loads it, and its fingerprint shows the new release; no session edits the plugin it runs.",
-  "why": "Auto mode refuses a thread editing the plugin or settings it runs, and plugins load only at session start. So self-update has to be a release that the next session picks up, with the fingerprint proving it.",
+  "why": "Auto mode refuses a thread editing the plugin or settings it runs, and plugins load only at session start. So self-update has to be a release that the next session picks up, with the fingerprint proving it. The person chose full observability and environment before XState (30 Oct), so this lands in stage 0.",
   "serves": [
     "L-no-self-modification",
     "L-plugins-load-at-start",
@@ -14,7 +14,7 @@
     "L-copies-carry-lineage"
   ],
   "depends_on": [
-    "retro-first-item"
+    "env-bootstrap"
   ],
   "inputs": [
     {

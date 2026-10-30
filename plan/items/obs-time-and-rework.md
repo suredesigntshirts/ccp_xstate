@@ -2,9 +2,9 @@
 {
   "id": "obs-time-and-rework",
   "title": "Show where wall-clock time goes, how much is rework, and what the harness costs itself",
-  "stage": "s4b-widen",
+  "stage": "s1-observability",
   "kind": "build",
-  "status": "draft",
+  "status": "ready",
   "outcome": "Derived views over the journal answer: time working versus waiting (on the person, CI, a wake, a rebuild); rounds, red CI pushes and replans per PR; and tokens spent on harness work against product work. A tripwire row fires when a PR passes its round limit.",
   "why": "PR #72 ran five rounds before the person noticed, and much of v1's effort went into its own bookkeeping without anyone seeing the ratio.",
   "serves": [
@@ -15,8 +15,7 @@
   ],
   "depends_on": [
     "obs-live-capture",
-    "obs-person-attention",
-    "retro-first-item"
+    "obs-person-attention"
   ],
   "inputs": [
     {
@@ -66,7 +65,8 @@
     "budget": 2
   },
   "non_goals": [
-    "The tripwire only records; acting on it is the engine's job in stage 3"
+    "The tripwire only records; acting on it is the engine's job in stage 3",
+    "Before the engine exists, rounds are counted per PR, not per item"
   ],
   "records": [
     "ci.result",

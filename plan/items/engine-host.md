@@ -19,7 +19,10 @@
   ],
   "depends_on": [
     "wf-quick-fix",
-    "obs-live-capture"
+    "obs-live-capture",
+    "obs-page",
+    "obs-journal-vs-world",
+    "obs-refusal-log"
   ],
   "inputs": [
     {

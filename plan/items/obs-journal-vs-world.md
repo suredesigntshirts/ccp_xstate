@@ -2,9 +2,9 @@
 {
   "id": "obs-journal-vs-world",
   "title": "Check the journal against the session logs and GitHub",
-  "stage": "s4b-widen",
+  "stage": "s1-observability",
   "kind": "build",
-  "status": "draft",
+  "status": "ready",
   "outcome": "One command compares the journal with a session's own event log and with GitHub's PRs and merges, and lists anything missing or unexplained.",
   "why": "v1's checks compared the store with itself and passed while the world disagreed. A check against outside facts is what makes the journal trustworthy.",
   "serves": [
@@ -13,8 +13,7 @@
     "L-facts-from-source"
   ],
   "depends_on": [
-    "obs-live-capture",
-    "retro-first-item"
+    "obs-live-capture"
   ],
   "inputs": [
     {

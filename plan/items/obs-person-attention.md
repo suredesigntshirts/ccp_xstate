@@ -2,9 +2,9 @@
 {
   "id": "obs-person-attention",
   "title": "Measure what the harness asks of the person",
-  "stage": "s4b-widen",
+  "stage": "s1-observability",
   "kind": "build",
-  "status": "draft",
+  "status": "ready",
   "outcome": "Every message and tap from the person, every card and post to them, and how long each card waited is in the journal.",
   "why": "The person's attention is the system's constraint. v1 recorded the person's messages but couldn't say what each item cost them, or how long work waited on them.",
   "serves": [
@@ -14,8 +14,7 @@
     "L-never-idle-on-person"
   ],
   "depends_on": [
-    "obs-live-capture",
-    "retro-first-item"
+    "obs-live-capture"
   ],
   "inputs": [
     {

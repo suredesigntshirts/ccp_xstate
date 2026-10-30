@@ -2,9 +2,9 @@
 {
   "id": "obs-page",
   "title": "Give the person one live page that answers where time, tokens and refusals went",
-  "stage": "s4b-widen",
+  "stage": "s1-observability",
   "kind": "build",
-  "status": "draft",
+  "status": "ready",
   "outcome": "A published page reads the journal live and answers, for a day or a thread: where the tokens went, where the time went, what was refused and why, and what was asked of the person. It shows the release and refresh time.",
   "why": "v1's pages went stale for days and were rebuilt by hand. The person wants pages current while they look, with a refresh button and refresh timing recorded. PR #110 itself drifted into 17 commits of page polish, so this page has a hard round budget and no polish rounds without a person ask.",
   "serves": [
@@ -16,8 +16,7 @@
   ],
   "depends_on": [
     "obs-time-and-rework",
-    "obs-refusal-log",
-    "retro-first-item"
+    "obs-refusal-log"
   ],
   "inputs": [
     {
@@ -55,8 +54,9 @@
     "budget": 1
   },
   "non_goals": [
-    "No item or workflow views yet (stage 3 adds them)",
-    "No timers when nobody is viewing"
+    "No item or workflow views yet (engine-item-views adds them after the first real item)",
+    "No timers when nobody is viewing",
+    "No polish rounds unless the person asks"
   ],
   "records": [
     "page.refresh"
