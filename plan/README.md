@@ -58,7 +58,6 @@ The plan will change. These rules keep a change to one file plus edges:
 - Run `node plan/check.mjs` after any change. It refuses unknown ids, cycles, an item that depends on a
   later stage, and a `ready` item with an empty field. `--order` prints the items in build order, and
   `--coverage` lists ledger rows no item serves.
-  later stage, and a `ready` item with an empty field.
 
 ## Status
 
