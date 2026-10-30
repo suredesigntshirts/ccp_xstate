@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Installs the harness in this project: creates the journal root (<harness dir>/journal/sessions) and writes the
+// Installs the harness in this project: creates the journal root (<harness dir>/journal/sessions, and journal/blobs for capture) and writes the
 // install marker (<harness dir>/install.json). Run by the install skill when the person asks. Until the marker
 // exists, every hook in the plugin does nothing. Running it again changes nothing and says so.
 // Prints one line; exits 1 only when the marker could not be written.
@@ -15,6 +15,7 @@ if ((await gate(process.env, 5000)) === 'installed') {
 try {
   const { name, version, tag, commit } = release();
   mkdirSync(join(journalDir(), 'sessions'), { recursive: true });
+  mkdirSync(join(journalDir(), 'blobs'), { recursive: true });
   const body = {
     installed_at: new Date().toISOString(),
     session: sessionName(),

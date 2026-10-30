@@ -4,7 +4,7 @@
   "title": "Record every tool call, agent, wake, token, brief and result as it happens",
   "stage": "s1-observability",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "While a session runs, the journal gains a row for each tool call, subagent start and finish, wake, hook run and turn usage, attributed to session and agent, and each subagent brief and result is stored as a blob linked by hash.",
   "why": "v1 recovered its history by salvaging session logs afterwards: slow, partial and racing an unknown retention window. A mod sees every call live, with the agent id, so recording at the source is cheaper and complete.",
   "serves": [

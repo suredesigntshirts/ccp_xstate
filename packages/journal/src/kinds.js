@@ -16,4 +16,5 @@ export const KINDS = Object.freeze([
   'result.stored',
   'ci.result',
   'page.refresh',
+  'wake',
 ]);
