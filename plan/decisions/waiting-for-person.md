@@ -8,3 +8,7 @@ One line each: what, why, which item waits. Threads add to this; the person clea
 - Thread branches are named `claude/...` by the environment, so threads can't follow CLAUDE.md's `<kind>/<item-id>`
   branch rule; they name the item in the PR body instead. Change the environment if you want the branch rule kept
   (plan item repo-skeleton).
+- The setup sitting, in one go once env-bootstrap merges: paste `infra/cloud-environment/paste-me.sh` into the
+  project's environment setup script, save, and start one fresh thread so it rebuilds. That paste places the full
+  v2 allow-rule set from probe-platform-baseline. Pick the product repo in the same sitting (plan items
+  person-setup-sitting, env-bootstrap; see `person-setup-sitting.md` here).

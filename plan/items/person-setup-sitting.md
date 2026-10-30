@@ -4,7 +4,7 @@
   "title": "One sitting with the person: place every rule, set up the project, pick the first workflow",
   "stage": "s0-environment",
   "kind": "decision",
-  "status": "ready",
+  "status": "done",
   "outcome": "In one sitting the person places the full v2 allow-rule set the probe produced, pastes the setup stub, triggers one rebuild, picks the product repo for the first real item, and answers the workflow questions.",
   "why": "The first draft asked the person for allow rules and rebuilds in five separate items, about 16 asks before any value (plan-review finding 7). Rules must exist before sessions start, so collect them all once.",
   "serves": [
