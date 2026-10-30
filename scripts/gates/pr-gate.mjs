@@ -5,7 +5,8 @@
 import { execFileSync } from 'node:child_process';
 import { checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem } from './lib.mjs';
 
-const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 << 20 }).trimEnd();
+const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'pipe'] })
+  .trimEnd();
 const show = (rev, path) => { try { return git('show', `${rev}:${path}`); } catch { return null; } };
 const lines = (s) => s.split('\n').filter(Boolean);
 
