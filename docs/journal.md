@@ -103,8 +103,8 @@ sha256 and a size. The only text kept is a subagent's brief and final answer, ea
 | Hook | Kind | `payload` |
 |---|---|---|
 | PostToolUse, PostToolUseFailure | `tool.call` | `tool`, `inputHash` (sha256 of the input's JSON), `inputBytes`, `ms` (Claude Code's `duration_ms`), `ok` (false from PostToolUseFailure) |
-| SubagentStart | `agent.spawn` | `agentId`, `type`, `model` (null: the start doesn't say; `agent.finish` has the served one), `briefHash`, `depth` |
-| SubagentStart | `brief.stored` | `agentId`, `hash`, `bytes`; `source.ref` is `blobs/<hash>` |
+| SubagentStart | `agent.spawn` | `agentId`, `type`, `model` (null: the start doesn't say; `agent.finish` has the served one), `briefHash` (null with a placeholder when a background agent's transcript is not written yet), `depth` |
+| PostToolUse of the Agent tool | `brief.stored` | `agentId` (from the call's result), `hash`, `bytes` of the prompt it was given; `source.ref` is `blobs/<hash>` |
 | SubagentStop | `agent.finish` | `agentId`, `type`, `model`, `ms` (first to last line of its transcript), `tokens` (`input`, `output`, `cacheRead`, `cacheCreation`, summed over its messages), `resultHash` |
 | SubagentStop | `result.stored` | `agentId`, `hash`, `bytes`: its SubagentHandback message, else its last text |
 | UserPromptSubmit | `wake` | `reason` (the hearth wake's reason, `agent-message`, `task-notification` or `prompt`), `source` (`hearth`, `subagent`, `claude-code` or `user`), `hash`, `bytes` |
@@ -112,7 +112,7 @@ sha256 and a size. The only text kept is a subagent's brief and final answer, ea
 | each of the above | `hook.run` | `name` (`capture <event>`), `ms` (since the hook's process started), `timedOut` |
 
 `agent.spawn` and `agent.finish` take `source.ref` from the spawning tool use id in the subagent's `meta.json`. The
-brief is the first line of the subagent's transcript, which Claude Code writes before SubagentStart runs.
+brief is the first line of the subagent's transcript; the Agent call returns it too, which is where `brief.stored` comes from.
 
 ## Release rows
 

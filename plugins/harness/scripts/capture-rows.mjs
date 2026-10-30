@@ -51,7 +51,10 @@ export function capture(input, { read, state = {} } = {}) {
 }
 
 const HANDLERS = {
-  PostToolUse: (input) => ({ rows: [toolCall(input, true)] }),
+  PostToolUse: (input) => {
+    const brief = briefOf(input);
+    return { rows: [toolCall(input, true), ...brief.rows], blobs: brief.blobs };
+  },
   PostToolUseFailure: (input) => ({ rows: [toolCall(input, false)] }),
   SubagentStart: spawn,
   SubagentStop: finish,
@@ -101,7 +104,8 @@ const lines = (text) => text.split('\n').flatMap((l) => {
   }
 });
 
-// SubagentStart: the brief is the first line of the agent's transcript, written just before the hook runs.
+// SubagentStart: the brief is the first line of the agent's transcript, which a foreground agent has written by now.
+// A background agent may not have, so the spawn row's briefHash can be null; brief.stored comes from the Agent call.
 function spawn(input, { read }) {
   const agentId = input.agent_id;
   const m = meta(input, read);
@@ -109,22 +113,28 @@ function spawn(input, { read }) {
   const first = path && read(path, { from: 0, cap: 1024 * 1024 });
   const opening = first ? lines(first.text.split('\n')[0])[0] : null;
   const brief = opening?.type === 'user' ? textOf(opening.message?.content) : '';
-  const ref = m.toolUseId ?? `SubagentStart ${agentId}`;
-  const rows = [];
-  const blobs = [];
-  if (brief) {
-    const b = blob(brief);
-    blobs.push(b);
-    rows.push({ kind: 'brief.stored', source: { system: 'journal', ref: `blobs/${b.hash}` }, agent: agentId, payload: { agentId, hash: b.hash, bytes: b.bytes } });
-  }
-  rows.unshift({
-    kind: 'agent.spawn',
-    source: { system: 'claude-code', ref },
-    agent: agentId,
-    payload: { agentId, type: input.agent_type ?? m.agentType ?? null, model: m.model ?? null, briefHash: blobs[0]?.hash ?? null, depth: m.spawnDepth ?? null },
-    ...(brief ? {} : { placeholder: 'the brief was not readable from the subagent transcript at SubagentStart' }),
-  });
-  return { rows, blobs };
+  return {
+    rows: [{
+      kind: 'agent.spawn',
+      source: { system: 'claude-code', ref: m.toolUseId ?? `SubagentStart ${agentId}` },
+      agent: agentId,
+      payload: { agentId, type: input.agent_type ?? m.agentType ?? null, model: m.model ?? null, briefHash: brief ? sha256(brief) : null, depth: m.spawnDepth ?? null },
+      ...(brief ? {} : { placeholder: 'the brief was not yet in the subagent transcript at SubagentStart; brief.stored has it' }),
+    }],
+  };
+}
+
+// The Agent call's own record of the brief, with the id of the agent it started: returned at once for a background
+// agent, at its end for a foreground one.
+function briefOf(input) {
+  const agentId = input.tool_response?.agentId;
+  const text = input.tool_input?.prompt;
+  if (typeof agentId !== 'string' || typeof text !== 'string' || !text) return { rows: [], blobs: [] };
+  const b = blob(text);
+  return {
+    rows: [{ kind: 'brief.stored', source: { system: 'journal', ref: `blobs/${b.hash}` }, agent: agentId, payload: { agentId, hash: b.hash, bytes: b.bytes } }],
+    blobs: [b],
+  };
 }
 
 // Token counts summed over assistant messages, each message once (a transcript writes one line per content block).
