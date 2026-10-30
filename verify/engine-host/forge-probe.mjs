@@ -1,4 +1,4 @@
-// NOT a test (kept out of npm test on purpose): shows that the host's command-line entry point takes its "wake"
+// NOT a test (kept out of npm test): at round 1 this showed the CLI reading a wake out of a Bash tool result. At the round-2 head it shows the item unchanged. Run: node verify/engine-host/forge-probe.mjs
 // from whatever is on stdin, so an agent that can run `node packages/engine/bin/host.js wake` writes the event's
 // source itself. Run: node verify/engine-host/forge-probe.mjs
 import { mkdtempSync, writeFileSync } from 'node:fs';
