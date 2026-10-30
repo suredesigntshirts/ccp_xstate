@@ -57,13 +57,14 @@ export function actionHash(tool, input) {
  * capture state ({ transcriptAt, thread }: how far the last Stop read the transcript, which the Stop handler advances,
  * and the thread of the last hearth wake, which UserPromptSubmit sets).
  * `refused` maps the actionHash of each action this session already had refused to that refusal row's id; `newId`
- * makes a refusal row's id, so a later row can link to it. Returns { rows, blobs, state }; each row has kind,
+ * makes a refusal row's id, so a later row can link to it. `actor(agentId)` says whether a subagent is an invoked
+ * actor's agent (plan item engine-actors), whose tool calls also keep their paths. Returns { rows, blobs, state }; each row has kind,
  * source, agent, payload and maybe placeholder, id and at.
  */
-export function capture(input, { read, state = {}, refused = {}, newId = randomUUID } = {}) {
+export function capture(input, { read, state = {}, refused = {}, newId = randomUUID, actor = () => false } = {}) {
   const handler = HANDLERS[input?.hook_event_name];
   if (!handler) return { rows: [], blobs: [], state };
-  return { blobs: [], state, ...handler(input, { read, state, refused: { ...refused }, newId }) };
+  return { blobs: [], state, ...handler(input, { read, state, refused: { ...refused }, newId, actor }) };
 }
 
 const HANDLERS = {
@@ -85,7 +86,7 @@ const HANDLERS = {
   Stop: usage,
 };
 
-function toolCall(input, ok, { refused }) {
+function toolCall(input, ok, { refused, actor = () => false }) {
   const given = JSON.stringify(input.tool_input ?? null);
   const retryOf = refused[actionHash(input.tool_name, input.tool_input)];
   return {
@@ -98,9 +99,30 @@ function toolCall(input, ok, { refused }) {
       inputBytes: bytes(given),
       ms: Number.isFinite(input.duration_ms) ? input.duration_ms : null,
       ok,
+      ...(input.agent_id && actor(input.agent_id) ? { paths: pathsOf(input.tool_name, input.tool_input, input.cwd) } : {}),
       ...(retryOf ? { retryOf } : {}),
     },
   };
+}
+
+const FILE_TOOLS = { Read: 'file_path', Write: 'file_path', Edit: 'file_path', MultiEdit: 'file_path', NotebookEdit: 'notebook_path' };
+const SEARCH_TOOLS = { Glob: 'path', Grep: 'path', LS: 'path' };
+// A shell command an invoked actor runs is wrapped to start in its worktree (packages/engine/src/actors.js, confine).
+const CONFINED = /^\( cd '((?:[^']|'\\'')*)' \|\| exit 1\n/;
+
+/**
+ * The paths a tool call names (plan item engine-actors): a file tool's path, a search's folder (the session's when it
+ * names none), and the folder a shell command ran from. Kept only on an invoked actor's tool.call rows, the one part
+ * of a tool's input a row keeps, so the journal shows where each actor worked.
+ */
+export function pathsOf(tool, input, cwd = null) {
+  if (FILE_TOOLS[tool]) return typeof input?.[FILE_TOOLS[tool]] === 'string' ? [input[FILE_TOOLS[tool]]] : [];
+  if (SEARCH_TOOLS[tool]) return [typeof input?.[SEARCH_TOOLS[tool]] === 'string' && input[SEARCH_TOOLS[tool]] ? input[SEARCH_TOOLS[tool]] : cwd].filter(Boolean);
+  if (tool === 'Bash' && typeof input?.command === 'string') {
+    const m = input.command.match(CONFINED);
+    return [m ? m[1].replace(/'\\''/g, "'") : cwd].filter(Boolean);
+  }
+  return [];
 }
 
 // A refusal row. `refused` is updated, so a second refusal of the same action in one batch links to the first.

@@ -38,8 +38,26 @@ command.
 
 `handlers({ github, hearth, clock })` builds them. `github` (`src/effects/github.js`) reaches api.github.com through
 the session's proxy itself. `bin/host.js` runs merges only: a command can't reach the thread or schedule a wake, so cards,
-posts and timers stay pending (and printed) for a host that has a `hearth` client and a clock, and the agents
-engine-actors starts stay pending for its handlers.
+posts and timers stay pending (and printed) for a host that has a `hearth` client and a clock. Agent actors are
+prepared by `src/actors.js` (below).
 
 The journal check (`packages/journal/bin/journal-check.js --repo <owner/name>`) lists every merge the host's merge
 effect didn't make, and with `--host` fails on one.
+
+## Actors
+
+A state that invokes `brief`, `build` or `verify` starts an agent (`src/actors.js`, plan item engine-actors). The run
+handler writes the run's folder under `<root>/items/<item>/runs/<seq>.<invoke>/`, adds a git worktree named
+`<item>--<seq>.<invoke>` on branch `run/<item>/<seq>.<invoke>` (from `--repo`, under `--worktrees`), and journals the
+brief's hash. The run stays open until its agent returns:
+
+1. The session calls the Agent tool with the prompt `ccp-run <run>` (bin/host.js prints it under `waiting`, and the
+   harness hook names waiting runs after each Agent call and wake). The harness's PreToolUse hook swaps in the brief,
+   so the agent's prompt is the brief exactly; a second start of a run is refused.
+2. SubagentStart binds the agent to the run and tells it its run, worktree and result schema. Its shell commands run
+   from the worktree, and file tools outside it are refused.
+3. The agent calls the return tool (`mcp__plugin_ccp-harness_harness__return`, `{ run, result }`). Its PreToolUse hook
+   refuses it unless the caller is the run's agent, the result matches the actor's schema and any claimed PR is on
+   GitHub at the claimed head (`accept`), then hands the result to the item (`deliver`), which prepares the next runs.
+
+Rows: `docs/journal.md`, "Actor rows". Why: `plan/decisions/2026-10-30-engine-actors.md`.

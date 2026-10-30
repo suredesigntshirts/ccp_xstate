@@ -4,6 +4,7 @@
 //   host.js start --item <id> --workflow <name> --input <json> --session <id> [--root <dir>] [--release x.y.z]
 //   host.js wake  --item <id> --workflow <name> [--root <dir>] [--release x.y.z]   < hook input JSON
 //   host.js show  --item <id> --workflow <name> [--root <dir>]
+//   start and wake also take [--repo <git clone>] [--worktrees <dir>] for the actors' worktrees.
 //
 // wake reads a Claude Code hook's input on stdin: UserPromptSubmit (the wake is its prompt) or PostToolUse of
 // ReadNotifications, where only notifications GitHub's webhook delivered are read. Any other tool's output is
@@ -11,14 +12,18 @@
 // event or its source: those come only from the wake text. What this cannot stop: an agent with a shell can run this
 // command with stdin it typed, as it can append rows by hand (ledger L-same-account-everywhere); the decision says so.
 // Effects run with the handlers in src/effects (plan item engine-effects): merges, over GitHub REST. A command has no
-// way into the thread and no clock to wake it, so cards, posts and timers, and the agents engine-actors starts, stay
-// pending and are printed; a timer's due time is there for the session to schedule its wake.
+// way into the thread and no clock to wake it, so cards, posts and timers stay pending and are printed; a timer's due
+// time is there for the session to schedule its wake. An agent actor's run (brief, build, verify; plan item
+// engine-actors) is prepared here: its brief, folder and worktree (added from --repo, default the current folder,
+// under --worktrees). `waiting` lists the runs whose agent the session starts next, with the Agent prompt to use.
+// Every call also offers the results the harness's return hook accepted and has not yet handed to the item.
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { loadWorkflow } from '../src/index.js';
 import { restore, offer, pending } from '../src/host.js';
 import { inputsOfWake } from '../src/wake.js';
 import { github, handlers } from '../src/effects/index.js';
+import { actors, resultsOf, waiting } from '../src/actors.js';
 
 const { positionals: [command], values: opts } = parseArgs({
   allowPositionals: true,
@@ -28,7 +33,9 @@ const { positionals: [command], values: opts } = parseArgs({
     input: { type: 'string' },
     session: { type: 'string' },
     root: { type: 'string', default: process.env.CCP_JOURNAL_DIR ?? '/mnt/project-files/harness/journal' },
-    release: { type: 'string' }
+    release: { type: 'string' },
+    repo: { type: 'string' },
+    worktrees: { type: 'string' }
   }
 });
 
@@ -76,12 +83,15 @@ if (command === 'start') {
   if (!opts.input) fail('start needs --input');
   inputs = [{ event: { type: 'xstate.init', input: JSON.parse(opts.input) }, source: { system: 'claude-code', ref: session } }];
 }
-const effects = { run: handlers({ github: github() }).run };
-const results = command === 'show' ? [] : await offer(host, typeof inputs === 'function' ? inputs(host) : inputs, effects);
+const agents = actors({ host, repo: opts.repo ?? process.cwd(), ...(opts.worktrees ? { worktrees: opts.worktrees } : {}) });
+const effects = { run: handlers({ github: github(), actors: agents }).run };
+const offered = typeof inputs === 'function' ? inputs(host) : inputs;
+const results = command === 'show' ? [] : await offer(host, [...offered, ...(host.snapshot ? resultsOf(host) : [])], effects);
 console.log(JSON.stringify({
   item: opts.item,
   owner: host.owner,
   state: host.snapshot?.value ?? null,
   results: results.map(({ outcome, row }) => ({ outcome, reason: row.payload.reason, event: row.payload.event?.type, source: row.source })),
-  pending: pending(host)
+  pending: pending(host),
+  waiting: waiting(opts.root, opts.item)
 }, null, 2));
