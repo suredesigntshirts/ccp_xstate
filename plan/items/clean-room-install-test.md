@@ -4,7 +4,7 @@
   "title": "Prove in CI that a fresh install works from the plugin alone",
   "stage": "s0-environment",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Every release runs a clean-room job: empty HOME, empty project folder, setup script, install, a headless session, and the self-check passes.",
   "why": "The product installs on fresh projects, but we only ever run in our own. A clean room catches anything that quietly depends on this project's leftovers.",
   "serves": [
