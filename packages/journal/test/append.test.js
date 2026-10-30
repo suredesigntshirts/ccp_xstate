@@ -35,7 +35,7 @@ test('append keeps a given id and at', () => {
 test('append refuses an invalid row, an unknown kind and another version', () => {
   const path = fresh();
   assert.throws(() => append(path, input({ source: undefined })), /row.source must be object/);
-  assert.throws(() => append(path, input({ kind: 'engine.transition' })), /unknown kind engine.transition/);
+  assert.throws(() => append(path, input({ kind: 'engine.unknown' })), /unknown kind engine.unknown/);
   assert.throws(() => append(path, input({ v: 2 })), /writes v1 rows, not v2/);
   assert.throws(() => append(path, input({ payload: { big: 'x'.repeat(MAX_LINE_BYTES) } })), /byte limit/);
 });
