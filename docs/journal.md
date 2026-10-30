@@ -56,6 +56,7 @@ after a newer one.
 | Kind | Records | `source.system`, `source.ref` |
 |---|---|---|
 | `session.fingerprint` | A session's start: model, plugins, environment, cwd | `claude-code`, the session id |
+| `session.selfcheck` | The start-of-session self-check: each check and whether it passed | `hook`, `SessionStart <session id>` |
 | `tool.call` | One tool call and its completion | `claude-code`, the tool use id |
 | `agent.spawn` | A subagent started | `claude-code`, the spawning tool use id |
 | `agent.finish` | A subagent finished, with its result size and status | `claude-code`, the spawning tool use id |
@@ -70,9 +71,25 @@ after a newer one.
 | `ci.result` | A CI run finished on a sha | `github`, the run id |
 | `page.refresh` | A page was published or refreshed | `artifact`, the page url |
 
-Payload fields per kind are set by the item that first writes that kind; the envelope above is what every reader
+Payload fields per kind are set by the item that first writes that kind (the two `session.*` kinds are below); the envelope above is what every reader
 can rely on. Engine transitions arrive in stage 3 as `engine.transition`, with the transition id and the causing
 call or completion id recorded at write time (L-record-route-at-write).
+
+## Session rows
+
+The harness plugin's SessionStart hook (plan item env-bootstrap, `plugins/harness/README.md`) writes both, in that
+order, to `sessions/<session>.jsonl` under the journal root, in a project that installed the harness.
+
+`session.fingerprint` payload: `claude_code` (from `claude --version`), `model` (null: SessionStart's input doesn't
+carry it; the served model arrives with turn rows), `start` (`startup`, `resume`, ...), `cwd`, `plugin`
+(`name`, `version`, `tag`, `commit`, `root` of the running copy), `latest_release` (the newest `harness-v*` tag's
+version on origin, or `none` or `unknown`), `settings` (`present`, `missing` or `unreadable (...)`), `allow_rules`
+(how many), `rules_hash` (16 hex of a sha256 over the sorted rules), `depth` (the subagent depth setting),
+`plugins` (skills-dir plugins: `name`, `version`, `from`) and `environment` (`remote`, `entrypoint`, `container`).
+
+`session.selfcheck` payload: `passed` (false when any check failed) and `checks`, a list of `{ id, status, detail }`
+with status `pass`, `fail` or `unknown`. An unknown doesn't fail the check. A failure's `detail` is one plain
+sentence saying what is wrong and what to do. The ids: `settings`, `rules`, `depth`, `copy`, `release`, `journal`.
 
 ## Adding a kind
 

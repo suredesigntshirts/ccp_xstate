@@ -2,6 +2,7 @@
 // kind added later. docs/journal.md says what each kind records and how to add one.
 export const KINDS = Object.freeze([
   'session.fingerprint',
+  'session.selfcheck',
   'tool.call',
   'agent.spawn',
   'agent.finish',

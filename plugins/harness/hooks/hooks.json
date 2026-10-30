@@ -1,0 +1,16 @@
+{
+  "description": "SessionStart: in a project that installed the harness, journal a fingerprint row and a self-check row and say in one line whether the check passed. Elsewhere, or with CCP_HARNESS_DISABLED=1, nothing.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/session-start.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
