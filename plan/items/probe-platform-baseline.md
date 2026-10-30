@@ -54,52 +54,68 @@
     {
       "id": "versions",
       "check": "The report names the Claude Code version, the model served and the date",
-      "how": "Read the report's header"
+      "how": "Read the report's header",
+      "proof": "world"
     },
     {
       "id": "idle-spawn",
       "check": "The report says whether a mod's $.agent.spawn runs on a send_later wake and on a GitHub PR event wake, each with no person message in that turn, under a pre-placed allow rule",
-      "how": "Two probe-log lines per wake kind, each with the wake envelope (its reason shows no person message) and the spawned agent's answer or the refusal text"
+      "how": "Two probe-log lines per wake kind, each with the wake envelope (its reason shows no person message) and the spawned agent's answer or the refusal text",
+      "proof": "world"
     },
     {
       "id": "mcp-from-mod",
       "check": "The report says whether $.mcp.call reaches the project's thread tools (read_thread, request_decision, send_later) from a mod",
-      "how": "The probe's logged call results"
+      "how": "The probe's logged call results",
+      "proof": "world"
     },
     {
       "id": "hooks-see-refusals",
       "check": "The report says how a classifier refusal shows up to hooks and to a mod (event name and fields), or that it doesn't",
-      "how": "A deliberately refused harmless action and the probe's capture of it"
+      "how": "A deliberately refused harmless action and the probe's capture of it",
+      "proof": "world"
     },
     {
       "id": "depth-and-budgets",
       "check": "Subagent depth, the SessionStart and PreToolUse time budgets, and a mod hook's budget are measured",
-      "how": "Probe output lines with the numbers"
+      "how": "Probe output lines with the numbers",
+      "proof": "world"
     },
     {
       "id": "self-edit",
       "check": "The report says whether a thread in the v2 project may commit a change under plugins/ while a released copy of that plugin is loaded, and whether it may when the session loads the working tree",
-      "how": "Two probe commits on a scratch branch, with the outcome text of each"
+      "how": "Two probe commits on a scratch branch, with the outcome text of each",
+      "proof": "world"
     },
     {
       "id": "idle-merge",
       "check": "The report says whether a merge through the GitHub merge tool on an idle wake is allowed under a pre-placed rule",
-      "how": "A probe merge of a scratch PR in a scratch repo, on a send_later wake, with its outcome"
+      "how": "A probe merge of a scratch PR in a scratch repo, on a send_later wake, with its outcome",
+      "proof": "world"
     },
     {
       "id": "page-reads-journal",
       "check": "The report says whether a published artifact can read a JSONL file in the project's Library through the files capability",
-      "how": "A throwaway page reading a probe file, with a screenshot or its read result"
+      "how": "A throwaway page reading a probe file, with a screenshot or its read result",
+      "proof": "world"
     },
     {
       "id": "cwd",
       "check": "The report says whether $.agent.spawn honours cwd on this version, and what works instead",
-      "how": "Probe spawn with a cwd and the agent's pwd output"
+      "how": "Probe spawn with a cwd and the agent's pwd output",
+      "proof": "world"
     },
     {
       "id": "rerunnable",
       "check": "probes/platform/README.md gives one command per probe and says which need a wake that only the platform can make",
-      "how": "Read it"
+      "how": "Read it",
+      "proof": "world"
+    },
+    {
+      "id": "negative-evidence",
+      "check": "Every \"doesn't hold\" answer has two attempts and the smallest reproduction, each with its raw output, and the verifier reproduced at least one",
+      "how": "The verifier reruns one negative probe from probes/platform/README.md",
+      "proof": "verifier"
     }
   ],
   "cases": [],

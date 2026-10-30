@@ -40,22 +40,26 @@
     {
       "id": "rows",
       "check": "A session start writes exactly one fingerprint and one self-check row",
-      "how": "Hook test against a temp journal"
+      "how": "Hook test against a temp journal",
+      "proof": "builder"
     },
     {
       "id": "checks",
       "check": "The self-check covers: journal writable, GitHub reachable via REST, allow rules present (hash matches the repo's), plugin not behind main, subagent depth, install marker",
-      "how": "Test with stubs makes each check fail once and confirms the row names it"
+      "how": "Test with stubs makes each check fail once and confirms the row names it",
+      "proof": "builder"
     },
     {
       "id": "budget",
       "check": "The hook finishes within half its budget on a cold Library mount, and anything slower runs detached",
-      "how": "Timing test on a temp folder plus the measured mount numbers from the probe"
+      "how": "Timing test on a temp folder plus the measured mount numbers from the probe",
+      "proof": "verifier"
     },
     {
       "id": "says-so",
       "check": "A failed check reaches the session as one plain sentence with the fix",
-      "how": "Hook output in the failing-check test"
+      "how": "Hook output in the failing-check test",
+      "proof": "verifier"
     }
   ],
   "cases": [],

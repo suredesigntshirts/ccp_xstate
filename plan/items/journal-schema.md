@@ -47,22 +47,32 @@
     {
       "id": "schema-tests",
       "check": "Rows of every kind validate; a row missing source or v fails",
-      "how": "npm test -w packages/journal"
+      "how": "npm test -w packages/journal",
+      "proof": "builder"
     },
     {
       "id": "one-writer",
       "check": "Two sessions appending at once never interleave within a file, and read() returns both in time order",
-      "how": "A test with two writers on a temp folder"
+      "how": "The verifier's own stress test: 100 rows from each of two writers at once on a temp folder",
+      "proof": "verifier"
     },
     {
       "id": "older-writer",
       "check": "A writer whose release is older than the newest row's release is refused, naming both versions",
-      "how": "Test for case C-older-writer-refused"
+      "how": "The verifier hand-writes a newer-release row and runs an older writer (case C-older-writer-refused)",
+      "proof": "verifier"
     },
     {
       "id": "no-scan-on-append",
       "check": "append() opens exactly one file and lists no folder",
-      "how": "A test counts fs calls with a stub"
+      "how": "A test counts fs calls with a stub",
+      "proof": "builder"
+    },
+    {
+      "id": "mount",
+      "check": "Two sessions appending to one file on the real /mnt/project-files mount at once leave no torn line, and a third session reads both rows within 60 seconds",
+      "how": "Three real sessions; the verifier reads the file",
+      "proof": "world"
     }
   ],
   "cases": [

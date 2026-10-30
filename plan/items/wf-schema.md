@@ -51,12 +51,14 @@
     {
       "id": "two-validate",
       "check": "Two different sample workflows validate and compile",
-      "how": "npm test -w packages/workflow"
+      "how": "npm test -w packages/workflow",
+      "proof": "verifier"
     },
     {
       "id": "refuses-bad",
       "check": "A workflow whose invoke has no onError, or a state that can't reach a final state, is refused with the state named",
-      "how": "Tests with two broken samples"
+      "how": "Tests with two broken samples",
+      "proof": "builder"
     }
   ],
   "cases": [

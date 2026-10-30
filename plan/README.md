@@ -59,6 +59,29 @@ The plan will change. These rules keep a change to one file plus edges:
   later stage, and a `ready` item with an empty field. `--order` prints the items in build order, and
   `--coverage` lists ledger rows no item serves.
 
+## How slop is kept out
+
+An item is done when the verifier, not the builder, shows its outcome holds (ledger L-proof-source). Four rules hold
+that up, and each is enforced by something other than the builder:
+
+- **Every Expect line names its proof.** `world` means the real platform or GitHub shows it before accept (a real
+  session, PR, CI run or published page). `verifier` means tests or reads the verifier writes itself. `builder` means
+  the builder's own tests. `check.mjs` refuses a ready build item with no `world` line, or with more than half its
+  lines `builder`.
+- **The verifier commits its evidence.** It writes its tests under `verify/<item>/` and a `verdict.json` that marks
+  every Expect id MET or NOT MET with the command and an output excerpt, and, for each `builder` line, the code it
+  broke and the test that went red. CI (repo-skeleton's verdict gate) checks this at the head sha and refuses a
+  verdict committed from the builder's session.
+- **The contract is frozen.** Once an item's build starts, CI refuses a PR that changes its head or Verifier brief.
+  Only a PR labelled `replan` that touches nothing but `plan/` may change them.
+- **No stubs count as done.** CI fails on TODO, FIXME, "not implemented" or a skipped test in `packages/` and
+  `plugins/`.
+
+What this doesn't close: every agent acts as the person's GitHub account, so a `Claude-Session` trailer is weak
+identity, and a determined builder session could forge a verdict commit. The journal records which session wrote
+what, and the stage gates put a real result in front of the person. A separate verdict identity stays parked
+(ledger L-same-account-everywhere) until a forged verdict is actually seen.
+
 ## Status
 
 `draft` (being written) → `ready` (complete head, can be picked up) → `doing` → `done`. Off-path:

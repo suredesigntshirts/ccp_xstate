@@ -32,17 +32,26 @@
     {
       "id": "captured",
       "check": "A refusal fixture recorded during the probe becomes one refusal row with the classifier's rule text",
-      "how": "Unit test on the fixture"
+      "how": "Unit test on the fixture",
+      "proof": "builder"
     },
     {
       "id": "hook-denials",
       "check": "A denial by one of our own hooks produces a refusal row with source hook and the rule name",
-      "how": "Hook test"
+      "how": "The verifier triggers a denial by one of our own hooks in its own session",
+      "proof": "verifier"
     },
     {
       "id": "retry-linked",
       "check": "Given a refusal fixture recorded during the probe and a later identical action, the second row links to the first by retryOf",
-      "how": "Unit test on recorded fixtures; nothing is refused or retried live"
+      "how": "Unit test on recorded fixtures; nothing is refused or retried live",
+      "proof": "builder"
+    },
+    {
+      "id": "live",
+      "check": "A harmless refusal triggered in a real v2 session becomes one refusal row carrying the classifier's rule text",
+      "how": "The probe's recipe, run by the verifier",
+      "proof": "world"
     }
   ],
   "cases": [

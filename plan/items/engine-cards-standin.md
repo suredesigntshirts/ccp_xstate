@@ -44,22 +44,26 @@
     {
       "id": "legal-only",
       "check": "A stand-in answer that isn't a legal event in that state is refused",
-      "how": "Test for case C-stand-in-picks-legal-event"
+      "how": "Test for case C-stand-in-picks-legal-event",
+      "proof": "builder"
     },
     {
       "id": "closes",
       "check": "Cancelling or finishing an item closes its open card",
-      "how": "Test for case C-finish-closes-waits"
+      "how": "Test for case C-finish-closes-waits",
+      "proof": "builder"
     },
     {
       "id": "no-stall",
       "check": "With one item waiting on the person, another item still advances and a wake is scheduled",
-      "how": "Test for case C-waiting-does-not-stall"
+      "how": "Test for case C-waiting-does-not-stall",
+      "proof": "builder"
     },
     {
       "id": "grant-source",
       "check": "Each stand-in answer is journalled with the grant entry that covered it",
-      "how": "Test"
+      "how": "Test",
+      "proof": "builder"
     }
   ],
   "cases": [

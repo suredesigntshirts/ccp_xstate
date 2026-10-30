@@ -48,28 +48,33 @@
   "expect": [
     {
       "id": "fixed-before-build",
-      "check": "The verifier brief's hash is in context before the builder is invoked",
-      "how": "Test reads context at the building state"
+      "check": "In a real headless run, the prompt the verifier agent received hashes to the briefHash journalled before the builder was spawned",
+      "how": "The verifier compares the agent.spawn rows and blobs from its own headless run",
+      "proof": "world"
     },
     {
       "id": "wrong-caller",
-      "check": "A return call from any other agent is refused and journalled",
-      "how": "Test"
+      "check": "A return call from any agent other than the run's actor is refused and journalled",
+      "how": "The verifier spawns a second agent in its own headless run that calls the return tool for the first agent's run",
+      "proof": "verifier"
     },
     {
       "id": "schema",
       "check": "A result missing a required field is refused, naming it",
-      "how": "Test"
+      "how": "Test",
+      "proof": "builder"
     },
     {
       "id": "github-fact",
-      "check": "A claimed PR that GitHub doesn't show at that head is refused and the item stays in building",
-      "how": "Test for case C-claimed-pr-not-on-github with a GitHub stub"
+      "check": "A claimed PR that GitHub doesn't show at the claimed head is refused and the item stays in building",
+      "how": "Case C-claimed-pr-not-on-github against a real scratch PR in a scratch repo, not a stub",
+      "proof": "world"
     },
     {
       "id": "own-folder",
-      "check": "Each actor works in its own worktree or folder named by item and run, even though $.agent.spawn ignores cwd",
-      "how": "Test: two actors' briefs name different folders, and the brief tells the actor to cd first"
+      "check": "Each actor works in its own git worktree named by item and run: every file path in its tool.call rows is under that worktree",
+      "how": "A real headless run with two actors; the verifier reads the paths from the journal and lists the worktrees",
+      "proof": "world"
     }
   ],
   "cases": [
@@ -105,5 +110,8 @@
 
 ## Verifier brief
 
-Run the tests. Then, in a headless session with the plugin, invoke a toy builder whose brief tells it to call the
-return tool with a made-up PR. Confirm the refusal names the GitHub fact. Verdict per Expect id.
+Read case C-claimed-pr-not-on-github first. In a headless session with the plugin installed, run two actors on
+a scratch repo. Have a toy builder call the return tool with a made-up PR and with a real PR at the wrong head, and
+have a second agent call the return tool for the first one's run. Read the journal: brief hashes against the prompts
+the agents received, refusals and their reasons, and the file paths each actor touched. Write
+verify/engine-actors/verdict.json in your own commit, with a mutation for the builder line.

@@ -37,13 +37,15 @@
   "expect": [
     {
       "id": "answers",
-      "check": "For one real session, the page shows tokens by agent, time by kind, refusals with rule, and person asks, each matching the derived views",
-      "how": "Snapshot test of the page's data layer against the views"
+      "check": "For one real session, the data layer gives tokens by agent, time by kind, refusals with rule and person asks, each matching the derived views",
+      "how": "Snapshot test of the data layer against the views",
+      "proof": "builder"
     },
     {
-      "id": "lineage",
-      "check": "The page's data layer outputs the release and newest row time",
-      "how": "Snapshot test"
+      "id": "live",
+      "check": "The published page reads the journal through the files capability: after the verifier appends a row and presses Refresh, the page shows it, shows the release and a newest row time within 5 minutes of the journal's, writes a page.refresh row, and three numbers on it match views the verifier computes by hand",
+      "how": "The published page, opened by the verifier",
+      "proof": "world"
     }
   ],
   "cases": [],

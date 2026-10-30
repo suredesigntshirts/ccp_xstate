@@ -36,17 +36,26 @@
     {
       "id": "merged",
       "check": "The PR is merged at the verified sha by the host",
-      "how": "GitHub plus the journal"
+      "how": "GitHub plus the journal",
+      "proof": "world"
     },
     {
       "id": "complete",
       "check": "Every tool call in the sessions that served the item has a journal row",
-      "how": "Compare the sessions' event logs with the journal"
+      "how": "Compare the sessions' event logs with the journal",
+      "proof": "verifier"
     },
     {
       "id": "asks",
-      "check": "Every person ask on the item is one the workflow declares",
-      "how": "Compare card.posted rows with the workflow's cards"
+      "check": "Every post_message, request_decision and card call in the item's sessions (from tool.call rows, not only card.posted) is one the workflow declares; a workflow that declares none shows none",
+      "how": "The verifier compares tool.call rows with the workflow's declared asks",
+      "proof": "verifier"
+    },
+    {
+      "id": "product-ci",
+      "check": "The product repo's own CI is green at the merged sha, and the change does what its issue asked",
+      "how": "The verifier reads the issue, the diff and the CI run on GitHub",
+      "proof": "world"
     }
   ],
   "cases": [],
@@ -71,3 +80,10 @@
   "risks": []
 }
 ```
+
+## Verifier brief
+
+Read the issue and the product repo's tests before the PR. Check the merge sha against the verdict sha on GitHub,
+the product CI at the merged sha, and whether the diff does what the issue asked. Compare every session's event log
+with the journal, and every ask the person saw with the workflow's declared asks. Write
+verify/first-real-issue/verdict.json in your own commit.

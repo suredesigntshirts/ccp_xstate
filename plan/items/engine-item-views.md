@@ -39,17 +39,20 @@
     {
       "id": "tagged",
       "check": "Every tool.call from an item's agents carries item and state",
-      "how": "Toy run's rows"
+      "how": "Toy run's rows",
+      "proof": "verifier"
     },
     {
       "id": "tripwire-acts",
       "check": "Passing the round limit moves the item to replanning",
-      "how": "Test"
+      "how": "Test",
+      "proof": "builder"
     },
     {
       "id": "view",
       "check": "The page shows the toy item's state and cost, matching the rows",
-      "how": "Data-layer snapshot test"
+      "how": "Data-layer snapshot test",
+      "proof": "verifier"
     }
   ],
   "cases": [

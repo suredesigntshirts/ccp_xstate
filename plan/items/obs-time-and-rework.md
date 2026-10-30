@@ -40,18 +40,27 @@
   "expect": [
     {
       "id": "time",
-      "check": "For a fixture day, working plus each waiting kind sums to wall-clock time, with nothing unclassified over 5%",
-      "how": "Unit test on a fixture built from a real session"
+      "check": "A gap with no tool call, turn or wake in progress is labelled waiting with its wake reason, or unknown, never working; on a fixture with a 10-minute idle gap, that gap is not working, and working plus each waiting kind plus unknown sums to wall-clock time",
+      "how": "Unit test on a fixture built from a real session, with the idle gap inserted",
+      "proof": "builder"
     },
     {
       "id": "rework",
-      "check": "A fixture PR with 3 pushes and 2 red CI runs reports 3 rounds and 2 red, and emits one tripwire at limit 2",
-      "how": "Unit test"
+      "check": "For real ccp_machine PRs (#72 and two others the verifier picks), derived rounds and red CI runs equal what GitHub's commits and check runs show",
+      "how": "The verifier compares the view with GitHub REST",
+      "proof": "world"
     },
     {
       "id": "overhead",
-      "check": "Work in this repo's plugins/ and packages/ counts as harness; other repos as product; the split is configurable",
-      "how": "Unit test with both"
+      "check": "Paths listed in a config file count as harness and everything else as product; changing the file moves the split",
+      "how": "Unit test with both",
+      "proof": "builder"
+    },
+    {
+      "id": "tripwire",
+      "check": "A PR passing its round limit emits one tripwire row and no second one for the same limit",
+      "how": "The verifier writes its own test from case C-second-fail-replans",
+      "proof": "verifier"
     }
   ],
   "cases": [

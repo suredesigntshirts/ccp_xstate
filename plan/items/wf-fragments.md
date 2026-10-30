@@ -40,12 +40,14 @@
     {
       "id": "cases-pass",
       "check": "Tests for C-verdict-on-old-head, C-push-after-pass, C-pass-carries-to-merge-of-main, C-second-fail-replans, C-stand-in-picks-legal-event pass",
-      "how": "npm test; test names carry the case ids"
+      "how": "npm test; test names carry the case ids",
+      "proof": "verifier"
     },
     {
       "id": "fail-closed",
       "check": "Each fragment's guards fail when their context field is absent",
-      "how": "One absent-input test per guard"
+      "how": "One absent-input test per guard",
+      "proof": "verifier"
     }
   ],
   "cases": [

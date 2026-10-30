@@ -89,8 +89,19 @@ for (const it of items.values()) {
     if (items.has(d) && !isLive(items.get(d))) fail(at, `live item depends on ${d}, which is ${items.get(d).status}`);
   for (const l of it.serves ?? []) if (!ledger.has(l)) fail(at, `serves unknown ledger row ${l}`);
   for (const c of it.cases ?? []) if (!cases.has(c)) fail(at, `names unknown case ${c}`);
-  if (it.status === 'ready')
+  if (it.status === 'ready') {
     for (const k of schema.readyRequired) if (empty(it[k])) fail(at, `ready, but ${k} is empty`);
+    // Proof rules (ledger L-proof-source): a build item touches the real world before accept, and the builder's own
+    // tests prove at most half of it.
+    const proofs = (it.expect ?? []).map((e) => e.proof);
+    if (it.kind === 'build' && !proofs.includes('world')) fail(at, 'a ready build item needs an Expect line with proof world');
+    if (it.kind === 'build' && proofs.filter((p) => p === 'builder').length * 2 > proofs.length)
+      fail(at, 'more than half its Expect lines are proven by the builder alone');
+    const brief = readFileSync(join(root, at), 'utf8').split(/^## Verifier brief$/m)[1];
+    if (it.kind !== 'decision' && !brief?.trim()) fail(at, 'a ready item needs a ## Verifier brief section');
+    for (const c of brief?.match(/C-[a-z0-9-]+[a-z0-9]/g) ?? [])
+      if (!(it.cases ?? []).includes(c)) fail(at, `its Verifier brief names ${c}, which its head doesn't`);
+  }
 }
 
 // A cycle in depends_on means no order exists.

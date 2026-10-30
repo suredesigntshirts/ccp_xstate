@@ -30,6 +30,11 @@
 **Evidence:** 37 of 37 builder-written check lines were `[met]`. One check swapped all three lines and still passed (audit F9).
 **Fate:** design. Only the verifier's report counts, and it names the commit it checked.
 
+### L-proof-source
+**Lesson:** An Expect line proven only by tests the builder writes, on fixtures the builder makes, is self-graded, however well the item is shaped.
+**Evidence:** The 30 Oct anti-slop review of this plan: 23 of 74 Expect lines in ready items were proven only that way, 0 items checked their outcome on the real platform before accept, and the only merge gate was a PASS review the builder could post itself (same account everywhere). Cheapest fakes it found: a salvage parser passing "live capture", every idle gap counted as working.
+**Fate:** design. Every Expect line names its proof (world, verifier, builder). The checker refuses a ready build item with no world line or with more than half builder lines. The verifier commits its own tests and verdict.json, with a mutation for each builder line, from a session other than the builder's, and CI checks it at the head sha. An item's head and Verifier brief are frozen once its build starts; only a replan PR changes them.
+
 ### L-attention-is-the-constraint
 **Lesson:** The person's attention is the system's constraint. Never route a mechanical check to them.
 **Evidence:** The person: "Is this appropriate use of my scarce attention?" (27 Oct). Audit F2: hand-posted cards with 0 taps.

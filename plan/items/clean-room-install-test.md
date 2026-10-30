@@ -35,12 +35,14 @@
     {
       "id": "green",
       "check": "The clean-room job passes on the current release",
-      "how": "The job also runs on PRs that touch plugins/ or infra/, so it ran on this PR"
+      "how": "The job also runs on PRs that touch plugins/ or infra/, so it ran on this PR",
+      "proof": "verifier"
     },
     {
       "id": "catches",
       "check": "Removing a file the plugin needs makes the job fail with the self-check naming it",
-      "how": "A scratch PR that deletes one plugin file"
+      "how": "A scratch PR that deletes one plugin file",
+      "proof": "world"
     }
   ],
   "cases": [],

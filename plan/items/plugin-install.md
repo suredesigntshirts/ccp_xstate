@@ -41,22 +41,26 @@
     {
       "id": "inert-until-installed",
       "check": "In a project with no marker, every hook exits 0 with no output and writes nothing",
-      "how": "Hook tests in an empty temp project"
+      "how": "Hook tests in an empty temp project",
+      "proof": "builder"
     },
     {
       "id": "install-once",
       "check": "Install writes the marker and journal root; a second install reports it is already installed and changes nothing",
-      "how": "Test runs install twice"
+      "how": "Test runs install twice",
+      "proof": "builder"
     },
     {
       "id": "disable",
       "check": "HARNESS_DISABLED=1 makes an installed project inert",
-      "how": "Hook test"
+      "how": "Hook test",
+      "proof": "builder"
     },
     {
       "id": "validate",
       "check": "claude plugin validate passes",
-      "how": "CI step"
+      "how": "CI step",
+      "proof": "world"
     }
   ],
   "cases": [],

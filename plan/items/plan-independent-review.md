@@ -28,12 +28,14 @@
     {
       "id": "answered",
       "check": "Every finding has a plan change or a written reason",
-      "how": "Read plan-review.md"
+      "how": "Read plan-review.md",
+      "proof": "verifier"
     },
     {
       "id": "checks",
       "check": "The plan check passes after the changes",
-      "how": "node plan/check.mjs --coverage"
+      "how": "node plan/check.mjs --coverage",
+      "proof": "verifier"
     }
   ],
   "cases": [],

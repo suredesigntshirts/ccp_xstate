@@ -44,17 +44,20 @@
     {
       "id": "clean-home",
       "check": "setup.sh run against an empty HOME produces the expected ~/.claude files and is safe to run twice",
-      "how": "test/setup.test.js runs it twice in a temp HOME and diffs the results"
+      "how": "test/setup.test.js runs it twice in a temp HOME and diffs the results",
+      "proof": "builder"
     },
     {
       "id": "no-values-logged",
       "check": "The setup log names environment variables but never their values",
-      "how": "The test sets a secret-looking variable and greps the log for its value"
+      "how": "The test sets a secret-looking variable and greps the log for its value",
+      "proof": "verifier"
     },
     {
       "id": "rules-plain",
       "check": "Every autoMode.allow entry names a v2 action and who may do it, with no v1 terms (lead, store, stand-in ladder)",
-      "how": "A test checks the entries against a list of v1 terms"
+      "how": "A test checks the entries against a list of v1 terms",
+      "proof": "verifier"
     }
   ],
   "cases": [],

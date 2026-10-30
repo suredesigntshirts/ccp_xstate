@@ -35,12 +35,14 @@
     {
       "id": "selected",
       "check": "The item's first engine row names its workflow and who selected it, and the builder couldn't change it",
-      "how": "Rows plus a test that a builder-sent selection is refused"
+      "how": "Rows plus a test that a builder-sent selection is refused",
+      "proof": "verifier"
     },
     {
       "id": "ran",
       "check": "The item finished through its workflow's states",
-      "how": "engine.transition rows"
+      "how": "engine.transition rows",
+      "proof": "verifier"
     }
   ],
   "cases": [

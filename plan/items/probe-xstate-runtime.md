@@ -28,17 +28,20 @@
     {
       "id": "restore",
       "check": "For each version: persist mid-workflow, restart the process, restore, continue to done",
-      "how": "Probe script output"
+      "how": "Probe script output",
+      "proof": "verifier"
     },
     {
       "id": "stale",
       "check": "For each version: a completion from a replaced run is identifiable and can be dropped",
-      "how": "Probe script output, case C-stale-completion-dropped"
+      "how": "Probe script output, case C-stale-completion-dropped",
+      "proof": "verifier"
     },
     {
       "id": "choice",
       "check": "The report names the version and pins it",
-      "how": "Read the report"
+      "how": "Read the report",
+      "proof": "verifier"
     }
   ],
   "cases": [

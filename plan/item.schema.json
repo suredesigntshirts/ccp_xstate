@@ -138,7 +138,8 @@
         "required": [
           "id",
           "check",
-          "how"
+          "how",
+          "proof"
         ],
         "properties": {
           "id": {
@@ -151,6 +152,15 @@
           "how": {
             "type": "string",
             "description": "The command, test or read that shows it, runnable before accept. Never a step after landing."
+          },
+          "proof": {
+            "type": "string",
+            "enum": [
+              "world",
+              "verifier",
+              "builder"
+            ],
+            "description": "Who makes the evidence. world: the real platform or GitHub, before accept (a real session, PR, CI run, published page). verifier: tests or reads the verifier writes itself, committed under verify/<item>/. builder: tests the builder writes; each needs a mutation in the verdict (the verifier breaks the code and names the test that went red). A ready build item needs at least one world line, and at most half its lines may be builder."
           }
         }
       }

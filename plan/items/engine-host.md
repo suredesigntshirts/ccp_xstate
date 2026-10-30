@@ -48,32 +48,38 @@
     {
       "id": "duplicate",
       "check": "The same GitHub event delivered twice, and a restart mid-effect, each produce the effect once",
-      "how": "Test for case C-duplicate-wake-no-double-effect"
+      "how": "The verifier writes its own test from case C-duplicate-wake-no-double-effect",
+      "proof": "verifier"
     },
     {
       "id": "stale",
       "check": "A completion from a replaced run is journalled as stale and changes nothing",
-      "how": "Test for case C-stale-completion-dropped"
+      "how": "The verifier writes its own test from case C-stale-completion-dropped",
+      "proof": "verifier"
     },
     {
       "id": "refused-effect",
       "check": "A refused effect is journalled with its rule and not retried; the item steps back",
-      "how": "Test for case C-refused-action-not-retried"
+      "how": "The verifier writes its own test from case C-refused-action-not-retried",
+      "proof": "verifier"
     },
     {
       "id": "replay",
       "check": "Replaying an item's journal rebuilds its snapshot exactly",
-      "how": "Test compares snapshot hashes"
+      "how": "Test compares snapshot hashes",
+      "proof": "builder"
     },
     {
       "id": "no-agent-events",
-      "check": "No code path lets an agent send a lifecycle event",
-      "how": "Test: the host's event intake accepts only wake, completion and timer sources"
+      "check": "An event's source comes from the wake envelope the platform delivered; no tool, argument or file an agent can write sets it",
+      "how": "The verifier calls every tool the plugin registers with source fields set to wake, completion and timer, and confirms no transition",
+      "proof": "verifier"
     },
     {
       "id": "one-owner",
       "check": "An item has one owner thread and one journal file; a second host trying to apply an event to it is refused and journalled",
-      "how": "Test for case C-two-hosts-one-item"
+      "how": "Two real sessions on the Library mount; the second's attempt to apply an event is refused and journalled (case C-two-hosts-one-item)",
+      "proof": "world"
     }
   ],
   "cases": [
@@ -120,5 +126,7 @@ by its known path, never a folder (ledger L-library-mount-slow).
 
 ## Verifier brief
 
-Read the six cases named above first. Write your own test for each from the case text, against the host's public
-functions, and run them. Then replay a recorded item journal and compare hashes. Verdict per Expect id.
+Read the four cases named in the head first. Write your own test for each from the case text, against the
+host's public functions, and run them. Call every tool the plugin registers with forged source fields and confirm
+nothing transitions. Run the two-session owner test on the real Library mount. Replay a recorded item journal and
+compare hashes. Write verify/engine-host/verdict.json in your own commit, with a mutation for the builder line.

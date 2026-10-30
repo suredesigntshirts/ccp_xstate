@@ -30,7 +30,8 @@
     {
       "id": "all",
       "check": "A test exists for every case id and all pass",
-      "how": "A test lists case ids from plan/cases/ and fails on any without a test"
+      "how": "A test lists case ids from plan/cases/ and fails on any without a test",
+      "proof": "verifier"
     }
   ],
   "cases": [

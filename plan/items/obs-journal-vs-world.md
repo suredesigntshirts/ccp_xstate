@@ -35,12 +35,20 @@
     {
       "id": "session-diff",
       "check": "On a test session, the report shows 0 missing calls; after deleting one row, it shows exactly that call",
-      "how": "Run twice"
+      "how": "A real session in the v2 project: run the check, delete one tool.call row in a copy, run again",
+      "proof": "world"
     },
     {
       "id": "merge-diff",
       "check": "A PR merged on GitHub with no journal row is listed",
-      "how": "Fixture of GitHub responses"
+      "how": "Fixture of GitHub responses",
+      "proof": "builder"
+    },
+    {
+      "id": "real-merge",
+      "check": "A scratch PR merged by hand through GitHub REST, with no journal row, is listed by the check",
+      "how": "A scratch repo",
+      "proof": "world"
     }
   ],
   "cases": [

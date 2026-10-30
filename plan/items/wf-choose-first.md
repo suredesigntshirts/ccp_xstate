@@ -32,7 +32,8 @@
     {
       "id": "recorded",
       "check": "The decision file holds an answer to all three questions",
-      "how": "Read it"
+      "how": "Read it",
+      "proof": "verifier"
     }
   ],
   "cases": [],

@@ -34,23 +34,27 @@
   "expect": [
     {
       "id": "merge-at-sha",
-      "check": "Merge passes expectedHeadSha equal to verdict.sha, and a moved head makes it fail without merging",
-      "how": "Test with a GitHub stub"
+      "check": "Merge passes expectedHeadSha equal to verdict.sha; when a commit lands after the verdict, the merge fails and the PR stays open",
+      "how": "A scratch PR in a scratch repo, pushed to between verdict and merge",
+      "proof": "world"
     },
     {
       "id": "outside-merge",
       "check": "A PR merged outside the host is listed by the journal check",
-      "how": "Test for case C-merge-outside-host-detected"
+      "how": "The verifier writes its own test from case C-merge-outside-host-detected",
+      "proof": "verifier"
     },
     {
       "id": "no-bash",
-      "check": "No effect runs a shell command or parses one",
-      "how": "Test greps effects/ for child_process and $.process"
+      "check": "No effect runs a shell command: with child_process and $.process wrapped during the effects suite, they record zero calls",
+      "how": "Test wraps both at runtime, so code outside effects/ or a dynamic import is still caught",
+      "proof": "builder"
     },
     {
       "id": "red-ci",
-      "check": "A red CI result sends the item back to building",
-      "how": "Test for case C-red-ci-back-to-building"
+      "check": "A red CI result on the item's PR sends the item back to building, with the failing check's name in context",
+      "how": "A scratch PR with a deliberately failing check, case C-red-ci-back-to-building",
+      "proof": "world"
     }
   ],
   "cases": [
@@ -83,5 +87,7 @@
 
 ## Verifier brief
 
-Run the tests. Read every effect and confirm none shells out. Use a GitHub stub to move a PR's head between verdict
-and merge and confirm no merge happens. Verdict per Expect id.
+Read cases C-merge-outside-host-detected and C-red-ci-back-to-building first and write your own test for the
+first. On a scratch repo: push to a PR between its verdict and the merge effect and confirm no merge happens; make a
+check fail and confirm the item returns to building with that check named. Write verify/engine-effects/verdict.json
+in your own commit, with a mutation for the builder line.

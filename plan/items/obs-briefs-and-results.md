@@ -32,12 +32,14 @@
     {
       "id": "stored",
       "check": "A test session's subagent brief and final answer exist as blobs whose hashes match the rows",
-      "how": "Script recomputes sha256"
+      "how": "Script recomputes sha256",
+      "proof": "verifier"
     },
     {
       "id": "dedup",
       "check": "The same brief twice is stored once",
-      "how": "Test"
+      "how": "Test",
+      "proof": "builder"
     }
   ],
   "cases": [],

@@ -43,27 +43,38 @@
     {
       "id": "complete",
       "check": "For a recorded fixture session (its transcript and expected rows checked in), capture produces a row for every tool call, and none extra",
-      "how": "Test replays the fixture transcript through the capture handlers"
+      "how": "Test replays the fixture transcript through the capture handlers",
+      "proof": "builder"
     },
     {
       "id": "attributed",
       "check": "Subagent calls carry the subagent's agentId; the parent's carry none",
-      "how": "Same fixture, which includes one subagent"
+      "how": "The verifier's own recorded session, which includes one subagent",
+      "proof": "verifier"
     },
     {
       "id": "no-content",
       "check": "Rows hold hashes and sizes of tool inputs, never the raw input or any secret",
-      "how": "Test with a secret-looking input; grep the output"
+      "how": "The verifier puts a secret-looking input in its own session and greps the journal",
+      "proof": "verifier"
     },
     {
       "id": "blobs",
       "check": "The fixture's subagent brief and final answer exist as blobs whose hashes match the rows, stored once",
-      "how": "Test recomputes sha256"
+      "how": "The verifier recomputes sha256 of the brief and answer from its own session",
+      "proof": "verifier"
     },
     {
       "id": "cheap",
-      "check": "Capture's own time per call is measured and reported",
-      "how": "hook.run rows in the fixture run"
+      "check": "Capture adds at most 50 ms median and 200 ms at the 95th percentile per tool call",
+      "how": "hook.run rows from the fixture run",
+      "proof": "builder"
+    },
+    {
+      "id": "live",
+      "check": "In a real session in the v2 project, each tool.call row is in the journal within 2 seconds of the call's time in the session's own event log, read while the session is still running",
+      "how": "The verifier reads the journal mid-session, then compares times with list_events after it ends",
+      "proof": "world"
     }
   ],
   "cases": [],

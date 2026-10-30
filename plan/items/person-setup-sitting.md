@@ -37,7 +37,8 @@
     {
       "id": "recorded",
       "check": "The decision file lists the rules placed, the product repo chosen, and answers to the workflow questions",
-      "how": "Read it"
+      "how": "Read it",
+      "proof": "verifier"
     }
   ],
   "cases": [],

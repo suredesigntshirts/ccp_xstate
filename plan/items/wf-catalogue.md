@@ -37,17 +37,20 @@
     {
       "id": "valid",
       "check": "All four validate and compile",
-      "how": "npm test"
+      "how": "npm test",
+      "proof": "verifier"
     },
     {
       "id": "traced",
       "check": "Each workflow's README entry names the research rows it follows",
-      "how": "Read it"
+      "how": "Read it",
+      "proof": "verifier"
     },
     {
       "id": "concurrency",
       "check": "Every workflow sets concurrency 1 unless its README says why not",
-      "how": "Test"
+      "how": "Test",
+      "proof": "builder"
     }
   ],
   "cases": [],

@@ -36,17 +36,26 @@
     {
       "id": "rows",
       "check": "A test thread with one person message, one card and one tap yields the three rows linked by card id",
-      "how": "Fixture from a real wake envelope"
+      "how": "The verifier builds its own fixture from one real wake envelope with a tap",
+      "proof": "verifier"
     },
     {
       "id": "wait",
       "check": "Card wait time equals tap time minus post time",
-      "how": "Unit test"
+      "how": "Unit test",
+      "proof": "builder"
     },
     {
       "id": "caps",
       "check": "The derived view flags an hour with more than 20 posts in one thread",
-      "how": "Unit test"
+      "how": "Unit test",
+      "proof": "builder"
+    },
+    {
+      "id": "rows-real",
+      "check": "For the person-setup-sitting thread, every message and tap the person made there appears as a row",
+      "how": "The verifier counts them with read_thread and compares",
+      "proof": "world"
     }
   ],
   "cases": [],

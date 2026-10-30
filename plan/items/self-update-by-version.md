@@ -40,17 +40,20 @@
     {
       "id": "release",
       "check": "A merge touching plugins/ produces a tag and a higher version; a merge not touching it doesn't",
-      "how": "Workflow test with act, or two test PRs on a scratch repo"
+      "how": "Workflow test with act, or two test PRs on a scratch repo",
+      "proof": "world"
     },
     {
       "id": "behind-notice",
       "check": "A session on release N while N+1 exists is told so once per 30 minutes",
-      "how": "Hook test with a stubbed latest release"
+      "how": "Hook test with a stubbed latest release",
+      "proof": "builder"
     },
     {
       "id": "no-self-edit",
       "check": "Nothing in the update path writes under the running plugin's root",
-      "how": "Test asserts no write calls under CLAUDE_PLUGIN_ROOT"
+      "how": "The verifier traces every write in the update path and confirms none is under CLAUDE_PLUGIN_ROOT",
+      "proof": "verifier"
     }
   ],
   "cases": [],

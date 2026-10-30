@@ -36,17 +36,20 @@
     {
       "id": "merged",
       "check": "The toy PR is merged at the verified sha",
-      "how": "GitHub plus the journal, run by the verifier on its own"
+      "how": "GitHub plus the journal, run by the verifier on its own",
+      "proof": "world"
     },
     {
       "id": "complete",
       "check": "Every tool call in the toy run's sessions has a journal row",
-      "how": "Compare the sessions' event logs with the journal (by hand or script)"
+      "how": "Compare the sessions' event logs with the journal (by hand or script)",
+      "proof": "verifier"
     },
     {
       "id": "sources",
       "check": "Every engine.transition row's source is a wake, completion or timer",
-      "how": "Query the rows"
+      "how": "Query the rows",
+      "proof": "verifier"
     }
   ],
   "cases": [],
@@ -71,3 +74,9 @@
   "risks": []
 }
 ```
+
+## Verifier brief
+
+Rerun the toy run yourself from a fresh scratch issue, without reading the builder's report first. Check the
+merge sha against the verdict sha on GitHub, compare every session's event log with the journal, and query every
+engine.transition row's source. Write verify/engine-toy-run/verdict.json in your own commit.
