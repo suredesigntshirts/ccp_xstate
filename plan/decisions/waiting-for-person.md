@@ -16,3 +16,8 @@ One line each: what, why, which item waits. Threads add to this; the person clea
 - Optional: let threads read ccp_machine's GitHub REST (attach ccp_machine to the project, or allow api.github.com for it).
   Threads can clone it, but the proxy refuses its REST (403), so no thread can read #72's check runs. Until then the
   rework view is proved on this repo's PRs (plan item obs-time-and-rework; `2026-10-30-obs-time-and-rework.md`).
+- Re-save the environment's setup script (any change, even a comment), so the next thread gets a new container and
+  installs harness-v0.1.9. New threads resume a snapshot from 16:46Z that holds 0.1.0 and skip `setup.sh`, so no
+  thread has ever run capture. Stage s1's gate waits on it (`2026-10-30-s1-observability-gate.md`).
+- Open the observe page (https://claude.ai/artifact/GEVcccpqcToRUb7EhTG4B3) after the re-save and a thread or two, press
+  Refresh, and say whether any answer is missing. That is s1's `answers` check, and obs-page's after-landing step.
