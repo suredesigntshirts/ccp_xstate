@@ -7,7 +7,7 @@
   `expectedHeadSha` is the REST merge call's `sha`, and a node process can't call an MCP tool, so
   `effects/merge.js` makes that REST call (`PUT /repos/{o}/{r}/pulls/{n}/merge`, `sha` = the verdict's sha,
   `merge_method` merge). GitHub answers 409 "Head branch was modified" when a commit landed after the verdict, and the
-  PR stays open: seen on scratch PR #13 at 20:33Z (refused at 41ea291, PR head c484188, then merged at c484188 by the
+  PR stays open: seen on scratch PR #13 at about 20:12Z (refused at 41ea291, PR head c484188, then merged at c484188 by the
   same effect). No GraphQL (ledger L-graphql-blocked).
 - **No shell, so the proxy tunnel is in code.** Node's fetch ignores `HTTPS_PROXY`; the journal check re-runs itself
   with `NODE_USE_ENV_PROXY`, which an effect can't (that is a child process). `effects/github.js` opens the CONNECT
