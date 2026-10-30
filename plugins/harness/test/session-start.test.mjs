@@ -217,7 +217,7 @@ test('release: an install whose commit already contains the newest release passe
   assert.match(context(r.stdout), /self-check passed/);
   execFileSync('git', ['-C', origin, 'tag', '-d', 'harness-v9.9.9']);
   // The same release on a commit the install does not contain is newer code, and fails.
-  execFileSync('git', ['-C', origin, 'update-ref', 'refs/heads/release/harness-v9.9.9', execFileSync('git', ['-C', REPO, 'commit-tree', '-m', 'elsewhere', `${rev(TEST_REF)}^{tree}`], { encoding: 'utf8' }).trim()]);
+  execFileSync('git', ['-C', origin, 'update-ref', 'refs/heads/release/harness-v9.9.9', execFileSync('git', ['-C', REPO, '-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false', 'commit-tree', '-m', 'elsewhere', `${rev(TEST_REF)}^{tree}`], { encoding: 'utf8' }).trim()]);
   r = run();
   assert.match(context(r.stdout), /This session runs release 0\.1\.0 but 9\.9\.9 is out/);
   // A release commit the clone doesn't have (a shallow clone, say) can't be compared: unknown, not failed.
