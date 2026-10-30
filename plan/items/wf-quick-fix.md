@@ -4,7 +4,7 @@
   "title": "Port PR #110's machine as the quick-fix workflow, with v1's hardest cases as tests",
   "stage": "s2-workflow-model",
   "kind": "build",
-  "status": "ready",
+  "status": "doing",
   "outcome": "workflows/quick-fix.json holds #110's item machine (briefing, building, verifying, awaitingMerge, merging, replanning, done, dropped) on xstate 5.33.3, with tests on pure transitions for the cases that cost v1 most.",
   "why": "PR #110 already ran this machine end to end with real actors, replay and stale-run refusal, in about 650 lines and with 9 precondition guards. Port it, don't redesign it. The schema for many workflows waits until a second workflow needs it.",
   "serves": [

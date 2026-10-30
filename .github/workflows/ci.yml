@@ -14,6 +14,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: install xstate (the one runtime dependency, pinned in package-lock.json)
+        run: npm ci
       - name: npm test (packages, plugins, scripts, verify)
         run: npm test
       - name: plan check

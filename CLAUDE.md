@@ -28,7 +28,8 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 |---|---|
 | `plan/` | The plan: items, stages, ledger, cases, decisions. Start at `plan/README.md` |
 | `plan/check.mjs` | Checks the plan; `--order` prints build order |
-| `packages/` | npm workspaces for the harness libraries; `packages/journal/` is the record format |
+| `packages/` | npm workspaces for the harness libraries; `packages/journal/` is the record format, `packages/engine/` loads workflows |
+| `workflows/` | Workflow files as XState JSON; `workflows/quick-fix.json` is the first |
 | `plugins/` | npm workspaces for the Claude Code plugins |
 | `verify/<item>/` | The verifier's tests and `verdict.json` for each item |
 | `scripts/gates/` | The PR gates CI runs |
