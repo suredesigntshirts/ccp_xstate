@@ -8,7 +8,7 @@
   "gate": [
     {
       "id": "fresh-install",
-      "check": "A new thread in the v2 project installs the plugin and writes its fingerprint and self-check rows; the fingerprint's plugin version equals the latest harness-v* release and the self-check passes",
+      "check": "A new thread in the v2 project installs the plugin and writes its fingerprint and self-check rows; the fingerprint's plugin version equals the latest harness-v* release (a tag or a release/ branch) and the self-check passes",
       "how": "The two rows in the journal, read by a session other than the one that wrote them"
     },
     {

@@ -24,8 +24,12 @@
   ],
   "outputs": [
     {
+      "ref": "scripts/release/release.mjs",
+      "what": "After a merge to main with a plugin change: the next version, pushed by the merging thread as a branch release/harness-v<x.y.z>"
+    },
+    {
       "ref": ".github/workflows/release.yml",
-      "what": "On merge to main with a plugin change: bump the version, tag it"
+      "what": "The same release as a tag when Actions runs (optional: Actions minutes can run out)"
     },
     {
       "ref": "plugins/harness/hooks/ (UserPromptSubmit)",
@@ -39,8 +43,8 @@
   "expect": [
     {
       "id": "release",
-      "check": "A merge touching plugins/ produces a tag and a higher version; a merge not touching it doesn't",
-      "how": "Workflow test with act, or two test PRs on a scratch repo",
+      "check": "A merge touching plugins/ produces a release ref (a release/harness-v<x.y.z> branch, or a tag) at a higher version; a merge not touching it doesn't",
+      "how": "Two test PRs merged on the scratch repo, each followed by the release script as the merging thread runs it, reading origin's refs",
       "proof": "world"
     },
     {
@@ -86,5 +90,5 @@
 
 ## Verifier brief
 
-Run the tests. Read release.yml and confirm the version only rises. Check the update path never writes under the
+Run the tests. Read release.mjs and release.yml and confirm the version only rises. Check the update path never writes under the
 plugin root. If a real release exists, read the two fingerprint rows that bracket it. Verdict per Expect id.
