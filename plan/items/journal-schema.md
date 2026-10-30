@@ -4,7 +4,7 @@
   "title": "Define the one journal format every record uses, versioned from the first row",
   "stage": "s0-environment",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A JSON Schema and a tiny append library define the journal: append-only JSONL, one writer per file (a session file, or an item file owned by one thread), every row carrying a version and its source.",
   "why": "v1's store had no schema version, so every format or rule change broke replay, and joining histories took about 15 PRs. Observability, the engine and the pages all read this format, so it comes first and is versioned from row one.",
   "serves": [
