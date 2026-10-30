@@ -30,7 +30,7 @@ happened without the rules too, so a refusal may not survive the rules. The rebu
 | What a mod sees of a wake | **Only a summary.** Both wake kinds reach `turn.start` as the same `<task-notification>` "queued-remote-notifications" text. The body (send_later message, GitHub event JSON) comes only from the model's `ReadNotifications` call. A mod can tell *that* a wake came, not *what* it says. | both wake fixtures, `turn_text_as_mod_saw_it` |
 | `$.mcp.call` reaches the project's thread tools from a mod (L-mods-capabilities) | **Holds** in a live thread: `hearthbot.read_thread`, `hearthbot.request_decision` (card posted, then closed by the thread) and `claude-code-remote.send_later` (trigger created) all returned `isError: false`. Headless it doesn't: those servers aren't connected in `claude -p` ("no connected MCP tool"). | `fixtures/wakes/2026-10-30-pr-event-wake.json` (`second_wake.mod_mcp_calls`); `fixtures/runs/live-thread.jsonl`; run 1 lines `probe:"mcp"` |
 | `$.agent.spawn` honours `cwd` (L-spawn-ignores-cwd) | **Doesn't hold.** Asked for `/tmp/probe-cwd-target`, the subagent's `pwd` was the parent's `/tmp`, twice (runs 1 and 2). What works instead: subagents start in the session's working folder (the live thread's `pwd` followed the session's current directory), so name the folder in the brief and have the agent `cd` there. | runs 1-2 lines `"label":"cwd"`; smallest repro in the README |
-| How a classifier refusal shows to the model and hooks | **To the model:** a tool_result error, "Permission for this action was denied by the Claude Code auto mode classifier. Reason: [Category]. ..." **To settings hooks:** no PostToolUse fires for the denied call; the debug log has `Auto mode classifier blocked action: [Category]`. **To a mod:** untested. Both deliberate refusals happened in the outer thread before the mod was loaded, and the child never started. A non-classifier block (Claude Code's own `sleep` guard) reaches a mod's `tool.call` as `isError: true` with the text, `deny` unset. | `fixtures/refusals/` (two refusals, debug log excerpt); run 2 line `probe:"tool-refusal"` |
+| How a classifier refusal shows to the model, hooks and a mod | **To the model:** a tool_result error, "Permission for this action was denied by the Claude Code auto mode classifier. Reason: [Category]. ..." **To settings hooks:** a `PermissionDenied` hook fires with `tool_name`, `tool_input`, `tool_use_id` and `reason: "[Self-Modification]"` (the category only); no PostToolUse fires. **To a mod:** `tool.call`'s `await next(e)` resolves `isError: true` with the full refusal text in `text`, and `deny` is unset. So a mod can't tell a classifier refusal from a tool error except by the text. The debug log also has `Auto mode classifier blocked action: [Category]`. Captured live at 11:34Z, when this thread tried the SessionStart probe below (a real refusal, not a staged one). | `fixtures/refusals/2026-10-30-self-modification-live-mod-and-hook.jsonl`, `fixtures/refusals/` (the two earlier refusals and the debug log excerpt) |
 | Retrying after a refusal reads as a bypass (L-retries-look-like-bypass) | Not re-tested. The second refusal ([Self-Modification]) was a different action with the intent stated; it was refused too. Stopped there. | `fixtures/refusals/2026-10-30-self-modification-outer.json` |
 | Subagent depth (L-subagent-depth) | **Unclear at 1, holds at 3.** With `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1` (this container's value) the builder saw a subagent with no Agent tool in 2 of 2 runs (run 3, and a 10:27Z rerun where `=0` gave the Agent tool and `nested-ok`), but the verifier's 3 reruns at `=1` got a second level that answered `nested-ok`. With `=3`, three levels ran (`nested-3-ok`). Don't rely on the default: set the value explicitly and have the self-check spawn one nested agent. | `fixtures/runs/2026-10-30-results.jsonl` runs 3 and 5, `fixtures/runs/2026-10-30-depth-rerun.txt`, verifier notes in `verify/probe-platform-baseline/verdict.json` |
 | SessionStart settings hook budget (L-hook-time-budget) | **No timeout set: at least 70 s;** the session waited the full 70 s before starting. **`timeout: 5`: killed at 5 s** (4 ticks, no end line). | runs 3-5 log (70 s), `fixtures/runs/2026-10-30-run-6-configured-timeouts.jsonl` |
@@ -42,8 +42,32 @@ happened without the rules too, so a refusal may not survive the rules. The rebu
 | Headless spawns need a live main turn (L-headless-spawn-needs-live-turn) | **Holds in practice**: in run 2 the main turn stayed alive because the model waited for its subagents; the timer spawn fired 5 s after its turn hook. | runs 1-2 log |
 | Rules work only if placed before the session (L-rules-before-session) | **Untested,** because no rules were placed. Not run by the thread itself (that would be a self-placed rule). | this section |
 | GraphQL blocked, REST only (L-graphql-blocked) | **Untested** this run. The GitHub MCP tools (REST) worked for PR create, merge and subscribe. | — |
-| A page reads a Library JSONL through `files` | **Untested: needs a viewer.** Publishing a page declaring `files: {project}` was accepted. It reads `probes/platform/probe-journal.jsonl` on load and stores the result in its own db, so a later thread can read it with `ArtifactData list results`. | https://claude.ai/artifact/YUMK21WxirbJgGCE7ppaQj, `probes/platform/page/journal-read.html` |
+| A page reads a Library JSONL through `files` | **Holds.** The project owner opened the page. `files.list` found `probes/platform/probe-journal.jsonl` and `files.read` returned 1488 bytes (revision 6eb7ee3d…), and all 4 JSONL rows parsed, on 4 loads between 11:30Z and 11:32Z. The read asks the viewer once; a viewer outside the project gets `not_found`. | `fixtures/runs/2026-10-30-page-read-results.json` (from the page's db), https://claude.ai/artifact/YUMK21WxirbJgGCE7ppaQj |
 | A `claude -p` child loads the parent session's mods folder | **Observed:** run 6, started after the person turned mods on, logged the dev mod's `session.start` (it shares the parent's session id). Check this before using headless runs as clean rooms. | `fixtures/runs/live-thread.jsonl` first two lines |
+
+## Setup script vs SessionStart
+
+The person asked whether a SessionStart hook or mod should keep the settings current instead of, or as well as, the
+setup script. What was seen:
+
+- **Setup script:** runs when a container is built for a new session. A thread resumed on a cached container skips
+  it: env-manager logged "Skipping initialization script for faster startup" at 10:07Z, and again at 11:33Z after the
+  person re-saved the script. A re-save reaches new threads, not running ones.
+- **Repo `.claude/settings.json`:** never loads here. Threads start in `/home/user`, not the repo
+  (L-repo-skills-dont-load), so only `~/.claude/settings.json` counts.
+- **A SessionStart hook started from inside the thread:** refused. This thread tried a `claude -p` child whose
+  plugin SessionStart hook runs `setup.sh`, with the person's ask stated in the prompt. Auto mode denied it as
+  [Self-Modification] before the child started (11:34Z). A thread placing its own rules is the case
+  L-rules-before-session warns about. It was not retried.
+- **Not tested:** a SessionStart hook in a plugin the person installs, which runs before the thread's first turn
+  with no classifier in the way. Settings it writes probably land after the session read its settings, so they
+  would count from the next start or resume, not the current session.
+
+Recommendation, for setup-script and env-bootstrap: keep the setup script as the way rules arrive. Add a SessionStart
+hook in the v2 plugin that only *checks*: is `~/.claude/settings.json` there, are the rules in it, is the depth 3.
+When something is missing, it says so loudly at session start and records it. Whether that hook should also write
+the settings (for the next resume) is a one-way door about settings, so it is for the person, on
+waiting-for-person.md.
 
 ## What this changes for later items
 
@@ -79,12 +103,13 @@ None of these were in force during the probe. They take effect only after the pe
 ## Verdict and what is left
 
 The independent verifier (verify/probe-platform-baseline/verdict.json, at 4239dac) marked 6 Expect lines MET
-(versions, mcp-from-mod, self-edit, cwd, rerunnable, negative-evidence) and 5 NOT MET. The item is not done, so this
+(versions, mcp-from-mod, self-edit, cwd, rerunnable, negative-evidence) and 5 NOT MET. Since then two of the 5 have
+new evidence (below), which needs a new verdict. The item is not done, so this
 PR is not merged (plan/README.md, "How slop is kept out"). Each open line and what closes it:
 
 - **idle-spawn, idle-merge:** answered with no allow rule in force, not under the pre-placed rule the line names.
-  Rerun the two wake probes (README) in a fresh thread after the environment rebuild. Needs the person.
-- **page-reads-journal:** needs a project member to open the probe page once. Needs the person.
-- **hooks-see-refusals:** the mod side is untested. Rerun in that same fresh thread with the mod loaded: one
-  deliberate refusal inside the thread, not a `claude -p` child (the outer classifier refuses the child's prompt).
-- **depth-and-budgets:** depth 1 gave conflicting results (above). Rerun after the rebuild, when depth should be 3.
+  The person re-saved the setup script at about 11:30Z, so a new thread should start with the rules. Rerun the two
+  wake probes (README) there, after checking `~/.claude/settings.json` exists.
+- **page-reads-journal:** now holds (11:30Z, opened by the person).
+- **hooks-see-refusals:** now answered for the mod and settings hooks (11:34Z refusal, above).
+- **depth-and-budgets:** depth 1 gave conflicting results (above). Rerun in that new thread, where depth should be 3.

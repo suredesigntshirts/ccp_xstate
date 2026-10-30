@@ -8,6 +8,4 @@ One line each: what, why, which item waits. Threads add to this; the person clea
 - Thread branches are named `claude/...` by the environment, so threads can't follow CLAUDE.md's `<kind>/<item-id>`
   branch rule; they name the item in the PR body instead. Change the environment if you want the branch rule kept
   (plan item repo-skeleton).
-- Rebuild the v2 cloud environment (re-save the setup script). The probe thread's container started from a cache and skipped it ("Skipping initialization script for faster startup"), so `~/.claude/settings.json` was never written: no allow rules, subagent depth 1. probe-platform-baseline's rule-dependent rows wait on a rerun after that (plan/research/platform-baseline.md).
-- Open https://claude.ai/artifact/YUMK21WxirbJgGCE7ppaQj once and allow file access: it records whether a page can read a Library JSONL (probe-platform-baseline, row page-reads-journal).
-- After the rebuild, start a fresh probe-platform-baseline thread to rerun its 5 open Expect lines (plan/research/platform-baseline.md, "Verdict and what is left"). The item is not done until then, so person-setup-sitting and env-bootstrap wait on it.
+- Should the v2 plugin's SessionStart hook also write the repo's settings into `~/.claude/settings.json` (taking effect from the next resume), or only check and report? A thread can't do it for itself: tried 11:34Z, refused [Self-Modification]. Until you choose, setup-script/env-bootstrap build the check only (plan/research/platform-baseline.md, "Setup script vs SessionStart").
