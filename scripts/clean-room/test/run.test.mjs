@@ -15,7 +15,8 @@ test('green: the plugin at this commit passes the clean room, with the self-chec
   t.after(() => rmSync(r.room, { recursive: true, force: true }));
   assert.equal(r.passed, true, report(r));
   assert.equal(r.mode, 'hooks without a model');
-  assert.match(r.line, /^ccp-harness \d+\.\d+\.\d+: self-check passed \(7 of 7 checks\)\.$/);
+  // 6 of 7 in a shallow clone, where the release check can't tell whether this commit contains the newest release.
+  assert.match(r.line, /^ccp-harness \d+\.\d+\.\d+: self-check passed \([67] of 7 checks\)\./);
   assert.deepEqual(r.steps.map((s) => s.step), ['empty', 'setup', 'install', 'session', 'selfcheck', 'journal']);
 });
 

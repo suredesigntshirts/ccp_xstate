@@ -49,6 +49,8 @@ export function fakeRepo({ rules = RULES, tags = [] } = {}) {
   git(clone, '-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-qm', 'settings');
   for (const v of tags) git(clone, 'tag', `harness-v${v}`);
   git(clone, 'remote', 'add', 'origin', origin);
+  // Shares this repo's objects, so the release check can compare an installed commit with the fake releases.
+  writeFileSync(join(clone, '.git', 'objects', 'info', 'alternates'), `${git(REPO, 'rev-parse', '--path-format=absolute', '--git-common-dir').trim()}/objects\n`);
   git(clone, 'push', '-q', '--tags', 'origin', 'HEAD:refs/heads/main');
   return clone;
 }
