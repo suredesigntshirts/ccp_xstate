@@ -95,6 +95,7 @@ test('fail-closed (verifier): every guard fails for each absent field it reads',
   }
 });
 
-test('observation (verifier): buildsLeft with builds=null passes (null < 2), unlike present()-based guards', () => {
-  assert.deepEqual(failing(spec, ['buildsLeft'], { context: { builds: null } }), []);
+test('fail-closed (verifier): buildsLeft fails when builds is null, a string or NaN', () => {
+  for (const v of [null, '1', NaN, undefined]) assert.deepEqual(failing(spec, ['buildsLeft'], { context: { builds: v } }), ['buildsLeft'], String(v));
+  assert.deepEqual(failing(spec, ['buildsLeft'], { context: { builds: 1 } }), []);
 });

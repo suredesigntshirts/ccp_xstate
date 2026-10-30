@@ -1,6 +1,6 @@
 {
   "item": "wf-quick-fix",
-  "verified_sha": "50d7d645f3af62e4ef1c0e4bce41b342e6dfbd90",
+  "verified_sha": "fc5e45a2702cb21be912a982a4c128f3fc44a92a",
   "verifier": {
     "session": "https://claude.ai/code/session_01KfkB5HZRbfGRGcZb4ar2mX#agent=verifier-wf-quick-fix",
     "model": "claude-sonnet-5-5"
@@ -10,13 +10,13 @@
       "id": "cases",
       "status": "MET",
       "command": "node --test verify/wf-quick-fix/cases.test.mjs (own tests from plan/cases/work-item.md) ; npm test",
-      "excerpt": "ok 1-4 C-verdict-on-old-head (x2), C-push-after-pass, C-second-fail-replans; ok 5 C-missing-expect-fails-closed; # pass 7 # fail 0. Full npm test: # tests 85 # pass 85 # fail 0. PASS for A with head B never reaches awaitingMerge/merging; push in awaitingMerge returns to verifying for B; second FAIL goes to replanning with no third build spawn; replan without a why stays in replanning; startRefusal refuses empty/absent expect naming it."
+      "excerpt": "ok 1-4 C-verdict-on-old-head (x2), C-push-after-pass, C-second-fail-replans; ok 5 C-missing-expect-fails-closed; # pass 7 (re-run at fc5e45a) # fail 0. Full npm test: # tests 85 # pass 85 # fail 0. PASS for A with head B never reaches awaitingMerge/merging; push in awaitingMerge returns to verifying for B; second FAIL goes to replanning with no third build spawn; replan without a why stays in replanning; startRefusal refuses empty/absent expect naming it."
     },
     {
       "id": "fail-closed",
       "status": "MET",
-      "command": "own per-guard absent-field check in cases.test.mjs; mutation: packages/engine/src/spec.js 'below' -> return !(value >= condition.below); node --test packages/engine/test/guards.test.js; git checkout",
-      "excerpt": "All 10 guards in meta.guards fail on an empty scope and on each field they read being absent (undefined). Mutation made buildsLeft pass on an absent value: 'not ok 3 - fail-closed: buildsLeft fails when any field it reads is absent', # fail 1; reverted. A second mutation (dropping present() in 'same') stayed green: masked by the sibling 'is PASS' condition, so equivalent for verifiedHead. Caveat: buildsLeft passes when context.builds is null (null < 2), unlike present()-based guards; not 'absent' (undefined), so not counted against the line."
+      "command": "own per-guard absent-field check + buildsLeft null/string/NaN test in cases.test.mjs; mutation: packages/engine/src/spec.js 'below' -> return !(value >= condition.below); node --test packages/engine/test/guards.test.js verify/wf-quick-fix/cases.test.mjs; git checkout",
+      "excerpt": "At fc5e45a all 10 guards fail on an empty scope and on each read field absent. buildsLeft now also fails on null, '1' and NaN (below holds only for a number). Mutation made buildsLeft pass on absent/null: 'not ok fail-closed: buildsLeft fails when any field it reads is absent' in guards.test.js plus my buildsLeft test went red; reverted. Dropping present() in 'same' stays green (masked by the 'is PASS' sibling, equivalent)."
     },
     {
       "id": "pinned",
