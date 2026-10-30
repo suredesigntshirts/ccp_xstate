@@ -90,6 +90,15 @@ test('rows: an installed session writes one fingerprint and one passing self-che
 });
 
 // Each case breaks one thing and expects exactly that check to fail, named in one sentence in the session's line.
+// A copy of the installed plugin that says it is the release harness-v0.1.0, as setup.sh writes a release install.
+function taggedCopy() {
+  const root = join(temp('tagged'), 'ccp-harness');
+  cpSync(INSTALLED, root, { recursive: true });
+  const path = join(root, 'release.json');
+  writeFileSync(path, JSON.stringify({ ...JSON.parse(readFileSync(path, 'utf8')), tag: 'harness-v0.1.0' }));
+  return join(root, 'scripts', 'session-start.mjs');
+}
+
 const ONE_FAILING = [
   {
     id: 'depth',
@@ -113,6 +122,7 @@ const ONE_FAILING = [
   },
   {
     id: 'release',
+    hook: taggedCopy(),
     tags: ['0.1.0', '0.2.0'],
     says: /This session runs release 0\.1\.0 but 0\.2\.0 is out/
   }
@@ -216,15 +226,33 @@ test('release: an install whose commit already contains the newest release passe
   r = run();
   assert.match(context(r.stdout), /self-check passed/);
   execFileSync('git', ['-C', origin, 'tag', '-d', 'harness-v9.9.9']);
-  // The same release on a commit the install does not contain is newer code, and fails.
-  execFileSync('git', ['-C', origin, 'update-ref', 'refs/heads/release/harness-v9.9.9', execFileSync('git', ['-C', REPO, '-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false', 'commit-tree', '-m', 'elsewhere', `${rev(TEST_REF)}^{tree}`], { encoding: 'utf8' }).trim()]);
-  r = run();
-  assert.match(context(r.stdout), /This session runs release 0\.1\.0 but 9\.9\.9 is out/);
-  // A release commit the clone doesn't have (a shallow clone, say) can't be compared: unknown, not failed.
-  execFileSync('git', ['-C', origin, 'update-ref', 'refs/heads/release/harness-v9.9.9', rev('HEAD')]);
-  writeFileSync(join(repo, '.git', 'objects', 'info', 'alternates'), '');
-  r = run();
-  assert.match(context(r.stdout), /self-check passed .*Not checked: .*This session runs commit .*not a release, and the clone can't tell whether it contains harness-v9\.9\.9/);
+});
+
+// contains() over a repo made here, so the answer doesn't depend on how much history the test checkout has.
+test('release: contains() says true for an ancestor, false for a commit not in the history, null when it cannot tell', async () => {
+  const { contains } = await import('../scripts/fingerprint.mjs');
+  const repo = join(temp('history'), 'repo');
+  execFileSync('git', ['init', '-q', repo]);
+  const commit = (...parents) => execFileSync('git', ['-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit-tree', '-m', `c${parents.length}`,
+    ...parents.flatMap((p) => ['-p', p]), '4b825dc642cb6eb9a060e54bf8d69288fbee4904'], { encoding: 'utf8' }).trim();
+  execFileSync('git', ['-C', repo, 'hash-object', '-w', '-t', 'tree', '/dev/null']);
+  const a = commit(), b = commit(a), elsewhere = execFileSync('git', ['-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit-tree', '-m', 'elsewhere', '4b825dc642cb6eb9a060e54bf8d69288fbee4904'], { encoding: 'utf8' }).trim();
+  assert.equal(await contains(repo, b, a), true);
+  assert.equal(await contains(repo, b, b), true);
+  assert.equal(await contains(repo, a, b), false);
+  assert.equal(await contains(repo, b, elsewhere), false);
+  assert.equal(await contains(repo, b, '0'.repeat(40)), null);
+  assert.equal(await contains(repo, null, a), null);
+});
+
+test('release: an older install fails unless it is an untagged commit that contains the release, or git cannot tell', async () => {
+  const { CHECKS } = await import('../scripts/selfcheck.mjs');
+  const facts = (tag, contained) => ({ plugin: { version: '0.1.0', tag, commit: 'c'.repeat(40) }, latest: { state: 'found', tag: 'harness-v0.2.0', version: '0.2.0', contained } });
+  assert.equal(CHECKS.release(facts(null, true)).status, 'pass');
+  assert.equal(CHECKS.release(facts(null, null)).status, 'unknown');
+  assert.equal(CHECKS.release(facts(null, false)).status, 'fail');
+  for (const contained of [true, null, false]) assert.equal(CHECKS.release(facts('harness-v0.1.0', contained)).status, 'fail', `tagged, contained ${contained}`);
+  assert.equal(CHECKS.release({ ...facts(null, null), plugin: { version: '0.2.0', tag: null } }).status, 'pass');
 });
 
 test('the install script makes the journal root and the marker once, and a second run changes nothing', () => {
