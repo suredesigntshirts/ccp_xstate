@@ -51,7 +51,7 @@
     "budget": 0
   },
   "non_goals": [
-    "Not a test of a real Projects thread; the stage gate's fresh-project run does that"
+    "Not a test of a real Projects thread; the s0 gate fresh-install does that"
   ],
   "records": [
     "ci.result for the clean-room job"

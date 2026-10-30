@@ -21,6 +21,7 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 - One plan item per PR. Put `Item: <item-id>` on its own line in the PR body.
 - Every commit ends with a `Claude-Session:` trailer naming the session that wrote it.
 - Merge into `main` only when `ci` and `verdict` are green at the head sha. See `docs/gates.md`.
+- After merging a plugin change, release it: `node scripts/release/release.mjs branch --push` (`docs/gates.md`).
 
 ## Layout
 

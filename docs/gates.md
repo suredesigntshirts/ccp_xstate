@@ -62,3 +62,11 @@ An item is frozen when the PR names it, or when its status at the base is `doing
 head (every field but `status`) and its `## Verifier brief` section must not change. The only exception is a
 PR labelled `replan` that changes nothing outside `plan/`. Changing `status` is always allowed, so a build PR
 can mark its item `done`.
+
+## After the merge: the release
+
+A merge that changes `plugins/harness/` or `packages/journal/` (tests aside) is released by the thread that merged
+it: `git fetch origin main && node scripts/release/release.mjs branch --push`. That pushes `release/harness-v<x.y.z>`
+at the merge, and prints a `ci.result` row for the thread's journal. It makes nothing when the merge changed no
+released file or is already released, so running it after every merge is safe. `.github/workflows/release.yml`
+makes the same release as a tag when Actions runs. See `plugins/harness/README.md`, "Releases".

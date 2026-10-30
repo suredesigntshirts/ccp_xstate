@@ -4,7 +4,7 @@
   "title": "Install the plugin from the repo, gate it per project, and start every session with a fingerprint and a self-check",
   "stage": "s0-environment",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A stub pasted into the project's environment runs the repo's setup script, which installs the released plugin and v2's allow rules. The plugin does nothing until installed in a project, and every session in an installed project starts by journalling a fingerprint row and a short self-check.",
   "why": "Repo settings and skills don't load in Projects threads, rules must exist before a session starts, a pasted full script goes stale, and v1 lost hours to stale installs and rules that hadn't loaded. These three pieces only make sense together, so they are one PR (plan-review finding 1c).",
   "serves": [
@@ -81,14 +81,15 @@
       "proof": "builder"
     },
     {
-      "id": "fresh-project",
-      "check": "In a fresh thread of the v2 project after the setup sitting, the first session journals one fingerprint row whose plugin version equals the latest release, and a passing self-check",
-      "how": "The verifier reads the journal of a thread the person or coordinator starts for it",
+      "id": "real-session",
+      "check": "A real Claude Code session, with a fresh HOME set up by this PR's setup.sh, loads the installed copy as a plugin and journals one fingerprint row whose plugin version and commit match the copy's release.json, and a self-check where every check but the release check passes",
+      "how": "The verifier runs setup.sh into its own temp HOME, runs the install skill's script, starts claude -p in an empty folder with that HOME, and reads the journal",
       "proof": "world"
     }
   ],
   "after_landing": [
-    "The person pastes paste-me.sh and saves the setup script once; the stage gate checks the first real thread's rows"
+    "The person pastes paste-me.sh and saves the setup script once; the stage gate checks the first real thread's rows",
+    "Moved out of Expect by replan (plan/decisions/2026-10-30-env-bootstrap-fresh-project-after-landing.md): in a fresh thread of the v2 project after the setup sitting and the first harness-v* release tag, the first session journals one fingerprint row whose plugin version equals the latest release, and a passing self-check. The s0 gate fresh-install checks it."
   ],
   "cases": [
     "C-older-writer-refused"
