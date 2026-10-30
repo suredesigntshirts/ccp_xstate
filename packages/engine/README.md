@@ -19,6 +19,7 @@ The rows are in `docs/journal.md`, "Engine rows". Why it is shaped this way: `pl
 node packages/engine/bin/host.js start --item <id> --workflow quick-fix --input '<json>' --session <id>
 node packages/engine/bin/host.js wake --item <id> --workflow quick-fix < <hook input JSON>
 node packages/engine/bin/host.js show --item <id> --workflow quick-fix
+node packages/engine/bin/host.js card --item <id> --workflow quick-fix --effect <ask run id> --ref <card id>
 ```
 
 `--root` defaults to `$CCP_JOURNAL_DIR` or `/mnt/project-files/harness/journal`.
@@ -37,8 +38,11 @@ command.
 | `timer.js` | a delayed transition | asks the clock for a wake at the due time; the host fires the timer from that wake |
 
 `handlers({ github, hearth, clock })` builds them. `github` (`src/effects/github.js`) reaches api.github.com through
-the session's proxy itself. `bin/host.js` runs merges only: a command can't reach the thread or schedule a wake, so cards,
-posts and timers stay pending (and printed) for a host that has a `hearth` client and a clock. Agent actors are
+the session's proxy itself. A command can't reach the thread or schedule a wake, so in `bin/host.js` posts and timers
+stay pending (and printed). Its cards go through `src/effects/relay.js` (plan item engine-toy-run): the session that
+has the thread's tools posts the card `show` lists and records its id with `card`, and the host's next call finishes
+the card effect with that id, so the tap wake on that card answers the run. `scripts/toy-run.sh` runs the whole loop;
+why: `plan/decisions/2026-10-30-engine-toy-run.md`. Agent actors are
 prepared by `src/actors.js` (below).
 
 The journal check (`packages/journal/bin/journal-check.js --repo <owner/name>`) lists every merge the host's merge
