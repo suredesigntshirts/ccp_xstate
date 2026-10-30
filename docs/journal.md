@@ -134,13 +134,13 @@ null. `payload`:
 
 | Field | What |
 |---|---|
-| `source` | `classifier`, `hook` or `permission` |
-| `rule` | The classifier's `reason`; for a hook, the name its reason starts with (`<rule>: why`, as our hooks write them), else `<event> hook`; for a permission, `deny rule` or `person declined` |
-| `textHash` | sha256 of the refusal text the model saw, or null for a classifier refusal (its text doesn't reach the hook). The text itself is never kept: a permission denial's text holds the command, and a hook's may |
-| `actionHash` | sha256 of the tool name and its input, without a top-level `description` (the model's label, reworded freely). Two calls of the same action share it |
-| `tool` | The refused tool's name |
-| `retryOf` | The id of the latest earlier refusal in this session with the same `actionHash`, or null |
-| `outcome` | `denied`: the refused call did not run |
+| source | `classifier`, `hook` or `permission` |
+| rule | The classifier's `reason`; for a hook, the name its reason starts with (`<rule>: why`, as our hooks write them), else `<event> hook`; for a permission, `deny rule` or `person declined` |
+| textHash | sha256 of the refusal text the model saw, or null for a classifier refusal (its text doesn't reach the hook). The text itself is never kept: a permission denial's text holds the command, and a hook's may |
+| actionHash | sha256 of the tool name and its input, without a top-level `description` (the model's label, reworded freely). Two calls of the same action share it |
+| tool | The refused tool's name |
+| retryOf | The id of the latest earlier refusal in this session with the same `actionHash`, or null |
+| outcome | `denied`: the refused call did not run |
 
 A row is never changed after it is written, so whether a refusal was retried and how that ended is read forward: a
 later `refusal` whose `retryOf` is this row's id was refused again; a later `tool.call` whose `payload.retryOf` is this
