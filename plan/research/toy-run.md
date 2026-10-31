@@ -48,9 +48,24 @@ the return tool, and the hook handed the result to the item, which prepared the 
 - **A pgrep for the script matched its own wait loop**, so a 2-minute run looked like a 10-minute one from outside.
   Waiting on the item file instead is exact.
 
+## To merged: the verifier's rerun (toy-v1)
+
+The verifier filed its own issue (#25) and ran the script itself; its builder opened scratch PR #26, verified PASS at
+`7bd0dc6c0d4b57d5e1872512404cef116e684bbb`. The thread put up card `cmsg_01VhYV3jhQ9s4qrrh2th12sNBT3tuZcMNfPfiXXuv7WQWq`
+at about 21:39Z. The person tapped approve at 02:24:22Z on 2026-10-31. `scripts/toy-run.sh tap` resumed the driver
+with the wake, and its host hook took it: seq 4 `xstate.done.actor.ask` (source `hearth` and the card id), then the
+merge effect merged #26 at the verified head (merge commit `bcbf16da`, 02:24:58Z), seq 5 `xstate.done.actor.merge`
+(source `engine`), state `done`. Issue #25 closed. Journal check: 25 tool calls, 25 rows; 1 merge, 1 host merge
+effect, nothing unexplained. Verdict: `verify/engine-toy-run/verdict.json`, all three lines MET.
+
+- Filed to awaitingMerge about 3 minutes; awaitingMerge to merged 4 h 45 min, all of it waiting on the tap. From
+  tap to merge: 36 s, most of it the resumed driver session starting.
+- toy-2 (#24) stays at awaitingMerge: its card is open and optional now.
+
 ## Still open
 
-- The merge: waits for the tap on the card above (waiting-for-person.md). When it comes, `scripts/toy-run.sh tap toy-2
-  <wake file>` hands it to the driver, and this page gets the merge's numbers.
+- A release isn't cut for engine changes: `scripts/release/release.mjs` watches only `plugins/harness` and
+  `packages/journal`, though setup.sh bundles `packages/engine/src` into the installed copy. This item's merge made
+  no release for that reason.
 - This thread's own calls (posting the card, running `toy-run.sh`) aren't journalled: it runs the 0.1.0 snapshot.
   The driver's are.
