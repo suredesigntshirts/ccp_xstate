@@ -74,6 +74,10 @@
 **Lesson:** An item's cost and waits are spread over sessions the item's journal doesn't hold, so a per-item view from the item's own sessions shows 0 s waiting on the person when it waited 16 minutes.
 **Evidence:** first-real-issue's first run: the card, the person wait and two refusals happened in the owning thread; `derive.js time` over the item's journal shows person 0 ms (retro-first-item finding 2).
 **Fate:** measure. engine-item-views joins the owning thread's rows (cards, taps, refusals, turn usage) to the item.
+**Since:** engine-item-views (PR #54, harness-v0.1.16) joins each ask's card by id from any session, and tags an
+invoked actor's tool.call and finish rows with item and state. Its verifier found that capture's hook.run rows and its
+own agent.spawn rows still carry item null (scratch run iv1), and that the person wait counts from the card's record,
+not from entering awaitingMerge. Both are open for the next item that needs them.
 
 ### L-agent-finish-twice
 **Lesson:** One agent can carry two `agent.finish` rows with cumulative tokens, so summing rows overcounts.
