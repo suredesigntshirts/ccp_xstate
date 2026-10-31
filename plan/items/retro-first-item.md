@@ -4,7 +4,7 @@
   "title": "Learn from the first real item and splice the lessons into the plan",
   "stage": "s4-first-real-item",
   "kind": "research",
-  "status": "ready",
+  "status": "done",
   "outcome": "A short retro, from the journal, says what ran, what it cost, where it waited and what was refused. Every lesson is a ledger row, and the retro orders the s4b-widen items, dropping any that no finding justifies.",
   "why": "The ratchet: each observed failure becomes a rule, test or check. This is where the plan learns from v2 rather than v1. Replanned 31 Oct: it reads first-real-issue's first run rather than waiting for the item to be done, because what the run showed (no stand-in path for an ask) decides the order of s4b, and the rerun needs engine-cards-standin first.",
   "serves": [
