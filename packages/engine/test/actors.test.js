@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { restore, offer } from '../src/index.js';
 import { handlers, github } from '../src/effects/index.js';
-import { actors, accept, bind, bindLate, boundRun, confine, deliver, isReturnTool, loadRun, resultsOf, runDir, spawn, startedRun, waiting } from '../src/actors.js';
+import { actors, accept, bind, bindLate, boundRun, confine, deliver, isReturnTool, loadRun, resultsOf, runDir, spawn, startedRun, stopped, handback, waiting } from '../src/actors.js';
 import { readFile } from '../../journal/src/index.js';
 import { workflow, ISSUE, BRIEFS } from './flow.js';
 
@@ -228,4 +228,57 @@ test('the return tool is known under its plugin prefix and its bare name only', 
   assert.ok(isReturnTool('mcp__plugin_ccp-harness_harness__return'));
   assert.ok(!isReturnTool('mcp__evil_return'));
   assert.ok(!isReturnTool('mcp__harness__return2'));
+});
+
+// Plan item engine-actor-returns: an actor that stops without returning is sent back once, then its run fails.
+test('stopped: sent back once, then the run fails with a no-return refusal and the actor\'s error moves the item', async () => {
+  const { root } = await started();
+  assert.equal(stopped({ root, agentId: 'ag1' }), null, 'no agent bound yet');
+  startAgent(root, BRIEF_RUN, 'ag1');
+  assert.match(stopped({ root, agentId: 'ag1' }).block, /Call the harness return tool now .*it-1:0\.brief/);
+  assert.deepEqual(stopped({ root, agentId: 'ag1', session: 's' }), { failed: BRIEF_RUN }, 'sent back once only, even without stop_hook_active');
+  assert.equal(stopped({ root, agentId: 'ag1', again: true }), null, 'failed once');
+  const refusal = rows(root).filter((r) => r.kind === 'refusal').at(-1);
+  assert.deepEqual([refusal.payload.rule, refusal.payload.run, refusal.source.ref], ['no-return', BRIEF_RUN, 'stop ag1']);
+  assert.equal((await accept({ root, caller: 'ag1', run: BRIEF_RUN, result: BRIEFS })).refused.rule, 'already-failed');
+
+  const host = restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' });
+  assert.deepEqual(resultsOf(host).map((i) => [i.event.type, i.source.ref]), [['xstate.error.actor.brief', 'stop ag1']]);
+  const d = await deliver({ root, run: BRIEF_RUN });
+  assert.equal(d.state, 'replanning');
+  const t = rows(root).find((r) => r.kind === 'engine.transition' && r.payload.event.type === 'xstate.error.actor.brief');
+  assert.deepEqual(t.source, { system: 'harness', ref: 'stop ag1' });
+});
+
+test('stopped: an agent whose result was accepted stops freely', async () => {
+  const { root } = await started();
+  startAgent(root, BRIEF_RUN, 'ag1');
+  await accept({ root, caller: 'ag1', run: BRIEF_RUN, result: BRIEFS });
+  assert.equal(stopped({ root, agentId: 'ag1' }), null);
+  assert.equal(stopped({ root, agentId: 'ag1', again: true }), null);
+});
+
+test('handback: the first SubagentHandback with the run open is refused with the return instruction, the next fails the run', async () => {
+  const { root } = await started();
+  startAgent(root, BRIEF_RUN, 'ag1');
+  assert.equal(handback({ root, agentId: 'other' }), null, 'not an actor');
+  assert.match(handback({ root, agentId: 'ag1' }).deny, /^no-return: .*Call the harness return tool now/);
+  assert.deepEqual(handback({ root, agentId: 'ag1' }), { failed: BRIEF_RUN });
+  assert.equal(stopped({ root, agentId: 'ag1' }), null, 'its stop after that adds nothing');
+  assert.equal(rows(root).filter((r) => r.kind === 'refusal' && r.payload.rule === 'no-return').at(-1).payload.tool, 'SubagentHandback');
+  assert.equal((await deliver({ root, run: BRIEF_RUN })).state, 'replanning');
+});
+
+test('stopped: a stop after a handback the hook never saw fails the run at once, since a block cannot bring it back', async () => {
+  const { root } = await started();
+  startAgent(root, BRIEF_RUN, 'ag1');
+  assert.deepEqual(stopped({ root, agentId: 'ag1', handedBack: true }), { failed: BRIEF_RUN });
+});
+
+test('handback: an agent sent back that then returns hands back freely', async () => {
+  const { root } = await started();
+  startAgent(root, BRIEF_RUN, 'ag1');
+  assert.ok(handback({ root, agentId: 'ag1' }).deny);
+  await accept({ root, caller: 'ag1', run: BRIEF_RUN, result: BRIEFS });
+  assert.equal(handback({ root, agentId: 'ag1' }), null);
 });
