@@ -94,3 +94,8 @@
 **Lesson:** Allow rules name repos, and different tools are judged differently, so a new product repo works unattended only once a rule names it.
 **Evidence:** 31 Oct, no rule named ccp_machine_test: the thread's `gh api` issue filing there was refused [External System Writes], while the GitHub MCP issue tool and the headless builder's push and REST PR went through (retro-first-item finding 5).
 **Fate:** setup. A rule for each product repo the stand-in works in, on the person's list (waiting-for-person.md); engine-cards-standin's grant names the repo.
+
+### L-handback-without-return
+**Lesson:** An invoked actor can finish its work and hand back without calling the return tool, and nothing then moves its run.
+**Evidence:** first-real-issue run 2 (31 Oct): the verify agent for fri-jsonl-lint-2 checked all six lines, then ended with SubagentHandback only; the item sat in verifying with nothing waiting until the thread nudged the agent (`plan/decisions/2026-10-31-first-real-issue-run-2.md`).
+**Fate:** test. engine-actor-returns blocks the stop once, then fails the run.

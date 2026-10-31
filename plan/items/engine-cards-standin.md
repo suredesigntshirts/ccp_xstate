@@ -4,7 +4,7 @@
   "title": "Let a stand-in answer a workflow's ask through the host, under the person's grant",
   "stage": "s4-first-real-item",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "When the person is away, a stand-in session on another model answers an item's open ask through the host: the host takes the answer only if it is one of the ask's legal choices and a grant entry the person set covers this workflow, ask, repo and time, journals the transition with that grant, and runs what follows (the merge) itself. A real run can be started from an existing issue.",
   "why": "Retro finding 1 (plan/research/retro-first-item.md): on the first real item the person was away, the workflow's one ask had no answer the host would take, and the merge happened outside the host, so first-real-issue can't finish without this. v1 had three machines for decisions, grants and audits (34 context fields), cards piled up overnight, and finished items left decisions in the person's inbox. One pattern, a state that declares its card, covers all of it.",
   "serves": [
