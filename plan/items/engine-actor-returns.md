@@ -4,7 +4,7 @@
   "title": "An invoked actor that ends without returning is sent back, or its run fails",
   "stage": "s4-first-real-item",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A bound actor agent that stops without its run's result accepted is told once to call the return tool; if it stops again, its run ends in the actor's error so the item leaves the state instead of waiting forever.",
   "why": "first-real-issue's run 2 (plan/decisions/2026-10-31-first-real-issue-run-2.md): the verify agent ran every check, then handed back with SubagentHandback only. The run stayed open, nothing was waiting, and verifying has no timeout, so the item stalled until the thread nudged the agent by hand.",
   "serves": [
