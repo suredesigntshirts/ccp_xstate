@@ -137,3 +137,31 @@ test('SubagentStop: an actor whose result was accepted stops freely', async () =
   hook(env, { hook_event_name: 'PreToolUse', agent_id: 'ag1', tool_name: 'mcp__plugin_ccp-harness_harness__return', tool_use_id: 't2', tool_input: { run, result: { builder: 'b', verifier: 'v' } } });
   assert.equal(stop(env, { agent_id: 'ag1', stop_hook_active: false }), null);
 });
+
+test('SubagentHandback: refused once with the return instruction; a second handback fails the run, and the item steps back', async () => {
+  const { root, env } = await project();
+  const run = 'it-1:0.brief';
+  hook(env, { hook_event_name: 'PreToolUse', tool_name: 'Agent', tool_use_id: 't1', tool_input: { prompt: `ccp-run ${run}` } });
+  hook(env, { hook_event_name: 'SubagentStart', agent_id: 'ag1', agent_type: 'general-purpose' });
+  const call = { hook_event_name: 'PreToolUse', agent_id: 'ag1', tool_name: 'SubagentHandback', tool_input: { message: 'done' } };
+  const first = hook(env, { ...call, tool_use_id: 'h1' });
+  assert.equal(first.permissionDecision, 'deny');
+  assert.match(first.permissionDecisionReason, /^no-return: .*harness__return/);
+  assert.equal(hook(env, { ...call, tool_use_id: 'h2' }), null, 'the second handback goes through');
+  assert.equal(restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' }).snapshot.value, 'replanning');
+});
+
+test('SubagentStop after a handback the hook let through (its transcript ends in the handback result) fails the run at once', async () => {
+  const { dir, root, env } = await project();
+  const run = 'it-1:0.brief';
+  hook(env, { hook_event_name: 'PreToolUse', tool_name: 'Agent', tool_use_id: 't1', tool_input: { prompt: `ccp-run ${run}` } });
+  hook(env, { hook_event_name: 'SubagentStart', agent_id: 'ag1', agent_type: 'general-purpose' });
+  // The tail Claude Code writes for an agent that handed back (verify/engine-actor-returns/evidence/ar2-agent-tail.json).
+  const tx = join(dir, 'agent-ag1.jsonl');
+  writeFileSync(tx, [
+    { type: 'assistant', message: { content: [{ type: 'tool_use', id: 'toolu_h', name: 'SubagentHandback', input: { message: 'done' } }] } },
+    { type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 'toolu_h', content: 'Report delivered to your caller.' }] } }
+  ].map((l) => JSON.stringify(l)).join('\n') + '\n');
+  assert.equal(stop(env, { agent_id: 'ag1', stop_hook_active: false, agent_transcript_path: tx }), null, 'no block: it would not bring the agent back');
+  assert.equal(restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' }).snapshot.value, 'replanning');
+});

@@ -9,8 +9,9 @@
 //   PreToolUse of any other tool a bound agent calls: run shell commands from its worktree, refuse file tools outside.
 //   SubagentStart: bind the agent to its run and give it its run, worktree and return instructions. When the session
 //     has several runs starting at once, the agent is bound at its first tool call instead, from its meta.json.
-//   SubagentStop of a bound agent whose run has no result: block once, telling it to call the return tool; if it
-//     stops again, fail the run, so the item gets the actor's error instead of waiting (plan item engine-actor-returns).
+//   SubagentHandback, or SubagentStop, of a bound agent whose run has no result: send it back once to call the return
+//     tool; the next time it ends, fail the run, so the item gets the actor's error instead of waiting (plan item
+//     engine-actor-returns). A stop after a handback fails at once: a block doesn't bring that agent back.
 //   PostToolUse of Agent in the main session, and UserPromptSubmit (a wake, such as a background agent finishing):
 //     say which runs are prepared and waiting for their agent.
 //
@@ -19,6 +20,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { engine, gate, journalDir, sessionName, stdin } from './host.mjs';
+import { handedBack, read } from './capture-rows.mjs';
 
 const out = (hookSpecificOutput) => process.stdout.write(`${JSON.stringify({ hookSpecificOutput })}\n`);
 const deny = (reason) => out({ hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason });
@@ -42,6 +44,12 @@ function waitingRuns(A, root) {
     items = readdirSync(join(root, 'items'), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
   } catch {}
   return items.flatMap((item) => A.waiting(root, item));
+}
+
+// Hands a failed run's error to its item, which steps back.
+async function deliverFailed(A, root, run) {
+  const { github } = await engine('effects/github.js');
+  await A.deliver({ root, run, github: github({ ...(process.env.CCP_GITHUB_API ? { api: process.env.CCP_GITHUB_API } : {}) }) });
 }
 
 async function main() {
@@ -75,18 +83,22 @@ async function main() {
     if (late?.bound) return deny(`bound: you are an invoked actor; this call did not run. Read this, then make it again.\n${late.bound.context}`);
     const bound = A.boundRun(root, input.agent_id);
     if (!bound) return;
+    if (tool === 'SubagentHandback') {
+      const h = A.handback({ root, agentId: input.agent_id, session });
+      if (h?.deny) return deny(h.deny);
+      if (h?.failed) await deliverFailed(A, root, h.failed);
+      return;
+    }
     const c = A.confine({ worktree: bound.worktree, tool, input: input.tool_input });
     if (c?.deny) return deny(c.deny);
     if (c?.input) return rewrite(c.input);
     return;
   }
   if (event === 'SubagentStop' && input.agent_id) {
-    const r = A.stopped({ root, agentId: input.agent_id, again: input.stop_hook_active === true, session });
+    const tail = input.agent_transcript_path ? read(input.agent_transcript_path, { from: null, cap: 256 * 1024 })?.text ?? '' : '';
+    const r = A.stopped({ root, agentId: input.agent_id, again: input.stop_hook_active === true, handedBack: handedBack(tail), session });
     if (r?.block) return process.stdout.write(JSON.stringify({ decision: 'block', reason: r.block }));
-    if (r?.failed) {
-      const { github } = await engine('effects/github.js');
-      await A.deliver({ root, run: r.failed, github: github({ ...(process.env.CCP_GITHUB_API ? { api: process.env.CCP_GITHUB_API } : {}) }) });
-    }
+    if (r?.failed) await deliverFailed(A, root, r.failed);
     return;
   }
   if (event === 'SubagentStart') {

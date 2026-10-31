@@ -381,30 +381,63 @@ function claimedPrs(value, path = 'result') {
   return [...here, ...Object.entries(value).flatMap(([k, v]) => claimedPrs(v, `${path}.${k}`))];
 }
 
-/**
- * SubagentStop of an agent (plan item engine-actor-returns): an invoked actor that stops with its run still open is
- * sent back once to call the return tool; if it stops again without returning, its run fails, so the item leaves the
- * state instead of waiting forever. Returns null (not an actor, or its result is in), { block: reason } or
- * { failed: run }. `again` is the hook input's stop_hook_active: the agent is stopping after being sent back.
- */
-export function stopped({ root, agentId, again = false, session = null }) {
+// An agent ending with its run still open (plan item engine-actor-returns) is sent back once to call the return tool;
+// the next time it ends, its run fails, so the item gets the actor's error instead of waiting forever. An agent ends
+// in two ways, and both are watched: the SubagentHandback tool (PreToolUse, handback()) and a plain stop (SubagentStop,
+// stopped()). A block at SubagentStop does not re-prompt an agent that already handed back (seen in the verifier's
+// scratch run ar2, 2026-10-31), so such a stop fails the run at once.
+const sentBackFile = (dir) => join(dir, 'sent-back.json');
+const returnInstruction = (run) => `You are the invoked ${run.actor} actor for run ${run.run}, and you are ending without returning your result, so the item can't move. Call the harness return tool now (its name ends in harness__return; load it with ToolSearch if it is deferred) with { "run": "${run.run}", "result": <your result> }. Don't redo your work unless the tool refuses the result.`;
+
+// The bound agent's open run and its folder, or null when the agent is no actor or its run returned or failed.
+function openRunOf(root, agentId) {
   const bound = boundRun(root, agentId);
   const run = bound && loadRun(root, bound.run);
   if (!run) return null;
   const dir = runDir(root, run.run);
   if (existsSync(join(dir, 'result.json')) || existsSync(join(dir, 'failed.json'))) return null;
-  if (!again) {
-    return { block: `You are the invoked ${run.actor} actor for run ${run.run}, and you stopped without returning your result, so the item can't move. Call the harness return tool now (its name ends in harness__return; load it with ToolSearch if it is deferred) with { "run": "${run.run}", "result": <your result> }. Don't redo your work unless the tool refuses the result.` };
-  }
-  const why = 'the actor stopped without returning its result, after being sent back once';
+  return { run, dir };
+}
+
+// Sends the run's agent back the first time it ends; true when it had already been sent back.
+function sentBackBefore(dir, agentId, how) {
+  return !writeOnce(sentBackFile(dir), { agentId, how, at: new Date().toISOString() });
+}
+
+function fail(root, { run, dir }, agentId, how, session) {
+  const why = `the actor ended (${how}) without returning its result${how === 'SubagentStop, after a handback' ? '' : ', after being sent back once'}`;
   if (!writeOnce(join(dir, 'failed.json'), { agentId, why, at: new Date().toISOString() })) return null;
   journal(root, run, {
     kind: 'refusal',
     source: { system: 'hook', ref: `stop ${agentId}` },
     agent: agentId,
-    payload: { source: 'hook', rule: 'no-return', reason: why, run: run.run, actor: run.actor, caller: agentId, tool: 'SubagentStop', textHash: sha256(`no-return: ${why}`), outcome: 'denied', hookSession: session }
+    payload: { source: 'hook', rule: 'no-return', reason: why, run: run.run, actor: run.actor, caller: agentId, tool: how.startsWith('SubagentStop') ? 'SubagentStop' : 'SubagentHandback', textHash: sha256(`no-return: ${why}`), outcome: 'denied', hookSession: session }
   });
   return { failed: run.run };
+}
+
+/**
+ * PreToolUse of SubagentHandback by an agent: null (no actor, or its result is in), { deny: reason } the first time
+ * its run is open, or { failed: run } the next time; the handback then goes through.
+ */
+export function handback({ root, agentId, session = null }) {
+  const open = openRunOf(root, agentId);
+  if (!open) return null;
+  if (!sentBackBefore(open.dir, agentId, 'SubagentHandback')) return { deny: `no-return: ${returnInstruction(open.run)} Hand back after the return tool accepts it.` };
+  return fail(root, open, agentId, 'SubagentHandback', session);
+}
+
+/**
+ * SubagentStop of an agent: null (no actor, or its run returned or failed), { block: reason } the first time its run
+ * is open, or { failed: run }. `again` is the hook input's stop_hook_active; `handedBack` is true when the agent's
+ * transcript ends in its SubagentHandback result, when a block would not bring it back.
+ */
+export function stopped({ root, agentId, again = false, handedBack = false, session = null }) {
+  const open = openRunOf(root, agentId);
+  if (!open) return null;
+  if (handedBack) return fail(root, open, agentId, 'SubagentStop, after a handback', session);
+  if (!again && !sentBackBefore(open.dir, agentId, 'SubagentStop')) return { block: returnInstruction(open.run) };
+  return fail(root, open, agentId, 'SubagentStop', session);
 }
 
 /**

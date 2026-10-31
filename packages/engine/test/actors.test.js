@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { restore, offer } from '../src/index.js';
 import { handlers, github } from '../src/effects/index.js';
-import { actors, accept, bind, bindLate, boundRun, confine, deliver, isReturnTool, loadRun, resultsOf, runDir, spawn, startedRun, stopped, waiting } from '../src/actors.js';
+import { actors, accept, bind, bindLate, boundRun, confine, deliver, isReturnTool, loadRun, resultsOf, runDir, spawn, startedRun, stopped, handback, waiting } from '../src/actors.js';
 import { readFile } from '../../journal/src/index.js';
 import { workflow, ISSUE, BRIEFS } from './flow.js';
 
@@ -235,9 +235,8 @@ test('stopped: sent back once, then the run fails with a no-return refusal and t
   const { root } = await started();
   assert.equal(stopped({ root, agentId: 'ag1' }), null, 'no agent bound yet');
   startAgent(root, BRIEF_RUN, 'ag1');
-  assert.match(stopped({ root, agentId: 'ag1' }).block, /Call the harness return tool now/);
-  assert.match(stopped({ root, agentId: 'ag1' }).block, /it-1:0\.brief/, 'a first stop is sent back each time it is a first stop');
-  assert.deepEqual(stopped({ root, agentId: 'ag1', again: true, session: 's' }), { failed: BRIEF_RUN });
+  assert.match(stopped({ root, agentId: 'ag1' }).block, /Call the harness return tool now .*it-1:0\.brief/);
+  assert.deepEqual(stopped({ root, agentId: 'ag1', session: 's' }), { failed: BRIEF_RUN }, 'sent back once only, even without stop_hook_active');
   assert.equal(stopped({ root, agentId: 'ag1', again: true }), null, 'failed once');
   const refusal = rows(root).filter((r) => r.kind === 'refusal').at(-1);
   assert.deepEqual([refusal.payload.rule, refusal.payload.run, refusal.source.ref], ['no-return', BRIEF_RUN, 'stop ag1']);
@@ -257,4 +256,29 @@ test('stopped: an agent whose result was accepted stops freely', async () => {
   await accept({ root, caller: 'ag1', run: BRIEF_RUN, result: BRIEFS });
   assert.equal(stopped({ root, agentId: 'ag1' }), null);
   assert.equal(stopped({ root, agentId: 'ag1', again: true }), null);
+});
+
+test('handback: the first SubagentHandback with the run open is refused with the return instruction, the next fails the run', async () => {
+  const { root } = await started();
+  startAgent(root, BRIEF_RUN, 'ag1');
+  assert.equal(handback({ root, agentId: 'other' }), null, 'not an actor');
+  assert.match(handback({ root, agentId: 'ag1' }).deny, /^no-return: .*Call the harness return tool now/);
+  assert.deepEqual(handback({ root, agentId: 'ag1' }), { failed: BRIEF_RUN });
+  assert.equal(stopped({ root, agentId: 'ag1' }), null, 'its stop after that adds nothing');
+  assert.equal(rows(root).filter((r) => r.kind === 'refusal' && r.payload.rule === 'no-return').at(-1).payload.tool, 'SubagentHandback');
+  assert.equal((await deliver({ root, run: BRIEF_RUN })).state, 'replanning');
+});
+
+test('stopped: a stop after a handback the hook never saw fails the run at once, since a block cannot bring it back', async () => {
+  const { root } = await started();
+  startAgent(root, BRIEF_RUN, 'ag1');
+  assert.deepEqual(stopped({ root, agentId: 'ag1', handedBack: true }), { failed: BRIEF_RUN });
+});
+
+test('handback: an agent sent back that then returns hands back freely', async () => {
+  const { root } = await started();
+  startAgent(root, BRIEF_RUN, 'ag1');
+  assert.ok(handback({ root, agentId: 'ag1' }).deny);
+  await accept({ root, caller: 'ag1', run: BRIEF_RUN, result: BRIEFS });
+  assert.equal(handback({ root, agentId: 'ag1' }), null);
 });

@@ -82,8 +82,10 @@ brief's hash. The run stays open until its agent returns:
 3. The agent calls the return tool (`mcp__plugin_ccp-harness_harness__return`, `{ run, result }`). Its PreToolUse hook
    refuses it unless the caller is the run's agent, the result matches the actor's schema and any claimed PR is on
    GitHub at the claimed head (`accept`), then hands the result to the item (`deliver`), which prepares the next runs.
-4. If the agent stops without its result accepted, its SubagentStop hook blocks the stop once and tells it to call the
-   return tool (`stopped`). If it stops again, the run fails (`failed.json`, a `no-return` refusal row) and the item
-   gets the actor's error event, so it steps back instead of waiting (plan item engine-actor-returns).
+4. If the agent ends without its result accepted, by SubagentHandback (PreToolUse, `handback`) or a plain stop
+   (SubagentStop, `stopped`), it is sent back once to call the return tool. The next time it ends, the run fails
+   (`failed.json`, a `no-return` refusal row) and the item gets the actor's error event, so it steps back instead of
+   waiting. A stop right after a handback fails at once, because a block does not bring that agent back (plan item
+   engine-actor-returns).
 
 Rows: `docs/journal.md`, "Actor rows". Why: `plan/decisions/2026-10-30-engine-actors.md`.

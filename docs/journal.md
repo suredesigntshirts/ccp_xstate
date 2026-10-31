@@ -326,7 +326,7 @@ are blobs, `<journal root>/blobs/<sha256>`, as capture stores them.
 |---|---|---|
 | A run is prepared (its brief), or a `brief` actor's result is accepted (each brief it returned, fixed before any build starts) | `brief.stored` | `run`, `actor`, `role` (the actor, or `builder`/`verifier` for returned briefs), `hash`, `bytes`; a prepared run also has `contextHash` and `worktree` |
 | The harness binds an agent to the run its Agent call started | `agent.spawn` | `agentId`, `type`, `run`, `actor`, `briefHash`, `worktree`, `via` (`start`: found at SubagentStart; `meta`: from the agent's meta.json at its first call), `hookSession` |
-| A return or bind the actor hook refused | `refusal` | `source` `hook`, `rule` (`wrong-caller`, `schema`, `github-fact`, `already-returned`, `already-failed`, `unknown-run`; `no-return` when an actor stopped twice without returning, `tool` `SubagentStop`), `reason` (names the missing field or fact), `run`, `actor`, `caller`, `tool`, `textHash`, `outcome` `denied` |
+| A return or bind the actor hook refused | `refusal` | `source` `hook`, `rule` (`wrong-caller`, `schema`, `github-fact`, `already-returned`, `already-failed`, `unknown-run`; `no-return` when an actor ended again after being sent back to return, or stopped after a handback, `tool` `SubagentHandback` or `SubagentStop`), `reason` (names the missing field or fact), `run`, `actor`, `caller`, `tool`, `textHash`, `outcome` `denied` |
 | A return passed every check | `result.stored` | `run`, `actor`, `agentId`, `hash`, `bytes`, `toolUseId` |
 
 The completion an accepted result makes is an `engine.transition` whose source is `harness` and `return <tool use id>`.
