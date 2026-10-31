@@ -1,0 +1,34 @@
+{
+  "item": "first-real-issue",
+  "verified_sha": "6786b8476c9922dacbd0585486b84867ae189420",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GUeqgfhdQ3hcvUkHq#agent=verifier-first-real-issue",
+    "model": "claude-sonnet-5-5"
+  },
+  "results": [
+    {
+      "id": "merged",
+      "status": "NOT MET",
+      "command": "gh api repos/suredesigntshirts/ccp_machine_test/pulls/103 and commits/b74bddb3...; TOY_DIR=/mnt/project-files/first-real-issue TOY_REPO=suredesigntshirts/ccp_machine_test TOY_WORK=$HOME/fri-work scripts/toy-run.sh check fri-jsonl-lint; node --test verify/first-real-issue/first-real-issue.test.mjs (offline; evidence in verify/first-real-issue/evidence/).",
+      "excerpt": "The merge was a stand-in merge at the verified sha because the person was away, not a merge by the host. GitHub: PR #103 merged true, head 68235591fa507cd0be2f8ce70d3a5114e838e2f9, merge_commit_sha b74bddb3b7f22287c00594ba1a9561398b675121 (parents b772aff and 68235591, message says 'Merged by the project owner's stand-in at the verified sha'), merged_by suredesigntshirts (the one shared GitHub account, so the account does not show who acted). The verify run's engine.transition (seq 3, harness return) is PASS at sha 68235591... = the PR head, so the sha part holds. The host part does not: the item's journal stops at awaitingMerge (restore() replay ends there), has 0 engine.effect merge rows and 0 pr.merge rows, and journal-check prints '1 merges with no journal row' and '1 merges not made by the host's merge effect (unverified): ccp_machine_test#103 merged 2026-10-31T03:03:38Z'. The Expect line says 'by the host'; the host did not merge. NOT MET, as the stand-in's own decision note (plan/decisions/2026-10-31-first-real-issue-stand-in-merge.md) anticipates. The ask card was never answered by a tap."
+    },
+    {
+      "id": "complete",
+      "status": "MET",
+      "command": "Own script (/tmp/cmp.mjs): collect every tool_use block from /root/.claude/projects/-root-fri-work-fri-jsonl-lint-repo/b61aac02-....jsonl and its 3 subagents/agent-*.jsonl, compare by tool_use id and name with the tool.call rows of journal/sessions/b61aac02-....jsonl; scripts/toy-run.sh check fri-jsonl-lint; node --test verify/first-real-issue/first-real-issue.test.mjs.",
+      "excerpt": "28 tool_use calls in the 4 logs (Bash 16, Agent 3, ToolSearch 3, harness return 3, SubagentHandback 3), 27 tool.call rows, 0 extra rows, 0 name mismatches. The one call without a row is toolu_01AiaoDxhFXWZh5AvzEtegb8 (Bash 'sleep 60; ... gh pr checks' in the verify agent): its tool_result is a <tool_use_error>Blocked: sleep 60 ...</tool_use_error>, so Claude Code answered it without running it and no hook fired; journal-check lists it as 'calls Claude Code answered without running, which no hook sees (not counted)' and reports 0 missing, 0 extra. Judged MET: the line concerns calls the sessions made that ran; a refused call has no effect to record. A stricter reading would count it. Only the driver session and its 3 agents served the item; the thread's own calls (card, stand-in merge) are outside those sessions and are covered under merged and asks."
+    },
+    {
+      "id": "asks",
+      "status": "MET",
+      "command": "Collected the tool names of all 28 calls in the driver and agent logs and of all 27 tool.call rows; grep for post_message, request_decision, post_widget, card, hearthbot, AskUser; read workflows/quick-fix.json for the states that invoke the ask actor; node --test verify/first-real-issue/first-real-issue.test.mjs.",
+      "excerpt": "Tool names across driver and agents: Bash, Agent, ToolSearch, mcp__plugin_ccp-harness_harness__return, SubagentHandback. No post_message, request_decision or card call in any log or tool.call row. quick-fix declares exactly two ask states, awaitingMerge ('Merge this PR at the verified commit?', approve/reject) and replanning; the item never entered replanning, and the journal has no ask run effect because the headless driver stopped at awaitingMerge. So the item's sessions show no undeclared ask. The merge card itself was posted by the owning Projects thread (session_01KfkB5GUeqgfhdQ3hcvUkHq) with request_decision, outside the item's sessions: I judged it from the decision note and from the absence of any such call in the driver's logs (the thread's own tool calls are not in the journal or in these event logs, so I could not read it from tool.call rows); its text and choices match the declared awaitingMerge ask, and it was the only ask the person was shown. That evidence is the thread's own account, not independently checkable here."
+    },
+    {
+      "id": "product-ci",
+      "status": "MET",
+      "command": "gh api repos/suredesigntshirts/ccp_machine_test/{issues/102,pulls/103,pulls/103/files,commits/<sha>/check-runs} at 68235591 and b74bddb3; git clone at b74bddb3 and `npm ci && npm test`; read packages/jsonl-lint/src/index.js and bin/jsonl-lint.js.",
+      "excerpt": "Check run 'test' completed/success at head 68235591 and at merge commit b74bddb3. Local npm ci (0 vulnerabilities) && npm test at the merge commit: tests 12, pass 12, fail 0. Issue #102 asked for packages/jsonl-lint with a CLI printing <file>:<line>: <error> per bad row (1-based, blank lines skipped, unterminated last line checked), exit 1/0, exit 2 with stderr on missing file or no argument, lint(text) exported from src/index.js returning [{line,error}], own package.json (name jsonl-lint, type module, test script node --test, no dependencies), node:test tests for a clean file, bad middle row, torn last row, blank lines and exit codes, a README, and a root README entry. The diff (8 files, +223/-1) has all of those: bin/jsonl-lint.js does the exits as specified, lint() skips blank lines but counts them, tolerates CRLF, checks the last line; package.json has no dependencies; cli.test.js and lint.test.js cover the listed cases. PR body says 'Closes .../issues/102'."
+    }
+  ]
+}
