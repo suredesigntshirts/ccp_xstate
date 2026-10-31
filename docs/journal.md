@@ -251,17 +251,28 @@ parents), `result` (the run's conclusion), `startedAt`, `completedAt`, `item` (t
 branch's last segment) and `labels`. With `--append` it adds the rows the journal file lacks, and the new tripwires.
 
 `tripwire` payload: `repo`, `pr`, `rounds`, `limit`, `item` and `inputs` (the `ci.result` row ids counted). The
-tripwire only records; acting on it is the engine's job.
+tripwire row only records. The engine acts on it (plan item engine-item-views): `--append` it to the item's own file
+(`items/<item>.jsonl`), and the host's next call offers it once as a `tripwire` event (`packages/engine/src/tripwire.js`,
+source `journal`, `tripwire <row id>`); quick-fix steps back to replanning when the event names the item's PR.
 
 ## The observe page
 
 `plugins/harness/pages/observe/` (plan item obs-page) is the person's live page over the journal, published as a
-claude.ai artifact: https://claude.ai/artifact/GEVcccpqcToRUb7EhTG4B3. For everything, a UTC day, a thread or a session
+claude.ai artifact: https://claude.ai/artifact/GEVcccpqcToRUb7EhTG4B3. For everything, a UTC day, a thread, a session or an item
 it shows tokens by agent (`turn.usage` for the main session, `agent.finish` per subagent), time by kind (the time
 view's totals), what was refused with its rule and whether it was retried, and what was asked of the person (the
 attention view's cards, posts, messages, taps and waits). It shows its own release, the newest release that wrote
 rows, the newest row's time and when it last read.
 
+- An item is a scope too (plan item engine-item-views). Its view gives the workflow, current state and since when,
+  the handles its events carried (issue, PR and head, verdict, merge), build rounds, tokens and person asks, read
+  across every journal file: the agents its `agent.spawn` rows bound, wherever their `agent.finish` rows are, each at
+  its last row (an `agent.finish` row covers the agent's whole transcript, so an agent that finished twice is not
+  summed; the tokens-by-agent table and `overhead.js` count the same way); the turns of the sessions that applied
+  its events; and each ask run's card, joined by the card id on its `engine.effect` done row to the `card.posted` and
+  `person.tap` rows of any session, so a card posted and tapped in the owning thread counts. Its wait runs from the
+  card going up to the answer reaching the item. An invoked actor's own rows carry its item and state (capture
+  reads the actor hook's binding).
 - `data.js` is the data layer, pure functions over rows; `page.html` is the page. `build.mjs` inlines `data.js` and
   the derived views it uses into `observe.html`, the file that is published, so the page runs the code the tests run.
   A test fails when `observe.html` is stale. Rebuild with `node plugins/harness/pages/observe/build.mjs --release

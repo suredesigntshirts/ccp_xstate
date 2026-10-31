@@ -1,15 +1,19 @@
 // Opens the built observe page in Chromium with a stand-in viewer (plan item obs-page): `files` serves a local folder
 // as the project's files and `db` keeps the page's rows in memory. It presses Refresh and prints what the page shows
 // and the page.refresh rows it recorded, so the page's script can be checked before it is published. Usage:
-//   node plugins/harness/pages/observe/test/browser-check.mjs <project files folder> [--shot <png>]
+//   node plugins/harness/pages/observe/test/browser-check.mjs <project files folder> [--shot <png>] [--item <id>]
+// With --item it then picks that item as the scope and prints the item panel too (plan item engine-item-views).
 // Needs Playwright (the cloud container has it); it is a check to run by hand, not part of npm test.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { createRequire } from 'node:module';
 import { OUT } from '../build.mjs';
 
-const [root, flag, shot] = process.argv.slice(2);
-if (!root) { console.error('usage: browser-check.mjs <project files folder> [--shot <png>]'); process.exit(2); }
+const [root, ...flags] = process.argv.slice(2);
+const opt = (name) => { const i = flags.indexOf(`--${name}`); return i >= 0 ? flags[i + 1] : undefined; };
+const shot = opt('shot');
+const item = opt('item');
+if (!root) { console.error('usage: browser-check.mjs <project files folder> [--shot <png>] [--item <id>]'); process.exit(2); }
 const walk = (dir) => readdirSync(dir).flatMap((n) => {
   const p = join(dir, n);
   return statSync(p).isDirectory() ? [{ path: relative(root, p), isDirectory: true, size: 0 }, ...walk(p)] : [{ path: relative(root, p), isDirectory: false, size: statSync(p).size }];
@@ -46,8 +50,17 @@ await page.click('#refresh');
 await page.waitForFunction(() => Object.keys(window.__db?.refresh ?? {}).length >= 2);
 const shown = await page.evaluate(() => Object.fromEntries(['status', 'page-release', 'release', 'newest', 'refreshed', 'read', 'tokens-total', 'time-wall', 'refusals-count', 'refusals-rules', 'asks-cards', 'asks-sub']
   .map((id) => [id, document.getElementById(id).textContent])));
+if (item) {
+  await page.selectOption('#scope', `item:${item}`);
+  Object.assign(shown, await page.evaluate(() => ({
+    'item-panel-hidden': document.getElementById('item-panel').hidden,
+    ...Object.fromEntries(['h-item', 'item-state', 'item-sub'].map((id) => [id, document.getElementById(id).textContent])),
+    'item-rows': [...document.querySelectorAll('#item tbody tr')].map((tr) => [...tr.cells].map((c) => c.textContent)),
+    'item-asks': [...document.querySelectorAll('#item-asks tbody tr')].map((tr) => [...tr.cells].map((c) => c.textContent)),
+  })));
+}
 const refreshes = await page.evaluate(() => Object.values(window.__db.refresh));
-if (flag === '--shot' && shot) await page.screenshot({ path: shot, fullPage: true });
+if (shot) await page.screenshot({ path: shot, fullPage: true });
 await browser.close();
 console.log(JSON.stringify({ shown, refreshes, errors }, null, 2));
 process.exit(errors.length ? 1 : 0);

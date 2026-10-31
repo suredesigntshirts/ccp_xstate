@@ -37,7 +37,10 @@
         },
         "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
       },
-      "after": { "buildTimeout": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": { "value": "the build outlived buildTimeout" } } }] } }
+      "after": { "buildTimeout": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": { "value": "the build outlived buildTimeout" } } }] } },
+      "on": {
+        "tripwire": { "target": "replanning", "guard": "tripwireOnPr", "description": "the PR passed its round limit (derive.js rework's tripwire row): step back instead of another round", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.tripwire": "event.url", "failure.rounds": "event.rounds", "failure.limit": "event.limit" } }] }
+      }
     },
     "verifying": {
       "meta": { "needs": ["hasBriefs", "hasPr"] },
@@ -53,6 +56,7 @@
         "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
       },
       "on": {
+        "tripwire": { "target": "replanning", "guard": "tripwireOnPr", "description": "the PR passed its round limit (derive.js rework's tripwire row): step back instead of another round", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.tripwire": "event.url", "failure.rounds": "event.rounds", "failure.limit": "event.limit" } }] },
         "pr.pushed": { "target": "verifying", "reenter": true, "actions": [{ "type": "set", "params": { "pr.headSha": "event.headSha" } }] },
         "github.check_run.completed": [
         { "target": "building", "guard": "redOnHead", "description": "a check went red on the PR's head, with a build left: build again with the check as the failure", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] },
@@ -73,6 +77,7 @@
         "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
       },
       "on": {
+        "tripwire": { "target": "replanning", "guard": "tripwireOnPr", "description": "the PR passed its round limit (derive.js rework's tripwire row): step back instead of another round", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.tripwire": "event.url", "failure.rounds": "event.rounds", "failure.limit": "event.limit" } }] },
         "pr.pushed": { "target": "verifying", "actions": [{ "type": "set", "params": { "pr.headSha": "event.headSha" } }] },
         "github.check_run.completed": [
         { "target": "building", "guard": "redOnHead", "description": "a check went red on the PR's head, with a build left: build again with the check as the failure", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] },
@@ -122,6 +127,7 @@
       "replan": [{ "path": "event.output.choice", "is": "replan" }, "event.output.why"],
       "drop": [{ "path": "event.output.choice", "is": "drop" }],
       "isMerged": ["context.merge.sha"],
+      "tripwireOnPr": [{ "path": "event.url", "same": "context.pr.url" }],
       "redOnHead": [{ "path": "event.conclusion", "in": ["failure", "timed_out"] }, { "path": "event.head_sha", "same": "context.pr.headSha" }]
     },
     "delays": { "buildTimeout": 3600000 },
@@ -137,6 +143,11 @@
       }
     },
     "events": {
+      "tripwire": {
+        "type": "object",
+        "required": ["url", "rounds", "limit"],
+        "properties": { "url": { "type": "string", "minLength": 1 }, "rounds": { "type": "integer" }, "limit": { "type": "integer" } }
+      },
       "pr.pushed": { "type": "object", "required": ["headSha"], "properties": { "headSha": { "$ref": "#sha" } } },
       "github.check_run.completed": {
         "type": "object",

@@ -82,5 +82,5 @@ test('the published page contains the built file byte for byte and declares the 
   const pub = readFileSync(fx('published-index.html'), 'utf8');
   const built = readFileSync(join(here, '../../plugins/harness/pages/observe/observe.html'), 'utf8');
   assert.ok(pub.includes(built.trim()));
-  assert.match(pub, /PAGE_RELEASE = "0\.1\.9"/);
+  assert.match(pub, /PAGE_RELEASE = "0\.1\.16"/);
 });

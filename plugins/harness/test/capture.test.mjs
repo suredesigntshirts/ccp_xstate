@@ -207,3 +207,15 @@ test('pr.merge: the MCP merge tool makes a pr.merge row from its own response', 
   const other = { ...input, tool_name: 'mcp__github__pull_request_read' };
   assert.deepEqual(capture(other, { read: reader() }).rows.map((r) => r.kind), ['tool.call']);
 });
+
+test('a bound actor agent\'s rows carry its run\'s item and state; other rows carry none (plan item engine-item-views)', () => {
+  const dir = project();
+  const agents = join(dir, 'journal', 'actors', 'agents');
+  execFileSync('mkdir', ['-p', agents]);
+  writeFileSync(join(agents, 'ag1.json'), JSON.stringify({ run: 'it-1:1.build', item: 'it-1', state: '"building"', worktree: dir, toolUseId: 't0', verified: true }));
+  const env = { CCP_HARNESS_DIR: dir, CCP_HARNESS_STATE: join(dir, 'state') };
+  const call = (agent_id, id) => ({ session_id: 'tag-sess', hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_use_id: id, tool_input: { command: 'pwd' }, tool_response: { stdout: dir }, cwd: dir, ...(agent_id ? { agent_id, agent_type: 'general-purpose' } : {}) });
+  for (const input of [call('ag1', 'c1'), call('other', 'c2'), call(null, 'c3')]) assert.equal(runHook(HOOK, { env, input }).status, 0);
+  const rows = readFile(join(dir, 'journal', 'sessions', 'tag-sess.jsonl')).rows.filter((r) => r.kind === 'tool.call');
+  assert.deepEqual(rows.map((r) => [r.source.ref, r.item, r.state]), [['c1', 'it-1', '"building"'], ['c2', null, null], ['c3', null, null]]);
+});

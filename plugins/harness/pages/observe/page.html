@@ -72,6 +72,13 @@ code { font: .8rem var(--mono); }
     <span>Read <b id="read">–</b></span>
   </div>
   <div class="grid">
+    <section class="panel" aria-labelledby="h-item" id="item-panel" hidden>
+      <h2 id="h-item">Item</h2>
+      <div class="big" id="item-state">–</div>
+      <div class="sub" id="item-sub"></div>
+      <div class="scroll"><table id="item"><tbody></tbody></table></div>
+      <div class="scroll"><table id="item-asks"><thead><tr><th>Card posted (UTC)</th><th>Answered by</th><th>Choice</th><th class="n">Wait</th></tr></thead><tbody></tbody></table></div>
+    </section>
     <section class="panel" aria-labelledby="h-tokens">
       <h2 id="h-tokens">Tokens by agent</h2>
       <div class="big" id="tokens-total">–</div>
@@ -141,12 +148,12 @@ code { font: .8rem var(--mono); }
 
   function fillScopes() {
     const keep = $('scope').value;
-    const { days, threads, sessions } = D.scopes(state.rows);
+    const { days, threads, sessions, items } = D.scopes(state.rows);
     const opts = [new Option('Everything in the journal', '')];
-    for (const [label, key, list] of [['Day', 'day', days], ['Thread', 'thread', threads], ['Session', 'session', sessions]]) {
+    for (const [label, key, list] of [['Item', 'item', items], ['Day', 'day', days], ['Thread', 'thread', threads], ['Session', 'session', sessions]]) {
       const g = document.createElement('optgroup');
       g.label = label;
-      list.forEach((x) => g.append(new Option(`${label} ${key === 'day' ? x : short(x)}`, `${key}:${x}`)));
+      list.forEach((x) => g.append(new Option(`${label} ${key === 'day' || key === 'item' ? x : short(x)}`, `${key}:${x}`)));
       if (list.length) opts.push(g);
     }
     $('scope').replaceChildren(...opts);
@@ -159,6 +166,26 @@ code { font: .8rem var(--mono); }
     const v = D.observe(state.rows, scopeOf());
     $('release').textContent = v.freshness.release ?? '–';
     $('newest').textContent = utc(v.freshness.newestAt);
+
+    // The item view (plan item engine-item-views): only when the scope is an item.
+    $('item-panel').hidden = !v.item;
+    if (v.item) {
+      const it = v.item;
+      $('h-item').textContent = `Item ${it.item}`;
+      $('item-state').textContent = `${typeof it.state === 'string' ? it.state : JSON.stringify(it.state)} · ${fmtN(it.tokens.total.total)} tokens`;
+      $('item-sub').textContent = `${it.workflow ?? 'unknown workflow'}, since ${utc(it.since)} · ${many(it.rounds, 'build round')} · ${many(it.transitions, 'transition')} · waited on the person ${fmtMs(it.personWaitMs)}`;
+      const h = it.handles;
+      fill('item', [
+        ['Issue', h.issue ?? '–'],
+        ['PR', h.pr ? `${h.pr.url} at ${h.pr.headSha?.slice(0, 7) ?? '?'}` : '–'],
+        ['Verdict', h.verdict ? `${h.verdict.result} at ${h.verdict.sha?.slice(0, 7) ?? '?'}` : '–'],
+        ['Merge', h.merge ? h.merge.sha.slice(0, 7) : '–'],
+        ['Agents', `${fmtN(it.tokens.agents.total)} tokens over ${many(it.tokens.agentCount, 'agent')}`],
+        ['Driving sessions', `${fmtN(it.tokens.sessions.total)} tokens in ${many(it.tokens.sessionIds.length, 'session')}`],
+        ['Refusals', fmtN(it.refusals)],
+      ].map(([k, x]) => rowOf([cell(k), cell(x)])), 'Nothing recorded for this item.', 2);
+      fill('item-asks', it.asks.map((a) => rowOf([cell(utc(a.postedAt)), cell(a.open ? 'open' : (a.by ?? '–')), cell(a.choice ?? '–'), cell(fmtMs(a.waitMs), 'n')])), 'The item asked the person nothing.', 4);
+    }
 
     const t = v.tokens;
     $('tokens-total').textContent = `${fmtN(t.total.total)} tokens`;
