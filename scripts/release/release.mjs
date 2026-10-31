@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Makes a harness release after a merge to main (plan item self-update-by-version): when the merge changed what the
-// setup script copies into a session (plugins/harness and packages/journal, tests aside), it names the merged sha
-// harness-v<x.y.z>. The version only rises: it is the newest release's patch + 1, or the version in
+// setup script copies into a session (plugins/harness, packages/journal and packages/engine/src, tests aside), it
+// names the merged sha harness-v<x.y.z>. The version only rises: it is the newest release's patch + 1, or the version in
 // plugins/harness/.claude-plugin/plugin.json when that is higher (so a minor or major bump is made by editing it).
 // No commit is made: the release ref carries the version, and setup.sh writes it into the copy's plugin.json.
 //
@@ -23,8 +23,10 @@ import { fileURLToPath } from 'node:url';
 import { validate, VERSION } from '../../packages/journal/src/index.js';
 
 export const TAG_PREFIX = 'harness-v';
-/** What setup.sh copies into a session, as git pathspecs. A change here is a plugin change. */
-export const RELEASED = ['plugins/harness', 'packages/journal', ':(exclude)plugins/harness/test', ':(exclude)packages/journal/test'];
+/** What setup.sh copies into a session, as git pathspecs. A change here is a plugin change. packages/engine/src is
+ * the actor hooks' checks, copied to lib/engine/src since engine-actors; an engine-only merge missed a release before
+ * it was listed here. */
+export const RELEASED = ['plugins/harness', 'packages/journal', 'packages/engine/src', ':(exclude)plugins/harness/test', ':(exclude)packages/journal/test'];
 const MANIFEST = 'plugins/harness/.claude-plugin/plugin.json';
 const ZERO = /^0+$/;
 
@@ -80,7 +82,7 @@ export function plan({ cwd = process.cwd(), sha = 'HEAD', before = null } = {}) 
   out.changed = out.base
     ? lines(git('diff', '--name-only', out.base, sha, '--', ...RELEASED))
     : lines(git('ls-tree', '-r', '--name-only', sha, '--', ...RELEASED));
-  if (!out.changed.length) return { ...out, reason: `nothing under plugins/harness or packages/journal changed since ${base ? (latest?.tag ?? base.slice(0, 12)) : 'the root'}` };
+  if (!out.changed.length) return { ...out, reason: `nothing under plugins/harness, packages/journal or packages/engine/src changed since ${base ? (latest?.tag ?? base.slice(0, 12)) : 'the root'}` };
   const manifest = JSON.parse(git('show', `${sha}:${MANIFEST}`)).version;
   const version = nextVersion(latest?.version ?? null, manifest);
   if (latest && compare(version, latest.version) <= 0) throw new Error(`refused: ${version} is not above ${latest.version}`);
