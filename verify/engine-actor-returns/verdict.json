@@ -1,0 +1,17 @@
+{
+  "item": "engine-actor-returns",
+  "verified_sha": "51eced2afbb71f6d937a58f6e906a0ff57b1ed2c",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5GUeqgfhdQ3hcvUkHq#agent=verifier-actor-returns", "model": "claude-sonnet-5-5" },
+  "results": [
+    { "id": "sent-back", "status": "MET", "command": "node --test verify/engine-actor-returns/actor-returns.test.mjs",
+      "excerpt": "Real plugins/harness/scripts/actors.mjs on a SubagentStop input shaped like the recorded one: a bound agent with its run open gets {decision:'block', reason} naming harness__return and run it-1:0.brief, once, and the item stays in briefing; an unbound agent and an agent whose return was accepted stop freely with no output; hooks.json runs actors.mjs on SubagentStop without async",
+      "mutation": "actors.js stopped(): 'if (!again) {' replaced by 'if (false) {'; separately, 'result.json' dropped from the open-run guard",
+      "red_test": "sent-back (first mutation); 'stops freely: an actor whose result was accepted' (second mutation); both restored with git checkout" },
+    { "id": "fails-after", "status": "MET", "command": "node --test verify/engine-actor-returns/actor-returns.test.mjs",
+      "excerpt": "Second stop with stop_hook_active:true: no output, failed.json written, a refusal row rule 'no-return', and an engine.transition on xstate.error.actor.<invoke> moves the item out of briefing; a later stop does nothing and a late return is denied 'already-failed: ...'. These hold when the second stop arrives",
+      "mutation": "resultsOf: 'xstate.error.actor' event type changed to 'xstate.errorX.actor'; separately the first-stop block disabled",
+      "red_test": "fails-after: stopping again fails the run, journals no-return, and the item leaves the state by the actor error" },
+    { "id": "real", "status": "NOT MET", "command": "scripts/toy-run.sh run ar2 --issue https://github.com/suredesigntshirts/ccp_xstate_scratch/issues/31 --expect /tmp/ar-expect2.json (TOY_DIR=/mnt/project-files/toy-run-returns); node --test verify/engine-actor-returns/world.test.mjs",
+      "excerpt": "Run ar1 (issue 29, told in the body not to call the return tool): every actor returned anyway and the item reached the ask. Run ar2 (issue 31, stronger instruction in body and Expect): the brief agent ended with the SubagentHandback tool, not the return tool. The real SubagentStop hook ran and its block was recorded as a hook_blocking_error in the agent's log, but the agent had already ended, took no further turn, and no second SubagentStop came (1 SubagentStop row). So no failed.json, no no-return refusal row, and the item journal holds only xstate.init: the item stayed in briefing with ar2:0.brief open until the driver stopped, the same stall as run 2. Run ar3 (issue 32, told not to use SubagentHandback either) was refused by the auto-mode classifier on the driver's Agent call, so it never ran; not retried. The block-then-fail path is untested in the world for a plain final message; for SubagentHandback, which is how run 2 stalled, the block does not re-prompt the agent. Scratch issues 29, 31, 32 and PR 30 closed, nothing merged" }
+  ]
+}
