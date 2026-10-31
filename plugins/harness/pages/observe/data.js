@@ -37,7 +37,7 @@ const threadsOf = (rows) => {
   return out;
 };
 
-/** What the page can be scoped to: the UTC days, threads and sessions the rows hold, newest first. */
+/** What the page can be scoped to: the UTC days, threads, sessions and items the rows hold, newest first. */
 export function scopes(rows) {
   const days = new Set();
   const sessions = new Set();
@@ -47,12 +47,13 @@ export function scopes(rows) {
   }
   const threads = new Set([...threadsOf(rows).values()].flatMap((s) => [...s]));
   const desc = (set) => [...set].sort().reverse();
-  return { days: desc(days), threads: desc(threads), sessions: desc(sessions) };
+  return { days: desc(days), threads: desc(threads), sessions: desc(sessions), items: items(rows) };
 }
 
 /**
  * The rows in `scope`: { day } keeps rows written that UTC day; { thread } keeps every row of the sessions working that
- * thread; { session } keeps one session's rows; {} keeps all. A row read twice (the same id) is kept once.
+ * thread; { session } keeps one session's rows; { item } keeps an item's rows, its agents' rows and the main-session rows
+ * of the sessions that applied its events; {} keeps all. A row read twice (the same id) is kept once.
  */
 export function inScope(rows, scope = {}) {
   const seen = new Set();
@@ -63,6 +64,13 @@ export function inScope(rows, scope = {}) {
     return unique.filter((r) => map.get(r.session)?.has(scope.thread));
   }
   if (scope.session) return unique.filter((r) => r.session === scope.session);
+  if (scope.item) {
+    // The item's own rows, its agents' rows and the rows of the sessions that applied its events.
+    const own = unique.filter((r) => r.item === scope.item);
+    const agents = new Set(own.filter((r) => r.kind === 'agent.spawn').map((r) => r.payload?.agentId ?? r.agent));
+    const sessions = new Set(own.filter((r) => r.kind === 'engine.transition').map((r) => r.session));
+    return unique.filter((r) => r.item === scope.item || (r.agent && agents.has(r.agent)) || (!r.item && sessions.has(r.session) && !r.agent));
+  }
   return unique;
 }
 
@@ -75,13 +83,28 @@ const add = (into, t) => {
 };
 
 /**
+ * The token rows: every `turn.usage`, and each subagent's last `agent.finish` (by time), whose tokens are cumulative.
+ */
+export function lastFinishes(rows) {
+  const last = new Map();
+  for (const r of rows) {
+    if (r?.kind !== 'agent.finish') continue;
+    const key = `${r.session} ${r.payload?.agentId ?? r.agent ?? 'unknown'}`;
+    if (!last.has(key) || r.at >= last.get(key).at) last.set(key, r);
+  }
+  const kept = new Set(last.values());
+  return rows.filter((r) => r?.kind === 'turn.usage' || kept.has(r));
+}
+
+/**
  * Tokens by agent: the main session's turns (`turn.usage`, agent null) and each subagent (`agent.finish`), the same
  * rows overhead.js counts. Returns { total, agents: [{ session, agent, type, rows, ...tokens }] }, biggest first.
+ * An agent's `agent.finish` tokens cover its whole transcript, so one that finished twice counts its last row, not
+ * the sum (retro finding 3, plan item engine-item-views).
  */
 export function tokensByAgent(rows) {
   const agents = new Map();
-  for (const r of rows) {
-    if (r.kind !== 'turn.usage' && r.kind !== 'agent.finish') continue;
+  for (const r of lastFinishes(rows)) {
     const agent = r.kind === 'agent.finish' ? (r.payload?.agentId ?? r.agent ?? 'unknown') : null;
     const key = `${r.session} ${agent ?? 'main'}`;
     if (!agents.has(key)) agents.set(key, { session: r.session, agent, type: agent ? (r.payload?.type ?? null) : 'main', rows: 0, ...zero() });
@@ -132,6 +155,96 @@ export function asks(rows) {
   return { ...totals, list: view.cards, flags: view.flags };
 }
 
+const parseState = (s) => {
+  try {
+    return typeof s === 'string' ? JSON.parse(s) : s ?? null;
+  } catch {
+    return s;
+  }
+};
+const lastOf = (list, f) => list.reduce((got, x) => f(x) ?? got, null);
+
+/** The items the rows name (engine.transition rows of an item), newest first by their last row. */
+export function items(rows) {
+  const at = new Map();
+  for (const r of rows) if (r?.item && r.kind === 'engine.transition' && !(at.get(r.item) > r.at)) at.set(r.item, r.at);
+  return [...at.entries()].sort((a, b) => b[1].localeCompare(a[1])).map(([item]) => item);
+}
+
+/**
+ * One item (plan item engine-item-views): its workflow and current state, the handles its events carried (issue, PR,
+ * verdict, merge), its build rounds, its tokens and its person asks, from every journal file, not only the item's.
+ * An item's work spans sessions: its actors' agents finish in the driver's session file, and its card is posted and
+ * tapped in the thread that owns it (retro finding 2). So the agents are the ones its agent.spawn rows bound, wherever
+ * their agent.finish rows are, each counted once at its last row (finding 3); the sessions that applied its events
+ * add their turns; and each ask's card is joined by its id to the card.posted and person.tap rows of any session.
+ * `now` ends an open card's wait.
+ */
+export function itemView(rows, item, { now = null } = {}) {
+  const seen = new Set();
+  const all = rows.filter((r) => r && !seen.has(r.id) && seen.add(r.id));
+  const own = all.filter((r) => r.item === item).sort((a, b) => a.at.localeCompare(b.at));
+  const transitions = own.filter((r) => r.kind === 'engine.transition' && r.payload?.outcome === 'applied')
+    .sort((a, b) => (a.payload.seq ?? 0) - (b.payload.seq ?? 0));
+  if (!own.length) return null;
+  const events = transitions.map((t) => t.payload.event ?? {});
+  const outputs = (type) => events.filter((e) => e.type === type).map((e) => e.output);
+  const handles = {
+    issue: events.find((e) => e.type === 'xstate.init')?.input?.issue?.url ?? null,
+    pr: lastOf(outputs('xstate.done.actor.build'), (o) => o?.pr?.url ? { url: o.pr.url, headSha: o.pr.headSha ?? null } : null),
+    verdict: lastOf(outputs('xstate.done.actor.verify'), (o) => o?.result ? { result: o.result, sha: o.sha ?? null } : null),
+    merge: lastOf(outputs('xstate.done.actor.merge'), (o) => o?.sha ? { sha: o.sha } : null),
+  };
+
+  // Tokens: the item's agents (from its agent.spawn rows) at their last finish, and the turns of its sessions.
+  const agentIds = new Set(own.filter((r) => r.kind === 'agent.spawn').map((r) => r.payload?.agentId ?? r.agent).filter(Boolean));
+  const sessions = new Set(transitions.map((t) => t.session));
+  const finishes = lastFinishes(all.filter((r) => r.kind === 'agent.finish' && agentIds.has(r.payload?.agentId ?? r.agent)));
+  const turns = all.filter((r) => r.kind === 'turn.usage' && sessions.has(r.session));
+  const tokens = { total: zero(), agents: zero(), sessions: zero(), agentCount: agentIds.size, finished: finishes.length, sessionIds: [...sessions] };
+  for (const r of finishes) add(tokens.agents, r.payload?.tokens);
+  for (const r of turns) add(tokens.sessions, r.payload?.tokens);
+  add(add(tokens.total, tokens.agents), tokens.sessions);
+
+  // Asks: each ask run's card, posted and answered wherever that happened.
+  const cards = new Map(attention(all).cards.map((c) => [c.cardId, c]));
+  const answers = new Map(transitions.filter((t) => t.payload.run && /^xstate\.done\.actor\./.test(t.payload.event?.type ?? '')).map((t) => [t.payload.run, t]));
+  const end = now ?? all.reduce((m, r) => (r.at > m ? r.at : m), '');
+  // An ask run starts when its state is entered; its card's id is on the run's done row once the host has seen the
+  // card recorded. Until then the wait counts from the run's start.
+  const askRows = own.filter((r) => r.kind === 'engine.effect' && r.payload?.actor === 'ask' && r.payload?.type === 'run');
+  const asks = [...new Set(askRows.map((r) => r.payload.effect))]
+    .map((effect) => {
+      const mine = askRows.filter((r) => r.payload.effect === effect);
+      const cardId = lastOf(mine, (r) => r.payload.outcome?.ref ?? null);
+      const card = cardId ? cards.get(cardId) : null;
+      const answer = answers.get(effect);
+      const postedAt = card?.postedAt ?? (cardId ? mine.find((r) => r.payload.outcome?.ref)?.at : mine[0].at);
+      const answeredAt = answer?.at ?? card?.tappedAt ?? null;
+      return {
+        effect, cardId, thread: card?.thread ?? null, postedAt, answeredAt,
+        by: answer?.source?.system ?? (card?.tappedAt ? 'hearth' : null), choice: answer?.payload?.event?.output?.choice ?? card?.option ?? null,
+        waitMs: Date.parse(answeredAt ?? end) - Date.parse(postedAt), open: !answeredAt,
+      };
+    });
+  const last = transitions.at(-1);
+  return {
+    item,
+    workflow: transitions[0]?.payload?.workflow ?? null,
+    state: last ? parseState(last.state) : null,
+    since: last?.at ?? null,
+    firstAt: own[0].at,
+    lastAt: own.at(-1).at,
+    transitions: transitions.length,
+    rounds: transitions.filter((t) => parseState(t.state) === 'building').length,
+    handles,
+    tokens,
+    asks,
+    personWaitMs: asks.reduce((s, a) => s + (Number.isFinite(a.waitMs) ? a.waitMs : 0), 0),
+    refusals: own.filter((r) => r.kind === 'refusal').length,
+  };
+}
+
 /** The newest row's time, and the releases that wrote the rows, newest first. */
 export function freshness(rows) {
   const newestAt = rows.reduce((m, r) => (r.at > m ? r.at : m), '') || null;
@@ -140,7 +253,7 @@ export function freshness(rows) {
   return { newestAt, release: releases[0] ?? null, releases };
 }
 
-/** Everything the page shows for `scope`: { scope, rows, freshness, tokens, time, refusals, asks }. */
+/** Everything the page shows for `scope`: { scope, rows, freshness, tokens, time, refusals, asks, item }. */
 export function observe(rows, scope = {}) {
   const scoped = inScope(rows, scope);
   return {
@@ -151,6 +264,7 @@ export function observe(rows, scope = {}) {
     time: timeByKind(scoped),
     refusals: refusals(scoped),
     asks: asks(scoped),
+    item: scope.item ? itemView(rows, scope.item) : null,
   };
 }
 

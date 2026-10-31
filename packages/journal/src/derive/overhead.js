@@ -25,8 +25,18 @@ const tokensOf = (t) => (t ? (t.input ?? 0) + (t.output ?? 0) + (t.cacheRead ?? 
 export function overhead(rows, prs, config) {
   const seen = new Set();
   const sessions = {};
+  // An agent.finish row's tokens cover the agent's whole transcript, so an agent that finished twice counts once: its
+  // last row (retro finding 3, plan item engine-item-views).
+  const last = new Map();
+  for (const r of rows) {
+    if (r?.kind !== 'agent.finish') continue;
+    const key = `${r.session} ${r.payload?.agentId ?? r.agent}`;
+    if (!last.has(key) || r.at >= last.get(key).at) last.set(key, r);
+  }
+  const lastIds = new Set([...last.values()].map((r) => r.id));
   for (const r of rows) {
     if (!r || seen.has(r.id) || (r.kind !== 'turn.usage' && r.kind !== 'agent.finish')) continue;
+    if (r.kind === 'agent.finish' && !lastIds.has(r.id)) continue;
     seen.add(r.id);
     sessions[r.session] ??= { tokens: 0, harnessLines: 0, productLines: 0, prs: [], rows: [] };
     sessions[r.session].tokens += tokensOf(r.payload?.tokens);

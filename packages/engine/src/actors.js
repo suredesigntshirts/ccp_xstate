@@ -241,7 +241,8 @@ export function bind({ root, agentId, toolUseId, agentType = null, session = nul
   if (!run) return null;
   const dir = runDir(root, run.run);
   if (!writeOnce(join(dir, 'agent.json'), { agentId, toolUseId, via, at: new Date().toISOString() })) return null;
-  writeJson(agentFile(root, agentId), { run: run.run, worktree: run.worktree, toolUseId, verified: via === 'meta' });
+  // item and state: what capture tags the agent's own rows with (plan item engine-item-views).
+  writeJson(agentFile(root, agentId), { run: run.run, item: run.item, state: run.state, worktree: run.worktree, toolUseId, verified: via === 'meta' });
   journal(root, run, {
     kind: 'agent.spawn',
     source: { system: 'claude-code', ref: toolUseId },
@@ -272,7 +273,7 @@ export function bindLate({ root, agentId, metaToolUseId, agentType = null, sessi
   return got ? { bound: got } : null;
 }
 
-/** The run an agent was bound to, or null: { run, worktree }. */
+/** The run an agent was bound to, or null: { run, item, state, worktree }. */
 export const boundRun = (root, agentId) => (agentId ? readJson(agentFile(root, agentId)) : null);
 
 const FILE_TOOLS = { Read: 'file_path', Write: 'file_path', Edit: 'file_path', MultiEdit: 'file_path', NotebookEdit: 'notebook_path' };

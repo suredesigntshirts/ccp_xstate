@@ -108,6 +108,8 @@ test('bin/host.js: a tap before the card is recorded matches nothing; after `car
 
     const record = await hostCli(root, ['card', '--effect', ask.id, '--ref', CARD]);
     assert.equal(record.ref, CARD);
+    const done = readFile(host.file).rows.filter((r) => r.kind === 'engine.effect' && r.payload.effect === ask.id && r.payload.phase === 'done');
+    assert.equal(done.at(-1)?.payload.outcome.ref, CARD, '`card` finishes the card effect at once, so the item\'s file names the card');
 
     // Another card's tap is not this run's answer.
     assert.deepEqual((await wake(tap('cmsg_someOtherCard'))).results.filter((r) => r.event?.startsWith('xstate.done.actor.ask')), []);

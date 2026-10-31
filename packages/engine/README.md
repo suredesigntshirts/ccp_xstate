@@ -41,10 +41,16 @@ command.
 `handlers({ github, hearth, clock })` builds them. `github` (`src/effects/github.js`) reaches api.github.com through
 the session's proxy itself. A command can't reach the thread or schedule a wake, so in `bin/host.js` posts and timers
 stay pending (and printed). Its cards go through `src/effects/relay.js` (plan item engine-toy-run): the session that
-has the thread's tools posts the card `show` lists and records its id with `card`, and the host's next call finishes
-the card effect with that id, so the tap wake on that card answers the run. `scripts/toy-run.sh` runs the whole loop;
+has the thread's tools posts the card `show` lists and records its id with `card`, which then finishes the card
+effect with that id as the item's owner (so the item's file names the card; plan item engine-item-views), so the tap wake on that card answers the run. `scripts/toy-run.sh` runs the whole loop;
 why: `plan/decisions/2026-10-30-engine-toy-run.md`. Agent actors are
 prepared by `src/actors.js` (below).
+
+## Tripwires
+
+A `tripwire` row (`derive.js rework --append items/<item>.jsonl`, when a PR passes its item's round limit) is offered
+on the host's next call as a `tripwire` event, once (`src/tripwire.js`, plan item engine-item-views). quick-fix steps
+back to replanning from building, verifying or awaitingMerge when the event's PR is the item's.
 
 ## Stand-in answers
 

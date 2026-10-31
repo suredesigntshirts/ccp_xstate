@@ -132,11 +132,27 @@ try {
   const before = usesState || event === 'PostToolUse' ? loadState(where) : {};
   const refusals = refusedPath(session);
   const refused = REFUSAL_AWARE.includes(event) ? loadRefused(refusals) : {};
-  // An invoked actor's agent is bound to its run by the actor hook (actors.mjs), in <journal>/actors/agents/.
-  const actor = (agentId) => existsSync(join(journalDir(), 'actors', 'agents', `${String(agentId).replace(/[^A-Za-z0-9._-]/g, '_')}.json`));
+  // An invoked actor's agent is bound to its run by the actor hook (actors.mjs), in <journal>/actors/agents/; its rows
+  // carry the run's item and state (plan item engine-item-views).
+  const bound = new Map();
+  const boundOf = (agentId) => {
+    if (!agentId) return null;
+    if (!bound.has(agentId)) {
+      let b = null;
+      try {
+        b = JSON.parse(readFileSync(join(journalDir(), 'actors', 'agents', `${String(agentId).replace(/[^A-Za-z0-9._-]/g, '_')}.json`), 'utf8'));
+      } catch {}
+      bound.set(agentId, b);
+    }
+    return bound.get(agentId);
+  };
+  const actor = (agentId) => boundOf(agentId) !== null;
   const { rows, blobs, state } = capture(input, { read, state: before, refused, actor });
   for (const b of blobs) store(join(journalDir(), 'blobs'), b);
-  for (const row of rows) append(path, { ...base, ...row });
+  for (const row of rows) {
+    const b = boundOf(row.agent);
+    append(path, { ...base, ...(b?.item ? { item: b.item, state: b.state ?? null } : {}), ...row });
+  }
   noteRefused(refusals, rows);
   if (usesState && state !== before) saveState(where, state);
   done(false);

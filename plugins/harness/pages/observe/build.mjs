@@ -15,7 +15,7 @@ export const OUT = join(HERE, 'observe.html');
 // The modules the page needs, in dependency order. Each runs in its own scope with its imports dropped, and hands its
 // exports to the ones after it by name; attention.js's readAll import is only used by attentionOf, which the page never calls.
 const MODULES = [join(DERIVE, 'time.js'), join(DERIVE, 'attention.js'), join(HERE, 'data.js')];
-const EXPOSED = ['parseJournal', 'scopes', 'inScope', 'tokensByAgent', 'timeByKind', 'refusals', 'asks', 'freshness', 'observe', 'refreshRow'];
+const EXPOSED = ['parseJournal', 'scopes', 'inScope', 'items', 'itemView', 'lastFinishes', 'tokensByAgent', 'timeByKind', 'refusals', 'asks', 'freshness', 'observe', 'refreshRow'];
 
 const EXPORT = /^export (?:const|function|class|async function) (\w+)/gm;
 const wrap = (src) => {

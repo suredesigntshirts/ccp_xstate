@@ -69,7 +69,7 @@ test('what was asked of the person matches the attention view: one card, tapped 
 });
 
 test('a scope keeps a day, a thread\'s sessions or one session, and lists what can be picked', () => {
-  assert.deepEqual(scopes(rows), { days: ['2026-10-30'], threads: [THREAD], sessions: [THREAD_SESSION, PROBE, HEADLESS] });
+  assert.deepEqual(scopes(rows), { days: ['2026-10-30'], threads: [THREAD], sessions: [THREAD_SESSION, PROBE, HEADLESS], items: [] });
   assert.equal(inScope(rows, { thread: THREAD }).length, 3);
   assert.ok(inScope(rows, { thread: THREAD }).every((r) => r.session === THREAD_SESSION));
   assert.equal(inScope(rows, { session: PROBE }).length, 1);
