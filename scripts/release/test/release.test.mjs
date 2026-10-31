@@ -4,10 +4,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { branch, compare, newestTag, nextVersion, plan, row, tag } from '../release.mjs';
+import { RELEASED, branch, compare, newestTag, nextVersion, plan, row, tag } from '../release.mjs';
 import { validate } from '../../../packages/journal/src/index.js';
 
 const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
@@ -166,4 +166,23 @@ test('release: tags and release branches count as one series; the next is above 
   // origin's release branches, as a fetch leaves them, count too
   git(cwd, 'update-ref', 'refs/remotes/origin/release/harness-v0.4.0', sha);
   assert.equal(plan({ cwd, sha: head }).latest, '0.4.0');
+});
+
+test('release: an engine-only change is released (setup.sh copies packages/engine/src); engine tests are not', () => {
+  const cwd = repo('0.1.0');
+  merge(cwd, 'plugins/harness/scripts/a.mjs');
+  assert.equal(merge(cwd, 'packages/engine/test/a.test.js').release, false);
+  assert.equal(merge(cwd, 'packages/engine/bin/host.js').release, false);
+  const d = merge(cwd, 'packages/engine/src/actors.js');
+  assert.equal(d.tag, 'harness-v0.1.1');
+  assert.deepEqual(d.changed, ['packages/engine/src/actors.js']);
+});
+
+test('release: every path setup.sh archives into a session is a released path', () => {
+  const setup = readFileSync(new URL('../../../infra/cloud-environment/setup.sh', import.meta.url), 'utf8');
+  const archived = [...setup.matchAll(/git -C "\$repo" archive "\$commit" ([^|]*)\|/g)]
+    .flatMap((m) => m[1].replace(/\\\n/g, ' ').split(/\s+/))
+    .filter((p) => p && !p.startsWith("'") && !p.startsWith('2>'));
+  assert.ok(archived.includes('packages/engine/src'), `setup.sh archives: ${archived.join(', ')}`);
+  for (const path of archived) assert.ok(RELEASED.includes(path), `${path} is copied into sessions but not in RELEASED`);
 });
