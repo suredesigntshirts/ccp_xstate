@@ -1,16 +1,14 @@
 ```json
 {
   "id": "engine-cards-standin",
-  "title": "Turn waiting states into cards that the stand-in or the person answers",
+  "title": "Let a stand-in answer a workflow's ask through the host, under the person's grant",
   "stage": "s4-first-real-item",
   "kind": "build",
-  "status": "draft",
-  "outcome": "A waiting state's declared card is posted through the project's decision tool. Under the person's grant a stand-in on another model answers with one of the legal events; one-way doors outside the work wait for the person. Finishing an item closes its waits.",
+  "status": "ready",
+  "outcome": "When the person is away, a stand-in session on another model answers an item's open ask through the host: the host takes the answer only if it is one of the ask's legal choices and a grant entry the person set covers this workflow, ask, repo and time, journals the transition with that grant, and runs what follows (the merge) itself. A real run can be started from an existing issue.",
   "why": "Retro finding 1 (plan/research/retro-first-item.md): on the first real item the person was away, the workflow's one ask had no answer the host would take, and the merge happened outside the host, so first-real-issue can't finish without this. v1 had three machines for decisions, grants and audits (34 context fields), cards piled up overnight, and finished items left decisions in the person's inbox. One pattern, a state that declares its card, covers all of it.",
   "serves": [
     "L-stand-in-decides",
-    "L-never-idle-on-person",
-    "L-item-finish-clears-inbox",
     "L-attention-is-the-constraint",
     "L-builder-supplies-gate-inputs",
     "L-standin-gap",
@@ -25,87 +23,95 @@
   ],
   "inputs": [
     {
-      "ref": "packages/workflow/fragments/card-wait.json",
-      "what": "The fragment"
+      "ref": "plan/research/retro-first-item.md, finding 1 and 4",
+      "what": "Why, and the runner gap"
     },
     {
-      "ref": "v1 autoMode.allow stand-in rule and grant notes",
-      "what": "The person's grant, to restate as data"
+      "ref": "The person's 31 Oct grant: 02:40Z \"I authorize you to act on my behalf as a stand in and make decisions\", 03:03Z \"I'm not around, I said work autonomously\"",
+      "what": "The first grant, restated as data"
     }
   ],
   "outputs": [
     {
-      "ref": "packages/engine/src/cards.js",
-      "what": "Post a card from meta.interaction; map a tap to its event"
+      "ref": "packages/engine/src/standin.js",
+      "what": "Check a stand-in answer against the ask and the grants; build the completion with source standin and the grant id"
     },
     {
-      "ref": "grants.json in the harness folder",
-      "what": "What the stand-in may decide, set by the person"
+      "ref": "bin/host.js answer",
+      "what": "The command a stand-in session runs"
+    },
+    {
+      "ref": "grants.json in the harness folder, and its format in packages/engine/README.md",
+      "what": "What the stand-in may decide"
+    },
+    {
+      "ref": "scripts/toy-run.sh run --issue <url> --expect <file>, and toy-run.sh answer",
+      "what": "A run from an existing issue, and the stand-in's answer"
     }
   ],
   "expect": [
     {
       "id": "legal-only",
-      "check": "A stand-in answer that isn't a legal event in that state is refused",
-      "how": "Test for case C-stand-in-picks-legal-event",
-      "proof": "builder"
-    },
-    {
-      "id": "closes",
-      "check": "Cancelling or finishing an item closes its open card",
-      "how": "Test for case C-finish-closes-waits",
-      "proof": "builder"
-    },
-    {
-      "id": "no-stall",
-      "check": "With one item waiting on the person, another item still advances and a wake is scheduled",
-      "how": "Test for case C-waiting-does-not-stall",
-      "proof": "builder"
+      "check": "An answer that is not one of the open ask's choices, or that no grant entry covers (workflow, ask, repo, expiry), is refused, changes nothing in the item, and the refusal is printed with its reason",
+      "how": "The verifier's own tests from case C-stand-in-picks-legal-event, against bin/host.js answer on a recorded item",
+      "proof": "verifier"
     },
     {
       "id": "grant-source",
-      "check": "Each stand-in answer is journalled with the grant entry that covered it",
-      "how": "Test",
+      "check": "Each accepted stand-in answer's engine.transition row has source system standin, ref naming the grant id, and the answering session in its output",
+      "how": "The verifier's tests read the journal rows",
+      "proof": "verifier"
+    },
+    {
+      "id": "host-merges",
+      "check": "On a scratch item run from an existing issue with toy-run.sh run --issue, a stand-in answer through toy-run.sh answer moves the item from awaitingMerge to done, and the host's merge effect merges the PR at the verified sha",
+      "how": "A fresh run on ccp_xstate_scratch; GitHub's merge sha and the journal's pr.merge and engine.transition rows",
+      "proof": "world"
+    },
+    {
+      "id": "no-tap-needed-for-person",
+      "check": "A person's tap on the same card still answers the ask as before, and an ask already answered refuses the other",
+      "how": "Builder test on the tap fixture plus a stand-in answer",
       "proof": "builder"
     }
   ],
   "cases": [
-    "C-stand-in-picks-legal-event",
-    "C-finish-closes-waits",
-    "C-waiting-does-not-stall"
+    "C-stand-in-picks-legal-event"
   ],
   "concepts": {
     "adds": [
-      "card",
       "grant"
     ],
     "merges": [
-      "v1's decision, grant and audit machines"
+      "v1's decision and grant machines, for the merge ask only"
     ],
-    "budget": 2
+    "budget": 1
   },
   "non_goals": [
-    "No learning the person's taste yet"
+    "No closing cards when an item finishes, and no concurrency for the no-stall case (cases C-finish-closes-waits and C-waiting-does-not-stall stay with a later item)",
+    "No learning the person's taste",
+    "No stand-in for asks other than the ones a grant names"
   ],
   "records": [
-    "card.posted",
-    "person.tap",
-    "engine.transition with grant"
+    "engine.transition with source standin and the grant id"
   ],
   "person_prereqs": [
-    "Write the first grants.json with the thread (a short conversation)"
+    "None while the 31 Oct grant holds: the stand-in writes the first grants.json from the person's own words, with an expiry, and records it in plan/decisions/"
   ],
   "step_back": {
     "max_rounds": 2,
     "max_tokens": 2500000
   },
-  "verifier": "A separate subagent on a different model, using the Verifier brief below.",
+  "verifier": "A separate subagent on a different model from the builder, using the Verifier brief below.",
   "risks": [
-    "Concurrency above 1 is needed for the no-stall case; the workflow must allow 2 for that test"
+    "A stand-in with a shell can run bin/host.js answer by hand, as any agent can append rows (ledger L-same-account-everywhere); the grant check limits what it can answer, not who runs it"
   ]
 }
 ```
 ## Verifier brief
 
-Write your own tests for the three named cases from their text, with a stub for the decision tool and a recorded
-tap fixture. No real card is posted. Verdict per Expect id.
+Write your own tests for case C-stand-in-picks-legal-event from its text, against `bin/host.js answer` on items you
+record yourself: an illegal choice, a missing or expired grant, a grant for another repo or ask, and a legal answer.
+Check the accepted answer's journal row names the grant and the session. Then do one fresh scratch run from an
+existing issue with `toy-run.sh run --issue`, answer its ask with `toy-run.sh answer`, and read the merge sha on
+GitHub against the verdict's sha. Verdict per Expect id.

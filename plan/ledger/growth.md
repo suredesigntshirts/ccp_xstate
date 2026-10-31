@@ -12,7 +12,7 @@
 
 ### L-build-for-next-real-item
 **Lesson:** Build only what the next real item needs. Add a state, gate or role back only when a real item needs it.
-**Evidence:** Triage tiers, plan, accept and integration gates, history states: v1 built them up front. The XState doc's park list defers them (Gall's Law).
+**Evidence:** Triage tiers, plan, accept and integration gates, history states: v1 built them up front. The XState doc's park list defers them (Gall's Law). In v2, the first real item (ccp_machine_test#102, 31 Oct) ran on quick-fix unchanged, so the retro parked wf-schema, wf-fragments and wf-catalogue (plan/research/retro-first-item.md, finding 6).
 **Fate:** design. The skeleton workflow starts minimal, and the ledger rows say why each thing is or isn't there.
 
 ### L-measure-then-park
