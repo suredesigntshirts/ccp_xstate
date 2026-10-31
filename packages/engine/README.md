@@ -20,6 +20,7 @@ node packages/engine/bin/host.js start --item <id> --workflow quick-fix --input 
 node packages/engine/bin/host.js wake --item <id> --workflow quick-fix < <hook input JSON>
 node packages/engine/bin/host.js show --item <id> --workflow quick-fix
 node packages/engine/bin/host.js card --item <id> --workflow quick-fix --effect <ask run id> --ref <card id>
+node packages/engine/bin/host.js answer --item <id> --workflow quick-fix --effect <ask run id> --choice <c> --by <session> [--grants <file>]
 ```
 
 `--root` defaults to `$CCP_JOURNAL_DIR` or `/mnt/project-files/harness/journal`.
@@ -44,6 +45,24 @@ has the thread's tools posts the card `show` lists and records its id with `card
 the card effect with that id, so the tap wake on that card answers the run. `scripts/toy-run.sh` runs the whole loop;
 why: `plan/decisions/2026-10-30-engine-toy-run.md`. Agent actors are
 prepared by `src/actors.js` (below).
+
+## Stand-in answers
+
+When the person is away, a stand-in session answers an open ask with `bin/host.js answer` (`src/standin.js`, plan
+item engine-cards-standin). The host takes it only when the ask's card is up, the choice is one of the ask's choices,
+and an entry in the grants file covers it; otherwise it prints `refused: <why>` and exits 2, and the item is
+unchanged. An accepted answer is the ask run's completion, `{ choice, by, grant }`, with source
+`{ system: 'standin', ref: '<grant id> <card id>' }`, applied as the item's owner, so the host runs the merge that
+follows as it would on a tap. Whichever of a tap and a stand-in answer comes first is applied; the other finds no open
+run. The grants file defaults to `grants.json` beside the journal folder (`<harness>/grants.json`):
+
+```json
+{ "grants": [{ "id": "…", "workflow": "quick-fix", "ask": "ask", "choices": ["approve", "reject"],
+  "repos": ["owner/repo"], "until": "<ISO time>", "granted_by": "…", "said": "the person's words", "said_at": "…" }] }
+```
+
+An entry covers an answer when its workflow and ask (the invoke id) match, it lists the choice and the PR's repo, and
+`until` is still ahead. The person sets the file; the first one is `plan/decisions/2026-10-31-first-grant.md`.
 
 The journal check (`packages/journal/bin/journal-check.js --repo <owner/name>`) lists every merge the host's merge
 effect didn't make, and with `--host` fails on one.

@@ -5,6 +5,7 @@
 //   host.js wake  --item <id> --workflow <name> [--root <dir>] [--release x.y.z]   < hook input JSON
 //   host.js show  --item <id> --workflow <name> [--root <dir>]
 //   host.js card  --item <id> --workflow <name> --effect <ask run id> --ref <card id> [--root <dir>]
+//   host.js answer --item <id> --workflow <name> --effect <ask run id> --choice <c> --by <session> [--grants <file>]
 //   start and wake also take [--repo <git clone>] [--worktrees <dir>] for the actors' worktrees.
 //
 // wake reads a Claude Code hook's input on stdin: UserPromptSubmit (the wake is its prompt) or PostToolUse of
@@ -21,6 +22,9 @@
 // under --worktrees). `waiting` lists the runs whose agent the session starts next, with the Agent prompt to use.
 // CCP_GITHUB_API points GitHub calls at another server (tests), as it does for the actor hook.
 // Every call also offers the results the harness's return hook accepted and has not yet handed to the item.
+// answer is a stand-in's answer to an open ask whose card is up (src/standin.js, plan item engine-cards-standin): taken
+// only if it is one of the ask's choices and an entry in the grants file (default <root>/../grants.json) covers it.
+// It is applied as the item's owner, like a tap the owner's hook reads, so the host runs what follows itself.
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { loadWorkflow } from '../src/index.js';
@@ -28,6 +32,7 @@ import { restore, offer, pending } from '../src/host.js';
 import { inputsOfWake } from '../src/wake.js';
 import { github, handlers, recordCard, relay } from '../src/effects/index.js';
 import { actors, resultsOf, waiting } from '../src/actors.js';
+import { grantsFileFor, readGrants, standinInput } from '../src/standin.js';
 
 const { positionals: [command], values: opts } = parseArgs({
   allowPositionals: true,
@@ -41,7 +46,10 @@ const { positionals: [command], values: opts } = parseArgs({
     repo: { type: 'string' },
     worktrees: { type: 'string' },
     effect: { type: 'string' },
-    ref: { type: 'string' }
+    ref: { type: 'string' },
+    choice: { type: 'string' },
+    by: { type: 'string' },
+    grants: { type: 'string' }
   }
 });
 
@@ -66,7 +74,7 @@ const fail = (message) => {
   process.exit(2);
 };
 
-if (!['start', 'wake', 'show', 'card'].includes(command)) fail('the command is start, wake, show or card');
+if (!['start', 'wake', 'show', 'card', 'answer'].includes(command)) fail('the command is start, wake, show, card or answer');
 if (!opts.item || !opts.workflow) fail('--item and --workflow are required');
 const spec = loadWorkflow(opts.workflow);
 const release = opts.release ?? process.env.CCP_HARNESS_RELEASE ?? manifestRelease();
@@ -79,12 +87,20 @@ if (command === 'wake') {
   const text = wakeTextOf(hook);
   inputs = (host) => inputsOfWake(host, text);
 }
-if (!session && !['show', 'card'].includes(command)) fail('no session: start takes --session, wake reads session_id from the hook input');
+if (!session && !['show', 'card', 'answer'].includes(command)) fail('no session: start takes --session, wake reads session_id from the hook input');
 
 // A refusal from the journal (an older writer, say) is printed as one line, not a stack.
 process.on('uncaughtException', (error) => fail(error.message));
 process.on('unhandledRejection', (error) => fail(error?.message ?? String(error)));
-const host = restore({ root: opts.root, item: opts.item, spec, session: session ?? command, release });
+let host = restore({ root: opts.root, item: opts.item, spec, session: session ?? command, release });
+if (command === 'answer') {
+  // Applied as the item's owner: the answer is the run's completion, as a tap read by the owner's hook would be.
+  if (!host.owner) fail(`${opts.item} has not started`);
+  host = restore({ root: opts.root, item: opts.item, spec, session: host.owner, release });
+  const grants = readGrants(opts.grants ?? grantsFileFor(opts.root));
+  // Read after the open effects run, so a card recorded since the last call is up before the answer is checked.
+  inputs = (h) => [standinInput(h, { effect: opts.effect, choice: opts.choice, by: opts.by, grants })];
+}
 if (command === 'card') {
   // Only a record of which card was put up: the owner's next host call finishes the card effect with it.
   console.log(JSON.stringify(recordCard({ host, effect: opts.effect, ref: opts.ref }), null, 2));
