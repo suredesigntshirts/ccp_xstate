@@ -9,6 +9,8 @@
 //   PreToolUse of any other tool a bound agent calls: run shell commands from its worktree, refuse file tools outside.
 //   SubagentStart: bind the agent to its run and give it its run, worktree and return instructions. When the session
 //     has several runs starting at once, the agent is bound at its first tool call instead, from its meta.json.
+//   SubagentStop of a bound agent whose run has no result: block once, telling it to call the return tool; if it
+//     stops again, fail the run, so the item gets the actor's error instead of waiting (plan item engine-actor-returns).
 //   PostToolUse of Agent in the main session, and UserPromptSubmit (a wake, such as a background agent finishing):
 //     say which runs are prepared and waiting for their agent.
 //
@@ -76,6 +78,15 @@ async function main() {
     const c = A.confine({ worktree: bound.worktree, tool, input: input.tool_input });
     if (c?.deny) return deny(c.deny);
     if (c?.input) return rewrite(c.input);
+    return;
+  }
+  if (event === 'SubagentStop' && input.agent_id) {
+    const r = A.stopped({ root, agentId: input.agent_id, again: input.stop_hook_active === true, session });
+    if (r?.block) return process.stdout.write(JSON.stringify({ decision: 'block', reason: r.block }));
+    if (r?.failed) {
+      const { github } = await engine('effects/github.js');
+      await A.deliver({ root, run: r.failed, github: github({ ...(process.env.CCP_GITHUB_API ? { api: process.env.CCP_GITHUB_API } : {}) }) });
+    }
     return;
   }
   if (event === 'SubagentStart') {

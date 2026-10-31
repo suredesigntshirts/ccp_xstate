@@ -332,6 +332,7 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   if (!caller) return refuse('wrong-caller', `the main session is not run ${run.run}'s actor (${bound.agentId})`);
   if (caller !== bound.agentId) return refuse('wrong-caller', `agent ${caller} is not run ${run.run}'s actor (${bound.agentId})`);
   if (existsSync(join(dir, 'result.json'))) return refuse('already-returned', `run ${run.run} already returned its result`);
+  if (existsSync(join(dir, 'failed.json'))) return refuse('already-failed', `run ${run.run} failed: its actor stopped without returning`);
 
   const problems = check(run.schema, result, run.defs);
   if (problems.length) return refuse('schema', `${run.actor} result: ${problems.join('; ').replaceAll('$', 'result')}`);
@@ -381,15 +382,47 @@ function claimedPrs(value, path = 'result') {
 }
 
 /**
+ * SubagentStop of an agent (plan item engine-actor-returns): an invoked actor that stops with its run still open is
+ * sent back once to call the return tool; if it stops again without returning, its run fails, so the item leaves the
+ * state instead of waiting forever. Returns null (not an actor, or its result is in), { block: reason } or
+ * { failed: run }. `again` is the hook input's stop_hook_active: the agent is stopping after being sent back.
+ */
+export function stopped({ root, agentId, again = false, session = null }) {
+  const bound = boundRun(root, agentId);
+  const run = bound && loadRun(root, bound.run);
+  if (!run) return null;
+  const dir = runDir(root, run.run);
+  if (existsSync(join(dir, 'result.json')) || existsSync(join(dir, 'failed.json'))) return null;
+  if (!again) {
+    return { block: `You are the invoked ${run.actor} actor for run ${run.run}, and you stopped without returning your result, so the item can't move. Call the harness return tool now (its name ends in harness__return; load it with ToolSearch if it is deferred) with { "run": "${run.run}", "result": <your result> }. Don't redo your work unless the tool refuses the result.` };
+  }
+  const why = 'the actor stopped without returning its result, after being sent back once';
+  if (!writeOnce(join(dir, 'failed.json'), { agentId, why, at: new Date().toISOString() })) return null;
+  journal(root, run, {
+    kind: 'refusal',
+    source: { system: 'hook', ref: `stop ${agentId}` },
+    agent: agentId,
+    payload: { source: 'hook', rule: 'no-return', reason: why, run: run.run, actor: run.actor, caller: agentId, tool: 'SubagentStop', textHash: sha256(`no-return: ${why}`), outcome: 'denied', hookSession: session }
+  });
+  return { failed: run.run };
+}
+
+/**
  * The accepted results of an item's open runs, as host inputs: the actor's done event with the result as output.
- * The source is the return call that the checks accepted. A host offers these on any wake; deliver() offers them
- * at once.
+ * The source is the return call that the checks accepted. A run whose actor stopped without returning (stopped())
+ * gives the actor's error event instead, its source the agent's stop. A host offers these on any wake; deliver()
+ * offers them at once.
  */
 export function resultsOf(host) {
   const inputs = [];
   for (const run of host.runs.values()) {
     if (!AGENTS.includes(run.actor)) continue;
     const got = readJson(join(runDir(host.root, run.id), 'result.json'));
+    const failed = !got && readJson(join(runDir(host.root, run.id), 'failed.json'));
+    if (failed) {
+      inputs.push({ event: { type: `xstate.error.actor.${run.invoke}`, error: failed.why }, run: run.id, source: { system: 'harness', ref: `stop ${failed.agentId}` } });
+      continue;
+    }
     if (!got) continue;
     inputs.push({
       event: { type: `xstate.done.actor.${run.invoke}`, output: got.result },

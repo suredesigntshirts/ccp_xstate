@@ -113,6 +113,11 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
             "timeout": 5,
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/actors.mjs\"",
+            "timeout": 10
           }
         ]
       }
