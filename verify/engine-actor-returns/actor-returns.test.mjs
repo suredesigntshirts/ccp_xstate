@@ -81,6 +81,62 @@ test('fails-after: stopping again fails the run, journals no-return, and the ite
   assert.match(late.hookSpecificOutput.permissionDecisionReason, /^already-failed: /);
 });
 
+const handback = (env, agent, id = 'h1') => run(env, { hook_event_name: 'PreToolUse', agent_id: agent, tool_name: 'SubagentHandback', tool_use_id: id, tool_input: { message: 'done' } });
+const failedRows = (root) => rows(root).filter((r) => r.kind === 'refusal' && r.payload.rule === 'no-return');
+const errorTransitions = (root) => rows(root).filter((r) => r.kind === 'engine.transition' && /^xstate\.error\.actor\./.test(r.payload.event.type));
+
+test('sent-back (handback path): the first SubagentHandback of a bound agent with its run open is denied no-return, naming the tool and run', async () => {
+  const { env, root } = await bound();
+  const out = handback(env, 'ag1').hookSpecificOutput;
+  assert.equal(out.permissionDecision, 'deny');
+  assert.match(out.permissionDecisionReason, /^no-return: /);
+  assert.match(out.permissionDecisionReason, /harness__return/);
+  assert.ok(out.permissionDecisionReason.includes(RUN));
+  assert.equal(state(root), 'briefing');
+  assert.equal(failedRows(root).length, 0);
+});
+
+test('fails-after (handback path): a second handback fails the run and the item leaves the state; a stop after it is quiet', async () => {
+  const { env, root } = await bound();
+  const invoke = restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' }).runs.get(RUN).invoke;
+  assert.ok(handback(env, 'ag1'));
+  assert.equal(handback(env, 'ag1', 'h2'), null, 'the second handback goes through');
+  assert.equal(failedRows(root).length, 1);
+  assert.equal(errorTransitions(root)[0].payload.event.type, `xstate.error.actor.${invoke}`);
+  assert.notEqual(state(root), 'briefing');
+  assert.equal(stop(env, 'ag1', false), null);
+  assert.equal(failedRows(root).length, 1, 'failed once');
+});
+
+test('once holds across both ways of ending: a handback deny then a plain stop fails the run', async () => {
+  const { env, root } = await bound();
+  assert.ok(handback(env, 'ag1'));
+  assert.equal(stop(env, 'ag1', false), null, 'no second block');
+  assert.equal(failedRows(root).length, 1);
+  assert.equal(errorTransitions(root).length, 1);
+});
+
+test('SubagentStop whose transcript tail is the real SubagentHandback result (recorded in ar2) fails the run at once', async () => {
+  const { env, root } = await bound();
+  const tx = join(mkdtempSync(join(tmpdir(), 'ver-ar-tx-')), 'agent-ag1.jsonl');
+  writeFileSync(tx, readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'evidence', 'ar2-handback-tail.jsonl')));
+  const out = run(env, { hook_event_name: 'SubagentStop', agent_id: 'ag1', agent_type: 'general-purpose', stop_hook_active: false, agent_transcript_path: tx, transcript_path: '/x/s.jsonl' });
+  assert.equal(out, null, 'no block');
+  assert.equal(failedRows(root).length, 1);
+  assert.equal(errorTransitions(root).length, 1);
+  assert.notEqual(state(root), 'briefing');
+});
+
+test('a handback after the return was accepted, and by an unbound agent, goes through untouched', async () => {
+  const { env, root } = await bound();
+  assert.equal(handback(env, 'stranger'), null);
+  assert.ok(handback(env, 'ag1'), 'denied first');
+  assert.equal(run(env, { hook_event_name: 'PreToolUse', agent_id: 'ag1', tool_name: TOOL, tool_use_id: 't8', tool_input: { run: RUN, result: { builder: 'b', verifier: 'v' } } }), null);
+  assert.equal(handback(env, 'ag1', 'h3'), null);
+  assert.equal(failedRows(root).length, 0);
+  assert.equal(state(root), 'building');
+});
+
 test('stops freely: an unbound agent, even with stop_hook_active', async () => {
   const { env, root } = await bound();
   assert.equal(stop(env, 'stranger', false), null);
