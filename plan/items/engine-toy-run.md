@@ -4,7 +4,7 @@
   "title": "Run a toy issue through the first workflow end to end in the test project",
   "stage": "s3-engine-skeleton",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A toy issue in a scratch repo goes from filed to merged through the person's chosen workflow, with no agent-sent lifecycle events, and the journal check reports nothing missing.",
   "why": "This is the stage gate: the walking skeleton working end to end, with real actors, before a real issue.",
   "serves": [

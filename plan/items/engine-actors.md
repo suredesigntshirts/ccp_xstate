@@ -4,7 +4,7 @@
   "title": "Start builders and verifiers as invoked actors and accept only checked results",
   "stage": "s3-engine-skeleton",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "When a workflow state invokes an actor, the host writes its brief, spawns it, records its agent id, and accepts its result only through a return tool that checks the caller, the output schema and the facts on GitHub.",
   "why": "Completions from the actor the machine started can't be forged. Mods don't enforce tool schemas and show registered tools to every subagent (v1 probe), so the host checks both caller and schema itself, and confirms a claimed PR against GitHub.",
   "serves": [
