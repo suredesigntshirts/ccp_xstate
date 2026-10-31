@@ -4,9 +4,9 @@
   "title": "Define a workflow as a data file the engine can run",
   "stage": "s4b-widen",
   "kind": "build",
-  "status": "draft",
+  "status": "parked",
   "outcome": "One JSON Schema describes a workflow (states, the actor each state invokes, gates as preconditions, cards, limits, fragments it reuses), and a pure compiler turns a valid file into an XState machine config.",
-  "why": "The person wants workflows that are easy to change and picked per type of work. v1's rules drifted into host code and skill prose; a workflow that is only data, run by a fixed engine, keeps every rule visible and testable.",
+  "why": "Parked by retro-first-item (finding 6): the first real item ran on quick-fix unchanged, and nothing in it needed a schema, fragment or new workflow. It comes back when a real item needs a workflow quick-fix can't run. The person wants workflows that are easy to change and picked per type of work. v1's rules drifted into host code and skill prose; a workflow that is only data, run by a fixed engine, keeps every rule visible and testable.",
   "serves": [
     "L-rules-in-spec-not-host",
     "L-count-concepts",

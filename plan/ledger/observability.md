@@ -69,3 +69,13 @@
 **Lesson:** Page work expands without bound: PR #110, built to prove the XState skeleton, spent 17 of its 23 commits on inspector polish rounds and review-lens agents, and was never merged.
 **Evidence:** git log of ccp_machine branch claude/project-thread-3kdqwr (plan-review finding 10).
 **Fate:** design. Pages come after a real item, carry a round budget, and get polish rounds only when the person asks.
+
+### L-item-view-spans-sessions
+**Lesson:** An item's cost and waits are spread over sessions the item's journal doesn't hold, so a per-item view from the item's own sessions shows 0 s waiting on the person when it waited 16 minutes.
+**Evidence:** first-real-issue's first run: the card, the person wait and two refusals happened in the owning thread; `derive.js time` over the item's journal shows person 0 ms (retro-first-item finding 2).
+**Fate:** measure. engine-item-views joins the owning thread's rows (cards, taps, refusals, turn usage) to the item.
+
+### L-agent-finish-twice
+**Lesson:** One agent can carry two `agent.finish` rows with cumulative tokens, so summing rows overcounts.
+**Evidence:** first-real-issue's brief agent a2ebf056 finished at 02:45:12Z and 02:45:17Z; summing both overstates the item by 76,459 tokens, 9% (retro-first-item finding 3).
+**Fate:** test. engine-item-views takes the last finish row per agent, with a test on this fixture.

@@ -6,12 +6,14 @@
   "kind": "build",
   "status": "draft",
   "outcome": "Every journal row from an item's actors carries the item and state. The tripwire sends an item to its step-back state. The observe page gains an item view: its workflow, current state, context handles and cost so far.",
-  "why": "Cost and time per item were what v1 couldn't explain. With the host knowing which agent serves which item and state, tagging comes free.",
+  "why": "Retro findings 2 and 3 (plan/research/retro-first-item.md): the first real item's person wait, card and refusals sat in the owning thread, so its own view showed 0 s on the person, and one agent's two finish rows overcount tokens by 9% if summed. Cost and time per item were what v1 couldn't explain. With the host knowing which agent serves which item and state, tagging comes free.",
   "serves": [
     "L-attribute-tokens-to-item",
     "L-rework-invisible",
     "L-measure-then-park",
-    "L-pages-current-on-demand"
+    "L-pages-current-on-demand",
+    "L-item-view-spans-sessions",
+    "L-agent-finish-twice"
   ],
   "depends_on": [
     "engine-actors",
