@@ -27,3 +27,13 @@ closed the card as "approve", which the platform records as the thread's note, n
   and the workflow had no way to let a stand-in answer its one ask. The retro should weigh it.
 
 Reversing it costs a revert PR in ccp_machine_test.
+
+## Replan, 03:10Z
+
+The independent verifier (subagent `verifier-first-real-issue`, Sonnet) judged the first run at 6786b84: `merged`
+NOT MET (stand-in merge, not the host), `complete`, `asks` and `product-ci` MET. The verdict gate rightly refuses
+that, so its evidence is not merged now: it stays in this branch's history (commit f799583) and as patches in
+`/mnt/project-files/first-real-issue/parked-pr/`. Rather than weaken `merged`, the plan changes order:
+first-real-issue stays `doing` and now waits on engine-cards-standin (moved from s4b into s4), so the host can take a
+stand-in's answer under the person's grant; retro-first-item reads this first run now, since it is what justifies
+that order. first-real-issue then reruns on a second real issue in ccp_machine_test, with the merge made by the host.

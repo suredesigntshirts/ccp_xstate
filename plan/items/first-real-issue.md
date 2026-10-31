@@ -4,9 +4,9 @@
   "title": "Finish one small real issue with v2 in a real Projects thread",
   "stage": "s4-first-real-item",
   "kind": "build",
-  "status": "ready",
+  "status": "doing",
   "outcome": "A small real issue, chosen with the person, goes from filed to merged through v2, observed end to end, with the person asked only what the workflow says to ask.",
-  "why": "The constraint after the skeleton is real use. A toy can't show waits on CI, real review findings or real refusals.",
+  "why": "The constraint after the skeleton is real use. A toy can't show waits on CI, real review findings or real refusals. Its first run (fri-jsonl-lint, ccp_machine_test#102 to PR #103, 31 Oct) ran brief, build and verify on the engine, but the person was away and the host has no way for a stand-in to answer its ask, so the stand-in merged outside the host and `merged` was NOT MET (plan/decisions/2026-10-31-first-real-issue-stand-in-merge.md). It is rerun on a second real issue once engine-cards-standin lets a stand-in answer through the host.",
   "serves": [
     "L-attention-is-the-constraint",
     "L-build-for-next-real-item",
@@ -14,7 +14,8 @@
     "L-first-item-is-product"
   ],
   "depends_on": [
-    "engine-toy-run"
+    "engine-toy-run",
+    "engine-cards-standin"
   ],
   "inputs": [
     {

@@ -2,7 +2,7 @@
 {
   "id": "engine-cards-standin",
   "title": "Turn waiting states into cards that the stand-in or the person answers",
-  "stage": "s4b-widen",
+  "stage": "s4-first-real-item",
   "kind": "build",
   "status": "draft",
   "outcome": "A waiting state's declared card is posted through the project's decision tool. Under the person's grant a stand-in on another model answers with one of the legal events; one-way doors outside the work wait for the person. Finishing an item closes its waits.",
