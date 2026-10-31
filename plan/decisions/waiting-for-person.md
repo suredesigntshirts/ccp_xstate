@@ -2,7 +2,9 @@
 
 One line each: what, why, which item waits. Threads add to this; the person clears it.
 
-- Pick the product repo for the first real issue (plan item first-real-issue). Stage s4 waits; s0-s3 run without it.
+- Product repo for the first real issue: chosen by the stand-in on 31 Oct (ccp_machine_test, a jsonl-lint tool;
+  `2026-10-31-first-real-issue-product-repo.md`). Say if you want another repo. What waits on you is the merge card
+  quick-fix puts up for it: only your tap merges it.
 - Protect `main`: require the `ci / test` and `verdict / gates` checks before merge (repo settings). Until then the
   gates are red marks threads respect, not a lock (plan item repo-skeleton).
 - Optional: add an `ANTHROPIC_API_KEY` repo secret if you want the clean-room job to start a real headless `claude -p`
