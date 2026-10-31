@@ -32,6 +32,3 @@ One line each: what, why, which item waits. Threads add to this; the person clea
 - Add an allow rule for the product repo the stand-in works in (ccp_machine_test): with none, a thread's `gh api`
   write there was refused while the GitHub MCP tool and the headless builder were not (ledger L-allow-rules-per-repo,
   `plan/research/retro-first-item.md` finding 5). A settings change.
-- PR #105 in ccp_machine_test (first-real-issue run 2) is verified and its merge card is in the thread. Tap "approve"
-  to merge it through the host, or add the ccp_machine_test allow rule above: the stand-in's answer was refused
-  twice, [Merge Without Review] (`2026-10-31-first-real-issue-run-2.md`).
