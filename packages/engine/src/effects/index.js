@@ -11,11 +11,13 @@ import { timer, cancel } from './timer.js';
 
 export { github, GitHubError } from './github.js';
 export { prRef } from './merge.js';
+export { relay, recordCard, cardFile } from './relay.js';
 
 /**
  * Handlers for runEffects: { run, timer, cancel }. `github` is a client from github.js; `hearth` ({ card, post,
  * find? }) reaches the thread, and without it cards and posts stay pending; `clock` ({ wakeAt?, drop? }) schedules
- * the wake a timer needs. `actors` adds run handlers by actor name.
+ * the wake a timer needs. `actors` adds run handlers by actor name. A hearth with ready(effect) (relay.js) holds a
+ * card or post until it says the thread side is done.
  */
 export function handlers({ github, hearth = null, clock = {}, actors = {} } = {}) {
   const byActor = {
@@ -25,7 +27,8 @@ export function handlers({ github, hearth = null, clock = {}, actors = {} } = {}
   };
   return {
     run: {
-      handles: (effect) => effect.actor in byActor,
+      handles: (effect) =>
+        effect.actor in byActor && !(hearth?.ready && ['ask', 'post'].includes(effect.actor) && !hearth.ready(effect)),
       start: (effect) => byActor[effect.actor].start(effect),
       find: (effect) => (byActor[effect.actor].find ? byActor[effect.actor].find(effect) : undefined)
     },

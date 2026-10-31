@@ -25,3 +25,6 @@ One line each: what, why, which item waits. Threads add to this; the person clea
   verdict's sha) after an independent PASS and green CI" to the repo's autoMode.allow (a settings change). The host's
   merge effect runs without it today, inside its own process; the rule covers a session running `bin/host.js` by Bash
   (`2026-10-30-engine-effects.md`).
+- Tap **approve** (or reject) on the toy run's merge card in the engine-toy-run thread, and on the verifier's card when
+  it comes. quick-fix asks the person before it merges, and only your tap makes the wake that moves it; no agent can
+  stand in (`2026-10-30-engine-toy-run.md`). The s3 gate and the toy run's `merged` line wait on it.
