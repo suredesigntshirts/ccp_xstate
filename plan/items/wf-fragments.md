@@ -4,9 +4,9 @@
   "title": "Build the reusable pieces every code workflow needs, with v1's hard cases as tests",
   "stage": "s4b-widen",
   "kind": "build",
-  "status": "draft",
+  "status": "parked",
   "outcome": "Four fragments exist as data with tests on pure transitions: verify at a head, merge at the verified head, replan after the second FAIL, and wait on a card.",
-  "why": "The cases v1 learned the hardest (merge after a FAIL, push after a PASS, five rounds without stepping back, cards stalling) belong in shared pieces tested once, not rewritten in every workflow.",
+  "why": "Parked by retro-first-item (finding 6): the first real item ran on quick-fix unchanged, and nothing in it needed a schema, fragment or new workflow. It comes back when a real item needs a workflow quick-fix can't run. The cases v1 learned the hardest (merge after a FAIL, push after a PASS, five rounds without stepping back, cards stalling) belong in shared pieces tested once, not rewritten in every workflow.",
   "serves": [
     "L-merge-at-verified-head",
     "L-replan-after-second-fail",

@@ -6,13 +6,16 @@
   "kind": "build",
   "status": "draft",
   "outcome": "A waiting state's declared card is posted through the project's decision tool. Under the person's grant a stand-in on another model answers with one of the legal events; one-way doors outside the work wait for the person. Finishing an item closes its waits.",
-  "why": "v1 had three machines for decisions, grants and audits (34 context fields), cards piled up overnight, and finished items left decisions in the person's inbox. One pattern, a state that declares its card, covers all of it.",
+  "why": "Retro finding 1 (plan/research/retro-first-item.md): on the first real item the person was away, the workflow's one ask had no answer the host would take, and the merge happened outside the host, so first-real-issue can't finish without this. v1 had three machines for decisions, grants and audits (34 context fields), cards piled up overnight, and finished items left decisions in the person's inbox. One pattern, a state that declares its card, covers all of it.",
   "serves": [
     "L-stand-in-decides",
     "L-never-idle-on-person",
     "L-item-finish-clears-inbox",
     "L-attention-is-the-constraint",
-    "L-builder-supplies-gate-inputs"
+    "L-builder-supplies-gate-inputs",
+    "L-standin-gap",
+    "L-real-run-reuses-toy",
+    "L-allow-rules-per-repo"
   ],
   "depends_on": [
     "engine-effects",

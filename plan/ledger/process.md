@@ -79,3 +79,18 @@
 **Lesson:** A plan written by the driving lead needs an independent read before acting.
 **Evidence:** The landing-gate rethink: an independent reviewer found the proposed GitHub-check option weaker than the existing gate (28 Oct 15:25).
 **Fate:** design. This plan gets an independent review pass in step 6.
+
+### L-standin-gap
+**Lesson:** An ask with no answer the host will take stops a real item, so a person away for hours turns minutes of work into a merge outside the host.
+**Evidence:** first-real-issue's first run (31 Oct, retro-first-item finding 1): brief, build and verify took 3 min 18 s; the merge card then waited 16 min on a person who had said they were away, and the stand-in merged ccp_machine_test#103 outside the host, so `merged` was NOT MET.
+**Fate:** design. engine-cards-standin lets a stand-in answer a declared ask through the host under the person's grant; first-real-issue reruns after it.
+
+### L-real-run-reuses-toy
+**Lesson:** A runner that writes its own toy issue can't take a real one, so the first real run needed a hand copy of the script outside the repo.
+**Evidence:** `scripts/toy-run.sh run` builds the toy issue's text and Expect lines itself; first-real-issue's run used `/home/user/fri/run.sh`, a copy that takes ccp_machine_test#102 (retro-first-item finding 4).
+**Fate:** design. engine-cards-standin's rerun path takes an existing issue URL and its Expect lines.
+
+### L-allow-rules-per-repo
+**Lesson:** Allow rules name repos, and different tools are judged differently, so a new product repo works unattended only once a rule names it.
+**Evidence:** 31 Oct, no rule named ccp_machine_test: the thread's `gh api` issue filing there was refused [External System Writes], while the GitHub MCP issue tool and the headless builder's push and REST PR went through (retro-first-item finding 5).
+**Fate:** setup. A rule for each product repo the stand-in works in, on the person's list (waiting-for-person.md); engine-cards-standin's grant names the repo.

@@ -29,3 +29,6 @@ One line each: what, why, which item waits. Threads add to this; the person clea
   (`2026-10-30-engine-effects.md`).
 - Optional: the toy-2 merge card (scratch PR #24) in the engine-toy-run thread is still open. The toy run is proved on
   toy-v1 (your tap at 02:24Z merged scratch #26), so tap it or leave it (`2026-10-30-engine-toy-run.md`).
+- Add an allow rule for the product repo the stand-in works in (ccp_machine_test): with none, a thread's `gh api`
+  write there was refused while the GitHub MCP tool and the headless builder were not (ledger L-allow-rules-per-repo,
+  `plan/research/retro-first-item.md` finding 5). A settings change.
