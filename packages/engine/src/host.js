@@ -98,7 +98,7 @@ export function applyEvent(host, { event, source, run = null, at = new Date().to
     row: transitionRow(host, { outcome, reason, event, source, run, at, file, seq: null })
   });
 
-  if (host.owner && host.owner !== host.session) {
+  if (!ownedHere(host)) {
     return turnedAway('not-owner', `${host.item} is owned by ${host.owner}`, sessionFile(host.root, host.session));
   }
   if (!source?.system || !source?.ref) return turnedAway('refused', 'the event has no source', sessionFile(host.root, host.session));
@@ -154,11 +154,16 @@ export function persist(host, rows) {
  * world whether it happened. With no find(), it is journalled unknown and left alone. A refused effect is journalled
  * with its rule and never retried; a refused or failed run sends its actor's error event, so the item steps back.
  *
+ * Only the item's owner carries out its effects. A host restored by another session runs none of them and writes
+ * nothing to the item's file, so a card, post, run, timer or merge the owner has open is started by the owner alone
+ * (plan item fix-other-host-runs-effects, case C-two-hosts-one-item). Its events are turned away by applyEvent.
+ *
  * Returns { rows, follow }: the engine.effect rows written, and the events to apply next (completions with output).
  */
 export async function runEffects(host, handlers = {}) {
   const rows = [];
   const follow = [];
+  if (!ownedHere(host)) return { rows, follow };
   const write = (effect, phase, extra = {}) => {
     const row = effectRow(host, effect, phase, extra);
     persist(host, row);
@@ -214,7 +219,7 @@ export async function runEffects(host, handlers = {}) {
 }
 
 /**
- * Offer inputs to the item in turn: first carry out effects a stopped host left open, then for each input apply,
+ * Offer inputs to the item in turn: first carry out effects a stopped host left open (only as the owner), then for each input apply,
  * persist and run the effects, and apply what those effects send back. Returns each input's { outcome, row }.
  * When another session made the item's file first, the item is restored again and the input is turned away.
  */
@@ -249,6 +254,9 @@ export const pending = (host) => ({
 // ---- Inside
 
 const sourceKey = ({ system, ref }) => `${system} ${ref}`;
+
+// Whether this host's session may act for the item: it owns it, or nobody does yet (nothing is open then).
+const ownedHere = (host) => !host.owner || host.owner === host.session;
 
 // The error event that steps a run's item back when its effect was refused or failed. Its source is the effect.
 const stepBack = (effect, ended, error) => ({

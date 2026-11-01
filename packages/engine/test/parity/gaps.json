@@ -3,7 +3,6 @@
   "gaps": [
     { "case": "C-builder-cannot-change-own-workflow", "item": "fix-workflow-pinned", "why": "the host loads the workflow named on each call and pins no workflow or file hash at filing" },
     { "case": "C-finish-closes-waits", "item": "fix-finish-closes-waits", "why": "no handler carries out the stop effect, so a left card stays up, and quick-fix takes no event for its PR merged by another path" },
-    { "case": "C-two-hosts-one-item", "item": "fix-other-host-runs-effects", "why": "offer() runs the item's open effects whoever owns it, so another session's host posts the owner's pending card" },
     { "case": "C-waiting-does-not-stall", "item": "fix-waiting-wake", "why": "awaitingMerge and replanning set no timer, so no wake is scheduled for an item waiting on a card" }
   ]
 }

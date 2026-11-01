@@ -7,7 +7,8 @@ drives one item of it from what reaches it from outside (`src/host.js` and `src/
   `<root>/items/<item>.jsonl`, checking every recorded hash.
 - `applyEvent(host, { event, source, run?, at? })` offers one event and returns its `engine.transition` row and the
   effects it asks for. `persist(host, rows)` appends rows; `runEffects(host, handlers)` carries out the effects once
-  each by effect id. `offer(host, inputs, handlers)` does all three in turn.
+  each by effect id, and only when the host's session owns the item: another session's host turns its events away
+  as `not-owner` and runs none of the item's effects. `offer(host, inputs, handlers)` does all three in turn.
 - `inputsOfWake(host, text)` turns a wake the platform delivered into those inputs. It is the only place an event's
   source is read, and it reads it from the envelope or the host's own record.
 
