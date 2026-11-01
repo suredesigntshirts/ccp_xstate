@@ -15,7 +15,10 @@
   ],
   "depends_on": [
     "parity-cases",
-    "second-workflow"
+    "second-workflow",
+    "fix-finish-closes-waits",
+    "fix-waiting-wake",
+    "fix-workflow-pinned"
   ],
   "inputs": [
     {
