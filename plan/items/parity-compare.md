@@ -18,7 +18,8 @@
     "second-workflow",
     "fix-finish-closes-waits",
     "fix-waiting-wake",
-    "fix-workflow-pinned"
+    "fix-workflow-pinned",
+    "fix-other-host-runs-effects"
   ],
   "inputs": [
     {

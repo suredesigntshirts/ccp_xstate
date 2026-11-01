@@ -98,6 +98,7 @@
   },
   "verifier": "A separate subagent, using the Verifier brief below, writes three of the case tests itself from the case text and compares.",
   "risks": [
+    "An item whose start is refused (C-missing-expect-fails-closed) keeps the refusal row in its file, so the same item id can never start later, even with Expect lines: the refused start fails closed for good. Noted for parity-compare; not a case gap.",
     "No real wake has shown how the platform reports a push to a PR, so C-push-after-pass offers pr.pushed with a github source as the host takes it; how a push reaches the host from a real wake is for parity-compare to note, not this item."
   ]
 }
@@ -108,6 +109,6 @@
 Read plan/cases/ and packages/engine/test/parity/. Run the listing test, then in a scratch copy delete one parity test
 and one gaps.json entry and confirm it fails each time. Read every parity test and confirm it drives the host (restore
 and offer, applyEvent, bin/host.js, or the journal and its check) and stubs nothing but GitHub and the platform. Pick
-three cases not in gaps.json, including C-two-hosts-one-item, write their tests yourself from the case text without
+three cases not in gaps.json, including C-duplicate-wake-no-double-effect, write their tests yourself from the case text without
 reading the builder's, run both, and say where they disagree. For each case in gaps.json write a test from its case text
 and show it red on the head. Read the ci check run at the head sha on GitHub. Verdict per Expect id.
