@@ -37,3 +37,8 @@ a risk on parity-cases for parity-compare, not a gap.
 Also found: a start refused for missing Expect lines leaves its refused row in the item's file, so `persist` later
 finds the file and the same item id can never start, even with Expect lines (the host takes the file as another
 session's). The case is met (it fails closed), so this is a risk on parity-cases for parity-compare, not a gap.
+
+**Outcome (2026-11-01 11:16Z).** parity-cases merged (PR #59, verdict all five MET at 85de49c by a separate verifier
+subagent). 13 cases pass through the host; the four above stay in `gaps.json`. The verifier's
+`verify/parity-cases/*.gap.test.mjs` assert today's behaviour for each gap, so each fix item deletes its own one with
+its gaps entry. The s5 cases-pass gate is not passed until the four fix items land.
