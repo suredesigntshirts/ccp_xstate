@@ -4,7 +4,7 @@
   "title": "Pass every case v1 met, end to end",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Every live case in plan/cases/ has a test under packages/engine/test/parity/, named by its id, that drives the real host (restore and offer, bin/host.js, the journal and its check) with stubs only for GitHub and the platform, and all of them pass, except a case the engine is known not to meet: that one is listed in packages/engine/test/parity/gaps.json with the live fix item that will meet it.",
   "why": "Fragment tests prove the rules. These prove the whole host behaves, which is what 'on par with v1' means. A case the engine doesn't meet yet is not hidden and not built here (non_goals): it is named, with its own fix item, so the s5 gate shows what is left (plan/decisions/2026-11-01-parity-cases-gaps.md).",
   "serves": [
