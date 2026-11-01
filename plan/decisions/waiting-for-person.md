@@ -32,3 +32,5 @@ One line each: what, why, which item waits. Threads add to this; the person clea
 - Add an allow rule for the product repo the stand-in works in (ccp_machine_test): with none, a thread's `gh api`
   write there was refused while the GitHub MCP tool and the headless builder were not (ledger L-allow-rules-per-repo,
   `plan/research/retro-first-item.md` finding 5). A settings change.
+- second-workflow: pick the second real item and the workflow it runs through (feature or research). It stays a
+  draft until you choose, and parity-compare waits on it (plan item second-workflow).
