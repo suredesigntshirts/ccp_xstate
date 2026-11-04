@@ -7,3 +7,6 @@ Each file is one wake as the platform delivered it, verbatim, read with claude-c
   and 19:27:48Z. They reached the session as the body of a ReadNotifications result (origin `github_webhook`), not
   as its prompt: a PR event wakes the session with "notifications pending", and the session reads them.
 - `tap-wake.txt`: a decision-chosen wake, copied from `plugins/harness/test/fixtures/attention/` (see its README).
+- `reminder-notification.json`: a send_later reminder as it reached a thread (plan item fix-reminder-wake): the
+  ReadNotifications result its session transcript recorded (`toolUseResult`) for a one-minute send_later scheduled
+  by the "Fix the reminder wake" thread on 2026-11-04, fired 23:10:35Z. Origin `trigger_fire`; no `<wake>` envelope.
