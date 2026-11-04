@@ -46,3 +46,12 @@ Item: fix-waiting-wake. Two-way doors, decided by the building thread as the per
 
 A thread that sleeps through a whole night after one check. Then the timer repeats, and the cost of a nested state
 is paid.
+
+## Outcome
+
+Built in PR #85 and released as harness-v0.1.21. A separate verifier session marked all six Expect lines MET at
+a740c55 (`verify/fix-waiting-wake/verdict.json`), so the item is done. In its thread-wake run, the send_later reminder
+arrived as a notification rather than a `<wake>` envelope, so the verifier wrapped it as a wake before feeding it to
+`bin/host.js wake`. A session that schedules a checkBack wake should do the same until the host reads that
+notification shape. All four parity gaps are now closed (`gaps.json` is empty), so the s5 cases-pass gate can be
+judged.
