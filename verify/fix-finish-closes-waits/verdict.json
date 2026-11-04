@@ -1,7 +1,10 @@
 {
   "item": "fix-finish-closes-waits",
   "verified_sha": "bc261f866f88c02e28602ce7da9a5c796627f954",
-  "verifier": { "session": "https://claude.ai/code/session_01KfkB5FhYwvFcAdzpHbcZR8", "model": "claude-opus-5-5" },
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FhYwvFcAdzpHbcZR8",
+    "model": "claude-opus-5-5"
+  },
   "results": [
     {
       "id": "left-closes",
@@ -27,7 +30,9 @@
       "id": "view-closed",
       "status": "MET",
       "command": "node --test plugins/harness/pages/observe/test/item.test.mjs (builder proof)",
-      "excerpt": "pass 5, fail 0. The builder's test over a stopped ask's rows: asks.length 1, open false, closedAt the stop's done time, answeredAt null, waitMs ends at the stop not at now; before the stop is done the ask is still open."
+      "excerpt": "pass 5, fail 0. The builder's test over a stopped ask's rows: asks.length 1, open false, closedAt the stop's done time, answeredAt null, waitMs ends at the stop not at now; before the stop is done the ask is still open. I read the view code: closedAt is the stop's done row time unless answered, open is !answeredAt && !closedAt, waitMs ends at closedAt.",
+      "mutation": "plugins/harness/pages/observe/data.js itemView: `const closedAt = answeredAt ? null : stops.get(effect)?.at ?? null;` replaced by `const closedAt = null;` (a stopped ask never counts as closed)",
+      "red_test": "plugins/harness/pages/observe/test/item.test.mjs: 'a stopped ask is closed, not open, and its wait ends when its stop is done (fix-finish-closes-waits)' (not ok 5; pass 4, fail 1)"
     },
     {
       "id": "thread-card",
