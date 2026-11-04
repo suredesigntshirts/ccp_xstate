@@ -26,13 +26,18 @@ export { item, childResults, settle, openItems, pump } from './item.js';
 
 export { github, GitHubError } from './github.js';
 export { prRef } from './merge.js';
-export { relay, recordCard, cardFile } from './relay.js';
+export { relay, recordCard, recordClosed, cardFile, closedFile } from './relay.js';
 
 /**
- * Handlers for runEffects: { run, timer, cancel }. `github` is a client from github.js; `hearth` ({ card, post,
+ * Handlers for runEffects: { run, stop, timer, cancel }. `github` is a client from github.js; `hearth` ({ card, post,
  * find? }) reaches the thread, and without it cards and posts stay pending; `clock` ({ wakeAt?, drop? }) schedules
  * the wake a timer needs. `actors` adds run handlers by actor name. A hearth with ready(effect) (relay.js) holds a
  * card or post until it says the thread side is done.
+ *
+ * stop (plan item fix-finish-closes-waits): a run's state was left. An ask's card is closed through hearth.close by the
+ * run's key; with no hearth.close the stop stays pending for a host that has one, and a hearth with ready(effect) holds
+ * it until the thread side has closed the card. Any other stopped run has nothing in front of the person: its stop
+ * ends at once, and a late result is turned away as stale.
  */
 export function handlers({ github, hearth = null, clock = {}, actors = {}, host = null, workflows = [], load, handlersFor } = {}) {
   const byActor = {
@@ -51,6 +56,12 @@ export function handlers({ github, hearth = null, clock = {}, actors = {}, host 
       find: (effect) => (byActor[effect.actor].find ? byActor[effect.actor].find(effect) : undefined),
       // The run's done or error event was applied (host.js offer): a handler may record where its output went.
       ended: (effect, row) => byActor[effect.actor]?.ended?.(effect, row)
+    },
+    stop: {
+      handles: (effect) => effect.actor !== 'ask' || (Boolean(hearth?.close) && !(hearth.ready && !hearth.ready(effect))),
+      start: (effect) => (effect.actor === 'ask' ? card({ hearth }).stop(effect) : { closed: null }),
+      // A stop that started and never ended is asked again: closing a closed card changes nothing.
+      find: async () => null
     },
     timer: timer({ clock }),
     cancel: cancel({ clock })

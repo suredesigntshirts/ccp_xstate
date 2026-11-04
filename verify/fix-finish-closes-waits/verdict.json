@@ -1,0 +1,50 @@
+{
+  "item": "fix-finish-closes-waits",
+  "verified_sha": "963babc763b79e7fc2502fa9052794c4a4714cb6",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FhYwvFcAdzpHbcZR8",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "left-closes",
+      "status": "MET",
+      "command": "npm ci; node --test verify/fix-finish-closes-waits/left-closes.test.mjs (real engine, handlers() from packages/engine/src/effects over a thread client that records every card, close and post; one fresh item per path)",
+      "excerpt": "From awaitingMerge with one card up, moved on by a push (B), a red check on head A, pull_request.closed outcome merged, and outcome closed: each time thread.closes is exactly [{ key: <ask run id>, ref: <card id> }], pending() has no stop effect and no ask run, and the stop's journal rows are start then done with outcome { closed: <card id> }, actor ask. Offering again closes nothing more. The two closed wakes end in closedOutside (final, never done), failure = { closedOutside: 'o/r#1', outcome: merged|closed }, one card ever made, one ask run ever started, no merge run and no merge effect row. A pull_request.closed for another PR (o/r#2) moves nothing and closes nothing.",
+      "mutation": "packages/engine/src/effects/card.js stop(): `const closed = await hearth.close({ key: effect.run });` replaced by `const closed = null;`",
+      "red_test": "Under the mutation all four left-closes tests go red (not ok 1-4), and the builder's packages/engine/test/parity/C-finish-closes-waits.test.js goes red (6 of 7) and tourney Q7 goes red."
+    },
+    {
+      "id": "nothing-else-held",
+      "status": "MET",
+      "command": "node --test verify/fix-finish-closes-waits/nothing-else-held.test.mjs",
+      "excerpt": "A verify run left open in verifying and moved on by a push: its stop effect names actor verify, is done with outcome { closed: null }, and the thread was asked to close nothing. An ask whose card was never made (the thread holds it: ready false) moved on by a push: the stop is done with { closed: null }, no card made, the close call returned no card, nothing pending, and the never-started ask run is not listed as pending. A tap wake naming the closed card's id yields no inputs (the run is gone), and a forged completion naming the stopped run is not applied: the state and merge count are unchanged."
+    },
+    {
+      "id": "parity",
+      "status": "MET",
+      "command": "TMPDIR=<fresh> node --test packages/engine/test/parity/*.test.js packages/engine/test/tourney/*.test.js; git diff origin/main...bc261f8 -- packages/engine/test/parity packages/engine/test/tourney verify/parity-cases",
+      "excerpt": "tests 110, pass 110, fail 0, skipped 0 (C-finish-closes-waits.test.js and cases.test.js among them). gaps.json lists only C-waiting-does-not-stall. verify/parity-cases/C-finish-closes-waits.gap.test.mjs is deleted. Scenario changes: Q7 (now expects closedOutside, failure { closedOutside, outcome: merged }, no open card, one card, tap moves nothing, never done) and Q2's stop check (reads an agent run's stop from done effect rows instead of pending(); the asserted fact, that the verify run for A was stopped, is unchanged). This matches main's Expect text (replan #81, a91a1d3), which names exactly Q7 and Q2's stop check. At 963babc the PR no longer changes plan/ (git diff origin/main...963babc -- plan/ is empty), so main's parity line, naming Q7 and Q2's stop check, is the contract; the only change since bc261f8 is that plan file restored."
+    },
+    {
+      "id": "view-closed",
+      "status": "MET",
+      "command": "node --test plugins/harness/pages/observe/test/item.test.mjs (builder proof)",
+      "excerpt": "pass 5, fail 0. The builder's test over a stopped ask's rows: asks.length 1, open false, closedAt the stop's done time, answeredAt null, waitMs ends at the stop not at now; before the stop is done the ask is still open. I read the view code: closedAt is the stop's done row time unless answered, open is !answeredAt && !closedAt, waitMs ends at closedAt.",
+      "mutation": "plugins/harness/pages/observe/data.js itemView: `const closedAt = answeredAt ? null : stops.get(effect)?.at ?? null;` replaced by `const closedAt = null;` (a stopped ask never counts as closed)",
+      "red_test": "plugins/harness/pages/observe/test/item.test.mjs: 'a stopped ask is closed, not open, and its wait ends when its stop is done (fix-finish-closes-waits)' (not ok 5; pass 4, fail 1)"
+    },
+    {
+      "id": "thread-card",
+      "status": "MET",
+      "command": "In this verifier's thread: bin/host.js start/wake (stub agents bound and returned through spawn/bind/accept, local GitHub at CCP_GITHUB_API) with --root /mnt/project-files/verify-runs/fix-finish-closes-waits/journal, item vfcw-3; request_decision; bin/host.js card; bin/host.js wake < UserPromptSubmit hook input whose prompt is a pull_request.closed wake (outcome merged, pr o/r#1); bin/host.js show; close_decision; bin/host.js closed; bin/host.js show; read_thread. Evidence in /mnt/project-files/verify-runs/fix-finish-closes-waits/evidence/.",
+      "excerpt": "Item at awaitingMerge with ask run vfcw-3:3.ask. Card cmsg_01VhYV3jhQ9s4qrrh2th12sNKj72poUZstGvFVcGK9FW7j put up with request_decision and recorded with `card`. The wake applied github.pull_request.closed -> closedOutside; `show` listed pending effects [vfcw-3:3.ask:stop (stop, actor ask)] and no runs. Withdrew the card with close_decision; `closed --effect vfcw-3:3.ask` wrote cards/3.ask.closed.json and finished the stop as the owner: rows 'engine.effect vfcw-3:3.ask:stop stop start' then 'done {closed: cmsg_01VhYV3jhQ9s4qrrh2th12sNKj72poUZstGvFVcGK9FW7j}' in state closedOutside. `show` after: pending effects [], runs [], timers []. A second `closed` is refused ('has no stop waiting'). read_thread shows the card's activity 'Withdrew the card', close: withdrawn, closed_by session. Note: the stop finished within the `closed` call itself (as `card` finishes the card effect), so no further call was needed. Items vfcw-1 and vfcw-2 in the same journal are abandoned driver attempts (worktree on the mount, verify worktree not at head), not part of the check."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 82",
+      "excerpt": "Check run 'test' (id 126850501479) completed success at head bc261f8; clean-room success; 'gates' failed only because no verdict existed yet. Re-stamp at 963babc: 'test' run 126860048351 was still in progress when stamped; 963babc differs from bc261f8 only in plan/items/fix-finish-closes-waits.md, and the merge rule still needs ci green at the head."
+    }
+  ]
+}

@@ -21,6 +21,7 @@ node packages/engine/bin/host.js start --item <id> --workflow quick-fix --input 
 node packages/engine/bin/host.js wake --item <id> --workflow quick-fix < <hook input JSON>
 node packages/engine/bin/host.js show --item <id> --workflow quick-fix
 node packages/engine/bin/host.js card --item <id> --workflow quick-fix --effect <ask run id> --ref <card id>
+node packages/engine/bin/host.js closed --item <id> --workflow quick-fix --effect <ask run id>
 node packages/engine/bin/host.js answer --item <id> --workflow quick-fix --effect <ask run id> --choice <c> --by <session> [--grants <file>]
 ```
 
@@ -38,12 +39,15 @@ command.
 | `card.js` | a run of the `ask` actor | puts up a decision card keyed by the effect id; the tap wake is the answer |
 | `post.js` | a run of the `post` actor | posts `input.text` in the thread; the message id is the output |
 | `timer.js` | a delayed transition | asks the clock for a wake at the due time; the host fires the timer from that wake |
+| `stop` (`index.js`) | a run whose state was left | an `ask` run's card is closed by its key (`hearth.close`), so nothing waits on the person; any other run's stop ends at once, and its late result is stale |
 
 `handlers({ github, hearth, clock })` builds them. `github` (`src/effects/github.js`) reaches api.github.com through
 the session's proxy itself. A command can't reach the thread or schedule a wake, so in `bin/host.js` posts and timers
 stay pending (and printed). Its cards go through `src/effects/relay.js` (plan item engine-toy-run): the session that
 has the thread's tools posts the card `show` lists and records its id with `card`, which then finishes the card
-effect with that id as the item's owner (so the item's file names the card; plan item engine-item-views), so the tap wake on that card answers the run. `scripts/toy-run.sh` runs the whole loop;
+effect with that id as the item's owner (so the item's file names the card; plan item engine-item-views), so the tap wake on that card answers the run. When the item leaves the state that asked, `show` lists the ask run's
+`stop` under pending; the session withdraws the card (`close_decision` with no choice) and records that with `closed`,
+which finishes the stop (plan item fix-finish-closes-waits). `scripts/toy-run.sh` runs the whole loop;
 why: `plan/decisions/2026-10-30-engine-toy-run.md`. Agent actors are
 prepared by `src/actors.js` (below).
 

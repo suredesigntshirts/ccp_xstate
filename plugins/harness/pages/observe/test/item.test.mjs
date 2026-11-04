@@ -78,3 +78,20 @@ test('an item is a scope: its rows, its agents\' rows and its driving sessions\'
   assert.equal(observe(journal, { item: ITEM }).item.state, 'done');
   assert.equal(observe(journal, {}).item, null);
 });
+
+test('a stopped ask is closed, not open, and its wait ends when its stop is done (fix-finish-closes-waits)', () => {
+  // The same item to its merge card, then a PR merged elsewhere: the state is left at 05:00 and the card withdrawn at 05:30.
+  const left = [
+    ...journal.slice(0, 14),
+    transition('05:00', 4, 'closedOutside', { type: 'github.pull_request.closed', outcome: 'merged', pr: 'o/r#1' }),
+    row('05:30', 'engine.effect', { item: ITEM, state: '"closedOutside"', payload: { effect: `${ITEM}:3.ask:stop`, type: 'stop', phase: 'start', actor: 'ask', outcome: null } }),
+    row('05:30', 'engine.effect', { item: ITEM, state: '"closedOutside"', payload: { effect: `${ITEM}:3.ask:stop`, type: 'stop', phase: 'done', actor: 'ask', outcome: { closed: CARD } } }),
+  ];
+  const v = itemView(left, ITEM, { now: '2026-10-31T09:00:00.000Z' });
+  assert.equal(v.asks.length, 1, 'the stop is not counted as an ask of its own');
+  const [ask] = v.asks;
+  assert.deepEqual([ask.open, ask.closedAt, ask.answeredAt], [false, '2026-10-31T03:05:30.000Z', null]);
+  assert.equal(ask.waitMs, Date.parse('2026-10-31T03:05:30.000Z') - Date.parse('2026-10-31T03:02:05.000Z'), 'not until now');
+  // Before the stop is done, the ask is still open.
+  assert.equal(itemView(left.slice(0, -1), ITEM, { now: '2026-10-31T09:00:00.000Z' }).asks[0].open, true);
+});
