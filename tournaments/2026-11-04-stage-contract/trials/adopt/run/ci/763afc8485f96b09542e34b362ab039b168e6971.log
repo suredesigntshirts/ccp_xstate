@@ -1,0 +1,48 @@
+$ npm test (at 763afc8485f96b09542e34b362ab039b168e6971)
+
+> mathlib@1.0.0 test
+> node --test
+
+TAP version 13
+# Subtest: add sums two numbers
+ok 1 - add sums two numbers
+  ---
+  duration_ms: 3.030773
+  type: 'test'
+  ...
+# Subtest: subtract returns the difference
+ok 2 - subtract returns the difference
+  ---
+  duration_ms: 0.424516
+  type: 'test'
+  ...
+# Subtest: multiply returns the product
+ok 3 - multiply returns the product
+  ---
+  duration_ms: 0.356385
+  type: 'test'
+  ...
+# Subtest: clamp limits x to the range lo to hi
+ok 4 - clamp limits x to the range lo to hi
+  ---
+  duration_ms: 0.621103
+  type: 'test'
+  ...
+# Subtest: clamp throws a RangeError when lo is greater than hi
+ok 5 - clamp throws a RangeError when lo is greater than hi
+  ---
+  duration_ms: 0.98615
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 126.565123
+
+
+exit 0

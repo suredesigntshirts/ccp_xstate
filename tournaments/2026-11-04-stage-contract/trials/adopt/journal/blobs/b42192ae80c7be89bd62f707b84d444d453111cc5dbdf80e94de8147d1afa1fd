@@ -1,0 +1,15 @@
+Make one pull request in this repository (mathlib: math.js, README.md, test/math.test.js, package.json whose test script is `node --test`) that meets every line below.
+
+Acceptance lines (these are the pass or fail conditions):
+1. math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+2. clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+3. README.md documents every function math.js exports
+4. npm test passes
+
+Steps:
+1. Read math.js, README.md and test/math.test.js first. math.js currently exports add, subtract and multiply via `module.exports = { add, subtract, multiply };`. Note that README.md's API section documents add and multiply but not subtract.
+2. In math.js, add a function `clamp(x, lo, hi)` in the same style as the existing functions (a one-line doc comment, 'use strict' CommonJS). It must first check whether lo > hi and, if so, throw a `RangeError` with a clear message (for example naming lo and hi). Otherwise return lo when x < lo, hi when x > hi, and x itself when lo <= x <= hi (so the bounds are inclusive and clamp(x, v, v) returns v). Add clamp to the `module.exports` object, keeping add, subtract and multiply exported unchanged.
+3. In README.md's `## API` section, add a `### clamp(x, lo, hi)` entry matching the existing entries: one sentence saying it returns x limited to the range lo to hi and throws a RangeError when lo is greater than hi, plus a short js example (e.g. `clamp(-5, 0, 100); // 0`, `clamp(140, 0, 100); // 100`, `clamp(42, 0, 100); // 42`). Also add a `### subtract(a, b)` entry (it is exported but currently undocumented), so that every name in math.js's `module.exports` has its own `### name(...)` heading in README.md. Do not remove the existing add and multiply entries.
+4. In test/math.test.js, add tests for clamp: a value below the range returns lo, above returns hi, inside returns x unchanged, values equal to each bound return that bound, lo equal to hi returns that value, and `assert.throws(() => clamp(5, 10, 0), RangeError)`. Import clamp alongside the existing imports.
+5. Run `npm test` from the repository root and confirm it exits 0 with all tests passing, including the existing add, subtract and multiply tests. Also run `node -e "const m=require('./math.js'); console.log(Object.keys(m))"` and confirm every listed name has a heading in README.md.
+6. Commit the changes to math.js, README.md and test/math.test.js only, and open the pull request referencing https://github.com/o/r/issues/23 in its body.
