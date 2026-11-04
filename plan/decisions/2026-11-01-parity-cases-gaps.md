@@ -42,3 +42,8 @@ session's). The case is met (it fails closed), so this is a risk on parity-cases
 subagent). 13 cases pass through the host; the four above stay in `gaps.json`. The verifier's
 `verify/parity-cases/*.gap.test.mjs` assert today's behaviour for each gap, so each fix item deletes its own one with
 its gaps entry. The s5 cases-pass gate is not passed until the four fix items land.
+
+**fix-other-host-runs-effects (2026-11-01 11:36Z).** Merged (PR #62, verdict all five MET at 3ceaf95 by a separate
+verifier subagent, including the mount check under /mnt/project-files with two real session ids). `runEffects` now
+runs nothing for a host whose session doesn't own the item; C-two-hosts-one-item has its parity test and left
+`gaps.json`. Three gaps remain. No release: the change is in packages/engine only.
