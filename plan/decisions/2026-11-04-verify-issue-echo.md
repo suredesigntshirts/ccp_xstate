@@ -28,3 +28,8 @@ The Schema's `required` list then says what must be carried, and the Output text
 
 A reader that needs the verdict's issue to be complete (for example a page that shows the verdict alone). Then the
 host should copy the issue into the stored verdict itself rather than ask the agent to echo it.
+
+## Outcome
+
+Built in PR #79. A separate verifier session marked all five Expect lines MET at 2c0310e
+(`verify/fix-verify-issue-echo/verdict.json`), so the item is done.
