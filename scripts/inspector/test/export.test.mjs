@@ -439,17 +439,17 @@ function stageFixture() {
   writeFileSync(join(journal, 'items', 't', 'runs', '0.plan', 'brief.md'), '## Task\nplan it\n');
   writeFileSync(join(journal, 'items', 't', 'runs', '1.do', 'brief.md'), '## Task\ndo it\n');
   const plan = { run: 't:0.plan', stage: 'plan', invoke: 'plan', state: 'a', invokeAt: '/states/a/invoke', workflow: { id: 'tiny', name: 'tiny', hash: null }, started: 't#0',
-    prompt: { hash: 'h0', parts: { rules: [{ text: 'Data rule.', source: { frame: 'DATA_RULE' } }], task: [{ text: 'plan it', source: { input: 'task' } }],
-      return: [{ text: 'Run t:0.plan.', source: { frame: 'runLine' } }] } },
+    prompt: { hash: 'h0', parts: { rules: [{ text: 'Data rule.', source: { frame: 'DATA_RULE', fixed: true } }], task: [{ text: 'plan it', source: { input: 'task' } }],
+      return: [{ text: 'Run t:0.plan.', source: { frame: 'runLine', filled: { run: 't:0.plan' } } }] } },
     inputs: [{ name: 'task', meaning: 'What to plan.', meaningAt: '/meta/actors/plan/inputs/task', value: 'plan it', from: { value: 'plan it' }, wiredAt: '/states/a/invoke/input/task', producer: { kind: 'literal', at: '/states/a/invoke/input/task/value' } }],
-    ended: { transition: 't#1', event: 'xstate.done.actor.plan', state: 'b' }, output: { steps: 'do it' },
+    finished: { transition: 't#1', event: 'xstate.done.actor.plan', state: ['b'] }, output: { steps: 'do it' }, stamped: [],
     wrote: [{ path: 'plan', from: 'event.output', at: '/states/a/invoke/onDone/actions/0/params/plan', into: 'b',
-      readBy: [{ actor: 'do', invoke: 'do', state: 'b', input: 'task', reads: 'context.plan.steps', at: '/states/b/invoke/input/task', kind: 'stage' }] }] };
+      replaced: null, readBy: [{ actor: 'do', invoke: 'do', state: 'b', input: 'task', reads: 'context.plan.steps', at: '/states/b/invoke/input/task', kind: 'stage' }] }] };
   const doer = { run: 't:1.do', stage: 'do', invoke: 'do', state: 'b', invokeAt: '/states/b/invoke', workflow: { id: 'tiny', name: 'tiny', hash: null }, started: 't#1',
     prompt: { hash: 'h1', parts: { task: [{ text: 'do it', source: { input: 'task' } }], output: [{ text: 'Schema: {}', source: { workflow: '/meta/actors/do', inlined: '/meta/schemas' } }] } },
     inputs: [{ name: 'task', meaning: 'The steps.', value: 'do it', from: 'context.plan.steps', wiredAt: '/states/b/invoke/input/task',
       producer: { kind: 'stage', run: 't:0.plan', actor: 'plan', field: 'steps', transition: 't#1', at: '/states/a/invoke/onDone/actions/0/params/plan' } }],
-    ended: { transition: 't#2', event: 'xstate.done.actor.do', state: 'c' }, output: { done: true }, wrote: [] };
+    finished: { transition: 't#2', event: 'xstate.done.actor.do', state: ['c'] }, output: { done: true }, stamped: [], wrote: [] };
   writeFileSync(join(journal, 'items', 't', 'runs', '0.plan', 'stage.json'), JSON.stringify(plan));
   writeFileSync(join(journal, 'items', 't', 'runs', '1.do', 'stage.json'), JSON.stringify(doer));
   return { engine, journal };
@@ -465,7 +465,8 @@ test('stage.json goes into the run bundle: prompt parts with sources, inputs wit
   assert.ok(!('stageRaw' in JSON.parse(JSON.stringify(plan))), 'the raw record is not exported twice');
   // Instructions: parts in the engine's order, each piece with its source.
   assert.deepEqual(plan.stage.parts.map((p) => p.part), ['rules', 'task', 'return']);
-  assert.deepEqual(plan.stage.parts[0].pieces[0].source, { kind: 'frame', name: 'DATA_RULE', label: 'harness frame: DATA_RULE', detail: 'fixed text in the engine (packages/engine/src/stages.js), the same for every stage' });
+  assert.deepEqual(plan.stage.parts[0].pieces[0].source, { kind: 'frame', name: 'DATA_RULE', label: 'harness frame: DATA_RULE', fixed: true, filled: null, detail: 'fixed text in the engine (packages/engine/src/stages.js), the same for every stage' });
+  assert.match(plan.stage.parts.find((p) => p.part === 'return').pieces[0].source.detail, /filled in with this run's run/);
   assert.equal(doer.stage.parts.find((p) => p.part === 'output').pieces[0].source.at, '/meta/actors/do');
   const taskSrc = doer.stage.parts.find((p) => p.part === 'task').pieces[0].source;
   assert.equal(taskSrc.kind, 'input');
@@ -480,7 +481,7 @@ test('stage.json goes into the run bundle: prompt parts with sources, inputs wit
   assert.deepEqual(inp.producer.step, { index: 1, seq: 1 });
   // Output: the value, the path written, and the later run that read it.
   assert.deepEqual(plan.stage.output, { steps: 'do it' });
-  assert.deepEqual(plan.stage.ended, { transition: 't#1', step: { index: 1, seq: 1 }, event: 'xstate.done.actor.plan', state: 'b', stopped: false });
+  assert.deepEqual(plan.stage.finished, { transition: 't#1', step: { index: 1, seq: 1 }, event: 'xstate.done.actor.plan', state: 'b', stopped: false });
   const rb = plan.stage.wrote[0].readBy[0];
   assert.deepEqual(rb.runs, [{ run: 't:1.do', index: 1, seq: 1, actor: 'do', invoke: 'do', read: true }]);
   // The item's flow: start order, and the context path between the two runs.
@@ -505,9 +506,13 @@ test('producerRef words every producer kind, and a run without stage.json export
   assert.equal(parts.parts[0].detail, 'its whole output');
   assert.equal(parts.parts[1].detail, 'its error');
   assert.equal(parts.parts[1].link, null, 'a run not in this item is named, not linked');
-  // A parts producer's part-writes are not repeated as amendments.
-  const v = stageView({ run: 'x:3.w', stage: 'w', invoke: 'w', state: 's', inputs: [{ name: 'answers', from: 'context.answers', producer: { kind: 'parts', parts: [{ path: 'answers.q1', run: 'x:1.build', kind: 'stage', transition: 'x#2' }] }, amended: [{ path: 'answers.q1', by: { kind: 'stage', run: 'x:1.build', transition: 'x#2' } }] }], prompt: { parts: {} } }, ctx);
-  assert.deepEqual(v.inputs[0].amended, []);
+  // A write that replaced an earlier one names it; a reader that is the writing invoke itself is marked self.
+  const v = stageView({ run: 'x:1.build', stage: 'build', invoke: 'build', state: 'building', inputs: [], prompt: { parts: {} }, finished: { transition: 'x#2', event: 'xstate.done.actor.build', state: ['checking'] }, output: { pr: { url: 'u', at: 'a', key: 'k' } }, stamped: ['pr.key'],
+    wrote: [{ path: 'pr', from: 'event.output.pr', into: 'checking', replaced: { kind: 'stage', run: 'x:1.build', actor: 'build', field: 'pr' }, readBy: [{ actor: 'build', invoke: 'build', state: 'building', input: 'previous', reads: 'context.pr', kind: 'stage', self: true }] }] }, ctx);
+  assert.equal(v.wrote[0].replaced.link.run, 'x:1.build');
+  assert.equal(v.wrote[0].readBy[0].self, true);
+  assert.deepEqual(v.stamped, ['pr.key']);
+  assert.equal(v.finished.state, 'checking');
   assert.equal(flowOf([{ run: 'x:1.build', actor: 'build', stage: null }], ctx.steps), null);
 });
 
@@ -522,6 +527,8 @@ test('lane S Q1 and R1: every model run has its stage record, producers link to 
   assert.equal(target.producer.link.actor, 'build');
   assert.ok(target.amended.length, 'the CI event changed parts of the PR after build returned it');
   assert.equal(verify.stage.inputs.find((i) => i.name === 'checkout').producer.kind, 'host');
+  assert.ok(models.find((a) => a.actor === 'build').stage.stamped.includes('pr.key'), 'build output names the paths the harness stamped');
+  assert.ok(models.every((a) => a.stage.parts.every((p) => p.pieces.every((x) => x.source.kind !== 'frame' || x.source.fixed || x.source.filled))), 'every frame piece says fixed or filled');
   const build = models.find((a) => a.actor === 'build');
   const pr = build.stage.wrote.find((w) => w.path === 'pr');
   assert.ok(pr.readBy.some((rb) => rb.runs.some((x) => x.run === verify.effect && x.read === true)), 'build.pr is read by the verify run');

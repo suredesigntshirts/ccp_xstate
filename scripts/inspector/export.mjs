@@ -1067,7 +1067,7 @@ export function stampOf(engineSources, key, { nested = false } = {}) {
 /** Every item of a journal root as a bundle. */
 // ---- The stage record: runs/<n>.<actor>/stage.json, which an engine that writes it (the stage-contract lanes) leaves
 // in each model stage's run folder. It says what went into the prompt and from where, which earlier run produced each
-// input, and where the output went. The page shows it as the run's "Stage" view; nothing here is inferred, it is the
+// input, and where the output went (finished, output or error, the paths the harness stamped, and wrote). The page shows it as the run's "Stage" view; nothing here is inferred, it is the
 // engine's own record with each run id it names resolved to a run of this item.
 
 const PART_ORDER = ['rules', 'inputs', 'task', 'output', 'return'];
@@ -1116,17 +1116,18 @@ const names = (p, id) => !!p && (p.run === id || (p.kind === 'copy' && names(p.o
 
 function sourceRef(src, byName, ctx) {
   if (!src || typeof src !== 'object') return { kind: 'unknown', label: 'not recorded' };
-  if (src.frame != null) return { kind: 'frame', name: src.frame, label: `harness frame: ${src.frame}`, detail: 'fixed text in the engine (packages/engine/src/stages.js), the same for every stage' };
+  if (src.frame != null) return { kind: 'frame', name: src.frame, label: `harness frame: ${src.frame}`, fixed: !!src.fixed, filled: src.filled ?? null,
+    detail: src.filled ? `an engine template, filled in with this run's ${Object.keys(src.filled).join(', ')}` : src.fixed ? 'fixed text in the engine (packages/engine/src/stages.js), the same for every stage' : 'engine text (the record does not say whether it is fixed or filled in)' };
   if (src.workflow != null) return { kind: 'workflow', at: src.workflow, inlined: src.inlined ?? null, label: 'workflow JSON', detail: src.inlined ? `with ${src.inlined} inlined` : null };
   if (src.input != null) {
     const inp = byName[src.input];
-    return { kind: 'input', input: src.input, meaningAt: src.meaning ?? null, from: src.from ?? inp?.from ?? null, label: `input ${src.input}`,
+    return { kind: 'input', input: src.input, meaningAt: src.meaningAt ?? null, from: src.from ?? inp?.from ?? null, label: `input ${src.input}`,
       producer: inp?.producer ?? producerRef(src.producer, ctx) };
   }
   return { kind: 'unknown', label: JSON.stringify(src) };
 }
 
-const leavesText = (v) => (v == null ? null : typeof v === 'string' ? v : leavesOf(v).join(' + '));
+const leavesText = (v) => (v == null ? null : typeof v === 'string' ? v : Array.isArray(v) ? v.join(' + ') : leavesOf(v).join(' + '));
 
 /**
  * The page's Stage view of one stage.json: the prompt as parts (each piece with its source), the inputs (each with its
@@ -1138,9 +1139,7 @@ const leavesText = (v) => (v == null ? null : typeof v === 'string' ? v : leaves
 export function stageView(raw, ctx) {
   const inputs = (raw.inputs ?? []).map((i) => {
     const producer = producerRef(i.producer, ctx);
-    // A parts producer already lists the part-writes; the engine repeats them under amended.
-    const amended = (i.amended ?? []).filter((x) => !(i.producer?.kind === 'parts' && (i.producer.parts ?? []).some((q) => q.path === x.path && q.transition === x.by?.transition)))
-      .map((x) => ({ path: x.path, by: producerRef(x.by, ctx) }));
+    const amended = (i.amended ?? []).map((x) => ({ path: x.path, by: producerRef(x.by, ctx) }));
     const literal = i.from && typeof i.from === 'object';
     return { name: i.name, meaning: i.meaning ?? null, meaningAt: i.meaningAt ?? null, value: i.value ?? null, from: literal ? null : i.from ?? null, literal, wiredAt: i.wiredAt ?? null, producer, amended };
   });
@@ -1148,10 +1147,11 @@ export function stageView(raw, ctx) {
   const rawParts = raw.prompt?.parts ?? {};
   const order = [...PART_ORDER.filter((k) => k in rawParts), ...Object.keys(rawParts).filter((k) => !PART_ORDER.includes(k))];
   const parts = order.map((part) => ({ part, pieces: (rawParts[part] ?? []).map((p) => ({ text: p.text ?? '', source: sourceRef(p.source, byName, ctx) })) }));
-  const endSeq = seqOfTransition(raw.ended?.transition);
+  const fin = raw.finished ?? null;
+  const endSeq = seqOfTransition(fin?.transition);
   const endStep = endSeq == null ? null : ctx.steps.find((s) => s.seq === endSeq);
   const wrote = (raw.wrote ?? []).map((w) => ({
-    path: w.path, from: w.from ?? null, at: w.at ?? null, into: leavesText(w.into),
+    path: w.path, from: w.from ?? null, at: w.at ?? null, into: leavesText(w.into), replaced: w.replaced ? producerRef(w.replaced, ctx) : null,
     readBy: (w.readBy ?? []).map((rb) => {
       const later = ctx.runs.filter((r) => r.invoke === rb.invoke && r.state === rb.state && r.run !== raw.run && endSeq != null && r.seq >= endSeq);
       const judged = later.map((r) => {
@@ -1160,7 +1160,7 @@ export function stageView(raw, ctx) {
         return { run: r.run, index: r.index, seq: r.seq, actor: r.actor, invoke: r.invoke, read };
       });
       const yes = judged.filter((r) => r.read === true);
-      return { actor: rb.actor, invoke: rb.invoke, state: rb.state, input: rb.input, reads: rb.reads, at: rb.at ?? null, kind: rb.kind ?? null,
+      return { actor: rb.actor, invoke: rb.invoke, state: rb.state, input: rb.input, reads: rb.reads, at: rb.at ?? null, kind: rb.kind ?? null, self: !!rb.self,
         runs: yes.length ? yes : judged.slice(0, 1), later: later.length };
     })
   }));
@@ -1168,7 +1168,8 @@ export function stageView(raw, ctx) {
     run: raw.run, stage: raw.stage, invoke: raw.invoke, state: raw.state, invokeAt: raw.invokeAt ?? null,
     workflow: raw.workflow ?? null, started: raw.started ?? null, promptHash: raw.prompt?.hash ?? null,
     parts, inputs,
-    ended: raw.ended ? { transition: raw.ended.transition ?? null, step: endStep ? { index: endStep.index, seq: endStep.seq } : null, event: raw.ended.event ?? null, state: leavesText(raw.ended.state), stopped: !!raw.ended.stopped } : null,
+    finished: fin ? { transition: fin.transition ?? null, step: endStep ? { index: endStep.index, seq: endStep.seq } : null, event: fin.event ?? null, state: leavesText(fin.state), stopped: !!fin.stopped } : null,
+    stamped: raw.stamped ?? [],
     output: 'output' in raw ? raw.output : undefined, error: 'error' in raw ? raw.error : undefined, hasOutput: 'output' in raw, hasError: 'error' in raw,
     wrote
   };
@@ -1209,7 +1210,7 @@ export function flowOf(runs, steps) {
   }
   const used = new Set([...edges.values()].flatMap((e) => [e.from, e.to]));
   for (const r of staged) used.add(r.run);
-  const status = (r) => (!r.stage ? null : !r.stage.ended ? 'open' : r.stage.ended.stopped ? 'stopped' : 'error' in r.stage ? 'error' : 'returned');
+  const status = (r) => (!r.stage ? null : !r.stage.finished ? 'open' : r.stage.finished.stopped ? 'stopped' : 'error' in r.stage ? 'error' : 'returned');
   const nodes = runs.filter((r) => used.has(r.run)).map((r) => ({ id: r.run, actor: r.actor, invoke: r.invoke, index: r.index, seq: r.seq, staged: !!r.stage, model: !!r.model, status: status(r) }));
   // A producer run that is not a run of this item (it should not happen) is still named.
   for (const id of used) if (id !== 'start' && !nodes.some((n) => n.id === id)) nodes.push({ id, actor: id, invoke: null, index: null, seq: null, staged: false, model: false });
