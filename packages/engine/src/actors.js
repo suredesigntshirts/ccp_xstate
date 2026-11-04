@@ -332,6 +332,23 @@ export function confine({ worktree, tool, input }) {
   return null;
 }
 
+const plain = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+
+/**
+ * Whether a restated value agrees with the input it restates (fix-verify-issue-echo): an object may leave out keys,
+ * and every key it carries must agree with the input's, at any depth; arrays and other values must be equal. The
+ * schema's required list says what must be carried. Key order does not matter.
+ */
+export function agrees(given, input) {
+  if (plain(given) && plain(input)) {
+    return Object.keys(given).every((k) => Object.hasOwn(input, k) && agrees(given[k], input[k]));
+  }
+  if (Array.isArray(given) && Array.isArray(input)) {
+    return given.length === input.length && given.every((v, i) => agrees(v, input[i]) && agrees(input[i], v));
+  }
+  return JSON.stringify(given) === JSON.stringify(input);
+}
+
 /**
  * The checks a result passes before it counts, in order: the run exists, the caller is the agent the run started,
  * the run hasn't returned yet, the result matches the actor's schema, and every PR it claims is on GitHub at the
@@ -369,8 +386,8 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
     if (taken.length) return refuse('reserved', `${path} sets ${taken.join(', ')}: the host sets these from what it sees`);
   }
   for (const k of Object.keys(result ?? {})) {
-    if (run.input && Object.hasOwn(run.input, k) && JSON.stringify(result[k]) !== JSON.stringify(run.input[k])) {
-      return refuse('restated', `result.${k} is not the input's ${k}: a field your input has must repeat it exactly`);
+    if (run.input && Object.hasOwn(run.input, k) && !agrees(result[k], run.input[k])) {
+      return refuse('restated', `result.${k} is not the input's ${k}: whatever it carries must repeat the input exactly (it may leave out keys its schema does not require)`);
     }
   }
   // A blocked result (the stage's "could not") covers nothing: it becomes the stage's error (resultsOf).
