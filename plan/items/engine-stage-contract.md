@@ -19,8 +19,8 @@
   "depends_on": [],
   "inputs": [
     {
-      "ref": "ccp_xstate_scratch tourney/2026-11-04-stage-contract/S-cleanup at 8d51cbf",
-      "what": "The engine, workflows and tests to port: lane A (23c3290) plus the stage contract, cleanup rounds 1-5, the stage record fixes and the trial fixes. The branch head 3a2b4e3 adds two empty commits with the same tree; port 8d51cbf"
+      "ref": "ccp_xstate_scratch tourney/2026-11-04-stage-contract/S-cleanup at c62f5ac",
+      "what": "The engine, workflows and tests to port: lane A (23c3290) plus the stage contract, cleanup rounds 1-5, the stage record fixes, the trial fixes (8d51cbf) and the trial 2 fixes (c62f5ac: build notes reach the merge cards, which now receive the ask's inputs; PR title and body rule). 3a2b4e3 is two empty commits on 8d51cbf; port c62f5ac"
     },
     {
       "ref": "/mnt/project-files/stage-contract-tournament/S-cleanup/notes.md",
@@ -194,7 +194,7 @@ the report says so and the risk stays named. The report counts refusals by rule 
 
 Read this item's head, then check out the PR at its head sha in a clean clone. Run
 `node --test packages/engine/test/tourney/*.test.js`; diff the scenario tests (Q1-Q9, F1, F2, R1) against
-ccp_xstate_scratch `tourney/2026-11-04-stage-contract/S-cleanup` at 8d51cbf and confirm no assertion is weaker; for
+ccp_xstate_scratch `tourney/2026-11-04-stage-contract/S-cleanup` at c62f5ac and confirm no assertion is weaker; for
 the builder line, break one load rule in `stages.js` (for example, make every write feed every state) and name the
 test that goes red. Read the ci check at the head sha and the PR body's mapping of replaced tests; spot-check five
 mappings against the old test's assertion. Read the trial report under

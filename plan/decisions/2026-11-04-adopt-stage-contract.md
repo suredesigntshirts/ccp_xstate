@@ -23,7 +23,7 @@ the judge added that the contract is a good prompt design that is not a simplifi
 
 Adopt lane S as cleaned up on
 [tourney/2026-11-04-stage-contract/S-cleanup](https://github.com/suredesigntshirts/ccp_xstate_scratch/tree/tourney/2026-11-04-stage-contract/S-cleanup)
-at 8d51cbf, as main's engine and workflows (item `engine-stage-contract`). Change tournament scoring so this kind of
+at c62f5ac, as main's engine and workflows (item `engine-stage-contract`). Change tournament scoring so this kind of
 miss cannot recur (item `tournament-scoring-floors`).
 
 ## Why, from first principles
@@ -83,6 +83,7 @@ Two real-model trials ran lane S end to end on a local repo with a fake GitHub a
   not" return, stricter checks written into PASS/FAIL, line order not enforced, and the run line shown twice.
 - **Trial fixes** (8d51cbf) closed them in the contract: build rules name the GitHub tools and url shape, a `prRef`
   schema, `blocked`, order enforced by `covers`, the run line once in the context, the Advisory route.
+- **Trial 2 fixes** (c62f5ac): build `notes` returned, wired only to the two merge cards (the card effect now passes the ask's inputs, which before reached no person), and the PR rule asks for a title and body that say how each expect line is met. Net primitives 0.
 - **Trial 2** merged on the first build with **0 refusals**. Every agent's first return was valid; the brief writer
   put stricter checks under Advisory and the verifier kept them advisory.
 
