@@ -611,6 +611,9 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
         try { input = eng.spec.mapPaths(def.input, { context }); inputFrom = 'recomputed by replaying the journal (the host does not store it)'; } catch { /* leave null */ }
       }
       const a = { effect: e.effect, type: 'run', state: def?.state ?? null, actor: e.actor ?? def?.src ?? invokeId, invoke: invokeId, inputMap: def?.input ?? null, input, inputFrom, outcome: done?.payload?.outcome ?? null, model: brief != null };
+      // The stage record the engine wrote for this run (runs/<n>.<actor>/stage.json), when it writes one: resolved below.
+      const stageRaw = runPath ? readJson(join(runPath, 'stage.json')) : null;
+      if (stageRaw) Object.defineProperty(a, 'stageRaw', { value: stageRaw, enumerable: false });
       if (!a.model) {
         const cardPath = join(cardsDir, `${safe(name)}.json`);
         a.card = readJson(cardPath);
@@ -659,6 +662,10 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
       }
     }
   }
+  // The stage records, with every producer and reader resolved to a run of this item where there is one.
+  const itemRuns = steps.flatMap((s) => s.actors.filter((a) => a.type === 'run').map((a) => ({ run: a.effect, actor: a.actor, invoke: a.invoke, state: a.state, index: s.index, seq: s.seq, model: a.model, stage: a.stageRaw ?? null })));
+  for (const s of steps) for (const a of s.actors) if (a.stageRaw) a.stage = stageView(a.stageRaw, { runs: itemRuns, steps });
+  const flow = flowOf(itemRuns, steps);
   {
     const last = appliedSteps.at(-1);
     const where = last ? last.to.join(' + ') : '?';
@@ -680,7 +687,7 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
     label: label ?? item, kind, note: note ?? (kind === 'scripted' ? SCRIPTED_NOTE : 'Real run: real Claude Code agents did this work.'),
     item, items, journal, engine: { path: engine, commit, branch, loaded: eng.ok, error: eng.ok ? null : eng.error },
     workflow: { ...wf, spec }, graph, replay, notes, sessionsFound: sessionsDirs.length > 0,
-    final: steps.filter((s) => s.outcome === 'applied').at(-1)?.value ?? null, endNote, rowCount: rows.length, steps, modelRuns
+    final: steps.filter((s) => s.outcome === 'applied').at(-1)?.value ?? null, endNote, rowCount: rows.length, steps, modelRuns, flow
   };
 }
 
@@ -1058,6 +1065,158 @@ export function stampOf(engineSources, key, { nested = false } = {}) {
 }
 
 /** Every item of a journal root as a bundle. */
+// ---- The stage record: runs/<n>.<actor>/stage.json, which an engine that writes it (the stage-contract lanes) leaves
+// in each model stage's run folder. It says what went into the prompt and from where, which earlier run produced each
+// input, and where the output went. The page shows it as the run's "Stage" view; nothing here is inferred, it is the
+// engine's own record with each run id it names resolved to a run of this item.
+
+const PART_ORDER = ['rules', 'inputs', 'task', 'output', 'return'];
+const seqOfTransition = (t) => { const n = Number(String(t ?? '').split('#').pop()); return t != null && Number.isFinite(n) ? n : null; };
+const RUN_KINDS = ['stage', 'effect', 'workflow'];
+
+/** One producer of a stage record, as the page shows it: a label, a detail and a link to the producing run of this item when there is one. */
+export function producerRef(p, ctx) {
+  if (!p || typeof p !== 'object') return { kind: 'none', label: 'not recorded', detail: null, link: null };
+  const runOf = (id) => ctx.runs.find((r) => r.run === id) ?? null;
+  const stepOf = (t) => { const q = seqOfTransition(t); const s = q == null ? null : ctx.steps.find((x) => x.seq === q); return s ? { index: s.index, seq: s.seq } : null; };
+  const linkOf = (id) => { const r = id ? runOf(id) : null; return r ? { run: r.run, index: r.index, seq: r.seq, actor: r.actor, invoke: r.invoke } : null; };
+  const base = { kind: p.kind, at: p.at ?? null, transition: p.transition ?? null, step: stepOf(p.transition), link: null, detail: null };
+  const field = p.field ?? null;
+  switch (p.kind) {
+    case 'stage': case 'effect': case 'workflow': {
+      const what = p.kind === 'stage' ? `the ${p.actor} stage` : p.kind === 'effect' ? `the ${p.actor} host effect` : `the child workflow ${p.actor}`;
+      return { ...base, run: p.run, actor: p.actor, field, link: linkOf(p.run), label: `${what}, run ${p.run}`,
+        detail: field === 'error' ? 'its error' : field ? `its output field ${field}` : 'its whole output' };
+    }
+    case 'host':
+      return { ...base, run: p.run, actor: p.actor, field, stamped: p.stamped, link: linkOf(p.run), label: `the host, on the ${p.actor} result of run ${p.run}`,
+        detail: `the host stamped ${p.stamped} (${field}) on that result when it accepted it; the agent did not write it` };
+    case 'initial':
+      return { ...base, field, label: "the item's start input", detail: field ? `its field ${field}` : null };
+    case 'literal':
+      return { ...base, label: 'a literal in the workflow JSON', detail: p.event ? `set when the item took ${p.event}` : 'wired straight into the invoke input' };
+    case 'event':
+      return { ...base, event: p.event, field, label: `the ${p.event} event${p.source?.system ? ` (from ${p.source.system})` : ''}`, detail: field ? `its field ${field}` : 'the whole event' };
+    case 'copy':
+      return { ...base, from: p.from, of: producerRef(p.of, ctx), label: `a copy of ${p.from}`, detail: p.event ? `copied when the item took ${p.event}` : null };
+    case 'default':
+      return { ...base, label: 'the context default in the workflow JSON', detail: 'nothing had written this path yet' };
+    case 'parts':
+      return { ...base, default: p.default ?? null, label: `${(p.parts ?? []).length} part-writes onto a null default`,
+        detail: 'no one wrote the whole value: it is made of these parts', parts: (p.parts ?? []).map((x) => ({ path: x.path, ...producerRef(x, ctx) })) };
+    case 'none':
+      return { ...base, label: 'nothing', detail: 'the invoke wires no context path or literal to it' };
+    default:
+      return { ...base, label: `a ${p.kind ?? 'unknown'} producer`, detail: JSON.stringify(p) };
+  }
+}
+
+// True when a producer (raw, from stage.json) names run `id`, directly, through a copy, or as one of its parts.
+const names = (p, id) => !!p && (p.run === id || (p.kind === 'copy' && names(p.of, id)) || (p.kind === 'parts' && (p.parts ?? []).some((x) => x.run === id)));
+
+function sourceRef(src, byName, ctx) {
+  if (!src || typeof src !== 'object') return { kind: 'unknown', label: 'not recorded' };
+  if (src.frame != null) return { kind: 'frame', name: src.frame, label: `harness frame: ${src.frame}`, detail: 'fixed text in the engine (packages/engine/src/stages.js), the same for every stage' };
+  if (src.workflow != null) return { kind: 'workflow', at: src.workflow, inlined: src.inlined ?? null, label: 'workflow JSON', detail: src.inlined ? `with ${src.inlined} inlined` : null };
+  if (src.input != null) {
+    const inp = byName[src.input];
+    return { kind: 'input', input: src.input, meaningAt: src.meaning ?? null, from: src.from ?? inp?.from ?? null, label: `input ${src.input}`,
+      producer: inp?.producer ?? producerRef(src.producer, ctx) };
+  }
+  return { kind: 'unknown', label: JSON.stringify(src) };
+}
+
+const leavesText = (v) => (v == null ? null : typeof v === 'string' ? v : leavesOf(v).join(' + '));
+
+/**
+ * The page's Stage view of one stage.json: the prompt as parts (each piece with its source), the inputs (each with its
+ * producer resolved to a run of this item), and what came out: the output, each context path written, the invokes
+ * that could read it next, and the later runs of those invokes (read: true when that run's own record names this
+ * run as the producer of that input; false when it read a newer value; null for a host effect, whose input is not
+ * traced). ctx: { runs: [{ run, actor, invoke, state, index, seq, stage }], steps }.
+ */
+export function stageView(raw, ctx) {
+  const inputs = (raw.inputs ?? []).map((i) => {
+    const producer = producerRef(i.producer, ctx);
+    // A parts producer already lists the part-writes; the engine repeats them under amended.
+    const amended = (i.amended ?? []).filter((x) => !(i.producer?.kind === 'parts' && (i.producer.parts ?? []).some((q) => q.path === x.path && q.transition === x.by?.transition)))
+      .map((x) => ({ path: x.path, by: producerRef(x.by, ctx) }));
+    const literal = i.from && typeof i.from === 'object';
+    return { name: i.name, meaning: i.meaning ?? null, meaningAt: i.meaningAt ?? null, value: i.value ?? null, from: literal ? null : i.from ?? null, literal, wiredAt: i.wiredAt ?? null, producer, amended };
+  });
+  const byName = Object.fromEntries(inputs.map((i) => [i.name, i]));
+  const rawParts = raw.prompt?.parts ?? {};
+  const order = [...PART_ORDER.filter((k) => k in rawParts), ...Object.keys(rawParts).filter((k) => !PART_ORDER.includes(k))];
+  const parts = order.map((part) => ({ part, pieces: (rawParts[part] ?? []).map((p) => ({ text: p.text ?? '', source: sourceRef(p.source, byName, ctx) })) }));
+  const endSeq = seqOfTransition(raw.ended?.transition);
+  const endStep = endSeq == null ? null : ctx.steps.find((s) => s.seq === endSeq);
+  const wrote = (raw.wrote ?? []).map((w) => ({
+    path: w.path, from: w.from ?? null, at: w.at ?? null, into: leavesText(w.into),
+    readBy: (w.readBy ?? []).map((rb) => {
+      const later = ctx.runs.filter((r) => r.invoke === rb.invoke && r.state === rb.state && r.run !== raw.run && endSeq != null && r.seq >= endSeq);
+      const judged = later.map((r) => {
+        const inp = r.stage?.inputs?.find((x) => x.name === rb.input);
+        const read = !r.stage ? null : !!inp && (names(inp.producer, raw.run) || (inp.amended ?? []).some((x) => names(x.by, raw.run)));
+        return { run: r.run, index: r.index, seq: r.seq, actor: r.actor, invoke: r.invoke, read };
+      });
+      const yes = judged.filter((r) => r.read === true);
+      return { actor: rb.actor, invoke: rb.invoke, state: rb.state, input: rb.input, reads: rb.reads, at: rb.at ?? null, kind: rb.kind ?? null,
+        runs: yes.length ? yes : judged.slice(0, 1), later: later.length };
+    })
+  }));
+  return {
+    run: raw.run, stage: raw.stage, invoke: raw.invoke, state: raw.state, invokeAt: raw.invokeAt ?? null,
+    workflow: raw.workflow ?? null, started: raw.started ?? null, promptHash: raw.prompt?.hash ?? null,
+    parts, inputs,
+    ended: raw.ended ? { transition: raw.ended.transition ?? null, step: endStep ? { index: endStep.index, seq: endStep.seq } : null, event: raw.ended.event ?? null, state: leavesText(raw.ended.state), stopped: !!raw.ended.stopped } : null,
+    output: 'output' in raw ? raw.output : undefined, error: 'error' in raw ? raw.error : undefined, hasOutput: 'output' in raw, hasError: 'error' in raw,
+    wrote
+  };
+}
+
+/**
+ * The item's data flow, for the page's flow strip: every run with a stage record, every run that produced one of their
+ * inputs, and every later run that read one of their outputs, in the order they started; and the context paths
+ * between them. An edge from "start" is the item's start input. unverified: a host effect the chart says reads the
+ * path, whose own input is not traced.
+ */
+export function flowOf(runs, steps) {
+  const ctx = { runs, steps };
+  const staged = runs.filter((r) => r.stage);
+  if (!staged.length) return null;
+  const edges = new Map();
+  const add = (from, to, path, unverified = false) => {
+    const k = `${from}\u0000${to}`;
+    const e = edges.get(k) ?? { from, to, paths: [], unverified };
+    if (path && !e.paths.includes(path)) e.paths.push(path);
+    e.unverified = e.unverified && unverified;
+    edges.set(k, e);
+  };
+  const strip = (p) => String(p ?? '').replace(/^context\./, '');
+  for (const r of staged) {
+    for (const i of r.stage.inputs ?? []) {
+      const p = i.producer ?? {};
+      const via = typeof i.from === 'string' ? strip(i.from) : null;
+      if (RUN_KINDS.includes(p.kind) || p.kind === 'host') add(p.run, r.run, via);
+      else if (p.kind === 'initial') add('start', r.run, via);
+      else if (p.kind === 'copy' && p.of?.run) add(p.of.run, r.run, via);
+      else if (p.kind === 'parts') for (const x of p.parts ?? []) if (x.run) add(x.run, r.run, x.path);
+    }
+    const view = stageView(r.stage, ctx);
+    for (const w of view.wrote) for (const rb of w.readBy) for (const x of rb.runs) {
+      if (x.read === null) add(r.run, x.run, strip(rb.reads), true);
+    }
+  }
+  const used = new Set([...edges.values()].flatMap((e) => [e.from, e.to]));
+  for (const r of staged) used.add(r.run);
+  const status = (r) => (!r.stage ? null : !r.stage.ended ? 'open' : r.stage.ended.stopped ? 'stopped' : 'error' in r.stage ? 'error' : 'returned');
+  const nodes = runs.filter((r) => used.has(r.run)).map((r) => ({ id: r.run, actor: r.actor, invoke: r.invoke, index: r.index, seq: r.seq, staged: !!r.stage, model: !!r.model, status: status(r) }));
+  // A producer run that is not a run of this item (it should not happen) is still named.
+  for (const id of used) if (id !== 'start' && !nodes.some((n) => n.id === id)) nodes.push({ id, actor: id, invoke: null, index: null, seq: null, staged: false, model: false });
+  if (used.has('start')) nodes.unshift({ id: 'start', actor: 'start input', invoke: null, index: 0, seq: 0, staged: false, model: false });
+  return { nodes, edges: [...edges.values()].filter((e) => e.from !== e.to) };
+}
+
 export async function exportRoot(opts) {
   const itemsDir = join(resolve(opts.journal), 'items');
   const items = readdirSync(itemsDir).filter((n) => n.endsWith('.jsonl')).map((n) => basename(n, '.jsonl')).sort();

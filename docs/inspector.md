@@ -94,6 +94,25 @@ even when no run of it was captured.
 - **Trace.** Rows of the live capture whose agent is the run's agent (`agent.json`). Only the tool name, time, size
   and paths are kept, never the command itself.
 
+## The stage record (stage.json)
+
+An engine with the stage contract (lane S, `packages/engine/src/trace.js`; the format is in that lane's
+`docs/journal.md`) writes `runs/<n>.<actor>/stage.json` for every model stage run. When a run folder has one, the
+exporter puts it in the run's bundle as `stage` (`stageView` in `export.mjs`), with every run id it names resolved to
+a run of the same item, and the page shows it as the run's **Stage** view, before the seven layers:
+
+1. **Instructions**: the prompt part by part (rules, inputs, task, output, return), each piece with its source: a
+   harness frame constant or template, a JSON pointer in the workflow file, or an input with the run that produced it.
+2. **Inputs**: each input's meaning, value, the context path it was read from and its producer, as a link to the
+   producing run (stage, effect or child workflow; the host for a field it stamped on a returned ref) or a plain label
+   (start input, literal, event, copy, context default, parts, nothing). Later writes to parts of it are listed.
+3. **Output**: the value (or error, or that the run was stopped), each context path written from it, and the invokes
+   that could read it next, each with its later run in this item: "read it" when that run's own record names this run
+   as the producer, "read a newer value" when it does not, and a host effect's run marked as not traced.
+
+The bundle also gets `flow`: the item's runs in start order with the context paths between them, shown above the
+steps as "Data flow between stages". Runs without stage.json render as before.
+
 ## What it cannot show
 
 - Claude Code's own system prompt, tool list and CLAUDE.md files: the harness never records them.

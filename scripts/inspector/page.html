@@ -165,8 +165,8 @@ td.keyscell{max-width:28ch;min-width:14ch} td.keyscell .chips{flex-wrap:wrap}
 abbr[title]{text-decoration:underline dotted;text-underline-offset:2px;cursor:help}
 .glance td{font-family:var(--f-body);font-size:13px}
 .glance th{white-space:normal;min-width:8ch}
-.tblwrap td>.cell.host{max-width:22ch;min-width:12ch}
-.tblwrap td>.cell.ret{max-width:22ch;min-width:12ch}
+.tblwrap td>.cell.host{max-width:20ch;min-width:12ch}
+.tblwrap td>.cell.ret{max-width:20ch;min-width:12ch}
 .tblwrap td>.cell.what{max-width:28ch;min-width:14ch}
 .thwrap{max-width:40ch;min-width:16ch;white-space:normal}
 .tblwrap td>.cell.ft{max-width:22ch;min-width:12ch}
@@ -189,6 +189,44 @@ abbr[title]{text-decoration:underline dotted;text-underline-offset:2px;cursor:he
 .seg-run{background:var(--seg-run);box-shadow:inset 0 -2px 0 var(--seg-run-line)}
 .seg-passthrough{background:var(--seg-pass);box-shadow:inset 0 -2px 0 var(--seg-pass-line)}
 .seg-unknown{background:var(--seg-unknown);box-shadow:inset 0 -2px 0 var(--seg-unknown-line);text-decoration:underline dotted var(--seg-unknown-line)}
+/* Stage view (stage.json) and the item's data flow */
+.stage{display:grid;gap:16px;min-width:0}
+.sblk{display:grid;gap:8px;min-width:0;padding-top:10px;border-top:1px solid var(--line)}
+.sblk:first-of-type{border-top:none;padding-top:0}
+.sblk>h5{margin:0;font-size:15px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.sblk>h5 .hint{font-weight:400;color:var(--muted);font-size:12.5px}
+.part{display:grid;gap:6px;min-width:0}
+.part>h6{margin:6px 0 0;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.piece{border-left:4px solid var(--line);border-radius:4px;background:var(--bg);padding:6px 10px;display:grid;gap:4px;min-width:0}
+.piece.src-frame{border-left-color:var(--seg-template-line)} .piece.src-workflow{border-left-color:var(--seg-workflow-line)} .piece.src-input{border-left-color:var(--seg-input-line)}
+.piece .txt{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--f-body);font-size:13.5px;line-height:1.5;margin:0;max-height:240px;overflow:auto}
+.srcline{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere;min-width:0}
+.srcline code{color:var(--fg)}
+.srctag{display:inline-block;font-size:11px;font-weight:600;padding:0 7px;border-radius:4px;margin-right:6px;white-space:nowrap}
+.srctag.frame{background:var(--seg-template);color:var(--seg-template-line)} .srctag.workflow{background:var(--seg-workflow);color:var(--seg-workflow-line)} .srctag.input{background:var(--seg-input);color:var(--seg-input-line)}
+.inp{border:1px solid var(--line);border-radius:6px;padding:8px 12px;display:grid;gap:6px;align-content:start;min-width:0;scroll-margin-top:60px}
+.inp>header{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.inp>header b{font-family:var(--f-mono);font-size:14px}
+.inp .meaning{font-size:13.5px;color:var(--muted);max-width:none}
+.inp:focus{outline:2px solid var(--accent);outline-offset:2px}
+.vprev{font-family:var(--f-mono);font-size:12.5px;overflow-wrap:anywhere}
+.vprev details>summary{cursor:pointer;color:var(--accent);font-family:var(--f-body);font-size:12.5px}
+.linkbtn{font:inherit;font-size:12.5px;cursor:pointer;padding:1px 9px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent);min-height:26px;margin:2px 0}
+.linkbtn:hover{background:var(--accent);color:var(--accent-fg)}
+.inps{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));min-width:0}
+.readers{margin:0;padding-left:20px;display:grid;gap:4px;font-size:13.5px}
+.readers li{overflow-wrap:anywhere}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch;min-width:0}
+.fnode{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:6px 10px;display:grid;gap:3px;align-content:start;min-width:0;max-width:280px;font-size:12.5px}
+.fnode.model{border-color:var(--accent)} .fnode.start{border-style:dashed}
+.fnode>.fhead{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.fnode>.fhead b{font-size:13.5px}
+.fin{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);overflow-wrap:anywhere}
+.fin.unv{font-style:italic}
+.farrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-size:11.5px;color:var(--accent);font-family:var(--f-mono);max-width:150px;min-width:28px;text-align:center;overflow-wrap:anywhere}
+.farrow::after{content:"\2192";font-size:20px;line-height:1;color:var(--accent)}
+.farrow.none{color:var(--muted)} .farrow.none::after{color:var(--wire)}
+@media (max-width:560px){.fnode{max-width:none;flex:1 1 100%} .farrow{flex:1 1 100%;flex-direction:row;gap:6px;max-width:none} .farrow::after{content:"\2193"}}
 .seglegend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12.5px}
 .seglegend span{padding:1px 8px;border-radius:4px}
 .tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;-webkit-overflow-scrolling:touch}
@@ -822,6 +860,93 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     return verb === 'set' ? 'Starts ' + base + '.' : base.charAt(0).toUpperCase() + base.slice(1) + ' was ' + verb;
   }
 
+  // ---- The stage record (stage.json, written by an engine with the stage contract): Instructions, Inputs, Output.
+  const aid = (runId) => 'run-' + String(runId).replace(/[^A-Za-z0-9_-]/g, '_');
+  const gotoBtn = (link, text, field) => link ? '<button type="button" class="linkbtn" data-goto="' + esc(link.run) + '" data-index="' + link.index + '"' + (field ? ' data-field="' + esc(field) + '"' : '') + '>' + esc(text || ('run ' + link.run + ', step ' + link.seq)) + '</button>' : '';
+  const actorRunName = (x) => x.actor + (x.invoke && x.invoke !== x.actor ? ' ' + x.invoke : '');
+  const ptr = (p) => p ? '<code title="JSON pointer in the workflow file">' + esc(p) + '</code>' : '';
+  function producerHtml(p, depth) {
+    if (!p) return '<span class="muted">not recorded</span>';
+    depth = depth || 0;
+    let h = esc(p.label) + ((p.kind === 'literal' || p.kind === 'default') && p.at ? ' at ' + ptr(p.at) : '') + (p.detail ? (p.kind === 'default' ? ' (' + esc(p.detail) + ')' : ', ' + esc(p.detail)) : '');
+    if (p.link) h += ' ' + gotoBtn(p.link, 'go to ' + actorRunName(p.link) + ' (step ' + p.link.seq + ')');
+    if (p.kind === 'event' && p.step) h += ' <button type="button" class="linkbtn" data-jump="' + p.step.index + '">step ' + esc(p.step.seq) + '</button>';
+    if (p.kind === 'copy' && p.of && depth < 3) h += '; that value came from ' + producerHtml(p.of, depth + 1);
+    if (p.kind === 'parts' && p.parts) h += ':<ul class="readers">' + p.parts.map((x) => '<li><code>' + esc(x.path) + '</code> ← ' + producerHtml(x, depth + 1) + '</li>').join('') + '</ul>';
+    return h;
+  }
+  const valuePreview = (v, label) => {
+    if (v === undefined) return '<span class="muted">none</span>';
+    const s = JSON.stringify(v);
+    if (s == null) return '<span class="muted">none</span>';
+    if (s.length <= 90) return '<span class="vprev">' + linkify(s) + '</span>';
+    return '<div class="vprev">' + linkify(s.slice(0, 90)) + '… <details><summary>show the whole value (' + s.length.toLocaleString() + ' chars)</summary>' + pre(v, null, label) + '</details></div>';
+  };
+  const SRC_TAG = { frame: 'harness frame', workflow: 'workflow JSON', input: 'input' };
+  function pieceSource(src) {
+    if (src.kind === 'frame') return '<span class="srctag frame">harness frame</span><code>' + esc(src.name) + '</code>: ' + (/^[A-Z_]+$/.test(src.name) ? 'fixed text in the engine, the same for every stage' : src.name === 'none' ? 'the engine\'s placeholder for an empty part' : 'an engine template, filled in with this run\'s values (run id, worktree, branch)');
+    if (src.kind === 'workflow') return '<span class="srctag workflow">workflow JSON</span>' + ptr(src.at) + (src.inlined ? ', with ' + ptr(src.inlined) + ' inlined' : '');
+    if (src.kind === 'input') return '<span class="srctag input">input</span><b>' + esc(src.input) + '</b>' + (src.from ? ', read from <code>' + esc(src.from) + '</code>' : '') + '; produced by ' + producerHtml(src.producer);
+    return esc(src.label || 'unknown');
+  }
+  function stageHtml(a) {
+    const S = a.stage; if (!S) return '';
+    const scripted = run.kind === 'scripted';
+    const nPieces = S.parts.reduce((n, p) => n + p.pieces.length, 0);
+    const kinds = {}; S.parts.forEach((p) => p.pieces.forEach((x) => { kinds[x.source.kind] = (kinds[x.source.kind] || 0) + 1; }));
+    const instr = '<div class="sblk"><h5><span class="lnum">1</span> Instructions <span class="hint">the prompt, part by part: ' + Object.entries(kinds).map(([k, n]) => n + ' from ' + (SRC_TAG[k] || k)).join(', ') + '</span></h5>' +
+      S.parts.map((p) => '<div class="part"><h6>' + esc(p.part) + '</h6>' + p.pieces.map((x) => '<div class="piece src-' + esc(x.source.kind) + '"><pre class="txt">' + linkify(x.text) + '</pre><div class="srcline">' + pieceSource(x.source) + '</div></div>').join('') + '</div>').join('') + '</div>';
+    const inputs = '<div class="sblk"><h5><span class="lnum">2</span> Inputs <span class="hint">' + plural(S.inputs.length, 'input') + ', each with the run that produced it</span></h5>' +
+      S.inputs.map((i) => '<div class="inp" id="' + aid(S.run) + '-in-' + esc(i.name) + '" tabindex="-1"><header><b>' + esc(i.name) + '</b>' + (i.name === 'task' ? '<span class="pill p-mute">fills the Task part</span>' : '') + '</header>' +
+        (i.meaning ? '<p class="meaning">' + esc(i.meaning) + '</p>' : '') +
+        '<dl class="facts"><dt>Value</dt><dd>' + valuePreview(i.value, 'input ' + i.name) + '</dd>' +
+        '<dt>Read from</dt><dd>' + (i.literal ? 'a literal in the invoke' : i.from ? '<code>' + esc(i.from) + '</code>' : '<span class="muted">nothing</span>') + (i.wiredAt ? ' <span class="muted small">(wired at ' + ptr(i.wiredAt) + ')</span>' : '') + '</dd>' +
+        '<dt>Produced by</dt><dd>' + producerHtml(i.producer) + '</dd>' +
+        (i.amended.length ? '<dt>Then changed</dt><dd><ul class="readers">' + i.amended.map((x) => '<li><code>' + esc(x.path) + '</code> ← ' + producerHtml(x.by) + '</li>').join('') + '</ul></dd>' : '') + '</dl></div>').join('') + '</div>';
+    let out;
+    if (!S.ended) out = '<p class="small muted">No ended half: the item had not taken this run\'s result or error when the journal ends.</p>';
+    else if (S.ended.stopped) out = '<div class="warnbox">The item left <code>' + esc(S.state) + '</code> before this run returned (' + esc(S.ended.event) + ' at ' + (S.ended.step ? '<button type="button" class="linkbtn" data-jump="' + S.ended.step.index + '">step ' + esc(S.ended.step.seq) + '</button>' : esc(S.ended.transition)) + '), which stopped it. Nothing came out, and nothing was written.</div>';
+    else {
+      const took = '<p class="small">Taken at ' + (S.ended.step ? '<button type="button" class="linkbtn" data-jump="' + S.ended.step.index + '">step ' + esc(S.ended.step.seq) + '</button>' : esc(S.ended.transition)) + ' (<code>' + esc(S.ended.event) + '</code>), and the item went to <code>' + esc(S.ended.state) + '</code>.</p>';
+      const val = S.hasError ? '<p class="small"><b>It failed.</b> The error:</p>' + pre(S.error, null, 'error') : S.hasOutput ? pre(S.output, { host: ((a.layers && a.layers.l6 && a.layers.l6.hostWritten) || []).map((h) => h.path) }, 'output') : '<p class="muted small">No output recorded.</p>';
+      const rdr = (rb, w) => {
+        const who = rb.kind === 'stage' ? 'the <b>' + esc(rb.actor) + '</b> stage' : rb.kind === 'effect' ? 'the <b>' + esc(rb.actor) + '</b> host effect' : 'the child workflow <b>' + esc(rb.actor) + '</b>';
+        const what = who + ' in <code>' + esc(rb.state) + '</code>, as its input <code>' + esc(rb.input) + '</code>' + (rb.reads !== 'context.' + w.path ? ' (reads <code>' + esc(rb.reads) + '</code>)' : '');
+        const runs = rb.runs.map((x) => x.read === true ? gotoBtn({ run: x.run, index: x.index, seq: x.seq }, 'read it: ' + actorRunName(x) + ', step ' + x.seq, rb.input)
+          : x.read === false ? gotoBtn({ run: x.run, index: x.index, seq: x.seq }, 'ran at step ' + x.seq + ' but read a newer value', rb.input)
+            : gotoBtn({ run: x.run, index: x.index, seq: x.seq }, 'started at step ' + x.seq) + ' <span class="muted small">(a host effect: its input is not traced)</span>').join(' ');
+        return '<li>' + what + ': ' + (runs || '<span class="muted">no later run in this item</span>') + '</li>';
+      };
+      const wrote = S.wrote.length ? S.wrote.map((w) => '<div class="inp"><header><b>context.' + esc(w.path) + '</b><span class="muted small">← <code>' + esc(w.from) + '</code>' + (w.at ? ', by the set action at ' + ptr(w.at) : '') + '</span></header>' +
+        (w.readBy.length ? '<p class="small"><b>Read next by</b> (any invoke that reads it and that the item can reach from <code>' + esc(w.into) + '</code>; a later write may replace the value first):</p><ul class="readers">' + w.readBy.map((rb) => rdr(rb, w)).join('') + '</ul>' : '<p class="small muted">No invoke reachable from <code>' + esc(w.into) + '</code> reads it.</p>') + '</div>').join('')
+        : '<p class="small muted">The transition wrote nothing from it into the context.</p>';
+      out = took + val + '<p class="small"><b>Where it went:</b> ' + plural(S.wrote.length, 'context path') + ' written from it.</p>' + wrote;
+    }
+    const output = '<div class="sblk"><h5><span class="lnum">3</span> Output <span class="hint">' + (S.ended ? (S.ended.stopped ? 'stopped' : S.hasError ? 'error' : 'what came out and where it went') : 'not ended') + '</span></h5>' + out + '</div>';
+    return sec('Stage: instructions, inputs and output', '<div class="stage">' + instr + inputs.replace('</h5>', '</h5><div class="inps">').replace(/<\/div>$/, '</div></div>') + output + '</div>', { cls: 'layer', open: true,
+      hint: 'from stage.json: ' + plural(nPieces, 'prompt piece') + ', ' + plural(S.inputs.length, 'input') + (S.ended && !S.ended.stopped ? ', ' + plural(S.wrote.length, 'path') + ' written' : ''),
+      note: 'The engine\'s own stage record (<code>stage.json</code> in the run folder): stage <code>' + esc(S.stage) + '</code>, invoke <code>' + esc(S.invoke) + '</code> in state <code>' + esc(S.state) + '</code> (' + ptr(S.invokeAt) + ') of ' + esc((S.workflow && S.workflow.name) || '?') + (S.workflow && S.workflow.hash ? ' (sha ' + esc(S.workflow.hash.slice(0, 8)) + ')' : '') + '. Every producer and reader is a run of this item where there is one.' + (scripted ? ' In this scenario the stages are test fixtures: the prompt is what this engine would hand a real agent.' : '') });
+  }
+  function flowHtml(r) {
+    const F = r.flow; if (!F || !F.nodes.length) return '';
+    const name = (id) => { const n = F.nodes.find((x) => x.id === id); return n ? (n.id === 'start' ? 'start input' : actorRunName(n) + (n.seq != null ? ' (step ' + n.seq + ')' : '')) : id; };
+    const parts = [];
+    F.nodes.forEach((n, k) => {
+      if (k > 0) {
+        const prev = F.nodes[k - 1].id; const e = F.edges.find((x) => x.from === prev && x.to === n.id);
+        parts.push('<div class="farrow' + (e ? '' : ' none') + '" aria-hidden="true">' + (e ? esc(e.paths.join(', ')) : '') + '</div>');
+      }
+      const ins = F.edges.filter((x) => x.to === n.id && !(k > 0 && x.from === F.nodes[k - 1].id));
+      const direct = k > 0 ? F.edges.find((x) => x.from === F.nodes[k - 1].id && x.to === n.id) : null;
+      const lines = (direct ? [direct] : []).concat(ins).map((e) => '<span class="fin' + (e.unverified ? ' unv' : '') + '">← ' + esc(e.paths.join(', ')) + ' from ' + esc(name(e.from)) + (e.unverified ? ' (chart says it reads it)' : '') + '</span>').join('');
+      const head = n.id === 'start' ? '<b>start input</b>' : '<button type="button" class="linkbtn" data-goto="' + esc(n.id) + '" data-index="' + n.index + '">' + esc(actorRunName(n)) + '</button><span class="muted">step ' + esc(n.seq) + (n.model ? '' : ', host') + '</span>' +
+        (n.status === 'error' ? '<span class="pill p-bad">error</span>' : n.status === 'stopped' ? '<span class="pill p-warn">stopped</span>' : n.status === 'open' ? '<span class="pill p-mute">no result</span>' : '');
+      parts.push('<div class="fnode' + (n.id === 'start' ? ' start' : n.model ? ' model' : '') + '"><div class="fhead">' + head + '</div>' + lines + '</div>');
+    });
+    return sec('Data flow between stages', '<div class="flow">' + parts.join('') + '</div>', { open: true, hint: 'from the stage records',
+      note: 'Each run in the order it started. An arrow is labelled with the context path that carries data from the run before it; the lines in a box name every input path and the run it came from. Italic lines are host effects that the workflow says read the path; their own inputs are not traced.' });
+  }
+
   function actorHtml(s, a) {
     if (a.type !== 'run') {
       const what = a.type === 'timer' ? 'Timer set' + (a.due ? ', due ' + esc(String(a.due).replace('T', ' ').slice(0, 19)) : '') : esc(a.type);
@@ -832,11 +957,11 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const input = sec('Input it was given', a.input != null ? pre(a.input, null, 'actor input') : '<p class="muted">Not recorded.</p>',
       { note: (a.inputFrom ? esc(/^recomputed/.test(a.inputFrom) ? 'R' + a.inputFrom.slice(1) : 'From ' + a.inputFrom) + '. ' : '') + (a.inputMap ? 'The workflow builds it from the context with this map: ' + Object.entries(a.inputMap).map(([k, v]) => '<code>' + esc(k) + '</code> ← <code>' + esc(typeof v === 'string' ? v : JSON.stringify(v)) + '</code>').join(', ') : ''), open: !a.model });
     if (!a.model) {
-      return '<div class="actor">' + head + '<p class="small">No model here: <code>' + esc(a.actor) + '</code> is plain code in the host. It has no prompt.' + (a.hostNote ? ' ' + esc(a.hostNote) : '') + '</p>' + input +
+      return '<div class="actor" id="' + aid(a.effect) + '">' + head + stageHtml(a) + '<p class="small">No model here: <code>' + esc(a.actor) + '</code> is plain code in the host. It has no prompt.' + (a.hostNote ? ' ' + esc(a.hostNote) : '') + '</p>' + input +
         (a.card ? sec('The card it posted, word for word', pre(a.card, null, 'card'), { open: true }) : '') +
         (a.outcome ? sec('What the host recorded when it finished starting', pre(a.outcome, null, 'host outcome'), { open: !a.card }) : '') + '</div>';
     }
-    return '<div class="actor">' + head + input + '<p class="small"><b>The seven layers</b>, top to bottom: ' + (run.kind === 'scripted' ? 'what a model would have been given (1 to 4; no model ran here), what was recorded instead of its work (5), what the host kept from the test fixture\'s return (6)' : 'what the model saw (1 to 4), what it did (5), what the host kept (6)') + ' and what the host made of it (7). Run folder: <code>' + esc(a.layers.folder) + '</code></p>' + layers(s, a) + '</div>';
+    return '<div class="actor" id="' + aid(a.effect) + '">' + head + input + stageHtml(a) + '<p class="small"><b>The seven layers</b>, top to bottom: ' + (run.kind === 'scripted' ? 'what a model would have been given (1 to 4; no model ran here), what was recorded instead of its work (5), what the host kept from the test fixture\'s return (6)' : 'what the model saw (1 to 4), what it did (5), what the host kept (6)') + ' and what the host made of it (7). Run folder: <code>' + esc(a.layers.folder) + '</code></p>' + layers(s, a) + '</div>';
   }
 
   function candList(wf, list, taken) {
@@ -892,7 +1017,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     selState = null; $('statepanel').hidden = true; $('legend-taken').hidden = false;
     drawGraph(run, null); fit = autoFit ? null : fit; applyZoom();
     statesTable(run, false);
-    $('glance').innerHTML = glance(run);
+    $('glance').innerHTML = flowHtml(run) + glance(run);
     $('trail').innerHTML = trailHtml(run);
     $('steps').innerHTML = run.steps.map(stepHtml).join('');
     markTables();
@@ -939,6 +1064,15 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     el.scrollIntoView({ block: 'start' });
     if (focus !== false) el.querySelector('summary').focus({ preventScroll: true });
     setHash({ run: run.id, step: i }, push !== false);
+  }
+
+  // To a run of this item, and to one of its inputs: open its step and its Stage view, and scroll there.
+  function goRun(runId, index, field) {
+    goStep(index, true, false);
+    const box = document.getElementById(aid(runId)); if (!box) return;
+    const target = (field && document.getElementById(aid(runId) + '-in-' + field)) || box;
+    let d = target.parentElement; while (d && d !== box.parentElement) { if (d.tagName === 'DETAILS') d.open = true; d = d.parentElement; }
+    target.scrollIntoView({ block: 'start' }); if (target.tabIndex < 0 || target === box) { target.tabIndex = -1; } target.focus({ preventScroll: true });
   }
 
   // ---- Compare
@@ -1119,6 +1253,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   $('closeall').addEventListener('click', () => document.querySelectorAll('details.step').forEach((d) => { d.open = false; }));
   document.addEventListener('click', (e) => {
     const j = e.target.closest('[data-jump]'); if (j) { goStep(Number(j.dataset.jump)); return; }
+    const g = e.target.closest('[data-goto]'); if (g) { goRun(g.dataset.goto, Number(g.dataset.index), g.dataset.field); return; }
     const o = e.target.closest('[data-open]'); if (o) { setHash({ run: o.dataset.open, step: Number(o.dataset.step) }, true); setMode('one'); showRun(o.dataset.open, Number(o.dataset.step)); const el = $('step-' + o.dataset.step); if (el) el.querySelector('summary').focus(); return; }
     const m = e.target.closest('button.showmore'); if (m) { const ul = m.closest('ul'); const hid = Array.from(ul.querySelectorAll('li[hidden]')); hid.forEach((li) => { li.hidden = false; }); m.parentElement.remove(); if (hid[0]) { hid[0].tabIndex = -1; hid[0].focus(); } return; }
   });
