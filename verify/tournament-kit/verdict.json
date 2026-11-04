@@ -1,0 +1,48 @@
+{
+  "item": "tournament-kit",
+  "verified_sha": "906c16c46ec4adf5539af254965a8dacea426046",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5H9WvicVpdRd5APCND#agent=verifier-tournament-kit",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "generic",
+      "status": "MET",
+      "command": "node --test verify/tournament-kit/generic.test.mjs; node scripts/tournament/args.mjs verify/tournament-kit/toy/2026-11-04-readme-structure --out toy-args.json && node scripts/tournament/dry-run.mjs toy-args.json",
+      "excerpt": "4/4 pass. No file in scripts/tournament/ contains any tournament id, any lane id from tournaments/*/config.json, any workflow name (quick-fix, feature, research), packages/, harness workflows/, spec.js, host.js, engine or xstate (only .github/workflows/ in the CI template); runner.workflow.js quotes no stage or role name and imports/reads nothing. The verifier's toy tournament (README structure, stages sketch(designer, each) + verdict(judge, all), 3 lanes) builds args and, run through runner.workflow.js under the verifier's own stub host, makes calls sketch:R/T/Q then verdict, phases [Sketch, Verdict], prompts carry the toy question, lane stance and scoring rule, the judge prompt carries the lanes' outputs, result.ranking = the stub judge's ranking. Builder's dry-run.mjs on the same args: 'agent sketch:R-reference-first [Sketch] ... agent verdict [Verdict] prompt 1476 chars, schema'. Sanity mutation: appending 'workflows/quick-fix.json' to prompts/judge.md turns the grep test red."
+    },
+    {
+      "id": "pinned",
+      "status": "MET",
+      "command": "node --test verify/tournament-kit/pinned.test.mjs",
+      "excerpt": "20/20 pass. tournaments/2026-11-03-context/config.json has base.repo, base.sha (40-hex), lanes, stages, scoring.rule, runner.sha (40-hex) and builds. Toy control accepted; with each of base, base.repo, base.sha, lanes, stages, scoring, scoring.rule, runner, runner.sha deleted, and again emptied, args.mjs exits non-zero with 'args: refused: ...' and prints no args."
+    },
+    {
+      "id": "measure",
+      "status": "MET",
+      "command": "git -C ccp_xstate_scratch fetch origin 'refs/heads/tourney/*:refs/remotes/origin/tourney/*'; git worktree add --detach <tmp>/<lane> origin/tourney/2026-11-03-context/<lane>; npm ci (in each); node scripts/tournament/measure.mjs --tournament tournaments/2026-11-03-context --lane <lane> --checkout <tmp>/<lane> --out <tmp>/out/<lane>.json",
+      "excerpt": "All five exit 0. A-minimalist 23c32900 tests 27 pass 27 fail 0; B-event-sourcing 17d43602 19/19; C-provenance 88d3710e 22/22; D-wildcard dfcce0df 22/22; E-control c5b1a4d1 22/22 (matches A 27, B 19, C 22, D 22, E 22). measures keys: specLines (per workflow + total, e.g. A {feature:530, quick-fix:1341, research:774, total:2645}), stateKinds, transitionKinds, ops, guardForms, effects, actors, events, metaKeys, stateKeys, distinct, interpreterFilesChanged (A [spec.js], B [host.js, spec.js], E [host.js]), engineFilesChanged. Not run in npm test: needs the scratch checkouts."
+    },
+    {
+      "id": "ci-scratch",
+      "status": "MET",
+      "command": "diff scripts/tournament/ci/tournament.yml <(git show origin/tourney/2026-11-03-context/base:.github/workflows/tournament.yml); gh api repos/suredesigntshirts/ccp_xstate_scratch/pulls/{37..41}; gh api .../commits/<head>/check-runs; gh api .../actions/jobs/<score job>/logs",
+      "excerpt": "Base 1ca190f carries .github/workflows/tournament.yml identical to ci/tournament.yml, and its scripts/tournament/{args,measure}.mjs and tournaments/2026-11-03-context/{config.json,measure.mjs} are identical to this PR's. PRs #37-#41 are open drafts tourney/2026-11-03-context/<lane> -> .../base; at each head sha the 'score' check run is completed/success (jobs 126368835083, 126368847294, 126368858937, 126368871692, 126368880308). Each score log prints '## Tournament 2026-11-03-context: lane <lane>', 'Head `<head sha>`', the suite row (A 27|27|0, B 19|19|0, C 22|22|0, D 22|22|0, E 22|22|0) and the measures table (specLines, stateKinds, interpreterFilesChanged, ...), matching the local measure run. The lanes' own 'test' check (and B's 'clean-room') is red on every lane PR; that is the lane repo's npm test, not the tournament job."
+    },
+    {
+      "id": "index",
+      "status": "MET",
+      "command": "node --test verify/tournament-kit/index.test.mjs",
+      "excerpt": "2/2 pass. The tournaments/README.md row for 2026-11-03-context has the question ('What passes between states...'), winner A-minimalist (= config.record.winner), the issue #36 link, the viewer link and lane PRs #37-#41; docs/tournaments.md walks, in order, write the folder, args.mjs, dry-run.mjs, runner.workflow.js, push the lanes with ci/tournament.yml, read CI with measure.mjs, add a row to tournaments/README.md.",
+      "mutation": "sed -i '/2026-11-03-context/d' tournaments/README.md (deletes the index row); also, separately, removing the viewer link from the row. Both reverted with git checkout.",
+      "red_test": "verify/tournament-kit/index.test.mjs: 'tournaments/README.md has a 2026-11-03-context row with question, winner, issue and viewer' went red ('no index row for 2026-11-03-context', and 'viewer link' respectively)"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "gh api repos/suredesigntshirts/ccp_xstate/commits/906c16c46ec4adf5539af254965a8dacea426046/check-runs; gh api 'repos/suredesigntshirts/ccp_xstate/actions/runs?head_sha=906c16c...'",
+      "excerpt": "PR #66 head 906c16c4: workflow run 'ci' (41767411715) completed/success, its job 'test' (126368955798) success. ('verdict' run 41767411706 was red at that sha because this verdict did not exist yet.)"
+    }
+  ]
+}

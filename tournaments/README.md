@@ -1,0 +1,9 @@
+# Tournaments
+
+Each folder here is one design tournament: its pack, config, prompts, measure, result and scores. The runner and the
+other generic tools are in `scripts/tournament/`; how to run a new one is `docs/tournaments.md`. Lane code lives in
+ccp_xstate_scratch as `tourney/<id>/<lane>` branches with one draft PR each, and is never merged.
+
+| Id | Question | Winner | Fed | Links |
+|---|---|---|---|---|
+| [2026-11-03-context](2026-11-03-context/) | What passes between states, and what primitives make the work provably done, while staying simple and expressive? | A-minimalist (12/22 = 0.545 passes per weighted primitive; control E last at 0.293). Recommended: A plus C's host-placed subject, not yet executed on A | `plan/decisions/2026-11-04-tournament-layout.md` (this kit); the next engine replan starts from A + C's graft | [issue #36](https://github.com/suredesigntshirts/ccp_xstate_scratch/issues/36), lane PRs [#37](https://github.com/suredesigntshirts/ccp_xstate_scratch/pull/37) [#38](https://github.com/suredesigntshirts/ccp_xstate_scratch/pull/38) [#39](https://github.com/suredesigntshirts/ccp_xstate_scratch/pull/39) [#40](https://github.com/suredesigntshirts/ccp_xstate_scratch/pull/40) [#41](https://github.com/suredesigntshirts/ccp_xstate_scratch/pull/41), [viewer](https://claude.ai/artifact/CJtqBqa4vV6cKuVbB3uhfJ), [result](2026-11-03-context/result.md), [scores](2026-11-03-context/scores.json) |

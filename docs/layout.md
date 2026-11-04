@@ -7,6 +7,8 @@ plugins/<name>/     a Claude Code plugin: package.json, .claude-plugin/plugin.js
 workflows/          workflow files: XState machine config as JSON, loaded by packages/engine
 verify/<item>/      the verifier's own tests for an item, and its verdict.json
 scripts/gates/      the PR gates verdict.yml runs, with their tests
+scripts/tournament/ the generic design-tournament kit: runner, args builder, measure, CI template (docs/tournaments.md)
+tournaments/<id>/   one design tournament: pack, config, measure, result, scores; indexed in tournaments/README.md
 test/               repo-wide tests
 plan/               the plan (plan/README.md)
 docs/               standing knowledge, one file per subject

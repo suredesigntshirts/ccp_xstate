@@ -34,10 +34,12 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 | `plugins/` | npm workspaces for the Claude Code plugins |
 | `verify/<item>/` | The verifier's tests and `verdict.json` for each item |
 | `scripts/gates/` | The PR gates CI runs |
+| `scripts/tournament/` | The generic design-tournament runner, args builder, measure and CI template (`docs/tournaments.md`) |
+| `tournaments/` | One folder per design tournament, indexed in `tournaments/README.md`; lane code stays in the scratch repo |
 | `test/` | Repo-wide tests, such as the workspace rules |
 | `infra/cloud-environment/` | The cloud environment's setup script |
 | `.github/workflows/` | `.github/workflows/ci.yml` and `.github/workflows/verdict.yml` |
-| `docs/` | Standing knowledge; `docs/layout.md`, `docs/gates.md` and `docs/journal.md` |
+| `docs/` | Standing knowledge; `docs/layout.md`, `docs/gates.md`, `docs/journal.md` and `docs/tournaments.md` |
 
 ## Commands
 
