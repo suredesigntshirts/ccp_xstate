@@ -47,3 +47,5 @@ its gaps entry. The s5 cases-pass gate is not passed until the four fix items la
 verifier subagent, including the mount check under /mnt/project-files with two real session ids). `runEffects` now
 runs nothing for a host whose session doesn't own the item; C-two-hosts-one-item has its parity test and left
 `gaps.json`. Three gaps remain. No release: the change is in packages/engine only.
+
+**fix-waiting-wake (2026-11-04).** Merged (PR #85, verdict all six MET, harness-v0.1.21). C-waiting-does-not-stall has its parity test, and `gaps.json` is empty: all four gaps are closed.
