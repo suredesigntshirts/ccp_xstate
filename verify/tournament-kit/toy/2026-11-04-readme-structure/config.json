@@ -1,0 +1,18 @@
+{
+  "id": "2026-11-04-readme-structure",
+  "question": "How should a project README be structured so a newcomer can install, run and contribute within ten minutes?",
+  "pack": "pack.md",
+  "base": { "repo": "example/readme-toy", "sha": "0123456789abcdef0123456789abcdef01234567" },
+  "runner": { "sha": "fedcba9876543210fedcba9876543210fedcba98" },
+  "lanes": [
+    { "id": "R-reference-first", "alias": "R", "stance": "Reference-first: lead with a command table, prose later." },
+    { "id": "T-tutorial-first", "alias": "T", "stance": "Tutorial-first: one worked walkthrough from clone to first contribution." },
+    { "id": "Q-question-led", "alias": "Q", "stance": "Question-led: sections are the newcomer's questions, in the order they ask them." }
+  ],
+  "stages": [
+    { "id": "sketch", "title": "Sketch", "role": "designer", "over": "each" },
+    { "id": "verdict", "title": "Verdict", "role": "judge", "over": "all" }
+  ],
+  "scoring": { "rule": "Newcomer tasks completed (install, run, first PR) per hundred README lines; ties go to fewer top-level headings." },
+  "vars": {}
+}
