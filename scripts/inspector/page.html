@@ -305,7 +305,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
 
   <section class="panel" aria-label="In short">
     <p>This page replays one run of a workflow, step by step: where the item went, how its context (working memory) changed, and for each model agent exactly what it was given, what it did, what it returned and whether the host kept it. It says where every piece of prompt text came from.</p>
-    <p class="small"><b>Not recorded anywhere:</b> Claude Code's own system prompt, the exact commands agents ran, and the messages the parent session sends when it resumes an agent. <b>Lane A and lane C runs are scripted:</b> their agents are test fixtures, GitHub is fake, and no model ran.</p>
+    <p class="small"><b>Not recorded anywhere:</b> Claude Code's own system prompt, the exact commands agents ran, and the messages the parent session sends when it resumes an agent. <b>Scripted scenario runs</b> (the tourney tests, on main's engine or a lane's) <b>are not model runs:</b> their agents are test fixtures, GitHub is fake, and no model ran.</p>
   </section>
 
   <details class="callout" id="intro">
@@ -327,7 +327,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
         <li>The Claude Code system prompt is never recorded (layer 1).</li>
         <li>Tool calls keep only the tool name, time, size and paths. The exact commands are not stored, only a hash of them.</li>
         <li>When the parent session resumes an agent (for example because it finished without calling the return tool), the message it sends is not recorded. The prompt shown in layer 2 is then the agent's first message, not everything it was told; the page marks such agents "resumed, message not recorded".</li>
-        <li>Lane A and lane C runs are <b>scripted scenarios</b>: their "agents" are test fixtures (briefs and results typed into the test), GitHub is a fake server, and no model ran. They show what each design's engine would hand a real agent.</li>
+        <li>Scenario runs (main's tourney tests, lane A and lane C) are <b>scripted</b>: their "agents" are test fixtures (briefs and results typed into the test), GitHub is a fake server, and no model ran. They show what each design's engine would hand a real agent.</li>
         <li>The context after each step is recovered by <b>replay</b>. The page says where replay did not match or failed.</li>
         <li>Real runs from before workflows were pinned are shown with today's workflow file; the page says so on those runs.</li>
       </ul>
@@ -789,10 +789,12 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
 
   const writeLine = (w) => '<li><code>' + esc(w.path) + '</code> ← ' + (typeof w.source === 'string' ? '<code>' + esc(w.source) + '</code>' : 'the value <code>' + esc(JSON.stringify(w.source && w.source.value !== undefined ? w.source.value : w.source)) + '</code>') + '</li>';
   const findRun = (effect) => { for (const s of run.steps) for (const a of s.actors) if (a.effect === effect) return { s, a }; return null; };
-  const whoLine = (pv, scripted) => pv.kind === 'template' ? 'nobody. The engine filled in a template around the actor input.'
+  const whoLine = (pv, scripted) => pv.kind === 'stage' ? [...new Set((pv.writers || []).map((w) => w.words))].join(' and ') + (scripted && pv.producer ? ' (a test fixture here)' : '') + ', in the harness frame.'
+    : pv.kind === 'template' ? 'nobody. The engine filled in a template around the actor input.'
     : pv.kind === 'template+workflow' ? 'the workflow author, as instructions in the workflow JSON (state ' + (pv.state || '?') + ', invoke ' + pv.invoke + ', input.' + (pv.literals || []).join(', input.') + '), wrapped by the engine template.'
       : pv.kind === 'passthrough' ? (pv.producer && pv.producer.model ? 'the ' + pv.producer.actor + ' agent' + (scripted ? ' (a test fixture here)' : '') : pv.producer && pv.producer.event === 'xstate.init' ? 'whoever started the item' : 'an earlier step') : 'unknown';
-  const pillWho = (pv) => pv.kind === 'template' ? 'engine template, nobody wrote it' : pv.kind === 'template+workflow' ? 'workflow JSON + engine template' : pv.kind === 'passthrough' ? 'written by the ' + (pv.producer ? pv.producer.actor + (pv.producer.model ? ' agent' : ' step') : 'an earlier step') : '';
+  const stageWho = (pv) => pv.producer ? 'written by the ' + pv.producer.actor + ' agent' : pv.writers && pv.writers.some((w) => w.kind === 'workflow') ? 'workflow JSON + harness frame' : 'see the Stage view';
+  const pillWho = (pv) => pv.kind === 'stage' ? stageWho(pv) : pv.kind === 'template' ? 'engine template, nobody wrote it' : pv.kind === 'template+workflow' ? 'workflow JSON + engine template' : pv.kind === 'passthrough' ? 'written by the ' + (pv.producer ? pv.producer.actor + (pv.producer.model ? ' agent' : ' step') : 'an earlier step') : '';
 
   function layers(s, a) {
     const L = a.layers; const out = [];
@@ -1173,7 +1175,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     return sec(esc(title), '<p class="small"><b>In short</b> (lines that differ, with hard-wrapped lines joined; JSON lines left out):</p>' + sum + '<p class="small"><b>Side by side</b>, in the readable layout:</p><div class="cols"><div class="col"><h4>' + esc(NAME_L) + '</h4><pre class="text" tabindex="0" role="region" aria-label="' + esc(title) + ', ' + esc(NAME_L) + '">' + d.L + '</pre></div><div class="col"><h4>' + esc(NAME_R) + '</h4><pre class="text" tabindex="0" role="region" aria-label="' + esc(title) + ', ' + esc(NAME_R) + '">' + d.R + '</pre></div></div>', { open: true, hint: 'differs' });
   }
   const modelRuns = (r) => { const out = []; r.steps.forEach((s) => s.actors.forEach((a) => { if (a.model) out.push({ key: a.actor + ' #' + a.occurrence, s, a }); })); return out; };
-  const whoShort = (r, a) => { const pv = a.layers.l2.provenance; return pv.kind === 'template' ? 'Engine template (nobody wrote it)' : pv.kind === 'template+workflow' ? 'Workflow author\'s task (in the workflow JSON) + engine template' : pv.kind === 'passthrough' ? 'Written by ' + (pv.producer ? 'the ' + pv.producer.actor + (pv.producer.model ? ' agent' : ' step') : 'an earlier step') + (r.kind === 'scripted' && pv.producer && pv.producer.model ? ' (a test fixture)' : '') : 'Unknown'; };
+  const whoShort = (r, a) => { const pv = a.layers.l2.provenance; return pv.kind === 'stage' ? (pv.producer ? 'Written by the ' + pv.producer.actor + ' agent' + (r.kind === 'scripted' ? ' (a test fixture)' : '') + ', in a harness frame' : pv.writers && pv.writers.some((w) => w.kind === 'workflow') ? 'Workflow author\'s task (in the workflow JSON) + harness frame' : 'Named per piece in the Stage view') : pv.kind === 'template' ? 'Engine template (nobody wrote it)' : pv.kind === 'template+workflow' ? 'Workflow author\'s task (in the workflow JSON) + engine template' : pv.kind === 'passthrough' ? 'Written by ' + (pv.producer ? 'the ' + pv.producer.actor + (pv.producer.model ? ' agent' : ' step') : 'an earlier step') + (r.kind === 'scripted' && pv.producer && pv.producer.model ? ' (a test fixture)' : '') : 'Unknown'; };
   let cmpIds = null;
   function compare(idA, idB, push) {
     const A = runById[idA], B = runById[idB]; if (!A || !B) return;
@@ -1235,7 +1237,8 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   }
   function setHash(o, push) { const h = '#' + Object.entries(o).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&'); if (location.hash === h) return;
     try { if (push) history.pushState(null, '', h); else history.replaceState(null, '', h); } catch (e) { /* file: urls in some browsers */ } }
-  const defaultRun = () => D.runs.find((r) => r.item === 'fri-jsonl-lint-2') || D.runs[0] || null;
+  // The first run with stage records opens by default: it shows the most. Older sources fall back to the first real issue.
+  const defaultRun = () => D.runs.find((r) => r.flow) || D.runs.find((r) => r.item === 'fri-jsonl-lint-2') || D.runs[0] || null;
   function fromHash() {
     const p = {}; location.hash.slice(1).split('&').forEach((kv) => { const i = kv.indexOf('='); if (i > 0) p[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
     if (p.compare) { const [a, b] = p.compare.split(','); setMode('cmp'); $('incidental').checked = p.incidental !== 'shown'; if (!run) showRun((runById[a] || defaultRun() || {}).id); if (runById[a] && runById[b || a]) { compare(a, b || a, false); return; } notice('That comparison names a run this build does not have.'); const d = defaultPair(); compare(d[0], d[1], false); return; }

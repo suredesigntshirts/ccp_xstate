@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { exportRun, graphOf, leavesOf, segmentsOf, sourceOf, jsonChunks, stringPieces, piecesOf, labelGap, runValuesOf, producerRef, stageView, flowOf } from '../export.mjs';
-import { build, capture, testNames, scenarioText } from '../build.mjs';
+import { build, capture, engineOf, testNames, scenarioText } from '../build.mjs';
 
 const REPO = fileURLToPath(new URL('../../../', import.meta.url));
 const LANE_A = '/home/user/lanes/A-minimalist';
@@ -421,7 +421,8 @@ test('fri-jsonl-lint-2 verify: the agent was resumed with a message that was not
 });
 
 // ---- The stage record (stage.json): a tiny journal with two stage runs, no engine checkout needed.
-const LANE_S = '/home/user/sc/S-cleanup';
+// Main's engine has the stage contract (engine-stage-contract), so its own tourney scenarios make stage records.
+const MAIN = REPO;
 function stageFixture() {
   const engine = mkdtempSync(join(tmpdir(), 'wi-stage-eng-'));
   const journal = mkdtempSync(join(tmpdir(), 'wi-stage-j-'));
@@ -518,10 +519,10 @@ test('producerRef words every producer kind, and a run without stage.json export
   assert.equal(flowOf([{ run: 'x:1.build', actor: 'build', stage: null }], ctx.steps), null);
 });
 
-test('lane S Q1 and R1: every model run has its stage record, producers link to runs of the item, and R1 answers are made of researcher parts', { skip: !existsSync(join(LANE_S, 'packages/engine/test/tourney/R1.test.js')) && 'no lane S checkout here', timeout: 300000 }, async () => {
+test('main Q1 and R1: every model run has its stage record, producers link to runs of the item, and R1 answers are made of researcher parts', { skip: !existsSync(join(MAIN, 'packages/engine/test/tourney/R1.test.js')) && 'no tourney scenarios here', timeout: 300000 }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'wi-stage-cap-'));
-  const q1 = capture({ engine: LANE_S, scenario: 'packages/engine/test/tourney/Q1.test.js', dir: join(dir, 'q1') });
-  const b = await exportRun({ engine: LANE_S, journal: q1.roots[0], kind: 'scripted' });
+  const q1 = capture({ engine: MAIN, scenario: 'packages/engine/test/tourney/Q1.test.js', dir: join(dir, 'q1') });
+  const b = await exportRun({ engine: MAIN, journal: q1.roots[0], kind: 'scripted' });
   const models = b.steps.flatMap((s) => s.actors.filter((a) => a.model));
   assert.ok(models.length >= 3 && models.every((a) => a.stage), 'every model run has a stage view');
   const verify = models.find((a) => a.actor === 'verify');
@@ -535,12 +536,58 @@ test('lane S Q1 and R1: every model run has its stage record, producers link to 
   const pr = build.stage.wrote.find((w) => w.path === 'pr');
   assert.ok(pr.readBy.some((rb) => rb.runs.some((x) => x.run === verify.effect && x.read === true)), 'build.pr is read by the verify run');
   assert.deepEqual(b.flow.nodes.slice(0, 4).map((n) => n.actor), ['start input', 'brief', 'build', 'verify']);
-  const r1 = capture({ engine: LANE_S, scenario: 'packages/engine/test/tourney/R1.test.js', dir: join(dir, 'r1') });
-  const rb = await exportRun({ engine: LANE_S, journal: r1.roots[0], kind: 'scripted' });
+  const r1 = capture({ engine: MAIN, scenario: 'packages/engine/test/tourney/R1.test.js', dir: join(dir, 'r1') });
+  const rb = await exportRun({ engine: MAIN, journal: r1.roots[0], kind: 'scripted' });
   const write = rb.steps.flatMap((s) => s.actors).find((a) => a.actor === 'write' && a.stage);
   const answers = write.stage.inputs.find((i) => i.name === 'answers');
   assert.equal(answers.producer.kind, 'parts');
   assert.equal(answers.producer.parts.length, 3);
   assert.ok(answers.producer.parts.every((p) => p.link && p.link.actor === 'researcher'));
   assert.deepEqual(answers.amended, []);
+});
+
+// The adopt trial of engine-stage-contract is committed, so this check runs everywhere: real agents, main's engine.
+const ADOPT = join(REPO, 'tournaments/2026-11-04-stage-contract/trials/adopt/journal');
+
+test('adopt trial: every model run carries its stage.json as on disk, and the flow is brief, build, verify with briefs.builder, pr and verdict between them', { timeout: 300000 }, async () => {
+  const b = await exportRun({ engine: REPO, journal: ADOPT, kind: 'real' });
+  const models = b.steps.flatMap((s) => s.actors.filter((a) => a.model));
+  assert.deepEqual(models.map((a) => a.actor), ['brief', 'build', 'verify']);
+  for (const a of models) {
+    const [, n] = a.effect.split(':');
+    const disk = JSON.parse(readFileSync(join(ADOPT, 'items', 'trial', 'runs', n, 'stage.json'), 'utf8'));
+    assert.equal(a.stage.run, disk.run);
+    assert.deepEqual(a.stage.parts.map((p) => p.part), Object.keys(disk.prompt.parts), `${a.effect}: parts in order`);
+    for (const p of a.stage.parts) assert.deepEqual(p.pieces.map((x) => x.text), disk.prompt.parts[p.part].map((x) => x.text), `${a.effect}: ${p.part} pieces`);
+    // A literal input's from is { value } on disk; the view marks it literal and keeps the value.
+    const fromOf = (i) => (typeof i.from === 'string' ? i.from : null);
+    assert.deepEqual(a.stage.inputs.map((i) => [i.name, i.meaning, fromOf(i)]), disk.inputs.map((i) => [i.name, i.meaning, fromOf(i)]), `${a.effect}: inputs`);
+    for (const [i, inp] of a.stage.inputs.entries()) assert.deepEqual(inp.value, disk.inputs[i].value, `${a.effect}: ${inp.name} value`);
+    for (const [i, inp] of a.stage.inputs.entries()) if (disk.inputs[i].producer.run) assert.equal(inp.producer.link.run, disk.inputs[i].producer.run, `${a.effect}: ${inp.name} producer links its run`);
+    assert.deepEqual(a.stage.output, disk.output);
+    assert.deepEqual(a.stage.wrote.map((w) => w.path), disk.wrote.map((w) => w.path), `${a.effect}: paths written`);
+  }
+  const between = (from, to) => b.flow.edges.find((e) => e.from === from.effect && e.to === to.effect)?.paths ?? [];
+  const [brief, build, verify] = models;
+  assert.ok(between(brief, build).includes('briefs.builder'));
+  assert.ok(between(build, verify).includes('pr'));
+  const order = b.flow.nodes.map((n) => n.id);
+  assert.ok(order.indexOf(brief.effect) < order.indexOf(build.effect) && order.indexOf(build.effect) < order.indexOf(verify.effect), 'brief, build, verify in start order');
+  assert.ok(b.flow.edges.some((e) => e.from === verify.effect && e.paths.includes('verdict')), 'verify passes verdict on');
+});
+
+test('engineOf: a string engine is relative to the repo root, a { commit } engine is a worktree of that commit', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'wi-engine-'));
+  assert.equal(engineOf('.', dir).path, REPO.replace(/\/$/, ''));
+  assert.match(engineOf({ commit: '0'.repeat(40) }, dir).missing, /not in this clone/);
+  assert.match(engineOf({}, dir).missing, /neither a folder nor/);
+  const head = execFileSync('git', ['-C', REPO, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  const made = new Map();
+  const e = engineOf({ commit: head }, dir, made);
+  try {
+    assert.ok(existsSync(join(e.path, 'packages/engine/src/spec.js')), 'the worktree holds the engine');
+    assert.equal(engineOf({ commit: head }, dir, made), e, 'checked out once per build');
+  } finally {
+    execFileSync('git', ['-C', REPO, 'worktree', 'remove', '--force', e.path], { stdio: 'ignore' });
+  }
 });

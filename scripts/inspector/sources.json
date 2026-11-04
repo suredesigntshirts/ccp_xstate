@@ -1,79 +1,81 @@
 {
-  "about": "The sources build.mjs reads by default. Paths are this machine's; a missing source is skipped and named. A source is a journal root (engine + journal) or a lane scenario test (engine + scenario). See docs/inspector.md.",
+  "about": "The sources build.mjs reads by default. A string engine or journal path is relative to this repo's root, so \".\" is this checkout; an engine { commit } is this repo at that commit, checked out as a worktree for the build. /mnt/project-files is the project's shared folder; /home/user/lanes are tournament lane checkouts from the scratch repo. A missing source is skipped and named. See docs/inspector.md.",
   "engines": {
-    "/home/user/wi": "Main",
+    ".": "Main",
+    "commit:36da3e4421c88e6d1762f1f671494a71f0b70940": "Main @36da3e4 (before the stage contract)",
     "/home/user/lanes/A-minimalist": "Lane A",
-    "/home/user/lanes/C-provenance": "Lane C",
-    "/home/user/sc/S-cleanup": "Lane S",
-    "/home/user/sc/at-aac5572": "Lane S @aac5572",
-    "/home/user/sc/at-8d51cbf": "Lane S @8d51cbf"
+    "/home/user/lanes/C-provenance": "Lane C"
   },
   "sources": [
     {
       "origin": "Real runs (main engine)",
       "kind": "real",
-      "engine": "/home/user/wi",
+      "engine": ".",
+      "journal": "tournaments/2026-11-04-stage-contract/trials/adopt/journal",
+      "label": "Adopt trial: the stage contract on main, 4 Nov",
+      "note": "Real run: the agents were real Claude agents, and GitHub was a local stand-in server, not github.com. The write-up is tournaments/2026-11-04-stage-contract/trials/adopt/report.md."
+    },
+    {
+      "origin": "Real runs (engine before the stage contract)",
+      "kind": "real",
+      "engine": {
+        "commit": "36da3e4421c88e6d1762f1f671494a71f0b70940"
+      },
       "journal": "/mnt/project-files/first-real-issue/harness/journal",
-      "label": "First real issue, 31 Oct"
+      "label": "First real issue, 31 Oct",
+      "note": "Recorded before the stage contract, so it has no stage records. Replayed on main at 36da3e4, the last commit before engine-stage-contract, because today's engine refuses a journal without a pinned contract workflow by design."
     },
     {
-      "origin": "Real runs (main engine)",
+      "origin": "Real runs (engine before the stage contract)",
       "kind": "real",
-      "engine": "/home/user/wi",
+      "engine": {
+        "commit": "36da3e4421c88e6d1762f1f671494a71f0b70940"
+      },
       "journal": "/mnt/project-files/toy-run/harness/journal",
-      "label": "Toy run, 30-31 Oct"
+      "label": "Toy run, 30-31 Oct",
+      "note": "Recorded before the stage contract, so it has no stage records. Replayed on main at 36da3e4, the last commit before engine-stage-contract, because today's engine refuses a journal without a pinned contract workflow by design."
     },
     {
-      "origin": "Real runs (main engine)",
+      "origin": "Real runs (engine before the stage contract)",
       "kind": "real",
-      "engine": "/home/user/wi",
+      "engine": {
+        "commit": "36da3e4421c88e6d1762f1f671494a71f0b70940"
+      },
       "journal": "/mnt/project-files/toy-run-returns/harness/journal",
-      "label": "Actor returns, 31 Oct"
+      "label": "Actor returns, 31 Oct",
+      "note": "Recorded before the stage contract, so it has no stage records. Replayed on main at 36da3e4, the last commit before engine-stage-contract, because today's engine refuses a journal without a pinned contract workflow by design."
     },
     {
-      "origin": "Real runs (main engine)",
+      "origin": "Real runs (engine before the stage contract)",
       "kind": "real",
-      "engine": "/home/user/wi",
+      "engine": {
+        "commit": "36da3e4421c88e6d1762f1f671494a71f0b70940"
+      },
       "journal": "/mnt/project-files/toy-run-views/harness/journal",
-      "label": "Item views, 31 Oct"
+      "label": "Item views, 31 Oct",
+      "note": "Recorded before the stage contract, so it has no stage records. Replayed on main at 36da3e4, the last commit before engine-stage-contract, because today's engine refuses a journal without a pinned contract workflow by design."
     },
     {
-      "origin": "Lane S: real-model trials",
-      "kind": "real",
-      "engine": "/home/user/sc/at-aac5572",
-      "journal": "/mnt/project-files/stage-contract-tournament/trial/journal",
-      "label": "Trial 1: multiply (before fixes)",
-      "note": "Real run: the agents were real Claude agents, and GitHub was a local stand-in server, not github.com. Engine: lane S at aac5572. The full write-up is report.md in /mnt/project-files/stage-contract-tournament/trial/."
-    },
-    {
-      "origin": "Lane S: real-model trials",
-      "kind": "real",
-      "engine": "/home/user/sc/at-8d51cbf",
-      "journal": "/mnt/project-files/stage-contract-tournament/trial2/journal",
-      "label": "Trial 2: divide (after fixes)",
-      "note": "Real run: the agents were real Claude agents, and GitHub was a local stand-in server, not github.com. Engine: lane S at 8d51cbf. The full write-up is report.md in /mnt/project-files/stage-contract-tournament/trial2/."
-    },
-    {
-      "origin": "Lane S cleaned up (scripted)",
-      "engine": "/home/user/sc/S-cleanup",
+      "origin": "Main engine (scripted)",
+      "engine": ".",
       "scenario": "packages/engine/test/tourney/Q1.test.js",
       "label": "Q1 happy path"
     },
     {
-      "origin": "Lane S cleaned up (scripted)",
-      "engine": "/home/user/sc/S-cleanup",
+      "origin": "Main engine (scripted)",
+      "engine": ".",
       "scenario": "packages/engine/test/tourney/Q3.test.js",
       "label": "Q3 red CI, rebuild"
     },
     {
-      "origin": "Lane S cleaned up (scripted)",
-      "engine": "/home/user/sc/S-cleanup",
+      "origin": "Main engine (scripted)",
+      "engine": ".",
       "scenario": "packages/engine/test/tourney/Q5.test.js",
       "label": "Q5 verifier misreports"
     },
     {
-      "origin": "Lane S cleaned up (scripted)",
-      "engine": "/home/user/sc/S-cleanup",
+      "origin": "Main engine (scripted)",
+      "engine": ".",
       "scenario": "packages/engine/test/tourney/R1.test.js",
       "label": "R1 research, three researchers"
     },

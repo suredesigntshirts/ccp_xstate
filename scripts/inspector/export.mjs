@@ -883,7 +883,25 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
   const literals = Object.entries(def?.input ?? {}).filter(([, v]) => v && typeof v === 'object' && 'value' in v && typeof v.value === 'string')
     .map(([k, v]) => ({ key: k, text: v.value }));
   let provenance;
-  if (brief == null) provenance = { kind: 'missing', summary: 'brief.md is missing from the run folder.' };
+  // A stage-contract run names the source of every prompt piece in stage.json; who wrote its Task part is read there,
+  // not guessed from input.brief (that input no longer exists) or from the template.
+  const stageRec = readJson(join(runPath, 'stage.json'));
+  const taskPieces = stageRec?.prompt?.parts?.task ?? null;
+  if (brief != null && taskPieces?.length) {
+    const writers = taskPieces.map((x) => {
+      const p = x.source?.producer ?? {};
+      if (p.kind === 'stage') return { kind: 'stage', actor: p.actor, run: p.run, field: p.field ?? null, model: true, words: `the ${p.actor} agent (run ${p.run}${p.field ? `, its ${p.field} field` : ''})` };
+      if (p.kind === 'literal') return { kind: 'workflow', at: p.at, words: `the workflow author, in the workflow JSON at ${p.at}` };
+      if (p.kind === 'initial') return { kind: 'initial', words: "whoever started the item (its start input)" };
+      return { kind: p.kind ?? 'unknown', words: p.kind ? `a ${p.kind} value` : 'an unrecorded source' };
+    });
+    const stageWriter = writers.find((w) => w.kind === 'stage');
+    provenance = {
+      kind: 'stage', scripted, writers, producer: stageWriter ? { actor: stageWriter.actor, run: stageWriter.run, field: stageWriter.field, model: true } : null,
+      summary: `The Task part of this prompt was written by ${[...new Set(writers.map((w) => w.words))].join(' and ')}; the rest is the harness's fixed frame around it. The Stage view above names the source of every piece, from stage.json.` +
+        (scripted && stageWriter ? ' In this scenario that "agent" is a test fixture: the text was typed into the test, not written by a model.' : '')
+    };
+  } else if (brief == null) provenance = { kind: 'missing', summary: 'brief.md is missing from the run folder.' };
   else if (typeof input?.brief === 'string' && input.brief && input.brief === brief) {
     // Passed through: find the step that put this text into the context, and the run whose result it was.
     let producer = null;
@@ -924,7 +942,8 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
   const inputMinus = { ...input };
   const promptKnown = [
     ...literals.map((l) => ({ text: l.text, from: 'workflow', note: `literal "${l.key}" in the workflow JSON` })),
-    { value: input, subset: true, from: 'input', note: 'the actor input as JSON, computed from the context by the invoke input map' }
+    { value: input, subset: true, from: 'input', note: 'the actor input as JSON, computed from the context by the invoke input map' },
+    ...(provenance.kind === 'stage' ? taskPieces.map((x, i) => ({ text: x.text, from: provenance.writers[i].kind === 'workflow' ? 'workflow' : 'passthrough', note: `the Task part, written by ${provenance.writers[i].words} (stage.json)` })) : [])
   ];
   // Text is "template" only where it is literally a static piece of the engine's string literals; this run's values
   // fill the holes; anything neither explains is "unknown", never "template".
