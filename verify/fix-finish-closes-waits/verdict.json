@@ -1,6 +1,6 @@
 {
   "item": "fix-finish-closes-waits",
-  "verified_sha": "bc261f866f88c02e28602ce7da9a5c796627f954",
+  "verified_sha": "963babc763b79e7fc2502fa9052794c4a4714cb6",
   "verifier": {
     "session": "https://claude.ai/code/session_01KfkB5FhYwvFcAdzpHbcZR8",
     "model": "claude-opus-5-5"
@@ -24,7 +24,7 @@
       "id": "parity",
       "status": "MET",
       "command": "TMPDIR=<fresh> node --test packages/engine/test/parity/*.test.js packages/engine/test/tourney/*.test.js; git diff origin/main...bc261f8 -- packages/engine/test/parity packages/engine/test/tourney verify/parity-cases",
-      "excerpt": "tests 110, pass 110, fail 0, skipped 0 (C-finish-closes-waits.test.js and cases.test.js among them). gaps.json lists only C-waiting-does-not-stall. verify/parity-cases/C-finish-closes-waits.gap.test.mjs is deleted. Scenario changes: Q7 (now expects closedOutside, failure { closedOutside, outcome: merged }, no open card, one card, tap moves nothing, never done) and Q2's stop check (reads an agent run's stop from done effect rows instead of pending(); the asserted fact, that the verify run for A was stopped, is unchanged). This matches main's Expect text (replan #81, a91a1d3), which names exactly Q7 and Q2's stop check. Finding: the PR's own plan/items/fix-finish-closes-waits.md diff reverts that line to its earlier wording ('Q7's change the only scenario assertion changed'), which the PR's own Q2 change would contradict; it is a stale copy and should be dropped from the PR so main keeps the replanned contract. Judged against main's contract, the line holds."
+      "excerpt": "tests 110, pass 110, fail 0, skipped 0 (C-finish-closes-waits.test.js and cases.test.js among them). gaps.json lists only C-waiting-does-not-stall. verify/parity-cases/C-finish-closes-waits.gap.test.mjs is deleted. Scenario changes: Q7 (now expects closedOutside, failure { closedOutside, outcome: merged }, no open card, one card, tap moves nothing, never done) and Q2's stop check (reads an agent run's stop from done effect rows instead of pending(); the asserted fact, that the verify run for A was stopped, is unchanged). This matches main's Expect text (replan #81, a91a1d3), which names exactly Q7 and Q2's stop check. At 963babc the PR no longer changes plan/ (git diff origin/main...963babc -- plan/ is empty), so main's parity line, naming Q7 and Q2's stop check, is the contract; the only change since bc261f8 is that plan file restored."
     },
     {
       "id": "view-closed",
@@ -44,7 +44,7 @@
       "id": "ci",
       "status": "MET",
       "command": "mcp__github__pull_request_read get_check_runs PR 82",
-      "excerpt": "Check run 'test' (id 126850501479) completed success at head bc261f8; clean-room success; 'gates' failed only because no verdict existed yet."
+      "excerpt": "Check run 'test' (id 126850501479) completed success at head bc261f8; clean-room success; 'gates' failed only because no verdict existed yet. Re-stamp at 963babc: 'test' run 126860048351 was still in progress when stamped; 963babc differs from bc261f8 only in plan/items/fix-finish-closes-waits.md, and the merge rule still needs ci green at the head."
     }
   ]
 }
