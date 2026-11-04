@@ -38,6 +38,7 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 | `tournaments/` | One folder per design tournament, indexed in `tournaments/README.md`; lane code stays in the scratch repo |
 | `test/` | Repo-wide tests, such as the workspace rules |
 | `infra/cloud-environment/` | The cloud environment's setup script |
+| `vendor/` | Third-party tools copied in verbatim; `vendor/documentation-downloader/` is the docs skill setup installs |
 | `.github/workflows/` | `.github/workflows/ci.yml` and `.github/workflows/verdict.yml` |
 | `docs/` | Standing knowledge; `docs/layout.md`, `docs/gates.md`, `docs/journal.md` and `docs/tournaments.md` |
 

@@ -1,0 +1,37 @@
+{
+  "item": "tool-docs-downloader",
+  "verified_sha": "6ff8ba7394d2a78760e3b4a4ea51b0267121e9a6",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5HjHSWnaxCrLEUviB3#verifier-subagent",
+    "model": "claude-opus-5-5"
+  },
+  "summary": "Verified at 6ff8ba7 from a fresh clone (/tmp/verify-tdd). vendor/ copy is identical to git archive e011667 minus eval/ and .github/. setup.sh installs the skill with node_modules and doctor reports Ready; reruns give the same files; CCP_SETUP_FETCH=0 copies without node_modules. A real nodejs.org page fetched and searched from the installed copy. npm test: 508 pass / 1 fail / 11 skipped at the PR head, identical to origin/main (36da3e4); the one failure is the same environmental release-tag test on both. Note: npm test took 678 s at the PR head vs 35 s on main in this container, almost all in verify/self-update-by-version/no-self-edit.test.mjs, which runs setup.sh with only HOME and PATH (no proxy env), so step 2b's npm ci waits on the registry; those tests still pass.",
+  "results": [
+    {
+      "id": "verbatim",
+      "status": "MET",
+      "command": "git -C /tmp/verify-sdd-src archive e011667601fb9396c7c65c81b47ffa53870c6ce5 | tar -x -C <tmp>/arch --exclude=eval --exclude=.github; diff -r <tmp>/arch vendor/documentation-downloader",
+      "excerpt": "diff exit 0; 97 files on each side"
+    },
+    {
+      "id": "setup-installs",
+      "status": "MET",
+      "command": "env -u CCP_SETUP_FETCH HOME=<tmp>/home1 CCP_SETUP_LOG=<tmp>/setup1.log bash infra/cloud-environment/setup.sh (twice); cd <home1>/.claude/skills/documentation-downloader && npm run doctor; HOME=<tmp>/home2 CCP_SETUP_FETCH=0 bash infra/cloud-environment/setup.sh (twice)",
+      "excerpt": "log 'installed .../home1/.claude/skills/documentation-downloader'; SKILL.md and node_modules present (42 packages); doctor: 'ok Node.js v22.23.4, ok npm packages playwright, @mixmark-io/domino, proper-lockfile, yaml, @ghostery/adblocker, ok Browser binary 153.0.8010.12 via system Chrome ... Ready.' Second run: same 3874-entry path list and same sha256 of every non-node_modules file. CCP_SETUP_FETCH=0: SKILL.md present, no node_modules, same 107-entry list on both runs."
+    },
+    {
+      "id": "fetches",
+      "status": "MET",
+      "command": "cd <tmp>/fetchwork && node <home1>/.claude/skills/documentation-downloader/scripts/docs.mjs fetch https://nodejs.org/api/path.html && node .../docs.mjs search \"path.relative\"",
+      "excerpt": "[OK] https://nodejs.org/api/path.html -> nodejs.org/api/path.md via html, rendered, 3.1s; file external-docs/nodejs.org/api/path.md (585 lines); search: 'external-docs/nodejs.org/api/path.md ... 466-498 (33 lines) Path › path.relative(from, to)', and line 466 is '### path.relative(from, to)'"
+    },
+    {
+      "id": "tests",
+      "status": "MET",
+      "command": "node plan/check.mjs; npm ci && npm test at 6ff8ba7, and the same at origin/main 36da3e4 in a separate clone; mutation run with node --test test/setup.test.mjs",
+      "excerpt": "plan ok (8 stages, 48 items). PR head: tests 520, pass 508, fail 1, skipped 11. main: tests 520, pass 508, fail 1, skipped 11. The only failure on both is 'copy-not-link: with release tags, setup installs the newest release by version, not the HEAD' (expected harness-v0.1.10, actual harness-v0.1.17: the clone sees real release tags), so the PR adds no failure. Mutation: setup.test.mjs went 5 pass/1 fail to 4 pass/2 fail; restored with git checkout, back to 5/1.",
+      "mutation": "deleted step 2b (the 15-line documentation-downloader block) from infra/cloud-environment/setup.sh in the working tree",
+      "red_test": "test/setup.test.mjs: copy-not-link: replacing the installed copy leaves no old files behind"
+    }
+  ]
+}
