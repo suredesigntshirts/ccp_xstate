@@ -97,6 +97,7 @@
     },
     "awaitingGates": {
       "meta": { "needs": ["verifiedHead", "gatesTouched"] },
+      "after": { "checkBack": { "description": "no answer an hour after the ask: nothing moves; the wake brings the thread back to the waiting item (fix-waiting-wake)" } },
       "invoke": {
         "id": "ask", "src": "ask",
         "input": { "question": { "value": "This PR changes CI configuration, so its green CI is the builder's own. Merge it at the verified commit, CI change included?" }, "choices": { "value": ["approve CI change", "reject"] }, "pr": "context.verdict.pr", "verdict": "context.verdict", "notes": "context.notes" },
@@ -120,6 +121,7 @@
     },
     "awaitingMerge": {
       "meta": { "needs": ["verifiedHead"] },
+      "after": { "checkBack": { "description": "no answer an hour after the ask: nothing moves; the wake brings the thread back to the waiting item (fix-waiting-wake)" } },
       "invoke": {
         "id": "ask", "src": "ask",
         "input": { "question": { "value": "Merge this PR at the verified commit?" }, "choices": { "value": ["approve", "reject"] }, "pr": "context.verdict.pr", "verdict": "context.verdict", "notes": "context.notes" },
@@ -151,6 +153,7 @@
       }
     },
     "replanning": {
+      "after": { "checkBack": { "description": "no answer an hour after the ask: nothing moves; the wake brings the thread back to the waiting item (fix-waiting-wake)" } },
       "invoke": {
         "id": "ask", "src": "ask",
         "input": { "question": { "value": "This item stalled. Replan it with a written five whys, or drop it?" }, "choices": { "value": ["replan", "drop"] }, "verdict": "context.verdict", "failure": "context.failure" },
@@ -166,6 +169,7 @@
     "closedOutside": { "type": "final" }
   },
   "meta": {
+    "delays": { "checkBack": 3600000 },
     "guards": {
       "hasIssue": ["context.issue.url", "context.issue.expect"],
       "hasBriefs": ["context.briefs.builder", "context.briefs.verifier"],

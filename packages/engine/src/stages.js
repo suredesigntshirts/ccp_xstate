@@ -483,9 +483,12 @@ export function decisions(spec, src, wiring = chart(spec)) {
  * - every stage invoke gives exactly its declared inputs, and every invoke input (stage, effect or workflow) is a
  *   literal or a context path that something feeds when the invoke's state is entered (shapes); a literal task is
  *   non-empty text, and a wired task may hold text there (mayBeText); a child workflow's invoke gives every input
- *   its item input requires.
+ *   its item input requires;
+ * - every state that invokes ask sets a timer: an after transition whose delay is a number of ms or a positive
+ *   meta.delays entry (plan item fix-waiting-wake). Not for a `pinned` workflow, which an item started before it may
+ *   still run.
  */
-export function checkStages(spec, { workflows = null } = {}) {
+export function checkStages(spec, { workflows = null, pinned = false } = {}) {
   const children = Array.isArray(workflows) ? Object.fromEntries(workflows.map((n) => [n, null])) : workflows;
   const actors = spec.meta?.actors ?? {};
   const defs = spec.meta?.schemas ?? {};
@@ -519,6 +522,18 @@ export function checkStages(spec, { workflows = null } = {}) {
     if (EFFECTS.includes(inv.src) || !children || Object.hasOwn(children, inv.src)) continue;
     const lacks = PARTS.filter((p) => !(isObject(st) && p in st)).join(' and ');
     throw new Error(`${spec.id}: actor ${inv.src}, invoked at ${inv.at}, is not a stage (it lacks ${lacks}), a host effect (${EFFECTS.join(', ')}) or a workflow. A workflow pinned before the stage contract cannot run: finish its items on the engine that started them, or migrate it`);
+  }
+  // A state that asks the person sets a timer, so a wake is scheduled for the item while it waits (plan item
+  // fix-waiting-wake, case C-waiting-does-not-stall). Its delay is a number of ms or a name in meta.delays.
+  for (const inv of pinned ? [] : wiring.invokes.filter((v) => v.src === 'ask')) {
+    const state = inv.state.join('.');
+    const delays = Object.keys(wiring.nodes.get(state)?.after ?? {});
+    const named = spec.meta?.delays ?? {};
+    if (!delays.length) throw new Error(`${spec.id}: state ${state} asks the person (invoke ${inv.id}) and sets no timer: give it an after transition, so a wake is scheduled while it waits`);
+    for (const d of delays) {
+      const ms = /^\d+$/.test(d) ? Number(d) : named[d];
+      if (!(Number.isFinite(ms) && ms > 0)) throw new Error(`${spec.id}: state ${state} waits on delay ${d}, which is neither a number of ms nor a positive meta.delays entry`);
+    }
   }
   for (const src of stagesOf(spec)) {
     const st = actors[src];

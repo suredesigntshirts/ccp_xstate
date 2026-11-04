@@ -323,7 +323,9 @@ then `done`, `refused`, `failed` or `unknown`), `transition` (the transition tha
 actor), `timer` and `due` (a timer's), `outcome` (what the handler reported, such as the card or task id it made),
 `rule` (what refused it) and `reason`. A merge's `done` outcome is `{ ref, repo, number, head, sha }`: `owner/repo#n`,
 the verified head it merged at and GitHub's merge sha. A card's is `{ ref, choices }`, a post's `{ ref }` and a
-timer's `{ ref, due }` (plan item engine-effects). A stop carries its run's `actor`; its `done` outcome is
+timer's `{ ref, due }` (plan item engine-effects); in `bin/host.js`, which has no clock, the ref is `due <time>`, and a
+cancel's outcome is `{}`. A fired timer is an `engine.transition` row with source `timer` and the timer effect id;
+a waiting state's `checkBack` timer is applied though it changes nothing (plan item fix-waiting-wake). A stop carries its run's `actor`; its `done` outcome is
 `{ closed: <card id> }` when it closed an ask's card, and `{ closed: null }` when there was nothing in front of the
 person (plan item fix-finish-closes-waits). An effect that has ended is never run again. One that started and never ended
 (the host stopped mid-effect) is looked up with its handler's `find()`, or journalled `unknown` and left alone.

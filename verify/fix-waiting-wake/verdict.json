@@ -1,0 +1,52 @@
+{
+  "item": "fix-waiting-wake",
+  "verified_sha": "a740c55030e5eab6dfd9aa8bfcb05cb6e5ea8925",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FB1YRba6e1euEgUe7",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "scheduled",
+      "status": "MET",
+      "command": "npm ci; TMPDIR=<fresh> node --test verify/fix-waiting-wake/scheduled.test.mjs (real restore/offer/pending and handlers() from packages/engine/src/effects over a thread client and clock that record every card, close, wakeAt and drop; stub agents)",
+      "excerpt": "pass 8, fail 0. quick-fix awaitingMerge (with a second item it-2 started beside it in the same journal, which advances briefing..awaitingMerge to its own card), awaitingGates (PASS with verdict.pr.gates), replanning (brief run failed), feature replanning, research replanning and research awaitingPublish (brief, three researchers, write, PASS): each item asked the clock for exactly one wake, key == the open timer's id == <item>:<seq>.xstate.after.checkBack.<workflow@sha>.<state> where seq is the entering transition's, due - entering row's at == 3600000 ms, timer effect rows start then done under that transition, card up. Leaving awaitingMerge by a tap (merging, then done, one merge) and, in a fresh item, by a push (check_suite.completed at a new head -> verifying, card closed): clock.drop called with exactly that key, cancel effect start/done, pending().timers empty, no further wake asked for.",
+      "mutation": "workflows/quick-fix.json: after removed from an asking state is covered by load-check; for the engine, packages/engine/src/host.js refusal: the new `return null` for a set timer removed",
+      "red_test": "Under the host.js mutation, verify/fix-waiting-wake/fires-holds.test.mjs goes red (timer event refused, item never takes it) and the builder's packages/engine/test/parity/C-waiting-does-not-stall.test.js goes red (pass 5, fail 1)."
+    },
+    {
+      "id": "fires-holds",
+      "status": "MET",
+      "command": "TMPDIR=<fresh> node --test verify/fix-waiting-wake/fires-holds.test.mjs (wake text from packages/engine/test/fixtures/wakes/check-suite-completed.txt and tap-wake.txt with current-time set, `now` passed to inputsOfWake)",
+      "excerpt": "pass 1. A wake 1 s before due yields no timer input and no timer row; a wake claiming due+60 s with the host's now before due is clamped and fires nothing. A wake 1 s after due yields one input, source { system: timer, ref: <timer effect id> }; its engine.transition row is applied, event type the checkBack timer, state awaitingMerge. After it: state awaitingMerge, pending().runs == [the ask run], pending().timers == [], pending().effects == [], no new card, no new wake, no close, no effect row under the timer's transition; a second late wake fires nothing. Then a tap on the card: applied transitions in seq order end awaitingMerge, merging, done, and the fake GitHub saw one merge.",
+      "mutation": "packages/engine/src/host.js refusal(): `return null;` after the timers.has check removed (XState can() decides again)",
+      "red_test": "fires-holds.test.mjs not ok 1 under the mutation (pass 17, fail 1 across verify/fix-waiting-wake)."
+    },
+    {
+      "id": "load-check",
+      "status": "MET",
+      "command": "TMPDIR=<fresh> node --test verify/fix-waiting-wake/load-check.test.mjs packages/engine/test/waits.test.js",
+      "excerpt": "Verifier's test: pass 9. The three workflows load; their asking states are exactly quick-fix awaitingGates/awaitingMerge/replanning, feature replanning, research awaitingPublish/replanning, each with after.checkBack (no target, no actions) and meta.delays.checkBack 3600000. A copy of workflows/ with each asking state's after removed in turn is refused by loadWorkflow with a message starting '<name>@<sha256>: state <state> asks the person...'; with a root given nothing is pinned. An after naming no meta.delays entry is refused. Builder's waits.test.js: pass 4. Note: a pinned blob is loaded with pinned: true and skips the check (an item started before this change keeps running), as the decision and the item's risks say.",
+      "mutation": "packages/engine/src/stages.js checkStages: `if (!delays.length) throw ...` replaced by `if (false && !delays.length) throw ...` (a missing after goes through)",
+      "red_test": "Builder's packages/engine/test/waits.test.js 'an asking state with no timer is refused, naming the workflow and the state' goes red (not ok 2); the verifier's six removed-after tests go red too (pass 3, fail 6)."
+    },
+    {
+      "id": "parity",
+      "status": "MET",
+      "command": "TMPDIR=<fresh> node --test packages/engine/test/*.test.js packages/engine/test/*/*.test.js; git diff origin/main...a740c55 -- packages/engine/test verify/parity-cases; TMPDIR=<fresh> npm test",
+      "excerpt": "Engine tests 218, pass 218, fail 0 (parity incl. C-waiting-does-not-stall.test.js and cases.test.js, every tourney scenario). gaps.json is { gaps: [] }; verify/parity-cases/C-waiting-does-not-stall.gap.test.mjs is deleted. Changed test files besides the two new ones: parity/cases.test.js, whose gap checks now write their own C-waiting-does-not-stall entry (and mark the item live in the plan copy) since gaps.json is empty, which the Expect allows; and fixtures/workflows/timed.json, description text only (no assertion). No tourney scenario or other engine assertion changed. Full npm test: 687 tests, 675 pass, 1 fail (test/setup.test.mjs copy-not-link, the known local-only failure in a clone without release tags; green in CI)."
+    },
+    {
+      "id": "thread-wake",
+      "status": "MET",
+      "command": "In this verifier's thread: driver to-card.mjs (bin/host.js start/wake with stub agents through spawn/bind/accept, local GitHub at CCP_GITHUB_API) with --root /mnt/project-files/verify-runs/fix-waiting-wake/journal, item vfww-1; request_decision; bin/host.js card; bin/host.js show; send_later at 22:30Z; bin/host.js wake < UserPromptSubmit hook input; bin/host.js show; read rows; read the card message. Evidence in /mnt/project-files/verify-runs/fix-waiting-wake/evidence/.",
+      "excerpt": "vfww-1 entered awaitingMerge at 2026-11-04T21:28:47.980Z (vfww-1#3); timer effect rows start/done at 21:28:48. Card cmsg_01VhYV3jhQ9s4qrrh2th12sNHLxqHdQTZiF1sFQLYD87yR put up with request_decision and recorded with `card`. `show` listed pending.timers [checkBack ...awaitingMerge, due 2026-11-04T22:28:47.980Z], pending.effects [] (no timer or cancel pending), runs [vfww-1:3.ask]. send_later scheduled for 22:30:00Z; it fired 22:30:10Z (it reached the session as a queued scheduled-trigger notification; its body was wrapped as <wake reason=\"scheduled\" current-time=\"2026-11-04T22:30:10Z\"> and fed as the prompt of a UserPromptSubmit hook input). The item's file gained 'engine.transition 22:30:10.000Z state awaitingMerge source {system: timer, ref: vfww-1:3.xstate.after.checkBack...awaitingMerge} applied'. `show` after: state awaitingMerge, timers [], effects [], runs [vfww-1:3.ask]. Reading the card message after the wake: the ask_decision activity with no answer or close recorded, so the card was still open."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 85",
+      "excerpt": "Check run 'test' (id 126876870722) completed success at head a740c55; 'gates' failed only because no verdict existed yet."
+    }
+  ]
+}
