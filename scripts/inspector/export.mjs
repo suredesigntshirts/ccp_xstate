@@ -293,9 +293,10 @@ const subsetOf = (part, whole) => part && whole && typeof part === 'object' && !
 /**
  * Split a text into labelled segments. `known` is a list of { from, note, value?, text? }: a JSON value matched
  * against embedded JSON chunks (exactly, or as a subset of an object), or a literal text found verbatim. Everything
- * not matched gets `rest`.
+ * not matched gets `rest`: a label object, or a function that labels each unmatched stretch (as labelGap does).
  */
 export function segmentsOf(text, known, rest) {
+  const gap = typeof rest === 'function' ? rest : (t) => [{ text: t, ...rest }];
   const marks = [];
   for (const chunk of jsonChunks(text)) {
     const hit = known.find((k) => 'value' in k && (same(chunk.value, k.value) || (k.subset && subsetOf(chunk.value, k.value))));
@@ -313,11 +314,180 @@ export function segmentsOf(text, known, rest) {
   let last = 0;
   for (const m of marks) {
     if (m.start < last) continue;
-    if (m.start > last) out.push({ text: text.slice(last, m.start), ...rest });
+    if (m.start > last) out.push(...gap(text.slice(last, m.start)));
     out.push({ text: text.slice(m.start, m.end), from: m.from, note: m.note });
     last = m.end;
   }
-  if (last < text.length) out.push({ text: text.slice(last), ...rest });
+  if (last < text.length) out.push(...gap(text.slice(last)));
+  return out;
+}
+
+// ---- Which text is literally the engine's: the static pieces of its string literals
+
+const unescapeJs = (s) => s.replace(/\\(u\{[0-9a-fA-F]+\}|u[0-9a-fA-F]{4}|x[0-9a-fA-F]{2}|\r\n|[\s\S])/g, (_, e) => {
+  if (e[0] === 'u' && e.length > 1) return String.fromCodePoint(parseInt(e[1] === '{' ? e.slice(2, -1) : e.slice(1), 16));
+  if (e[0] === 'x' && e.length === 3) return String.fromCharCode(parseInt(e.slice(1), 16));
+  return { n: '\n', t: '\t', r: '\r', b: '\b', f: '\f', v: '\v', 0: '\0', '\n': '', '\r\n': '' }[e] ?? e;
+});
+
+/**
+ * The fixed text of every string literal in a JavaScript source, as the strings the code can print: a quoted string
+ * whole, and a template literal split on its ${...} holes (each static piece separately). Comments and regular
+ * expression literals are skipped. These are the only texts a prompt may label as "engine template".
+ */
+export function stringPieces(src) {
+  const out = [];
+  const text = String(src ?? '');
+  let prev = '';
+  // A '/' starts a regular expression after an operator, an opening bracket, a comma or a keyword like return.
+  const regexAllowed = () => prev === '' || /[(,=:[!&|?{};+\-*%<>~^]$/.test(prev) || /^(?:return|typeof|case|do|else|in|of|void|yield|await)$/.test(prev);
+  // Scan code from k until the closing character `close` at depth 0 (or the end); returns the index after it.
+  const code = (k, close) => {
+    let depth = 0;
+    while (k < text.length) {
+      const c = text[k];
+      if (c === '/' && text[k + 1] === '/') { const nl = text.indexOf('\n', k); k = nl < 0 ? text.length : nl; continue; }
+      if (c === '/' && text[k + 1] === '*') { const e = text.indexOf('*/', k + 2); k = e < 0 ? text.length : e + 2; continue; }
+      if (c === '"' || c === "'") {
+        let j = k + 1, s = '';
+        while (j < text.length && text[j] !== c && text[j] !== '\n') { if (text[j] === '\\') { s += text.slice(j, j + 2); j += 2; } else s += text[j++]; }
+        out.push(unescapeJs(s)); k = j + 1; prev = 'x'; continue;
+      }
+      if (c === '`') { k = template(k); prev = 'x'; continue; }
+      if (c === '/' && regexAllowed()) {
+        let j = k + 1, cls = false;
+        while (j < text.length && text[j] !== '\n') {
+          if (text[j] === '\\') { j += 2; continue; }
+          if (text[j] === '[') cls = true; else if (text[j] === ']') cls = false; else if (text[j] === '/' && !cls) break;
+          j++;
+        }
+        k = j + 1; while (/[a-z]/.test(text[k] ?? '')) k++;
+        prev = 'x'; continue;
+      }
+      if (c === '{' || c === '(' || c === '[') depth++;
+      else if (c === '}' || c === ')' || c === ']') { if (depth === 0 && c === close) { prev = c; return k + 1; } depth--; }
+      if (!/\s/.test(c)) {
+        if (/[\w$]/.test(c)) { let j = k; while (/[\w$]/.test(text[j] ?? '')) j++; prev = text.slice(k, j); k = j; continue; }
+        prev = c;
+      }
+      k++;
+    }
+    return k;
+  };
+  // text[start] is a backtick; returns the index after the closing one.
+  const template = (start) => {
+    let j = start + 1, piece = '';
+    while (j < text.length) {
+      const c = text[j];
+      if (c === '\\') { piece += text.slice(j, j + 2); j += 2; continue; }
+      if (c === '`') { out.push(unescapeJs(piece)); return j + 1; }
+      if (c === '$' && text[j + 1] === '{') {
+        out.push(unescapeJs(piece)); piece = '';
+        prev = '{';
+        j = code(j + 2, '}');
+        continue;
+      }
+      piece += c; j++;
+    }
+    return j;
+  };
+  code(0, null);
+  return out.filter((s) => s.length > 0);
+}
+
+/** Every distinct static piece of an engine's src/*.js, indexed by first character for the matcher below. */
+export function piecesOf(sources) {
+  const all = new Set();
+  for (const text of Object.values(sources ?? {})) for (const p of stringPieces(text)) all.add(p);
+  const byFirst = new Map();
+  for (const p of all) { const k = p[0]; if (!byFirst.has(k)) byFirst.set(k, []); byFirst.get(k).push(p); }
+  return { all, byFirst };
+}
+
+/**
+ * The scalar values a run fills into its prompt and context: every string or number leaf of the actor input labelled
+ * "input", every leaf of run.json (outside its schema, defs, input and stored texts) labelled "run", and what a GitHub
+ * URL implies (its PR or issue number and owner/repo). Returns [{ text, from, note }], longest first.
+ */
+export function runValuesOf(runJson, input) {
+  const out = new Map();
+  const add = (v, from, field, note) => {
+    if (v == null || typeof v === 'object' || typeof v === 'boolean') return;
+    const t = String(v);
+    if (!t.length) return;
+    const had = out.get(t);
+    if (had) { if (had.from === from && field && !had.fields.includes(field)) had.fields.push(field); return; }
+    out.set(t, { text: t, from, fields: field ? [field] : [], note });
+    for (const m of t.matchAll(/github\.com\/([\w.-]+)\/([\w.-]+)\/(?:pull|issues)\/(\d+)/g)) {
+      add(m[3], from, null, `the PR or issue number in ${t}`);
+      add(`${m[1]}/${m[2]}`, from, null, `the repository in ${t}`);
+    }
+  };
+  const leaves = (v, path, from) => {
+    if (v && typeof v === 'object') { for (const [k, x] of Object.entries(v)) leaves(x, [...path, k], from); return; }
+    add(v, from, path.join('.') || 'value', null);
+  };
+  leaves(input ?? {}, [], 'input');
+  const { schema: _s, defs: _d, input: _i, context: _c, brief: _b, ...rest } = runJson ?? {};
+  leaves(rest, [], 'run');
+  return [...out.values()].map(({ text, from, fields, note }) => ({
+    text, from,
+    note: note ?? (from === 'input' ? `the actor input's ${fields.join(' / ')}, filled in by the engine` : `this run's ${fields.join(' / ')} (run.json), filled in by the host`)
+  })).sort((a, b) => b.text.length - a.text.length);
+}
+
+const WORD = /[A-Za-z0-9_]/;
+export const UNKNOWN_ORIGIN = { from: 'unknown', note: 'not found in the engine source, the workflow JSON or this run\'s known values, so where it came from is not known' };
+const TEMPLATE_NOTE = 'fixed text from a string literal in the engine code (packages/engine/src)';
+
+/**
+ * Label a stretch of text that no JSON value or workflow literal explained: tile it with the engine's static string
+ * pieces ("template") and this run's scalar values ("run" / "input"), leaving as little as possible uncovered; what is
+ * left is "unknown", never "template". A token may not cut into a word, and a short or punctuation-only piece only
+ * counts next to text already explained, so a stray "." or "/" inside an unexplained value is not called engine text.
+ */
+export function labelGap(text, pieces, values, templateNote = TEMPLATE_NOTE) {
+  const n = text.length;
+  if (!n) return [];
+  const isW = (k) => k >= 0 && k < n && WORD.test(text[k]);
+  const bounded = (s, e) => !(s > 0 && isW(s - 1) && isW(s)) && !(e < n && isW(e - 1) && isW(e));
+  const cand = [];
+  for (let k = 0; k < n; k++) {
+    const list = [];
+    for (const p of pieces?.byFirst?.get(text[k]) ?? []) {
+      if (text.startsWith(p, k) && bounded(k, k + p.length)) list.push({ len: p.length, from: 'template', note: templateNote, short: p.length < 3 || !/[A-Za-z0-9]/.test(p) });
+    }
+    for (const v of values ?? []) if (text.startsWith(v.text, k) && bounded(k, k + v.text.length)) list.push({ len: v.text.length, from: v.from, note: v.note, value: true });
+    cand[k] = list;
+  }
+  // best[k][f]: the cheapest labelling of text[k..], given whether text[k-1] was explained (f = 1) or not (f = 0).
+  // Cost: a million per unexplained character, then ten per token, plus one when a piece (not a value) fills a slot.
+  const UNC = 1e6;
+  const best = Array.from({ length: n + 1 }, () => [null, null]);
+  best[n] = [{ cost: 0 }, { cost: 0 }];
+  for (let k = n - 1; k >= 0; k--) {
+    for (const f of [0, 1]) {
+      const prevOk = f === 1 || k === 0;
+      let b = { cost: UNC + best[k + 1][0].cost, len: 1, from: null };
+      for (const c of cand[k]) {
+        if (c.short && !prevOk && k + c.len !== n) continue;
+        const cost = 10 + (c.value ? 0 : 1) + best[k + c.len][1].cost;
+        if (cost < b.cost) b = { cost, len: c.len, from: c.from, note: c.note };
+      }
+      best[k][f] = b;
+    }
+  }
+  const out = [];
+  let k = 0, f = 1;
+  while (k < n) {
+    const b = best[k][f];
+    const seg = b.from ? { text: text.slice(k, k + b.len), from: b.from, note: b.note } : { text: text[k], ...UNKNOWN_ORIGIN };
+    const last = out.at(-1);
+    if (last && last.from === seg.from && last.note === seg.note && (seg.from === 'template' || seg.from === 'unknown')) last.text += seg.text;
+    else out.push(seg);
+    f = b.from ? 1 : 0;
+    k += b.len;
+  }
   return out;
 }
 
@@ -749,9 +919,14 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
     ...literals.map((l) => ({ text: l.text, from: 'workflow', note: `literal "${l.key}" in the workflow JSON` })),
     { value: input, subset: true, from: 'input', note: 'the actor input as JSON, computed from the context by the invoke input map' }
   ];
+  // Text is "template" only where it is literally a static piece of the engine's string literals; this run's values
+  // fill the holes; anything neither explains is "unknown", never "template".
+  eng.pieces ??= piecesOf(eng.sources);
+  const runValues = runValuesOf(runJson, input);
+  const fill = (note) => (t) => labelGap(t, eng.pieces, runValues, note);
   const promptSegments = brief == null ? [] : provenance.kind === 'passthrough'
     ? [{ text: brief, from: 'passthrough', note: provenance.summary }]
-    : segmentsOf(brief, promptKnown, { from: 'template', note: 'template text in the engine code (writtenBrief)' });
+    : segmentsOf(brief, promptKnown, fill('fixed text in the engine code: a string literal in packages/engine/src (writtenBrief)'));
 
   // Layer 3: added context.
   const schema = runJson?.schema ?? spec.meta?.actors?.[a.actor] ?? null;
@@ -759,8 +934,7 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
   const ctxKnown = [
     { value: schema, from: 'workflow', note: `the output schema, from the workflow JSON (meta.actors.${a.actor})` },
     ...(defs && Object.keys(defs).length ? [{ value: defs, from: 'workflow', note: 'shared schema definitions, from the workflow JSON (meta.schemas)' }] : []),
-    { value: inputMinus, subset: true, from: 'input', note: 'the actor input as JSON' },
-    ...[runJson?.run, runJson?.worktree, runJson?.branch].filter(Boolean).map((t) => ({ text: t, from: 'run', note: 'a value of this run, set by the host' }))
+    { value: inputMinus, subset: true, from: 'input', note: 'the actor input as JSON' }
   ];
   // The schema the agent was shown: a schema-like JSON object in context.md. When it differs from the schema the host
   // stores (run.json), the difference is named, and the agent-facing one is marked as the workflow's, transformed.
@@ -769,7 +943,7 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
   const agentSchema = shown ?? null;
   const schemaDiff = agentSchema && schema && !same(agentSchema, schema) ? schemaDifference(schema, agentSchema) : null;
   if (agentSchema && schemaDiff) ctxKnown.unshift({ value: agentSchema, from: 'workflow', note: `the output schema from the workflow JSON (meta.actors.${a.actor}), changed by the engine before it was shown: ${schemaDiff.text}` });
-  const contextSegments = added == null ? [] : segmentsOf(added, ctxKnown, { from: 'template', note: 'fixed text in the engine code (contextOf and the helpers it calls)' });
+  const contextSegments = added == null ? [] : segmentsOf(added, ctxKnown, fill('fixed text in the engine code: a string literal in packages/engine/src (contextOf and the helpers it calls)'));
 
   // Layer 6: what the host stored, and which of its fields the host wrote itself (the agent was told not to set them).
   const stored6 = result && typeof result === 'object' && 'result' in result ? result.result : result;
@@ -802,7 +976,7 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
   if (stored && briefHash) checks.push({ what: 'brief.md matches the hash the host journaled when it wrote the brief', ok: stored.payload.hash === briefHash });
   if (stored && added != null) checks.push({ what: 'context.md matches the hash the host journaled', ok: stored.payload.contextHash === sha256(added) });
   const live = agentId && sessionRows.find((r) => r.kind === 'brief.stored' && (r.agent === agentId || r.payload?.agentId === agentId));
-  if (live && briefHash) checks.push({ what: 'the prompt the live capture saw the agent start with hashes to brief.md', ok: live.payload.hash === briefHash });
+  if (live && briefHash) checks.push({ what: 'the prompt the harness\'s SubagentStart capture saw the agent start with hashes to brief.md', ok: live.payload.hash === briefHash });
 
   // Layer 7: the host's answer to the return.
   const verdicts = rows.filter((r) => r.payload?.run === runId && ['result.stored', 'refusal', 'result.refused', 'result.accepted'].includes(r.kind) || (r.kind === 'brief.stored' && r.payload?.run === runId && r.payload?.role && !r.payload?.contextHash))
@@ -856,8 +1030,9 @@ export function hostFieldsOf(result, contextText, schemaDiff, engineSources) {
     for (const [k, x] of Object.entries(v)) {
       const p = Array.isArray(v) ? `${path}[${k}]` : path ? `${path}.${k}` : k;
       const rule = !Array.isArray(v) && rules.find((r) => r.names.includes(k));
-      const stamp = rule && !path ? stampOf(engineSources, k) : null;
-      if (rule && stamp) add(p, `The added context tells the agent: "${rule.sentence}" And the engine code stamps it on every accepted result before it writes result.json (${stamp.file} line ${stamp.line}: ${stamp.text}). So the host wrote this field, not the agent.`);
+      const stamp = rule ? stampOf(engineSources, k, { nested: !!path }) : null;
+      if (rule && stamp && !path) add(p, `The added context tells the agent: "${rule.sentence}" And the engine code stamps it on every accepted result before it writes result.json (${stamp.file} line ${stamp.line}: ${stamp.text}). So the host wrote this field, not the agent.`);
+      else if (rule && stamp) add(p, `The added context tells the agent: "${rule.sentence}" And the engine code writes this field onto the reference itself while it checks the return (${stamp.file} line ${stamp.line}: ${stamp.text}). So the host wrote this field, not the agent.`);
       else if (rule) add(p, `The added context tells the agent: "${rule.sentence}" So this field was very likely written by the host after it accepted the return (inferred from that rule: the host does not record who wrote each field).`);
       walk(x, p);
     }
@@ -867,14 +1042,16 @@ export function hostFieldsOf(result, contextText, schemaDiff, engineSources) {
 }
 
 /**
- * Where the engine's own code adds a top-level field to a result it accepts: an object literal that spreads the
- * result and sets the key (`{ ...result, attested: ... }`). Returns { file, line, text } or null.
+ * Where the engine's own code adds a field to a result it accepts: for a top-level field, an object literal that
+ * spreads the result and sets the key (`{ ...result, attested: ... }`); for a nested one (nested: true), an assignment
+ * to that property of an object (`ref.key = ...`). Returns { file, line, text } or null.
  */
-export function stampOf(engineSources, key) {
+export function stampOf(engineSources, key, { nested = false } = {}) {
   for (const [file, text] of Object.entries(engineSources ?? {})) {
     const lines = String(text).split('\n');
     const k = String(key).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const i = lines.findIndex((l) => new RegExp(`\\.\\.\\.\\s*\\w+\\s*,\\s*${k}\\s*:`).test(l));
+    const re = nested ? new RegExp(`\\b\\w+\\.${k}\\s*=(?!=)`) : new RegExp(`\\.\\.\\.\\s*\\w+\\s*,\\s*${k}\\s*:`);
+    const i = lines.findIndex((l) => !/^\s*\/\//.test(l) && re.test(l));
     if (i >= 0) return { file: `packages/engine/src/${file}`, line: i + 1, text: lines[i].trim().slice(0, 140) };
   }
   return null;

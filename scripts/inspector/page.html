@@ -12,6 +12,7 @@
   --ok:#256f45; --ok-bg:#e3f1e8; --warn:#8a5a00; --warn-bg:#fbf0d9; --bad:#a82f43; --bad-bg:#f9e3e7;
   --seg-template:#efe6fb; --seg-template-line:#7b55c7; --seg-workflow:#e1f0f4; --seg-workflow-line:#0d6a80;
   --seg-input:#fbf0d9; --seg-input-line:#a26a06; --seg-run:#e8ecef; --seg-run-line:#56656d; --seg-pass:#e3f1e8; --seg-pass-line:#256f45;
+  --seg-unknown:#f9e3e7; --seg-unknown-line:#a82f43;
   --del:#f9e3e7; --del-fg:#8d2236; --ins:#e0f2e6; --ins-fg:#1f6239;
   --f-body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --f-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
@@ -23,6 +24,7 @@
   --ok:#6fcf97; --ok-bg:#173326; --warn:#f0b84a; --warn-bg:#3a2c10; --bad:#f07a8c; --bad-bg:#3d1a21;
   --seg-template:#2a2140; --seg-template-line:#b49af0; --seg-workflow:#14323a; --seg-workflow-line:#5cc4dc;
   --seg-input:#3a2c10; --seg-input-line:#f0b84a; --seg-run:#243238; --seg-run-line:#9dafb6; --seg-pass:#173326; --seg-pass-line:#6fcf97;
+  --seg-unknown:#3d1a21; --seg-unknown-line:#f07a8c;
   --del:#4a1d27; --del-fg:#ffc2cc; --ins:#173a26; --ins-fg:#b9f0cf; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0f1619; --panel:#162127; --fg:#e3ebee; --muted:#9dafb6; --line:#2e3f47; --wire:#7d97a3;
@@ -30,6 +32,7 @@
   --ok:#6fcf97; --ok-bg:#173326; --warn:#f0b84a; --warn-bg:#3a2c10; --bad:#f07a8c; --bad-bg:#3d1a21;
   --seg-template:#2a2140; --seg-template-line:#b49af0; --seg-workflow:#14323a; --seg-workflow-line:#5cc4dc;
   --seg-input:#3a2c10; --seg-input-line:#f0b84a; --seg-run:#243238; --seg-run-line:#9dafb6; --seg-pass:#173326; --seg-pass-line:#6fcf97;
+  --seg-unknown:#3d1a21; --seg-unknown-line:#f07a8c;
   --del:#4a1d27; --del-fg:#ffc2cc; --ins:#173a26; --ins-fg:#b9f0cf; color-scheme:dark}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -152,6 +155,7 @@ pre.text,pre.rd,pre.seg{white-space:pre-wrap;overflow-wrap:anywhere}
 pre.json button.more,pre.json button.tog{font:inherit;font-size:11.5px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--accent);border-radius:4px;padding:0 6px;margin:0 2px}
 pre.json .full[hidden],pre.json .hd[hidden],pre.json .foldbody[hidden]{display:none}
 pre.json .full{white-space:pre-wrap;overflow-wrap:anywhere}
+pre.json .j-s{white-space:pre-wrap;overflow-wrap:anywhere}
 .authored{margin:4px 0;max-width:46ch;overflow-wrap:anywhere} .authored pre{margin-top:4px;max-width:none}
 td.keyscell{max-width:28ch;min-width:14ch} td.keyscell .chips{flex-wrap:wrap}
 @media (max-width:560px){pre.json .hd,pre.json .j-s{white-space:pre-wrap;overflow-wrap:anywhere}pre.json button.more{display:inline-block;margin:2px 0 2px 1ch}}
@@ -184,6 +188,7 @@ abbr[title]{text-decoration:underline dotted;text-underline-offset:2px;cursor:he
 .seg-input{background:var(--seg-input);box-shadow:inset 0 -2px 0 var(--seg-input-line)}
 .seg-run{background:var(--seg-run);box-shadow:inset 0 -2px 0 var(--seg-run-line)}
 .seg-passthrough{background:var(--seg-pass);box-shadow:inset 0 -2px 0 var(--seg-pass-line)}
+.seg-unknown{background:var(--seg-unknown);box-shadow:inset 0 -2px 0 var(--seg-unknown-line);text-decoration:underline dotted var(--seg-unknown-line)}
 .seglegend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12.5px}
 .seglegend span{padding:1px 8px;border-radius:4px}
 .tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;-webkit-overflow-scrolling:touch}
@@ -230,7 +235,7 @@ tr:last-child td{border-bottom:none}
 .onlylist.changed .cl::before{content:"\2190  ";color:var(--muted)} .onlylist.changed .cr::before{content:"\2192  ";color:var(--muted)}
 .gapline{display:inline-block;width:100%;background:repeating-linear-gradient(135deg,transparent 0 6px,var(--line) 6px 7px)}
 .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
-@media (max-width:760px){.cols{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){.cols{grid-template-columns:minmax(0,1fr)} .cols .gapline{display:none}}
 .col{display:grid;gap:6px;min-width:0;align-content:start}
 .col h4{margin:0;font-size:13px;color:var(--muted);font-weight:600;overflow-wrap:anywhere}
 del.d{background:var(--del);color:var(--del-fg);text-decoration:line-through;text-decoration-thickness:1px}
@@ -458,7 +463,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   // JSON lines carry an invisible mark (U+2063), so a diff summary can leave them out; it is stripped before display.
   const JM = '\u2063';
   const readablePlain = (t) => { const ps = pieces(t); return ps.map((p, i) => (p.value ? '\n' + JSON.stringify(p.value, null, 2).split('\n').map((l) => JM + l).join('\n') + '\n' : splitProse(tidy(p, i, ps)))).join('').replace(/\n{2,}/g, '\n').trim(); };
-  const SEG = { template: 'Engine template (code in actors.js)', workflow: 'Workflow JSON', input: 'Actor input, from the context', run: 'Run values set by the host', passthrough: 'Written by an earlier step, passed through' };
+  const SEG = { template: 'Engine template (string literals in the engine code)', workflow: 'Workflow JSON', input: 'Actor input, from the context', run: 'Run values set by the host', passthrough: 'Written by an earlier step, passed through', unknown: 'Unknown origin (not in the engine code or any known value)' };
   const segHtml = (segs) => segs.map((s) => '<span class="seg-' + esc(s.from) + '" title="' + esc(SEG[s.from] || s.from) + ': ' + esc(s.note || '') + '">' + esc(s.text) + '</span>').join('');
   const segLegend = (segs) => { const seen = []; segs.forEach((s) => { if (seen.indexOf(s.from) < 0) seen.push(s.from); });
     const total = segs.reduce((n, s) => n + s.text.length, 0) || 1;
@@ -628,7 +633,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
 
   const guardText = (wf, name) => { const gd = wf.spec && wf.spec.meta && wf.spec.meta.guards && wf.spec.meta.guards[name]; return gd ? name + ': ' + JSON.stringify(gd) : name; };
   const gname = (wf, name) => '<code title="' + esc(guardText(wf, name)) + '">' + esc(name) + '</code>';
-  const evWords = (e) => e.kind === 'on' ? 'on ' + e.event : e.kind === 'done' ? 'when ' + e.event + ' finishes' : e.kind === 'error' ? 'when ' + e.event + ' fails' : e.kind === 'after' ? 'after ' + e.event : e.kind === 'join' ? 'when everything inside is done (join)' : 'at once';
+  const evWords = (e) => e.kind === 'on' ? 'on ' + e.event : e.kind === 'done' ? 'when ' + e.event + ' finishes' : e.kind === 'error' ? 'when ' + e.event + ' fails' : e.kind === 'after' ? 'after ' + e.event : e.kind === 'join' ? 'when every inner state is done (join)' : 'at once';
 
   // One way out, with its condition inline: its guard, and the needs of the state it enters (the engine checks both).
   // Ways out for the same event are tried in order, so a conditional one says the next line is tried when it fails.
@@ -672,12 +677,12 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const rows = g.nodes.map((n) => {
       const outs = g.edges.filter((e) => e.from === n.id);
       return '<tr><td class="nw"><code>' + esc(st(n.id)) + '</code>' + (n.type === 'final' ? ' <span class="pill p-mute">final</span>' : n.type === 'compound' || n.type === 'parallel' ? ' <span class="pill p-mute">group</span>' : '') + '</td>' +
-        '<td><div class="cell starts">' + (n.invokes.map((i) => '<div>' + invName(i, kindOf(i.src || i.id, kinds[i.id || i.src])) + '</div>' + authoredHtml(i, false)).join('') || '') + '</div></td>' +
-        '<td class="nw">' + n.needs.map((x) => gname(wf, x)).join('<br>') + '</td>' +
-        '<td>' + (outs.length ? '<div class="cell wide"><ul class="cand">' + outs.map((e) => '<li>' + wayOut(wf, g, e) + '</li>').join('') + '</ul></div>' : '') + '</td></tr>';
+        '<td><div class="cell starts">' + (n.invokes.map((i) => '<div>' + invName(i, kindOf(i.src || i.id, kinds[i.id || i.src])) + '</div>' + authoredHtml(i, false)).join('') || '<span class="muted">' + (n.type === 'final' ? 'none: this is where an item ends' : 'nothing (no invoke)') + '</span>') + '</div></td>' +
+        '<td class="nw">' + (n.needs.map((x) => gname(wf, x)).join('<br>') || '<span class="muted">—</span>') + '</td>' +
+        '<td>' + (outs.length ? '<div class="cell wide"><ul class="cand">' + outs.map((e) => '<li>' + wayOut(wf, g, e) + '</li>').join('') + '</ul></div>' : '<span class="muted">' + (n.type === 'final' ? 'none: this is where an item ends' : '—') + '</span>') + '</td></tr>';
     }).join('');
     const any = g.edges.filter((e) => e.from === '');
-    const anyRow = any.length ? '<tr><td class="nw"><i>In any state</i></td><td></td><td></td><td><div class="cell wide"><ul class="cand">' + any.map((e) => '<li>' + wayOut(wf, g, e) + '</li>').join('') + '</ul></div></td></tr>' : '';
+    const anyRow = any.length ? '<tr><td class="nw"><i>In any state</i></td><td><span class="muted">—</span></td><td><span class="muted">—</span></td><td><div class="cell wide"><ul class="cand">' + any.map((e) => '<li>' + wayOut(wf, g, e) + '</li>').join('') + '</ul></div></td></tr>' : '';
     $('statestable').innerHTML = sec('All states and ways out', '<div class="tblwrap"><table class="glance stack"><thead><tr><th scope="col">State</th><th scope="col">Starts</th><th scope="col">Needs</th><th scope="col"><div class="thwrap">' + WAYS_HEAD + '</div></th></tr></thead><tbody>' + rows + anyRow + '</tbody></table></div>',
       { open, hint: g.nodes.length + ' states, ' + g.edges.length + ' ways out', note: 'Read from the workflow JSON. Hover or focus a guard or a need to see its test.' });
   }
@@ -735,7 +740,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
         '<td><div class="cell what">' + esc(s.words || s.eventType) + (applied ? '' : ' <span class="pill p-bad">ignored</span>') + '</div></td>' +
         '<td class="mono"><div class="cell ft">' + esc(s.from.length ? short(s.from) : '(start)') + ' → ' + esc(applied ? short(s.to) : 'unchanged') + '</div></td>' +
         '<td class="keyscell">' + (s.changed.length ? '<div class="chips">' + s.changed.map((k) => '<span class="chip">' + esc(k) + '</span>').join('') + '</div>' : '<span class="muted">—</span>') + '</td>' +
-        '<td class="nw">' + (started.map((a) => esc(a.actor) + (a.model ? ' <span class="pill p-acc">model</span>' : ' <span class="pill p-mute">host</span>')).join('<br>') || '<span class="muted">—</span>') + '</td>' +
+        '<td class="nw">' + (started.map((a) => esc(a.actor) + (a.model ? (r.kind === 'scripted' ? ' <span class="pill p-acc" title="a model agent\'s slot, filled by a test fixture: no model ran">fixture</span>' : ' <span class="pill p-acc">model</span>') : ' <span class="pill p-mute">host</span>')).join('<br>') || '<span class="muted">—</span>') + '</td>' +
         '<td><div class="cell ret">' + (started.filter((a) => a.model).map((a) => esc(resultWords(a.layers))).join('<br>') || '<span class="muted">—</span>') + '</div></td>' +
         '<td><div class="cell host">' + (started.filter((a) => a.model).map((a) => esc(hostWords(a.layers))).join('<br>') || '<span class="muted">—</span>') + '</div></td></tr>';
     }).join('');
@@ -768,7 +773,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const tmpl = pv.templateSource ? '<details class="sec"><summary>The engine code that wrote it <span class="hint">writtenBrief() in this engine\'s actors.js</span></summary><div class="inner"><pre class="text" tabindex="0">' + esc(pv.templateSource) + '</pre></div></details>' : (pv.templateNote ? '<p class="muted small">' + esc(pv.templateNote) + '</p>' : '');
     const checks = (L.l2.checks || []).length ? '<ul class="checks">' + L.l2.checks.map((c) => '<li class="' + (c.ok ? '' : 'no') + '">' + esc(c.what) + (c.ok ? '' : ': it does NOT') + ' (' + ab('hash', 'hash check') + ')</li>').join('') + '</ul>' : '';
     out.push(sec('<span class="lnum">2</span> Prompt', who + (L.l2.text != null ? textViews(L.l2.text, L.l2.segments, 'prompt') : '<p class="muted">brief.md is missing.</p>') + checks + tmpl,
-      { cls: 'layer', open: true, hint: esc(pillWho(pv)) + (L.l2.resumeNote ? ' · <span class="pill p-warn">' + esc(L.l2.resumeNote.chip) + '</span>' : ''), note: (scripted ? 'The exact text the engine wrote as this agent\'s prompt (<code>brief.md</code> in its run folder). No model ran in this scenario: a test fixture stood in for the agent, and this is the prompt the engine would start a real agent with.' : 'The exact text the agent was started with (<code>brief.md</code> in its run folder): the prompt Claude Code started it with.') + (L.l2.resumeNote ? ' It is the first message only: this agent was resumed later with a message that was not recorded.' : '') }));
+      { cls: 'layer', open: true, hint: esc(pillWho(pv)) + (L.l2.resumeNote ? ' · <span class="pill p-warn">' + esc(L.l2.resumeNote.chip) + '</span>' : ''), note: (scripted ? 'The exact text the engine wrote as this agent\'s prompt (<code>brief.md</code> in its run folder). No model ran in this scenario: a test fixture stood in for the agent, and this is the prompt the engine would start a real agent with.' : 'The exact first message Claude Code started the agent with (<code>brief.md</code> in its run folder).') + (L.l2.resumeNote ? ' It is the first message only: this agent was resumed later with a message that was not recorded.' : '') }));
     const tmpl3 = L.l3.templateSource ? '<details class="sec"><summary>The engine code that writes it <span class="hint">contextOf() and the helpers it uses, from this engine\'s actors.js</span></summary><div class="inner"><pre class="text" tabindex="0">' + esc(L.l3.templateSource) + '</pre></div></details>' : '';
     const checks3 = (L.l3.checks || []).length ? '<ul class="checks">' + L.l3.checks.map((c) => '<li class="' + (c.ok ? '' : 'no') + '">' + esc(c.what) + (c.ok ? '' : ': it does NOT') + '</li>').join('') + '</ul>' : '';
     out.push(sec('<span class="lnum">3</span> Added context', (L.l3.text != null ? textViews(L.l3.text, L.l3.segments, 'added context') : '<p class="muted">context.md is missing.</p>') + checks3 + tmpl3,
@@ -787,7 +792,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const calls = tr.filter((r) => r.kind === 'tool.call');
     const table = tr.length ? '<div class="tblwrap"><table><thead><tr><th scope="col">time</th><th scope="col">by</th><th scope="col">what</th><th scope="col">ok</th><th scope="col">ms</th><th scope="col">input bytes</th><th scope="col">paths</th></tr></thead><tbody>' +
       tr.map((r) => { const wordy = r.kind !== 'tool.call' && r.what && r.what !== r.kind;
-        return '<tr><td class="nw">' + esc(String(r.at || '').slice(11, 19)) + '</td><td class="nw">' + esc(r.by || '') + '</td><td' + (wordy ? '><div class="cell">' + esc(r.what) + ' <span class="muted">(' + esc(r.kind) + ')</span></div>' : ' class="nw">' + esc(r.what || (r.kind === 'tool.call' ? r.tool : r.kind))) + '</td><td class="nw">' + (r.ok === false ? '<span class="pill p-bad">failed</span>' : r.ok ? 'yes' : '') + '</td><td class="nw">' + esc(r.ms == null ? '' : r.ms) + '</td><td class="nw">' + esc(r.inputBytes == null ? '' : r.inputBytes) + '</td><td><div class="cell">' + esc((r.paths || []).map((x) => String(x).split('/').pop()).join(' ')) + '</div></td></tr>'; }).join('') + '</tbody></table></div>' : '';
+        return '<tr><td class="nw">' + esc(String(r.at || '').slice(11, 19)) + '</td><td class="nw">' + esc(r.by || '') + '</td><td' + (wordy ? '><div class="cell">' + esc(r.what) + ' <span class="muted">(' + esc(r.kind) + ')</span></div>' : ' class="nw">' + esc(r.what || (r.kind === 'tool.call' ? r.tool : r.kind))) + '</td><td class="nw">' + (r.ok === false ? '<span class="pill p-bad">failed</span>' : r.ok ? 'yes' : '<span class="muted">—</span>') + '</td><td class="nw">' + (r.ms == null ? '<span class="muted">—</span>' : esc(r.ms)) + '</td><td class="nw">' + (r.inputBytes == null ? '<span class="muted">—</span>' : esc(r.inputBytes)) + '</td><td><div class="cell">' + esc((r.paths || []).map((x) => String(x).split('/').pop()).join(' ')) + '</div></td></tr>'; }).join('') + '</tbody></table></div>' : '';
     const nFin = tr.filter((r) => r.kind === 'agent.finish').length;
     const tok = L.tokens ? ' Tokens' + (nFin > 1 ? ' at its last finish (the capture counts on across a resume)' : '') + ': ' + (L.tokens.output || 0).toLocaleString() + ' out, ' + ((L.tokens.input || 0) + (L.tokens.cacheRead || 0) + (L.tokens.cacheCreation || 0)).toLocaleString() + ' in (most from cache).' : '';
     const finishes = tr.filter((r) => r.kind === 'agent.finish').length;
@@ -869,7 +874,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
       (stopped.length ? '<p class="small muted"><b>Stopped by this step:</b> ' + stopped.map((a) => '<span title="' + esc(a.timer || a.effect) + '">' + esc(timerWords(a.timer || a.effect, 'cancelled')) + ' (by the host)</span>').join(', ') + '</p>' : '');
     const modelNames = s.actors.filter((a) => a.model).map((a) => a.actor);
     return '<details class="step" id="step-' + i + '" data-index="' + i + '"><summary><span class="sno' + (applied ? '' : ' ref') + '">' + esc(s.seq == null ? '×' : s.seq) + '</span><span class="story">' + esc(s.label) + '</span>' +
-      '<span class="smeta"><span>' + esc(s.words || '') + ' (' + esc(s.eventType) + ')</span><span>' + (applied ? '→ ' + esc(short(s.to)) : 'ignored') + '</span><span>' + esc(String(s.at || '').replace('T', ' ').slice(0, 19)) + (s.atNote ? ' (event time)' : '') + '</span>' + (s.changed.length ? '<span>changed: ' + esc(s.changed.join(', ')) + '</span>' : '') + (modelNames.length ? '<span>model agent: ' + esc(modelNames.join(', ')) + '</span>' : '') + '</span></summary>' +
+      '<span class="smeta"><span>' + esc(s.words || '') + ' (' + esc(s.eventType) + ')</span><span>' + (applied ? '→ ' + esc(short(s.to)) : 'ignored') + '</span><span>' + esc(String(s.at || '').replace('T', ' ').slice(0, 19)) + (s.atNote ? ' (event time)' : '') + '</span>' + (s.changed.length ? '<span>changed: ' + esc(s.changed.join(', ')) + '</span>' : '') + (modelNames.length ? '<span>' + (run.kind === 'scripted' ? 'model agent slot (test fixture): ' : 'model agent: ') + esc(modelNames.join(', ')) + '</span>' : '') + '</span></summary>' +
       '<div class="sbody">' + sec('What happened', happened, { open: true }) +
       sec('Context after this step', changed + hashNote + ctx, { open: true, hint: !applied ? 'unchanged' : s.seq === 0 ? 'the context is created here' : s.changed.length ? plural(s.changed.length, 'key') + ' changed, highlighted; unchanged ones are folded' : 'unchanged' }) +
       sec('Actors started by this step', actors, { open: true, hint: s.actors.filter((a) => a.type === 'run').map((a) => a.actor + (a.model ? ' (model)' : ' (host)')).join(', ') || 'none' }) +

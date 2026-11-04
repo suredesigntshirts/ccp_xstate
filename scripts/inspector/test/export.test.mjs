@@ -6,7 +6,7 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } fro
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { exportRun, graphOf, leavesOf, segmentsOf, sourceOf, jsonChunks } from '../export.mjs';
+import { exportRun, graphOf, leavesOf, segmentsOf, sourceOf, jsonChunks, stringPieces, piecesOf, labelGap, runValuesOf } from '../export.mjs';
 import { build, capture, testNames, scenarioText } from '../build.mjs';
 
 const REPO = fileURLToPath(new URL('../../../', import.meta.url));
@@ -70,6 +70,70 @@ test('segmentsOf labels embedded JSON and literal text, and leaves the rest to t
   assert.equal(segs.map((s) => s.text).join(''), text, 'segments cover the text exactly');
   assert.deepEqual(segs.map((s) => s.from), ['template', 'workflow', 'template', 'input', 'template']);
   assert.equal(jsonChunks('x {"k":"}"} y').length, 1);
+});
+
+test('stringPieces splits template literals on their holes and skips comments and regexes', () => {
+  const src = "// not 'this'\nconst a = `You are the ${actor} actor. Input ${JSON.stringify({ x: '}' })}.`;\nconst r = /'q'/g;\nconst b = 'it\\'s' + \"two\\n\";";
+  assert.deepEqual(stringPieces(src), ['You are the ', ' actor. Input ', '}', '.', "it's", 'two\n']);
+});
+
+test('labelGap calls only engine string pieces template, fills holes with run values, and leaves the rest unknown', () => {
+  const pieces = piecesOf({ 'a.js': "const t = `run ${r} (item ${i}) at ${sha}.`; const j = ['\\n'].join('.');" });
+  const values = runValuesOf({ run: 'x:1.verify', item: 'x' }, { subject: 'a'.repeat(40) });
+  const segs = labelGap(`run x:1.verify (item x) at ${'a'.repeat(40)}.\nrun x:1.verify (item zz) at 1234.`, pieces, values);
+  assert.equal(segs.map((s) => s.text).join(''), `run x:1.verify (item x) at ${'a'.repeat(40)}.\nrun x:1.verify (item zz) at 1234.`);
+  assert.deepEqual(segs.map((s) => s.from), ['template', 'run', 'template', 'run', 'template', 'input', 'template', 'run', 'template', 'unknown', 'template', 'unknown', 'template']);
+  assert.deepEqual(segs.filter((s) => s.from === 'unknown').map((s) => s.text), ['zz', '1234']);
+  assert.deepEqual(runValuesOf({ run: 'q', actor: 'v', invoke: 'v' }, { target: { url: 'https://github.com/o/r/pull/12' } }).map((v) => v.text).sort(), ['12', 'https://github.com/o/r/pull/12', 'o/r', 'q', 'v']);
+});
+
+// Every model step of every bundle the default sources build (main real runs, lane scenarios): each "template"
+// segment of layers 2 and 3 must be made only of static string pieces of that engine's own src/*.js, each piece
+// found verbatim (after unescaping) in that source; and no run value (a SHA, a GitHub URL, the run id, the item id,
+// the worktree) may sit inside a template segment.
+test('every template segment of every model step is literally the engine\'s own text', { timeout: 300000 }, async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'wi-tpl-'));
+  const conf = JSON.parse(readFileSync(new URL('../sources.json', import.meta.url), 'utf8'));
+  conf.sources = conf.sources.filter((s) => existsSync(s.engine));
+  if (!conf.sources.length) return;
+  writeFileSync(join(dir, 'sources.json'), JSON.stringify(conf));
+  const out = join(dir, 'out');
+  await build({ config: join(dir, 'sources.json'), out, captureDir: join(dir, 'cap') });
+  const txt = readFileSync(join(out, 'data.js'), 'utf8');
+  const data = JSON.parse(txt.slice(txt.indexOf('=') + 1).trim().replace(/;\s*$/, ''));
+  const engines = {};
+  const engineOf = (path) => engines[path] ??= (() => {
+    const srcDir = join(path, 'packages/engine/src');
+    const sources = Object.fromEntries(readdirSync(srcDir).filter((n) => n.endsWith('.js')).map((n) => [n, readFileSync(join(srcDir, n), 'utf8')]));
+    const raw = Object.values(sources).join('\n').replace(/\\(['"`$\\])/g, '$1').replace(/\\n/g, '\n');
+    return { pieces: [...new Set(Object.values(sources).flatMap(stringPieces))], raw };
+  })();
+  const tiles = (text, pieces) => { // can text be cut into whole pieces? (memoised DP from the end)
+    const ok = new Array(text.length + 1).fill(false); ok[text.length] = true;
+    for (let k = text.length - 1; k >= 0; k--) ok[k] = pieces.some((p) => ok[k + p.length] && text.startsWith(p, k));
+    return ok[0];
+  };
+  let models = 0, segs = 0;
+  const bad = [];
+  for (const r of data.runs) {
+    const eng = engineOf(r.engine.path);
+    for (const s of r.steps ?? []) for (const a of s.actors ?? []) {
+      if (!a.model || !a.layers) continue;
+      models++;
+      const runVals = [a.layers.runId, a.layers.worktree, r.item].filter((v) => typeof v === 'string' && v.length >= 4);
+      for (const L of ['l2', 'l3']) for (const seg of a.layers[L]?.segments ?? []) {
+        if (seg.from !== 'template') continue;
+        segs++;
+        const where = `${r.id} ${a.effect} ${L}: ${JSON.stringify(seg.text).slice(0, 160)}`;
+        if (!tiles(seg.text, eng.pieces.filter((p) => seg.text.includes(p)))) bad.push(`not made of engine string pieces: ${where}`);
+        for (const p of eng.pieces.filter((p) => p.length >= 8 && seg.text.includes(p))) if (!eng.raw.includes(p)) bad.push(`piece not verbatim in source (${JSON.stringify(p).slice(0, 60)}): ${where}`);
+        if (/\b[0-9a-f]{40}\b|https?:\/\//.test(seg.text)) bad.push(`a SHA or URL inside template: ${where}`);
+        for (const v of runVals) if (new RegExp(`(^|[^\\w-])${v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\w-])`).test(seg.text)) bad.push(`run value ${v} inside template: ${where}`);
+      }
+    }
+  }
+  assert.ok(models > 0 && segs > 0, 'some model steps were checked');
+  assert.deepEqual(bad, []);
 });
 
 test('sourceOf extracts a const arrow and a function, with their comments', () => {
@@ -185,7 +249,10 @@ test('lane A Q1: the brief prompt is the workflow author\'s task wrapped by the 
   assert.match(pv.summary, /workflow author/);
   assert.ok(brief.layers.l2.segments.some((s) => s.from === 'workflow'));
   assert.equal(buildRun.actor, 'build');
-  assert.ok(buildRun.layers.l6.hostWritten.some((h) => h.path === 'pr.key'), 'pr.key is stamped by the host');
+  const key = buildRun.layers.l6.hostWritten.find((h) => h.path === 'pr.key');
+  assert.ok(key, 'pr.key is stamped by the host');
+  assert.match(key.why, /engine code writes this field .*packages\/engine\/src\/actors\.js line \d+: ref\.key =/);
+  assert.doesNotMatch(key.why, /very likely|inferred/);
   assert.ok(!buildRun.layers.l6.hostWritten.some((h) => h.path === 'pr.url'));
 });
 
@@ -211,6 +278,9 @@ test('stampOf finds where the engine spreads a result and sets a key; hostFields
   const src = { 'attest.js': 'a\n  return { output: { ...result, attested: { run } } };' };
   assert.deepEqual(stampOf(src, 'attested'), { file: 'packages/engine/src/attest.js', line: 2, text: 'return { output: { ...result, attested: { run } } };' });
   assert.equal(stampOf(src, 'other'), null);
+  const nested = { 'actors.js': '// ref.gates = old\n  if (gates.length) ref.gates = gates;\n  if (ref.green == null) x();' };
+  assert.equal(stampOf(nested, 'gates', { nested: true }).line, 2, 'an assignment, not a comment');
+  assert.equal(stampOf(nested, 'green', { nested: true }), null, 'a comparison is not an assignment');
   const [h] = hostFieldsOf({ attested: {} }, 'Don\'t include an "attested" field: the host writes it.', null, src);
   assert.match(h.why, /engine code stamps it/);
   const [g] = hostFieldsOf({ attested: {} }, 'Don\'t include an "attested" field: the host writes it.', null, {});
@@ -219,7 +289,7 @@ test('stampOf finds where the engine spreads a result and sets a key; hostFields
 
 test('the page never tells a scripted run that Claude Code started its agent', () => {
   const page = readFileSync(new URL('../page.html', import.meta.url), 'utf8');
-  const at = page.indexOf('the prompt Claude Code started it with');
+  const at = page.indexOf('first message Claude Code started the agent with');
   assert.ok(at > 0);
   assert.match(page.slice(at - 400, at), /scripted \? 'The exact text the engine wrote/);
 });

@@ -76,7 +76,12 @@ even when no run of it was captured.
   template, and the page shows that code from the checkout's `actors.js`. When the template wraps a literal from the
   workflow JSON (an invoke input such as `task: { value }`), the prompt is credited to the workflow author
   (`template+workflow`); "nobody wrote it" is said only when the template and the actor input are all of it. "Where each part came from" colours the text: engine template, workflow JSON
-  literal, actor input, run values, or passed through.
+  literal, actor input, run values, passed through, or unknown origin. Text is labelled engine template only where it
+  is literally a static piece of a string literal in that engine's `packages/engine/src/*.js` (a quoted string, or a
+  template literal split on its `${...}` holes). Embedded JSON is matched to the schema, defs and input; the rest is
+  tiled with those static pieces and this run's scalar values (every string or number in `run.json` and the actor
+  input, plus the PR or issue number and owner/repo a GitHub URL implies), labelled run or input. Whatever none of
+  these explains is labelled unknown origin, never template. A test checks this for every model step of every bundle.
 - **Schema and stored result.** Layer 4 shows the schema the agent was shown (the schema JSON in `context.md`); if
   it differs from `run.json`'s, the difference is named and both are shown. Layer 6 is `result.json`, what the host
   stored; fields the host wrote itself are marked: keys the agent-facing schema removed, and keys the added context
