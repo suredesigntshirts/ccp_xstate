@@ -61,7 +61,7 @@ test('copy-not-link: replacing the installed copy leaves no old files behind', (
   cpSync(join(dest, 'package.json'), join(dest, 'stray.txt'));
   setup(home);
   assert.equal(existsSync(join(dest, 'stray.txt')), false);
-  assert.deepEqual(readdirSync(join(home, '.claude', 'skills')), ['ccp-harness']);
+  assert.deepEqual(readdirSync(join(home, '.claude', 'skills')).sort(), ['ccp-harness', 'documentation-downloader']);
 });
 
 test('no-values-logged: the setup log names environment variables but never their values', () => {

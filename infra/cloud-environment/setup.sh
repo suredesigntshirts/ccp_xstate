@@ -15,6 +15,8 @@
 #    session must never edit the plugin it runs (ledger L-no-self-modification); the next container gets the update.
 # 0. Before all that, fast-forwards the clone to origin/main when that is safe: tracked files clean, and HEAD is a
 #    branch tracking origin/main or detached at an ancestor of it. Otherwise it leaves the clone and says why.
+# 2b. Installs the documentation-downloader skill from vendor/ at ~/.claude/skills/documentation-downloader and runs
+#    npm ci there (skipped when CCP_SETUP_FETCH=0).
 # 3. Logs the names of the environment variables, never their values.
 # Running it again gives the same ~/.claude files. Log: $CCP_SETUP_LOG (default /tmp/ccp-xstate-setup.log).
 # Tests only: CCP_SETUP_FETCH=0 skips fetching main and the release refs from origin, and CCP_SETUP_REF installs that ref
@@ -123,6 +125,22 @@ PY
     echo "plugin not installed: could not extract plugins/harness at ${ref}"
   fi
   rm -rf "$work"
+
+  # 2b. The documentation-downloader skill (plan item tool-docs-downloader), copied from vendor/ at the clone's HEAD
+  #     into ~/.claude/skills/documentation-downloader, then `npm ci` there. Chromium is not downloaded: the skill
+  #     finds the container's preinstalled browser (its lib/browser.mjs). CCP_SETUP_FETCH=0 skips the npm step.
+  skill=documentation-downloader
+  sdest="$HOME/.claude/skills/$skill"
+  swork=$(mktemp -d)
+  if git -C "$repo" archive HEAD "vendor/$skill" 2>/dev/null | tar -x -C "$swork" 2>/dev/null && [ -f "$swork/vendor/$skill/SKILL.md" ]; then
+    if [ "${CCP_SETUP_FETCH:-1}" != 0 ]; then
+      (cd "$swork/vendor/$skill" && timeout 300 npm ci --no-audit --no-fund --loglevel=error) || echo "skill $skill: npm ci failed; run npm ci in $sdest"
+    fi
+    rm -rf "$sdest" && mv "$swork/vendor/$skill" "$sdest" && echo "installed $sdest"
+  else
+    echo "skill $skill not installed: no vendor/$skill at HEAD"
+  fi
+  rm -rf "$swork"
 
   # 3. Environment variable names only.
   echo "env names: $(compgen -e | sort | tr '\n' ' ')"

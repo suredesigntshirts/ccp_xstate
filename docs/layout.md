@@ -11,6 +11,7 @@ scripts/tournament/ the generic design-tournament kit: runner, args builder, mea
 scripts/inspector/  the Workflow Inspector: exporter, build and page that show any run step by step (docs/inspector.md)
 tournaments/<id>/   one design tournament: pack, config, measure, result, scores; indexed in tournaments/README.md
 test/               repo-wide tests
+vendor/<name>/      third-party code copied in verbatim, not a workspace; vendor/README.md names each source and sha
 plan/               the plan (plan/README.md)
 docs/               standing knowledge, one file per subject
 ```
@@ -26,3 +27,7 @@ of its own to be covered by CI.
 No runtime dependency except `xstate` and sibling workspaces. `test/workspaces.test.mjs` fails a
 `package.json` that adds one. Dev tooling stays at what Node ships. `xstate` is pinned to an exact version in each `package.json` and in
 `package-lock.json`; CI installs it with `npm ci`.
+
+`vendor/` is outside that rule: it holds tools sessions use (such as the documentation-downloader skill), not
+harness code, and it is neither a workspace nor covered by `npm test`. Its packages install their own dependencies
+where they are installed (`infra/cloud-environment/setup.sh`).
