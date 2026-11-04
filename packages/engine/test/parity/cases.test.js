@@ -69,19 +69,33 @@ test('parity: a case with neither, both, or a gap given to a missing item is cau
   rmSync(join(dir, 'C-push-after-pass.test.js'));
   assert.deepEqual(problems({ root, dir }), ['C-push-after-pass has neither a test nor a gaps.json entry']);
 
+  // gaps.json is empty since fix-waiting-wake, so the gap checks make their own entry, given to the item that met the
+  // case, marked live again in the copy of the plan.
+  const gap = { case: 'C-waiting-does-not-stall', item: 'fix-waiting-wake', why: 'a gap made for this test' };
+  const live = (root) => {
+    const file = join(root, 'plan', 'items', 'fix-waiting-wake.md');
+    writeFileSync(file, readFileSync(file, 'utf8').replace(/"status": "[a-z]+"/, '"status": "ready"'));
+  };
   ({ root, dir } = copy());
-  const g = gapsOf(dir);
-  g.gaps = g.gaps.filter((x) => x.case !== 'C-waiting-does-not-stall');
-  writeFileSync(join(dir, 'gaps.json'), JSON.stringify(g));
+  rmSync(join(dir, 'C-waiting-does-not-stall.test.js'));
   assert.deepEqual(problems({ root, dir }), ['C-waiting-does-not-stall has neither a test nor a gaps.json entry']);
+  const g = gapsOf(dir);
+  g.gaps = [gap];
+  writeFileSync(join(dir, 'gaps.json'), JSON.stringify(g));
+  live(root);
+  assert.deepEqual(problems({ root, dir }), [], 'a gap entry with no test is listed');
 
   ({ root, dir } = copy());
-  writeFileSync(join(dir, 'C-waiting-does-not-stall.test.js'), '');
+  const both = gapsOf(dir);
+  both.gaps = [gap];
+  writeFileSync(join(dir, 'gaps.json'), JSON.stringify(both));
+  live(root);
   assert.deepEqual(problems({ root, dir }), ['C-waiting-does-not-stall has a test and a gaps.json entry; remove the entry']);
 
   ({ root, dir } = copy());
+  rmSync(join(dir, 'C-waiting-does-not-stall.test.js'));
   const h = gapsOf(dir);
-  h.gaps[0].item = 'no-such-item';
+  h.gaps = [{ ...gap, item: 'no-such-item' }];
   writeFileSync(join(dir, 'gaps.json'), JSON.stringify(h));
   assert.match(problems({ root, dir }).join('\n'), /which is no plan item/);
 

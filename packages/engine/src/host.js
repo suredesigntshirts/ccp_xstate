@@ -298,6 +298,9 @@ function refusal(host, event, run) {
     }
   } else if (type.startsWith(TIMER)) {
     if (!host.timers.has(type)) return { stale: true, why: `no timer ${type} is set` };
+    // A timer set and not cancelled is taken where it was set, even by a transition that changes nothing (a waiting
+    // state's checkBack, plan item fix-waiting-wake), which XState's can() reports as not taken.
+    return null;
   } else {
     const schema = host.spec.meta.events?.[type];
     if (!schema) return { why: `${type} is not an event ${host.spec.id} takes from outside` };

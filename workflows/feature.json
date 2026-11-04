@@ -318,6 +318,7 @@
       }
     },
     "replanning": {
+      "after": { "checkBack": { "description": "no answer an hour after the ask: nothing moves; the wake brings the thread back to the waiting item (fix-waiting-wake)" } },
       "invoke": {
         "id": "ask",
         "src": "ask",
@@ -400,6 +401,7 @@
     }
   },
   "meta": {
+    "delays": { "checkBack": 3600000 },
     "guards": {
       "hasIssue": [
         "context.issue.url",

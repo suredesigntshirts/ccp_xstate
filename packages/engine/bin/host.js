@@ -15,8 +15,9 @@
 // event or its source: those come only from the wake text. What this cannot stop: an agent with a shell can run this
 // command with stdin it typed, as it can append rows by hand (ledger L-same-account-everywhere); the decision says so.
 // Effects run with the handlers in src/effects (plan item engine-effects): merges, over GitHub REST. A command has no
-// way into the thread and no clock to wake it, so posts and timers stay pending and are printed; a timer's due time is
-// there for the session to schedule its wake. A card waits until the session that can post it has put it up and run
+// way into the thread and no clock to wake it, so posts stay pending and are printed. A timer effect ends at once with
+// its due time, and the open timer stays listed under pending.timers: its due time is there for the session to
+// schedule its wake (send_later), and any wake past it fires the timer (plan item fix-waiting-wake). A card waits until the session that can post it has put it up and run
 // `card` with its id (src/effects/relay.js, plan item engine-toy-run); `card` then finishes the card effect as the
 // item's owner, so the item's file names the card from then on (plan item engine-item-views), and a tap on it is
 // matched to its run. When the item leaves the state that asked, the ask run's stop is listed under pending; the
@@ -124,7 +125,9 @@ if (command === 'start') {
 }
 const agents = actors({ host, repo: opts.repo ?? process.cwd(), ...(opts.worktrees ? { worktrees: opts.worktrees } : {}) });
 const all = handlers({ github: github(process.env.CCP_GITHUB_API ? { api: process.env.CCP_GITHUB_API } : {}), hearth: relay({ root: opts.root }), actors: agents });
-const effects = { run: all.run, stop: all.stop };
+// timer and cancel have no clock here: a timer ends with its due time, still listed under pending.timers for the
+// session to schedule its wake, and a cancel ends at once (plan item fix-waiting-wake).
+const effects = { run: all.run, stop: all.stop, timer: all.timer, cancel: all.cancel };
 // Effects left open (a card now put up) run first, so the wake's inputs are read against the item as they leave it.
 const before = command === 'show' ? [] : await offer(host, [], effects);
 const offered = typeof inputs === 'function' ? inputs(host) : inputs;

@@ -82,6 +82,7 @@
     },
     "awaitingPublish": {
       "meta": { "needs": ["passed"] },
+      "after": { "checkBack": { "description": "no answer an hour after the ask: nothing moves; the wake brings the thread back to the waiting item (fix-waiting-wake)" } },
       "invoke": {
         "id": "ask", "src": "ask",
         "input": { "question": { "value": "Publish this verified report?" }, "choices": { "value": ["approve", "reject"] }, "draft": "context.draft", "verdict": "context.verdict" },
@@ -102,6 +103,7 @@
       }
     },
     "replanning": {
+      "after": { "checkBack": { "description": "no answer an hour after the ask: nothing moves; the wake brings the thread back to the waiting item (fix-waiting-wake)" } },
       "invoke": {
         "id": "ask", "src": "ask",
         "input": { "question": { "value": "This research stalled. Replan it with a written five whys, or drop it?" }, "choices": { "value": ["replan", "drop"] }, "answers": "context.answers", "verdict": "context.verdict", "failure": "context.failure" },
@@ -116,6 +118,7 @@
     "dropped": { "type": "final" }
   },
   "meta": {
+    "delays": { "checkBack": 3600000 },
     "guards": {
       "hasIssue": ["context.issue.url", "context.issue.expect"],
       "hasPlan": ["context.plan.questions", "context.plan.researcher", "context.plan.writer", "context.plan.verifier"],

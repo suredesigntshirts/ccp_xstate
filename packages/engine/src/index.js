@@ -63,7 +63,8 @@ export const loadWorkflow = (name, { root = null, dir = null } = {}) => {
     const bytes = readFileSync(blob);
     const hash = createHash('sha256').update(bytes).digest('hex');
     if (hash !== pinned[2]) throw new Error(`blob ${pinned[2]} hashes to ${hash}`);
-    return checkStages({ ...JSON.parse(bytes.toString('utf8')), id: name }, { workflows: workflowNames(dir ?? REPO_WORKFLOWS) });
+    // An item pinned before fix-waiting-wake keeps its asking states with no timer until it finishes.
+    return checkStages({ ...JSON.parse(bytes.toString('utf8')), id: name }, { workflows: workflowNames(dir ?? REPO_WORKFLOWS), pinned: true });
   }
   const bytes = readFileSync(join(dir ?? REPO_WORKFLOWS, `${name}.json`));
   const hash = createHash('sha256').update(bytes).digest('hex');

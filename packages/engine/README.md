@@ -42,8 +42,11 @@ command.
 | `stop` (`index.js`) | a run whose state was left | an `ask` run's card is closed by its key (`hearth.close`), so nothing waits on the person; any other run's stop ends at once, and its late result is stale |
 
 `handlers({ github, hearth, clock })` builds them. `github` (`src/effects/github.js`) reaches api.github.com through
-the session's proxy itself. A command can't reach the thread or schedule a wake, so in `bin/host.js` posts and timers
-stay pending (and printed). Its cards go through `src/effects/relay.js` (plan item engine-toy-run): the session that
+the session's proxy itself. A command can't reach the thread or schedule a wake, so in `bin/host.js` posts stay
+pending (and printed), and a timer effect ends at once with its due time while the open timer stays listed under
+`pending.timers`: the session schedules a wake for that time (send_later), and any wake past it fires the timer. Every
+state that asks the person sets one: a one-hour `checkBack` that moves nothing, so a quiet thread comes back to the
+waiting item, and the load check refuses an asking state without a timer (plan item fix-waiting-wake). Its cards go through `src/effects/relay.js` (plan item engine-toy-run): the session that
 has the thread's tools posts the card `show` lists and records its id with `card`, which then finishes the card
 effect with that id as the item's owner (so the item's file names the card; plan item engine-item-views), so the tap wake on that card answers the run. When the item leaves the state that asked, `show` lists the ask run's
 `stop` under pending; the session withdraws the card (`close_decision` with no choice) and records that with `closed`,
