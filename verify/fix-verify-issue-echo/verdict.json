@@ -1,0 +1,39 @@
+{
+  "item": "fix-verify-issue-echo",
+  "verified_sha": "2c0310e755592e231aaa7028274a11a9f3d8814f",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5J5g2DaK8MmBpURMSY", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "trimmed-accepted",
+      "status": "MET",
+      "command": "npm ci; TMPDIR=<fresh> node --test verify/fix-verify-issue-echo/echo.test.mjs (real engine through the tourney world: start quick-fix with issue {url,title,body,expect(3 lines)}, brief, build, drive to verifying, then spawn/bind/accept() the verify run)",
+      "excerpt": "The verify run's input.issue deep-equals all four keys. Item t1: issue {url, expect} -> accepted, item moved to awaitingMerge, 0 refusal rows. Fresh item t2: issue {body, expect, title, url} (all four, different order) -> accepted, awaitingMerge. Negative control: with packages/engine/src/actors.js restored to main's version, both tests go red (not ok 1, not ok 2), so the tests discriminate the old rule."
+    },
+    {
+      "id": "tamper-refused",
+      "status": "MET",
+      "command": "TMPDIR=<fresh> node --test verify/fix-verify-issue-echo/echo.test.mjs (test 'tamper-refused'); mutation of agrees() object branch to `return true`",
+      "excerpt": "On one verifying item, each refused with rule restated (reason \"result.issue is not the input's issue: whatever it carries must repeat the input exactly ...\"), item stayed verifying, 6 restated refusal rows journalled: one expect line with a word changed (RangeError->TypeError), one expect line dropped, url changed (#42->#43), title differing (full echo, trailing space), extra key labels, plus an extra expect line added. Also url omitted is refused (by schema: result.issue.url is missing). The exact echo is then accepted. With agrees() object branch mutated to `return true`, this test goes red."
+    },
+    {
+      "id": "prompt-agrees",
+      "status": "MET",
+      "command": "verify test 'prompt-agrees' reads items/t4/runs/2.verify/brief.md and stage.json; TMPDIR=<fresh> node --test packages/engine/test/tourney/*.test.js then grep over all 57 verify brief.md run folders, including research item r1 runs/5.verify/brief.md; read workflows/research.json verify issue description",
+      "excerpt": "quick-fix brief.md ## Output: \"- issue: Your input's issue: url and expect copied exactly (every expect line, in order). You may leave out title, body and any other key; a key you include must equal the input's exactly. The host compares what you send with your input.\" No 'same keys in the same order' or 'byte for byte'; stage.json carries the same text. The research verify brief.md Output carries the identical issue line, and research.json's description matches. 0 of 57 scenario verify briefs contain the old 'same keys in the same order' text."
+    },
+    {
+      "id": "scenarios",
+      "status": "MET",
+      "command": "TMPDIR=<fresh> node --test packages/engine/test/tourney/*.test.js; node --test packages/engine/test/tourney/Q9.test.js; git diff --stat origin/main...2c0310e -- packages/engine/test/",
+      "excerpt": "tests 72, pass 72, fail 0, skipped 0. Q9 passes and still asserts drift.refused?.rule === 'restated' (line 31). The only test diff is the new packages/engine/test/tourney/echo.test.js (+91); no existing scenario file is changed, so no assertion is weakened. Under the mutation: pass 69, fail 3 (Q9, echo tamper test, agrees unit test).",
+      "mutation": "packages/engine/src/actors.js agrees(): the plain-object branch `return Object.keys(given).every((k) => Object.hasOwn(input, k) && agrees(given[k], input[k]));` replaced by `return true;` (any restated object agrees)",
+      "red_test": "packages/engine/test/tourney/Q9.test.js: 'Q9: an issue edit mid-build is refused; the verifier grades the original lines and must restate them exactly' (not ok 37), also echo.test.js tests 71 and 72"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 79; git rev-parse origin/build/fix-verify-issue-echo",
+      "excerpt": "Check run 'test' (ci.yml, id 126825810476) completed success at head 2c0310e (PR head confirmed 2c0310e755592e231aaa7028274a11a9f3d8814f). 'gates' failed only because no verdict existed yet."
+    }
+  ]
+}
