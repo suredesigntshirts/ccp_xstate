@@ -16,7 +16,7 @@ from**, and to say plainly what was never recorded.
 | `scripts/inspector/build.mjs` | Many sources to one folder: `index.html` (a copy of `page.html`) and `data.js` |
 | `scripts/inspector/page.html` | The page. Self-contained: no CDN, no fonts, no network |
 | `scripts/inspector/sources.json` | The sources the build reads by default. Its paths are this machine's |
-| `scripts/inspector/check-page.mjs` | Opens a built page in headless Chromium: every run, step, workflow and compare pair at 390px and 1280px, failing on console errors or sideways page scroll |
+| `scripts/inspector/check-page.mjs` | Opens a built page in headless Chromium: every run, step, workflow and compare pair at 390px and 1280px, failing on console errors, sideways page scroll, a table wider than its box at 1280px, or a scripted step that claims Claude Code started its agent |
 | `scripts/inspector/test/` | node:test tests; `node --test scripts/inspector/test/` or `npm test` |
 
 ## Build
@@ -93,6 +93,8 @@ even when no run of it was captured.
 
 - Claude Code's own system prompt, tool list and CLAUDE.md files: the harness never records them.
 - The exact commands an agent ran: the capture stores only a hash of each tool's input.
+- The messages the parent session sends when it resumes an agent (after it finished without returning, or after a
+  handback): only that a resume happened is known.
 - The raw return of an agent, where the engine stores only its stamped version (lanes A and C): host-written fields
   are marked from the rules the context states, not from a stored copy of the return.
 - That a `template` prompt is byte for byte what `writtenBrief()` gives today: the code is shown, not re-run.
@@ -103,8 +105,14 @@ even when no run of it was captured.
 
 - An event the engine ignored lists every way out that listens for it on the active state, its ancestors and the root,
   with which guard or need failed on the unchanged context. "Nothing listens for it" is said only when none does.
-- A run with no stored result is described from the evidence, in this order: refusal rows ("returned N times, each
-  refused (rule)"), a `failed*` file in the run folder, a capture `agent.finish` row ("finished at T without calling
-  the return tool"), the item leaving the state, and only then "no answer yet".
+- A run with no stored result is described from the evidence, in this order: a `failed*` file in the run folder or
+  an `xstate.error.actor.<id>` step that took it ("failed: never returned"), refusals of return-tool calls ("returned
+  N times, each refused (rule)"), a capture `agent.finish` row ("finished at T without calling the return tool"), the
+  item leaving the state, and only then "no answer yet". A refusal with rule `no-return` (or of a tool other than the
+  return tool, such as `SubagentHandback`) is a handback refused and sent back, never counted as a return.
+- When an agent finishes more than once, each later finish took in a further message: a resume by the parent session
+  (a second `agent.spawn` row with the same agent id) or a reply after a handback. Its time and token counts carry on,
+  which is how the capture shows one conversation. The text of that message is not recorded, so layer 2 marks the
+  agent "resumed, message not recorded" and says brief.md is its first message, not everything it was told.
 - Live-capture rows `result.stored` and `brief.stored` are the capture hook's hashes of the agent's final message and
   prompt, shown as by "capture": they are not the harness accepting anything. Layer 7 holds the harness's own rows.

@@ -24,7 +24,13 @@ for (const width of [390, 1280]) {
   page.on('console', (m) => { if (m.type() === 'error') problems.push(`${width}px console: ${m.text()}`); });
   page.on('pageerror', (e) => problems.push(`${width}px page error: ${e.message}`));
   await page.goto(url);
-  const { runs, shelf } = await page.evaluate(() => ({ runs: window.INSPECTOR_DATA.runs.map((r) => ({ id: r.id, n: r.steps.length })), shelf: window.INSPECTOR_DATA.shelf.map((w) => w.id) }));
+  const { runs, shelf } = await page.evaluate(() => ({ runs: window.INSPECTOR_DATA.runs.map((r) => ({ id: r.id, n: r.steps.length, kind: r.kind })), shelf: window.INSPECTOR_DATA.shelf.map((w) => w.id) }));
+  // A table that is wider than its own box at desktop width hides its right-hand columns behind a sideways scroll.
+  const fits = async (sel, what) => {
+    if (width < 1280) return;
+    const w = await page.evaluate((sel) => { const el = document.querySelector(sel); return el ? [el.scrollWidth, el.clientWidth] : null; }, sel);
+    if (w && w[0] > w[1]) problems.push(`${width}px: ${what} is wider than its box (${w[0]} > ${w[1]})`);
+  };
   const wide = async (what) => {
     const w = await page.evaluate(() => document.documentElement.scrollWidth);
     if (w > width) problems.push(`${width}px: ${what} scrolls sideways (scrollWidth ${w})`);
@@ -35,11 +41,18 @@ for (const width of [390, 1280]) {
       // Open every section of the step, as a reader clicking through would.
       await page.evaluate((i) => { const s = document.getElementById(`step-${i}`); s.querySelectorAll('details').forEach((d) => { d.open = true; }); }, i);
       await wide(`run ${r.id} step ${i}`);
+      if (i === 0) await fits('#glance .tblwrap', `run ${r.id}: the steps-at-a-glance table`);
+      if (r.kind === 'scripted') {
+        const said = await page.evaluate((i) => document.getElementById(`step-${i}`).textContent, i);
+        if (/Claude Code started it with/.test(said)) problems.push(`run ${r.id} step ${i}: a scripted step says Claude Code started an agent`);
+      }
     }
   }
   for (const id of shelf) {
     await page.evaluate((id) => { location.hash = `wf=${id}`; dispatchEvent(new PopStateEvent('popstate')); }, id);
     await wide(`workflow ${id}`);
+    await page.evaluate(() => document.querySelectorAll('#statestable details').forEach((d) => { d.open = true; }));
+    await fits('#statestable .tblwrap', `workflow ${id}: the states table`);
   }
   for (const [a, b] of [[runs[0].id, runs.at(-1).id], ...runs.slice(1).map((r, k) => [runs[k].id, r.id])]) {
     await page.evaluate((h) => { location.hash = h; dispatchEvent(new PopStateEvent('popstate')); }, `compare=${a},${b}`);

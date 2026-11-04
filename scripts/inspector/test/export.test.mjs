@@ -200,6 +200,28 @@ test('lane C Q1 verify: the agent-facing schema has no attested, and attested in
   assert.ok((l4.hostSchema.required ?? []).includes('attested'));
   assert.ok(verify.layers.l6.hostWritten.some((h) => h.path === 'attested'));
   assert.equal(modelsOf(b)[0].layers.l2.provenance.kind, 'template', 'lane C\'s brief has no authored task: nobody wrote it');
+  const briefAttested = modelsOf(b)[0].layers.l6.hostWritten.find((h) => h.path === 'attested');
+  assert.ok(briefAttested, 'the brief result\'s attested is host-written too');
+  assert.match(briefAttested.why, /engine code stamps it .*packages\/engine\/src\/attest\.js line \d+/);
+  assert.doesNotMatch(briefAttested.why, /very likely|inferred/);
+});
+
+test('stampOf finds where the engine spreads a result and sets a key; hostFieldsOf then states it firmly', async () => {
+  const { stampOf, hostFieldsOf } = await import('../export.mjs');
+  const src = { 'attest.js': 'a\n  return { output: { ...result, attested: { run } } };' };
+  assert.deepEqual(stampOf(src, 'attested'), { file: 'packages/engine/src/attest.js', line: 2, text: 'return { output: { ...result, attested: { run } } };' });
+  assert.equal(stampOf(src, 'other'), null);
+  const [h] = hostFieldsOf({ attested: {} }, 'Don\'t include an "attested" field: the host writes it.', null, src);
+  assert.match(h.why, /engine code stamps it/);
+  const [g] = hostFieldsOf({ attested: {} }, 'Don\'t include an "attested" field: the host writes it.', null, {});
+  assert.match(g.why, /very likely/);
+});
+
+test('the page never tells a scripted run that Claude Code started its agent', () => {
+  const page = readFileSync(new URL('../page.html', import.meta.url), 'utf8');
+  const at = page.indexOf('the prompt Claude Code started it with');
+  assert.ok(at > 0);
+  assert.match(page.slice(at - 400, at), /scripted \? 'The exact text the engine wrote/);
 });
 
 test('lane C Q3: a verify run that never returned says so, and does not claim the test handed over a result', { skip: !existsSync(join(LANE_C, 'packages/engine/test/tourney/Q3.test.js')) && 'no lane C checkout here' }, async () => {
@@ -270,4 +292,39 @@ test('lane C Q5 test 2: a verifier whose return was refused says it returned and
   assert.match(v.layers.l6.missing, /returned once; the return was refused \(attested-reserved\)/);
   assert.match(v.layers.l6.short, /refused \(attested-reserved\)/);
   assert.match(b.endNote, /every return was refused/);
+});
+
+test('ar4: an agent that never called the return tool and whose run failed is not "refused" or "waiting for a new return"', { skip: !existsSync(TRR) && 'no toy-run-returns journal here' }, async () => {
+  const b = await exportRun({ engine: REPO, journal: TRR, item: 'ar4', kind: 'real' });
+  const L = b.steps[0].actors.find((a) => a.model).layers;
+  assert.notEqual(L.outcome.status, 'refused');
+  assert.equal(L.outcome.status, 'failed');
+  for (const t of [L.l6.missing, L.l6.short, L.l5.story]) {
+    assert.doesNotMatch(t, /returned once|waits for a new return|refused \d+ return/);
+  }
+  assert.match(L.l6.missing, /never called the return tool/);
+  assert.match(L.l6.missing, /sent back once \(sent-back\.json\)/);
+  assert.match(L.l6.missing, /failed/);
+  assert.match(L.l6.missing, /replanning/);
+  assert.match(L.l6.short, /^failed: never returned \(no-return\)/);
+  assert.match(L.l5.story, /refused 2 handbacks that came without a return: it sent the agent back once/);
+  const hook = L.l5.trace.find((r) => r.kind === 'refusal');
+  assert.equal(hook.by, 'harness hook');
+  assert.match(hook.what, /sent the agent back/);
+});
+
+test('fri-jsonl-lint-2 verify: the agent was resumed with a message that was not recorded, and the page data says so', { skip: !existsSync(FRI) && 'no first-real-issue journal here' }, async () => {
+  const b = await exportRun({ engine: REPO, journal: FRI, item: 'fri-jsonl-lint-2', kind: 'real' });
+  const verify = b.steps.flatMap((s) => s.actors).find((a) => a.model && a.actor === 'verify').layers;
+  assert.match(verify.l5.story, /parent session resumed this same agent/);
+  assert.match(verify.l5.story, /not recorded/);
+  assert.doesNotMatch(verify.l5.story, /started again|a new agent\.spawn row/);
+  assert.ok(verify.l2.resumeNote, 'layer 2 carries a resume note');
+  assert.match(verify.l2.resumeNote.text, /resumed once after it finished without returning/);
+  assert.match(verify.l2.resumeNote.text, /not recorded/);
+  assert.match(verify.l2.resumeNote.chip, /resumed 1×, message not recorded/);
+  const build = b.steps.flatMap((s) => s.actors).find((a) => a.model && a.actor === 'build').layers;
+  assert.equal(build.l2.resumeNote, null, 'an agent that finished once has no resume note');
+  const page = readFileSync(join(REPO, 'scripts/inspector/page.html'), 'utf8');
+  assert.match(page, /messages the parent session sends when it resumes an agent/);
 });

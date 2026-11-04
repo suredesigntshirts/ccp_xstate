@@ -90,7 +90,7 @@ svg .n.final rect{stroke-width:3}
 svg .n{cursor:pointer}
 svg .n:focus{outline:none}
 svg .n:focus-visible rect{stroke:var(--fg);stroke-width:3;stroke-dasharray:4 2}
-svg .grp>rect{fill:none;stroke:var(--wire);stroke-dasharray:5 4;stroke-width:1.2}
+svg .grp>rect{fill:transparent;pointer-events:all;cursor:pointer;stroke:var(--wire);stroke-dasharray:5 4;stroke-width:1.2}
 svg .grp.visited>rect{stroke:var(--accent)}
 svg .grp.sel>rect{fill:var(--accent-bg);stroke:var(--accent);stroke-width:2}
 svg .nt{font-weight:600;font-size:13px;text-anchor:middle}
@@ -152,10 +152,23 @@ pre.text,pre.rd,pre.seg{white-space:pre-wrap;overflow-wrap:anywhere}
 pre.json button.more,pre.json button.tog{font:inherit;font-size:11.5px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--accent);border-radius:4px;padding:0 6px;margin:0 2px}
 pre.json .full[hidden],pre.json .hd[hidden],pre.json .foldbody[hidden]{display:none}
 pre.json .full{white-space:pre-wrap;overflow-wrap:anywhere}
+.authored{margin:4px 0;max-width:46ch;overflow-wrap:anywhere} .authored pre{margin-top:4px;max-width:none}
+td.keyscell{max-width:28ch;min-width:14ch} td.keyscell .chips{flex-wrap:wrap}
+@media (max-width:560px){pre.json .hd,pre.json .j-s{white-space:pre-wrap;overflow-wrap:anywhere}pre.json button.more{display:inline-block;margin:2px 0 2px 1ch}}
+.who .resumed{display:block;margin-top:4px;padding:6px 8px;border-radius:4px;background:var(--warn-bg);color:var(--fg)}
 .hostw{background:var(--bad-bg);box-shadow:inset 3px 0 0 var(--bad)}
 .tag{font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--bad);margin-left:6px}
 abbr[title]{text-decoration:underline dotted;text-underline-offset:2px;cursor:help}
 .glance td{font-family:var(--f-body);font-size:13px}
+.glance th{white-space:normal;min-width:8ch}
+.tblwrap td>.cell.host{max-width:22ch;min-width:12ch}
+.tblwrap td>.cell.ret{max-width:22ch;min-width:12ch}
+.tblwrap td>.cell.what{max-width:28ch;min-width:14ch}
+.thwrap{max-width:40ch;min-width:16ch;white-space:normal}
+.tblwrap td>.cell.ft{max-width:22ch;min-width:12ch}
+.tblwrap td>.cell.starts{max-width:30ch;min-width:16ch}
+.glance td.keyscell{max-width:20ch}
+.glance .tblwrap td>.cell.wide,.tblwrap .glance td>.cell.wide{max-width:46ch}
 .glance td.mono,.glance td code{font-family:var(--f-mono);font-size:12px}
 .glance button{font:inherit;font-size:12.5px;font-family:var(--f-mono);cursor:pointer;padding:2px 8px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent);min-height:28px;white-space:nowrap}
 .cand{margin:0;padding-left:22px;display:grid;gap:3px;font-size:14px}
@@ -187,7 +200,8 @@ table{border-collapse:collapse;width:100%;font-size:13px}
   table.stack tr:last-child{border-bottom:none}
   table.stack td{display:block;border:none;padding:3px 10px;white-space:normal}
   .tblwrap table.stack td.nw,.tblwrap table.stack td.nw code{white-space:normal}
-  table.stack td>.cell,table.stack td>.cell.wide{max-width:none;min-width:0}
+  table.stack td>.cell,table.stack td>.cell.wide,.tblwrap table.stack td>.cell{max-width:none;min-width:0}
+  .glance table.stack td.keyscell,table.stack.glance td.keyscell{max-width:none}
   table.stack td[data-label]::before{content:attr(data-label);display:block;font-family:var(--f-body);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
   table.stack td:empty{display:none}
 }
@@ -211,6 +225,10 @@ tr:last-child td{border-bottom:none}
 .dtable td:first-child{white-space:nowrap}
 .onlylist{margin:0;padding-left:20px;font-size:13.5px;display:grid;gap:3px}
 .onlylist li{overflow-wrap:anywhere}
+.onlylist.changed li{display:grid;gap:2px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.onlylist.changed li:last-child{border-bottom:none}
+.onlylist.changed .cl::before{content:"\2190  ";color:var(--muted)} .onlylist.changed .cr::before{content:"\2192  ";color:var(--muted)}
+.gapline{display:inline-block;width:100%;background:repeating-linear-gradient(135deg,transparent 0 6px,var(--line) 6px 7px)}
 .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
 @media (max-width:760px){.cols{grid-template-columns:minmax(0,1fr)}}
 .col{display:grid;gap:6px;min-width:0;align-content:start}
@@ -243,7 +261,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
 
   <section class="panel" aria-label="In short">
     <p>This page replays one run of a workflow, step by step: where the item went, how its context (working memory) changed, and for each model agent exactly what it was given, what it did, what it returned and whether the host kept it. It says where every piece of prompt text came from.</p>
-    <p class="small"><b>Not recorded anywhere:</b> Claude Code's own system prompt, and the exact commands agents ran. <b>Lane A and lane C runs are scripted:</b> their agents are test fixtures, GitHub is fake, and no model ran.</p>
+    <p class="small"><b>Not recorded anywhere:</b> Claude Code's own system prompt, the exact commands agents ran, and the messages the parent session sends when it resumes an agent. <b>Lane A and lane C runs are scripted:</b> their agents are test fixtures, GitHub is fake, and no model ran.</p>
   </section>
 
   <details class="callout" id="intro">
@@ -264,6 +282,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
       <ul>
         <li>The Claude Code system prompt is never recorded (layer 1).</li>
         <li>Tool calls keep only the tool name, time, size and paths. The exact commands are not stored, only a hash of them.</li>
+        <li>When the parent session resumes an agent (for example because it finished without calling the return tool), the message it sends is not recorded. The prompt shown in layer 2 is then the agent's first message, not everything it was told; the page marks such agents "resumed, message not recorded".</li>
         <li>Lane A and lane C runs are <b>scripted scenarios</b>: their "agents" are test fixtures (briefs and results typed into the test), GitHub is a fake server, and no model ran. They show what each design's engine would hand a real agent.</li>
         <li>The context after each step is recovered by <b>replay</b>. The page says where replay did not match or failed.</li>
         <li>Real runs from before workflows were pinned are shown with today's workflow file; the page says so on those runs.</li>
@@ -465,7 +484,10 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     if (b.classList.contains('more')) {
       const s = b.previousElementSibling; const open = b.getAttribute('aria-expanded') !== 'true';
       if (s) { const hd = s.querySelector('.hd'), full = s.querySelector('.full'); if (hd) hd.hidden = open; if (full) full.hidden = !open; }
-      b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'show less' : b.dataset.label; return;
+      b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'show less' : b.dataset.label;
+      const box = b.closest('pre'); if (box) box.scrollLeft = 0;
+      if (s && s.scrollIntoView) { try { s.scrollIntoView({ block: 'nearest', inline: 'start' }); } catch (_) {} if (box) box.scrollLeft = 0; }
+      return;
     }
     if (b.classList.contains('tog')) {
       const target = b.nextElementSibling; const open = b.getAttribute('aria-expanded') !== 'true';
@@ -571,15 +593,15 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const nodeOf = (n) => {
       const p = P[n.id]; const ch = L.kids[n.id] || []; const v = visits[n.id];
       const cls = (v ? ' visited' : '') + (sel === n.id ? ' sel' : '') + (n.type === 'final' ? ' final' : '');
-      const inv = n.invokes.map((i) => (i.id || i.src) + (models.has(i.id || i.src) ? ' (model)' : '')).join(', ');
+      const inv = n.invokes.length ? 'runs ' + n.invokes.map((i) => (i.src && i.id && i.src !== i.id ? i.id + ': ' + i.src : (i.id || i.src)) + (models.has(i.id || i.src) ? ' (model)' : '')).join(', ') : '';
       const steps = r.steps.filter((s) => s.outcome === 'applied' && s.to.some((l) => l === n.id || l.indexOf(n.id + '.') === 0)).map((s) => s.seq);
-      const aria = n.name + (n.type === 'final' ? ', final state' : '') + (inv ? ', runs ' + inv : '') + (r.steps.length ? (steps.length ? ', entered at step ' + steps.join(', ') : ', not entered in this run') : '');
+      const aria = n.name + (n.type === 'final' ? ', final state' : '') + (inv ? ', ' + inv : '') + (r.steps.length ? (steps.length ? ', entered at step ' + steps.join(', ') : ', not entered in this run') : '');
       if (ch.length) {
         return '<g class="grp n' + cls + '" data-state="' + esc(n.id) + '" tabindex="0" role="button" aria-label="' + esc(aria) + '"><rect x="' + p.x + '" y="' + p.y + '" width="' + p.w + '" height="' + p.h + '" rx="10"/><text class="gt" x="' + (p.x + 10) + '" y="' + (p.y + 16) + '">' + esc(n.name) + (n.type === 'parallel' ? ' (all at once)' : '') + '</text></g>' + ch.map(nodeOf).join('');
       }
       const cnt = v >= 1 ? '<g class="cnt"><circle cx="' + (p.x + p.w - 4) + '" cy="' + (p.y + 4) + '" r="9"/><text x="' + (p.x + p.w - 4) + '" y="' + (p.y + 4) + '">' + Math.round(v) + '</text></g>' : '';
       return '<g class="n' + cls + '" data-state="' + esc(n.id) + '" tabindex="0" role="button" aria-label="' + esc(aria) + '"><rect x="' + p.x + '" y="' + p.y + '" width="' + p.w + '" height="' + p.h + '" rx="' + (n.type === 'final' ? 22 : 8) + '"/>' +
-        '<text class="nt" x="' + (p.x + p.w / 2) + '" y="' + (p.y + (inv ? 22 : 30)) + '">' + esc(n.name) + '</text>' + (inv ? '<text class="na" x="' + (p.x + p.w / 2) + '" y="' + (p.y + 40) + '">' + esc(inv.length > 24 ? inv.slice(0, 23) + '…' : inv) + '</text>' : '') + cnt + '</g>';
+        '<text class="nt" x="' + (p.x + p.w / 2) + '" y="' + (p.y + (inv ? 22 : 30)) + '">' + esc(n.name) + '</text>' + (inv ? '<text class="na" x="' + (p.x + p.w / 2) + '" y="' + (p.y + 40) + '">' + esc(inv.length > Math.max(12, Math.floor((p.w - 12) / 6.3)) ? inv.slice(0, Math.max(12, Math.floor((p.w - 12) / 6.3)) - 1) + '…' : inv) + '</text>' : '') + cnt + '</g>';
     };
     (L.kids[''] || []).forEach((n) => { nodes += nodeOf(n); });
     const x0 = Math.floor(minX - 14), w = Math.ceil(maxX - minX + 28), h = Math.ceil(maxY + 16);
@@ -599,7 +621,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
       if (n) { const a = n.getBoundingClientRect(), b = box.getBoundingClientRect(); box.scrollLeft += a.left + a.width / 2 - (b.left + box.clientWidth / 2); } } $('zoom').textContent = fit ? 'Show map at actual size' : 'Fit map to width';
     graphCue(); }
   function graphCue() { const b = $('graph'); const more = b.scrollHeight > b.clientHeight + 16 && b.scrollTop + b.clientHeight < b.scrollHeight - 16; $('graphwrap').classList.toggle('more', more);
-    $('zoomhint').textContent = (fit ? 'The whole map is scaled to fit its width.' : 'Actual size.') + (more ? ' The map continues below: scroll inside it.' : ''); }
+    $('zoomhint').textContent = (fit ? 'The whole map is scaled to fit its width.' : 'Actual size: scroll the map sideways to see all of it.') + (more ? ' The map continues below: scroll inside it.' : ''); }
   $('graph').addEventListener('scroll', graphCue);
   let autoFit = true;
   $('zoom').addEventListener('click', () => { fit = !fit; autoFit = false; applyZoom(); });
@@ -621,7 +643,12 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   // What an actor is, for a map with no run: as runs of the same name show it, or a child workflow, or unknown.
   const kindsSeen = {}; D.runs.forEach((r) => r.steps.forEach((s) => s.actors.forEach((a) => { if (a.type === 'run') kindsSeen[a.actor] = a.model ? 'model' : 'host'; })));
   const shelfNames = D.shelf.map((w) => String(w.file).split('/').pop().replace(/\.json$/, ''));
-  const kindOf = (src, fromRun) => fromRun || (shelfNames.indexOf(src) >= 0 ? 'child workflow' : kindsSeen[src] ? kindsSeen[src] + ' in the captured runs' : 'kind unknown without a run');
+  // "q1 (runs build; model in the captured runs)": an invoke id that differs from its actor names the actor it runs.
+  const invName = (i, kind) => '<code>' + esc(i.id || i.src) + '</code> <span class="muted">(' + (i.src && i.id && i.src !== i.id ? 'runs ' + esc(i.src) + '; ' : '') + esc(kind) + ')</span>';
+  const authored = (i) => Object.entries(i.input || {}).filter(([, v]) => v && typeof v === 'object' && typeof v.value === 'string' && v.value.length >= 20);
+  const authoredHtml = (i, full) => authored(i).map(([k, v]) => '<div class="small authored"><b>Text written in the workflow file</b> for <code>' + esc(i.id || i.src) + '</code>, <code>input.' + esc(k) + '</code>' +
+    (full ? ' (the only prompt text a workflow author writes; the engine template wraps it):<pre class="text" tabindex="0">' + esc(v.value) + '</pre>' : ': <span title="' + esc(v.value) + '">"' + esc(v.value.length > 90 ? v.value.slice(0, 89) + '…' : v.value) + '"</span>') + '</div>').join('');
+  const kindOf = (src, fromRun) => fromRun || (shelfNames.indexOf(src) >= 0 ? 'child workflow' : kindsSeen[src] ? (kindsSeen[src] === 'model' ? 'a model agent' : 'host code') + ' in other captured runs' : 'kind unknown without a run');
 
   const runKind = (r, invoke) => { for (const s of r.steps) for (const a of s.actors) if (a.type === 'run' && a.invoke === invoke) return a.model ? 'model' : 'host'; return null; };
   function statePanel(r, id) {
@@ -631,7 +658,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const outs = g.edges.filter((e) => e.from === id);
     box.hidden = false;
     box.innerHTML = '<h3>State: ' + esc(st(n.id)) + (n.type === 'final' ? ' (final)' : '') + '</h3>' + (n.description ? '<p class="small">' + esc(n.description) + '</p>' : '') +
-      (n.invokes.length ? '<p class="small">Starts (' + ab('invoke') + '): ' + n.invokes.map((i) => '<code>' + esc(i.id || i.src) + '</code> (' + esc(kindOf(i.src || i.id, runKind(r, i.id || i.src))) + ')').join(', ') + '</p>' : '') +
+      (n.invokes.length ? '<p class="small">Starts (' + ab('invoke') + '): ' + n.invokes.map((i) => invName(i, kindOf(i.src || i.id, runKind(r, i.id || i.src)))).join(', ') + '</p>' + n.invokes.map((i) => authoredHtml(i, true)).join('') : '') +
       (n.needs.length ? '<p class="small">' + ab('needs', 'Needs') + ' to enter: ' + n.needs.map((x) => gname(wf, x)).join(', ') + '</p>' : '') +
       (r.steps.length ? '<div class="jumps">' + (steps.length ? steps.map((s) => '<button type="button" class="btn" data-jump="' + s.index + '">Go to step ' + esc(s.seq) + '</button>').join('') : '<span class="muted small">This run never entered this state.</span>') + '</div>' : '') +
       (outs.length ? '<p class="small"><b>' + WAYS_HEAD + ':</b></p><ul>' + outs.map((e) => '<li>' + wayOut(wf, g, e) + '</li>').join('') + '</ul>' : '<p class="small muted">No ways out of its own' + (n.type === 'final' ? ': this is where an item ends.' : '.') + '</p>');
@@ -645,24 +672,27 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const rows = g.nodes.map((n) => {
       const outs = g.edges.filter((e) => e.from === n.id);
       return '<tr><td class="nw"><code>' + esc(st(n.id)) + '</code>' + (n.type === 'final' ? ' <span class="pill p-mute">final</span>' : n.type === 'compound' || n.type === 'parallel' ? ' <span class="pill p-mute">group</span>' : '') + '</td>' +
-        '<td class="nw">' + (n.invokes.map((i) => esc(i.id || i.src) + ' <span class="muted">(' + esc(kindOf(i.src || i.id, kinds[i.id || i.src])) + ')</span>').join('<br>') || '') + '</td>' +
+        '<td><div class="cell starts">' + (n.invokes.map((i) => '<div>' + invName(i, kindOf(i.src || i.id, kinds[i.id || i.src])) + '</div>' + authoredHtml(i, false)).join('') || '') + '</div></td>' +
         '<td class="nw">' + n.needs.map((x) => gname(wf, x)).join('<br>') + '</td>' +
         '<td>' + (outs.length ? '<div class="cell wide"><ul class="cand">' + outs.map((e) => '<li>' + wayOut(wf, g, e) + '</li>').join('') + '</ul></div>' : '') + '</td></tr>';
     }).join('');
     const any = g.edges.filter((e) => e.from === '');
     const anyRow = any.length ? '<tr><td class="nw"><i>In any state</i></td><td></td><td></td><td><div class="cell wide"><ul class="cand">' + any.map((e) => '<li>' + wayOut(wf, g, e) + '</li>').join('') + '</ul></div></td></tr>' : '';
-    $('statestable').innerHTML = sec('All states and ways out', '<div class="tblwrap"><table class="glance stack"><thead><tr><th scope="col">State</th><th scope="col">Starts</th><th scope="col">Needs</th><th scope="col">' + WAYS_HEAD + '</th></tr></thead><tbody>' + rows + anyRow + '</tbody></table></div>',
+    $('statestable').innerHTML = sec('All states and ways out', '<div class="tblwrap"><table class="glance stack"><thead><tr><th scope="col">State</th><th scope="col">Starts</th><th scope="col">Needs</th><th scope="col"><div class="thwrap">' + WAYS_HEAD + '</div></th></tr></thead><tbody>' + rows + anyRow + '</tbody></table></div>',
       { open, hint: g.nodes.length + ' states, ' + g.edges.length + ' ways out', note: 'Read from the workflow JSON. Hover or focus a guard or a need to see its test.' });
   }
 
   // ---- One run
   let run = null, selState = null;
+  const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+  const prevSeq = (r, s) => { for (let i = s.index - 1; i >= 0; i--) if (r.steps[i].seq != null) return r.steps[i].seq; return null; };
+  const stepName = (r, s) => s.seq != null ? 'step ' + s.seq : (prevSeq(r, s) != null ? 'the ignored event after step ' + prevSeq(r, s) : 'the ignored event before step 0');
   function summary(r) {
     const scripted = r.kind === 'scripted';
     const models = r.steps.reduce((n, s) => n + s.actors.filter((a) => a.model).length, 0);
     const ok = r.replay.ok && r.replay.failedAt == null && !r.replay.mismatches.length;
     return '<div class="badges"><span class="pill ' + (scripted ? 'p-acc' : 'p-ok') + '">' + (scripted ? 'Scripted scenario' : 'Real model run') + '</span>' +
-      '<span class="pill p-mute">' + r.steps.length + ' steps</span><span class="pill p-mute">' + models + ' model agent runs</span><span class="pill p-mute">ends in ' + esc(short(r.final)) + '</span>' +
+      '<span class="pill p-mute">' + plural(r.steps.length, 'step') + '</span><span class="pill p-mute">' + plural(models, 'model agent run') + '</span><span class="pill p-mute">ends in ' + esc(short(r.final)) + '</span>' +
       '<span class="pill ' + (ok ? 'p-ok' : 'p-warn') + '">' + (ok ? 'replay matches the journal' : 'replay incomplete') + '</span></div>' +
       (r.endNote ? '<p><b>How it ends:</b> ' + esc(r.endNote) + '</p>' : '') +
       '<div class="' + (scripted ? 'scriptbox' : 'okbox') + '">' + esc(r.note) + '</div>' +
@@ -676,11 +706,11 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   }
 
   function trailHtml(r) {
-    return r.steps.map((s) => '<button type="button" data-jump="' + s.index + '" class="' + (s.outcome === 'applied' ? '' : 'refused') + '" aria-label="Step ' + esc(s.seq == null ? 'ignored event' : s.seq) + ': ' + esc(s.label) + '"><b>' + esc(s.seq == null ? '×' : s.seq) + '</b>' + esc(s.outcome === 'applied' ? short(s.to).split(' › ').pop() : 'ignored') + '</button>').join('');
+    return r.steps.map((s) => '<button type="button" data-jump="' + s.index + '" class="' + (s.outcome === 'applied' ? '' : 'refused') + '" aria-label="' + esc(stepName(r, s).replace(/^./, (c) => c.toUpperCase())) + ': ' + esc(s.label) + '"><b>' + esc(s.seq == null ? '×' : s.seq) + '</b>' + esc(s.outcome === 'applied' ? short(s.to).split(' › ').pop() : 'ignored') + '</button>').join('');
   }
 
   const resultWords = (L) => {
-    const v = L.l6.result; if (v == null) return L.l6.short || L.l6.missing || 'nothing';
+    const v = L.l6.result; if (v == null) return gloss(L.l6.short || L.l6.missing || 'nothing');
     if (typeof v !== 'object') return String(v).slice(0, 40);
     const host = (L.l6.hostWritten || []).map((h) => h.path).filter((p) => p.indexOf('.') < 0 && p.indexOf('[') < 0);
     const plus = host.length ? ' + ' + host.join(', ') + ' (added by host)' : '';
@@ -688,22 +718,29 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const pr = v.pr && v.pr.url ? String(v.pr.url).match(/\/pull\/(\d+)/) : null; if (pr) return 'pr #' + pr[1] + plus;
     const ks = Object.keys(v).filter((k) => host.indexOf(k) < 0); return (ks.length ? ks.slice(0, 3).join(', ') + (ks.length > 3 ? '…' : '') : '{}') + plus;
   };
-  const hostWords = (L) => { const ref = L.l7.rows.filter((x) => x.verdict === 'refused').length, acc = L.l7.rows.some((x) => x.verdict === 'accepted');
-    return ref && acc ? 'refused ' + ref + '×, then stored' : ref ? 'refused' + (ref > 1 ? ' ' + ref + '×' : '') : acc ? 'stored' : '—'; };
+  const RULE_WORDS = { 'no-return': 'it did not use the return tool', 'attested-reserved': 'it set a field only the host may write', 'reserved': 'it set a field only the host may write',
+    'schema': 'its answer did not fit the output schema', 'wrong-caller': 'another agent called the return tool for this run', 'already-returned': 'this run had already returned',
+    'already-failed': 'this run had already failed', 'unknown-run': 'the run id was not one the host knows', 'github-fact': 'a GitHub fact it claimed did not hold', 'ref': 'a reference it gave did not resolve',
+    'restated': 'it restated a value the host already holds', 'source': 'a source it named could not be checked', 'lane': 'it named the wrong lane' };
+  const gloss = (t) => String(t).replace(/\(([a-z]+(?:-[a-z]+)*)(?:, ([a-z]+(?:-[a-z]+)*))?\)/g, (m, a, b) => RULE_WORDS[a] ? '(' + [a, b].filter(Boolean).map((x) => RULE_WORDS[x] || x).join('; ') + ')' : m);
+  const hostWords = (L) => { const refs = L.l7.rows.filter((x) => x.verdict === 'refused'), ref = refs.length, acc = L.l7.rows.some((x) => x.verdict === 'accepted');
+    const why = [...new Set(refs.map((x) => x.payload && x.payload.rule).filter(Boolean))].map((r) => RULE_WORDS[r] || r).join('; ');
+    const failed = L.outcome && L.outcome.status === 'failed';
+    return ref && acc ? 'refused ' + ref + '×' + (why ? ' (' + why + ')' : '') + ', then stored' : ref ? 'refused' + (ref > 1 ? ' ' + ref + '×' : '') + (why ? ': ' + why : '') + (failed ? '; run failed' : '') : acc ? 'stored' : failed ? 'run failed' : '—'; };
   function glance(r) {
     const rows = r.steps.map((s) => {
       const applied = s.outcome === 'applied';
       const started = s.actors.filter((a) => a.type === 'run');
-      return '<tr><td class="nw"><button type="button" data-jump="' + s.index + '" aria-label="Go to step ' + esc(s.seq == null ? 'ignored event' : s.seq) + '">' + esc(s.seq == null ? '×' : s.seq) + '</button></td>' +
-        '<td><div class="cell">' + esc(s.words || s.eventType) + (applied ? '' : ' <span class="pill p-bad">ignored</span>') + '</div></td>' +
-        '<td class="mono nw">' + esc(s.from.length ? short(s.from) : '(start)') + ' → ' + esc(applied ? short(s.to) : 'unchanged') + '</td>' +
-        '<td>' + (s.changed.length ? '<div class="chips">' + s.changed.map((k) => '<span class="chip">' + esc(k) + '</span>').join('') + '</div>' : '<span class="muted">—</span>') + '</td>' +
+      return '<tr><td class="nw"><button type="button" data-jump="' + s.index + '" aria-label="Go to ' + esc(stepName(r, s)) + '">' + esc(s.seq == null ? '×' : s.seq) + '</button></td>' +
+        '<td><div class="cell what">' + esc(s.words || s.eventType) + (applied ? '' : ' <span class="pill p-bad">ignored</span>') + '</div></td>' +
+        '<td class="mono"><div class="cell ft">' + esc(s.from.length ? short(s.from) : '(start)') + ' → ' + esc(applied ? short(s.to) : 'unchanged') + '</div></td>' +
+        '<td class="keyscell">' + (s.changed.length ? '<div class="chips">' + s.changed.map((k) => '<span class="chip">' + esc(k) + '</span>').join('') + '</div>' : '<span class="muted">—</span>') + '</td>' +
         '<td class="nw">' + (started.map((a) => esc(a.actor) + (a.model ? ' <span class="pill p-acc">model</span>' : ' <span class="pill p-mute">host</span>')).join('<br>') || '<span class="muted">—</span>') + '</td>' +
-        '<td><div class="cell">' + (started.filter((a) => a.model).map((a) => esc(resultWords(a.layers))).join('<br>') || '<span class="muted">—</span>') + '</div></td>' +
-        '<td class="nw">' + (started.filter((a) => a.model).map((a) => esc(hostWords(a.layers))).join('<br>') || '<span class="muted">—</span>') + '</td></tr>';
+        '<td><div class="cell ret">' + (started.filter((a) => a.model).map((a) => esc(resultWords(a.layers))).join('<br>') || '<span class="muted">—</span>') + '</div></td>' +
+        '<td><div class="cell host">' + (started.filter((a) => a.model).map((a) => esc(hostWords(a.layers))).join('<br>') || '<span class="muted">—</span>') + '</div></td></tr>';
     }).join('');
     return sec('Steps at a glance', '<div class="tblwrap"><table class="glance stack"><thead><tr><th scope="col">Step</th><th scope="col">What happened</th><th scope="col">From → to</th><th scope="col">Context keys changed</th><th scope="col">Started</th><th scope="col">Agent returned</th><th scope="col">Host</th></tr></thead><tbody>' + rows + '</tbody></table></div>',
-      { open: true, hint: r.steps.length + ' steps', note: '"Agent returned" and "Host" belong to the agent the step started; its answer arrives at a later step.' });
+      { open: true, hint: plural(r.steps.length, 'step'), note: '"Agent returned" and "Host" belong to the agent the step started; its answer arrives at a later step.' });
   }
 
   const writeLine = (w) => '<li><code>' + esc(w.path) + '</code> ← ' + (typeof w.source === 'string' ? '<code>' + esc(w.source) + '</code>' : 'the value <code>' + esc(JSON.stringify(w.source && w.source.value !== undefined ? w.source.value : w.source)) + '</code>') + '</li>';
@@ -716,7 +753,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   function layers(s, a) {
     const L = a.layers; const out = [];
     const scripted = run.kind === 'scripted';
-    out.push(sec('<span class="lnum">1</span> Claude Code system prompt', '<p class="small">' + esc(L.l1.note) + '</p>', { cls: 'layer nolog', hint: 'not recorded' }));
+    out.push(sec('<span class="lnum">1</span> Claude Code system prompt', '<p class="small">' + esc(L.l1.note) + '</p>', { cls: 'layer nolog', hint: scripted ? 'none: no model ran' : 'not recorded' }));
     const pv = L.l2.provenance;
     let chain = '';
     if (pv.kind === 'passthrough' && pv.producer && pv.producer.run) {
@@ -726,15 +763,16 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
           '<span><button type="button" class="btn" data-jump="' + pr.s.index + '">See its prompt (step ' + esc(pr.s.seq) + ')</button></span></div>'; }
     }
     const who = '<div class="who ' + esc(pv.kind.replace('+', '-')) + '"><b>Who wrote this prompt: ' + esc(whoLine(pv, scripted)) + '</b><span>' + esc(pv.summary) + '</span>' +
-      (pv.producer && pv.producer.step != null ? (run.steps.findIndex((x) => x.seq === pv.producer.step) === s.index ? '<span class="small">It arrived at this very step: the event above carries it.</span>' : '<span><button type="button" class="btn" data-jump="' + run.steps.findIndex((x) => x.seq === pv.producer.step) + '">Go to step ' + esc(pv.producer.step) + ', where it arrived</button></span>') : '') + '</div>' + chain;
+      (pv.producer && pv.producer.step != null ? (run.steps.findIndex((x) => x.seq === pv.producer.step) === s.index ? '<span class="small">It arrived at this very step: the event above carries it.</span>' : '<span><button type="button" class="btn" data-jump="' + run.steps.findIndex((x) => x.seq === pv.producer.step) + '">Go to step ' + esc(pv.producer.step) + ', where it arrived</button></span>') : '') +
+      (L.l2.resumeNote ? '<span class="resumed"><b>Not the whole conversation:</b> ' + esc(L.l2.resumeNote.text) + '</span>' : '') + '</div>' + chain;
     const tmpl = pv.templateSource ? '<details class="sec"><summary>The engine code that wrote it <span class="hint">writtenBrief() in this engine\'s actors.js</span></summary><div class="inner"><pre class="text" tabindex="0">' + esc(pv.templateSource) + '</pre></div></details>' : (pv.templateNote ? '<p class="muted small">' + esc(pv.templateNote) + '</p>' : '');
     const checks = (L.l2.checks || []).length ? '<ul class="checks">' + L.l2.checks.map((c) => '<li class="' + (c.ok ? '' : 'no') + '">' + esc(c.what) + (c.ok ? '' : ': it does NOT') + ' (' + ab('hash', 'hash check') + ')</li>').join('') + '</ul>' : '';
     out.push(sec('<span class="lnum">2</span> Prompt', who + (L.l2.text != null ? textViews(L.l2.text, L.l2.segments, 'prompt') : '<p class="muted">brief.md is missing.</p>') + checks + tmpl,
-      { cls: 'layer', open: true, hint: esc(pillWho(pv)), note: 'The exact text the agent was started with (<code>brief.md</code> in its run folder): the prompt the Agent tool spawned it with.' }));
+      { cls: 'layer', open: true, hint: esc(pillWho(pv)) + (L.l2.resumeNote ? ' · <span class="pill p-warn">' + esc(L.l2.resumeNote.chip) + '</span>' : ''), note: (scripted ? 'The exact text the engine wrote as this agent\'s prompt (<code>brief.md</code> in its run folder). No model ran in this scenario: a test fixture stood in for the agent, and this is the prompt the engine would start a real agent with.' : 'The exact text the agent was started with (<code>brief.md</code> in its run folder): the prompt Claude Code started it with.') + (L.l2.resumeNote ? ' It is the first message only: this agent was resumed later with a message that was not recorded.' : '') }));
     const tmpl3 = L.l3.templateSource ? '<details class="sec"><summary>The engine code that writes it <span class="hint">contextOf() and the helpers it uses, from this engine\'s actors.js</span></summary><div class="inner"><pre class="text" tabindex="0">' + esc(L.l3.templateSource) + '</pre></div></details>' : '';
     const checks3 = (L.l3.checks || []).length ? '<ul class="checks">' + L.l3.checks.map((c) => '<li class="' + (c.ok ? '' : 'no') + '">' + esc(c.what) + (c.ok ? '' : ': it does NOT') + '</li>').join('') + '</ul>' : '';
     out.push(sec('<span class="lnum">3</span> Added context', (L.l3.text != null ? textViews(L.l3.text, L.l3.segments, 'added context') : '<p class="muted">context.md is missing.</p>') + checks3 + tmpl3,
-      { cls: 'layer', open: true, hint: 'engine code, with the workflow\'s schema and the input in it', note: 'Text the harness adds when the agent starts (<code>context.md</code>): its run, worktree, how to return, the output schema and its input. ' + (scripted ? 'In the main harness the SubagentStart hook hands it to the agent as added context beside the prompt; this lane\'s engine would hand it the same way, but no model ran here and no hook ran: this is what it would hand one.' : 'In this harness the SubagentStart hook hands it to the agent as added context beside the prompt, so layers 2 and 3 together are all the text the harness gives the model.') + ' Engine code writes it, embedding the workflow\'s schema and the actor input; "Where each part came from" shows which is which.' }));
+      { cls: 'layer', open: true, hint: 'engine code, with the workflow\'s schema and the input in it', note: 'Text the harness adds when the agent starts (<code>context.md</code>): its run, worktree, how to return, the output schema and its input. ' + (scripted ? 'In the main harness the SubagentStart hook hands it to the agent as added context beside the prompt; this lane\'s engine would hand it the same way, but no model ran here and no hook ran: this is what it would hand one.' : 'In this harness the SubagentStart hook hands it to the agent as added context beside the prompt, so layers 2 and 3 together are all the text the harness gives the model when it starts' + (L.l2.resumeNote ? ' (this agent was later resumed with a further message that is not recorded; see layer 2)' : '') + '.') + ' Engine code writes it, embedding the workflow\'s schema and the actor input; "Where each part came from" shows which is which.' }));
     let l4 = '';
     if (!L.l4.schema) l4 = '<p class="muted">No schema recorded.</p>';
     else {
@@ -750,40 +788,50 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const table = tr.length ? '<div class="tblwrap"><table><thead><tr><th scope="col">time</th><th scope="col">by</th><th scope="col">what</th><th scope="col">ok</th><th scope="col">ms</th><th scope="col">input bytes</th><th scope="col">paths</th></tr></thead><tbody>' +
       tr.map((r) => { const wordy = r.kind !== 'tool.call' && r.what && r.what !== r.kind;
         return '<tr><td class="nw">' + esc(String(r.at || '').slice(11, 19)) + '</td><td class="nw">' + esc(r.by || '') + '</td><td' + (wordy ? '><div class="cell">' + esc(r.what) + ' <span class="muted">(' + esc(r.kind) + ')</span></div>' : ' class="nw">' + esc(r.what || (r.kind === 'tool.call' ? r.tool : r.kind))) + '</td><td class="nw">' + (r.ok === false ? '<span class="pill p-bad">failed</span>' : r.ok ? 'yes' : '') + '</td><td class="nw">' + esc(r.ms == null ? '' : r.ms) + '</td><td class="nw">' + esc(r.inputBytes == null ? '' : r.inputBytes) + '</td><td><div class="cell">' + esc((r.paths || []).map((x) => String(x).split('/').pop()).join(' ')) + '</div></td></tr>'; }).join('') + '</tbody></table></div>' : '';
-    const tok = L.tokens ? ' Tokens: ' + (L.tokens.output || 0).toLocaleString() + ' out, ' + ((L.tokens.input || 0) + (L.tokens.cacheRead || 0) + (L.tokens.cacheCreation || 0)).toLocaleString() + ' in (most from cache).' : '';
+    const nFin = tr.filter((r) => r.kind === 'agent.finish').length;
+    const tok = L.tokens ? ' Tokens' + (nFin > 1 ? ' at its last finish (the capture counts on across a resume)' : '') + ': ' + (L.tokens.output || 0).toLocaleString() + ' out, ' + ((L.tokens.input || 0) + (L.tokens.cacheRead || 0) + (L.tokens.cacheCreation || 0)).toLocaleString() + ' in (most from cache).' : '';
     const finishes = tr.filter((r) => r.kind === 'agent.finish').length;
     out.push(sec('<span class="lnum">5</span> What it did', table || '<p class="small">' + esc(L.l5.reason) + '</p>',
-      { cls: 'layer' + (tr.length ? '' : ' nolog'), open: !!tr.length, hint: tr.length ? calls.length + ' tool calls' + (L.ms ? ', ' + Math.round(L.ms / 1000) + ' s' : '') : 'none recorded',
-        note: tr.length ? 'From the live session capture, rows of agent <code>' + esc(L.agentId) + '</code>. It keeps each tool\'s name, timing, size and the paths it touched, but only a hash of its input: <b>the exact commands are not stored</b>. "by" says who the row is about: the agent (its tool calls and finishes), the platform (Claude Code starting it) or the capture (the capture hook saving a hash of the agent\'s prompt or final message, which is not the harness accepting anything); times are the capture\'s clock, so they can differ by a few seconds from the journal times in layer 7.' + (L.l5.story ? ' ' + esc(L.l5.story) : '') + esc(tok) + (L.l5.hooks ? ' ' + L.l5.hooks + ' harness hook runs are left out.' : '') : '' }));
+      { cls: 'layer' + (tr.length ? '' : ' nolog'), open: !!tr.length, hint: tr.length ? plural(calls.length, 'tool call') + (L.ms ? ', ' + Math.round(L.ms / 1000) + ' s' + (nFin > 1 ? ' at last finish' : '') : '') : 'none recorded',
+        note: tr.length ? 'From the live session capture, rows of agent <code>' + esc(L.agentId) + '</code>. It keeps each tool\'s name, timing, size and the paths it touched, but only a hash of its input: <b>the exact commands are not stored</b>. "by" says who the row is about: the agent (its tool calls and finishes), the platform (Claude Code starting it), the capture (the capture hook saving a hash of the agent\'s prompt or final message, which is not the harness accepting anything) or the harness hook (refusing a handback that came without a return, and sending the agent back); times are the capture\'s clock, so they can differ by a few seconds from the journal times in layer 7.' + (L.l5.story ? ' ' + esc(L.l5.story) : '') + esc(tok) + (L.l5.hooks ? ' ' + plural(L.l5.hooks, 'more capture row') + ' of kind hook.run (the capture timing its own hooks) are left out of this table, so the capture holds ' + (tr.length + L.l5.hooks) + ' rows for this agent in all.' : '') : '' }));
     const hw = L.l6.hostWritten || [];
     const hwList = hw.length ? '<div class="warnbox"><b>Written by the host, not the agent:</b><ul class="onlylist">' + hw.map((h) => '<li><code>' + esc(h.path) + '</code>: ' + esc(h.why) + '</li>').join('') + '</ul></div>' : '';
-    out.push(sec('<span class="lnum">6</span> What the host stored as its result', L.l6.result != null ? hwList + pre(L.l6.result, { host: hw.map((h) => h.path) }, 'stored result') : '<p class="small">' + esc(L.l6.missing || 'No result.json.') + '</p>',
-      { cls: 'layer' + (L.l6.result != null ? '' : ' nolog'), open: true, hint: 'result.json' + (hw.length ? ', ' + hw.length + ' field(s) added by the host' : ''),
+    out.push(sec('<span class="lnum">6</span> What the host stored as its result', L.l6.result != null ? hwList + pre(L.l6.result, { host: hw.map((h) => h.path) }, 'stored result') : '<p class="small">No result stored' + (L.l6.short ? ' (' + esc(L.l6.short) + ')' : '') + ': there is no result.json in the run folder. Layer 7 says why.</p>',
+      { cls: 'layer' + (L.l6.result != null ? '' : ' nolog'), open: true, hint: L.l6.result != null ? 'result.json' + (hw.length ? ', ' + plural(hw.length, 'field') + ' added by the host' : '') : 'no result',
         note: L.l6.result != null ? 'The result as the host stored it (<code>result.json</code>) after it accepted the return. This engine does not keep the raw return separately' + (hw.length ? ', so the fields the host added are marked' : '') + '.' + (scripted ? ' In this scenario the test supplied what the "agent" returned.' : '') : '' }));
-    const v = L.l7.rows.map((r) => '<div class="verdict ' + r.verdict + '"><b>' + (r.verdict === 'accepted' ? 'Stored (passed the schema and the host\'s return checks)' : r.verdict === 'refused' ? 'Refused and sent back' : 'Recorded') + '</b> <span class="small">' + esc(String(r.at || '').slice(0, 19).replace('T', ' ')) + ' · <code>' + esc(r.kind) + '</code></span>' +
+    const failedAt = ((L.l7.files || []).find((f) => /^failed\b/.test(f.name)) || {}).value;
+    const failAt = failedAt ? String((failedAt && failedAt.at) || '9999') : null;
+    const v = L.l7.rows.map((r) => '<div class="verdict ' + r.verdict + '"><b>' + (r.verdict === 'accepted' ? 'Stored (passed the schema and the host\'s return checks)' : r.verdict === 'refused' ? (failAt && String(r.at || '').slice(0, 19) >= failAt.slice(0, 19) ? 'Refused; run failed' : 'Refused and sent back') : 'Recorded') + '</b> <span class="small">' + esc(String(r.at || '').slice(0, 19).replace('T', ' ')) + ' · <code>' + esc(r.kind) + '</code></span>' +
       '<span class="small">' + esc(r.verdict === 'refused' ? (r.payload.rule ? 'rule ' + r.payload.rule + ': ' : '') + (r.payload.reason || '') : r.verdict === 'accepted' ? 'The result went to the item.' : r.kind === 'brief.stored' && r.payload.role ? 'The host stored the ' + r.payload.role + ' brief from this result (' + r.payload.bytes + ' bytes): it is fixed from now on.' : '') + '</span></div>').join('');
-    const after = L.after ? '<p class="small"><b>What the workflow did with it:</b> ' + (L.after.took ? 'at step ' + esc(L.after.step) + ' the engine took this result: ' : 'at step ' + esc(L.after.step) + ' the item moved on without it: ') + esc(L.after.label) + ' <button type="button" class="btn" data-jump="' + L.after.index + '">Go to step ' + esc(L.after.step) + '</button></p>' : '';
+    const after = L.after ? '<p class="small"><b>What the workflow did with it:</b> ' + (L.after.took ? 'at step ' + esc(L.after.step) + (/^xstate\.error\./.test(L.after.eventType || '') ? ' the engine took the failure: ' : ' the engine took this result: ') : 'at step ' + esc(L.after.step) + ' the item moved on without it: ') + esc(L.after.label) + ' <button type="button" class="btn" data-jump="' + L.after.index + '">Go to step ' + esc(L.after.step) + '</button></p>' : '';
     const files = (L.l7.files || []).map((f) => sec('<code>' + esc(f.name) + '</code>', typeof f.value === 'string' ? '<pre class="text" tabindex="0">' + esc(f.value) + '</pre>' : pre(f.value, null, f.name), { hint: 'another file the host left in the run folder', open: true })).join('');
-    out.push(sec('<span class="lnum">7</span> Host check', (v || '<p class="small">' + esc(L.l7.empty || 'No accept or refuse row for this run.') + '</p>') + (v && L.l6.result == null && L.l6.missing ? '<p class="small">' + esc(L.l6.missing) + '</p>' : '') + files + after,
+    out.push(sec('<span class="lnum">7</span> Host check', (v || '<p class="small">' + esc(L.l7.empty || 'No accept or refuse row for this run.') + '</p>') + (v && L.l6.result == null && L.l6.missing ? '<p class="small"><b>What became of it:</b> ' + esc(L.l6.missing) + '</p>' : '') + files + after,
       { cls: 'layer', open: true, hint: L.l7.rows.some((r) => r.verdict === 'refused') ? 'refused at least once' : L.l7.rows.some((r) => r.verdict === 'accepted') ? 'stored' : 'no answer recorded' }));
     return out.join('');
+  }
+
+  // "xstate.after.buildTimeout.quick-fix@…building" -> "the build time limit was cancelled".
+  function timerWords(id, verb) {
+    const m = String(id || '').match(/xstate\.after\.([^.]+)/); const name = m ? m[1] : String(id || 'a timer');
+    const base = /timeout$/i.test(name) ? 'the ' + name.replace(/timeout$/i, '').replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase() + ' time limit' : /^\d+$/.test(name) ? 'a ' + name + ' ms timer' : 'the ' + name.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase() + ' timer';
+    return verb === 'set' ? 'Starts ' + base + '.' : base.charAt(0).toUpperCase() + base.slice(1) + ' was ' + verb;
   }
 
   function actorHtml(s, a) {
     if (a.type !== 'run') {
       const what = a.type === 'timer' ? 'Timer set' + (a.due ? ', due ' + esc(String(a.due).replace('T', ' ').slice(0, 19)) : '') : esc(a.type);
-      return '<div class="actor"><header><h4>' + what + '</h4><span class="pill p-mute">host</span></header><p class="small muted"><code>' + esc(a.timer || a.effect) + '</code></p></div>';
+      return '<div class="actor"><header><h4>' + what + '</h4><span class="pill p-mute">host</span></header><p class="small">' + esc(timerWords(a.timer || a.effect, 'set')) + ' <span class="muted">(id <code>' + esc(a.timer || a.effect) + '</code>)</span></p></div>';
     }
     const head = '<header><h4>' + esc(a.actor) + (a.invoke !== a.actor ? ' <span class="muted small">(invoke ' + esc(a.invoke) + ')</span>' : '') + '</h4>' +
       (a.model ? '<span class="pill p-acc">model agent' + (a.layers.model ? ': ' + esc(a.layers.model) : run.kind === 'scripted' ? ': test fixture' : '') + '</span><span class="pill p-mute">' + esc(a.actor) + ' #' + a.occurrence + '</span>' : '<span class="pill p-mute">host code, no model</span>') + '</header>';
     const input = sec('Input it was given', a.input != null ? pre(a.input, null, 'actor input') : '<p class="muted">Not recorded.</p>',
-      { note: (a.inputFrom ? 'From ' + esc(a.inputFrom) + '. ' : '') + (a.inputMap ? 'The workflow builds it from the context with this map: ' + Object.entries(a.inputMap).map(([k, v]) => '<code>' + esc(k) + '</code> ← <code>' + esc(typeof v === 'string' ? v : JSON.stringify(v)) + '</code>').join(', ') : ''), open: !a.model });
+      { note: (a.inputFrom ? esc(/^recomputed/.test(a.inputFrom) ? 'R' + a.inputFrom.slice(1) : 'From ' + a.inputFrom) + '. ' : '') + (a.inputMap ? 'The workflow builds it from the context with this map: ' + Object.entries(a.inputMap).map(([k, v]) => '<code>' + esc(k) + '</code> ← <code>' + esc(typeof v === 'string' ? v : JSON.stringify(v)) + '</code>').join(', ') : ''), open: !a.model });
     if (!a.model) {
       return '<div class="actor">' + head + '<p class="small">No model here: <code>' + esc(a.actor) + '</code> is plain code in the host. It has no prompt.' + (a.hostNote ? ' ' + esc(a.hostNote) : '') + '</p>' + input +
         (a.card ? sec('The card it posted, word for word', pre(a.card, null, 'card'), { open: true }) : '') +
         (a.outcome ? sec('What the host recorded when it finished starting', pre(a.outcome, null, 'host outcome'), { open: !a.card }) : '') + '</div>';
     }
-    return '<div class="actor">' + head + input + '<p class="small"><b>The seven layers</b>, top to bottom: what the model saw (1 to 4), what it did (5), what the host kept (6) and what the host made of it (7). Run folder: <code>' + esc(a.layers.folder) + '</code></p>' + layers(s, a) + '</div>';
+    return '<div class="actor">' + head + input + '<p class="small"><b>The seven layers</b>, top to bottom: ' + (run.kind === 'scripted' ? 'what a model would have been given (1 to 4; no model ran here), what was recorded instead of its work (5), what the host kept from the test fixture\'s return (6)' : 'what the model saw (1 to 4), what it did (5), what the host kept (6)') + ' and what the host made of it (7). Run folder: <code>' + esc(a.layers.folder) + '</code></p>' + layers(s, a) + '</div>';
   }
 
   function candList(wf, list, taken) {
@@ -818,14 +866,14 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const started = s.actors.filter((a) => a.type !== 'cancel');
     const stopped = s.actors.filter((a) => a.type === 'cancel');
     const actors = (started.length ? started.map((a) => actorHtml(s, a)).join('') : '<p class="small muted">This step started no actor.</p>') +
-      (stopped.length ? '<p class="small muted"><b>Stopped by this step:</b> ' + stopped.map((a) => 'timer <code>' + esc(a.timer || a.effect) + '</code> cancelled (host)').join(', ') + '</p>' : '');
+      (stopped.length ? '<p class="small muted"><b>Stopped by this step:</b> ' + stopped.map((a) => '<span title="' + esc(a.timer || a.effect) + '">' + esc(timerWords(a.timer || a.effect, 'cancelled')) + ' (by the host)</span>').join(', ') + '</p>' : '');
     const modelNames = s.actors.filter((a) => a.model).map((a) => a.actor);
     return '<details class="step" id="step-' + i + '" data-index="' + i + '"><summary><span class="sno' + (applied ? '' : ' ref') + '">' + esc(s.seq == null ? '×' : s.seq) + '</span><span class="story">' + esc(s.label) + '</span>' +
       '<span class="smeta"><span>' + esc(s.words || '') + ' (' + esc(s.eventType) + ')</span><span>' + (applied ? '→ ' + esc(short(s.to)) : 'ignored') + '</span><span>' + esc(String(s.at || '').replace('T', ' ').slice(0, 19)) + (s.atNote ? ' (event time)' : '') + '</span>' + (s.changed.length ? '<span>changed: ' + esc(s.changed.join(', ')) + '</span>' : '') + (modelNames.length ? '<span>model agent: ' + esc(modelNames.join(', ')) + '</span>' : '') + '</span></summary>' +
       '<div class="sbody">' + sec('What happened', happened, { open: true }) +
-      sec('Context after this step', changed + hashNote + ctx, { open: true, hint: !applied ? 'unchanged' : s.seq === 0 ? 'the context is created here' : s.changed.length ? s.changed.length + ' key(s) changed, highlighted; unchanged ones are folded' : 'unchanged' }) +
+      sec('Context after this step', changed + hashNote + ctx, { open: true, hint: !applied ? 'unchanged' : s.seq === 0 ? 'the context is created here' : s.changed.length ? plural(s.changed.length, 'key') + ' changed, highlighted; unchanged ones are folded' : 'unchanged' }) +
       sec('Actors started by this step', actors, { open: true, hint: s.actors.filter((a) => a.type === 'run').map((a) => a.actor + (a.model ? ' (model)' : ' (host)')).join(', ') || 'none' }) +
-      sec('Journal rows for this step', s.rows.length ? s.rows.map((r) => pre(r, null, 'journal row')).join('') : '<p class="muted small">None besides the transition row.</p>', { hint: s.rows.length + ' rows' }) + '</div></details>';
+      sec('Journal rows for this step', (s.rows.length ? '<p class="small muted">Shown exactly as stored. The journal keeps each row\'s <code>state</code> as a JSON-encoded string, so a state reads <code>""building""</code> here: the inner quotes are part of the stored value, not a display fault.</p>' : '') + (s.rows.length ? s.rows.map((r) => pre(r, null, 'journal row')).join('') : '<p class="muted small">None besides the transition row.</p>'), { hint: s.rows.length + ' rows' }) + '</div></details>';
   }
 
   function showRun(id, stepIndex) {
@@ -852,7 +900,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     $('pick').innerHTML = optionsHtml(run.id, true);
     const wf = D.workflows[w.key];
     $('summary').innerHTML = '<div class="badges"><span class="pill p-mute">Workflow only</span><span class="pill p-mute">' + wf.graph.nodes.length + ' states</span></div>' +
-      '<p>' + (w.runs.length ? 'This is the map of the workflow on its own. ' + w.runs.length + ' captured run(s) use these exact bytes: pick one above to see its steps.' : 'No run of this workflow was captured, so there are no steps to show: only its map and its states.') + '</p>' +
+      '<p>' + (w.runs.length ? 'This is the map of the workflow on its own. ' + plural(w.runs.length, 'captured run') + (w.runs.length === 1 ? ' uses' : ' use') + ' these exact bytes: pick one above to see its steps.' : 'No run of this workflow was captured, so there are no steps to show: only its map and its states.') + '</p>' +
       (wf.spec && wf.spec.description ? '<p class="small">' + esc(wf.spec.description) + '</p>' : '') +
       '<dl class="facts"><dt>File</dt><dd><code>' + esc(w.file) + '</code></dd><dt>sha256</dt><dd><code>' + esc(w.key.slice(0, 16)) + '…</code></dd></dl>';
     selState = null; $('statepanel').hidden = true; $('legend-taken').hidden = true;
@@ -867,9 +915,22 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     document.querySelectorAll('details.step').forEach((d) => d.classList.toggle('cur', d.dataset.index === String(i)));
     const cur = document.querySelector('#trail button[aria-current]'); const tr = $('trail'); if (cur && tr) { const l = cur.offsetLeft - tr.offsetLeft; if (l < tr.scrollLeft || l + cur.offsetWidth > tr.scrollLeft + tr.clientWidth) tr.scrollLeft = Math.max(0, l - 24); }
   }
+  // The trail's highlight follows the step on screen as the reader scrolls (the hash is left alone).
+  let scrollTick = false, jumpedAt = 0;
+  addEventListener('scroll', () => {
+    if (Date.now() - jumpedAt < 700 || scrollTick || !run || !run.steps || !run.steps.length || $('stepsec').hidden) return; scrollTick = true;
+    requestAnimationFrame(() => {
+      scrollTick = false;
+      const tr = $('trail'); const top = (tr ? tr.getBoundingClientRect().bottom : 0) + 40;
+      let cur = null; document.querySelectorAll('details.step').forEach((d) => { if (d.getBoundingClientRect().top <= top) cur = d; });
+      const first = document.querySelector('details.step');
+      if (!cur && first && first.getBoundingClientRect().top < innerHeight) cur = first;
+      if (cur && !cur.classList.contains('cur')) setCurrent(Number(cur.dataset.index));
+    });
+  }, { passive: true });
   function goStep(i, push, focus) {
     const el = $('step-' + i); if (!el) return;
-    el.open = true; setCurrent(i);
+    el.open = true; setCurrent(i); jumpedAt = Date.now();
     el.scrollIntoView({ block: 'start' });
     if (focus !== false) el.querySelector('summary').focus({ preventScroll: true });
     setHash({ run: run.id, step: i }, push !== false);
@@ -894,18 +955,27 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   // Line by line; a run of removed lines next to a run of added ones is diffed word by word, pair by pair.
   function proseDiff(a, b) {
     const ops = lcs(a.split('\n'), b.split('\n')); if (!ops) return null;
-    const L = [], R = [], onlyL = [], onlyR = [];
+    const L = [], R = [], onlyL = [], onlyR = [], changed = [];
+    const GAP = '<span class="gapline" aria-hidden="true"> </span>';
     for (let k = 0; k < ops.length;) {
       if (ops[k][0] === '=') { L.push(esc(ops[k][1])); R.push(esc(ops[k][2])); k++; continue; }
       const del = [], ins = []; while (k < ops.length && ops[k][0] !== '=') { (ops[k][0] === '-' ? del : ins).push(ops[k][1]); k++; }
       const pairs = Math.min(del.length, ins.length);
       for (let p = 0; p < Math.max(del.length, ins.length); p++) {
-        if (p < pairs) { const w = wordDiff(del[p], ins[p]); L.push(w[0]); R.push(w[1]); onlyL.push(del[p]); onlyR.push(ins[p]); }
-        else { if (p < del.length) { L.push('<del class="d">' + esc(del[p]) + '</del>'); onlyL.push(del[p]); } if (p < ins.length) { R.push('<ins class="d">' + esc(ins[p]) + '</ins>'); onlyR.push(ins[p]); } }
+        if (p < pairs && alike(del[p], ins[p])) { const w = wordDiff(del[p], ins[p]); L.push(w[0]); R.push(w[1]); changed.push([del[p], ins[p]]); }
+        else if (p < pairs) { L.push('<del class="d">' + esc(del[p]) + '</del>'); onlyL.push(del[p]); R.push('<ins class="d">' + esc(ins[p]) + '</ins>'); onlyR.push(ins[p]); }
+        else { if (p < del.length) { L.push('<del class="d">' + esc(del[p]) + '</del>'); onlyL.push(del[p]); } else L.push(GAP); if (p < ins.length) { R.push('<ins class="d">' + esc(ins[p]) + '</ins>'); onlyR.push(ins[p]); } else R.push(GAP); }
       }
     }
     const clean = (h) => h.split(JM).join('');
-    return { L: clean(L.join('\n')), R: clean(R.join('\n')), onlyL, onlyR };
+    return { L: clean(L.join('\n')), R: clean(R.join('\n')), onlyL, onlyR, changed };
+  }
+  // Two lines are partners (diffed word by word) only when they share most of their words; otherwise each is struck whole.
+  function alike(a, b) {
+    const wa = String(a).toLowerCase().split(/\W+/).filter(Boolean), wb = String(b).toLowerCase().split(/\W+/).filter(Boolean);
+    if (!wa.length || !wb.length) return false;
+    const sb = new Set(wb); const common = wa.filter((w) => sb.has(w)).length;
+    return common / Math.max(wa.length, wb.length) >= 0.5;
   }
   // Ids, paths, hashes and times that differ between runs for no design reason.
   function normaliser(r, a) {
@@ -925,17 +995,19 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     if (v && typeof v === 'object' && Object.keys(v).length) { Object.keys(v).forEach((k) => flat(v[k], p ? p + (Array.isArray(v) ? '[' + k + ']' : '.' + k) : (Array.isArray(v) ? '[' + k + ']' : k), out)); }
     else out[p || '(whole value)'] = JSON.stringify(v === undefined ? null : v);
     return out; };
+  let NAME_L = 'Left', NAME_R = 'Right';
+  const runName = (r) => { const o = String(r.origin || ''); const lane = o.match(/^Lane ([A-Z])/); return (lane ? 'Lane ' + lane[1] : r.kind === 'scripted' ? 'Scripted' : 'Real') + ' · ' + String(r.label || r.item).split(/[,:]/)[0].trim(); };
   function jsonDiff(title, va, vb, na, nb) {
     if (va == null && vb == null) return '';
-    if (va == null || vb == null) return sec(esc(title), '<div class="cols"><div class="col"><h4>Left</h4>' + (va == null ? '<div class="empty">Not on this side.</div>' : pre(va, null, title)) + '</div><div class="col"><h4>Right</h4>' + (vb == null ? '<div class="empty">Not on this side.</div>' : pre(vb, null, title)) + '</div></div>', { hint: va == null ? 'only on the right' : 'only on the left' });
+    if (va == null || vb == null) return sec(esc(title), '<div class="cols"><div class="col"><h4>' + esc(NAME_L) + '</h4>' + (va == null ? '<div class="empty">Not on this side.</div>' : pre(va, null, title)) + '</div><div class="col"><h4>' + esc(NAME_R) + '</h4>' + (vb == null ? '<div class="empty">Not on this side.</div>' : pre(vb, null, title)) + '</div></div>', { hint: va == null ? 'only in ' + esc(NAME_R) : 'only in ' + esc(NAME_L) });
     const A = flat(va), B = flat(vb); const keys = []; Object.keys(A).concat(Object.keys(B)).forEach((k) => { if (keys.indexOf(k) < 0) keys.push(k); });
     let same = 0; const rows = [];
     keys.forEach((k) => { const a = k in A ? na(A[k]) : null, b = k in B ? nb(B[k]) : null;
       if (a === b) { same++; return; }
-      const status = a == null ? 'only right' : b == null ? 'only left' : 'value differs';
+      const status = a == null ? 'only in ' + NAME_R : b == null ? 'only in ' + NAME_L : 'value differs';
       rows.push('<tr><td class="nw">' + esc(k) + '</td><td><div class="cell">' + (a == null ? '<span class="muted">—</span>' : esc(a)) + '</div></td><td><div class="cell">' + (b == null ? '<span class="muted">—</span>' : esc(b)) + '</div></td><td class="nw"><span class="pill ' + (status === 'value differs' ? 'p-warn' : 'p-acc') + '">' + status + '</span></td></tr>'); });
     if (!rows.length) return sec(esc(title), '<p class="small"><span class="pill p-ok">identical</span> ' + same + ' keys, the same on both sides' + '.</p>', { hint: 'identical' });
-    return sec(esc(title), '<p class="small">' + rows.length + ' key(s) differ; ' + same + ' are the same and not listed.</p><div class="tblwrap"><table class="dtable"><thead><tr><th scope="col">Key</th><th scope="col">Left</th><th scope="col">Right</th><th scope="col"></th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>', { open: true, hint: rows.length + ' key(s) differ' });
+    return sec(esc(title), '<p class="small">' + plural(rows.length, 'key') + (rows.length === 1 ? ' differs; ' : ' differ; ') + same + (same === 1 ? ' is' : ' are') + ' the same and not listed.</p><div class="tblwrap"><table class="dtable"><thead><tr><th scope="col">Key</th><th scope="col">' + esc(NAME_L) + '</th><th scope="col">' + esc(NAME_R) + '</th><th scope="col"></th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>', { open: true, hint: plural(rows.length, 'key') + (rows.length === 1 ? ' differs' : ' differ') });
   }
   // Hard-wrapped prose (a line that does not end a sentence or a block) is joined to the next line before the summary.
   const unwrap = (xs) => { const out = []; xs.forEach((l) => { const prev = out.length ? out[out.length - 1] : null;
@@ -945,16 +1017,18 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     if (ta == null && tb == null) return '';
     if (ta == null || tb == null) {
       const side = (t) => t == null ? '<div class="empty">Not on this side.</div>' : '<pre class="json" tabindex="0">' + readableHtml(t) + '</pre>';
-      return sec(esc(title), '<div class="cols"><div class="col"><h4>Left</h4>' + side(ta) + '</div><div class="col"><h4>Right</h4>' + side(tb) + '</div></div>', { open: true, hint: ta == null ? 'only on the right' : 'only on the left' });
+      return sec(esc(title), '<div class="cols"><div class="col"><h4>' + esc(NAME_L) + '</h4>' + side(ta) + '</div><div class="col"><h4>' + esc(NAME_R) + '</h4>' + side(tb) + '</div></div>', { open: true, hint: ta == null ? 'only in ' + esc(NAME_R) : 'only in ' + esc(NAME_L) });
     }
     const a = na(readablePlain(ta)), b = nb(readablePlain(tb));
     if (a === b) return sec(esc(title), '<p class="small"><span class="pill p-ok">identical</span>' + (ta !== tb ? ' once ids, paths, hashes and times are set aside.' : '') + '</p><pre class="json" tabindex="0">' + readableHtml(ta) + '</pre>', { open: openSame, hint: 'identical' });
     const d = proseDiff(a, b);
     if (!d) return sec(esc(title), '<p class="small">Too long to compare word by word.</p>', { hint: 'differs' });
     const nLines = (xs) => { const n = unwrap(xs).filter((l) => l.trim() && !isPunct(l)).length; return n + (n === 1 ? ' line' : ' lines'); };
-    const list = (xs) => { const ys = unwrap(xs).filter((l) => l.trim() && !isPunct(l)); return ys.length ? '<ul class="onlylist">' + ys.map((l, i) => '<li' + (i >= 14 ? ' hidden' : '') + '>' + esc(l.trim()) + '</li>').join('') + (ys.length > 14 ? '<li><button type="button" class="btn showmore">Show ' + (ys.length - 14) + ' more</button></li>' : '') + '</ul>' : '<p class="small muted">No sentences; only JSON values.</p>'; };
-    const sum = '<div class="cols"><div class="col"><h4>Only in the left run (' + nLines(d.onlyL) + ')</h4>' + list(d.onlyL) + '</div><div class="col"><h4>Only in the right run (' + nLines(d.onlyR) + ')</h4>' + list(d.onlyR) + '</div></div>';
-    return sec(esc(title), '<p class="small"><b>In short</b> (lines that differ, with hard-wrapped lines joined; JSON lines left out):</p>' + sum + '<p class="small"><b>Side by side</b>, in the readable layout:</p><div class="cols"><div class="col"><h4>Left</h4><pre class="text" tabindex="0" role="region" aria-label="' + esc(title) + ', left">' + d.L + '</pre></div><div class="col"><h4>Right</h4><pre class="text" tabindex="0" role="region" aria-label="' + esc(title) + ', right">' + d.R + '</pre></div></div>', { open: true, hint: 'differs' });
+    const list = (xs) => { const ys = unwrap(xs).filter((l) => l.trim() && !isPunct(l)); return ys.length ? '<ul class="onlylist">' + ys.map((l, i) => '<li' + (i >= 14 ? ' hidden' : '') + '>' + esc(l.trim()) + '</li>').join('') + (ys.length > 14 ? '<li><button type="button" class="btn showmore">Show ' + (ys.length - 14) + ' more</button></li>' : '') + '</ul>' : '<p class="small muted">' + (xs.length ? 'No sentences; only JSON values.' : 'None.') + '</p>'; };
+    const ch = d.changed.filter((c) => c[0].trim() && !isPunct(c[0]));
+    const chHtml = ch.length ? '<p class="small"><b>Changed between the two</b> (' + plural(ch.length, 'line') + ', ' + esc(NAME_L) + ' then ' + esc(NAME_R) + '):</p><ul class="onlylist changed">' + ch.map((c, i) => { const w = wordDiff(c[0].trim(), c[1].trim()).map((h) => h.split(JM).join('')); return '<li' + (i >= 14 ? ' hidden' : '') + '><span class="cl">' + w[0] + '</span><span class="cr">' + w[1] + '</span></li>'; }).join('') + (ch.length > 14 ? '<li><button type="button" class="btn showmore">Show ' + (ch.length - 14) + ' more</button></li>' : '') + '</ul>' : '';
+    const sum = chHtml + '<div class="cols"><div class="col"><h4>Only in ' + esc(NAME_L) + ' (' + nLines(d.onlyL) + ')</h4>' + list(d.onlyL) + '</div><div class="col"><h4>Only in ' + esc(NAME_R) + ' (' + nLines(d.onlyR) + ')</h4>' + list(d.onlyR) + '</div></div>';
+    return sec(esc(title), '<p class="small"><b>In short</b> (lines that differ, with hard-wrapped lines joined; JSON lines left out):</p>' + sum + '<p class="small"><b>Side by side</b>, in the readable layout:</p><div class="cols"><div class="col"><h4>' + esc(NAME_L) + '</h4><pre class="text" tabindex="0" role="region" aria-label="' + esc(title) + ', ' + esc(NAME_L) + '">' + d.L + '</pre></div><div class="col"><h4>' + esc(NAME_R) + '</h4><pre class="text" tabindex="0" role="region" aria-label="' + esc(title) + ', ' + esc(NAME_R) + '">' + d.R + '</pre></div></div>', { open: true, hint: 'differs' });
   }
   const modelRuns = (r) => { const out = []; r.steps.forEach((s) => s.actors.forEach((a) => { if (a.model) out.push({ key: a.actor + ' #' + a.occurrence, s, a }); })); return out; };
   const whoShort = (r, a) => { const pv = a.layers.l2.provenance; return pv.kind === 'template' ? 'Engine template (nobody wrote it)' : pv.kind === 'template+workflow' ? 'Workflow author\'s task (in the workflow JSON) + engine template' : pv.kind === 'passthrough' ? 'Written by ' + (pv.producer ? 'the ' + pv.producer.actor + (pv.producer.model ? ' agent' : ' step') : 'an earlier step') + (r.kind === 'scripted' && pv.producer && pv.producer.model ? ' (a test fixture)' : '') : 'Unknown'; };
@@ -962,12 +1036,13 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   function compare(idA, idB, push) {
     const A = runById[idA], B = runById[idB]; if (!A || !B) return;
     cmpIds = [A.id, B.id];
+    NAME_L = runName(A); NAME_R = runName(B); if (NAME_L === NAME_R) { NAME_L += ' (left)'; NAME_R += ' (right)'; }
     $('cmpa').innerHTML = optionsHtml(A.id, false); $('cmpb').innerHTML = optionsHtml(B.id, false);
     const hide = $('incidental').checked;
     const ma = modelRuns(A), mb = modelRuns(B);
     const keys = []; ma.concat(mb).forEach((x) => { if (keys.indexOf(x.key) < 0) keys.push(x.key); });
     const side = (r) => '<b>' + esc(r.label) + '</b> <span class="muted">(' + esc(r.origin) + ', ' + (r.kind === 'scripted' ? 'scripted' : 'real') + ', workflow ' + esc(wfName(r)) + ', ends in ' + esc(short(r.final)) + ')</span>';
-    $('cmpsum').innerHTML = '<p class="small">Left: ' + side(A) + '</p><p class="small">Right: ' + side(B) + '</p>' +
+    $('cmpsum').innerHTML = '<p class="small">Left, called "' + esc(NAME_L) + '" below: ' + side(A) + '</p><p class="small">Right, called "' + esc(NAME_R) + '" below: ' + side(B) + '</p>' +
       (A.id === B.id ? '<div class="warnbox">You picked the same run on both sides.</div>' : '') +
       ((A.kind === 'scripted' || B.kind === 'scripted') ? '<div class="scriptbox">At least one side is a scripted scenario: brief texts written by its "brief agent" are test fixtures, so differences there say nothing about a model. Differences in engine templates (layer 2 template text, layer 3) and in workflow-authored text are real design differences.</div>' : '') +
       '<p class="small">' + keys.length + ' model agent runs lined up by actor and occurrence.' + (hide ? ' Ids, paths, hashes and times are replaced by placeholders such as &lt;run&gt; and &lt;path&gt; before comparing.' : '') + '</p>';
@@ -980,8 +1055,8 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
       const pt = eq((m, n) => n(readablePlain(m.a.layers.l2.text || ''))), ct = eq((m, n) => n(readablePlain(m.a.layers.l3.text || ''))), sct = eq((m) => JSON.stringify(m.a.layers.l4.schema));
       const pill = (ok, what) => '<span class="pill ' + (ok ? 'p-ok' : 'p-warn') + '">' + what + ' ' + (ok ? 'same' : 'differs') + '</span>';
       return '<article class="pair" aria-label="' + esc(k) + '"><header><h3>' + esc(k) + '</h3>' +
-        (x && y ? pill(pt, 'prompt') + pill(ct, 'added context') + pill(sct, 'schema') : '<span class="pill p-acc">only on the ' + (x ? 'left' : 'right') + '</span>') + '</header>' +
-        '<div class="cols"><div class="col"><h4>Left: who wrote the prompt</h4>' + p(x, A) + '</div><div class="col"><h4>Right: who wrote the prompt</h4>' + p(y, B) + '</div></div>' +
+        (x && y ? pill(pt, 'prompt') + pill(ct, 'added context') + pill(sct, 'schema') : '<span class="pill p-acc">only in ' + esc(x ? NAME_L : NAME_R) + '</span>') + '</header>' +
+        '<div class="cols"><div class="col"><h4>' + esc(NAME_L) + ': who wrote the prompt</h4>' + p(x, A) + '</div><div class="col"><h4>' + esc(NAME_R) + ': who wrote the prompt</h4>' + p(y, B) + '</div></div>' +
         proseBlock('Prompt (brief.md)', x ? x.a.layers.l2.text : null, y ? y.a.layers.l2.text : null, na, nb, true) +
         proseBlock('Added context (context.md)', x ? x.a.layers.l3.text : null, y ? y.a.layers.l3.text : null, na, nb, false) +
         jsonDiff('Output schema the agent was shown', x ? x.a.layers.l4.schema : null, y ? y.a.layers.l4.schema : null, (t) => t, (t) => t) +
@@ -1023,8 +1098,9 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const p = {}; location.hash.slice(1).split('&').forEach((kv) => { const i = kv.indexOf('='); if (i > 0) p[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
     if (p.compare) { const [a, b] = p.compare.split(','); setMode('cmp'); $('incidental').checked = p.incidental !== 'shown'; if (!run) showRun((runById[a] || defaultRun() || {}).id); if (runById[a] && runById[b || a]) { compare(a, b || a, false); return; } notice('That comparison names a run this build does not have.'); const d = defaultPair(); compare(d[0], d[1], false); return; }
     setMode('one');
-    if (p.wf) { showWorkflow(p.wf); return; }
-    if (p.run) showRun(p.run, p.step != null ? Number(p.step) : null); else showRun((defaultRun() || {}).id, null);
+    if (p.wf) showWorkflow(p.wf);
+    else if (p.run) showRun(p.run, p.step != null ? Number(p.step) : null); else showRun((defaultRun() || {}).id, null);
+    if (p.state && run && D.workflows[run.workflow.key] && D.workflows[run.workflow.key].graph.nodes.some((n) => n.id === p.state)) { selState = p.state; drawGraph(run, selState); statePanel(run, selState); }
   }
   const defaultPair = () => { const q = D.runs.filter((r) => /Q1/.test(r.label)); return q.length >= 2 ? [q[0].id, q.find((r) => r.origin !== q[0].origin) ? q.find((r) => r.origin !== q[0].origin).id : q[1].id] : [D.runs[0].id, (D.runs[1] || D.runs[0]).id]; };
   $('tab-one').addEventListener('click', () => { setMode('one'); if (!run) showRun((defaultRun() || {}).id); setHash(run.kind === 'workflow' ? { wf: run.id.slice(3) } : { run: run.id }, true); });
@@ -1039,9 +1115,10 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   document.addEventListener('click', (e) => {
     const j = e.target.closest('[data-jump]'); if (j) { goStep(Number(j.dataset.jump)); return; }
     const o = e.target.closest('[data-open]'); if (o) { setHash({ run: o.dataset.open, step: Number(o.dataset.step) }, true); setMode('one'); showRun(o.dataset.open, Number(o.dataset.step)); const el = $('step-' + o.dataset.step); if (el) el.querySelector('summary').focus(); return; }
-    const m = e.target.closest('button.showmore'); if (m) { const ul = m.closest('ul'); ul.querySelectorAll('li[hidden]').forEach((li) => { li.hidden = false; }); m.parentElement.remove(); return; }
+    const m = e.target.closest('button.showmore'); if (m) { const ul = m.closest('ul'); const hid = Array.from(ul.querySelectorAll('li[hidden]')); hid.forEach((li) => { li.hidden = false; }); m.parentElement.remove(); if (hid[0]) { hid[0].tabIndex = -1; hid[0].focus(); } return; }
   });
   const pickState = (g) => { const id = g.dataset.state; selState = selState === id ? null : id; drawGraph(run, selState); if (selState) statePanel(run, selState); else { $('statepanel').hidden = true; document.querySelectorAll('#trail button').forEach((b) => b.classList.remove('hl')); }
+    const base = run.kind === 'workflow' ? { wf: run.id.slice(3) } : { run: run.id }; if (selState) base.state = selState; setHash(base, true);
     const again = document.querySelector('#graph [data-state="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"]'); if (again) again.focus({ preventScroll: true }); };
   $('graph').addEventListener('click', (e) => { const g = e.target.closest('[data-state]'); if (g) pickState(g); });
   $('graph').addEventListener('keydown', (e) => { if (e.key !== 'Enter' && e.key !== ' ') return; const g = e.target.closest('[data-state]'); if (g) { e.preventDefault(); pickState(g); } });

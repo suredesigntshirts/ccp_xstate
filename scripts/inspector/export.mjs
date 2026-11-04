@@ -215,7 +215,9 @@ async function loadEngine(checkout) {
     const xstate = await import(pathToFileURL(join(dirname(pkgPath), esm)).href);
     const missing = ['machineOf', 'hashOf'].filter((n) => typeof spec[n] !== 'function');
     if (missing.length) return { ok: false, error: `spec.js does not export ${missing.join(', ')}` };
-    return { ok: true, spec, xstate, specPath, actorsSource: readText(join(checkout, 'packages/engine/src/actors.js')) };
+    const srcDir = join(checkout, 'packages/engine/src');
+    const sources = Object.fromEntries(readdirSync(srcDir).filter((n) => n.endsWith('.js')).map((n) => [n, readText(join(srcDir, n)) ?? '']));
+    return { ok: true, spec, xstate, specPath, actorsSource: sources['actors.js'] ?? null, sources };
   } catch (error) {
     return { ok: false, error: String(error?.message ?? error) };
   }
@@ -476,10 +478,12 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
     const o = outcomeOf({ trace: L.l5.trace, rows: L.l7.rows, files: L.l7.files, accepted: !!L.l6.raw, after: L.after, state, scripted: kind === 'scripted', agentId: L.agentId });
     L.outcome = o;
     L.l5.story = o.story;
+    L.l2.resumes = o.resumes;
+    L.l2.resumeNote = resumeNote(o.resumes, L.l5.trace);
     if (!L.l6.raw) {
       L.l6.missing = o.sentence;
       L.l6.short = o.short;
-      L.l7.empty = o.status === 'refused' ? null : `No accept or refuse row for this run. ${o.sentence}`;
+      L.l7.empty = L.l7.rows.length ? null : `No accept or refuse row for this run. ${o.sentence}`;
       if (!L.l5.trace.length) {
         L.l5.reason = (kind === 'scripted' ? 'None recorded: this is a scripted scenario, so no model ran and no tools were called. ' : (L.l5.reason ?? '') + ' ') + o.sentence;
       }
@@ -556,8 +560,31 @@ const TRACE_WHAT = {
   'brief.stored': "capture saved the agent's prompt (a hash)"
 };
 const times = (n) => (n === 1 ? 'once' : n === 2 ? 'twice' : `${n} times`);
-const isReturnTool = (tool) => /(^|_)return$/.test(String(tool ?? ''));
+const isReturnTool = (tool) => /(^|[_\s])return$/i.test(String(tool ?? ''));
 const hms = (at) => String(at ?? '').slice(11, 19);
+
+/**
+ * What a reader must know when an agent took in messages after its first one: the text of those messages is never
+ * recorded, so brief.md is the first message, not everything the agent was told. Null when it was never resumed.
+ */
+export function resumeNote(resumes = [], trace = []) {
+  if (!resumes.length) return null;
+  const n = resumes.length;
+  const firstFinish = trace.find((r) => r.kind === 'agent.finish');
+  const returnedFirst = trace.some((r) => r.kind === 'tool.call' && isReturnTool(r.tool) && firstFinish && r.at <= firstFinish.at);
+  const bySpawn = resumes.filter((r) => r.how === 'spawn');
+  const when = resumes.map((r) => hms(r.at ?? r.after)).filter(Boolean);
+  const chip = `resumed ${times(n).replace('once', '1×').replace('twice', '2×').replace(' times', '×')}, message not recorded`;
+  const how = bySpawn.length
+    ? `The parent session resumed it with a new message (a new start row with the same agent id${when.length ? `, at ${when.join(', ')}` : ''}). The text of that message was not recorded.`
+    : `It took in a further message after it finished (same agent id, no new start row${when.length ? `, after ${when.join(', ')}` : ''}), then handed back a chat message (SubagentHandback, of which only a hash and a size are kept). Who sent that further message and what it said were not recorded.`;
+  const carries = resumes.every((r) => r.carries);
+  return {
+    chip,
+    text: `This agent was resumed ${times(n)} after it finished ${returnedFirst ? '(it had already returned)' : 'without returning'}. ${how} So brief.md is the first message it was given, not everything it was told.` +
+      (carries ? ' Its time and token counts carry on across the resume, which is how the capture shows it was one conversation and not a fresh start.' : '')
+  };
+}
 
 /**
  * What became of one model run's return, in words, from the live capture (layer 5), the host rows (layer 7) and the
@@ -567,12 +594,24 @@ const hms = (at) => String(at ?? '').slice(11, 19);
  */
 export function outcomeOf({ trace = [], rows = [], files = [], accepted = false, after = null, state = null, scripted = false, agentId = null }) {
   const refusals = rows.filter((r) => r.verdict === 'refused');
+  // A refusal of a handback (the agent ended its turn with a chat message, rule no-return) is not a refused return:
+  // the agent never called the return tool, and the harness sent it back.
+  const isHandbackRefusal = (r) => r.payload?.rule === 'no-return' || (r.payload?.tool != null && !isReturnTool(r.payload.tool));
+  const returnRefusals = refusals.filter((r) => !isHandbackRefusal(r));
+  const handbackRefusals = refusals.filter(isHandbackRefusal);
+  // The capture's own hook refusals (sent back) also count as handbacks refused.
+  const hookRefusals = trace.filter((r) => r.kind === 'refusal');
+  const sentBack = files.find((f) => /^sent-back\b/.test(f.name));
   const acceptRow = rows.find((r) => r.verdict === 'accepted');
   const finishes = trace.filter((r) => r.kind === 'agent.finish');
   const returns = trace.filter((r) => r.kind === 'tool.call' && isReturnTool(r.tool));
   const failed = files.find((f) => /^failed\b/.test(f.name));
-  const rules = [...new Set(refusals.map((r) => r.payload?.rule).filter(Boolean))];
+  const errored = after?.took && String(after.eventType ?? '').startsWith('xstate.error.actor.');
+  const rules = [...new Set(returnRefusals.map((r) => r.payload?.rule).filter(Boolean))];
+  const hbRules = [...new Set(handbackRefusals.map((r) => r.payload?.rule).filter(Boolean))];
   const leftWords = after && !after.took ? `the item left ${state ?? 'its state'} at step ${after.step} (${after.label})` : null;
+  // Resumes: a later finish of the same agent took in a further message. Its text is never recorded.
+  const resumes = [];
   // The story of the finishes: each one, whether the return tool was called before it, and what came between.
   let story = null;
   if (finishes.length) {
@@ -584,7 +623,13 @@ export function outcomeOf({ trace = [], rows = [], files = [], accepted = false,
       const ret = seg.find((r) => r.kind === 'tool.call' && isReturnTool(r.tool));
       const handback = seg.some((r) => r.kind === 'tool.call' && r.tool === 'SubagentHandback');
       const spawn = i > 0 && seg.find((r) => r.kind === 'agent.spawn');
-      const lead = i === 0 ? 'It' : spawn ? `It was started again at ${hms(spawn.at)} (a new agent.spawn row), and` : handback ? 'It was then resumed for a handback message (SubagentHandback), and' : 'It was then resumed, and';
+      const prev = finishes[i - 1];
+      const carries = i > 0 && f.ms != null && prev?.ms != null && f.ms > prev.ms;
+      if (i > 0) resumes.push({ at: spawn ? spawn.at : null, after: prev?.at ?? null, how: spawn ? 'spawn' : handback ? 'handback' : 'other', carries });
+      const carryWords = carries ? '; its time and token counts carry on from the first start' : '';
+      const lead = i === 0 ? 'It'
+        : spawn ? `At ${hms(spawn.at)} the parent session resumed this same agent (same agent id${carryWords}) with a new message. That message is not recorded: only brief.md and context.md are. It then`
+          : `It was then resumed (same agent id, no new start row${carryWords}) by a further message whose text is not recorded${handback ? '; it handed back a chat message (SubagentHandback)' : ''}, and`;
       const secs = f.ms != null ? ` (${Math.round(f.ms / 1000)} s in)` : '';
       const before = trace.slice(0, from).some((r) => r.kind === 'tool.call' && isReturnTool(r.tool));
       parts.push(ret ? `${lead} called the return tool at ${hms(ret.at)} and finished at ${hms(f.at)}${secs}.`
@@ -593,28 +638,43 @@ export function outcomeOf({ trace = [], rows = [], files = [], accepted = false,
       from = at + 1;
     }
     const tokens = finishes.filter((f) => f.tokens?.output != null).map((f) => f.tokens.output.toLocaleString('en-US'));
+    const nHb = new Set([...handbackRefusals, ...hookRefusals].map((r) => hms(r.at))).size;
     story = (finishes.length > 1 ? `The agent finished ${times(finishes.length)}. ` : '') + parts.join(' ') +
       (finishes.length > 1 && tokens.length > 1 ? ` Output tokens at each finish: ${tokens.join(', then ')} (the capture's figures at each finish).` : '') +
-      (refusals.length ? ` The host refused ${refusals.length} return(s) in between (layer 7).` : finishes.length > 1 ? ` The host refused nothing${acceptRow ? `; it had stored the result at ${hms(acceptRow.at)}` : ''}.` : '');
+      (returnRefusals.length ? ` The host refused ${returnRefusals.length} return(s) (layer 7).` : '') +
+      (nHb ? ` The harness refused ${nHb === 1 ? 'a handback' : `${nHb} handbacks`} that came without a return${sentBack ? `: it sent the agent back once (${sentBack.name})` : ''}${failed ? `${sentBack ? ', then' : ', and'} marked the run failed (${failed.name})` : ''} (layer 7).` : '') +
+      (!refusals.length && !hookRefusals.length && finishes.length > 1 ? ` The host refused nothing${acceptRow ? `; it had stored the result at ${hms(acceptRow.at)}` : ''}.` : '');
   }
-  if (accepted || acceptRow) return { status: 'accepted', sentence: null, short: null, story, finishes: finishes.length };
+  if (accepted || acceptRow) return { status: 'accepted', sentence: null, short: null, story, finishes: finishes.length, resumes };
   const lastFinish = finishes.at(-1);
   let status, sentence, short;
-  if (refusals.length) {
-    status = 'refused';
-    sentence = `It returned ${times(refusals.length)}; ${refusals.length > 1 ? 'each return was' : 'the return was'} refused${rules.length ? ` (${rules.join(', ')})` : ''}, so the host stored no result. ` +
-      (leftWords ? `Then ${leftWords}.` : `The journal ends while the run waits for a new return${scripted ? ' (the test stopped here)' : ''}.`);
-    short = `returned ${refusals.length}×, refused${rules.length ? ` (${rules.join(', ')})` : ''}; no accepted result`;
-  } else if (failed) {
+  if (failed || errored) {
     status = 'failed';
-    sentence = `The host marked this run failed (${failed.name}), so no result was stored.` + (leftWords ? ` Then ${leftWords}.` : '');
-    short = 'failed (no result)';
+    const nReturns = returns.length;
+    const hbTimes = [sentBack?.value?.at, ...handbackRefusals.map((r) => r.at)].filter(Boolean).map(hms);
+    const failWords = failed ? `the host marked the run failed (${failed.name}${hbRules.length ? `, rule ${hbRules.join(', ')}` : ''})` : null;
+    let how;
+    if (nReturns) how = `It called the return tool ${times(nReturns)}, but no return was stored${failWords ? `, and ${failWords}` : ''}.`;
+    else if (hbTimes.length) {
+      const bits = [`handed back a chat message at ${hbTimes[0]}` + (sentBack ? ` and was sent back once (${sentBack.name})` : '')];
+      if (hbTimes.length > 1) bits.push(`handed back again at ${hbTimes.at(-1)}`);
+      if (failWords) bits.push(failWords.replace(/^the host/, 'the host'));
+      how = `It never called the return tool. It ${bits.length > 1 ? bits.slice(0, -1).join(', ') + ', and ' + bits.at(-1) : bits[0]}.`;
+    } else how = `It never called the return tool${failWords ? `, and ${failWords}` : ''}.`;
+    sentence = how + (errored ? ` At step ${after.step} ${eventWords(after.eventType)} and the item moved to ${(after.to ?? []).join(' + ') || '?'}.` : leftWords ? ` Then ${leftWords}.` : '') + ' No result was stored.';
+    short = nReturns ? `failed: returns not stored${rules.length ? ` (${rules.join(', ')})` : ''}` : `failed: never returned${hbRules.length ? ` (${hbRules.join(', ')})` : ''}`;
+  } else if (returnRefusals.length) {
+    status = 'refused';
+    sentence = `It returned ${times(returnRefusals.length)}; ${returnRefusals.length > 1 ? 'each return was' : 'the return was'} refused${rules.length ? ` (${rules.join(', ')})` : ''}, so the host stored no result. ` +
+      (leftWords ? `Then ${leftWords}.` : `The journal ends while the run waits for a new return${scripted ? ' (the test stopped here)' : ''}.`);
+    short = `returned ${returnRefusals.length}×, refused${rules.length ? ` (${rules.join(', ')})` : ''}; no accepted result`;
   } else if (lastFinish) {
     const ret = returns.filter((r) => r.at <= lastFinish.at);
     status = 'no-return';
     sentence = ret.length
       ? `The agent called the return tool at ${hms(ret.at(-1).at)} and finished at ${hms(lastFinish.at)}, but the host wrote no accept or refuse row for it, so no result reached the item.`
       : `The agent finished at ${hms(lastFinish.at)} without calling the harness return tool (it handed back a chat message instead), so the host never received a result` +
+        (handbackRefusals.length ? ` (the harness refused the handback${sentBack ? ' and sent it back' : ''})` : '') +
         (leftWords ? `; later ${leftWords}.` : ` and the item stayed in ${state ?? 'its state'}.`);
     short = ret.length ? 'called return; no host row' : 'finished without calling return';
   } else if (leftWords) {
@@ -627,7 +687,7 @@ export function outcomeOf({ trace = [], rows = [], files = [], accepted = false,
       : `No answer yet: the journal ends while this ${scripted ? 'run waits for a return (the test stopped here)' : 'agent was still running (the capture has no finish row for it)'}.`;
     short = 'no answer before the journal ends';
   }
-  return { status, sentence, short, story, finishes: finishes.length };
+  return { status, sentence, short, story, finishes: finishes.length, resumes };
 }
 
 // The seven layers of one model run.
@@ -713,7 +773,7 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
 
   // Layer 6: what the host stored, and which of its fields the host wrote itself (the agent was told not to set them).
   const stored6 = result && typeof result === 'object' && 'result' in result ? result.result : result;
-  const hostWritten = hostFieldsOf(stored6, added, schemaDiff);
+  const hostWritten = hostFieldsOf(stored6, added, schemaDiff, eng.sources);
   // Layer 7 extras: other files the host left in the run folder (a send-back, a failure).
   const KNOWN = new Set(['brief.md', 'context.md', 'run.json', 'result.json', 'agent.json', 'spawn.json']);
   const extraFiles = runPath && existsSync(runPath) ? readdirSync(runPath).filter((n) => !KNOWN.has(n)).sort().map((n) => ({ name: n, value: readJson(join(runPath, n)) ?? readText(join(runPath, n)) })) : [];
@@ -723,7 +783,8 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
   // The capture can hold the same row twice (a session file both under the journal and beside it): keep one.
   const seen = new Set();
   const trace = mine.filter((r) => !['hook.run'].includes(r.kind)).filter((r) => { const k = r.id ?? JSON.stringify(r); if (seen.has(k)) return false; seen.add(k); return true; })
-    .map((r) => ({ ...(r.payload ?? {}), at: r.at, kind: r.kind, by: TRACE_BY[r.kind] ?? 'capture', what: r.kind === 'tool.call' ? r.payload?.tool : TRACE_WHAT[r.kind] ?? r.kind }))
+    .map((r) => ({ ...(r.payload ?? {}), at: r.at, kind: r.kind, by: r.kind === 'refusal' ? (r.source?.system === 'hook' || r.payload?.source === 'hook' ? 'harness hook' : 'harness') : TRACE_BY[r.kind] ?? 'capture',
+      what: r.kind === 'tool.call' ? r.payload?.tool : r.kind === 'refusal' ? (r.payload?.rule === 'no-return' ? `refused a handback without a return (rule no-return) and sent the agent back${r.payload?.tool ? ` (${r.payload.tool})` : ''}` : `refused (${r.payload?.rule ?? 'no rule named'})`) : TRACE_WHAT[r.kind] ?? r.kind }))
     .sort((x, y) => String(x.at).localeCompare(String(y.at)));
   const hooks = mine.filter((r) => r.kind === 'hook.run').length;
   const finish = trace.filter((r) => r.kind === 'agent.finish').at(-1) ?? null;
@@ -752,7 +813,7 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
     l1: { note: scripted ? 'No model ran in this scenario, so there was no system prompt.' : 'Not recorded. The agent is a Claude Code subagent, so it also got Claude Code\'s own system prompt, its tool list and the CLAUDE.md files of its worktree. The harness writes none of that down.' },
     l2: { text: brief, bytes: brief == null ? 0 : Buffer.byteLength(brief), sha256: briefHash, provenance, segments: promptSegments, checks: checks.filter((c) => !/context\.md/.test(c.what)) },
     l3: { text: added, segments: contextSegments, templateSource: withHelpers(actorsSrc, 'contextOf'), checks: checks.filter((c) => /context\.md/.test(c.what)) },
-    l4: { schema: agentSchema ?? schema, hostSchema: schemaDiff ? schema : null, diff: schemaDiff, defs, shownInContext: !!agentSchema, from: `workflow JSON, meta.actors.${a.actor}` },
+    l4: { schema: agentSchema ?? schema, hostSchema: schemaDiff ? schema : null, diff: schemaDiff, defs, shownInContext: !!agentSchema, from: schemaDiff ? `workflow file (meta.actors.${a.actor}), with the fields the host writes removed by the engine` : `workflow file (its list of actor output shapes, meta.actors.${a.actor})` },
     l5: { trace, hooks, reason: traceReason, bound: !!agentId },
     l6: { result: stored6 ?? null, raw: result, hostWritten },
     l7: { rows: verdicts, files: extraFiles }
@@ -779,7 +840,7 @@ const STOP = new Set(['a', 'an', 'the', 'on', 'or', 'and', 'any', 'in', 'to', 'o
  * the added context tells the agent never to set ("Never set key, gates or green", "Don't include an \"attested\" field").
  * Returns [{ path, why }].
  */
-export function hostFieldsOf(result, contextText, schemaDiff) {
+export function hostFieldsOf(result, contextText, schemaDiff, engineSources) {
   if (!result || typeof result !== 'object') return [];
   const out = [];
   const add = (path, why) => { if (!out.some((x) => x.path === path)) out.push({ path, why }); };
@@ -795,12 +856,28 @@ export function hostFieldsOf(result, contextText, schemaDiff) {
     for (const [k, x] of Object.entries(v)) {
       const p = Array.isArray(v) ? `${path}[${k}]` : path ? `${path}.${k}` : k;
       const rule = !Array.isArray(v) && rules.find((r) => r.names.includes(k));
-      if (rule) add(p, `The added context tells the agent: "${rule.sentence}" So this field was very likely written by the host after it accepted the return (inferred from that rule: the host does not record who wrote each field).`);
+      const stamp = rule && !path ? stampOf(engineSources, k) : null;
+      if (rule && stamp) add(p, `The added context tells the agent: "${rule.sentence}" And the engine code stamps it on every accepted result before it writes result.json (${stamp.file} line ${stamp.line}: ${stamp.text}). So the host wrote this field, not the agent.`);
+      else if (rule) add(p, `The added context tells the agent: "${rule.sentence}" So this field was very likely written by the host after it accepted the return (inferred from that rule: the host does not record who wrote each field).`);
       walk(x, p);
     }
   };
   walk(result, '');
   return out;
+}
+
+/**
+ * Where the engine's own code adds a top-level field to a result it accepts: an object literal that spreads the
+ * result and sets the key (`{ ...result, attested: ... }`). Returns { file, line, text } or null.
+ */
+export function stampOf(engineSources, key) {
+  for (const [file, text] of Object.entries(engineSources ?? {})) {
+    const lines = String(text).split('\n');
+    const k = String(key).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const i = lines.findIndex((l) => new RegExp(`\\.\\.\\.\\s*\\w+\\s*,\\s*${k}\\s*:`).test(l));
+    if (i >= 0) return { file: `packages/engine/src/${file}`, line: i + 1, text: lines[i].trim().slice(0, 140) };
+  }
+  return null;
 }
 
 /** Every item of a journal root as a bundle. */
