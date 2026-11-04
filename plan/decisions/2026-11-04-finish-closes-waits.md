@@ -46,3 +46,9 @@ Item: fix-finish-closes-waits. Two-way doors, decided by the building thread.
 
 A person who wants to be told when an item ends outside the host. Then a `post` (not a decision) goes in the
 `closedOutside` state, which asks nothing and waits on no one.
+
+## Outcome
+
+Built in PR #82, released as harness-v0.1.20. A separate verifier session marked all six Expect lines MET, re-stamped
+at 963babc after a stale copy of the item's head was dropped from the PR (`verify/fix-finish-closes-waits/verdict.json`),
+so the item is done. One parity gap is left: C-waiting-does-not-stall (fix-waiting-wake).
