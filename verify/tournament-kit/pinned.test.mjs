@@ -1,5 +1,5 @@
 // Verifier tests for plan item tournament-kit, Expect `pinned`: each tournament folder's config.json records the
-// base repo and sha, lanes, stages, scoring rule and runner sha, and args.mjs refuses a folder missing any of them.
+// base repo and sha, lanes, stages, scoring (floors and trade-offs since tournament-scoring-floors) and runner sha, and args.mjs refuses a folder missing any of them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -14,7 +14,7 @@ const ARGS = path.join(ROOT, 'scripts/tournament/args.mjs');
 const TOY = path.join(HERE, 'toy/2026-11-04-readme-structure');
 const ID = path.basename(TOY);
 
-const FIELDS = [['base'], ['base', 'repo'], ['base', 'sha'], ['lanes'], ['stages'], ['scoring'], ['scoring', 'rule'], ['runner'], ['runner', 'sha']];
+const FIELDS = [['base'], ['base', 'repo'], ['base', 'sha'], ['lanes'], ['stages'], ['scoring'], ['scoring', 'floors'], ['scoring', 'tradeoffs'], ['runner'], ['runner', 'sha']];
 
 function present(c, p) {
   let v = c;

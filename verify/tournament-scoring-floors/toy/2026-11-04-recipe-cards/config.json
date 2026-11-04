@@ -1,0 +1,35 @@
+{
+  "id": "2026-11-04-recipe-cards",
+  "question": "How should a tool turn a plain-text recipe into a printable card, and a week of recipes into a menu?",
+  "pack": "pack.md",
+  "base": { "repo": "example/recipe-toy", "sha": "1111111111111111111111111111111111111111" },
+  "runner": { "sha": "2222222222222222222222222222222222222222" },
+  "lanes": [
+    { "id": "P-pass", "alias": "P", "stance": "Passes every floor; the reference qualified lane." },
+    { "id": "Q-lean", "alias": "Q", "stance": "Passes every floor; fewer primitives than P but more prompt bytes." },
+    { "id": "R-untried", "alias": "R", "stance": "Passes every floor; same costs as P but no real trial." },
+    { "id": "X-scenario", "alias": "X", "stance": "Fails scenario S2." },
+    { "id": "Y-contract", "alias": "Y", "stance": "Fails contract test C1." },
+    { "id": "Z-constraint", "alias": "Z", "stance": "Breaks hard constraint H1, with the lowest cost of any lane." }
+  ],
+  "stages": [
+    { "id": "design", "title": "Design", "role": "designer", "over": "each" },
+    { "id": "judge", "title": "Judge", "role": "judge", "over": "all" }
+  ],
+  "scoring": {
+    "floors": {
+      "scenarios": [
+        { "id": "S1", "what": "A recipe with no quantities still renders" },
+        { "id": "S2", "what": "A unicode fraction is kept" }
+      ],
+      "contractTests": ["C1"],
+      "constraints": [{ "id": "H1", "what": "Zero runtime dependencies" }]
+    },
+    "tradeoffs": [
+      { "id": "primitives", "kind": "primitives" },
+      { "id": "promptBytes", "kind": "measure", "measure": "promptInEngine.bytes", "better": "lower" },
+      { "id": "trials", "kind": "trials" }
+    ]
+  },
+  "vars": {}
+}

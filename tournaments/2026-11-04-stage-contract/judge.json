@@ -1,0 +1,1300 @@
+{
+  "note": "Written by the tournament-scoring-floors builder from result2.md (the round-2 judge's reruns) and the lane workflows' meta.actors; it is a reading, not a rerun. Primitive usage per model stage is the builder's reading of the control's 21 primitives plus each lane's additions as result2.md lists them.",
+  "scores": [
+    {
+      "lane": "A-control",
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "Q1",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q2",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q3",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q4",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q5",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q6",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q7",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q8",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q9",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F1",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F2",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "R1",
+          "pass": true,
+          "evidence": "result2.md: rerun 27/27, scenarios 12/12"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P1",
+          "pass": false,
+          "evidence": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P2",
+          "pass": false,
+          "evidence": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P3",
+          "pass": false,
+          "evidence": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P4",
+          "pass": false,
+          "evidence": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P5",
+          "pass": false,
+          "evidence": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P6",
+          "pass": false,
+          "evidence": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "constraints",
+          "id": "first-pack",
+          "pass": true,
+          "evidence": "result2.md: spec.js/host.js unchanged; scenarios rerun 12/12"
+        },
+        {
+          "kind": "constraints",
+          "id": "prompt-in-json",
+          "pass": false,
+          "evidence": "brief instructions stay in engine code (critique fix 1: P); promptInEngine 10787 bytes"
+        },
+        {
+          "kind": "constraints",
+          "id": "load-check",
+          "pass": false,
+          "evidence": "no load-time check for stage parts; the control has no stage parts"
+        },
+        {
+          "kind": "constraints",
+          "id": "fixed-parts",
+          "pass": false,
+          "evidence": "critique fix 3 (data rule everywhere): P"
+        },
+        {
+          "kind": "constraints",
+          "id": "brief-fills-task",
+          "pass": false,
+          "evidence": "no task part; the brief is not confined to one"
+        },
+        {
+          "kind": "constraints",
+          "id": "verify-covers",
+          "pass": false,
+          "evidence": "critique fix 2 (one result per Expect line, host checks coverage): N"
+        }
+      ],
+      "modelStages": [
+        "quick-fix/brief",
+        "quick-fix/build",
+        "quick-fix/verify",
+        "feature/brief",
+        "research/brief",
+        "research/build",
+        "research/verify"
+      ],
+      "primitives": [
+        {
+          "name": "normal state",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/build",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "final state",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "invoke onDone/onError",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/build",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "list-form invoke",
+          "weight": 2,
+          "stages": [
+            "research/build"
+          ],
+          "note": "a spec.js change, weighs 2; only the parallel research fan-out uses it"
+        },
+        {
+          "name": "on",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ],
+          "note": "events between stages, not a stage part"
+        },
+        {
+          "name": "set",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/build",
+            "research/verify"
+          ],
+          "note": "each stage's onDone stores its output"
+        },
+        {
+          "name": "guard present",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "guard same",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "guard in",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.needs",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.actors",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/build",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "meta.events",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.input",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/build",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "effect run",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/build",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "effect stop",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/build",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "xstate.done/error events",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/build",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "github.<kind> events",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "ref handle",
+          "stages": [
+            "quick-fix/build"
+          ],
+          "workflows": [
+            "research"
+          ],
+          "note": "stamped at accept on build output"
+        },
+        {
+          "name": "accept-time check",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/build",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "child item",
+          "stages": [],
+          "workflows": [
+            "feature"
+          ]
+        },
+        {
+          "name": "pin (load-time check)",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "role-from-schema convention",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/build",
+            "research/verify"
+          ]
+        }
+      ],
+      "trials": [],
+      "notes": "Control: unchanged lane A."
+    },
+    {
+      "lane": "S-six-parts",
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "Q1",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q2",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q3",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q4",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q5",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q6",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q7",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q8",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q9",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F1",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F2",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "R1",
+          "pass": true,
+          "evidence": "result2.md: rerun 43/43, scenarios 12/12"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P1",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified, read and rerun"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P2",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified, read and rerun"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P3",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified, read and rerun"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P4",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified, read and rerun"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P5",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified, read and rerun"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P6",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified, read and rerun"
+        },
+        {
+          "kind": "constraints",
+          "id": "first-pack",
+          "pass": true,
+          "evidence": "result2.md: S contract tests and critique table cover it; spec.js/host.js unchanged"
+        },
+        {
+          "kind": "constraints",
+          "id": "prompt-in-json",
+          "pass": true,
+          "evidence": "result2.md: S contract tests and critique table cover it; spec.js/host.js unchanged"
+        },
+        {
+          "kind": "constraints",
+          "id": "load-check",
+          "pass": true,
+          "evidence": "result2.md: S contract tests and critique table cover it; spec.js/host.js unchanged"
+        },
+        {
+          "kind": "constraints",
+          "id": "fixed-parts",
+          "pass": true,
+          "evidence": "result2.md: S contract tests and critique table cover it; spec.js/host.js unchanged"
+        },
+        {
+          "kind": "constraints",
+          "id": "brief-fills-task",
+          "pass": true,
+          "evidence": "result2.md: S contract tests and critique table cover it; spec.js/host.js unchanged"
+        },
+        {
+          "kind": "constraints",
+          "id": "verify-covers",
+          "pass": true,
+          "evidence": "result2.md: S contract tests and critique table cover it; spec.js/host.js unchanged"
+        }
+      ],
+      "modelStages": [
+        "quick-fix/brief",
+        "quick-fix/build",
+        "quick-fix/verify",
+        "feature/brief",
+        "research/brief",
+        "research/researcher",
+        "research/write",
+        "research/verify"
+      ],
+      "primitives": [
+        {
+          "name": "normal state",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "final state",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "invoke onDone/onError",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "list-form invoke",
+          "weight": 2,
+          "stages": [
+            "research/researcher"
+          ],
+          "note": "a spec.js change, weighs 2; only the parallel research fan-out uses it"
+        },
+        {
+          "name": "on",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ],
+          "note": "events between stages, not a stage part"
+        },
+        {
+          "name": "set",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "each stage's onDone stores its output"
+        },
+        {
+          "name": "guard present",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "guard same",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "guard in",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.needs",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.actors",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "meta.events",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.input",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "effect run",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "effect stop",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "xstate.done/error events",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "github.<kind> events",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "ref handle",
+          "stages": [
+            "quick-fix/build"
+          ],
+          "workflows": [
+            "research"
+          ],
+          "note": "stamped at accept on build output"
+        },
+        {
+          "name": "accept-time check",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "child item",
+          "stages": [],
+          "workflows": [
+            "feature"
+          ]
+        },
+        {
+          "name": "pin (load-time check)",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "stage part rules",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "stage part task",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "stage part inputs",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "covers (field attribute)",
+          "stages": [
+            "quick-fix/verify",
+            "research/verify"
+          ],
+          "note": "verify stages only"
+        },
+        {
+          "name": "checkStages (load-time check)",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        }
+      ],
+      "trials": [
+        {
+          "ref": "/mnt/project-files/stage-contract-tournament/trial/report.md",
+          "passed": true,
+          "outcome": "merged on the first build (S-cleanup aac5572), 1 refusal then accepted"
+        },
+        {
+          "ref": "/mnt/project-files/stage-contract-tournament/trial2/report.md",
+          "passed": true,
+          "outcome": "merged on the first build (S-cleanup 8d51cbf), 0 refusals"
+        }
+      ],
+      "notes": "Trials ran on S's cleanup (S-cleanup), the shape adopted by engine-stage-contract."
+    },
+    {
+      "lane": "M-minimal",
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "Q1",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q2",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q3",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q4",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q5",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q6",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q7",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q8",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q9",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F1",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F2",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "scenarios",
+          "id": "R1",
+          "pass": true,
+          "evidence": "result2.md: rerun 47/47, scenarios 12/12"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P1",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified (P2 now accepted)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P2",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified (P2 now accepted)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P3",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified (P2 now accepted)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P4",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified (P2 now accepted)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P5",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified (P2 now accepted)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P6",
+          "pass": true,
+          "evidence": "result2.md: 6/6 verified (P2 now accepted)"
+        },
+        {
+          "kind": "constraints",
+          "id": "first-pack",
+          "pass": true,
+          "evidence": "result2.md: M contract tests and critique table cover it; spec.js/host.js unchanged"
+        },
+        {
+          "kind": "constraints",
+          "id": "prompt-in-json",
+          "pass": true,
+          "evidence": "result2.md: M contract tests and critique table cover it; spec.js/host.js unchanged"
+        },
+        {
+          "kind": "constraints",
+          "id": "load-check",
+          "pass": true,
+          "evidence": "result2.md: M contract tests and critique table cover it; spec.js/host.js unchanged"
+        },
+        {
+          "kind": "constraints",
+          "id": "fixed-parts",
+          "pass": true,
+          "evidence": "result2.md: M contract tests and critique table cover it; spec.js/host.js unchanged"
+        },
+        {
+          "kind": "constraints",
+          "id": "brief-fills-task",
+          "pass": true,
+          "evidence": "result2.md: M contract tests and critique table cover it; spec.js/host.js unchanged"
+        },
+        {
+          "kind": "constraints",
+          "id": "verify-covers",
+          "pass": true,
+          "evidence": "result2.md: M contract tests and critique table cover it; spec.js/host.js unchanged"
+        }
+      ],
+      "modelStages": [
+        "quick-fix/brief",
+        "quick-fix/build",
+        "quick-fix/verify",
+        "feature/brief",
+        "research/brief",
+        "research/researcher",
+        "research/write",
+        "research/verify"
+      ],
+      "primitives": [
+        {
+          "name": "normal state",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "final state",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "invoke onDone/onError",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "list-form invoke",
+          "weight": 2,
+          "stages": [
+            "research/researcher"
+          ],
+          "note": "a spec.js change, weighs 2; only the parallel research fan-out uses it"
+        },
+        {
+          "name": "on",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ],
+          "note": "events between stages, not a stage part"
+        },
+        {
+          "name": "set",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "each stage's onDone stores its output"
+        },
+        {
+          "name": "guard present",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "guard same",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "guard in",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.needs",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.actors",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "meta.events",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.input",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "effect run",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "effect stop",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "xstate.done/error events",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "github.<kind> events",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "ref handle",
+          "stages": [
+            "quick-fix/build"
+          ],
+          "workflows": [
+            "research"
+          ],
+          "note": "stamped at accept on build output"
+        },
+        {
+          "name": "accept-time check",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "child item",
+          "stages": [],
+          "workflows": [
+            "feature"
+          ]
+        },
+        {
+          "name": "pin (load-time check)",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.stages key",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "stage rules (meta.stages.X.task)",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "input meanings",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "task invoke input",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "stageProblems (load-time check)",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        }
+      ],
+      "trials": [],
+      "notes": "result2.md found PASS over a FAIL line merges and coverage matches by value; both are inside P5's letter, so the floor stands, and they are noted here."
+    }
+  ],
+  "ranking": [],
+  "bestIdeas": []
+}

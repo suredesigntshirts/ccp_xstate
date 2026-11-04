@@ -36,7 +36,7 @@ tournaments/<id>/          <id> is <date>-<topic>, and config.id must equal it
 | `runner.sha` | The commit of `scripts/tournament/` the run uses (add `repo` and `path` when it ran on something else) |
 | `lanes[]` | `id` (branch-safe), `alias` (the letter judges see), `stance`, and optional `skip` (stage ids), `given` (a stand-in output for a skipped stage), `brief` (`{ stageId: extra text }`) |
 | `stages[]` | `id`, `role`, `over` (`each` lane or `all` lanes once), optional `title`, `brief`, and `pick` (`{ from: <earlier all-stage>, top, exclude, plus }`) to run only ranked lanes |
-| `scoring.rule` | The scoring rule, written before the run |
+| `scoring.floors`, `scoring.tradeoffs` | How lanes are scored, written before the run: see Scoring below. `note`, `was` (an earlier free-text rule) and `written` are kept as record |
 | `suite` | Optional: `{ command: [cmd, ...args], install }`, run in each lane checkout; TAP output is read |
 | `measure` | Optional: the measure module, relative to the folder |
 | `vars` | Optional: values prompts use as `{{vars.x}}` |
@@ -50,7 +50,7 @@ lane taking the stage lacks.
 
 ## Running one, end to end
 
-1. **Write the folder.** Copy the shape above. Write the pack and `scoring.rule` before anything runs. Pick stages:
+1. **Write the folder.** Copy the shape above. Write the pack and `scoring` before anything runs. Pick stages:
    a design-only question can be `design` (each) then `judge` (all); a code question adds `build` (each), and maybe
    a `pick` round and a `final` judge. Leave `runner.sha` as the current `main` sha of `scripts/tournament/`.
 2. **Build and check the args.**
@@ -70,8 +70,37 @@ lane taking the stage lacks.
    results and measures in its job summary (and `measure.json` as an artifact). Judges read these instead of counting.
    For `scores.json`, run `node scripts/tournament/measure.mjs --tournament tournaments/<id> --lane <lane>
    --checkout <lane checkout> --scores` per lane.
-6. **Record it.** Copy `result.md`, each lane's design into `lanes/<lane>/`, fill `config.record`, add a row to
+6. **Score it.** Save the judge's output (the judge schema: per lane its floors, model stages, primitives and
+   trials) as `judge.json`, then `node scripts/tournament/score.mjs tournaments/<id>` writes `scoring.json` and
+   `scoring.md` (see Scoring).
+7. **Record it.** Copy `result.md`, each lane's design into `lanes/<lane>/`, fill `config.record`, add a row to
    `tournaments/README.md`, and open the PR. Write the decision the result feeds in `plan/decisions/`.
+
+## Scoring
+
+Plan item `tournament-scoring-floors`; the reasoning is in `plan/decisions/2026-11-04-adopt-stage-contract.md` and
+`plan/decisions/2026-11-04-tournament-scoring-floors.md`. A count measures what a design costs, not whether it works,
+so scoring asks the job first and the cost second:
+
+1. **Floors.** `scoring.floors` lists `scenarios`, `contractTests` and `constraints`, each as ids or `{ id, what }`. A
+   lane qualifies only if the judge reports every one as passed; a floor the judge leaves out counts as failed, and
+   `score.mjs` names each failed floor. No cost can buy back a failed floor. A contract-test floor means a control
+   that does not attempt the question cannot qualify; when that is the point, the pack says so before the run.
+2. **Trade-offs.** `scoring.tradeoffs` lists two or more costs, each `{ id, kind }`: `primitives` (from the judge,
+   lower is better), `trials` (real-model trials the judge lists, more passed is better) or `measure` (a path into
+   the lane's measures in `scores.json`, with `better: "lower" | "higher"`). Qualified lanes are laid side by side on
+   all of them. One lane ranks above another only if it is at least as good on every trade-off and better on one;
+   lanes neither beats share a tier. There is no composite score.
+3. **The primitive counting rule.** The judge lists each lane's model stages as `workflow/stage` and every primitive
+   with the model stages that use it (plus `workflows` where it is used outside any stage, and `weight`, default 1).
+   A primitive counts only if every model stage uses it and it is used in more than one workflow: that is the
+   vocabulary an author must learn to write any stage. Every other primitive is listed as a special case with the
+   reason, beside the count, never dropped.
+
+`args.mjs` refuses a scoring block with no floors, with fewer than two trade-offs, or with only a free-text `rule`, and
+a prompt naming a `{{scoring.x}}` that is not there. Role prompts read the scoring as `{{scoring.text}}`, which
+`args.mjs` writes from the floors and trade-offs. `score.mjs` takes `--judge`, `--scores` and `--out` to score from
+files elsewhere.
 
 If a lane PR existed before its base carried the CI, update the PR's branch from the base (GitHub's "Update branch",
 a merge of the base into the lane). The lane's own changes stay as judged, and the push runs the job.

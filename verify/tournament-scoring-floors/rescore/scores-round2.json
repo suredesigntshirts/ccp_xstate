@@ -1,0 +1,84 @@
+{
+  "tournament": "2026-11-04-stage-contract",
+  "note": "Copied by the verifier from the round-2 measure files (measure2.json) for each lane; only the fields score.mjs reads plus the suite and spec lines.",
+  "lanes": {
+    "A-control": {
+      "lane": "A-control",
+      "sha": "23c32900d1145853340ff746c941c598b326b2ac",
+      "source": "/mnt/project-files/stage-contract-tournament/A-control/measure2.json",
+      "suite": {
+        "command": "node --test --test-reporter=tap packages/engine/test/tourney/*.test.js",
+        "exit": 0,
+        "tests": 27,
+        "pass": 27,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0,
+        "failing": []
+      },
+      "measures": {
+        "promptInEngine": {
+          "bytes": 10787
+        },
+        "specLines": {
+          "feature": 530,
+          "quick-fix": 1341,
+          "research": 774,
+          "total": 2645
+        }
+      }
+    },
+    "S-six-parts": {
+      "lane": "S-six-parts",
+      "sha": "b1830bd434ee23177bd09b641ce352816bd38305",
+      "source": "/mnt/project-files/stage-contract-tournament/S-six-parts/measure2.json",
+      "suite": {
+        "command": "node --test --test-reporter=tap packages/engine/test/tourney/*.test.js",
+        "exit": 0,
+        "tests": 43,
+        "pass": 43,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0,
+        "failing": []
+      },
+      "measures": {
+        "promptInEngine": {
+          "bytes": 8471
+        },
+        "specLines": {
+          "feature": 543,
+          "quick-fix": 1429,
+          "research": 884,
+          "total": 2856
+        }
+      }
+    },
+    "M-minimal": {
+      "lane": "M-minimal",
+      "sha": "1b9f0832e454c4247d36d39ce7b6b44aa046c71d",
+      "source": "/mnt/project-files/stage-contract-tournament/M-minimal/measure2.json",
+      "suite": {
+        "command": "node --test --test-reporter=tap packages/engine/test/tourney/*.test.js",
+        "exit": 0,
+        "tests": 47,
+        "pass": 47,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0,
+        "failing": []
+      },
+      "measures": {
+        "promptInEngine": {
+          "bytes": 9021
+        },
+        "specLines": {
+          "feature": 544,
+          "quick-fix": 1420,
+          "research": 870,
+          "total": 2834
+        }
+      }
+    }
+  }
+}

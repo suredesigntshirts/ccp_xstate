@@ -1,0 +1,359 @@
+{
+  "scores": [
+    {
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "S1",
+          "pass": true,
+          "evidence": "S1 passed (toy)"
+        },
+        {
+          "kind": "scenarios",
+          "id": "S2",
+          "pass": true,
+          "evidence": "S2 passed (toy)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "C1",
+          "pass": true,
+          "evidence": "C1 passed (toy)"
+        },
+        {
+          "kind": "constraints",
+          "id": "H1",
+          "pass": true,
+          "evidence": "H1 passed (toy)"
+        }
+      ],
+      "lane": "P",
+      "modelStages": [
+        "card/parse",
+        "card/render",
+        "menu/parse",
+        "menu/render"
+      ],
+      "primitives": [
+        {
+          "name": "step-list",
+          "stages": [
+            "card/parse",
+            "card/render",
+            "menu/parse",
+            "menu/render"
+          ]
+        },
+        {
+          "name": "source-ref",
+          "weight": 2,
+          "stages": [
+            "card/parse",
+            "card/render",
+            "menu/parse",
+            "menu/render"
+          ]
+        },
+        {
+          "name": "fraction-table",
+          "stages": [
+            "card/parse",
+            "menu/parse"
+          ]
+        },
+        {
+          "name": "menu-week-grid",
+          "stages": [
+            "menu/render"
+          ]
+        },
+        {
+          "name": "print-css",
+          "stages": [],
+          "workflows": [
+            "card",
+            "menu"
+          ]
+        }
+      ],
+      "trials": [
+        {
+          "ref": "trial-1",
+          "passed": true,
+          "outcome": "merged"
+        }
+      ],
+      "notes": "toy"
+    },
+    {
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "S1",
+          "pass": true,
+          "evidence": "S1 passed (toy)"
+        },
+        {
+          "kind": "scenarios",
+          "id": "S2",
+          "pass": true,
+          "evidence": "S2 passed (toy)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "C1",
+          "pass": true,
+          "evidence": "C1 passed (toy)"
+        },
+        {
+          "kind": "constraints",
+          "id": "H1",
+          "pass": true,
+          "evidence": "H1 passed (toy)"
+        }
+      ],
+      "lane": "Q",
+      "modelStages": [
+        "card/parse",
+        "card/render"
+      ],
+      "primitives": [
+        {
+          "name": "step-list",
+          "stages": [
+            "card/parse",
+            "card/render"
+          ]
+        },
+        {
+          "name": "source-ref",
+          "stages": [
+            "card/parse",
+            "card/render"
+          ],
+          "workflows": [
+            "menu"
+          ]
+        },
+        {
+          "name": "inline-units",
+          "stages": [
+            "card/parse"
+          ]
+        }
+      ],
+      "trials": [
+        {
+          "ref": "trial-q",
+          "passed": true,
+          "outcome": "merged"
+        }
+      ],
+      "notes": "toy"
+    },
+    {
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "S1",
+          "pass": true,
+          "evidence": "S1 passed (toy)"
+        },
+        {
+          "kind": "scenarios",
+          "id": "S2",
+          "pass": true,
+          "evidence": "S2 passed (toy)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "C1",
+          "pass": true,
+          "evidence": "C1 passed (toy)"
+        },
+        {
+          "kind": "constraints",
+          "id": "H1",
+          "pass": true,
+          "evidence": "H1 passed (toy)"
+        }
+      ],
+      "lane": "R",
+      "modelStages": [
+        "card/parse",
+        "card/render",
+        "menu/parse",
+        "menu/render"
+      ],
+      "primitives": [
+        {
+          "name": "step-list",
+          "stages": [
+            "card/parse",
+            "card/render",
+            "menu/parse",
+            "menu/render"
+          ]
+        },
+        {
+          "name": "source-ref",
+          "weight": 2,
+          "stages": [
+            "card/parse",
+            "card/render",
+            "menu/parse",
+            "menu/render"
+          ]
+        },
+        {
+          "name": "fraction-table",
+          "stages": [
+            "card/parse",
+            "menu/parse"
+          ]
+        },
+        {
+          "name": "menu-week-grid",
+          "stages": [
+            "menu/render"
+          ]
+        },
+        {
+          "name": "print-css",
+          "stages": [],
+          "workflows": [
+            "card",
+            "menu"
+          ]
+        }
+      ],
+      "trials": [],
+      "notes": "toy"
+    },
+    {
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "S1",
+          "pass": true,
+          "evidence": "S1 passed (toy)"
+        },
+        {
+          "kind": "scenarios",
+          "id": "S2",
+          "pass": false,
+          "evidence": "S2 failed: the half sign became 1/2"
+        },
+        {
+          "kind": "contractTests",
+          "id": "C1",
+          "pass": true,
+          "evidence": "C1 passed (toy)"
+        },
+        {
+          "kind": "constraints",
+          "id": "H1",
+          "pass": true,
+          "evidence": "H1 passed (toy)"
+        }
+      ],
+      "lane": "X",
+      "modelStages": [
+        "card/parse",
+        "card/render",
+        "menu/parse",
+        "menu/render"
+      ],
+      "primitives": [],
+      "trials": [],
+      "notes": "toy"
+    },
+    {
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "S1",
+          "pass": true,
+          "evidence": "S1 passed (toy)"
+        },
+        {
+          "kind": "scenarios",
+          "id": "S2",
+          "pass": true,
+          "evidence": "S2 passed (toy)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "C1",
+          "pass": false,
+          "evidence": "C1 failed: step 3 names no source line"
+        },
+        {
+          "kind": "constraints",
+          "id": "H1",
+          "pass": true,
+          "evidence": "H1 passed (toy)"
+        }
+      ],
+      "lane": "Y",
+      "modelStages": [
+        "card/parse",
+        "card/render",
+        "menu/parse",
+        "menu/render"
+      ],
+      "primitives": [],
+      "trials": [],
+      "notes": "toy"
+    },
+    {
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "S1",
+          "pass": true,
+          "evidence": "S1 passed (toy)"
+        },
+        {
+          "kind": "scenarios",
+          "id": "S2",
+          "pass": true,
+          "evidence": "S2 passed (toy)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "C1",
+          "pass": true,
+          "evidence": "C1 passed (toy)"
+        },
+        {
+          "kind": "constraints",
+          "id": "H1",
+          "pass": false,
+          "evidence": "H1 broken: depends on left-pad"
+        }
+      ],
+      "lane": "Z",
+      "modelStages": [
+        "card/parse",
+        "card/render",
+        "menu/parse",
+        "menu/render"
+      ],
+      "primitives": [],
+      "trials": [
+        {
+          "ref": "z1",
+          "passed": true,
+          "outcome": "merged"
+        },
+        {
+          "ref": "z2",
+          "passed": true,
+          "outcome": "merged"
+        }
+      ],
+      "notes": "toy"
+    }
+  ]
+}

@@ -13,6 +13,13 @@
     { "id": "sketch", "title": "Sketch", "role": "designer", "over": "each" },
     { "id": "verdict", "title": "Verdict", "role": "judge", "over": "all" }
   ],
-  "scoring": { "rule": "Newcomer tasks completed (install, run, first PR) per hundred README lines; ties go to fewer top-level headings." },
+  "scoring": {
+    "floors": { "constraints": [{ "id": "newcomer-tasks", "what": "A newcomer completes install, run and a first PR from the README alone" }] },
+    "tradeoffs": [
+      { "id": "lines", "kind": "measure", "measure": "readme.lines", "better": "lower", "what": "README length, read as tasks completed per hundred README lines" },
+      { "id": "headings", "kind": "measure", "measure": "readme.headings", "better": "lower" }
+    ],
+    "was": "Newcomer tasks completed (install, run, first PR) per hundred README lines; ties go to fewer top-level headings."
+  },
   "vars": {}
 }

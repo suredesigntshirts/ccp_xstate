@@ -6,24 +6,154 @@
       "items": {
         "type": "object",
         "properties": {
-          "lane": { "type": "string" },
-          "verifiedPasses": { "type": "number" },
-          "score": { "type": "number" },
-          "rejectedPasses": { "type": "array", "items": { "type": "string" } },
-          "notes": { "type": "string" }
+          "lane": {
+            "type": "string"
+          },
+          "floors": {
+            "type": "array",
+            "description": "One entry per floor in the scoring, each checked by you, not taken from the lane's report",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "scenarios",
+                    "contractTests",
+                    "constraints"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                },
+                "pass": {
+                  "type": "boolean"
+                },
+                "evidence": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "id",
+                "pass",
+                "evidence"
+              ]
+            }
+          },
+          "modelStages": {
+            "type": "array",
+            "description": "Every model stage in this lane, as workflow/stage",
+            "items": {
+              "type": "string"
+            }
+          },
+          "primitives": {
+            "type": "array",
+            "description": "Every primitive the lane uses, with every model stage (workflow/stage) that uses it; score.mjs applies the counting rule",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "weight": {
+                  "type": "number"
+                },
+                "stages": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "workflows": {
+                  "type": "array",
+                  "description": "Workflows that use it outside any model stage",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "note": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "stages"
+              ]
+            }
+          },
+          "trials": {
+            "type": "array",
+            "description": "Real-model trials of this lane",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ref": {
+                  "type": "string"
+                },
+                "passed": {
+                  "type": "boolean"
+                },
+                "outcome": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "ref",
+                "passed",
+                "outcome"
+              ]
+            }
+          },
+          "rejectedPasses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notes": {
+            "type": "string"
+          }
         },
-        "required": ["lane", "score", "notes"]
+        "required": [
+          "lane",
+          "floors",
+          "modelStages",
+          "primitives",
+          "notes"
+        ]
       }
     },
-    "ranking": { "type": "array", "items": { "type": "string" } },
+    "ranking": {
+      "type": "array",
+      "description": "Lanes that pass every floor first, ordered only where one is at least as good on every trade-off and better on one; then the rest",
+      "items": {
+        "type": "string"
+      }
+    },
     "bestIdeas": {
       "type": "array",
       "items": {
         "type": "object",
-        "properties": { "lane": { "type": "string" }, "idea": { "type": "string" } },
-        "required": ["lane", "idea"]
+        "properties": {
+          "lane": {
+            "type": "string"
+          },
+          "idea": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "lane",
+          "idea"
+        ]
       }
     }
   },
-  "required": ["scores", "ranking", "bestIdeas"]
+  "required": [
+    "scores",
+    "ranking",
+    "bestIdeas"
+  ]
 }

@@ -1,0 +1,421 @@
+{
+  "tournament": "2026-11-04-stage-contract",
+  "scoredAt": "2026-11-04T15:21:40.479Z",
+  "rule": "Floors first: a lane qualifies only if it passes every floor. Then qualified lanes are laid side by side on every trade-off; a lane ranks above another only if it is at least as good on all of them and better on one.",
+  "floors": {
+    "A-control": {
+      "qualified": false,
+      "failed": [
+        {
+          "kind": "contractTests",
+          "id": "P1",
+          "why": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P2",
+          "why": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P3",
+          "why": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P4",
+          "why": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P5",
+          "why": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P6",
+          "why": "result2.md: 0 contract tests (it has none)"
+        },
+        {
+          "kind": "constraints",
+          "id": "prompt-in-json",
+          "why": "brief instructions stay in engine code (critique fix 1: P); promptInEngine 10787 bytes"
+        },
+        {
+          "kind": "constraints",
+          "id": "load-check",
+          "why": "no load-time check for stage parts; the control has no stage parts"
+        },
+        {
+          "kind": "constraints",
+          "id": "fixed-parts",
+          "why": "critique fix 3 (data rule everywhere): P"
+        },
+        {
+          "kind": "constraints",
+          "id": "brief-fills-task",
+          "why": "no task part; the brief is not confined to one"
+        },
+        {
+          "kind": "constraints",
+          "id": "verify-covers",
+          "why": "critique fix 2 (one result per Expect line, host checks coverage): N"
+        }
+      ]
+    },
+    "S-six-parts": {
+      "qualified": true,
+      "failed": []
+    },
+    "M-minimal": {
+      "qualified": true,
+      "failed": []
+    }
+  },
+  "qualified": [
+    "S-six-parts",
+    "M-minimal"
+  ],
+  "notQualified": [
+    "A-control"
+  ],
+  "tradeoffs": [
+    {
+      "id": "primitives",
+      "kind": "primitives",
+      "better": "lower"
+    },
+    {
+      "id": "promptInEngine",
+      "kind": "measure",
+      "measure": "promptInEngine.bytes",
+      "better": "lower"
+    },
+    {
+      "id": "trials",
+      "kind": "trials",
+      "better": "higher"
+    }
+  ],
+  "table": {
+    "S-six-parts": {
+      "primitives": {
+        "value": 13,
+        "better": "lower",
+        "text": "13 counted (13 weighted), 13 special",
+        "detail": {
+          "count": 13,
+          "weighted": 13,
+          "counted": [
+            {
+              "name": "normal state",
+              "weight": 1
+            },
+            {
+              "name": "invoke onDone/onError",
+              "weight": 1
+            },
+            {
+              "name": "set",
+              "weight": 1,
+              "note": "each stage's onDone stores its output"
+            },
+            {
+              "name": "meta.actors",
+              "weight": 1
+            },
+            {
+              "name": "meta.input",
+              "weight": 1
+            },
+            {
+              "name": "effect run",
+              "weight": 1
+            },
+            {
+              "name": "effect stop",
+              "weight": 1
+            },
+            {
+              "name": "xstate.done/error events",
+              "weight": 1
+            },
+            {
+              "name": "accept-time check",
+              "weight": 1
+            },
+            {
+              "name": "stage part rules",
+              "weight": 1
+            },
+            {
+              "name": "stage part task",
+              "weight": 1
+            },
+            {
+              "name": "stage part inputs",
+              "weight": 1
+            },
+            {
+              "name": "checkStages (load-time check)",
+              "weight": 1
+            }
+          ],
+          "special": [
+            {
+              "name": "final state",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "list-form invoke",
+              "weight": 2,
+              "note": "a spec.js change, weighs 2; only the parallel research fan-out uses it",
+              "why": "used by 1 of 8 model stages (not quick-fix/brief, quick-fix/build, quick-fix/verify, feature/brief, research/brief, research/write, research/verify); used in one workflow (research)"
+            },
+            {
+              "name": "on",
+              "weight": 1,
+              "note": "events between stages, not a stage part",
+              "why": "used by no model stage"
+            },
+            {
+              "name": "guard present",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "guard same",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "guard in",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "meta.needs",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "meta.events",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "github.<kind> events",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "ref handle",
+              "weight": 1,
+              "note": "stamped at accept on build output",
+              "why": "used by 1 of 8 model stages (not quick-fix/brief, quick-fix/verify, feature/brief, research/brief, research/researcher, research/write, research/verify)"
+            },
+            {
+              "name": "child item",
+              "weight": 1,
+              "why": "used by no model stage; used in one workflow (feature)"
+            },
+            {
+              "name": "pin (load-time check)",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "covers (field attribute)",
+              "weight": 1,
+              "note": "verify stages only",
+              "why": "used by 2 of 8 model stages (not quick-fix/brief, quick-fix/build, feature/brief, research/brief, research/researcher, research/write)"
+            }
+          ]
+        }
+      },
+      "promptInEngine": {
+        "value": 8471,
+        "better": "lower",
+        "text": "8471"
+      },
+      "trials": {
+        "value": 2,
+        "better": "higher",
+        "text": "2 passed of 2",
+        "detail": [
+          {
+            "ref": "/mnt/project-files/stage-contract-tournament/trial/report.md",
+            "passed": true,
+            "outcome": "merged on the first build (S-cleanup aac5572), 1 refusal then accepted"
+          },
+          {
+            "ref": "/mnt/project-files/stage-contract-tournament/trial2/report.md",
+            "passed": true,
+            "outcome": "merged on the first build (S-cleanup 8d51cbf), 0 refusals"
+          }
+        ]
+      }
+    },
+    "M-minimal": {
+      "primitives": {
+        "value": 14,
+        "better": "lower",
+        "text": "14 counted (14 weighted), 12 special",
+        "detail": {
+          "count": 14,
+          "weighted": 14,
+          "counted": [
+            {
+              "name": "normal state",
+              "weight": 1
+            },
+            {
+              "name": "invoke onDone/onError",
+              "weight": 1
+            },
+            {
+              "name": "set",
+              "weight": 1,
+              "note": "each stage's onDone stores its output"
+            },
+            {
+              "name": "meta.actors",
+              "weight": 1
+            },
+            {
+              "name": "meta.input",
+              "weight": 1
+            },
+            {
+              "name": "effect run",
+              "weight": 1
+            },
+            {
+              "name": "effect stop",
+              "weight": 1
+            },
+            {
+              "name": "xstate.done/error events",
+              "weight": 1
+            },
+            {
+              "name": "accept-time check",
+              "weight": 1
+            },
+            {
+              "name": "meta.stages key",
+              "weight": 1
+            },
+            {
+              "name": "stage rules (meta.stages.X.task)",
+              "weight": 1
+            },
+            {
+              "name": "input meanings",
+              "weight": 1
+            },
+            {
+              "name": "task invoke input",
+              "weight": 1
+            },
+            {
+              "name": "stageProblems (load-time check)",
+              "weight": 1
+            }
+          ],
+          "special": [
+            {
+              "name": "final state",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "list-form invoke",
+              "weight": 2,
+              "note": "a spec.js change, weighs 2; only the parallel research fan-out uses it",
+              "why": "used by 1 of 8 model stages (not quick-fix/brief, quick-fix/build, quick-fix/verify, feature/brief, research/brief, research/write, research/verify); used in one workflow (research)"
+            },
+            {
+              "name": "on",
+              "weight": 1,
+              "note": "events between stages, not a stage part",
+              "why": "used by no model stage"
+            },
+            {
+              "name": "guard present",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "guard same",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "guard in",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "meta.needs",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "meta.events",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "github.<kind> events",
+              "weight": 1,
+              "why": "used by no model stage"
+            },
+            {
+              "name": "ref handle",
+              "weight": 1,
+              "note": "stamped at accept on build output",
+              "why": "used by 1 of 8 model stages (not quick-fix/brief, quick-fix/verify, feature/brief, research/brief, research/researcher, research/write, research/verify)"
+            },
+            {
+              "name": "child item",
+              "weight": 1,
+              "why": "used by no model stage; used in one workflow (feature)"
+            },
+            {
+              "name": "pin (load-time check)",
+              "weight": 1,
+              "why": "used by no model stage"
+            }
+          ]
+        }
+      },
+      "promptInEngine": {
+        "value": 9021,
+        "better": "lower",
+        "text": "9021"
+      },
+      "trials": {
+        "value": 0,
+        "better": "higher",
+        "text": "0 passed of 0",
+        "detail": []
+      }
+    }
+  },
+  "beats": {
+    "S-six-parts": [
+      "M-minimal"
+    ],
+    "M-minimal": []
+  },
+  "tiers": [
+    [
+      "S-six-parts"
+    ],
+    [
+      "M-minimal"
+    ]
+  ]
+}
