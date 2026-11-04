@@ -445,7 +445,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     if (typeof v === 'number') return '<span class="j-n">' + v + '</span>';
     if (typeof v === 'boolean') return '<span class="j-b">' + v + '</span>';
     const pad = ind + '  ';
-    const mark = (p, line) => (opts.host && opts.host.indexOf(p) >= 0 ? '<span class="hostw">' + line + '\u0001<span class="tag">← written by the host</span></span>' : line);
+    const mark = (p, line) => (opts.host && opts.host.indexOf(p) >= 0 ? '<span class="hostw">' + line + '\u0001<span class="tag">← ' + esc(opts.hostTag || 'written by the host') + '</span></span>' : line);
     if (Array.isArray(v)) return v.length ? '[\n' + joinLines(v.map((x, i) => mark(path + '[' + i + ']', pad + json(x, pad, opts, path + '[' + i + ']')))) + '\n' + ind + ']' : '[]';
     const keys = Object.keys(v);
     if (!keys.length) return '{}';
@@ -884,7 +884,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   };
   const SRC_TAG = { frame: 'harness frame', workflow: 'workflow JSON', input: 'input' };
   function pieceSource(src) {
-    if (src.kind === 'frame') return '<span class="srctag frame">harness frame</span><code>' + esc(src.name) + '</code>: ' + (/^[A-Z_]+$/.test(src.name) ? 'fixed text in the engine, the same for every stage' : src.name === 'none' ? 'the engine\'s placeholder for an empty part' : 'an engine template, filled in with this run\'s values (run id, worktree, branch)');
+    if (src.kind === 'frame') return '<span class="srctag frame">harness frame</span><code>' + esc(src.name) + '</code>: ' + (src.filled ? 'an engine template, filled in with this run\'s ' + Object.keys(src.filled).map((k) => '<code>' + esc(k) + '</code>').join(', ') : src.fixed ? 'fixed text in the engine, the same for every stage' : 'engine text');
     if (src.kind === 'workflow') return '<span class="srctag workflow">workflow JSON</span>' + ptr(src.at) + (src.inlined ? ', with ' + ptr(src.inlined) + ' inlined' : '');
     if (src.kind === 'input') return '<span class="srctag input">input</span><b>' + esc(src.input) + '</b>' + (src.from ? ', read from <code>' + esc(src.from) + '</code>' : '') + '; produced by ' + producerHtml(src.producer);
     return esc(src.label || 'unknown');
@@ -904,27 +904,29 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
         '<dt>Produced by</dt><dd>' + producerHtml(i.producer) + '</dd>' +
         (i.amended.length ? '<dt>Then changed</dt><dd><ul class="readers">' + i.amended.map((x) => '<li><code>' + esc(x.path) + '</code> ← ' + producerHtml(x.by) + '</li>').join('') + '</ul></dd>' : '') + '</dl></div>').join('') + '</div>';
     let out;
-    if (!S.ended) out = '<p class="small muted">No ended half: the item had not taken this run\'s result or error when the journal ends.</p>';
-    else if (S.ended.stopped) out = '<div class="warnbox">The item left <code>' + esc(S.state) + '</code> before this run returned (' + esc(S.ended.event) + ' at ' + (S.ended.step ? '<button type="button" class="linkbtn" data-jump="' + S.ended.step.index + '">step ' + esc(S.ended.step.seq) + '</button>' : esc(S.ended.transition)) + '), which stopped it. Nothing came out, and nothing was written.</div>';
+    if (!S.finished) out = '<p class="small muted">No finished half: the item had not taken this run\'s result or error when the journal ends.</p>';
+    else if (S.finished.stopped) out = '<div class="warnbox">The item left <code>' + esc(S.state) + '</code> before this run returned (' + esc(S.finished.event) + ' at ' + (S.finished.step ? '<button type="button" class="linkbtn" data-jump="' + S.finished.step.index + '">step ' + esc(S.finished.step.seq) + '</button>' : esc(S.finished.transition)) + '), which stopped it. Nothing came out, and nothing was written.</div>';
     else {
-      const took = '<p class="small">Taken at ' + (S.ended.step ? '<button type="button" class="linkbtn" data-jump="' + S.ended.step.index + '">step ' + esc(S.ended.step.seq) + '</button>' : esc(S.ended.transition)) + ' (<code>' + esc(S.ended.event) + '</code>), and the item went to <code>' + esc(S.ended.state) + '</code>.</p>';
-      const val = S.hasError ? '<p class="small"><b>It failed.</b> The error:</p>' + pre(S.error, null, 'error') : S.hasOutput ? pre(S.output, { host: ((a.layers && a.layers.l6 && a.layers.l6.hostWritten) || []).map((h) => h.path) }, 'output') : '<p class="muted small">No output recorded.</p>';
+      const took = '<p class="small">Taken at ' + (S.finished.step ? '<button type="button" class="linkbtn" data-jump="' + S.finished.step.index + '">step ' + esc(S.finished.step.seq) + '</button>' : esc(S.finished.transition)) + ' (<code>' + esc(S.finished.event) + '</code>), and the item went to <code>' + esc(S.finished.state) + '</code>.</p>';
+      const val = S.hasError ? '<p class="small"><b>It failed.</b> The error:</p>' + pre(S.error, null, 'error') : S.hasOutput ? (S.stamped.length ? '<p class="small">Marked fields were stamped by the harness when it accepted the result, not returned by the agent: ' + S.stamped.map((p) => '<code>' + esc(p) + '</code>').join(', ') + '.</p>' : '') + pre(S.output, { host: S.stamped, hostTag: 'stamped by the harness' }, 'output') : '<p class="muted small">No output recorded.</p>';
       const rdr = (rb, w) => {
         const who = rb.kind === 'stage' ? 'the <b>' + esc(rb.actor) + '</b> stage' : rb.kind === 'effect' ? 'the <b>' + esc(rb.actor) + '</b> host effect' : 'the child workflow <b>' + esc(rb.actor) + '</b>';
         const what = who + ' in <code>' + esc(rb.state) + '</code>, as its input <code>' + esc(rb.input) + '</code>' + (rb.reads !== 'context.' + w.path ? ' (reads <code>' + esc(rb.reads) + '</code>)' : '');
+        if (rb.self) return '<li>' + what.replace(/^the /, 'this ') + ': read by itself on the next round' + (rb.runs.length ? ' ' + rb.runs.map((x) => gotoBtn({ run: x.run, index: x.index, seq: x.seq }, (x.read ? 'read it: ' : 'next round: ') + actorRunName(x) + ', step ' + x.seq, rb.input)).join(' ') : ' <span class="muted">(no later round in this item)</span>') + '</li>';
         const runs = rb.runs.map((x) => x.read === true ? gotoBtn({ run: x.run, index: x.index, seq: x.seq }, 'read it: ' + actorRunName(x) + ', step ' + x.seq, rb.input)
           : x.read === false ? gotoBtn({ run: x.run, index: x.index, seq: x.seq }, 'ran at step ' + x.seq + ' but read a newer value', rb.input)
             : gotoBtn({ run: x.run, index: x.index, seq: x.seq }, 'started at step ' + x.seq) + ' <span class="muted small">(a host effect: its input is not traced)</span>').join(' ');
         return '<li>' + what + ': ' + (runs || '<span class="muted">no later run in this item</span>') + '</li>';
       };
       const wrote = S.wrote.length ? S.wrote.map((w) => '<div class="inp"><header><b>context.' + esc(w.path) + '</b><span class="muted small">← <code>' + esc(w.from) + '</code>' + (w.at ? ', by the set action at ' + ptr(w.at) : '') + '</span></header>' +
+        '<p class="small">' + (w.replaced ? '<b>Replaced</b> ' + producerHtml(w.replaced) : 'Replaced nothing: no earlier write to this path.') + '</p>' +
         (w.readBy.length ? '<p class="small"><b>Read next by</b> (any invoke that reads it and that the item can reach from <code>' + esc(w.into) + '</code>; a later write may replace the value first):</p><ul class="readers">' + w.readBy.map((rb) => rdr(rb, w)).join('') + '</ul>' : '<p class="small muted">No invoke reachable from <code>' + esc(w.into) + '</code> reads it.</p>') + '</div>').join('')
         : '<p class="small muted">The transition wrote nothing from it into the context.</p>';
       out = took + val + '<p class="small"><b>Where it went:</b> ' + plural(S.wrote.length, 'context path') + ' written from it.</p>' + wrote;
     }
-    const output = '<div class="sblk"><h5><span class="lnum">3</span> Output <span class="hint">' + (S.ended ? (S.ended.stopped ? 'stopped' : S.hasError ? 'error' : 'what came out and where it went') : 'not ended') + '</span></h5>' + out + '</div>';
+    const output = '<div class="sblk"><h5><span class="lnum">3</span> Output <span class="hint">' + (S.finished ? (S.finished.stopped ? 'stopped' : S.hasError ? 'error' : 'what came out and where it went') : 'not finished') + '</span></h5>' + out + '</div>';
     return sec('Stage: instructions, inputs and output', '<div class="stage">' + instr + inputs.replace('</h5>', '</h5><div class="inps">').replace(/<\/div>$/, '</div></div>') + output + '</div>', { cls: 'layer', open: true,
-      hint: 'from stage.json: ' + plural(nPieces, 'prompt piece') + ', ' + plural(S.inputs.length, 'input') + (S.ended && !S.ended.stopped ? ', ' + plural(S.wrote.length, 'path') + ' written' : ''),
+      hint: 'from stage.json: ' + plural(nPieces, 'prompt piece') + ', ' + plural(S.inputs.length, 'input') + (S.finished && !S.finished.stopped ? ', ' + plural(S.wrote.length, 'path') + ' written' : ''),
       note: 'The engine\'s own stage record (<code>stage.json</code> in the run folder): stage <code>' + esc(S.stage) + '</code>, invoke <code>' + esc(S.invoke) + '</code> in state <code>' + esc(S.state) + '</code> (' + ptr(S.invokeAt) + ') of ' + esc((S.workflow && S.workflow.name) || '?') + (S.workflow && S.workflow.hash ? ' (sha ' + esc(S.workflow.hash.slice(0, 8)) + ')' : '') + '. Every producer and reader is a run of this item where there is one.' + (scripted ? ' In this scenario the stages are test fixtures: the prompt is what this engine would hand a real agent.' : '') });
   }
   function flowHtml(r) {

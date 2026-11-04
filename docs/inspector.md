@@ -106,9 +106,11 @@ a run of the same item, and the page shows it as the run's **Stage** view, befor
 2. **Inputs**: each input's meaning, value, the context path it was read from and its producer, as a link to the
    producing run (stage, effect or child workflow; the host for a field it stamped on a returned ref) or a plain label
    (start input, literal, event, copy, context default, parts, nothing). Later writes to parts of it are listed.
-3. **Output**: the value (or error, or that the run was stopped), each context path written from it, and the invokes
+3. **Output**: the value (or error, or that the run was stopped), with the paths the harness stamped marked, each
+   context path written from it with the earlier write it replaced, and the invokes
    that could read it next, each with its later run in this item: "read it" when that run's own record names this run
-   as the producer, "read a newer value" when it does not, and a host effect's run marked as not traced.
+   as the producer, "read a newer value" when it does not, and a host effect's run marked as not traced. A reader that
+   is the writing invoke itself (`self`) is shown as read by itself on the next round.
 
 The bundle also gets `flow`: the item's runs in start order with the context paths between them, shown above the
 steps as "Data flow between stages". Runs without stage.json render as before.
