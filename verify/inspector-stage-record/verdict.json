@@ -1,0 +1,26 @@
+{
+  "item": "inspector-stage-record",
+  "verified_sha": "378627152e551befad3eb47b8db5b31dd76ac848",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5JnTTK7N1HMNjtdDYH", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "true-to-record",
+      "status": "MET",
+      "command": "fresh non-shallow clone at 3786271; npm ci; node --test verify/inspector-stage-record/true-to-record.test.mjs (runs tourney Q1 and R1 on this head with TMPDIR set to a fresh folder, builds the page with scripts/inspector/build.mjs from the adopt trial journal and those journal roots, reads the rendered DOM in Chromium via Playwright, compares with each run folder's stage.json, clicks every [data-goto] link); planted three defects and re-ran, then git checkout scripts/inspector",
+      "excerpt": "5/5 pass, no page errors. 7 page runs (adopt trial, Q1, R1 x3 roots plus items) with a Stage view for exactly the run folders that hold stage.json. Every prompt piece's text equals stage.json byte for byte, with its source: frame name (fixed / filled keys), workflow JSON pointer (and inlined pointer), or input name, context path and producer. Every input's name, meaning, value (whole value for long ones), read-from path, producer (stage/host runs linked to the step their journal start row names; initial, literal and default pointers; event jumps) and amended writes (verify's target amended at pr.at) match. Output, error, stamped paths (and their marks in the output), each write's path/from/at, replaced producer and every readBy entry (actor, state, input, reads, self) match; the linked reader runs equal the later runs worked out from the journal's engine.effect start rows and each later run's own stage.json. Every producer and reader link lands focus on the named run's box (and the named input box) in the open, visible step. Mutations: dropping a prompt piece -> 'every prompt piece' red; readBy runs always first-later -> 'every output ... reader' red; goRun ignoring the field -> 'every producer and reader link lands' red."
+    },
+    {
+      "id": "flow",
+      "status": "MET",
+      "command": "node --test verify/inspector-stage-record/flow.test.mjs (builds the adopt trial page, reads #glance .flow in Chromium at 1280px and 390px, derives the expected arrows from stage.json inputs' producers and wrote/readBy)",
+      "excerpt": "3/3 pass. Strip in DOM order: start input -[issue]-> brief -[briefs.builder]-> build -[pr, pr.checkout]-> verify -[verdict.pr, verdict]-> ask -> merge. brief, build and verify are adjacent in that order; the brief->build and build->verify arrows equal the input paths the records say came from the earlier run (briefs.builder; pr, pr.checkout), brief wrote briefs read by build's task, build wrote pr read by verify's target, and the arrow after verify carries verdict to ask, a readBy of verify's verdict write. Each box lists every input path with its producing run. Same order at 390px, no sideways scroll."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 76 (head 3786271)",
+      "excerpt": "check 'test' (ci.yml, run 41895473644) completed success at 2026-11-04T19:20:33Z; 'gates' failure only because no verdict existed yet."
+    }
+  ],
+  "notes": "Brief line 'an older journal renders as before', not an Expect id: node --test verify/inspector-stage-record/older.test.mjs builds the four October journals in /mnt/project-files with main's inspector at 277d3f2 and with this head's (both on engine 36da3e4, the head's via its { commit } worktree) and compares summary, glance, map, trail and every step's text in Chromium: identical except the engine checkout's temp path; no Stage view, no flow strip, no page errors. These DOM tests skip in CI, which has no Playwright."
+}
