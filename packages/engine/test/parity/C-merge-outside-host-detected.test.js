@@ -33,9 +33,11 @@ test('C-merge-outside-host-detected: merges the host\'s merge effect didn\'t mak
     assert.equal(host.snapshot.value, 'done');
     // it-2: bound to #2 and waiting on its card when #2 is merged on GitHub by hand.
     const two = open(root, { item: 'it-2' });
-    const pr2 = { pr: { branch: 'build/y', headSha: B, url: 'https://github.com/o/r/pull/2' } };
-    await offer(two, [{ ...start(), event: { type: 'xstate.init', input: { issue: { url: 'https://github.com/o/r/issues/8', expect: ['x'] } } } }],
-      world({ actors: agents({ brief: BRIEFS, build: pr2, verify: verdict('PASS', B) }).byActor }));
+    const pr2 = { pr: { url: 'https://github.com/o/r/pull/2', at: B, key: 'o/r#2', green: true } };
+    const issue2 = { url: 'https://github.com/o/r/issues/8', expect: ['x'] };
+    const pass2 = { ...verdict('PASS', B, issue2), pr: { url: pr2.pr.url, at: B } };
+    await offer(two, [{ ...start(), event: { type: 'xstate.init', input: { issue: issue2 } } }],
+      world({ actors: agents({ brief: BRIEFS, build: pr2, verify: pass2 }).byActor }));
     assert.equal(two.snapshot.value, 'awaitingMerge');
 
     const later = new Date(Date.now() + 60000).toISOString();

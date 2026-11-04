@@ -1,0 +1,39 @@
+{
+  "item": "engine-stage-contract",
+  "verified_sha": "b829ff03bcaed90311596525ae3f8512e2fcf67f",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5HFnDWpRSJn2RiWCcy", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "scenarios",
+      "status": "MET",
+      "command": "npm ci; node --test packages/engine/test/tourney/*.test.js; git -C ccp_xstate_scratch archive c62f5ac packages/engine | tar -x -C /tmp/lane; diff each of Q1-Q9, F1, F2, R1, P1-P6, S2-S5, world.js, contract.js against packages/engine/test/tourney/; mutation then git checkout of stages.js",
+      "excerpt": "tests 68, pass 68, fail 0, skipped 0. All 22 test files plus world.js and contract.js are byte-identical to the lane at c62f5ac (diff empty), so no scenario assertion is weaker. workflows/quick-fix.json, research.json and feature.json are byte-identical to the lane; packages/engine/src differs from the lane only in index.js (pinned-blob fallback, hash still checked) and standin.js (grant matches workflow name or pinned id), both named in the PR body. With the mutation: pass 67, fail 1.",
+      "mutation": "packages/engine/src/stages.js line 292 in shapes(): removed `|| !wiring.reach(w.after).has(state)`, so every write on a live state feeds every state (dangling wiring is no longer detected)",
+      "red_test": "packages/engine/test/tourney/S3.test.js: 'S3 (E): a stage input read from a context path nothing writes is refused at load' (not ok 52)"
+    },
+    {
+      "id": "npm-test",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 74 (head b829ff0); npm test locally at b829ff0; read the PR body's test mapping and spot-checked five against the old tests (git diff origin/main...HEAD)",
+      "excerpt": "CI check 'test' (ci.yml) completed success at b829ff0; 'clean-room' success; 'gates' failure only because no verdict existed yet. Local npm test: tests 622, pass 610, fail 1, skipped 11. The one failure is test/setup.test.mjs copy-not-link (needs release tags, absent in this shallow clone; the PR body names it; CI passes it). The 11 skips are all inspector lane-checkout tests ('no lane A/C checkout here') present on main; the diff adds no skip under packages/ or plugins/. Spot-checks, each matching the body: (1) verify/parity-cases/C-builder-cannot-change-own-workflow.gap deleted, replaced by packages/engine/test/parity/C-builder-cannot-change-own-workflow.test.js, which asserts the opposite of the gap: filed id/hash journalled, blob kept, edited file ignored, second FAIL replans with 2 builds; (2) verify/engine-actors 'github-fact ... wrong branch' -> 'ref ... worktree not at the head', 3 ref refusals then accepted; (3) url-shape case now refused by schema 'result.pr.url does not match'; (4) tripwire.test.js runs on fixtures/workflows/timed.json and asserts quick-fix takes no tripwire; (5) plugins/harness/test/actors.test.mjs now asserts '^## Rules', 'You are the brief writer for one issue.', run line context and the frame's return line."
+    },
+    {
+      "id": "trial",
+      "status": "MET",
+      "command": "read tournaments/2026-11-04-stage-contract/trials/adopt/report.md, then journal/items/trial.jsonl (29 rows); git diff --name-only c592c62 b829ff0; sha256sum workflows/quick-fix.json",
+      "excerpt": "Journal: trial#0 briefing -> trial#1 building -> trial#2 checking -> trial#3 verifying (check_suite.completed) -> trial#4 awaitingMerge -> trial#5 merging (hearth tap cmsg_card1) -> trial:5.merge effect start/done -> trial#6 state done. Refusal rows: 1, rule restated (verify); 0 of rule schema. All rows name quick-fix@8dc9451a..., which is sha256 of workflows/quick-fix.json at b829ff0; b829ff0 changes only files under trials/adopt/, so the trial ran this head's engine. Report states 0 schema refusals, FAIL path not exercised (brief writer caught the half-met trap), N3 recurred. PR body links the report."
+    },
+    {
+      "id": "stage-record",
+      "status": "MET",
+      "command": "node --test verify/engine-stage-contract/stage-record.test.mjs (the verifier's own checker verify/engine-stage-contract/stage-record.mjs; does not call the engine renderer)",
+      "excerpt": "Trial journal: 3 model runs (0.brief, 1.build, 3.verify), 0 problems. Scenario runs (all tourney tests run with TMPDIR set to a fresh dir): 223 run folders, all model stages per their pinned workflow JSON, 223 stage.json present, parts joined under ## Rules/Inputs/Task/Output/Return equal brief.md byte for byte, prompt.hash = sha256(brief.md), context.text = context.md, every workflow pointer, meaningAt, wiredAt and producer.at resolves in the pinned workflow and its text matches (rules '- '+rule, '- k: description', Schema line = actor schema with #refs inlined from /meta/schemas, inputs '- k: meaning\\n  = value', frames fixed/filled): 0 problems. Negative control: an edited brief.md, a moved rule pointer and a dangling meaningAt are each reported."
+    },
+    {
+      "id": "coverage",
+      "status": "MET",
+      "command": "node --test verify/engine-stage-contract/coverage.test.mjs (real engine through the tourney world: spawn, bind, accept(), drive)",
+      "excerpt": "quick-fix item with 3 expect lines in verifying. missing line -> refused covers 'result.lines lacks \"clamp throws a RangeError when lo > hi\"'; two lines swapped -> refused covers 'result.lines order: [0] is \"clamp throws a RangeError when lo > hi\", not \"clamp is exported from math.js\"'; one word changed (RangeError -> TypeError) -> refused covers 'result.lines lacks \"clamp throws a RangeError when lo > hi\"'. Each journalled as a covers refusal (3 rows) and the item stayed verifying; the exact set was accepted and the item moved to awaitingMerge with verdict.lines equal to the expect lines."
+    }
+  ]
+}

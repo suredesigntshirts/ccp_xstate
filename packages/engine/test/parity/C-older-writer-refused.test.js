@@ -4,7 +4,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { A, ISSUE, checkWake, fresh, gitRepo, hostCli, offer, open, rows } from './world.js';
+import {
+  A, ISSUE, checkWake, fresh, gitRepo, hostCli, offer, open, rows, pushed
+} from './world.js';
 
 const hook = (session, prompt) => JSON.stringify({ hook_event_name: 'UserPromptSubmit', session_id: session, prompt });
 
@@ -21,7 +23,7 @@ test('C-older-writer-refused: a host on an older release is refused writing to t
 
   // In process too: the journal's append refuses the older host's first row.
   const host = open(root, { release: '0.2.0' });
-  await assert.rejects(offer(host, [{ event: { type: 'pr.pushed', headSha: A }, source: { system: 'github', ref: 'p1' } }], {}),
+  await assert.rejects(offer(host, [{ event: pushed(A), source: { system: 'github', ref: 'p1' } }], {}),
     (error) => error.name === 'OlderWriterError' && error.writer === '0.2.0' && error.newest === '0.3.0');
   assert.equal(rows(root).length, before);
 });
@@ -31,7 +33,7 @@ test('C-older-writer-refused: the same or a newer release writes (the control)',
   await hostCli(root, ['start', '--session', 'owner', '--input', JSON.stringify({ issue: ISSUE }), '--repo', gitRepo(), '--worktrees', join(root, 'wt')], { release: '0.3.0' });
   const before = rows(root).length;
   for (const [release, ref] of [['0.3.0', 'p1'], ['0.3.1', 'p2']]) {
-    await offer(open(root, { release }), [{ event: { type: 'pr.pushed', headSha: A }, source: { system: 'github', ref } }], {});
+    await offer(open(root, { release }), [{ event: pushed(A), source: { system: 'github', ref } }], {});
   }
   assert.deepEqual(rows(root).slice(before).map((r) => r.release), ['0.3.0', '0.3.1']);
 });

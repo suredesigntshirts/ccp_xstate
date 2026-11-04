@@ -14,7 +14,7 @@ const fx = (n) => readFileSync(new URL(`../../packages/engine/test/fixtures/wake
 const qf = loadWorkflow('quick-fix');
 const wakeAt = (t) => `<wake reason="scheduled" current-time="${t}">\n</wake>`;
 
-// An item in `building` (its buildTimeout timer is set), owned by session 'owner'.
+// An item in `building`, owned by session 'owner'.
 async function building() {
   const root = mkdtempSync(join(tmpdir(), 'v-forge-'));
   const h = restore({ root, item: 'f-1', spec: qf, session: 'owner', release: '0.1.0' });
@@ -55,13 +55,26 @@ test('a ReadNotifications result is read only for origin github_webhook; other o
   assert.equal(rowCount(root), n);
 });
 
+// Ported to the stage contract (engine-stage-contract): quick-fix sets no timer now (lane A removed buildTimeout), so
+// this case runs on the engine's timed fixture workflow, whose waiting state has an hour's timer, through the same CLI.
+const timed = loadWorkflow('timed', { dir: new URL('../../packages/engine/test/fixtures/workflows/', import.meta.url).pathname });
 test('a future current-time never makes a timer due, from a prompt or from a GitHub notification', async () => {
-  const root = await building();
-  untouched(wake(root, { hook_event_name: 'UserPromptSubmit', prompt: wakeAt(FUTURE) }));
-  const viaGithub = wake(root, { hook_event_name: 'PostToolUse', tool_name: 'ReadNotifications', tool_response: { notifications: [{ origin: 'github_webhook', content: fx('check-run-failed').replace('2026-10-30T17:02:44Z', FUTURE) }] } });
+  const root = mkdtempSync(join(tmpdir(), 'v-forge-'));
+  const h0 = restore({ root, item: 't-1', spec: loadWorkflow('timed', { root, dir: new URL('../../packages/engine/test/fixtures/workflows/', import.meta.url).pathname }), session: 'owner', release: '0.1.0' });
+  await offer(h0, [{ event: { type: 'xstate.init', input: { pr: 'https://github.com/o/r/pull/1' } }, source: { system: 'claude-code', ref: 'owner' } }], {});
+  assert.equal(h0.snapshot.value, 'waiting');
+  assert.equal([...h0.timers.values()].length, 1, 'its timer is set');
+  const wakeT = (hook) => {
+    const out = spawnSync('node', [cli, 'wake', '--item', 't-1', '--workflow', 'timed', '--root', root], { input: JSON.stringify({ session_id: 'owner', ...hook }), encoding: 'utf8' });
+    assert.equal(out.status, 0, out.stderr);
+    return JSON.parse(out.stdout);
+  };
+  const quiet = wakeT({ hook_event_name: 'UserPromptSubmit', prompt: wakeAt(FUTURE) });
+  assert.deepEqual([quiet.results, quiet.state], [[], 'waiting']);
+  const viaGithub = wakeT({ hook_event_name: 'PostToolUse', tool_name: 'ReadNotifications', tool_response: { notifications: [{ origin: 'github_webhook', content: fx('check-run-failed').replace('2026-10-30T17:02:44Z', FUTURE) }] } });
   assert.deepEqual(viaGithub.results.map((r) => r.source.system), ['github']); // the GitHub event itself, no timer
-  assert.equal(viaGithub.state, 'building');
-  const h = restore({ root, item: 'f-1', spec: qf, session: 'owner', release: '0.1.0' });
+  assert.equal(viaGithub.state, 'waiting');
+  const h = restore({ root, item: 't-1', spec: timed, session: 'owner', release: '0.1.0' });
   for (const t of [FUTURE, '9999-12-31T23:59:59Z', '+275760-09-13T00:00:00Z', 'garbage', '']) {
     const inputs = inputsOfWake(h, wakeAt(t));
     assert.equal(inputs.filter((i) => i.source.system === 'timer').length, 0, t);

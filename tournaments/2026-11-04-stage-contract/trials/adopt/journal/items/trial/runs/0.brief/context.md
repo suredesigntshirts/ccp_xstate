@@ -1,0 +1,1 @@
+Run trial:0.brief, worktree /home/user/trial-adopt/world/wt/trial--0.brief of https://github.com/o/r, branch run/trial/0.brief.

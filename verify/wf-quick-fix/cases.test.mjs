@@ -12,47 +12,54 @@ const issue = { url: 'https://github.com/o/r/issues/1', expect: ['x holds'] };
 const done = (id, output) => ({ type: `xstate.done.actor.${id}`, output });
 const step = (s, e) => transition(m, s, e)[0];
 const start = () => initialTransition(m, { issue })[0];
-const toVerifying = (head) => [done('brief', { builder: 'b', verifier: 'v' }), done('build', { pr: { branch: 'build/x', headSha: head, url: 'u' } })].reduce(step, start());
+// Ported to the stage contract (engine-stage-contract): the build's PR is a ref { url, at } as the host stamps it
+// (key; green when CI was green at accept), a verdict restates its PR and issue with one line per expect line, a
+// push is CI green on the PR at a new head, and the build bound is the shift register built/rebuilt.
+const URL_ = 'https://github.com/o/r/pull/1';
+const prOf = (head) => ({ pr: { url: URL_, at: head, key: 'o/r#1', green: true } });
+const verdictOf = (result, at) => ({ result, pr: { url: URL_, at }, issue, lines: issue.expect.map((line) => ({ line, result, evidence: 'e' })) });
+const pushTo = (head) => ({ type: 'github.check_suite.completed', head_sha: head, pr: 'o/r#1' });
+const toVerifying = (head) => [done('brief', { builder: 'b', verifier: 'v' }), done('build', prOf(head))].reduce(step, start());
 const val = (s) => s.value;
 
 test('C-verdict-on-old-head: PASS for A while head is B never reaches merging, verdict is recorded', () => {
   let s = toVerifying(A);
-  s = step(s, { type: 'pr.pushed', headSha: B });
-  assert.equal(val(s), 'verifying'); assert.equal(s.context.pr.headSha, B);
-  s = step(s, done('verify', { result: 'PASS', sha: A, report: 'r' }));
+  s = step(s, pushTo(B));
+  assert.equal(val(s), 'reverifying'); assert.equal(s.context.pr.at, B); // a fresh verify run for B
+  s = step(s, done('verify', verdictOf('PASS', A)));
   assert.notEqual(val(s), 'awaitingMerge'); assert.notEqual(val(s), 'merging'); assert.notEqual(val(s), 'done');
-  assert.equal(s.context.verdict.sha, A); // recorded, and differs from head
-  assert.notEqual(s.context.verdict.sha, s.context.pr.headSha);
+  assert.equal(s.context.verdict.pr.at, A); // recorded, and differs from head
+  assert.notEqual(s.context.verdict.pr.at, s.context.pr.at);
   // and no event path reaches merging from here
   for (const e of [done('ask', { choice: 'approve' }), done('merge', { sha: A })]) assert.notEqual(val(step(s, e)), 'done');
 });
 
 test('C-verdict-on-old-head: control, PASS at the head reaches awaitingMerge', () => {
-  const s = step(toVerifying(A), done('verify', { result: 'PASS', sha: A, report: 'r' }));
+  const s = step(toVerifying(A), done('verify', verdictOf('PASS', A)));
   assert.equal(val(s), 'awaitingMerge');
 });
 
 test('C-push-after-pass: push to B while awaitingMerge returns to verifying for B', () => {
-  let s = step(toVerifying(A), done('verify', { result: 'PASS', sha: A, report: 'r' }));
+  let s = step(toVerifying(A), done('verify', verdictOf('PASS', A)));
   assert.equal(val(s), 'awaitingMerge');
-  s = step(s, { type: 'pr.pushed', headSha: B });
-  assert.equal(val(s), 'verifying'); assert.equal(s.context.pr.headSha, B);
+  s = step(s, pushTo(B));
+  assert.equal(val(s), 'verifying'); assert.equal(s.context.pr.at, B);
   // the old PASS (sha A) cannot now carry to merge
-  const s2 = step(s, done('verify', { result: 'PASS', sha: A, report: 'r' }));
+  const s2 = step(s, done('verify', verdictOf('PASS', A)));
   assert.notEqual(val(s2), 'awaitingMerge');
   // a fresh PASS on B does
-  assert.equal(val(step(s, done('verify', { result: 'PASS', sha: B, report: 'r' }))), 'awaitingMerge');
+  assert.equal(val(step(s, done('verify', verdictOf('PASS', B)))), 'awaitingMerge');
 });
 
 test('C-second-fail-replans: FAIL, rebuild, second FAIL goes to replanning, no third build, waits for why', () => {
-  const fail = (sha) => done('verify', { result: 'FAIL', sha, report: 'r' });
+  const fail = (sha) => done('verify', verdictOf('FAIL', sha));
   let s = toVerifying(A);
   s = step(s, fail(A)); assert.equal(val(s), 'building');
-  s = step(s, done('build', { pr: { branch: 'build/x', headSha: B, url: 'u' } })); assert.equal(val(s), 'verifying');
+  s = step(s, done('build', prOf(B))); assert.equal(val(s), 'verifying');
   s = step(s, fail(B)); assert.equal(val(s), 'replanning');
   const [, actions] = transition(m, toVerifying(A), fail(A));
   assert.ok(actions.some((a) => a.type === 'xstate.spawnChild' && a.params.src === 'build'));
-  const [, a2] = transition(m, step(step(toVerifying(A), fail(A)), done('build', { pr: { branch: 'build/x', headSha: B, url: 'u' } })), fail(B));
+  const [, a2] = transition(m, step(step(toVerifying(A), fail(A)), done('build', prOf(B))), fail(B));
   assert.ok(!a2.some((a) => a.type === 'xstate.spawnChild' && a.params.src === 'build'), 'no third build started');
   // replan without a why: stays in replanning, no build
   const [r1, ra] = transition(m, s, done('ask', { choice: 'replan' }));
@@ -95,7 +102,10 @@ test('fail-closed (verifier): every guard fails for each absent field it reads',
   }
 });
 
-test('fail-closed (verifier): buildsLeft fails when builds is null, a string or NaN', () => {
-  for (const v of [null, '1', NaN, undefined]) assert.deepEqual(failing(spec, ['buildsLeft'], { context: { builds: v } }), ['buildsLeft'], String(v));
-  assert.deepEqual(failing(spec, ['buildsLeft'], { context: { builds: 1 } }), []);
+// Ported: buildsLeft is now { context.rebuilt in [null] } (the shift register; lane A removed inc and below). It holds
+// only while rebuilt is exactly null: an absent field fails closed, and so does any value a second build wrote.
+test('fail-closed (verifier): buildsLeft fails when rebuilt is absent or set, and holds only for null', () => {
+  for (const v of [undefined, true, false, 'null', 0]) assert.deepEqual(failing(spec, ['buildsLeft'], { context: { rebuilt: v } }), ['buildsLeft'], String(v));
+  assert.deepEqual(failing(spec, ['buildsLeft'], { context: {} }), ['buildsLeft']);
+  assert.deepEqual(failing(spec, ['buildsLeft'], { context: { rebuilt: null } }), []);
 });

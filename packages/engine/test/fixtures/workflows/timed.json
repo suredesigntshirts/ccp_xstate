@@ -1,0 +1,31 @@
+{
+  "id": "timed",
+  "description": "Test fixture (engine-stage-contract): the host's timer and tripwire machinery, which the engine keeps though quick-fix no longer uses it (lane A removed buildTimeout and the tripwire from the workflows). An item waits for a PR; an hour later its timer fires, and a tripwire naming its PR sends it to tripped first.",
+  "initial": "waiting",
+  "context": { "pr": null, "failure": null },
+  "states": {
+    "waiting": {
+      "after": {
+        "timeout": { "target": "timedOut", "actions": [{ "type": "set", "params": { "failure": { "value": { "timeout": true } } } }] }
+      },
+      "on": {
+        "tripwire": {
+          "target": "tripped",
+          "guard": "mine",
+          "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.tripwire": "event.url", "failure.rounds": "event.rounds", "failure.limit": "event.limit" } }]
+        }
+      }
+    },
+    "timedOut": { "type": "final" },
+    "tripped": { "type": "final" }
+  },
+  "meta": {
+    "input": { "type": "object", "required": ["pr"], "properties": { "pr": { "type": "string", "minLength": 1 } } },
+    "delays": { "timeout": 3600000 },
+    "guards": { "mine": [{ "path": "event.url", "same": "context.pr" }] },
+    "events": {
+      "tripwire": { "type": "object", "required": ["url", "rounds", "limit"], "properties": { "url": { "type": "string" }, "rounds": { "type": "integer" }, "limit": { "type": "integer" } } }
+    },
+    "actors": {}
+  }
+}

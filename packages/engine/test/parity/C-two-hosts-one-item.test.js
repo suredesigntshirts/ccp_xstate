@@ -6,8 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import {
-  A, B, agents, checkWake, fresh, handlers, hostCli, inputsOfWakeFor, itemFile, offer, open, pending, platform,
-  rows, sessionFile, sessionRows, start, timeWake
+  A, B, agents, checkWake, fresh, handlers, hostCli, inputsOfWakeFor, itemFile, offer, open, pending, platform, rows, sessionFile, sessionRows, start, timeWake, pr, verdict, pushed
 } from './world.js';
 import { cardFile } from '../../src/effects/relay.js';
 
@@ -31,7 +30,7 @@ function counting({ plat = platform(), actors = {}, hearth = true } = {}) {
 async function ownedWithCardOpen() {
   const root = fresh();
   const owner = open(root, { session: 'owner' });
-  const a = agents({ brief: [{ builder: 'b.md', verifier: 'v.md' }], build: [{ pr: { branch: 'build/x', headSha: A, url: 'https://github.com/o/r/pull/1' } }], verify: [{ result: 'PASS', sha: A, report: 'r' }] });
+  const a = agents({ brief: [{ builder: 'b.md', verifier: 'v.md' }], build: [pr(A)], verify: [verdict('PASS', A)] });
   await offer(owner, [start('owner')], handlers({ github: null, hearth: null, actors: a.byActor }));
   assert.equal(owner.snapshot.value, 'awaitingMerge');
   assert.equal(pending(owner).effects.filter((e) => e.actor === 'ask').length, 1, 'the card is open');
@@ -50,7 +49,7 @@ test('C-two-hosts-one-item: another session\'s host, offered a wake or nothing, 
   const results = await offer(other, [
     ...inputsOfWakeFor(other, checkWake({ head: A })),
     ...inputsOfWakeFor(other, timeWake('2999-01-01T00:00:00Z')),
-    { event: { type: 'pr.pushed', headSha: B }, source: { system: 'github', ref: 'p1' } }
+    { event: pushed(B), source: { system: 'github', ref: 'p1' } }
   ], c.handlers);
 
   assert.ok(results.length >= 1);
@@ -67,7 +66,7 @@ test('C-two-hosts-one-item: the owner\'s host still runs its open card once, aft
   const { root, a } = await ownedWithCardOpen();
   const shared = platform();
   const other = open(root, { session: 'other' });
-  await offer(other, [{ event: { type: 'pr.pushed', headSha: B }, source: { system: 'github', ref: 'p1' } }], counting({ plat: shared, actors: a.byActor }).handlers);
+  await offer(other, [{ event: pushed(B), source: { system: 'github', ref: 'p1' } }], counting({ plat: shared, actors: a.byActor }).handlers);
   assert.equal(shared.cards.length, 0);
 
   const back = open(root, { session: 'owner' });
@@ -98,7 +97,7 @@ test('C-two-hosts-one-item: bin/host.js wake from another session posts nothing 
   const root = fresh();
   // The owner's session files the item and takes it to its card, with the agents as stubs.
   const owner = open(root, { session: 'owner-session' });
-  const a = agents({ brief: [{ builder: 'b.md', verifier: 'v.md' }], build: [{ pr: { branch: 'build/x', headSha: A, url: 'https://github.com/o/r/pull/1' } }], verify: [{ result: 'PASS', sha: A, report: 'r' }] });
+  const a = agents({ brief: [{ builder: 'b.md', verifier: 'v.md' }], build: [pr(A)], verify: [verdict('PASS', A)] });
   await offer(owner, [start('owner-session')], handlers({ github: null, hearth: null, actors: a.byActor }));
   assert.equal(owner.snapshot.value, 'awaitingMerge');
   const ask = pending(owner).runs.find((r) => r.actor === 'ask');

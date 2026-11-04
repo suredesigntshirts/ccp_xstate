@@ -1,10 +1,14 @@
 // C-push-after-pass (plan/cases/work-item.md): an item waiting to merge after a PASS on head A returns to verifying
-// for B when GitHub reports a push making the head B. Driven through the host, with GitHub a local server.
+// for B when GitHub reports a push making the head B. Driven through the host, with GitHub a local server. Ported to
+// the stage contract: the push is CI green on the PR at B (pr.pushed is gone), the head is pr.at, and the verify run
+// gets the PR as its target.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { A, B, offer, inputsOfWakeFor, openRun, cardOf, tapWake, toAwaitingMerge, fakeGitHub, verdict, transitions } from './world.js';
+import {
+  A, B, offer, inputsOfWakeFor, openRun, cardOf, tapWake, toAwaitingMerge, fakeGitHub, verdict, transitions, pushed
+} from './world.js';
 
-const pushed = (head) => ({ event: { type: 'pr.pushed', headSha: head }, source: { system: 'github', ref: `push ${head}` } });
+const push = (head) => ({ event: pushed(head), source: { system: 'github', ref: `push ${head}` } });
 
 test('C-push-after-pass: a push to B while waiting to merge returns the item to verifying for B, and the merge is at B', async () => {
   const gh = await fakeGitHub({ 1: { head: A } });
@@ -14,12 +18,12 @@ test('C-push-after-pass: a push to B while waiting to merge returns the item to 
     const oldCard = cardOf(host, openRun(host, 'ask'));
 
     gh.push(1, B);
-    const [moved] = await offer(host, [pushed(B)], effects);
+    const [moved] = await offer(host, [push(B)], effects);
     assert.equal(moved.outcome, 'applied');
     assert.equal(host.snapshot.value, 'verifying');
-    assert.equal(host.snapshot.context.pr.headSha, B);
+    assert.equal(host.snapshot.context.pr.at, B);
     const verify = agents.started.filter((e) => e.actor === 'verify').at(-1);
-    assert.equal(verify.input.pr.headSha, B, 'the new verify run is for B');
+    assert.equal(verify.input.target.at, B, 'the new verify run is for B');
 
     // The approval on the card asked about A offers nothing: that ask is no longer open.
     assert.deepEqual(inputsOfWakeFor(host, tapWake(oldCard)), []);
@@ -34,7 +38,7 @@ test('C-push-after-pass: a push to B while waiting to merge returns the item to 
     await offer(host, inputsOfWakeFor(host, tapWake(newCard)), effects);
     assert.equal(host.snapshot.value, 'done');
     assert.deepEqual(gh.merges, [{ number: 1, sha: B }]);
-    assert.ok(transitions(root).some((r) => r.payload.event.type === 'pr.pushed' && r.payload.outcome === 'applied'));
+    assert.ok(transitions(root).some((r) => r.payload.event.type === 'github.check_suite.completed' && r.payload.event.head_sha === B && r.payload.outcome === 'applied'));
   } finally {
     await gh.close();
   }

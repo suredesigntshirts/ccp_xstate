@@ -42,9 +42,13 @@ for (const [name, conditions] of Object.entries(workflow.meta.guards)) {
   });
 }
 
+// Ported to the stage contract: quick-fix bounds its builds with the built/rebuilt shift register, so no repo workflow
+// uses below now; the engine still reads it, so it is held to failing closed on a spec of its own.
 test('fail-closed: a below condition fails on null or a non-number, not only on absent', () => {
+  const spec = { meta: { guards: { buildsLeft: [{ path: 'context.builds', below: 2 }] } } };
   for (const builds of [null, '0', undefined]) {
-    assert.deepEqual(failing(workflow, ['buildsLeft'], { context: { builds } }), ['buildsLeft'], `builds ${builds}`);
+    assert.deepEqual(failing(spec, ['buildsLeft'], { context: { builds } }), ['buildsLeft'], `builds ${builds}`);
   }
-  assert.deepEqual(failing(workflow, ['buildsLeft'], { context: { builds: 1 } }), []);
+  assert.deepEqual(failing(spec, ['buildsLeft'], { context: { builds: 1 } }), []);
+  assert.deepEqual(failing(spec, ['buildsLeft'], { context: { builds: 2 } }), ['buildsLeft']);
 });

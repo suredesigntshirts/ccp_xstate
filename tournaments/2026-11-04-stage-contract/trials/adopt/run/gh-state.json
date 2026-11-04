@@ -1,0 +1,41 @@
+{
+  "prs": {
+    "1": {
+      "head": "763afc8485f96b09542e34b362ab039b168e6971",
+      "base": "main",
+      "branch": "run/trial/1.build",
+      "files": [
+        "README.md",
+        "math.js",
+        "test/math.test.js"
+      ],
+      "merged": true,
+      "mergeSha": "0101010101010101010101010101010101010101",
+      "title": "Add clamp(x, lo, hi) to mathlib",
+      "body": "Closes https://github.com/o/r/issues/23\n\nHow each expect line is met:\n- **math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi**: new `clamp` in math.js returns lo when x < lo, hi when x > hi, else x (bounds inclusive); added to `module.exports` alongside add, subtract, multiply.\n- **clamp throws a RangeError when lo is greater than hi**: clamp checks `lo > hi` first and throws `RangeError` naming both values.\n- **README.md documents every function math.js exports**: added `### subtract(a, b)` (previously undocumented) and `### clamp(x, lo, hi)` entries; exports are add, subtract, multiply, clamp and each has a heading.\n- **npm test passes**: tests added in test/math.test.js for below/above/inside range, each bound, lo == hi, and the RangeError; `npm test` passes 5/5.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nhttps://claude.ai/code/session_01KfkB5F7WKxovGpwv21dn8L",
+      "draft": false
+    }
+  },
+  "suites": {
+    "763afc8485f96b09542e34b362ab039b168e6971": [
+      {
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "merges": [
+    {
+      "number": 1,
+      "sha": "763afc8485f96b09542e34b362ab039b168e6971",
+      "base": "main"
+    }
+  ],
+  "pushes": [
+    {
+      "at": "2026-11-04T18:23:08.842Z",
+      "branch": "run/trial/1.build",
+      "sha": "763afc8485f96b09542e34b362ab039b168e6971"
+    }
+  ]
+}

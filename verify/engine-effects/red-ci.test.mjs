@@ -23,7 +23,9 @@ const wakeFor = (facts) => fixture.replace(/\{"check":.*\}/, JSON.stringify(fact
 const facts = (r, pr = 'suredesigntshirts/ccp_xstate_scratch#18') =>
   ({ check: r.name, check_run_id: r.id, conclusion: r.conclusion, details_url: r.details_url, head_sha: r.head_sha, pr });
 
-const PR = { branch: 'verify/engine-effects-red-ci', headSha: HEAD, url: 'https://github.com/suredesigntshirts/ccp_xstate_scratch/pull/18' };
+// Ported to the stage contract (engine-stage-contract): the PR is a ref { url, at } as the host stamps it at accept
+// (key, and green: CI was green at accept, so the item verifies). The build bound is built/rebuilt.
+const PR = { url: 'https://github.com/suredesigntshirts/ccp_xstate_scratch/pull/18', at: HEAD, key: 'suredesigntshirts/ccp_xstate_scratch#18', green: true };
 async function itemInVerifying() {
   const root = mkdtempSync(join(tmpdir(), 'ee-redci-'));
   const builds = [];
@@ -47,7 +49,7 @@ test('the saved REST facts are a real red check run on the PR head', () => {
 test('red-ci: a red check on the PR head sends a verifying item back to building, naming the check, and the new build gets it', async () => {
   const { host, handlers, builds, root } = await itemInVerifying();
   assert.equal(host.snapshot.value, 'verifying');
-  assert.equal(host.snapshot.context.pr.headSha, HEAD);
+  assert.equal(host.snapshot.context.pr.at, HEAD);
   assert.equal(builds.length, 1);
 
   const inputs = inputsOfWake(host, wakeFor(facts(run)));
@@ -61,7 +63,7 @@ test('red-ci: a red check on the PR head sends a verifying item back to building
   assert.equal(host.snapshot.context.failure.conclusion, 'failure');
   assert.equal(host.snapshot.context.failure.sha, HEAD);
   assert.equal(host.snapshot.context.failure.url, run.details_url);
-  assert.equal(host.snapshot.context.builds, 1);
+  assert.deepEqual([host.snapshot.context.built, host.snapshot.context.rebuilt], [true, null], 'one build used, one left');
   // The second build started, with the failing check in its input.
   assert.equal(builds.length, 2);
   assert.equal(builds[1].failure.check, 'test');

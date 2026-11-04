@@ -1,6 +1,8 @@
 // C-red-ci-back-to-building (plan/cases/work-item.md): an item whose PR's CI goes red can't reach merging, and returns
 // to building with the failing check as input. The red result is the real check_run.completed wake the platform
-// delivered (fixtures/wakes/check-run-failed.txt), read by the host the way a hook hands it over.
+// delivered (fixtures/wakes/check-run-failed.txt), read by the host the way a hook hands it over. Ported to the stage
+// contract: a red check counts only on the item's own PR (event.pr is the stamped pr.key) at its head, and the build
+// bound is built/rebuilt.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync } from 'node:fs';
@@ -14,7 +16,9 @@ const RED = JSON.parse(wake.match(/\{"check"[^\n]*\}/)[0]); // check "test", con
 const red = (over = {}) => ({ type: 'github.check_run.completed', ...RED, ...over });
 const HEAD = RED.head_sha;
 const OTHER = 'c'.repeat(40);
-const verifying = [done('brief', BRIEFS), done('build', pr(HEAD))];
+// The item's PR is the one the real wake names, so its stamped key is the wake's pr.
+const prOf = (at) => ({ pr: { ...pr(at).pr, key: RED.pr } });
+const verifying = [done('brief', BRIEFS), done('build', prOf(HEAD))];
 
 test('C-red-ci: a red check on the PR head while verifying sends the item back to building, the check named', () => {
   const after = run([...verifying, red()]);
@@ -36,11 +40,12 @@ test('C-red-ci: a red check after a PASS, while waiting to merge, can no longer 
 test('C-red-ci: a green check, or a red one on another head, changes nothing', () => {
   assert.equal(run([...verifying, red({ conclusion: 'success' })]).value, 'verifying');
   assert.equal(run([...verifying, red({ head_sha: OTHER })]).value, 'verifying');
+  assert.equal(run([...verifying, red({ pr: 'o/r#2' })]).value, 'verifying', 'nor a red one on another PR');
 });
 
 test('C-red-ci: with no build left, a red check sends the item to replanning instead', () => {
-  const second = [...verifying, done('verify', verdict('FAIL', HEAD)), done('build', pr(HEAD))];
-  assert.equal(run(second).context.builds, 2);
+  const second = [...verifying, done('verify', verdict('FAIL', HEAD)), done('build', prOf(HEAD))];
+  assert.deepEqual([run(second).context.built, run(second).context.rebuilt], [true, true]);
   const after = run([...second, red()]);
   assert.equal(after.value, 'replanning');
   assert.equal(after.context.failure.check, 'test');
@@ -55,7 +60,7 @@ test('C-red-ci: through the host, the real wake steps the item back and the new 
       start: async (effect) => {
         started.push(effect);
         if (effect.actor === 'brief') return { ref: 'b', output: BRIEFS };
-        if (effect.actor === 'build' && started.filter((e) => e.actor === 'build').length === 1) return { ref: 'p', output: pr(HEAD) };
+        if (effect.actor === 'build' && started.filter((e) => e.actor === 'build').length === 1) return { ref: 'p', output: prOf(HEAD) };
         return { ref: effect.id };
       }
     }

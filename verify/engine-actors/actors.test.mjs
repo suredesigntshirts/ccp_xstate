@@ -30,14 +30,21 @@ function repo() {
   execFileSync('git', ['-C', dir, '-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-qm', 'one']);
   return dir;
 }
-async function fakeGitHub() {
+// GitHub with o/r#1 at gh.head; ported: it also lists the PR's files and the head's check suites (green when gh.green).
+async function fakeGitHub(head = HEAD) {
+  const gh = { head, green: false };
   const server = createServer((req, res) => {
-    const ok = req.url === '/repos/o/r/pulls/1';
-    res.writeHead(ok ? 200 : 404, { 'content-type': 'application/json' });
-    res.end(JSON.stringify(ok ? { number: 1, head: { sha: HEAD, ref: 'build/x' } } : { message: 'Not Found' }));
+    const path = req.url.split('?')[0];
+    const reply = (status, json) => { res.writeHead(status, { 'content-type': 'application/json' }); res.end(JSON.stringify(json)); };
+    if (path === '/repos/o/r/pulls/1') return reply(200, { number: 1, head: { sha: gh.head, ref: 'build/x' } });
+    if (path === '/repos/o/r/pulls/1/files') return reply(200, []);
+    if (/^\/repos\/o\/r\/commits\/[0-9a-f]+\/check-suites$/.test(path)) return reply(200, { check_suites: gh.green ? [{ status: 'completed', conclusion: 'success' }] : [] });
+    return reply(404, { message: 'Not Found' });
   });
   await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
-  return { client: github({ api: `http://127.0.0.1:${server.address().port}`, env: {} }), close: () => new Promise((ok) => { server.closeAllConnections(); server.close(ok); }) };
+  gh.client = github({ api: `http://127.0.0.1:${server.address().port}`, env: {} });
+  gh.close = () => new Promise((ok) => { server.closeAllConnections(); server.close(ok); });
+  return gh;
 }
 const rowsOf = (root) => readFile(join(root, 'items', 'v-1.jsonl')).rows;
 const start = (root, run, agent) => { spawn({ root, prompt: `ccp-run ${run}`, toolUseId: `t_${agent}` }); bind({ root, agentId: agent, toolUseId: `t_${agent}` }); };
@@ -54,7 +61,7 @@ async function building() {
   start(root, 'v-1:1.build', 'bd');
   return root;
 }
-const claim = (headSha, url = PR, branch = 'build/x') => ({ pr: { branch, headSha, url } });
+const claim = (at, url = PR) => ({ pr: { url, at } });
 const stateOf = (root) => restore({ root, item: 'v-1', spec, session: 's', release: '0.2.0' }).snapshot.value;
 
 test('wrong-caller: any other agent, the main session, or a run with no agent is refused and journalled; the rule comes before schema', async () => {
@@ -73,48 +80,62 @@ test('wrong-caller: any other agent, the main session, or a run with no agent is
   assert.equal(stateOf(root), 'building');
 });
 
+// Ported to the stage contract (engine-stage-contract): a build result is { pr: { url, at } } (or a blocked), the PR
+// url must be a GitHub PR url (schema #prRef), and the PR is checked at accept as rule `ref` (was github-fact): GitHub
+// must show it at `at`, and the builder's worktree must be at `at`. The PR ref names no branch, so the branch check is
+// replaced by the worktree check.
+const commitIn = (dir) => {
+  execFileSync('git', ['-C', dir, '-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '--allow-empty', '-m', 'build']);
+  return execFileSync('git', ['-C', dir, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+};
+
 test('schema: a build result missing pr.url, or with a bad sha, or with no pr, is refused naming the field', async () => {
   const root = await building();
-  const a = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: { pr: { branch: 'b', headSha: HEAD } } });
+  const a = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: { pr: { at: HEAD } } });
   assert.equal(a.refused.rule, 'schema');
   assert.match(a.refused.reason, /result\.pr\.url is missing/);
   const b = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim('abc') });
   assert.equal(b.refused.rule, 'schema');
-  assert.match(b.refused.reason, /headSha/);
+  assert.match(b.refused.reason, /result\.pr\.at/);
   const c = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: {} });
-  assert.match(c.refused.reason, /result\.pr is missing/);
+  assert.equal(c.refused.rule, 'schema');
+  assert.match(c.refused.reason, /exactly one of: pr; or blocked/, 'neither pr nor blocked');
   assert.equal(stateOf(root), 'building');
 });
 
-test('github-fact: made-up PR, real PR at the wrong head, wrong branch: refused naming the fact; item stays in building; right head accepted', async () => {
+test('ref: made-up PR, real PR at the wrong head, worktree not at the head: refused naming the fact; item stays in building; right head accepted', async () => {
   const root = await building();
-  const gh = await fakeGitHub();
+  const head = commitIn(loadRun(root, 'v-1:1.build').worktree);
+  const gh = await fakeGitHub(head);
   try {
-    const made = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(HEAD, 'https://github.com/o/r/pull/9999'), github: gh.client });
-    assert.equal(made.refused.rule, 'github-fact');
+    const made = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(head, 'https://github.com/o/r/pull/9999'), github: gh.client });
+    assert.equal(made.refused.rule, 'ref');
     assert.match(made.refused.reason, /pull\/9999: GitHub shows no such PR/);
     const moved = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(OTHER), github: gh.client });
-    assert.equal(moved.refused.reason, `result.pr: GitHub shows ${PR} at head ${HEAD}, not the claimed ${OTHER}`);
-    const br = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(HEAD, PR, 'nope'), github: gh.client });
-    assert.match(br.refused.reason, /on branch build\/x, not the claimed nope/);
+    assert.equal(moved.refused.reason, `result.pr: GitHub shows ${PR} at ${head}, not ${OTHER}`);
+    gh.head = HEAD;
+    const wt = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(HEAD), github: gh.client });
+    assert.equal(wt.refused.reason, `result.pr: your worktree is at ${head}, not ${HEAD}`);
+    gh.head = head;
     assert.equal(stateOf(root), 'building');
     assert.deepEqual(resultsOf(restore({ root, item: 'v-1', spec, session: 's', release: '0.2.0' })), []);
-    assert.equal(rowsOf(root).filter((r) => r.kind === 'refusal' && r.payload.rule === 'github-fact').length, 3);
-    assert.ok((await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(HEAD), github: gh.client })).accepted);
+    assert.equal(rowsOf(root).filter((r) => r.kind === 'refusal' && r.payload.rule === 'ref').length, 3);
+    gh.green = true;
+    assert.ok((await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(head), github: gh.client })).accepted);
     assert.equal((await deliver({ root, run: 'v-1:1.build', github: gh.client })).state, 'verifying');
   } finally {
     await gh.close();
   }
 });
 
-test('a build result whose url is not shaped /pull/N is refused as github-fact, and the item stays in building', async () => {
+test('a build result whose url is not shaped /pull/N is refused by the schema, and the item stays in building', async () => {
   const root = await building();
   const gh = await fakeGitHub();
   try {
     for (const url of ['https://example.com/not-a-pr', 'https://github.com/o/r/issues/5']) {
-      const got = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(HEAD, url, 'anything'), github: gh.client });
-      assert.equal(got.refused?.rule, 'github-fact', JSON.stringify(got));
-      assert.match(got.refused.reason, /is not a GitHub PR URL/);
+      const got = await accept({ root, caller: 'bd', run: 'v-1:1.build', result: claim(HEAD, url), github: gh.client });
+      assert.equal(got.refused?.rule, 'schema', JSON.stringify(got));
+      assert.match(got.refused.reason, /result\.pr\.url does not match/);
     }
     assert.equal(stateOf(root), 'building');
   } finally {

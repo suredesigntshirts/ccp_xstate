@@ -1,5 +1,6 @@
 // C-verdict-on-old-head (plan/cases/work-item.md): a PASS for commit A, when the PR's head is commit B, can't reach
-// merging, and the verdict is recorded as stale. Driven through the host; GitHub is a local server.
+// merging, and the verdict is recorded as stale. Driven through the host; GitHub is a local server. Ported to the stage
+// contract: heads are pr.at and verdict.pr.at.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { A, B, BRIEFS, agents, fakeGitHub, fresh, offer, open, pr, returned, start, transitions, verdict, world, platform } from './world.js';
@@ -18,7 +19,7 @@ test('C-verdict-on-old-head: a PASS for A on a PR whose head is B goes to replan
     assert.equal(result.outcome, 'applied');
     assert.equal(host.snapshot.value, 'replanning');
     const { verdict: v, pr: p } = host.snapshot.context;
-    assert.deepEqual([v.result, v.sha, p.headSha], ['PASS', A, B], 'the stale verdict is recorded with the head it does not match');
+    assert.deepEqual([v.result, v.pr.at, p.at], ['PASS', A, B], 'the stale verdict is recorded with the head it does not match');
     const states = transitions(root).map((r) => r.state);
     assert.ok(!states.includes('"awaitingMerge"') && !states.includes('"merging"'), states.join(' > '));
     assert.equal(gh.merges.length, 0);

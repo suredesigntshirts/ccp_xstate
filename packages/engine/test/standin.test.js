@@ -12,6 +12,7 @@ import { handlers, relay, recordCard } from '../src/effects/index.js';
 import { standinInput, repoOf } from '../src/standin.js';
 import { readFile } from '../../journal/src/index.js';
 import { workflow, ISSUE, BRIEFS, A, pr, verdict } from './flow.js';
+import { loadWorkflow } from '../src/index.js';
 
 const cli = new URL('../bin/host.js', import.meta.url).pathname;
 const CARD = 'cmsg_01CardPostedByTheThread';
@@ -26,7 +27,8 @@ async function toAwaitingMerge(grants = [GRANT]) {
   const harness = mkdtempSync(join(tmpdir(), 'engine-standin-'));
   const root = join(harness, 'journal');
   writeFileSync(join(harness, 'grants.json'), JSON.stringify({ grants }));
-  const host = restore({ root, item: 'it-1', spec: workflow, session: 'owner', release: '0.2.0' });
+  // Loaded with the root, so the workflow's pinned bytes are there for bin/host.js (workflowOf) to load the item on.
+  const host = restore({ root, item: 'it-1', spec: loadWorkflow('quick-fix', { root }), session: 'owner', release: '0.2.0' });
   const outputs = { brief: BRIEFS, build: pr(A), verify: verdict('PASS', A) };
   const actors = Object.fromEntries(Object.entries(outputs).map(([name, output]) => [name, { start: async (e) => ({ ref: e.id, output }) }]));
   await offer(host, [{ event: { type: 'xstate.init', input: { issue: ISSUE } }, source: { system: 'claude-code', ref: 'owner' } }],
@@ -82,12 +84,15 @@ test('standinInput refuses before the card is up, an illegal choice, a missing s
   assert.throws(() => standinInput(host, { effect: ask.id, choice: 'approve', by: ' ', grants: [GRANT], at }), /answering session/);
   for (const [grant, why] of [
     [{ ...GRANT, workflow: 'feature' }, /workflow feature/],
+    // The item runs on its pinned quick-fix@<sha256>: a grant naming another pinned version does not cover it.
+    [{ ...GRANT, workflow: `quick-fix@${'0'.repeat(64)}` }, /workflow quick-fix@0{64}, not quick-fix/],
     [{ ...GRANT, ask: 'review' }, /ask review/],
     [{ ...GRANT, choices: ['reject'] }, /does not grant "approve"/],
     [{ ...GRANT, repos: ['o/other'] }, /repo o\/r not granted/],
     [{ ...GRANT, until: '2026-10-31T03:59:59Z' }, /expired/]
   ]) assert.throws(() => standinInput(host, { effect: ask.id, choice: 'approve', by: 's', grants: [grant], at }), why);
   assert.throws(() => standinInput(host, { effect: ask.id, choice: 'approve', by: 's', grants: [], at }), /no grants/);
+  assert.equal(standinInput(host, { effect: ask.id, choice: 'approve', by: 's', grants: [{ ...GRANT, workflow: host.spec.id }], at }).event.output.grant, 'g-away', 'a grant naming the pinned id covers that version');
   const input = standinInput(host, { effect: ask.id, choice: 'approve', by: 'standin-session', grants: [{ ...GRANT, repos: [] }, GRANT], at });
   assert.deepEqual(input.source, { system: 'standin', ref: `g-away ${CARD}` });
   assert.deepEqual(input.event.output, { choice: 'approve', by: 'standin-session', grant: 'g-away' });

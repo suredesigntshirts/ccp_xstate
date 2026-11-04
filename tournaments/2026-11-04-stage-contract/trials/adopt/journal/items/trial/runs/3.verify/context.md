@@ -1,0 +1,1 @@
+Run trial:3.verify, worktree /home/user/trial-adopt/world/wt/trial--3.verify of https://github.com/o/r, branch run/trial/3.verify.

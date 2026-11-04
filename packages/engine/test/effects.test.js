@@ -164,7 +164,10 @@ test('card: puts up a card keyed by the effect id and records its id and choices
   const { run } = handlers({ hearth });
   const effect = { id: 'it:3.ask', actor: 'ask', input: { question: 'Merge?', choices: ['approve', 'reject'] } };
   assert.deepEqual(await run.start(effect), { ref: 'cmsg_card1', choices: ['approve', 'reject'] });
-  assert.deepEqual(made, [{ key: 'it:3.ask', question: 'Merge?', choices: ['approve', 'reject'] }]);
+  assert.deepEqual(made, [{ key: 'it:3.ask', question: 'Merge?', choices: ['approve', 'reject'], inputs: {} }]);
+  // The ask's other inputs go on the card for the person (trial 2, N1: the builder's notes); a null one is left out.
+  await run.start({ ...effect, id: 'it:4.ask', input: { ...effect.input, pr: { url: 'u', at: 'a' }, notes: 'body is a placeholder', verdict: null } });
+  assert.deepEqual(made[1].inputs, { pr: { url: 'u', at: 'a' }, notes: 'body is a placeholder' });
   await assert.rejects(run.start({ ...effect, input: { question: 'Merge?', choices: ['one'] } }), /two choices/);
   assert.equal(await run.find(effect), undefined, 'no find on the client: the host journals unknown, never a second card');
 });
@@ -203,12 +206,15 @@ test('timer: asks the clock for a wake at the due time keyed by the effect id; c
   await assert.rejects(handlers().timer.start({ ...effect, due: null }), /no due time/);
 });
 
-test('timer: a building item journals its buildTimeout timer effect done, once', async () => {
+// Ported to the stage contract: quick-fix sets no timer now (lane A removed buildTimeout), so the timer effect is
+// journalled on the fixture workflow test/fixtures/workflows/timed.json, whose waiting state has an hour's timer.
+test('timer: a waiting item journals its timeout timer effect done, once', async () => {
+  const { loadWorkflow } = await import('../src/index.js');
+  const timed = loadWorkflow('timed', { dir: new URL('./fixtures/workflows/', import.meta.url).pathname });
   const root = fresh();
-  const host = restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' });
-  const brief = { start: async (e) => ({ ref: e.id, output: BRIEFS }) };
-  await offer(host, [{ event: { type: 'xstate.init', input: { issue: ISSUE } }, source: { system: 'claude-code', ref: 's' } }], handlers({ actors: { brief } }));
-  await runEffects(host, handlers({ actors: { brief } }));
+  const host = restore({ root, item: 'it-1', spec: timed, session: 's', release: '0.2.0' });
+  await offer(host, [{ event: { type: 'xstate.init', input: { pr: 'https://github.com/o/r/pull/1' } }, source: { system: 'claude-code', ref: 's' } }], handlers({}));
+  await runEffects(host, handlers({}));
   const timers = effectRows(root).filter((r) => r.payload.type === 'timer');
   assert.deepEqual(timers.map((r) => r.payload.phase), ['start', 'done']);
 });

@@ -2,7 +2,8 @@
 // and lane checkouts skip when those folders are not on this machine.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,6 +14,21 @@ const REPO = fileURLToPath(new URL('../../../', import.meta.url));
 const LANE_A = '/home/user/lanes/A-minimalist';
 const LANE_C = '/home/user/lanes/C-provenance';
 const FRI = '/mnt/project-files/first-real-issue/harness/journal';
+// The first real issue ran on the engine before the stage contract (engine-stage-contract), which today's engine refuses
+// to load by design. Its export is replayed on that engine: main at 36da3e4, the last commit before the contract landed,
+// checked out as a worktree of this repo when the commit is here (it is not in a shallow clone).
+const PRE_CONTRACT = '36da3e4421c88e6d1762f1f671494a71f0b70940';
+const preContractEngine = () => {
+  try {
+    execFileSync('git', ['-C', REPO, 'cat-file', '-e', `${PRE_CONTRACT}^{commit}`], { stdio: 'ignore' });
+  } catch {
+    return null;
+  }
+  const dir = join(mkdtempSync(join(tmpdir(), 'pre-contract-')), 'engine');
+  execFileSync('git', ['-C', REPO, 'worktree', 'add', '-q', '--detach', dir, PRE_CONTRACT], { stdio: 'ignore' });
+  symlinkSync(join(REPO, 'node_modules'), join(dir, 'node_modules'));
+  return dir;
+};
 
 // Every state of a workflow JSON, as dotted paths, and every transition it declares.
 const statesOf = (spec, path = []) => Object.entries(spec.states ?? {}).flatMap(([k, s]) => [[...path, k].join('.'), ...statesOf(s, [...path, k])]);
@@ -143,8 +159,11 @@ test('sourceOf extracts a const arrow and a function, with their comments', () =
   assert.equal(sourceOf(src, 'missing'), null);
 });
 
-test('fri-jsonl-lint-2: the brief prompt is the engine template; build and verify prompts were written by the brief agent', { skip: !existsSync(FRI) && 'no first-real-issue journal here' }, async () => {
-  const b = await exportRun({ engine: REPO, journal: FRI, item: 'fri-jsonl-lint-2', kind: 'real' });
+test('fri-jsonl-lint-2: the brief prompt is the engine template; build and verify prompts were written by the brief agent', { skip: !existsSync(FRI) && 'no first-real-issue journal here' }, async (t) => {
+  const engine = preContractEngine();
+  if (!engine) return t.skip('the pre-contract commit is not in this clone');
+  t.after(() => { execFileSync('git', ['-C', REPO, 'worktree', 'remove', '--force', engine], { stdio: 'ignore' }); rmSync(join(engine, '..'), { recursive: true, force: true }); });
+  const b = await exportRun({ engine, journal: FRI, item: 'fri-jsonl-lint-2', kind: 'real' });
   assert.equal(b.replay.ok, true);
   assert.deepEqual(b.replay.mismatches, [], 'replay reaches every hash the journal recorded');
   const models = b.steps.flatMap((s) => s.actors.filter((a) => a.model).map((a) => ({ s, a })));

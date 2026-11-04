@@ -14,6 +14,8 @@ import { handlers, github } from '../src/effects/index.js';
 import { actors, accept, bind, bindLate, boundRun, confine, deliver, isReturnTool, loadRun, resultsOf, runDir, spawn, startedRun, stopped, handback, waiting } from '../src/actors.js';
 import { readFile } from '../../journal/src/index.js';
 import { workflow, ISSUE, BRIEFS } from './flow.js';
+import { loadWorkflow } from '../src/index.js';
+import { fakeGitHub as fakeGitHubWithFiles } from './tourney/world.js';
 
 const sha256 = (t) => createHash('sha256').update(t).digest('hex');
 const HEAD = 'a'.repeat(40);
@@ -45,7 +47,8 @@ async function started() {
   const root = mkdtempSync(join(tmpdir(), 'actors-'));
   const clone = repo();
   const worktrees = join(root, 'worktrees');
-  const host = restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' });
+  // Loaded with the root, so the pinned bytes are stored as a blob there for the hooks to load the run's workflow from.
+  const host = restore({ root, item: 'it-1', spec: loadWorkflow('quick-fix', { root }), session: 's', release: '0.2.0' });
   await offer(host, [{ event: { type: 'xstate.init', input: { issue: ISSUE } }, source: { system: 'claude-code', ref: 's' } }],
     handlers({ actors: actors({ host, repo: clone, worktrees }) }));
   return { root, clone, worktrees, host };
@@ -94,7 +97,7 @@ test('SubagentStart binds the agent its Agent call started, journals agent.spawn
   spawn({ root, prompt: `ccp-run ${BRIEF_RUN}`, toolUseId: 't1' });
   assert.equal(bind({ root, agentId: 'other', toolUseId: 'nope' }), null);
   const b = bind({ root, agentId: 'ag1', toolUseId: 't1' });
-  assert.match(b.context, /Your worktree is .*it-1--0\.brief/);
+  assert.match(b.context, /worktree .*it-1--0\.brief/);
   assert.equal(bind({ root, agentId: 'ag2', toolUseId: 't1' }), null, 'a run binds one agent');
   assert.equal(boundRun(root, 'ag1').run, BRIEF_RUN);
   const row = rows(root).find((r) => r.kind === 'agent.spawn');
@@ -121,7 +124,7 @@ test('an agent SubagentStart could not bind is bound from its meta.json at its f
   spawn({ root, prompt: `ccp-run ${BRIEF_RUN}`, toolUseId: 't1', session: 's1' });
   assert.equal(bindLate({ root, agentId: 'plain', metaToolUseId: 'not-a-run' }), null, 'an ordinary subagent is left alone');
   const late = bindLate({ root, agentId: 'ag1', metaToolUseId: 't1' });
-  assert.match(late.bound.context, /ccp-harness run it-1:0\.brief/);
+  assert.match(late.bound.context, /^Run it-1:0\.brief,/);
   assert.equal(rows(root).find((r) => r.kind === 'agent.spawn').payload.via, 'meta');
 });
 
@@ -160,8 +163,9 @@ test('an accepted brief fixes both briefs before any build, moves the item to bu
   assert.equal(d.state, 'building');
   assert.deepEqual(d.results.map((r) => r.outcome), ['applied']);
   const build = loadRun(root, 'it-1:1.build');
-  assert.equal(build.briefHash, sha256(briefs.builder), 'the builder\'s prompt is its brief exactly');
-  assert.equal(readFileSync(join(runDir(root, 'it-1:1.build'), 'brief.md'), 'utf8'), briefs.builder);
+  const prompt = readFileSync(join(runDir(root, 'it-1:1.build'), 'brief.md'), 'utf8');
+  assert.equal(build.briefHash, sha256(prompt), 'the run journals the hash of its whole rendered prompt');
+  assert.equal(prompt.split('\n## Task\n')[1].split('\n\n## Output\n')[0], briefs.builder, 'the builder\'s brief is its Task part exactly');
   const t = rows(root).find((r) => r.kind === 'engine.transition' && r.payload.event.type === 'xstate.done.actor.brief');
   assert.deepEqual(t.source, { system: 'harness', ref: 'return r1' });
   assert.equal((await deliver({ root, run: BRIEF_RUN })).results.length, 0, 'delivered once');
@@ -184,28 +188,41 @@ async function building() {
   startAgent(ctx.root, 'it-1:1.build', 'ag2');
   return ctx;
 }
-const claim = (headSha, url = URL_, branch = 'build/x') => ({ pr: { branch, headSha, url } });
+const claim = (at, url = URL_) => ({ pr: { url, at } });
+const commitIn = (dir) => {
+  execFileSync('git', ['-C', dir, '-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '--allow-empty', '-m', 'build']);
+  return execFileSync('git', ['-C', dir, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+};
 
-test('github-fact: a claimed PR GitHub doesn\'t show, or shows at another head, is refused and the item stays in building', async () => {
+// Ported to the stage contract (engine-stage-contract): the claimed PR is a ref { url, at }, refused as rule `ref`
+// (was github-fact) when GitHub has no such PR, shows it at another head, or the builder's worktree is not at it; a
+// url that is no GitHub PR url fails the schema (prRef). The PR ref carries no branch, so the branch check is gone.
+test('ref: a claimed PR GitHub doesn\'t show, shows at another head, or the worktree is not at, is refused and the item stays in building', async () => {
   const { root } = await building();
-  const gh = await fakeGitHub();
+  const head = commitIn(loadRun(root, 'it-1:1.build').worktree);
+  const gh = await fakeGitHubWithFiles({ 1: { head } });
   try {
-    const missing = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(HEAD, 'https://github.com/o/r/pull/99'), github: gh.client });
-    assert.equal(missing.refused.rule, 'github-fact');
+    const missing = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(head, 'https://github.com/o/r/pull/99'), github: gh.client });
+    assert.equal(missing.refused.rule, 'ref');
     assert.match(missing.refused.reason, /pull\/99: GitHub shows no such PR/);
     const moved = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(OTHER), github: gh.client });
-    assert.equal(moved.refused.reason, `result.pr: GitHub shows ${URL_} at head ${HEAD}, not the claimed ${OTHER}`);
-    const notPr = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(HEAD, 'https://example.com/not-a-pr'), github: gh.client });
-    assert.equal(notPr.refused.reason, 'result.pr.url "https://example.com/not-a-pr" is not a GitHub PR URL', 'no shape of url skips GitHub');
-    const branch = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(HEAD, URL_, 'build/y'), github: gh.client });
-    assert.match(branch.refused.reason, /on branch build\/x, not the claimed build\/y/);
+    assert.equal(moved.refused.reason, `result.pr: GitHub shows ${URL_} at ${head}, not ${OTHER}`);
+    const notPr = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(head, 'https://example.com/not-a-pr'), github: gh.client });
+    assert.equal(notPr.refused.rule, 'schema', 'no shape of url skips GitHub: a url that is no PR url fails the schema');
+    gh.push(1, HEAD);
+    const elsewhere = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(HEAD), github: gh.client });
+    assert.equal(elsewhere.refused.reason, `result.pr: your worktree is at ${head}, not ${HEAD}`);
+    gh.push(1, head);
     const host = restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' });
     assert.equal(host.snapshot.value, 'building');
     assert.deepEqual(resultsOf(host), []);
 
-    assert.ok((await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(HEAD), github: gh.client })).accepted);
+    gh.green(head);
+    assert.ok((await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(head), github: gh.client })).accepted);
     assert.equal((await deliver({ root, run: 'it-1:1.build' })).state, 'verifying');
-    assert.equal(loadRun(root, 'it-1:2.verify').briefHash, sha256(BRIEFS.verifier));
+    const prompt = readFileSync(join(runDir(root, 'it-1:2.verify'), 'brief.md'), 'utf8');
+    assert.equal(loadRun(root, 'it-1:2.verify').briefHash, sha256(prompt));
+    assert.equal(prompt.split('\n## Task\n')[1].split('\n\n## ')[0], BRIEFS.verifier, 'the verifier brief is its Task part exactly');
   } finally {
     await gh.close();
   }
@@ -235,7 +252,7 @@ test('stopped: sent back once, then the run fails with a no-return refusal and t
   const { root } = await started();
   assert.equal(stopped({ root, agentId: 'ag1' }), null, 'no agent bound yet');
   startAgent(root, BRIEF_RUN, 'ag1');
-  assert.match(stopped({ root, agentId: 'ag1' }).block, /Call the harness return tool now .*it-1:0\.brief/);
+  assert.match(stopped({ root, agentId: 'ag1' }).block, /Return through the harness return tool .*"run": "it-1:0\.brief"/);
   assert.deepEqual(stopped({ root, agentId: 'ag1', session: 's' }), { failed: BRIEF_RUN }, 'sent back once only, even without stop_hook_active');
   assert.equal(stopped({ root, agentId: 'ag1', again: true }), null, 'failed once');
   const refusal = rows(root).filter((r) => r.kind === 'refusal').at(-1);
@@ -262,7 +279,7 @@ test('handback: the first SubagentHandback with the run open is refused with the
   const { root } = await started();
   startAgent(root, BRIEF_RUN, 'ag1');
   assert.equal(handback({ root, agentId: 'other' }), null, 'not an actor');
-  assert.match(handback({ root, agentId: 'ag1' }).deny, /^no-return: .*Call the harness return tool now/);
+  assert.match(handback({ root, agentId: 'ag1' }).deny, /^no-return: Return through the harness return tool /);
   assert.deepEqual(handback({ root, agentId: 'ag1' }), { failed: BRIEF_RUN });
   assert.equal(stopped({ root, agentId: 'ag1' }), null, 'its stop after that adds nothing');
   assert.equal(rows(root).filter((r) => r.kind === 'refusal' && r.payload.rule === 'no-return').at(-1).payload.tool, 'SubagentHandback');

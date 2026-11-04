@@ -1,9 +1,11 @@
 // C-stale-completion-dropped (plan/cases/work-item.md): a builder run replaced by a newer run; when the old run's
-// completion arrives, it is journalled as stale and changes nothing. The build outlives its timeout (a wake past the
-// timer's due time fires it), the person replans, a new build run starts, and then the old build returns.
+// completion arrives, it is journalled as stale and changes nothing. Ported to the stage contract: quick-fix has no build
+// timeout (lane A removed timers), so the old run is replaced the way a run now ends without its result: its agent
+// stopped without returning and the hook failed the run (the actor's error), the person replans, a new build run
+// starts, and then the old build's result arrives late.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { A, BRIEFS, agents, cardOf, fresh, hashOfHost, inputsOfWakeFor, offer, open, openRun, platform, pr, start, timeWake, transitions, world } from './world.js';
+import { A, BRIEFS, agents, cardOf, fresh, hashOfHost, offer, open, openRun, platform, pr, start, transitions, world } from './world.js';
 
 test('C-stale-completion-dropped: the replaced build run\'s completion is journalled stale and the item is unchanged', async () => {
   const root = fresh();
@@ -14,9 +16,8 @@ test('C-stale-completion-dropped: the replaced build run\'s completion is journa
   await offer(host, [{ ...start(), at: '2026-11-01T10:00:00.000Z' }], effects);
   assert.equal(host.snapshot.value, 'building');
   const oldBuild = openRun(host, 'build');
-  assert.equal(plat.wakes.length, 1, 'the build timeout asked the clock for a wake');
 
-  await offer(host, inputsOfWakeFor(host, timeWake(plat.wakes[0].due)), effects);
+  await offer(host, [{ event: { type: 'xstate.error.actor.build', error: 'no-return: the agent stopped without returning' }, run: oldBuild.id, source: { system: 'harness', ref: 'stop ag-old' } }], effects);
   assert.equal(host.snapshot.value, 'replanning');
   const ask = openRun(host, 'ask');
   await offer(host, [{ event: { type: 'xstate.done.actor.ask', output: { choice: 'replan', by: 'person', why: 'the build hung' } }, run: ask.id, source: { system: 'hearth', ref: cardOf(host, ask) } }], effects);
