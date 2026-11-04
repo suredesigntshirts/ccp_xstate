@@ -33,7 +33,7 @@ const toy = () => ({
   question: 'How should test files be named?',
   base: { repo: 'example/toy', sha: SHA },
   runner: { sha: SHA },
-  scoring: { rule: 'clarity per word' },
+  scoring: { floors: { constraints: ['readable'] }, tradeoffs: [{ id: 'primitives', kind: 'primitives' }, { id: 'trials', kind: 'trials' }] },
   lanes: [
     { id: 'short', alias: 'A', stance: 'short names' },
     { id: 'long', alias: 'B', stance: 'descriptive names' }
@@ -64,7 +64,8 @@ test('args.mjs refuses a config missing each pinned field', () => {
     'lanes empty': (c) => (c.lanes = []),
     stages: (c) => delete c.stages,
     scoring: (c) => delete c.scoring,
-    'scoring.rule': (c) => delete c.scoring.rule
+    'scoring.floors': (c) => delete c.scoring.floors,
+    'scoring.tradeoffs': (c) => delete c.scoring.tradeoffs
   };
   assert.doesNotThrow(() => buildArgs(folder('toy-naming', toy())));
   for (const [name, fn] of Object.entries(drop)) {
@@ -165,4 +166,20 @@ test('scripts/tournament names no tournament, lane, workflow or engine path', ()
     const text = fs.readFileSync(path.join(KIT, f), 'utf8').toLowerCase().replaceAll('.github/workflows/', '.github/');
     for (const b of banned) assert.ok(!text.includes(b.toLowerCase()), `${f} names ${b}`);
   }
+});
+
+test('re-scoring the stage-contract tournament floors first qualifies S and M, not the control', async () => {
+  const { score } = await import('../../scripts/tournament/score.mjs');
+  const dir = path.join(ROOT, 'tournaments/2026-11-04-stage-contract');
+  const read = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
+  assert.doesNotThrow(() => buildArgs(dir));
+  const r = score({ config: read('config.json'), scores: read('scores.json'), judge: read('judge.json') });
+  assert.deepEqual(r.qualified, ['S-six-parts', 'M-minimal']);
+  assert.ok(r.floors['A-control'].failed.some((f) => f.kind === 'contractTests' && f.id === 'P1'));
+  assert.equal(r.table['S-six-parts'].promptInEngine.value, 8471);
+  assert.equal(r.table['M-minimal'].promptInEngine.value, 9021);
+  assert.equal(r.table['S-six-parts'].trials.value, 2);
+  assert.equal(r.table['M-minimal'].trials.value, 0);
+  const committed = read('scoring.json');
+  assert.deepEqual({ ...committed, scoredAt: null }, { ...r, scoredAt: null }, 'scoring.json is score.mjs output for the committed inputs');
 });

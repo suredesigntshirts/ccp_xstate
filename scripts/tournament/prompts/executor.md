@@ -17,6 +17,7 @@ Rules that make your report worth anything:
 - Stub only the outside world, never the mechanism under test.
 - If the design is ambiguous or broken, make the smallest change that makes it work and record it in deviations.
 
-Scoring, written before the run: {{scoring.rule}}
+Scoring, written before the run:
+{{scoring.text}}
 
 Return the structured report.

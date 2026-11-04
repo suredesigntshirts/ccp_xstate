@@ -33,8 +33,7 @@ export function checkConfig(c) {
   need(HEX.test(c.base.sha ?? ''), 'config.base.sha is required (a commit sha)');
   need(c.runner && typeof c.runner === 'object', 'config.runner is required (the runner sha the run is pinned to)');
   need(HEX.test(c.runner.sha ?? ''), 'config.runner.sha is required (a commit sha)');
-  need(c.scoring && typeof c.scoring === 'object', 'config.scoring is required, written before the run');
-  need(nonEmpty(c.scoring.rule), 'config.scoring.rule is required');
+  checkScoring(c.scoring);
 
   need(Array.isArray(c.lanes) && c.lanes.length > 0, 'config.lanes is required (one or more lanes)');
   const laneIds = new Set();
@@ -67,6 +66,67 @@ export function checkConfig(c) {
       need(seen.has(id), `lane ${l.id} names unknown stage ${id}`);
   }
   return c;
+}
+
+export const FLOOR_KINDS = ['scenarios', 'contractTests', 'constraints'];
+export const TRADEOFF_KINDS = ['primitives', 'measure', 'trials'];
+
+/** A floor entry is an id string or { id, what }; returns its id. */
+export const floorId = (f) => (typeof f === 'string' ? f : f?.id);
+
+/**
+ * Checks config.scoring: floors (what every lane must pass before its cost is compared) and trade-offs (the costs
+ * laid side by side among lanes that pass). A free-text rule alone is refused: it is how a count came to decide.
+ */
+export function checkScoring(s) {
+  need(s && typeof s === 'object', 'config.scoring is required, written before the run');
+  need(s.floors && typeof s.floors === 'object', 'config.scoring.floors is required: what a lane must pass before its cost is compared (scenarios, contractTests, constraints)');
+  for (const k of Object.keys(s.floors)) need(FLOOR_KINDS.includes(k), `config.scoring.floors.${k}: floor kinds are ${FLOOR_KINDS.join(', ')}`);
+  let floors = 0;
+  for (const k of FLOOR_KINDS) {
+    const list = s.floors[k] ?? [];
+    need(Array.isArray(list), `config.scoring.floors.${k} must be a list of ids or { id, what }`);
+    const ids = new Set();
+    for (const [i, f] of list.entries()) {
+      need(nonEmpty(floorId(f)), `config.scoring.floors.${k}[${i}] needs an id`);
+      need(!ids.has(floorId(f)), `config.scoring.floors.${k}: duplicate ${floorId(f)}`);
+      ids.add(floorId(f));
+    }
+    floors += list.length;
+  }
+  need(floors > 0, 'config.scoring.floors names no floor: list at least one scenario, contract test or constraint');
+  need(Array.isArray(s.tradeoffs) && s.tradeoffs.length >= 2, 'config.scoring.tradeoffs is required: two or more costs laid side by side, so no single count decides');
+  const tids = new Set();
+  for (const [i, t] of s.tradeoffs.entries()) {
+    need(t && nonEmpty(t.id), `config.scoring.tradeoffs[${i}].id is required`);
+    need(!tids.has(t.id), `config.scoring.tradeoffs: duplicate ${t.id}`);
+    tids.add(t.id);
+    need(TRADEOFF_KINDS.includes(t.kind), `config.scoring.tradeoffs[${i}] (${t.id}).kind must be one of ${TRADEOFF_KINDS.join(', ')}`);
+    if (t.kind === 'measure') {
+      need(nonEmpty(t.measure), `config.scoring.tradeoffs[${i}] (${t.id}).measure names the path in a lane's measures, e.g. size.bytes`);
+      need(t.better === 'lower' || t.better === 'higher', `config.scoring.tradeoffs[${i}] (${t.id}).better must be "lower" or "higher"`);
+    }
+  }
+  return s;
+}
+
+/** The scoring as plain text, for role prompts ({{scoring.text}}). */
+export function describeScoring(s) {
+  const lines = ['Floors (a lane qualifies only if it passes every one; a lane that fails one is not qualified, whatever its costs):'];
+  for (const k of FLOOR_KINDS)
+    for (const f of s.floors[k] ?? []) lines.push(`- ${k} ${floorId(f)}${typeof f === 'object' && f.what ? `: ${f.what}` : ''}`);
+  lines.push('Trade-offs (laid side by side for qualified lanes only; no single one decides, and there is no composite score):');
+  for (const t of s.tradeoffs) {
+    const what =
+      t.kind === 'primitives'
+        ? 'primitives, lower is better. A primitive counts only if every model stage uses it, in more than one workflow; any other primitive is listed as a special case beside the count'
+        : t.kind === 'trials'
+          ? 'real-model trial outcomes, more passed trials is better'
+          : `measure ${t.measure} from the lane's measures, ${t.better} is better`;
+    lines.push(`- ${t.id}: ${t.what || what}`);
+  }
+  if (s.note) lines.push(`Note: ${s.note}`);
+  return lines.join('\n');
 }
 
 /** Placeholder roots a template uses, e.g. {{lane.id}} -> lane. */
@@ -127,13 +187,22 @@ export function buildArgs(folder) {
       }
     }
   }
+  const scoring = { ...c.scoring, text: describeScoring(c.scoring) };
+  for (const [where, text] of [
+    ...Object.values(roles).map((r) => [`prompt ${path.relative(process.cwd(), r._file)}`, r.prompt]),
+    ...c.stages.filter((s) => s.brief).map((s) => [`stage ${s.id} brief`, s.brief])
+  ])
+    for (const p of placeholders(text).filter((x) => x.startsWith('scoring.'))) {
+      const v = p.split('.').slice(1).reduce((o, k) => (o == null ? undefined : o[k]), scoring);
+      need(v !== undefined, `${where} uses {{${p}}}, but the scoring has no value for it (use {{scoring.text}})`);
+    }
   for (const r of Object.values(roles)) delete r._file;
 
   return {
     id: c.id,
     question: c.question,
     pack: fs.readFileSync(packFile, 'utf8'),
-    scoring: c.scoring,
+    scoring,
     vars: c.vars || {},
     lanes: c.lanes.map((l) => ({ ...l, skip: l.skip || [], given: l.given || {}, brief: l.brief || {} })),
     stages: c.stages.map((s) => ({ id: s.id, title: s.title || s.id, role: s.role, over: s.over, ...(s.pick && { pick: s.pick }), ...(s.brief && { brief: s.brief }) })),

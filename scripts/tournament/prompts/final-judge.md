@@ -6,7 +6,14 @@ The question: {{question}}
 {{pack}}
 </pack>
 
-Scoring, written before the run: {{scoring.rule}}
+Scoring, written before the run:
+{{scoring.text}}
+
+Score floors first. For each lane and each floor above, rerun or read the check yourself and record pass and evidence;
+a lane that fails one floor is not qualified, whatever its costs. Then, for every lane, list its model stages
+(workflow/stage) and every primitive it uses with each model stage that uses it, honestly: scripts/tournament/score.mjs
+counts a primitive only if every model stage uses it in more than one workflow, and lists the rest as special cases.
+Record real-model trials only where one actually ran. Do not add the trade-offs into one number.
 
 Earlier stages' outputs: {{stages}}
 

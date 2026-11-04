@@ -100,7 +100,96 @@
     }
   ],
   "scoring": {
-    "rule": "Headline: scenarios passed (a runnable node --test file asserting the stated outcome) divided by weighted primitives, using the pack's kinds; an interpreter change (spec.js/host.js) counts per feature, double. Tie-breakers: person taps on Q1 and F1, then total spec lines of the three workflows. Expressiveness: one vocabulary across workflows, no workflow-specific host code.",
+    "floors": {
+      "scenarios": [
+        {
+          "id": "Q1",
+          "what": "Happy path"
+        },
+        {
+          "id": "Q2",
+          "what": "Push after PASS"
+        },
+        {
+          "id": "Q3",
+          "what": "Red CI"
+        },
+        {
+          "id": "Q4",
+          "what": "CI edited by the builder"
+        },
+        {
+          "id": "Q5",
+          "what": "Verifier misreports"
+        },
+        {
+          "id": "Q6",
+          "what": "Late push from a dead attempt"
+        },
+        {
+          "id": "Q7",
+          "what": "Merge outside the host"
+        },
+        {
+          "id": "Q8",
+          "what": "Workflow changes in flight"
+        },
+        {
+          "id": "Q9",
+          "what": "Expect edited on GitHub"
+        },
+        {
+          "id": "F1",
+          "what": "Three slices; slice 2 fails verify on every build"
+        },
+        {
+          "id": "F2",
+          "what": "The parent is restored on another host mid-slice"
+        },
+        {
+          "id": "R1",
+          "what": "Three parallel sub-questions, one researcher errors"
+        }
+      ],
+      "contractTests": [],
+      "constraints": [
+        {
+          "id": "node-deps",
+          "what": "Node 22+, zero runtime deps except xstate (5.x)"
+        },
+        {
+          "id": "replay",
+          "what": "State is rebuilt by replaying journalled events; effects run only on the owner host; nothing depends on replaying an agent"
+        },
+        {
+          "id": "one-vocabulary",
+          "what": "One vocabulary across workflows, no workflow-specific host code"
+        },
+        {
+          "id": "independent-verifier",
+          "what": "The verifier is independent of the builder"
+        }
+      ]
+    },
+    "tradeoffs": [
+      {
+        "id": "primitives",
+        "kind": "primitives",
+        "what": "weighted primitives, using the pack's kinds; an interpreter change (spec.js/host.js) weighs 2"
+      },
+      {
+        "id": "specLines",
+        "kind": "measure",
+        "measure": "specLines.total",
+        "better": "lower"
+      },
+      {
+        "id": "trials",
+        "kind": "trials"
+      }
+    ],
+    "note": "Restated as floors and trade-offs on 2026-11-04 (plan item tournament-scoring-floors). Person taps on Q1 and F1, a tie-breaker in the original rule, were judged by hand and are not a measure; the judge weighs them in notes.",
+    "was": "Headline: scenarios passed (a runnable node --test file asserting the stated outcome) divided by weighted primitives, using the pack's kinds; an interpreter change (spec.js/host.js) counts per feature, double. Tie-breakers: person taps on Q1 and F1, then total spec lines of the three workflows. Expressiveness: one vocabulary across workflows, no workflow-specific host code.",
     "written": "pack.md, frozen 2026-11-03 before the run"
   },
   "suite": {

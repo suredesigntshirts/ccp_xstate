@@ -13,7 +13,8 @@ Your stance: {{lane.stance}}
 Independence rule: other designers exist and you will not see them. Do not read other lanes' work or earlier
 tournaments on this question. Work from the pack, the code or material it names, and first principles.
 
-Scoring, written before the run: {{scoring.rule}}
+Scoring, written before the run:
+{{scoring.text}}
 
 Produce ONE design that answers the question and covers every scenario or requirement in the pack. Before you finish,
 try to remove one part of your own design and keep it out if the pack's requirements still hold.
