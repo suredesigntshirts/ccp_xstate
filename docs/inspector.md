@@ -46,6 +46,13 @@ node scripts/inspector/export.mjs --engine <checkout> --journal <journal root> [
 
 `sources.json` lists sources of two kinds:
 
+A string `engine` or `journal` is relative to this repo's root, so `"."` is this checkout and a committed journal
+(such as the adopt trial, `tournaments/2026-11-04-stage-contract/trials/adopt/journal`) is named by its repo path. An
+engine `{ "commit": "<sha>" }` is this repo at that commit: the build checks it out once as a git worktree under the
+capture folder and links this checkout's `node_modules` into it. That is how journals recorded before the stage
+contract (the October runs in `/mnt/project-files`) are replayed on main at 36da3e4, the engine that made them, since
+today's engine refuses them by design. A shallow clone may lack the commit; the source is then skipped and named.
+
 - **A journal root** (`engine`, `journal`, `kind`, `label`, `origin`): a folder with `items/<item>.jsonl`, the
   items' run folders, and maybe `sessions/*.jsonl` (the live capture). Every item in it becomes a run on the page.
 - **A lane scenario** (`engine`, `scenario`, `label`, `origin`): a scenario test of a tournament lane checkout, such
@@ -93,6 +100,30 @@ even when no run of it was captured.
   the journal ends while the run was open.
 - **Trace.** Rows of the live capture whose agent is the run's agent (`agent.json`). Only the tool name, time, size
   and paths are kept, never the command itself.
+
+## The stage record (stage.json)
+
+An engine with the stage contract (main since engine-stage-contract, `packages/engine/src/trace.js`; the format is in
+`docs/journal.md`) writes `runs/<n>.<actor>/stage.json` for every model stage run. When a run folder has one, the
+exporter puts it in the run's bundle as `stage` (`stageView` in `export.mjs`), with every run id it names resolved to
+a run of the same item, and the page shows it as the run's **Stage** view, before the seven layers:
+
+1. **Instructions**: the prompt part by part (rules, inputs, task, output, return), each piece with its source: a
+   harness frame constant or template, a JSON pointer in the workflow file, or an input with the run that produced it.
+2. **Inputs**: each input's meaning, value, the context path it was read from and its producer, as a link to the
+   producing run (stage, effect or child workflow; the host for a field it stamped on a returned ref) or a plain label
+   (start input, literal, event, copy, context default, parts, nothing). Later writes to parts of it are listed.
+3. **Output**: the value (or error, or that the run was stopped), with the paths the harness stamped marked, each
+   context path written from it with the earlier write it replaced, and the invokes
+   that could read it next, each with its later run in this item: "read it" when that run's own record names this run
+   as the producer, "read a newer value" when it does not, and a host effect's run marked as not traced. A reader that
+   is the writing invoke itself (`self`) is shown as read by itself on the next round.
+
+For such a run, layer 2's "who wrote this prompt" is read from the record too: the producer of each Task piece (the
+brief agent's field, or a literal in the workflow JSON), never guessed from the older `input.brief` rule.
+
+The bundle also gets `flow`: the item's runs in start order with the context paths between them, shown above the
+steps as "Data flow between stages". Runs without stage.json render as before.
 
 ## What it cannot show
 

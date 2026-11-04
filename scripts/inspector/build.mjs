@@ -4,7 +4,7 @@
 // runs with TMPDIR pointed at a capture folder so the journal roots the test makes are kept; the test itself is not
 // changed. Usage: docs/inspector.md.
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -12,6 +12,36 @@ import { createHash } from 'node:crypto';
 import { exportRoot, graphOf } from './export.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+const REPO = resolve(HERE, '../..');
+
+/**
+ * A source's engine checkout. A string is a folder, relative to this repo's root (so "." is this checkout). An object
+ * { commit } is this repo at that commit, checked out once per build as a worktree under the capture folder with this
+ * checkout's node_modules linked in: how a journal made before a format change is replayed on the engine that made it.
+ * Returns { path } or { missing } naming why there is none.
+ */
+export function engineOf(engine, captureDir, made = new Map()) {
+  if (typeof engine === 'string') return { path: resolve(REPO, engine) };
+  const commit = engine?.commit;
+  if (!commit) return { missing: `engine ${JSON.stringify(engine)} is neither a folder nor { commit }` };
+  if (made.has(commit)) return made.get(commit);
+  let out;
+  try {
+    execFileSync('git', ['-C', REPO, 'cat-file', '-e', `${commit}^{commit}`], { stdio: 'ignore' });
+    const dir = join(captureDir, `engine-${commit.slice(0, 12)}`);
+    if (!existsSync(join(dir, 'packages'))) {
+      rmSync(dir, { recursive: true, force: true });
+      execFileSync('git', ['-C', REPO, 'worktree', 'prune'], { stdio: 'ignore' });
+      execFileSync('git', ['-C', REPO, 'worktree', 'add', '-q', '--detach', dir, commit], { stdio: 'ignore' });
+      if (existsSync(join(REPO, 'node_modules'))) symlinkSync(join(REPO, 'node_modules'), join(dir, 'node_modules'));
+    }
+    out = { path: dir, commit };
+  } catch {
+    out = { missing: `commit ${commit} is not in this clone (a shallow clone lacks it: git fetch --unshallow)` };
+  }
+  made.set(commit, out);
+  return out;
+}
 const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 /** The leading // comment of a test file, as one paragraph: the scenario's own description. */
@@ -58,11 +88,22 @@ export function capture({ engine, scenario, dir }) {
   return { roots: rootsIn(dir), names: testNames(log), ok, log };
 }
 
+// The name sources.json gives an engine in `engines`: keyed by the folder as written, or by "commit:<sha>".
+const engineName = (conf, src) => {
+  if (!src || !conf.engines) return null;
+  const key = typeof src.engine === 'string' ? src.engine : `commit:${src.engine?.commit}`;
+  return conf.engines[key] ?? conf.engines[src.enginePath] ?? null;
+};
+
 export async function build({ config, out, captureDir }) {
   const conf = JSON.parse(readFileSync(config, 'utf8'));
-  const runs = [], skipped = [];
+  const runs = [], skipped = [], made = new Map();
+  mkdirSync(captureDir, { recursive: true });
   for (const src of conf.sources) {
-    const engine = resolve(src.engine);
+    const eng = engineOf(src.engine, captureDir, made);
+    if (eng.missing) { skipped.push(`${src.label}: ${eng.missing}`); continue; }
+    const engine = eng.path;
+    src.enginePath = engine;
     if (!existsSync(engine)) { skipped.push(`${src.label}: no engine checkout at ${engine}`); continue; }
     if (src.scenario) {
       const file = join(engine, src.scenario);
@@ -82,7 +123,7 @@ export async function build({ config, out, captureDir }) {
         runs.push(...bundles);
       }
     } else {
-      const journal = resolve(src.journal);
+      const journal = resolve(REPO, src.journal);
       if (!existsSync(join(journal, 'items'))) { skipped.push(`${src.label}: no items/ under ${journal}`); continue; }
       const bundles = await exportRoot({ engine, journal, workflow: src.workflow ?? null, kind: src.kind ?? 'real', label: src.label, origin: src.origin, note: src.note ?? null, id: slug(`${src.origin}-${src.label}`) });
       runs.push(...bundles);
@@ -99,10 +140,10 @@ export async function build({ config, out, captureDir }) {
   }
   // Every workflow file of every engine checkout named in the sources, shown even when no run of it was captured.
   const shelf = [];
-  const seenEngines = [...new Set(conf.sources.map((s) => resolve(s.engine)).filter((e) => existsSync(join(e, 'workflows'))))];
+  const seenEngines = [...new Set(conf.sources.map((s) => s.enginePath).filter((e) => e && existsSync(join(e, 'workflows'))))];
   for (const engine of seenEngines) {
-    const who = conf.sources.find((s) => resolve(s.engine) === engine);
-    const owner = conf.engines?.[engine] ?? String(who.origin).replace(/\s*\((?:scripted|main engine)\)\s*$/i, '').replace(/^Real runs$/i, 'Main');
+    const who = conf.sources.find((s) => s.enginePath === engine);
+    const owner = engineName(conf, who) ?? String(who.origin).replace(/\s*\((?:scripted|main engine)\)\s*$/i, '').replace(/^Real runs$/i, 'Main');
     for (const file of readdirSync(join(engine, 'workflows')).filter((n) => n.endsWith('.json')).sort()) {
       const path = join(engine, 'workflows', file);
       const text = readFileSync(path, 'utf8');
@@ -115,7 +156,7 @@ export async function build({ config, out, captureDir }) {
   }
   for (const r of runs) {
     const e = r.engine.path;
-    r.engineLabel = conf.engines?.[e] ?? shelf.find((x) => x.engine === e)?.label.split(' · ')[0] ?? null;
+    r.engineLabel = engineName(conf, conf.sources.find((s) => s.enginePath === e)) ?? shelf.find((x) => x.engine === e)?.label.split(' · ')[0] ?? null;
   }
   mkdirSync(out, { recursive: true });
   const data = { generated: new Date().toISOString(), skipped, runs, workflows, shelf };
