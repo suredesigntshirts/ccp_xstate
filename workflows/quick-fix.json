@@ -40,7 +40,7 @@
           { "target": "building", "guard": "redOnHead", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] },
           { "target": "replanning", "guard": "redOnHead", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] }
         ],
-        "github.pull_request.closed": { "target": "replanning", "guard": "mergedOutside", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.mergedOutside": "event.pr" } }] }
+        "github.pull_request.closed": { "target": "closedOutside", "guard": "closedOutside", "description": "the PR was merged or closed on GitHub by another path: the item ends, and its card is closed", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.closedOutside": "event.pr", "failure.outcome": "event.outcome" } }] }
       }
     },
     "verifying": {
@@ -66,7 +66,7 @@
           { "target": "building", "guard": "redOnHead", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] },
           { "target": "replanning", "guard": "redOnHead", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] }
         ],
-        "github.pull_request.closed": { "target": "replanning", "guard": "mergedOutside", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.mergedOutside": "event.pr" } }] }
+        "github.pull_request.closed": { "target": "closedOutside", "guard": "closedOutside", "description": "the PR was merged or closed on GitHub by another path: the item ends, and its card is closed", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.closedOutside": "event.pr", "failure.outcome": "event.outcome" } }] }
       }
     },
     "reverifying": {
@@ -92,7 +92,7 @@
           { "target": "building", "guard": "redOnHead", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] },
           { "target": "replanning", "guard": "redOnHead", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] }
         ],
-        "github.pull_request.closed": { "target": "replanning", "guard": "mergedOutside", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.mergedOutside": "event.pr" } }] }
+        "github.pull_request.closed": { "target": "closedOutside", "guard": "closedOutside", "description": "the PR was merged or closed on GitHub by another path: the item ends, and its card is closed", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.closedOutside": "event.pr", "failure.outcome": "event.outcome" } }] }
       }
     },
     "awaitingGates": {
@@ -115,7 +115,7 @@
           { "target": "building", "guard": "redOnHead", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] },
           { "target": "replanning", "guard": "redOnHead", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] }
         ],
-        "github.pull_request.closed": { "target": "replanning", "guard": "mergedOutside", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.mergedOutside": "event.pr" } }] }
+        "github.pull_request.closed": { "target": "closedOutside", "guard": "closedOutside", "description": "the PR was merged or closed on GitHub by another path: the item ends, and its card is closed", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.closedOutside": "event.pr", "failure.outcome": "event.outcome" } }] }
       }
     },
     "awaitingMerge": {
@@ -138,7 +138,7 @@
           { "target": "building", "guard": "redOnHead", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] },
           { "target": "replanning", "guard": "redOnHead", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.check": "event.check", "failure.conclusion": "event.conclusion", "failure.sha": "event.head_sha", "failure.url": "event.details_url" } }] }
         ],
-        "github.pull_request.closed": { "target": "replanning", "guard": "mergedOutside", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.mergedOutside": "event.pr" } }] }
+        "github.pull_request.closed": { "target": "closedOutside", "guard": "closedOutside", "description": "the PR was merged or closed on GitHub by another path: the item ends, and its card is closed", "actions": [{ "type": "set", "params": { "failure": { "value": null }, "failure.closedOutside": "event.pr", "failure.outcome": "event.outcome" } }] }
       }
     },
     "merging": {
@@ -162,7 +162,8 @@
       }
     },
     "done": { "type": "final", "meta": { "needs": ["isMerged"] } },
-    "dropped": { "type": "final" }
+    "dropped": { "type": "final" },
+    "closedOutside": { "type": "final" }
   },
   "meta": {
     "guards": {
@@ -182,7 +183,7 @@
       "mine": [{ "path": "event.pr", "same": "context.pr.key" }],
       "sameHead": [{ "path": "event.pr", "same": "context.pr.key" }, { "path": "event.head_sha", "same": "context.pr.at" }],
       "redOnHead": [{ "path": "event.pr", "same": "context.pr.key" }, { "path": "event.head_sha", "same": "context.pr.at" }, { "path": "event.conclusion", "in": ["failure", "timed_out", "cancelled", "action_required", "startup_failure"] }],
-      "mergedOutside": [{ "path": "event.pr", "same": "context.pr.key" }, { "path": "event.outcome", "in": ["merged"] }]
+      "closedOutside": [{ "path": "event.pr", "same": "context.pr.key" }, { "path": "event.outcome", "in": ["merged", "closed"] }]
     },
     "input": {
       "type": "object",

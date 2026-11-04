@@ -83,7 +83,7 @@
     },
     {
       "id": "parity",
-      "check": "packages/engine/test/parity/C-finish-closes-waits.test.js passes, gaps.json no longer lists the case, verify/parity-cases/C-finish-closes-waits.gap.test.mjs is gone, the parity listing test passes, and every tourney scenario passes; the only scenario assertions changed are Q7's (it now ends closedOutside) and Q2's stop check (which read an agent run's stop as pending for ever, and now reads it done)",
+      "check": "packages/engine/test/parity/C-finish-closes-waits.test.js passes, gaps.json no longer lists the case, verify/parity-cases/C-finish-closes-waits.gap.test.mjs is gone, the parity listing test passes, and every tourney scenario passes with Q7's change the only scenario assertion changed",
       "how": "node --test packages/engine/test/parity/ packages/engine/test/tourney/ and the diff of those folders",
       "proof": "verifier"
     },

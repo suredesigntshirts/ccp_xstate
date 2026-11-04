@@ -79,17 +79,30 @@ export async function fakeGitHub(prs = { 1: { head: A } }) {
   };
 }
 
-/** The thread and the clock as the host's effects reach them: every card, post and wake asked for is kept. */
+/**
+ * The thread and the clock as the host's effects reach them: every card, post and wake asked for is kept. A closed
+ * card is marked closed and its key kept in `closes`, once per ask (plan item fix-finish-closes-waits).
+ */
 export function platform() {
   const cards = [];
   const posts = [];
   const wakes = [];
+  const closes = [];
   let n = 0;
   return {
     cards,
     posts,
     wakes,
+    closes,
+    open: () => cards.filter((c) => !c.closed),
     hearth: {
+      close: async ({ key }) => {
+        const made = cards.find((c) => c.key === key);
+        closes.push(key);
+        if (!made) return null;
+        made.closed = true;
+        return { ref: made.ref };
+      },
       card: async ({ key, question, choices, inputs }) => {
         const made = { key, ref: `cmsg_card${++n}`, question, choices, inputs };
         cards.push(made);

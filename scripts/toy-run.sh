@@ -8,6 +8,8 @@
 #                                          the same from an existing issue (a real one), whose Expect lines are the
 #                                          JSON array of strings in <file>; nothing is filed
 #   scripts/toy-run.sh card <item> <id>    record the card a thread put up for the item's ask run (bin/host.js card)
+#   scripts/toy-run.sh closed <item>       record that the thread withdrew the card of an ask the item left (close_decision;
+#                                          bin/host.js closed, plan item fix-finish-closes-waits)
 #   scripts/toy-run.sh tap <item> <file>   resume the item's driver session with the tap wake in <file> as its prompt;
 #                                          the session's host hook reads it, and the merge runs at the verdict's sha
 #   scripts/toy-run.sh answer <item> <choice> <session>
@@ -151,6 +153,15 @@ cmd_card() {
   node "$HOST" card --item "$item" --workflow quick-fix --root "$JOURNAL" --effect "$effect" --ref "$ref"
 }
 
+cmd_closed() {
+  local item=$1
+  local effect
+  effect=$(node "$HOST" show --item "$item" --workflow quick-fix --root "$JOURNAL" |
+    node -e 'const s=JSON.parse(require("fs").readFileSync(0,"utf8"));const e=s.pending.effects.find((e)=>e.type==="stop"&&e.actor==="ask");if(!e)process.exit(1);console.log(e.run)') ||
+    die "$item has no card waiting to be closed"
+  node "$HOST" closed --item "$item" --workflow quick-fix --root "$JOURNAL" --effect "$effect"
+}
+
 cmd_tap() {
   local item=$1 file=$2
   [ -s "$file" ] || die "no wake text in $file"
@@ -207,7 +218,8 @@ case "${1:-}" in
   run) shift; cmd_run "$@" ;;
   answer) [ $# -eq 4 ] || die "usage: answer <item> <choice> <stand-in session>"; cmd_answer "$2" "$3" "$4" ;;
   card) [ $# -eq 3 ] || die "usage: card <item> <card id>"; cmd_card "$2" "$3" ;;
+  closed) [ $# -eq 2 ] || die "usage: closed <item>"; cmd_closed "$2" ;;
   tap) [ $# -eq 3 ] || die "usage: tap <item> <wake file>"; cmd_tap "$2" "$3" ;;
   check) [ $# -eq 2 ] || die "usage: check <item>"; cmd_check "$2" ;;
-  *) sed -n '2,18p' "$0" >&2; exit 2 ;;
+  *) sed -n '2,20p' "$0" >&2; exit 2 ;;
 esac

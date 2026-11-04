@@ -566,6 +566,10 @@ function itemView(rows, item, { now = null } = {}) {
   // An ask run starts when its state is entered; its card's id is on the run's done row once the host has seen the
   // card recorded. Until then the wait counts from the run's start.
   const askRows = own.filter((r) => r.kind === 'engine.effect' && r.payload?.actor === 'ask' && r.payload?.type === 'run');
+  // An ask whose state was left is closed when its stop effect is done (plan item fix-finish-closes-waits): its card
+  // was withdrawn, so it waits on no one from then on.
+  const stops = new Map(own.filter((r) => r.kind === 'engine.effect' && r.payload?.type === 'stop' && r.payload?.phase === 'done')
+    .map((r) => [String(r.payload.effect).replace(/:stop$/, ''), r]));
   const asks = [...new Set(askRows.map((r) => r.payload.effect))]
     .map((effect) => {
       const mine = askRows.filter((r) => r.payload.effect === effect);
@@ -574,10 +578,11 @@ function itemView(rows, item, { now = null } = {}) {
       const answer = answers.get(effect);
       const postedAt = card?.postedAt ?? (cardId ? mine.find((r) => r.payload.outcome?.ref)?.at : mine[0].at);
       const answeredAt = answer?.at ?? card?.tappedAt ?? null;
+      const closedAt = answeredAt ? null : stops.get(effect)?.at ?? null;
       return {
-        effect, cardId, thread: card?.thread ?? null, postedAt, answeredAt,
+        effect, cardId, thread: card?.thread ?? null, postedAt, answeredAt, closedAt,
         by: answer?.source?.system ?? (card?.tappedAt ? 'hearth' : null), choice: answer?.payload?.event?.output?.choice ?? card?.option ?? null,
-        waitMs: Date.parse(answeredAt ?? end) - Date.parse(postedAt), open: !answeredAt,
+        waitMs: Date.parse(answeredAt ?? closedAt ?? end) - Date.parse(postedAt), open: !answeredAt && !closedAt,
       };
     });
   const last = transitions.at(-1);
@@ -711,7 +716,7 @@ return Object.freeze({ PAGE_RELEASE, parseJournal, scopes, inScope, items, itemV
         ['Driving sessions', `${fmtN(it.tokens.sessions.total)} tokens in ${many(it.tokens.sessionIds.length, 'session')}`],
         ['Refusals', fmtN(it.refusals)],
       ].map(([k, x]) => rowOf([cell(k), cell(x)])), 'Nothing recorded for this item.', 2);
-      fill('item-asks', it.asks.map((a) => rowOf([cell(utc(a.postedAt)), cell(a.open ? 'open' : (a.by ?? '–')), cell(a.choice ?? '–'), cell(fmtMs(a.waitMs), 'n')])), 'The item asked the person nothing.', 4);
+      fill('item-asks', it.asks.map((a) => rowOf([cell(utc(a.postedAt)), cell(a.open ? 'open' : a.closedAt ? 'closed' : (a.by ?? '–')), cell(a.choice ?? '–'), cell(fmtMs(a.waitMs), 'n')])), 'The item asked the person nothing.', 4);
     }
 
     const t = v.tokens;

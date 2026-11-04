@@ -7,6 +7,7 @@
 // into effects for the outside world, each with an id that names it for good:
 //   xstate.spawnChild -> run     start an invoked actor's work         <item>:<seq>.<invoke id>
 //   xstate.stopChild  -> stop    its state was left; drop its result   <run effect id>:stop
+//                                and close what it put in front of the person (an ask's card)
 //   delayed raise     -> timer   send the event when it is due        <item>:<seq>.<timer id>
 //   xstate.cancel     -> cancel  the timer's state was left            <timer effect id>:cancel
 //
@@ -253,9 +254,14 @@ export async function offer(host, inputs, handlers = {}) {
   return results;
 }
 
-/** What the item is waiting on: the effects not yet ended, and the runs and timers still open. */
+/**
+ * What the item is waiting on: the effects not yet ended, and the runs and timers still open. A run stopped before its
+ * effect started (a card never put up) waits on nothing: it is never started (runEffects), so it is left out.
+ */
 export const pending = (host) => ({
-  effects: [...host.effects.values()].filter((e) => !TERMINAL.includes(e.phase)).map((e) => e.effect),
+  effects: [...host.effects.values()]
+    .filter((e) => !TERMINAL.includes(e.phase) && !(e.phase === null && e.effect.type === 'run' && !host.runs.has(e.effect.id)))
+    .map((e) => e.effect),
   runs: [...host.runs.values()],
   timers: [...host.timers.values()]
 });
@@ -345,7 +351,7 @@ function effectsOf(host, { type, params }, seq, at) {
       const open = [...host.runs.values()].find((r) => r.invoke === params.id);
       if (!open) return [];
       host.runs.delete(open.id);
-      return [{ id: `${open.id}:stop`, type: 'stop', run: open.id }];
+      return [{ id: `${open.id}:stop`, type: 'stop', run: open.id, actor: open.actor }];
     }
     case 'xstate.raise': {
       if (params.delay == null) return [];

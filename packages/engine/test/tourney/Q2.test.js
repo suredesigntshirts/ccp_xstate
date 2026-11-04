@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { inputsOfWake } from '../../src/wake.js';
-import { makeWorld, ISSUE, BRIEFS, builds, verifies, tapWake, suiteWake, pending } from './world.js';
+import { makeWorld, ISSUE, BRIEFS, builds, verifies, tapWake, suiteWake } from './world.js';
 
 async function toAwaitingMerge(w) {
   await w.start('q2', 'quick-fix', { issue: ISSUE });
@@ -93,8 +93,10 @@ test('Q2 (round 2, no reenter): the head moves twice while verifying; each move 
     const run2 = w.openRun('q2v', 'verify');
     assert.notEqual(run2.id, run1.id, 'a fresh verify run');
     assert.equal(run2.input.target.at, B);
-    // The world has no stop handler (no agent to kill), so each stop effect the host emits stays pending, by run.
-    const stops = () => pending(w.host('q2v')).effects.filter((e) => e.type === 'stop').map((e) => e.run);
+    // Each stop effect the host emits, by run. An agent run's stop ends at once with nothing to close
+    // (fix-finish-closes-waits); before that the world had no stop handler and the stops stayed pending.
+    const stops = () => w.rows('q2v').filter((r) => r.kind === 'engine.effect' && r.payload.type === 'stop' && r.payload.phase === 'done')
+      .map((r) => r.payload.effect.replace(/:stop$/, ''));
     assert.ok(stops().includes(run1.id), 'the verify run for A was stopped');
 
     const C = w.commit(w.repo, 'pushed again while verifying');

@@ -5,6 +5,7 @@
 //   host.js wake  --item <id> --workflow <name> [--root <dir>] [--release x.y.z]   < hook input JSON
 //   host.js show  --item <id> --workflow <name> [--root <dir>]
 //   host.js card  --item <id> --workflow <name> --effect <ask run id> --ref <card id> [--root <dir>]
+//   host.js closed --item <id> --workflow <name> --effect <ask run id> [--root <dir>]
 //   host.js answer --item <id> --workflow <name> --effect <ask run id> --choice <c> --by <session> [--grants <file>]
 //   start and wake also take [--repo <git clone>] [--worktrees <dir>] for the actors' worktrees.
 //
@@ -18,7 +19,9 @@
 // there for the session to schedule its wake. A card waits until the session that can post it has put it up and run
 // `card` with its id (src/effects/relay.js, plan item engine-toy-run); `card` then finishes the card effect as the
 // item's owner, so the item's file names the card from then on (plan item engine-item-views), and a tap on it is
-// matched to its run. An agent actor's run (brief, build, verify; plan item
+// matched to its run. When the item leaves the state that asked, the ask run's stop is listed under pending; the
+// session withdraws the card (close_decision) and runs `closed`, which finishes the stop as the owner (plan item
+// fix-finish-closes-waits). An agent actor's run (brief, build, verify; plan item
 // engine-actors) is prepared here: its brief, folder and worktree (added from --repo, default the current folder,
 // under --worktrees). `waiting` lists the runs whose agent the session starts next, with the Agent prompt to use.
 // CCP_GITHUB_API points GitHub calls at another server (tests), as it does for the actor hook.
@@ -31,7 +34,7 @@ import { parseArgs } from 'node:util';
 import { loadWorkflow, workflowOf } from '../src/index.js';
 import { restore, offer, pending } from '../src/host.js';
 import { inputsOfWake } from '../src/wake.js';
-import { github, handlers, recordCard, relay } from '../src/effects/index.js';
+import { github, handlers, recordCard, recordClosed, relay } from '../src/effects/index.js';
 import { actors, resultsOf, waiting } from '../src/actors.js';
 import { tripwiresOf } from '../src/tripwire.js';
 import { grantsFileFor, readGrants, standinInput } from '../src/standin.js';
@@ -76,7 +79,7 @@ const fail = (message) => {
   process.exit(2);
 };
 
-if (!['start', 'wake', 'show', 'card', 'answer'].includes(command)) fail('the command is start, wake, show, card or answer');
+if (!['start', 'wake', 'show', 'card', 'closed', 'answer'].includes(command)) fail('the command is start, wake, show, card, closed or answer');
 if (!opts.item || !opts.workflow) fail('--item and --workflow are required');
 const spec = workflowOf(opts.root, opts.item) ?? loadWorkflow(opts.workflow, { root: opts.root });
 const release = opts.release ?? process.env.CCP_HARNESS_RELEASE ?? manifestRelease();
@@ -89,7 +92,7 @@ if (command === 'wake') {
   const text = wakeTextOf(hook);
   inputs = (host) => inputsOfWake(host, text);
 }
-if (!session && !['show', 'card', 'answer'].includes(command)) fail('no session: start takes --session, wake reads session_id from the hook input');
+if (!session && !['show', 'card', 'closed', 'answer'].includes(command)) fail('no session: start takes --session, wake reads session_id from the hook input');
 
 // A refusal from the journal (an older writer, say) is printed as one line, not a stack.
 process.on('uncaughtException', (error) => fail(error.message));
@@ -110,12 +113,18 @@ if (command === 'card') {
   card = recordCard({ host, effect: opts.effect, ref: opts.ref });
   if (host.owner) host = restore({ root: opts.root, item: opts.item, spec, session: host.owner, release });
 }
+if (command === 'closed') {
+  // The card was withdrawn in the thread; the stop effect then finishes with it now, as the owner.
+  card = recordClosed({ host, effect: opts.effect });
+  if (host.owner) host = restore({ root: opts.root, item: opts.item, spec, session: host.owner, release });
+}
 if (command === 'start') {
   if (!opts.input) fail('start needs --input');
   inputs = [{ event: { type: 'xstate.init', input: JSON.parse(opts.input) }, source: { system: 'claude-code', ref: session } }];
 }
 const agents = actors({ host, repo: opts.repo ?? process.cwd(), ...(opts.worktrees ? { worktrees: opts.worktrees } : {}) });
-const effects = { run: handlers({ github: github(process.env.CCP_GITHUB_API ? { api: process.env.CCP_GITHUB_API } : {}), hearth: relay({ root: opts.root }), actors: agents }).run };
+const all = handlers({ github: github(process.env.CCP_GITHUB_API ? { api: process.env.CCP_GITHUB_API } : {}), hearth: relay({ root: opts.root }), actors: agents });
+const effects = { run: all.run, stop: all.stop };
 // Effects left open (a card now put up) run first, so the wake's inputs are read against the item as they leave it.
 const before = command === 'show' ? [] : await offer(host, [], effects);
 const offered = typeof inputs === 'function' ? inputs(host) : inputs;

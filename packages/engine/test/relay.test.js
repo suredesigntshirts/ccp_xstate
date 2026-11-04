@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { restore, offer, pending } from '../src/index.js';
-import { handlers, relay, recordCard, cardFile } from '../src/effects/index.js';
+import { handlers, relay, recordCard, recordClosed, cardFile } from '../src/effects/index.js';
 import { readFile } from '../../journal/src/index.js';
 import { workflow, ISSUE, BRIEFS, A, pr, verdict } from './flow.js';
 import { loadWorkflow } from '../src/index.js';
@@ -125,4 +125,47 @@ test('bin/host.js: a tap before the card is recorded matches nothing; after `car
   } finally {
     await gh.close();
   }
+});
+
+// fix-finish-closes-waits: a card the item left is closed the way it was put up.
+const closedWake = (outcome = 'merged') => `<wake reason="external-event" current-time="2026-10-30T19:27:48Z">
+  <event source="github" kind="pull_request.closed" from="system" trust="relay">
+    {"outcome":"${outcome}","pr":"o/r#1"}
+  </event>
+</wake>`;
+
+test('bin/host.js: a card the item left waits as a pending stop until the thread withdraws it and runs `closed`', async () => {
+  const root = fresh();
+  const host = await toAwaitingMerge(root);
+  const ask = askRun(host);
+  const wake = (prompt) => hostCli(root, ['wake'], { input: JSON.stringify({ session_id: 'owner', hook_event_name: 'UserPromptSubmit', prompt }) });
+  await hostCli(root, ['card', '--effect', ask.id, '--ref', CARD]);
+
+  const left = await wake(closedWake('merged'));
+  assert.equal(left.state, 'closedOutside');
+  const stop = left.pending.effects.find((e) => e.type === 'stop');
+  assert.deepEqual(stop, { id: `${ask.id}:stop`, type: 'stop', run: ask.id, actor: 'ask', transition: stop.transition }, 'show lists the stop of the ask run');
+  assert.deepEqual(left.pending.runs, []);
+
+  const record = await hostCli(root, ['closed', '--effect', ask.id]);
+  assert.equal(record.ref, CARD);
+  const shown = await hostCli(root, ['show']);
+  assert.deepEqual(shown.pending.effects, [], 'nothing waits once the card is recorded closed');
+  const rows = readFile(host.file).rows.filter((r) => r.kind === 'engine.effect' && r.payload.effect === `${ask.id}:stop`);
+  assert.deepEqual(rows.map((r) => r.payload.phase), ['start', 'done']);
+  assert.deepEqual(rows.at(-1).payload.outcome, { closed: CARD });
+});
+
+test('closed and card refuse what does not fit: no stop waiting, no card to close, a second record, a card for a stopped run', async () => {
+  const root = fresh();
+  const host = await toAwaitingMerge(root);
+  const ask = askRun(host);
+  assert.throws(() => recordClosed({ host, effect: ask.id }), /has no stop waiting/);
+  // The item leaves the card before the thread recorded it: nothing to close, and the stop ends at once.
+  const h = restore({ root, item: 'it-1', spec: loadWorkflow('quick-fix', { root }), session: 'owner', release: '0.2.0' });
+  const { inputsOfWake } = await import('../src/index.js');
+  await offer(h, inputsOfWake(h, closedWake('closed'), { now: '2999-01-01T00:00:00Z' }), handlers({ hearth: relay({ root }) }));
+  assert.equal(h.snapshot.value, 'closedOutside');
+  assert.deepEqual(pending(h).effects, [], 'no card was recorded, so the stop had nothing to wait for');
+  assert.throws(() => recordCard({ host: h, effect: ask.id, ref: CARD }), /was stopped.*withdraw the card/);
 });
