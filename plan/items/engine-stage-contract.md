@@ -4,7 +4,7 @@
   "title": "Rebuild main's engine and workflows on the stage contract from lane S",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Main's packages/engine and workflows/ are the cleaned-up lane S of the 2026-11-04 stage-contract tournament: every model stage is declared as rules, inputs (name to meaning, with task) and an output JSON Schema; the harness renders every prompt from those plus a fixed frame; the load check refuses missing parts, dangling wiring, actions off transitions and PASS/FAIL outputs without covers; every model run writes runs/<n>.<actor>/stage.json; npm test is green; and one real-model trial has reached merged on it.",
   "why": "The person wants to see, benchmark and observe every stage's instructions, its input data, its output, and how that output flows to the next stage. Main's engine cannot show any of that: its prompts are engine templates with no authored instructions (found by workflow-inspector), its inputs carry no meaning, and nothing records where a value came from or who reads it next. The 2026-11-04 tournament (scratch #44) built a stage contract in lane S, a cleanup made the wiring checked and the record complete, and two real-model trials merged on it. Adopted though it failed the tournament's primitive rule; the reasoning is plan/decisions/2026-11-04-adopt-stage-contract.md.",
   "serves": [
