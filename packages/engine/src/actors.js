@@ -1,8 +1,9 @@
 // Invoked actors (plan item engine-actors): the agents a workflow starts, and the one way their results come back.
-// When a state invokes brief, build or verify, the host's run handler writes the actor's brief into its own run
-// folder, makes it a git worktree named by item and run, and journals the brief's hash. The session then starts the
-// agent with the Agent tool and the prompt `ccp-run <run>`; the harness's PreToolUse hook swaps in the brief, so
-// the prompt the agent receives is the brief exactly, and its SubagentStart hook binds the agent's id to the run.
+// When a state invokes a model stage (an actor whose meta.actors entry has stage parts), the host's run handler renders
+// the run's prompt from that entry (stages.js) into brief.md in its own run folder, makes it a git worktree named by item and run,
+// journals the prompt's hash, and writes the run's stage record, stage.json (trace.js): every prompt piece and input with
+// its source, and, once the item takes the result (the handler's ended), where the output went. The session then starts the agent with the Agent tool and the prompt `ccp-run <run>`;
+// the harness's PreToolUse hook swaps in that prompt, and its SubagentStart hook binds the agent's id to the run.
 // A result counts only through the return tool, whose PreToolUse hook calls accept(): the caller must be the run's
 // agent, the result must match the actor's schema, and a claimed PR must be on GitHub at the claimed head. Why it is
 // built this way: plan/decisions/2026-10-30-engine-actors.md.
@@ -13,12 +14,14 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
-import { append } from '../../journal/src/index.js';
+import { append, readFile } from '../../journal/src/index.js';
 import { check } from './schema.js';
 import { prRef } from './effects/merge.js';
+import { assemble, blockedOf, contextOf, isStage, returnLine, sections, stagesOf, STAMPED, uncovered } from './stages.js';
+import { endRecord, stageRecord } from './trace.js';
 
-/** The actors that are agents. Others (merge, ask, post) are host effects (effects/index.js). */
-export const AGENTS = Object.freeze(['brief', 'build', 'verify']);
+// The actors that are agents are the workflow's model stages (stages.js isStage). Others (merge, ask, post) are host
+// effects (effects/index.js), and a workflow's name starts a child item.
 
 /** The prompt the session gives the Agent tool to start a run; the hook replaces it with the run's brief. */
 export const MARKER = /^\s*ccp-run\s+(\S+)\s*$/;
@@ -94,23 +97,8 @@ function journal(root, run, row) {
 
 // ---- The run handler: the host calls it when a state invokes an agent actor
 
-// What the agent is told besides its brief: its run, its worktree and how to return. It reaches the agent as the
-// SubagentStart hook's added context, so the prompt stays the brief alone and hashes to what was fixed before.
-function contextOf(run) {
-  const { brief, ...input } = run.input ?? {};
-  return [
-    `ccp-harness run ${run.run} (item ${run.item}, actor ${run.actor}).`,
-    `Your worktree is ${run.worktree}, on branch ${run.branch}. Work only there: the harness refuses file tools outside it and runs your shell commands from it.`,
-    `When you are done, call the harness return tool (its name ends in harness__return; load it with ToolSearch if it is deferred) with`,
-    `{ "run": "${run.run}", "result": <your result> }. The result must match this JSON Schema: ${JSON.stringify(run.schema)}${Object.keys(run.defs).length ? ` (with $ref into ${JSON.stringify(run.defs)})` : ''}.`,
-    `Only the agent this run started may return its result, and a claimed PR must be on GitHub at the claimed head.`,
-    Object.keys(input).length ? `Your input: ${JSON.stringify(input)}` : ''
-  ].filter(Boolean).join('\n');
-}
-
-// The brief an actor with no brief in its input gets (quick-fix's brief actor): written from its input alone.
-const writtenBrief = (actor, input) =>
-  `You are the ${actor} actor of a ccp_xstate work item. Your input is ${JSON.stringify(input ?? null)}. Do what the ${actor} step asks and return your result through the harness return tool.`;
+// A run's prompt is rendered from its stage contract alone (stages.js sections): rules, inputs, task, output and
+// return. The run's input named task (a brief another stage wrote, or a literal in the workflow) fills only the Task part.
 
 /**
  * Run handlers for the agent actors, for effects/index.js handlers({ actors }). `host` is the item's host (its root,
@@ -118,16 +106,43 @@ const writtenBrief = (actor, input) =>
  * `worktrees` the folder they go in. start() prepares the run and returns its outcome: { ref: the run, briefHash,
  * folder, worktree, branch, spawn: { tool, prompt } }. The run stays open until accept() hands back its result.
  */
-export function actors({ host, repo = process.cwd(), worktrees = join(dirname(resolve(repo)), 'ccp-actors'), names = AGENTS }) {
+export function actors({ host, repo = process.cwd(), worktrees = join(dirname(resolve(repo)), 'ccp-actors'), names = stagesOf(host.spec) }) {
   const handler = {
     start: (effect) => prepare({ host, effect, repo, worktrees }),
     // A host that stopped after the start row asks the run folder: prepared means it happened.
     find: (effect) => {
       const run = loadRun(host.root, effect.id);
       return run ? outcomeOf(run) : null;
+    },
+    // The item took the run's result or error: the stage record gains what came out and where it went.
+    ended: (effect, row) => {
+      const file = join(runDir(host.root, effect.id), 'stage.json');
+      const record = readJson(file);
+      if (record && !record.finished) writeJson(file, endRecord(record, host.spec, row, itemRows(host.root, host.item)));
     }
   };
   return Object.fromEntries(names.map((name) => [name, handler]));
+}
+
+// The item's journal rows, none before its file exists.
+function itemRows(root, item) {
+  try {
+    return readFile(itemFile(root, item)).rows;
+  } catch (error) {
+    if (error.code === 'ENOENT') return [];
+    throw error;
+  }
+}
+
+/** owner/repo of the clone's origin when it is on GitHub (https or ssh), else null: the run line names it. */
+export function githubOf(repo) {
+  let url = '';
+  try {
+    url = execFileSync('git', ['-C', resolve(repo), 'remote', 'get-url', 'origin'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return null;
+  }
+  return url.match(/^(?:https:\/\/github\.com\/|git@github\.com:|ssh:\/\/git@github\.com\/)([\w.-]+\/[\w.-]+?)(?:\.git)?\/?$/)?.[1] ?? null;
 }
 
 const outcomeOf = (run) => ({
@@ -148,7 +163,8 @@ export function prepare({ host, effect, repo, worktrees }) {
   const existing = readJson(join(dir, 'run.json'));
   if (existing) return outcomeOf(existing);
 
-  const brief = typeof effect.input?.brief === 'string' && effect.input.brief ? effect.input.brief : writtenBrief(effect.actor, effect.input);
+  const stage = spec.meta.actors?.[effect.actor];
+  if (!isStage(stage)) throw new Error(`${effect.actor} is no stage`);
   const branch = `run/${safe(item)}/${safe(r.name)}`;
   const worktree = join(resolve(worktrees), `${safe(item)}--${safe(r.name)}`);
   if (!existsSync(worktree)) {
@@ -167,24 +183,32 @@ export function prepare({ host, effect, repo, worktrees }) {
     release: host.release,
     state: host.snapshot ? JSON.stringify(host.snapshot.value) : null,
     input: effect.input ?? null,
-    schema: spec.meta.actors?.[effect.actor] ?? {},
+    schema: stage,
     defs: spec.meta.schemas ?? {},
     repo: resolve(repo),
+    github: githubOf(repo),
     worktrees: resolve(worktrees),
     worktree,
-    branch,
-    briefHash: sha256(brief)
+    branch
   };
-  run.context = contextOf(run);
+  const parts = sections(run);
+  const prompt = assemble(parts);
+  run.briefHash = sha256(prompt);
+  // The run facts go to the agent once, as its context (SubagentStart, or the first tool call's refusal), not in the prompt.
+  const context = contextOf(run);
+  run.context = context.text;
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, 'brief.md'), brief);
+  writeFileSync(join(dir, 'brief.md'), prompt); // file name kept: spawn() and the hook read brief.md
   writeFileSync(join(dir, 'context.md'), run.context);
-  const { hash, bytes } = storeBlob(root, brief);
+  const { hash, bytes } = storeBlob(root, prompt);
   journal(root, run, {
     kind: 'brief.stored',
     source: { system: 'journal', ref: `blobs/${hash}` },
     payload: { run: run.run, actor: run.actor, role: run.actor, hash, bytes, contextHash: sha256(run.context), worktree }
   });
+  const rows = itemRows(root, item);
+  const value = host.snapshot?.value ?? null;
+  writeJson(join(dir, 'stage.json'), stageRecord({ spec, run, parts, context, promptHash: run.briefHash, value, rows, transition: effect.transition }));
   writeJson(join(dir, 'run.json'), run);
   return outcomeOf(run);
 }
@@ -314,7 +338,7 @@ export function confine({ worktree, tool, input }) {
  * claimed head. `github` is a client from effects/github.js ({ pull }). Returns { accepted: { run, hash } } or
  * { refused: { rule, reason } }; both are journalled in the item's file.
  */
-export async function accept({ root, caller, run: runId, result, toolUseId, github, session = null }) {
+export async function accept({ root, caller, run: runId, result, toolUseId, github, web = null, session = null }) {
   const run = loadRun(root, runId);
   if (!run) return { refused: { rule: 'unknown-run', reason: `no prepared run ${JSON.stringify(runId ?? null)}` } };
   const refuse = (rule, reason) => {
@@ -338,23 +362,76 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   const problems = check(run.schema, result, run.defs);
   if (problems.length) return refuse('schema', `${run.actor} result: ${problems.join('; ').replaceAll('$', 'result')}`);
 
-  for (const { path, pr } of claimedPrs(result)) {
-    const ref = prRef(pr.url);
-    if (!ref) return refuse('github-fact', `${path}.url ${JSON.stringify(pr.url)} is not a GitHub PR URL`);
-    let now;
-    try {
-      now = await github.pull(ref);
-    } catch (error) {
-      const why = error.status === 404 ? 'GitHub shows no such PR' : `GitHub could not be read (${error.message})`;
-      return refuse('github-fact', `${path}: ${pr.url}: ${why}`);
+  // Design A, 4.1: refs observed, restated inputs equal, stamped fields reserved. Only the stamped result is stored.
+  const refs = refsIn(result);
+  for (const { path, ref } of refs) {
+    const taken = STAMPED.filter((k) => k in ref);
+    if (taken.length) return refuse('reserved', `${path} sets ${taken.join(', ')}: the host sets these from what it sees`);
+  }
+  for (const k of Object.keys(result ?? {})) {
+    if (run.input && Object.hasOwn(run.input, k) && JSON.stringify(result[k]) !== JSON.stringify(run.input[k])) {
+      return refuse('restated', `result.${k} is not the input's ${k}: a field your input has must repeat it exactly`);
     }
-    if (now?.head?.sha !== pr.headSha) return refuse('github-fact', `${path}: GitHub shows ${pr.url} at head ${now?.head?.sha ?? 'none'}, not the claimed ${pr.headSha}`);
-    if (pr.branch && now?.head?.ref !== pr.branch) return refuse('github-fact', `${path}: GitHub shows ${pr.url} on branch ${now?.head?.ref}, not the claimed ${pr.branch}`);
+  }
+  // A blocked result (the stage's "could not") covers nothing: it becomes the stage's error (resultsOf).
+  const gap = blockedOf(run.schema, result) == null ? uncovered(run.schema, run.input, result) : null;
+  if (gap) return refuse('covers', gap);
+  const stamped = structuredClone(result);
+  for (const { path, ref } of refsIn(stamped)) {
+    const pr = prRef(ref.url);
+    if (pr) {
+      let now;
+      try {
+        now = await github.pull(pr);
+      } catch (error) {
+        const why = error.status === 404 ? 'GitHub shows no such PR' : `GitHub could not be read (${error.message})`;
+        return refuse('ref', `${path}: ${ref.url}: ${why}`);
+      }
+      if (now?.head?.sha !== ref.at) return refuse('ref', `${path}: GitHub shows ${ref.url} at ${now?.head?.sha ?? 'none'}, not ${ref.at}`);
+      let head = null;
+      try {
+        head = execFileSync('git', ['-C', run.worktree, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+      } catch {
+        head = 'unreadable';
+      }
+      if (head !== ref.at) return refuse('ref', `${path}: your worktree is at ${head}, not ${ref.at}`);
+      ref.key = `${pr.owner}/${pr.repo}#${pr.pullNumber}`;
+      // The exact commands that put this head in a worktree (judge's round-1 graft from lane A): host-filled data.
+      ref.checkout = `git fetch origin pull/${pr.pullNumber}/head && git checkout --detach ${ref.at}`;
+      // Fails closed (round 2, graft from lane B): when the files cannot all be listed, the gates are unknown, and an
+      // unknown gate is a touched gate, so the person's CI-change card is asked.
+      let files = null;
+      let unlisted = null;
+      try {
+        files = await github.files(pr);
+      } catch (error) {
+        unlisted = `GitHub could not list the PR's files (${error.message})`;
+      }
+      if (!unlisted && !Array.isArray(files)) unlisted = 'GitHub gave no file list';
+      if (!unlisted && files.length >= FILES_PAGE) unlisted = `the PR has ${FILES_PAGE} or more files, more than one page`;
+      const gates = unlisted
+        ? [`(unknown: ${unlisted})`]
+        : files.map((f) => f.filename).filter((f) => typeof f === 'string' && f.startsWith('.github/'));
+      if (gates.length) ref.gates = gates;
+      const suites = (await github.suites({ owner: pr.owner, repo: pr.repo, sha: ref.at }))?.check_suites ?? [];
+      if (suites.length && suites.every((x) => x.status === 'completed' && GREEN.includes(x.conclusion))) ref.green = true;
+    } else {
+      let page = null;
+      try {
+        page = await web.get(ref.url);
+      } catch (error) {
+        page = { status: 0, body: String(error?.message ?? error) };
+      }
+      const flat = (t) => String(t ?? '').replace(/\s+/g, ' ').trim();
+      if (!(page?.status >= 200 && page?.status <= 299) || !flat(page.body).includes(flat(ref.at))) {
+        return refuse('ref', `${path}: the page at ${ref.url} does not contain the quoted text`);
+      }
+    }
   }
 
-  const text = JSON.stringify(result);
+  const text = JSON.stringify(stamped);
   const { hash, bytes } = storeBlob(root, text);
-  if (!writeOnce(join(dir, 'result.json'), { result, hash, caller, toolUseId, at: new Date().toISOString() })) {
+  if (!writeOnce(join(dir, 'result.json'), { result: stamped, hash, caller, toolUseId, at: new Date().toISOString() })) {
     return refuse('already-returned', `run ${run.run} already returned its result`);
   }
   journal(root, run, {
@@ -374,12 +451,14 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   return { accepted: { run: run.run, hash } };
 }
 
-// Every { url, headSha } object in a result: a claim of a PR at a head, `pr` at the top (quick-fix's build) or anywhere
-// below. A url that isn't a GitHub PR's is still a claim, and is refused for it, so no shape of url skips GitHub.
-function claimedPrs(value, path = 'result') {
+// Every ref { url, at } in a value, depth-first, with its path (design A, 4.1). STAMPED (stages.js): the fields the
+// host stamps on a PR ref.
+const FILES_PAGE = 100; // github.files asks for one page of 100
+const GREEN = ['success', 'neutral', 'skipped'];
+function refsIn(value, path = 'result') {
   if (!value || typeof value !== 'object') return [];
-  const here = typeof value.url === 'string' && typeof value.headSha === 'string' ? [{ path, pr: value }] : [];
-  return [...here, ...Object.entries(value).flatMap(([k, v]) => claimedPrs(v, `${path}.${k}`))];
+  const here = typeof value.url === 'string' && typeof value.at === 'string' ? [{ path, ref: value }] : [];
+  return [...here, ...Object.entries(value).flatMap(([k, v]) => refsIn(v, `${path}.${k}`))];
 }
 
 // An agent ending with its run still open (plan item engine-actor-returns) is sent back once to call the return tool;
@@ -388,7 +467,6 @@ function claimedPrs(value, path = 'result') {
 // stopped()). A block at SubagentStop does not re-prompt an agent that already handed back (seen in the verifier's
 // scratch run ar2, 2026-10-31), so such a stop fails the run at once.
 const sentBackFile = (dir) => join(dir, 'sent-back.json');
-const returnInstruction = (run) => `You are the invoked ${run.actor} actor for run ${run.run}, and you are ending without returning your result, so the item can't move. Call the harness return tool now (its name ends in harness__return; load it with ToolSearch if it is deferred) with { "run": "${run.run}", "result": <your result> }. Don't redo your work unless the tool refuses the result.`;
 
 // The bound agent's open run and its folder, or null when the agent is no actor or its run returned or failed.
 function openRunOf(root, agentId) {
@@ -403,6 +481,17 @@ function openRunOf(root, agentId) {
 // Sends the run's agent back the first time it ends; true when it had already been sent back.
 function sentBackBefore(dir, agentId, how) {
   return !writeOnce(sentBackFile(dir), { agentId, how, at: new Date().toISOString() });
+}
+
+// The send-back message is journalled word for word with its hash (critique fix 12, grafted from lane M).
+function sentBack(root, run, agentId, tool, text, session) {
+  journal(root, run, {
+    kind: 'refusal',
+    source: { system: 'hook', ref: `stop ${agentId}` },
+    agent: agentId,
+    payload: { source: 'hook', rule: 'sent-back', reason: text, run: run.run, actor: run.actor, caller: agentId, tool, textHash: sha256(text), outcome: 'sent-back', hookSession: session }
+  });
+  return text;
 }
 
 function fail(root, { run, dir }, agentId, how, session) {
@@ -424,7 +513,9 @@ function fail(root, { run, dir }, agentId, how, session) {
 export function handback({ root, agentId, session = null }) {
   const open = openRunOf(root, agentId);
   if (!open) return null;
-  if (!sentBackBefore(open.dir, agentId, 'SubagentHandback')) return { deny: `no-return: ${returnInstruction(open.run)} Hand back after the return tool accepts it.` };
+  if (!sentBackBefore(open.dir, agentId, 'SubagentHandback')) {
+    return { deny: sentBack(root, open.run, agentId, 'SubagentHandback', `no-return: ${returnLine(open.run.run)} Hand back after the return tool accepts it.`, session) };
+  }
   return fail(root, open, agentId, 'SubagentHandback', session);
 }
 
@@ -437,7 +528,7 @@ export function stopped({ root, agentId, again = false, handedBack = false, sess
   const open = openRunOf(root, agentId);
   if (!open) return null;
   if (handedBack) return fail(root, open, agentId, 'SubagentStop, after a handback', session);
-  if (!again && !sentBackBefore(open.dir, agentId, 'SubagentStop')) return { block: returnInstruction(open.run) };
+  if (!again && !sentBackBefore(open.dir, agentId, 'SubagentStop')) return { block: sentBack(root, open.run, agentId, 'SubagentStop', returnLine(open.run.run), session) };
   return fail(root, open, agentId, 'SubagentStop', session);
 }
 
@@ -450,7 +541,7 @@ export function stopped({ root, agentId, again = false, handedBack = false, sess
 export function resultsOf(host) {
   const inputs = [];
   for (const run of host.runs.values()) {
-    if (!AGENTS.includes(run.actor)) continue;
+    if (!isStage(host.spec.meta.actors?.[run.actor])) continue;
     const got = readJson(join(runDir(host.root, run.id), 'result.json'));
     const failed = !got && readJson(join(runDir(host.root, run.id), 'failed.json'));
     if (failed) {
@@ -458,6 +549,12 @@ export function resultsOf(host) {
       continue;
     }
     if (!got) continue;
+    // The stage's "could not" (stages.js BLOCKED): the actor's error, so the invoke's onError takes it like a stop.
+    const blocked = blockedOf(host.spec.meta.actors[run.actor], got.result);
+    if (blocked != null) {
+      inputs.push({ event: { type: `xstate.error.actor.${run.invoke}`, error: `${run.actor} blocked: ${blocked}` }, run: run.id, source: { system: 'harness', ref: `return ${got.toolUseId ?? got.hash}` } });
+      continue;
+    }
     inputs.push({
       event: { type: `xstate.done.actor.${run.invoke}`, output: got.result },
       run: run.id,
@@ -478,7 +575,7 @@ export async function deliver({ root, run: runId, github = null, workflow = null
   const { repo, worktrees } = run;
   try {
     const [{ restore, offer }, { handlers }, { loadWorkflow }] = await Promise.all([import('./host.js'), import('./effects/index.js'), import('./index.js')]);
-    const spec = workflow ?? loadWorkflow(run.workflow);
+    const spec = workflow ?? loadWorkflow(run.workflow, { root });
     const host = restore({ root, item: run.item, spec, session: run.session, release: run.release });
     host.session = host.owner ?? run.session;
     const results = await offer(host, resultsOf(host), handlers({ github, actors: actors({ host, repo, worktrees }) }));

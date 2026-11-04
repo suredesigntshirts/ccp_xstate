@@ -7,14 +7,14 @@ import { createServer } from 'node:http';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { restore, offer, pending, itemFile, sessionFile } from '../../src/index.js';
+import { restore, offer, pending, itemFile, sessionFile, loadWorkflow } from '../../src/index.js';
 import { handlers, github } from '../../src/effects/index.js';
 import { merge } from '../../src/effects/merge.js';
 export { merge };
 import { readFile } from '../../../journal/src/index.js';
-import { workflow, ISSUE, BRIEFS, A, B, pr, verdict } from '../flow.js';
+import { workflow, ISSUE, BRIEFS, A, B, pr, verdict, pushed } from '../flow.js';
 
-export { workflow, ISSUE, BRIEFS, A, B, pr, verdict, restore, offer, pending, itemFile, sessionFile, handlers };
+export { workflow, ISSUE, BRIEFS, A, B, pr, verdict, pushed, restore, offer, pending, itemFile, sessionFile, handlers };
 export const RELEASE = '0.2.0';
 export const REPO = 'o/r';
 export const PR_URL = 'https://github.com/o/r/pull/1';
@@ -23,7 +23,8 @@ export const MERGE_SHA = 'd'.repeat(40);
 import { inputsOfWake } from '../../src/index.js';
 export const inputsOfWakeFor = (host, text, now = '2999-01-01T00:00:00Z') => inputsOfWake(host, text, { now });
 export const fresh = (name = 'parity') => mkdtempSync(join(tmpdir(), `${name}-`));
-export const open = (root, { item = 'it-1', spec = workflow, session = 'owner', release = RELEASE } = {}) =>
+// Quick-fix is loaded with the root, so its pinned bytes are stored there for bin/host.js and the hooks (workflowOf).
+export const open = (root, { item = 'it-1', spec = loadWorkflow('quick-fix', { root }), session = 'owner', release = RELEASE } = {}) =>
   restore({ root, item, spec, session, release });
 export const start = (session = 'owner', input = { issue: ISSUE }) =>
   ({ event: { type: 'xstate.init', input }, source: { system: 'claude-code', ref: session } });
@@ -33,21 +34,27 @@ export const transitions = (root, item = 'it-1') => rows(root, item).filter((r) 
 export const effectRows = (root, item = 'it-1') => rows(root, item).filter((r) => r.kind === 'engine.effect');
 
 /**
- * GitHub as a local server: PRs of o/r by number, each { head, merged, mergeSha }. GET /repos/o/r/pulls/<n> reads
- * one; PUT /repos/o/r/pulls/<n>/merge merges it only at its head when a sha is sent, as the REST API does. `push`
- * moves a PR's head. Every merge request is kept in `merges`.
+ * GitHub as a local server: PRs of o/r by number, each { head, merged, mergeSha, files }. GET /repos/o/r/pulls/<n> reads
+ * one, and /files its files; PUT /repos/o/r/pulls/<n>/merge merges it only at its head when a sha is sent, as the REST
+ * API does; GET /repos/o/r/commits/<sha>/check-suites gives the suites `green` set. `push` moves a PR's head. Every
+ * merge request is kept in `merges`.
  */
 export async function fakeGitHub(prs = { 1: { head: A } }) {
   const state = Object.fromEntries(Object.entries(prs).map(([n, p]) => [n, { merged: false, mergeSha: null, branch: 'build/x', ...p }]));
   const merges = [];
+  const suites = {}; // sha -> [{ status, conclusion }]
   const server = createServer((req, res) => {
     let body = '';
     req.on('data', (c) => (body += c));
     req.on('end', () => {
       const reply = (status, json) => { res.writeHead(status, { 'content-type': 'application/json' }); res.end(JSON.stringify(json)); };
-      const m = req.url.match(/^\/repos\/o\/r\/pulls\/(\d+)(\/merge)?$/);
+      // The commit's check suites and the PR's files, which accept() reads to stamp green and gates (stage contract).
+      const cs = req.url.split('?')[0].match(/^\/repos\/o\/r\/commits\/([0-9a-f]+)\/check-suites$/);
+      if (cs) return reply(200, { total_count: (suites[cs[1]] ?? []).length, check_suites: suites[cs[1]] ?? [] });
+      const m = req.url.split('?')[0].match(/^\/repos\/o\/r\/pulls\/(\d+)(\/merge|\/files)?$/);
       const p = m && state[m[1]];
       if (!p) return reply(404, { message: 'Not Found' });
+      if (req.method === 'GET' && m[2] === '/files') return reply(200, (p.files ?? []).map((filename) => ({ filename })));
       if (req.method === 'GET' && !m[2]) {
         return reply(200, { number: Number(m[1]), merged: p.merged, merge_commit_sha: p.mergeSha, head: { sha: p.head, ref: p.branch } });
       }
@@ -65,6 +72,7 @@ export async function fakeGitHub(prs = { 1: { head: A } }) {
     state,
     merges,
     push: (number, head) => { state[number].head = head; },
+    green: (sha) => { suites[sha] = [{ status: 'completed', conclusion: 'success' }]; },
     api: `http://127.0.0.1:${server.address().port}`,
     client: github({ api: `http://127.0.0.1:${server.address().port}`, env: {} }),
     close: () => new Promise((ok) => { server.closeAllConnections(); server.close(ok); })
@@ -82,8 +90,8 @@ export function platform() {
     posts,
     wakes,
     hearth: {
-      card: async ({ key, question, choices }) => {
-        const made = { key, ref: `cmsg_card${++n}`, question, choices };
+      card: async ({ key, question, choices, inputs }) => {
+        const made = { key, ref: `cmsg_card${++n}`, question, choices, inputs };
         cards.push(made);
         return { ref: made.ref };
       },

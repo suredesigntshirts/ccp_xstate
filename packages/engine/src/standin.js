@@ -37,8 +37,11 @@ export function standinInput(host, { effect, choice, by, grants, at = new Date()
   const repo = repoOf(run.input?.pr?.url);
   const now = Date.parse(at);
   const why = [];
+  // An item runs on its pinned workflow, `<name>@<sha256>` (lane A, 4.3). A grant names the workflow by name, which
+  // covers every pinned version of it, or by the pinned id, which covers that version alone.
+  const [name] = String(host.spec.id).split('@');
   const grant = grants.find((g) => {
-    if (g.workflow !== host.spec.id) return why.push(`${g.id}: workflow ${g.workflow}, not ${host.spec.id}`), false;
+    if (g.workflow !== name && g.workflow !== host.spec.id) return why.push(`${g.id}: workflow ${g.workflow}, not ${name}`), false;
     if (g.ask !== run.invoke) return why.push(`${g.id}: ask ${g.ask}, not ${run.invoke}`), false;
     if (!Array.isArray(g.choices) || !g.choices.includes(choice)) return why.push(`${g.id}: does not grant "${choice}"`), false;
     if (!Array.isArray(g.repos) || !g.repos.includes(repo)) return why.push(`${g.id}: repo ${repo ?? '(none)'} not granted`), false;

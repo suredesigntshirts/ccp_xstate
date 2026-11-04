@@ -11,6 +11,7 @@ import { restore, offer, pending } from '../src/index.js';
 import { handlers, relay, recordCard, cardFile } from '../src/effects/index.js';
 import { readFile } from '../../journal/src/index.js';
 import { workflow, ISSUE, BRIEFS, A, pr, verdict } from './flow.js';
+import { loadWorkflow } from '../src/index.js';
 
 const cli = new URL('../bin/host.js', import.meta.url).pathname;
 const fresh = () => mkdtempSync(join(tmpdir(), 'engine-relay-'));
@@ -23,7 +24,8 @@ const tap = (card, index = 0, option = 'A') => readFileSync(new URL('../../../pl
 
 // An item of quick-fix taken to awaitingMerge on head A, its brief, build and verify done by stand-in actors.
 async function toAwaitingMerge(root) {
-  const host = restore({ root, item: 'it-1', spec: workflow, session: 'owner', release: '0.2.0' });
+  // Loaded with the root, so the workflow's pinned bytes are there for bin/host.js (workflowOf) to load the item on.
+  const host = restore({ root, item: 'it-1', spec: loadWorkflow('quick-fix', { root }), session: 'owner', release: '0.2.0' });
   const outputs = { brief: BRIEFS, build: pr(A), verify: verdict('PASS', A) };
   const actors = Object.fromEntries(Object.entries(outputs).map(([name, output]) => [name, { start: async (e) => ({ ref: e.id, output }) }]));
   await offer(host, [{ event: { type: 'xstate.init', input: { issue: ISSUE } }, source: { system: 'claude-code', ref: 'owner' } }],

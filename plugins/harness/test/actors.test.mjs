@@ -10,7 +10,7 @@ import { PLUGIN, REPO, temp } from './helpers.mjs';
 
 const HOOK = join(PLUGIN, 'scripts', 'actors.mjs');
 const SERVER = join(PLUGIN, 'scripts', 'return-tool.mjs');
-const { restore, offer } = await import(join(REPO, 'packages', 'engine', 'src', 'index.js'));
+const { restore, offer, loadWorkflow } = await import(join(REPO, 'packages', 'engine', 'src', 'index.js'));
 const { handlers } = await import(join(REPO, 'packages', 'engine', 'src', 'effects', 'index.js'));
 const { actors } = await import(join(REPO, 'packages', 'engine', 'src', 'actors.js'));
 const { workflow, ISSUE } = await import(join(REPO, 'packages', 'engine', 'test', 'flow.js'));
@@ -26,7 +26,8 @@ async function project() {
   writeFileSync(join(clone, 'f'), 'x');
   execFileSync('git', ['-C', clone, 'add', '-A']);
   execFileSync('git', ['-C', clone, '-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-qm', 'one']);
-  const host = restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' });
+  // Loaded with the root, so the item's pinned workflow bytes are there for the hook to load the run's workflow from.
+  const host = restore({ root, item: 'it-1', spec: loadWorkflow('quick-fix', { root }), session: 's', release: '0.2.0' });
   await offer(host, [{ event: { type: 'xstate.init', input: { issue: ISSUE } }, source: { system: 'claude-code', ref: 's' } }],
     handlers({ actors: actors({ host, repo: clone, worktrees: join(dir, 'wt') }) }));
   return { dir, root, env: { PATH: process.env.PATH, CCP_HARNESS_DIR: dir, CLAUDE_CODE_REMOTE_SESSION_ID: '' } };
@@ -63,14 +64,16 @@ test('the hooks start, bind, confine and check an actor, and the return tool acc
 
   const swap = hook(env, { hook_event_name: 'PreToolUse', tool_name: 'Agent', tool_use_id: 't1', tool_input: { prompt: `ccp-run ${run}`, description: 'brief' } });
   assert.equal(swap.permissionDecision, undefined, 'no allow: the permission flow still decides the call');
-  assert.match(swap.updatedInput.prompt, /You are the brief actor/);
+  // The swapped-in prompt is the run's brief.md, rendered from the stage contract: Rules first, the brief stage's role.
+  assert.match(swap.updatedInput.prompt, /^## Rules\n/);
+  assert.match(swap.updatedInput.prompt, /You are the brief writer for one issue\./);
   assert.equal(hook(env, { hook_event_name: 'PreToolUse', tool_name: 'Agent', tool_use_id: 't2', tool_input: { prompt: 'hello' } }), null);
 
   const transcript = join(dir, 'tx', 'sess.jsonl');
   mkdirSync(join(dir, 'tx', 'sess', 'subagents'), { recursive: true });
   writeFileSync(join(dir, 'tx', 'sess', 'subagents', 'agent-ag1.meta.json'), JSON.stringify({ toolUseId: 't1' }));
   const start = hook(env, { hook_event_name: 'SubagentStart', agent_id: 'ag1', agent_type: 'general-purpose', transcript_path: transcript });
-  assert.match(start.additionalContext, /ccp-harness run it-1:0\.brief/);
+  assert.match(start.additionalContext, /^Run it-1:0\.brief, worktree /);
 
   const bash = hook(env, { hook_event_name: 'PreToolUse', agent_id: 'ag1', tool_name: 'Bash', tool_use_id: 't3', tool_input: { command: 'pwd' } });
   assert.match(bash.updatedInput.command, /^\( cd '.*it-1--0\.brief' \|\| exit 1\npwd\n\)$/);
@@ -120,7 +123,7 @@ test('SubagentStop: a bound actor with its run open is blocked once with the ret
   assert.equal(stop(env, { ...base, agent_id: 'other', stop_hook_active: false }), null, 'an agent bound to no run stops freely');
   const first = stop(env, { ...base, stop_hook_active: false });
   assert.equal(first.decision, 'block');
-  assert.match(first.reason, /Call the harness return tool now .*"run": "it-1:0\.brief"/s);
+  assert.match(first.reason, /Return through the harness return tool .*"run": "it-1:0\.brief"/s);
   assert.equal(restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' }).snapshot.value, 'briefing');
 
   assert.equal(stop(env, { ...base, stop_hook_active: true }), null, 'the second stop is let through');

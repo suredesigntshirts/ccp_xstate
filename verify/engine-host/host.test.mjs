@@ -91,7 +91,11 @@ test('duplicate (b): process dies mid-effect (real child, exit 9); restart does 
 
 const qf = loadWorkflow('quick-fix');
 const BR = { builder: 'b.md', verifier: 'v.md' };
-const prOut = (h) => ({ pr: { branch: 'build/x', headSha: h, url: 'https://github.com/o/r/pull/1' } });
+// Ported to the stage contract (engine-stage-contract): the PR ref as the host stamps it, a push as CI green on a new
+// head (which moves verifying to reverifying, replacing the run), and a verdict in the contract's shape.
+const prOut = (h) => ({ pr: { url: 'https://github.com/o/r/pull/1', at: h, key: 'o/r#1', green: true } });
+const pushOf = (h) => ({ type: 'github.check_suite.completed', head_sha: h, pr: 'o/r#1' });
+const passOn = (h) => ({ result: 'PASS', pr: { url: 'https://github.com/o/r/pull/1', at: h }, issue: { url: 'https://github.com/o/r/issues/1', expect: ['x'] }, lines: [{ line: 'x', result: 'PASS', evidence: 'e' }] });
 const quickStart = { event: { type: 'xstate.init', input: { issue: { url: 'https://github.com/o/r/issues/1', expect: ['x'] } } }, source: { system: 'claude-code', ref: 'S-owner' } };
 
 test('stale: completion from a replaced run is journalled stale and changes nothing (also across restart, forged run id)', async () => {
@@ -101,18 +105,18 @@ test('stale: completion from a replaced run is journalled stale and changes noth
   await offer(host, [quickStart], handlers);
   assert.equal(host.snapshot.value, 'verifying');
   const oldRun = [...host.effects.values()].find((e) => e.effect.actor === 'verify').effect.id;
-  const [pushed] = await offer(host, [{ event: { type: 'pr.pushed', headSha: SHA('b') }, source: { system: 'github', ref: 'push-b' } }], handlers);
+  const [pushed] = await offer(host, [{ event: pushOf(SHA('b')), source: { system: 'github', ref: 'push-b' } }], handlers);
   assert.equal(pushed.outcome, 'applied');
   const newRun = [...host.runs.values()].find((r) => r.actor === 'verify').id;
   assert.notEqual(newRun, oldRun);
   const before = hashOf(host.snapshot);
   const nRows = rows(root).length;
-  const passA = { type: 'xstate.done.actor.verify', output: { result: 'PASS', sha: SHA('a'), report: 'r' } };
+  const passA = { type: 'xstate.done.actor.verify', output: passOn(SHA('a')) };
   for (const h of [host, open(root, qf)]) {
     const [r] = await offer(h, [{ event: passA, run: oldRun, source: { system: 'engine', ref: `old-${Math.random()}` } }], handlers);
     assert.equal(r.outcome, 'stale');
     assert.equal(hashOf(h.snapshot), before);
-    assert.equal(h.snapshot.value, 'verifying');
+    assert.equal(h.snapshot.value, 'reverifying');
   }
   // Completion naming no run at all, or a run that never existed: stale too.
   const [none] = await offer(host, [{ event: passA, source: { system: 'engine', ref: 'norun' } }], handlers);
@@ -125,7 +129,7 @@ test('stale: completion from a replaced run is journalled stale and changes noth
   assert.equal(hashOf(open(root, qf).snapshot), before);
   assert.ok(rows(root).length > nRows); // journalled
   // The current run's completion still works.
-  const [good] = await offer(host, [{ event: { ...passA, output: { ...passA.output, sha: SHA('b') } }, run: newRun, source: { system: 'engine', ref: 'new' } }], handlers);
+  const [good] = await offer(host, [{ event: { ...passA, output: passOn(SHA('b')) }, run: newRun, source: { system: 'engine', ref: 'new' } }], handlers);
   assert.equal(good.outcome, 'applied');
   assert.equal(host.snapshot.value, 'awaitingMerge');
 });

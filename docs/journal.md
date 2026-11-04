@@ -311,6 +311,7 @@ effect reported. A source already offered is a duplicate. `id` is the transition
 | run | The run effect id a completion answers, or null |
 | from | The state before (as JSON), on an applied row |
 | hash | `hashOf` the snapshot after, on an applied row; restore checks each one |
+| writes | On an applied row: the context paths the step wrote, in order, each `{ path, from, set }`. `from` is the source as the workflow wrote it (`event.output.pr`, `context.built`, `{ "value": x }`); `set` is the JSON pointer of the set action in the workflow file (null for the start, which writes the item's input as `event.input.<key>`). The stage record (below) traces every input's producer from these |
 
 A `not-owner` row, and a `refused` row for an item that hasn't started, go to the offering session's own file
 (`sessions/<session>.jsonl`), since only the owner writes the item's file.
@@ -329,9 +330,40 @@ timer's `{ ref, due }` (plan item engine-effects). An effect that has ended is n
 
 The engine's actor runs (plan item engine-actors, `packages/engine/src/actors.js`) write these to the item's own file,
 beside its engine rows, with `item` and the `state` the run was started in. A run's folder is
-`<journal root>/items/<item>/runs/<seq>.<invoke>/`: `brief.md`, `context.md`, `run.json`, `spawn.json` (the Agent call
-that started it), `agent.json` (the agent bound to it) and `result.json` (its accepted result). Brief and result texts
-are blobs, `<journal root>/blobs/<sha256>`, as capture stores them.
+`<journal root>/items/<item>/runs/<seq>.<invoke>/`: `brief.md`, `context.md`, `run.json`, `stage.json` (the stage
+record), `spawn.json` (the Agent call that started it), `agent.json` (the agent bound to it) and `result.json` (its
+accepted result). Brief and result texts are blobs, `<journal root>/blobs/<sha256>`, as capture stores them.
+
+`stage.json` (`packages/engine/src/trace.js`) is what the person reads to see one stage run end to end. Written when the
+run is prepared: `stage`, `workflow` (`id`, `name`, `hash`), the `invoke`, `state` and `invokeAt` (JSON pointer) that
+started it, `prompt` (`hash` and `parts`: rules, inputs, task, output and return, each a list of `{ text, source }`,
+where a source is a `frame` constant (with `fixed: true` when its text is the same for every run, as the data rule,
+or `filled`, the run facts it was filled from: `{ run }` for the return line), a `workflow` JSON pointer, or an `input`
+with its `meaningAt` and `producer`), `context` (the run line, `context.md`, which the harness tells the agent once at
+SubagentStart or before its first tool call runs, and which no prompt part repeats: `{ text, source }` with
+`filled: { run, worktree, repo, github, branch }`, github being the clone's origin on GitHub or null) and `inputs` (each `name`,
+`meaning`, `meaningAt`, `value`, `from` (the context path or literal it was wired from), `wiredAt` and `producer`,
+plus `amended` when later writes changed parts of it). A producer is `{ kind: 'stage', run, actor, field }`
+(or `workflow`/`effect` for a child item or host effect), `initial` (the item's input), `literal` (with its pointer),
+`event`, `copy`, `host` (a field the host stamped on a ref the run returned, such as `pr.checkout`), `default`, or
+`parts` (a null default built wholly from part-writes, such as research's `answers`: `parts` lists each part-writer,
+and they are not listed again as `amended`), each with the transition and set action that wrote it. Every write is a
+set action on a transition (the load check refuses actions on entry, exit, always or the root,
+`packages/engine/src/form.js`), so the journal's `writes` hold every write and the producers are exact.
+
+Added when the item takes the run's result or error: `finished` (`transition`, `event` and `state`, the active states
+after it as a list of dotted paths, such as `["awaitingMerge"]`; named `finished`, not `ended`, so no record field
+shares a state's name), `output` (the result as accepted) with `stamped` (the dotted paths in it the host wrote, such
+as `pr.key` and `pr.checkout`; an agent may not set them, so the output less these is what the agent returned), or
+`error`, and `wrote`: each path written from it with `at` (the set action's pointer), `into` (the state the
+transition entered, a dotted path), `replaced` (the producer of the value the write replaced, or null when there was
+none: the context default, or a literal null the workflow reset it to) and `readBy`, the invokes in the chart that
+read that path and that the item can reach from `into`: the ones that could read it next, not the one that will (a
+later write may replace the value first, as replanning nulls `verdict`). Reachability is the chart's, by any path,
+whether or not the item took it; `readBy` does not say which path reaches a reader. A reader that is the writing
+invoke itself, reached by entering its state again (the next build reads this build's `pr` as `previous`), is kept
+and marked `self: true`. A run whose state was left before it returned (the transition stopped it) gets `finished`
+with `stopped: true`, no output and an empty `wrote`.
 
 | When | Kind | `payload` |
 |---|---|---|

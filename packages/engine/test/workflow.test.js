@@ -37,9 +37,11 @@ test('every event taken from outside has a schema, and every delay a value', () 
   assert.deepEqual(states.flatMap(([, s]) => Object.keys(s.after ?? {})).filter((d) => !(d in itemSpec.meta.delays)), []);
 });
 
-test('context changes only through set and inc', () => {
-  const actions = states.flatMap(([, s]) => transitions(s).flatMap((t) => t.actions ?? []));
-  assert.deepEqual([...new Set(actions.map((a) => a.type))].sort(), ['inc', 'set']);
+// Ported to the stage contract: inc is gone (lane A, round 2: a bounded loop is a shift register of set), and the
+// load check refuses any other action (form.js, tested in tourney/S3).
+test('context changes only through set', () => {
+  const actions = states.flatMap(([, s]) => transitions(s).flatMap((t) => [t.actions ?? []].flat()));
+  assert.deepEqual([...new Set(actions.map((a) => a.type))].sort(), ['set']);
 });
 
 test('every guard condition is a path, or a path with one of is, in, same or below', () => {

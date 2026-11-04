@@ -6,7 +6,12 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { readFile } from '../../journal/src/index.js';
 import { restore, applyEvent, persist, runEffects, offer, pending, itemFile, sessionFile, hashOf, inputsOfWake, wakesIn } from '../src/index.js';
-import { A, ISSUE, BRIEFS, workflow, pr } from './flow.js';
+import { A, ISSUE, BRIEFS, workflow, pr, pushed, verdict } from './flow.js';
+import { loadWorkflow } from '../src/index.js';
+
+// Ported to the stage contract (engine-stage-contract): quick-fix sets no timer now (lane A removed buildTimeout), so
+// the timer test runs on the fixture workflow test/fixtures/workflows/timed.json.
+const timed = loadWorkflow('timed', { dir: new URL('./fixtures/workflows/', import.meta.url).pathname });
 
 const wake = (name) => readFileSync(new URL(`./fixtures/wakes/${name}.txt`, import.meta.url), 'utf8');
 const RELEASE = '0.2.0';
@@ -119,11 +124,12 @@ test('a completion from a replaced run is journalled stale and changes nothing',
   const { handlers } = counting({ brief: () => ({ output: BRIEFS }), build: () => ({ output: pr(A) }) });
   await offer(host, [start], handlers);
   assert.equal(host.snapshot.value, 'verifying');
-  // A push re-enters verifying: the first verify run is stopped and a new one starts.
-  const [pushed] = await offer(host, [{ event: { type: 'pr.pushed', headSha: 'b'.repeat(40) }, source: { system: 'github', ref: 'push-b' } }], handlers);
-  assert.equal(pushed.outcome, 'applied');
+  // A push (CI green on a new head) moves verifying to reverifying: the first verify run is stopped and a new one starts.
+  const [moved] = await offer(host, [{ event: pushed('b'.repeat(40)), source: { system: 'github', ref: 'push-b' } }], handlers);
+  assert.equal(moved.outcome, 'applied');
+  assert.equal(host.snapshot.value, 'reverifying');
   const before = hashOf(host.snapshot);
-  const [old] = await offer(host, [{ event: { type: 'xstate.done.actor.verify', output: { result: 'PASS', sha: A, report: 'r' } }, run: 'it-1:2.verify', source: { system: 'engine', ref: 'old-verify' } }], handlers);
+  const [old] = await offer(host, [{ event: { type: 'xstate.done.actor.verify', output: verdict('PASS', A) }, run: 'it-1:2.verify', source: { system: 'engine', ref: 'old-verify' } }], handlers);
   assert.equal(old.outcome, 'stale');
   assert.match(old.row.payload.reason, /run it-1:2\.verify is not in flight/);
   assert.equal(hashOf(host.snapshot), before);
@@ -151,7 +157,7 @@ test('a refused effect is journalled with its rule, not retried, and the item st
 test("replaying an item's journal rebuilds its snapshot exactly", async () => {
   const root = fresh();
   const host = open(root);
-  const { handlers } = counting({ brief: () => ({ output: BRIEFS }), build: () => ({ output: pr(A) }), verify: () => ({ output: { result: 'PASS', sha: A, report: 'r' } }) });
+  const { handlers } = counting({ brief: () => ({ output: BRIEFS }), build: () => ({ output: pr(A) }), verify: () => ({ output: verdict('PASS', A) }) });
   await offer(host, [start], handlers);
   const back = open(root);
   assert.equal(back.snapshot.value, 'awaitingMerge');
@@ -167,7 +173,7 @@ test('a second session is refused the item and the refusal goes to its own file'
   await offer(open(root), [start]);
   const intruder = open(root, workflow, 'intruder');
   assert.equal(intruder.owner, 'owner');
-  const [result] = await offer(intruder, [{ event: { type: 'pr.pushed', headSha: A }, source: { system: 'github', ref: 'x' } }]);
+  const [result] = await offer(intruder, [{ event: pushed(A), source: { system: 'github', ref: 'x' } }]);
   assert.equal(result.outcome, 'not-owner');
   const own = readFile(sessionFile(root, 'intruder')).rows;
   assert.equal(own.length, 1);
@@ -185,11 +191,15 @@ test('an event with no source, or one the workflow does not take from outside, i
   const root = fresh();
   const host = open(root);
   persist(host, applyEvent(host, start).row);
-  assert.equal(applyEvent(host, { event: { type: 'pr.pushed', headSha: A }, source: null }).outcome, 'refused');
-  const github = inputsOfWake(host, wake('pr-merged'));
-  const result = applyEvent(host, github[0]);
+  assert.equal(applyEvent(host, { event: pushed(A), source: null }).outcome, 'refused');
+  // quick-fix now takes pull_request.closed (a merge outside the host, lane A Q7), so the workflow that does not take
+  // it from outside is the on-merge one.
+  const other = open(fresh(), onMerge);
+  persist(other, applyEvent(other, { event: { type: 'xstate.init', input: {} }, source: { system: 'claude-code', ref: 'owner' } }).row);
+  const github = inputsOfWake(other, wake('pr-merged'));
+  const result = applyEvent(other, github[0]);
   assert.equal(result.outcome, 'refused');
-  assert.match(result.row.payload.reason, /github\.pull_request\.closed is not an event quick-fix takes from outside/);
+  assert.match(result.row.payload.reason, /github\.pull_request\.closed is not an event on-merge takes from outside/);
 });
 
 test('a wake-shaped line inside agent text is not read', () => {
@@ -214,7 +224,7 @@ test('real wakes parse into events whose source is the envelope', async () => {
   assert.deepEqual(inputsOfWake(host, JSON.parse(nested).notifications[0].content)[0].source, input.source);
 });
 
-test('a tap on a card a run posted completes that run; a timer fires once it is due', async () => {
+test('a tap on a card a run posted completes that run; a timer fires once it is due (timer on the timed fixture)', async () => {
   const root = fresh();
   const host = open(root);
   const card = 'cmsg_01VhYV3jhQ9s4qrrh2th12sN7oo3Bm18DgfoRpQy3bR2XZ';
@@ -232,17 +242,17 @@ test('a tap on a card a run posted completes that run; a timer fires once it is 
   assert.equal(host.snapshot.value, 'dropped');
 
   // The build's timeout is a timer the host set; a wake after it is due fires it, once.
-  const timed = open(fresh());
-  await offer(timed, [start], counting({ brief: () => ({ output: BRIEFS }) }).handlers);
-  const [timer] = pending(timed).timers;
+  const item = open(fresh(), timed);
+  await offer(item, [{ event: { type: 'xstate.init', input: { pr: 'https://github.com/o/r/pull/1' } }, source: { system: 'claude-code', ref: 'owner' } }], {});
+  const [timer] = pending(item).timers;
   assert.ok(Date.parse(timer.due) > Date.now() + 3500000);
-  assert.equal(inputsOfWake(timed, wake('check-suite-completed')).filter((i) => i.source.system === 'timer').length, 0);
+  assert.equal(inputsOfWake(item, wake('check-suite-completed')).filter((i) => i.source.system === 'timer').length, 0);
   const later = new Date(Date.parse(timer.due) + 1000).toISOString();
   const late = `<wake reason="scheduled" current-time="${later}"></wake>`;
   // A wake's time can't run ahead of the host's clock: the same wake fires nothing until the clock is past due.
-  assert.deepEqual(inputsOfWake(timed, late).filter((i) => i.source.system === 'timer'), []);
-  const fired = await offer(timed, inputsOfWake(timed, late, { now: later }));
+  assert.deepEqual(inputsOfWake(item, late).filter((i) => i.source.system === 'timer'), []);
+  const fired = await offer(item, inputsOfWake(item, late, { now: later }));
   assert.deepEqual(fired.map((r) => r.outcome), ['applied']);
-  assert.equal(timed.snapshot.value, 'replanning');
-  assert.deepEqual(inputsOfWake(timed, late, { now: later }).filter((i) => i.source.system === 'timer'), []);
+  assert.equal(item.snapshot.value, 'timedOut');
+  assert.deepEqual(inputsOfWake(item, late, { now: later }).filter((i) => i.source.system === 'timer'), []);
 });
