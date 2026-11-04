@@ -268,7 +268,7 @@
         "properties": {
           "result": { "enum": ["PASS", "FAIL"], "description": "PASS only if every entry in lines is PASS; otherwise FAIL." },
           "pr": { "$ref": "#prRef", "description": "Exactly target as { url, at }, with nothing added. The host checks that your worktree HEAD and GitHub's head of that PR both equal at." },
-          "issue": { "$ref": "#issue", "description": "Your input's issue, copied byte for byte with the same keys in the same order; the host compares it exactly." },
+          "issue": { "$ref": "#issue", "description": "Your input's issue: url and expect copied exactly (every expect line, in order). You may leave out title, body and any other key; a key you include must equal the input's exactly. The host compares what you send with your input." },
           "lines": { "type": "array", "minItems": 1, "items": { "$ref": "#line" }, "description": "One entry per expect line, in order: { line: the expect line copied exactly, result: PASS or FAIL, evidence: what you ran and what you saw }. PASS means a check you ran at target.at held; FAIL means it did not, or that you could not test it, with the reason as evidence. The host refuses a result that misses an expect line, adds another, puts them out of order, or whose result disagrees with these entries.", "covers": "issue.expect" }
         }
       },
