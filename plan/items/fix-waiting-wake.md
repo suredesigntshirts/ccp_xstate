@@ -52,6 +52,10 @@
       "what": "Every state that invokes ask has after.checkBack, a transition with no target and no actions, and meta.delays.checkBack is 3600000 (one hour)"
     },
     {
+      "ref": "packages/engine/src/host.js refusal",
+      "what": "A set timer's event is taken in its state even when its transition changes nothing (XState's can() says no to a transition with no target and no actions)"
+    },
+    {
       "ref": "packages/engine/src/stages.js",
       "what": "The load check refuses a workflow with a state that invokes ask and has no after transition, naming the state"
     },
