@@ -1,0 +1,74 @@
+{
+  "about": "The sources build.mjs reads by default. Paths are this machine's; a missing source is skipped and named. A source is a journal root (engine + journal) or a lane scenario test (engine + scenario). See docs/inspector.md.",
+  "engines": {
+    "/home/user/wi": "Main",
+    "/home/user/lanes/A-minimalist": "Lane A",
+    "/home/user/lanes/C-provenance": "Lane C"
+  },
+  "sources": [
+    {
+      "origin": "Real runs (main engine)",
+      "kind": "real",
+      "engine": "/home/user/wi",
+      "journal": "/mnt/project-files/first-real-issue/harness/journal",
+      "label": "First real issue, 31 Oct"
+    },
+    {
+      "origin": "Real runs (main engine)",
+      "kind": "real",
+      "engine": "/home/user/wi",
+      "journal": "/mnt/project-files/toy-run/harness/journal",
+      "label": "Toy run, 30-31 Oct"
+    },
+    {
+      "origin": "Real runs (main engine)",
+      "kind": "real",
+      "engine": "/home/user/wi",
+      "journal": "/mnt/project-files/toy-run-returns/harness/journal",
+      "label": "Actor returns, 31 Oct"
+    },
+    {
+      "origin": "Real runs (main engine)",
+      "kind": "real",
+      "engine": "/home/user/wi",
+      "journal": "/mnt/project-files/toy-run-views/harness/journal",
+      "label": "Item views, 31 Oct"
+    },
+    {
+      "origin": "Lane A: minimalist (scripted)",
+      "engine": "/home/user/lanes/A-minimalist",
+      "scenario": "packages/engine/test/tourney/Q1.test.js",
+      "label": "Q1 happy path"
+    },
+    {
+      "origin": "Lane A: minimalist (scripted)",
+      "engine": "/home/user/lanes/A-minimalist",
+      "scenario": "packages/engine/test/tourney/Q3.test.js",
+      "label": "Q3 red CI, rebuild"
+    },
+    {
+      "origin": "Lane A: minimalist (scripted)",
+      "engine": "/home/user/lanes/A-minimalist",
+      "scenario": "packages/engine/test/tourney/Q5.test.js",
+      "label": "Q5 verifier misreports"
+    },
+    {
+      "origin": "Lane C: provenance (scripted)",
+      "engine": "/home/user/lanes/C-provenance",
+      "scenario": "packages/engine/test/tourney/Q1.test.js",
+      "label": "Q1 happy path"
+    },
+    {
+      "origin": "Lane C: provenance (scripted)",
+      "engine": "/home/user/lanes/C-provenance",
+      "scenario": "packages/engine/test/tourney/Q3.test.js",
+      "label": "Q3 red CI, rebuild"
+    },
+    {
+      "origin": "Lane C: provenance (scripted)",
+      "engine": "/home/user/lanes/C-provenance",
+      "scenario": "packages/engine/test/tourney/Q5.test.js",
+      "label": "Q5 verifier misreports"
+    }
+  ]
+}

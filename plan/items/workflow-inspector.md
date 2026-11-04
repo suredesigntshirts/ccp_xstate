@@ -4,7 +4,7 @@
   "title": "Show exactly what every workflow step gives each agent, for any engine and workflow",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "The person can open one page and, for any recorded workflow run (main's engine or a tournament lane's, any workflow file), see the graph, each step's event and context change, and for each model step the prompt, the added context, the output schema, the tool trace, the result and the host's accept or refuse, each labelled with where its text came from. Two runs can be compared side by side by actor.",
   "why": "On 2026-11-04 the person asked to know exactly what each agent gets at each step (thread 'Show what's waiting and the architecture', 04:0x-04:55Z). A run inspector added to the hand-made Quick-fix Machine page showed at once that the brief actor's prompt is the bare template writtenBrief() ('Do what the brief step asks') with no authored instructions, so no person wrote any step's instructions. That page is hard-coded to main's engine and quick-fix.json, so it cannot show the tournament lanes, whose prompt designs are what a tournament compares. The person asked for a generic page (05:01Z) built with independent verifiers and a visual reviewer.",
   "serves": [

@@ -1,0 +1,1139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workflow Inspector</title>
+<meta name="description" content="How a ccp_xstate workflow run moved, how its context changed, and exactly what each model agent was given, did and returned.">
+<style>
+:root{
+  --bg:#f5f7f8; --panel:#ffffff; --fg:#17242b; --muted:#56656d; --line:#cdd6db; --wire:#7d93a0;
+  --accent:#0d6a80; --accent-bg:#e1f0f4; --accent-fg:#ffffff;
+  --ok:#256f45; --ok-bg:#e3f1e8; --warn:#8a5a00; --warn-bg:#fbf0d9; --bad:#a82f43; --bad-bg:#f9e3e7;
+  --seg-template:#efe6fb; --seg-template-line:#7b55c7; --seg-workflow:#e1f0f4; --seg-workflow-line:#0d6a80;
+  --seg-input:#fbf0d9; --seg-input-line:#a26a06; --seg-run:#e8ecef; --seg-run-line:#56656d; --seg-pass:#e3f1e8; --seg-pass-line:#256f45;
+  --seg-unknown:#f9e3e7; --seg-unknown-line:#a82f43;
+  --del:#f9e3e7; --del-fg:#8d2236; --ins:#e0f2e6; --ins-fg:#1f6239;
+  --f-body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --f-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1619; --panel:#162127; --fg:#e3ebee; --muted:#9dafb6; --line:#2e3f47; --wire:#7d97a3;
+  --accent:#5cc4dc; --accent-bg:#14323a; --accent-fg:#0f1619;
+  --ok:#6fcf97; --ok-bg:#173326; --warn:#f0b84a; --warn-bg:#3a2c10; --bad:#f07a8c; --bad-bg:#3d1a21;
+  --seg-template:#2a2140; --seg-template-line:#b49af0; --seg-workflow:#14323a; --seg-workflow-line:#5cc4dc;
+  --seg-input:#3a2c10; --seg-input-line:#f0b84a; --seg-run:#243238; --seg-run-line:#9dafb6; --seg-pass:#173326; --seg-pass-line:#6fcf97;
+  --seg-unknown:#3d1a21; --seg-unknown-line:#f07a8c;
+  --del:#4a1d27; --del-fg:#ffc2cc; --ins:#173a26; --ins-fg:#b9f0cf; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1619; --panel:#162127; --fg:#e3ebee; --muted:#9dafb6; --line:#2e3f47; --wire:#7d97a3;
+  --accent:#5cc4dc; --accent-bg:#14323a; --accent-fg:#0f1619;
+  --ok:#6fcf97; --ok-bg:#173326; --warn:#f0b84a; --warn-bg:#3a2c10; --bad:#f07a8c; --bad-bg:#3d1a21;
+  --seg-template:#2a2140; --seg-template-line:#b49af0; --seg-workflow:#14323a; --seg-workflow-line:#5cc4dc;
+  --seg-input:#3a2c10; --seg-input-line:#f0b84a; --seg-run:#243238; --seg-run-line:#9dafb6; --seg-pass:#173326; --seg-pass-line:#6fcf97;
+  --seg-unknown:#3d1a21; --seg-unknown-line:#f07a8c;
+  --del:#4a1d27; --del-fg:#ffc2cc; --ins:#173a26; --ins-fg:#b9f0cf; color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;overflow-x:hidden}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 64px;display:grid;gap:28px;min-width:0}
+section{display:grid;gap:12px;min-width:0}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0}
+h2{font-size:19px;margin:0}
+h3{font-size:16px;margin:0}
+p{margin:0;max-width:75ch}
+a{color:var(--accent)}
+code,.mono{font-family:var(--f-mono);font-size:.88em;overflow-wrap:anywhere}
+.muted{color:var(--muted)}
+.small{font-size:13.5px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.topbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.btn{cursor:pointer;font-size:14px;padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--fg);min-height:36px}
+.btn:hover{border-color:var(--accent)}
+.btn[aria-pressed="true"],.btn[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.callout{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:0}
+.callout>summary{cursor:pointer;padding:12px 16px;font-weight:600}
+.callout .in{padding:0 16px 16px;display:grid;gap:10px}
+.callout ol,.callout ul{margin:0;padding-left:22px;display:grid;gap:4px;max-width:75ch}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;gap:10px;min-width:0}
+.controls{display:grid;gap:12px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.field{display:grid;gap:4px;min-width:0}
+.field label{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.field select{width:100%;max-width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:15px;min-height:40px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;white-space:nowrap;border:1px solid transparent;font-weight:500}
+.p-ok{background:var(--ok-bg);color:var(--ok)} .p-warn{background:var(--warn-bg);color:var(--warn)} .p-bad{background:var(--bad-bg);color:var(--bad)}
+.p-acc{background:var(--accent-bg);color:var(--accent)} .p-mute{background:var(--bg);color:var(--muted);border-color:var(--line)}
+dl.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 14px;margin:0;font-size:14px}
+dl.facts dt{color:var(--muted)} dl.facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
+@media (max-width:560px){dl.facts{grid-template-columns:minmax(0,1fr)} dl.facts dt{margin-top:6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em}}
+.verdict,.verdict span,.who span,.warnbox,.okbox,.scriptbox,.panel p,.panel li,td,.story{overflow-wrap:anywhere;min-width:0}
+.warnbox{background:var(--warn-bg);color:var(--fg);border-radius:6px;padding:10px 12px;font-size:14px;border-left:3px solid var(--warn)}
+.okbox{background:var(--ok-bg);border-radius:6px;padding:10px 12px;font-size:14px;border-left:3px solid var(--ok)}
+.scriptbox{background:var(--accent-bg);border-radius:6px;padding:10px 12px;font-size:14px;border-left:3px solid var(--accent)}
+
+/* Graph */
+.graphwrap{position:relative;min-width:0}
+.graphbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:auto;max-height:85vh;-webkit-overflow-scrolling:touch}
+.graphbox svg{display:block;margin:0 auto}
+.graphbox.fit svg{width:100%;height:auto}
+.graphwrap.more::after{content:"";position:absolute;left:1px;right:1px;bottom:1px;height:30px;background:linear-gradient(rgba(0,0,0,0),var(--panel));pointer-events:none;border-radius:0 0 8px 8px}
+.glance td{overflow-wrap:normal}
+.maptools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+svg text{font-family:var(--f-body);fill:var(--fg)}
+svg .n rect{fill:var(--panel);stroke:var(--wire);stroke-width:1.3}
+svg .n.visited rect{stroke:var(--accent);stroke-width:2.2}
+svg .n.sel rect{fill:var(--accent-bg);stroke:var(--accent);stroke-width:3}
+svg .n.final rect{stroke-width:3}
+svg .n{cursor:pointer}
+svg .n:focus{outline:none}
+svg .n:focus-visible rect{stroke:var(--fg);stroke-width:3;stroke-dasharray:4 2}
+svg .grp>rect{fill:transparent;pointer-events:all;cursor:pointer;stroke:var(--wire);stroke-dasharray:5 4;stroke-width:1.2}
+svg .grp.visited>rect{stroke:var(--accent)}
+svg .grp.sel>rect{fill:var(--accent-bg);stroke:var(--accent);stroke-width:2}
+svg .nt{font-weight:600;font-size:13px;text-anchor:middle}
+svg .na{font-family:var(--f-mono);font-size:10.5px;fill:var(--muted);text-anchor:middle}
+svg .gt{font-weight:600;font-size:12px;fill:var(--muted)}
+svg .e{stroke:var(--wire);stroke-width:1.2;fill:none;opacity:.55}
+svg .e.err{stroke-dasharray:4 4}
+svg .e.hot{stroke:var(--accent);stroke-width:2.6;opacity:1}
+svg .ah{fill:var(--wire);opacity:.55} svg .ah-hot{fill:var(--accent)}
+svg .el rect{fill:var(--accent);stroke:var(--panel);stroke-width:1.5} svg .el text{fill:var(--accent-fg);font-size:10.5px;font-family:var(--f-mono);text-anchor:middle;dominant-baseline:central;font-weight:600}
+svg .cnt circle{fill:var(--accent)} svg .cnt text{fill:var(--accent-fg);font-size:10.5px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:24px;height:0;border-top:3px solid var(--accent);vertical-align:middle;margin-right:6px}
+.legend i.n{border-top:1.5px solid var(--wire)} .legend i.d{border-top:1.5px dashed var(--wire)}
+.statepanel{display:grid;gap:8px}
+.statepanel ul{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.jumps{display:flex;flex-wrap:wrap;gap:6px}
+
+/* Trail */
+.trail{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+.trail button{flex:none;cursor:pointer;font-size:12.5px;font-family:var(--f-mono);padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);min-height:32px}
+.trail button.hl{border-color:var(--accent);border-width:2px}
+.trail button.refused{border-style:dashed;color:var(--muted)}
+.trail button[aria-current="step"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.trail b{font-weight:700;margin-right:4px}
+
+/* Steps */
+.steps{display:grid;gap:14px}
+details.step{background:var(--panel);border:1px solid var(--line);border-radius:8px;min-width:0;scroll-margin-top:60px}
+details.step.cur{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+details.step>summary{cursor:pointer;list-style:none;padding:12px 16px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:start}
+details.step>summary::-webkit-details-marker{display:none}
+details.step[open]>summary{border-bottom:1px solid var(--line)}
+.sno{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;border-radius:15px;border:1.5px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-family:var(--f-mono);font-size:13px;font-weight:600}
+.sno.ref{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.story{font-weight:600;font-size:15.5px;line-height:1.35;overflow-wrap:anywhere}
+.smeta{grid-column:2;font-family:var(--f-mono);font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 14px;min-width:0}
+.smeta span{overflow-wrap:anywhere;min-width:0}
+.sbody{padding:14px 16px;display:grid;gap:14px;min-width:0}
+details.sec{border:1px solid var(--line);border-radius:6px;min-width:0;background:var(--panel)}
+details.sec>summary{cursor:pointer;padding:9px 12px;font-size:13px;font-weight:600;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+details.sec>summary .hint{font-weight:400;color:var(--muted);font-size:12.5px}
+details.sec>.inner{display:grid;gap:10px;padding:0 12px 12px;min-width:0;grid-template-columns:minmax(0,1fr)}
+details.sec.layer{border-left:3px solid var(--accent)}
+details.sec.layer.nolog{border-left-color:var(--warn)}
+.lnum{font-family:var(--f-mono);color:var(--accent)}
+.actor{border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:10px;min-width:0}
+.actor>header{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.actor>header h4{margin:0;font-size:15px}
+.who{border-radius:6px;padding:10px 12px;font-size:14px;display:grid;gap:4px}
+.who.template-workflow{background:var(--seg-workflow);border-left:4px solid var(--seg-workflow-line)}
+.who.template{background:var(--seg-template);border-left:4px solid var(--seg-template-line)}
+.who.passthrough{background:var(--seg-pass);border-left:4px solid var(--seg-pass-line)}
+.who.missing{background:var(--bad-bg);border-left:4px solid var(--bad)}
+.who b{font-weight:700}
+pre.json,pre.text{margin:0;font-family:var(--f-mono);font-size:12.5px;line-height:1.55;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;overflow:auto;max-height:560px;white-space:pre;tab-size:2;min-width:0}
+pre.text,pre.rd,pre.seg{white-space:pre-wrap;overflow-wrap:anywhere}
+.j-k{color:var(--accent)} .j-s{color:var(--ok)} .j-n{color:var(--warn)} .j-b{color:var(--bad)} .j-null{color:var(--muted)}
+pre.json button.more,pre.json button.tog{font:inherit;font-size:11.5px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--accent);border-radius:4px;padding:0 6px;margin:0 2px}
+pre.json .full[hidden],pre.json .hd[hidden],pre.json .foldbody[hidden]{display:none}
+pre.json .full{white-space:pre-wrap;overflow-wrap:anywhere}
+pre.json .j-s{white-space:pre-wrap;overflow-wrap:anywhere}
+.authored{margin:4px 0;max-width:46ch;overflow-wrap:anywhere} .authored pre{margin-top:4px;max-width:none}
+td.keyscell{max-width:28ch;min-width:14ch} td.keyscell .chips{flex-wrap:wrap}
+@media (max-width:560px){pre.json .hd,pre.json .j-s{white-space:pre-wrap;overflow-wrap:anywhere}pre.json button.more{display:inline-block;margin:2px 0 2px 1ch}}
+.who .resumed{display:block;margin-top:4px;padding:6px 8px;border-radius:4px;background:var(--warn-bg);color:var(--fg)}
+.hostw{background:var(--bad-bg);box-shadow:inset 3px 0 0 var(--bad)}
+.tag{font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--bad);margin-left:6px}
+abbr[title]{text-decoration:underline dotted;text-underline-offset:2px;cursor:help}
+.glance td{font-family:var(--f-body);font-size:13px}
+.glance th{white-space:normal;min-width:8ch}
+.tblwrap td>.cell.host{max-width:22ch;min-width:12ch}
+.tblwrap td>.cell.ret{max-width:22ch;min-width:12ch}
+.tblwrap td>.cell.what{max-width:28ch;min-width:14ch}
+.thwrap{max-width:40ch;min-width:16ch;white-space:normal}
+.tblwrap td>.cell.ft{max-width:22ch;min-width:12ch}
+.tblwrap td>.cell.starts{max-width:30ch;min-width:16ch}
+.glance td.keyscell{max-width:20ch}
+.glance .tblwrap td>.cell.wide,.tblwrap .glance td>.cell.wide{max-width:46ch}
+.glance td.mono,.glance td code{font-family:var(--f-mono);font-size:12px}
+.glance button{font:inherit;font-size:12.5px;font-family:var(--f-mono);cursor:pointer;padding:2px 8px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent);min-height:28px;white-space:nowrap}
+.cand{margin:0;padding-left:22px;display:grid;gap:3px;font-size:14px}
+.cand li.taken{font-weight:600}
+.chain{background:var(--seg-template);border-left:4px solid var(--seg-template-line);border-radius:6px;padding:8px 10px;font-size:14px;display:grid;gap:6px}
+.chg{background:var(--warn-bg);box-shadow:inset 3px 0 0 var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--f-mono);font-size:12px;padding:1px 8px;border-radius:4px;background:var(--warn-bg);color:var(--warn)}
+.views{display:flex;flex-wrap:wrap;gap:6px}
+.views .btn{font-size:13px;padding:4px 10px;min-height:32px}
+.seg-template{background:var(--seg-template);box-shadow:inset 0 -2px 0 var(--seg-template-line)}
+.seg-workflow{background:var(--seg-workflow);box-shadow:inset 0 -2px 0 var(--seg-workflow-line)}
+.seg-input{background:var(--seg-input);box-shadow:inset 0 -2px 0 var(--seg-input-line)}
+.seg-run{background:var(--seg-run);box-shadow:inset 0 -2px 0 var(--seg-run-line)}
+.seg-passthrough{background:var(--seg-pass);box-shadow:inset 0 -2px 0 var(--seg-pass-line)}
+.seg-unknown{background:var(--seg-unknown);box-shadow:inset 0 -2px 0 var(--seg-unknown-line);text-decoration:underline dotted var(--seg-unknown-line)}
+.seglegend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12.5px}
+.seglegend span{padding:1px 8px;border-radius:4px}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:13px}
+.tblwrap>table{width:max-content;min-width:100%}
+.tblwrap td,.tblwrap td code,.tblwrap td .mono{overflow-wrap:normal;word-break:normal}
+.tblwrap td.nw,.tblwrap td.nw code{white-space:nowrap}
+.tblwrap td>.cell{max-width:34ch;min-width:14ch;overflow-wrap:break-word;white-space:normal}
+.tblwrap td>.cell.wide{max-width:52ch;min-width:24ch}
+@media (max-width:560px){
+  .tblwrap>table.stack{width:100%;min-width:0}
+  table.stack thead{display:none}
+  table.stack tr{display:block;border-bottom:1px solid var(--line);padding:6px 0}
+  table.stack tr:last-child{border-bottom:none}
+  table.stack td{display:block;border:none;padding:3px 10px;white-space:normal}
+  .tblwrap table.stack td.nw,.tblwrap table.stack td.nw code{white-space:normal}
+  table.stack td>.cell,table.stack td>.cell.wide,.tblwrap table.stack td>.cell{max-width:none;min-width:0}
+  .glance table.stack td.keyscell,table.stack.glance td.keyscell{max-width:none}
+  table.stack td[data-label]::before{content:attr(data-label);display:block;font-family:var(--f-body);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  table.stack td:empty{display:none}
+}
+.scrollhint{font-size:12.5px;color:var(--muted);margin:0 0 -6px}
+.tblwrap.more-r{box-shadow:inset -14px 0 10px -10px var(--wire)}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;white-space:nowrap}
+td{font-family:var(--f-mono);font-size:12px}
+tr:last-child td{border-bottom:none}
+.verdict{display:grid;gap:4px;border-radius:6px;padding:8px 10px;font-size:14px}
+.verdict.accepted{background:var(--ok-bg)} .verdict.refused{background:var(--bad-bg)} .verdict.info{background:var(--bg);border:1px solid var(--line)}
+.checks{margin:0;padding-left:0;list-style:none;display:grid;gap:3px;font-size:13.5px}
+.checks li::before{content:"\2713  ";color:var(--ok);font-weight:700}
+.checks li.no::before{content:"\2717  ";color:var(--bad)}
+
+/* Compare */
+.pair{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;gap:12px;min-width:0}
+.pair>header{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cols pre{max-height:none}
+.dtable td{white-space:pre-wrap}
+.dtable td:first-child{white-space:nowrap}
+.onlylist{margin:0;padding-left:20px;font-size:13.5px;display:grid;gap:3px}
+.onlylist li{overflow-wrap:anywhere}
+.onlylist.changed li{display:grid;gap:2px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.onlylist.changed li:last-child{border-bottom:none}
+.onlylist.changed .cl::before{content:"\2190  ";color:var(--muted)} .onlylist.changed .cr::before{content:"\2192  ";color:var(--muted)}
+.gapline{display:inline-block;width:100%;background:repeating-linear-gradient(135deg,transparent 0 6px,var(--line) 6px 7px)}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:760px){.cols{grid-template-columns:minmax(0,1fr)} .cols .gapline{display:none}}
+.col{display:grid;gap:6px;min-width:0;align-content:start}
+.col h4{margin:0;font-size:13px;color:var(--muted);font-weight:600;overflow-wrap:anywhere}
+del.d{background:var(--del);color:var(--del-fg);text-decoration:line-through;text-decoration-thickness:1px}
+ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight:600}
+.empty{border:1px dashed var(--line);border-radius:6px;padding:12px;color:var(--muted);font-size:14px}
+[hidden]{display:none !important}
+@media (max-width:480px){
+  .wrap{gap:22px}
+  .panel{padding:12px}
+  details.step>summary{padding:10px 10px}
+  .sbody{padding:10px 6px;gap:10px}
+  .actor{border:none;padding:4px 0;border-top:1px solid var(--line);border-radius:0}
+  details.sec>summary{padding:8px 8px}
+  details.sec>.inner{padding:0 6px 8px}
+  details.sec details.sec{border-left-width:1px;border-right:none;border-radius:0}
+  pre.json,pre.text{padding:8px;font-size:12px}
+  .pair{padding:12px 8px}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto !important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <h1>Workflow Inspector</h1>
+    <button type="button" class="btn" id="theme" aria-label="Color theme: automatic. Change theme">Theme: auto</button>
+  </header>
+
+  <section class="panel" aria-label="In short">
+    <p>This page replays one run of a workflow, step by step: where the item went, how its context (working memory) changed, and for each model agent exactly what it was given, what it did, what it returned and whether the host kept it. It says where every piece of prompt text came from.</p>
+    <p class="small"><b>Not recorded anywhere:</b> Claude Code's own system prompt, the exact commands agents ran, and the messages the parent session sends when it resumes an agent. <b>Lane A and lane C runs are scripted:</b> their agents are test fixtures, GitHub is fake, and no model ran.</p>
+  </section>
+
+  <details class="callout" id="intro">
+    <summary>More: the seven layers, the caveats, and the words used here</summary>
+    <div class="in">
+      <p>A workflow is a map of states (briefing, building, verifying...). An item moves through it one step at a time: each step is an <b>event</b>, such as an agent finishing, a CI result or a person's tap. On each step the item's <b>context</b> (its working memory) can change, and the step can start <b>actors</b>: model agents (Claude Code subagents) or host code (posting a card, merging a PR).</p>
+      <p>For each model agent there are seven layers, top to bottom:</p>
+      <ol>
+        <li><b>Claude Code system prompt</b>: never recorded by the harness, so it cannot be shown.</li>
+        <li><b>Prompt</b> (<code>brief.md</code>), and <b>who wrote it</b>: a person, the workflow file's author (instructions written into the workflow JSON), an earlier agent, or nobody (the engine's fill-in template around the actor's input).</li>
+        <li><b>Added context</b> (<code>context.md</code>): what the harness adds beside the prompt when the agent starts.</li>
+        <li><b>Output schema</b>: the shape its answer must have, as the agent was shown it.</li>
+        <li><b>What it did</b>: its tool calls, when a live capture exists.</li>
+        <li><b>What the host stored as its result</b> (<code>result.json</code>), with any fields the host added itself marked.</li>
+        <li><b>Host check</b>: whether the host stored the answer or sent it back, and what the workflow did next.</li>
+      </ol>
+      <p><b>Honesty caveats.</b></p>
+      <ul>
+        <li>The Claude Code system prompt is never recorded (layer 1).</li>
+        <li>Tool calls keep only the tool name, time, size and paths. The exact commands are not stored, only a hash of them.</li>
+        <li>When the parent session resumes an agent (for example because it finished without calling the return tool), the message it sends is not recorded. The prompt shown in layer 2 is then the agent's first message, not everything it was told; the page marks such agents "resumed, message not recorded".</li>
+        <li>Lane A and lane C runs are <b>scripted scenarios</b>: their "agents" are test fixtures (briefs and results typed into the test), GitHub is a fake server, and no model ran. They show what each design's engine would hand a real agent.</li>
+        <li>The context after each step is recovered by <b>replay</b>. The page says where replay did not match or failed.</li>
+        <li>Real runs from before workflows were pinned are shown with today's workflow file; the page says so on those runs.</li>
+      </ul>
+      <p><b>Words used here.</b></p>
+      <dl class="facts">
+        <dt>event</dt><dd>Something that happened to the item: an agent finishing (<code>xstate.done.actor.build</code> means "the build actor finished"), a CI result, a tap. The first event, <code>xstate.init</code>, starts the item.</dd>
+        <dt>guard</dt><dd>A yes/no test on the item's context, named in the workflow JSON. A way out with a guard is taken only when the test holds.</dd>
+        <dt>needs</dt><dd>What must be true of the context to enter a state. The engine checks them like guards on every way in.</dd>
+        <dt>join</dt><dd>When everything inside a group state is done (it reached a final state), the group itself finishes and its own way out is taken.</dd>
+        <dt>invoke</dt><dd>A state starting an actor when the item enters it.</dd>
+        <dt>replay</dt><dd>Re-running the journal's events through the engine to recover the context, which the journal stores only as a hash.</dd>
+        <dt>hash check</dt><dd>A fingerprint comparison: equal hashes mean the bytes are identical.</dd>
+        <dt>brief</dt><dd>Three things share this word: the <b>brief agent</b> (the first actor, which writes instructions for the others), <code>brief.md</code> (any agent's prompt) and <code>context.briefs</code> (where the brief agent's output is kept).</dd>
+      </dl>
+    </div>
+  </details>
+
+  <section class="controls" aria-label="Choose what to look at">
+    <div class="tabs" role="tablist" aria-label="Mode">
+      <button type="button" class="btn" role="tab" id="tab-one" aria-controls="view-one" aria-selected="true">Inspect one run</button>
+      <button type="button" class="btn" role="tab" id="tab-cmp" aria-controls="view-cmp" aria-selected="false" tabindex="-1">Compare two runs</button>
+    </div>
+  </section>
+
+  <div id="view-one" role="tabpanel" aria-labelledby="tab-one" style="display:grid;gap:24px;min-width:0">
+    <div class="field"><label for="pick">Run or workflow</label><select id="pick"></select></div>
+    <div id="notice" hidden></div>
+    <section id="summary" class="panel" aria-label="About this run"></section>
+    <section aria-labelledby="maph" style="min-width:0">
+      <h2 id="maph">Workflow map</h2>
+      <p class="muted small" id="mapnote">Every state of this workflow, from its JSON. The path this run took is highlighted, with step numbers on the arrows it used. Select a state to see its steps and its ways out. The full list is in "All states and ways out" below the map.</p>
+      <div class="maptools"><button type="button" class="btn" id="zoom">Fit map to width</button><span class="muted small" id="zoomhint"></span></div>
+      <div class="graphwrap" id="graphwrap"><div class="graphbox" id="graph" tabindex="0" role="region" aria-label="Workflow map; scrolls when shown at actual size"></div></div>
+      <div class="legend"><span id="legend-taken"><i></i>taken in this run</span><span><i class="n"></i>possible</span><span><i class="d"></i>error or timeout</span><span>Arrows going back up run in the side channels and end under the state they lead to.</span></div>
+      <div id="anywhere"></div>
+      <div id="statepanel" class="panel statepanel" hidden aria-live="polite"></div>
+      <div id="statestable"></div>
+    </section>
+    <section aria-labelledby="stepsh" id="stepsec" style="min-width:0">
+      <h2 id="stepsh">Steps</h2>
+      <div id="glance"></div>
+      <nav class="trail" id="trail" aria-label="Step trail"></nav>
+      <div class="toolbar badges"><button type="button" class="btn" id="openall">Open all steps (layers closed)</button><button type="button" class="btn" id="closeall">Close all steps</button></div>
+      <div class="steps" id="steps"></div>
+    </section>
+  </div>
+
+  <div id="view-cmp" role="tabpanel" aria-labelledby="tab-cmp" hidden style="display:grid;gap:20px;min-width:0">
+    <p class="muted small">Pick two runs. Their model agents are lined up by actor and occurrence (the first build with the first build, and so on). Prompts and added context are compared line by line in the readable layout; inputs and schemas key by key. Text only in the left run is struck out in red; text only in the right run is green.</p>
+    <div class="row2">
+      <div class="field"><label for="cmpa">Left run</label><select id="cmpa"></select></div>
+      <div class="field"><label for="cmpb">Right run</label><select id="cmpb"></select></div>
+    </div>
+    <label class="small"><input type="checkbox" id="incidental" checked> Hide incidental differences (item and run ids, temp and worktree paths, commit hashes, times)</label>
+    <div id="cmpsum" class="panel"></div>
+    <div id="pairs" style="display:grid;gap:16px;min-width:0"></div>
+  </div>
+  <p class="muted small" id="foot"></p>
+</div>
+<script src="data.js"></script>
+<script>
+(function () {
+  'use strict';
+  const D = window.INSPECTOR_DATA || { runs: [], workflows: {}, shelf: [] };
+  D.shelf = D.shelf || [];
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* no storage */ } } };
+  const URL_RE = /https?:\/\/[^\s"'<>)\]]+/g;
+  const linkify = (text) => { text = String(text); let out = '', last = 0;
+    text.replace(URL_RE, (m, i) => { const t = m.replace(/[.,;:!?]+$/, ''); out += esc(text.slice(last, i)) + '<a href="' + esc(t) + '" target="_blank" rel="noopener">' + esc(t) + '</a>'; last = i + t.length; return m; });
+    return out + esc(text.slice(last)); };
+  const runById = Object.fromEntries(D.runs.map((r) => [r.id, r]));
+  const shelfById = Object.fromEntries(D.shelf.map((w) => [w.id, w]));
+  const leaves = (v, pre) => typeof v === 'string' ? [pre ? pre + '.' + v : v] : v && typeof v === 'object' ? Object.entries(v).flatMap(([k, x]) => leaves(x, pre ? pre + '.' + k : k)) : [];
+  const st = (id) => String(id).split('.').join(' › ');
+  const short = (v) => (Array.isArray(v) ? (v.length ? v.map(st).join(' + ') : '?') : v == null ? '?' : leaves(v).map(st).join(' + '));
+  const wfName = (r) => { const n = String(r.workflow.name || ''); const pin = n.match(/@([0-9a-f]{64})$/); const sha = pin ? pin[1] : r.workflow.sha256;
+    return n.split('@')[0] + ' (' + (r.engineLabel ? r.engineLabel + ' version' : 'this version') + (sha ? ', sha ' + sha.slice(0, 8) : '') + ')'; };
+  const GL = {
+    guard: 'A yes/no test on the item\'s context, named in the workflow JSON. A way out with a guard is taken only when it holds.',
+    needs: 'What must be true of the context to enter a state. The engine checks them like guards on every way in.',
+    join: 'Everything inside the group state is done, so the group itself finishes and its own way out is taken.',
+    replay: 'Re-running the journal\'s events through the engine to recover the context, which the journal stores only as a hash.',
+    hash: 'A fingerprint: equal hashes mean identical bytes.',
+    invoke: 'A state starting an actor when the item enters it.'
+  };
+  const ab = (term, shown) => '<abbr title="' + esc(GL[term]) + '" tabindex="0">' + esc(shown || term) + '</abbr>';
+
+  // ---- Theme and intro
+  const themes = ['auto', 'light', 'dark'];
+  const applyTheme = (t) => { if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t);
+    $('theme').textContent = 'Theme: ' + t; $('theme').setAttribute('aria-label', 'Color theme: ' + t + '. Change theme'); };
+  let theme = store.get('wi-theme') || 'auto'; if (themes.indexOf(theme) < 0) theme = 'auto'; applyTheme(theme);
+  $('theme').addEventListener('click', () => { theme = themes[(themes.indexOf(theme) + 1) % 3]; store.set('wi-theme', theme); applyTheme(theme); });
+  const intro = $('intro'); if (store.get('wi-intro') === 'open') intro.open = true;
+  intro.addEventListener('toggle', () => store.set('wi-intro', intro.open ? 'open' : 'closed'));
+
+  // ---- JSON as HTML. Long strings fold behind "show full" (swapped in place); unchanged keys can fold; changed keys
+  // and fields the host wrote are marked.
+  const LONG = 140;
+  const jstr = (v) => {
+    if (v.length > LONG || v.indexOf('\n') >= 0) {
+      const head = v.split('\n')[0].slice(0, 60);
+      const label = 'show full (' + v.length.toLocaleString() + ' chars)';
+      return '<span class="j-s">"<span class="hd">' + linkify(head) + '…</span><span class="full" hidden>' + linkify(v) + '</span>"</span>\u0001 <button type="button" class="more" aria-expanded="false" data-label="' + label + '">' + label + '</button>';
+    }
+    return '<span class="j-s">"' + linkify(v) + '"</span>';
+  };
+  const joinLines = (parts) => parts.map((x, i) => { const last = i === parts.length - 1; const at = x.lastIndexOf('\u0001');
+    return at >= 0 ? x.slice(0, at) + (last ? '' : ',') + x.slice(at + 1) : x + (last ? '' : ','); }).join('\n');
+  const json = (v, ind, opts, path) => {
+    ind = ind || ''; opts = opts || {}; path = path || '';
+    if (v === null || v === undefined) return '<span class="j-null">null</span>';
+    if (typeof v === 'string') return jstr(v);
+    if (typeof v === 'number') return '<span class="j-n">' + v + '</span>';
+    if (typeof v === 'boolean') return '<span class="j-b">' + v + '</span>';
+    const pad = ind + '  ';
+    const mark = (p, line) => (opts.host && opts.host.indexOf(p) >= 0 ? '<span class="hostw">' + line + '\u0001<span class="tag">← written by the host</span></span>' : line);
+    if (Array.isArray(v)) return v.length ? '[\n' + joinLines(v.map((x, i) => mark(path + '[' + i + ']', pad + json(x, pad, opts, path + '[' + i + ']')))) + '\n' + ind + ']' : '[]';
+    const keys = Object.keys(v);
+    if (!keys.length) return '{}';
+    return '{\n' + joinLines(keys.map((k) => {
+      const val = v[k]; const p = path ? path + '.' + k : k;
+      let body = json(val, pad, opts, p);
+      const changed = !path && opts.mark && opts.mark.indexOf(k) >= 0;
+      if (opts.fold && !changed && !path && val && typeof val === 'object' && Object.keys(val).length) {
+        const label = Array.isArray(val) ? '[… ' + val.length + ' items]' : '{… ' + Object.keys(val).length + ' keys}';
+        body = '<button type="button" class="tog" aria-expanded="false" data-label="' + esc(label) + '">' + esc(label) + '</button><span class="foldbody" hidden>' + body + '</span>';
+      }
+      const line = mark(p, pad + '<span class="j-k">"' + esc(k) + '"</span>: ' + body);
+      return changed ? '<span class="chg">' + line + '</span>' : line;
+    })) + '\n' + ind + '}';
+  };
+  const pre = (v, opts, label) => '<pre class="json" tabindex="0" role="region" aria-label="' + esc(label || 'JSON') + '">' + json(v, '', opts).replace(/\u0001/g, '') + '</pre>';
+  const sec = (title, inner, o) => { o = o || {}; return '<details class="sec' + (o.cls ? ' ' + o.cls : '') + '"' + (o.open ? ' open' : '') + '><summary>' + title + (o.hint ? ' <span class="hint">' + o.hint + '</span>' : '') + '</summary><div class="inner">' + (o.note ? '<p class="muted small">' + o.note + '</p>' : '') + inner + '</div></details>'; };
+
+  // ---- Prompt text: readable (JSON pulled out and pretty-printed inline), by origin, or byte for byte.
+  const jsonFull = (v, ind) => {
+    ind = ind || '';
+    if (v === null) return '<span class="j-null">null</span>';
+    if (typeof v === 'string') return '<span class="j-s">' + linkify(JSON.stringify(v)) + '</span>';
+    if (typeof v === 'number') return '<span class="j-n">' + v + '</span>';
+    if (typeof v === 'boolean') return '<span class="j-b">' + v + '</span>';
+    const pad = ind + '  ';
+    if (Array.isArray(v)) return v.length ? '[\n' + v.map((x) => pad + jsonFull(x, pad)).join(',\n') + '\n' + ind + ']' : '[]';
+    const ks = Object.keys(v);
+    return ks.length ? '{\n' + ks.map((k) => pad + '<span class="j-k">' + esc(JSON.stringify(k)) + '</span>: ' + jsonFull(v[k], pad)).join(',\n') + '\n' + ind + '}' : '{}';
+  };
+  const jsonEnd = (t, i) => { let depth = 0, inStr = false;
+    for (let j = i; j < t.length; j++) { const c = t[j];
+      if (inStr) { if (c === '\\') j++; else if (c === '"') inStr = false; continue; }
+      if (c === '"') inStr = true; else if (c === '{' || c === '[') depth++; else if (c === '}' || c === ']') { if (--depth === 0) return j + 1; } }
+    return -1; };
+  const splitProse = (t) => t.replace(/([.!?;])[ \t]+(?=[A-Z(`])/g, '$1\n');
+  // The text as pieces: prose (one sentence per line) and embedded JSON values.
+  const pieces = (t) => {
+    const out = []; let last = 0;
+    for (let i = 0; i < t.length; i++) {
+      if (t[i] !== '{' && t[i] !== '[') continue;
+      const e = jsonEnd(t, i); if (e < 0) continue;
+      let v; try { v = JSON.parse(t.slice(i, e)); } catch (err) { continue; }
+      if (!v || typeof v !== 'object' || e - i < 12) continue;
+      out.push({ prose: t.slice(last, i) }); out.push({ value: v });
+      last = e; i = e - 1;
+    }
+    out.push({ prose: t.slice(last) });
+    return out;
+  };
+  const tidy = (p, i, all) => { let s = p.prose; if (i > 0 && all[i - 1].value) s = s.replace(/^[ \t]+/, ''); if (i < all.length - 1 && all[i + 1].value) s = s.replace(/[ \t]+$/, ''); return s; };
+  const readableHtml = (t) => { const ps = pieces(t); return ps.map((p, i) => (p.value ? '\n' + jsonFull(p.value) + '\n' : linkify(splitProse(tidy(p, i, ps))))).join('').replace(/\n{3,}/g, '\n\n').trim(); };
+  // JSON lines carry an invisible mark (U+2063), so a diff summary can leave them out; it is stripped before display.
+  const JM = '\u2063';
+  const readablePlain = (t) => { const ps = pieces(t); return ps.map((p, i) => (p.value ? '\n' + JSON.stringify(p.value, null, 2).split('\n').map((l) => JM + l).join('\n') + '\n' : splitProse(tidy(p, i, ps)))).join('').replace(/\n{2,}/g, '\n').trim(); };
+  const SEG = { template: 'Engine template (string literals in the engine code)', workflow: 'Workflow JSON', input: 'Actor input, from the context', run: 'Run values set by the host', passthrough: 'Written by an earlier step, passed through', unknown: 'Unknown origin (not in the engine code or any known value)' };
+  const segHtml = (segs) => segs.map((s) => '<span class="seg-' + esc(s.from) + '" title="' + esc(SEG[s.from] || s.from) + ': ' + esc(s.note || '') + '">' + esc(s.text) + '</span>').join('');
+  const segLegend = (segs) => { const seen = []; segs.forEach((s) => { if (seen.indexOf(s.from) < 0) seen.push(s.from); });
+    const total = segs.reduce((n, s) => n + s.text.length, 0) || 1;
+    return '<div class="seglegend" aria-label="Colour key">' + seen.map((f) => { const n = segs.filter((s) => s.from === f).reduce((m, s) => m + s.text.length, 0);
+      return '<span class="seg-' + esc(f) + '">' + esc(SEG[f] || f) + ': ' + Math.round(100 * n / total) + '%</span>'; }).join('') + '</div>'; };
+  let textId = 0;
+  const textViews = (t, segs, name) => {
+    const id = 'tv' + (++textId);
+    return '<div class="views" role="group" aria-label="How to show the ' + esc(name) + '">' +
+      '<button type="button" class="btn" data-view="rd" data-for="' + id + '" aria-pressed="true">Readable</button>' +
+      (segs && segs.length ? '<button type="button" class="btn" data-view="seg" data-for="' + id + '" aria-pressed="false">Where each part came from</button>' : '') +
+      '<button type="button" class="btn" data-view="raw" data-for="' + id + '" aria-pressed="false">Original, byte for byte</button></div>' +
+      '<div id="' + id + '">' +
+      '<pre class="json rd" data-v="rd" tabindex="0" role="region" aria-label="' + esc(name) + ', readable" style="max-height:none">' + readableHtml(t) + '</pre>' +
+      (segs && segs.length ? '<div data-v="seg" hidden>' + segLegend(segs) + '<pre class="text seg" tabindex="0" role="region" aria-label="' + esc(name) + ', coloured by origin" style="max-height:none">' + segHtml(segs) + '</pre></div>' : '') +
+      '<pre class="text" data-v="raw" hidden tabindex="0" role="region" aria-label="' + esc(name) + ', original bytes" style="max-height:none">' + esc(t) + '</pre></div>' +
+      '<p class="muted small">' + t.length.toLocaleString() + ' characters. "Readable" only adds line breaks and indents JSON; the words are the same.</p>';
+  };
+
+  // ---- Delegated clicks: folds, show-full, view switches.
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.classList.contains('more')) {
+      const s = b.previousElementSibling; const open = b.getAttribute('aria-expanded') !== 'true';
+      if (s) { const hd = s.querySelector('.hd'), full = s.querySelector('.full'); if (hd) hd.hidden = open; if (full) full.hidden = !open; }
+      b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'show less' : b.dataset.label;
+      const box = b.closest('pre'); if (box) box.scrollLeft = 0;
+      if (s && s.scrollIntoView) { try { s.scrollIntoView({ block: 'nearest', inline: 'start' }); } catch (_) {} if (box) box.scrollLeft = 0; }
+      return;
+    }
+    if (b.classList.contains('tog')) {
+      const target = b.nextElementSibling; const open = b.getAttribute('aria-expanded') !== 'true';
+      target.hidden = !open; b.setAttribute('aria-expanded', String(open)); b.textContent = open ? 'fold' : b.dataset.label; return;
+    }
+    if (b.dataset.view) {
+      const box = $(b.dataset.for); if (!box) return;
+      box.querySelectorAll('[data-v]').forEach((el) => { el.hidden = el.dataset.v !== b.dataset.view; });
+      b.parentElement.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    }
+  });
+
+  // ---- Source pickers
+  const groups = [];
+  D.runs.forEach((r) => { let g = groups.find((x) => x.origin === r.origin); if (!g) groups.push(g = { origin: r.origin, runs: [] }); g.runs.push(r); });
+  const originShort = (r) => r.engineLabel ? r.engineLabel + (r.kind === 'scripted' ? ' (scripted)' : r.kind === 'real' ? ' (real run)' : '') : r.origin;
+  const runOption = (r, sel) => '<option value="' + esc(r.id) + '"' + (r.id === sel ? ' selected' : '') + '>' + esc(originShort(r) + ' · ' + r.label + (r.label.indexOf(r.item) >= 0 ? '' : ' · ' + r.item) + ' → ends in ' + short(r.final)) + '</option>';
+  const optionsHtml = (sel, withShelf) => groups.map((g) => '<optgroup label="' + esc(g.origin) + '">' + g.runs.map((r) => runOption(r, sel)).join('') + '</optgroup>').join('') +
+    (withShelf && D.shelf.length ? '<optgroup label="Workflows (map only, including ones with no runs yet)">' + D.shelf.map((w) => '<option value="wf:' + esc(w.id) + '"' + ('wf:' + w.id === sel ? ' selected' : '') + '>' + esc(w.label + (w.runs.length ? ' (map only; ' + w.runs.length + ' runs above)' : ' (no run captured)')) + '</option>').join('') + '</optgroup>' : '');
+
+  // ---- Graph layout: compound states hold their children in a row; top-level states are ranked by first reach.
+  const NW = 150, NH = 52, GAP = 28, VGAP = 84, PAD = 12, HEAD = 22;
+  function layout(graph) {
+    const kids = {}; graph.nodes.forEach((n) => { (kids[n.parent || ''] = kids[n.parent || ''] || []).push(n); });
+    const size = {};
+    const measure = (n) => {
+      const ch = kids[n.id] || [];
+      if (!ch.length) return (size[n.id] = { w: NW, h: NH });
+      ch.forEach(measure);
+      const w = ch.reduce((s, c) => s + size[c.id].w, 0) + GAP * (ch.length - 1) + PAD * 2;
+      const h = Math.max.apply(null, ch.map((c) => size[c.id].h)) + HEAD + PAD * 2;
+      return (size[n.id] = { w: Math.max(w, NW), h });
+    };
+    const top = kids[''] || [];
+    top.forEach(measure);
+    const topOf = (id) => id.split('.')[0];
+    const rank = {}; const first = graph.initial || (top[0] && top[0].id);
+    const adj = {}; graph.edges.forEach((e) => { if (!e.to || e.from === '') return; const a = topOf(e.from), b = topOf(e.to); if (a !== b) (adj[a] = adj[a] || []).push(b); });
+    const queue = first ? [first] : []; if (first) rank[first] = 0;
+    while (queue.length) { const a = queue.shift(); (adj[a] || []).forEach((b) => { if (rank[b] == null) { rank[b] = rank[a] + 1; queue.push(b); } }); }
+    let maxR = Math.max.apply(null, [0].concat(Object.values(rank)));
+    top.forEach((n) => { if (rank[n.id] == null) rank[n.id] = ++maxR; });
+    const rows = []; top.forEach((n) => { (rows[rank[n.id]] = rows[rank[n.id]] || []).push(n); });
+    const rowW = rows.map((r) => (r || []).reduce((s, n) => s + size[n.id].w, 0) + GAP * ((r || []).length - 1));
+    const W = Math.max.apply(null, rowW.concat([NW]));
+    const pos = {}; const rowBox = []; let y = 24;
+    const place = (n, x, y0) => { pos[n.id] = { x, y: y0, w: size[n.id].w, h: size[n.id].h };
+      const ch = kids[n.id] || []; let cx = x + PAD; ch.forEach((c) => { place(c, cx, y0 + HEAD + PAD); cx += size[c.id].w + GAP; }); };
+    rows.forEach((r, i) => { if (!r) return; let x = (W - rowW[i]) / 2; const h = Math.max.apply(null, r.map((n) => size[n.id].h));
+      rowBox[i] = { top: y, bottom: y + h };
+      r.forEach((n) => { place(n, x, y + (h - size[n.id].h) / 2); x += size[n.id].w + GAP; }); y += h + VGAP; });
+    return { pos, W, H: y - VGAP + 30, kids, rank, rowBox, topOf };
+  }
+
+  function drawGraph(r, sel) {
+    const wf = D.workflows[r.workflow.key]; const g = wf.graph;
+    const L = layout(g); const P = L.pos;
+    const taken = {}; r.steps.forEach((s) => { if (s.edge) (s.edge.ids || [s.edge.id]).forEach((id) => { (taken[id] = taken[id] || []).push(s.seq); }); });
+    const visits = {}; r.steps.forEach((s) => { if (s.outcome === 'applied') s.to.forEach((leaf) => { visits[leaf] = (visits[leaf] || 0) + 1; const parts = leaf.split('.'); parts.slice(0, -1).forEach((_, i) => { const id = parts.slice(0, i + 1).join('.'); visits[id] = visits[id] || 0.0001; }); }); });
+    const models = new Set(); r.steps.forEach((s) => s.actors.forEach((a) => { if (a.model) models.add(a.invoke); }));
+    let edges = '', hotEdges = ''; const labels = []; let k = { l: 0, r: 0 };
+    let minX = 0, maxX = L.W, maxY = L.H;
+    const ext = (x, y) => { if (x < minX) minX = x; if (x > maxX) maxX = x; if (y > maxY) maxY = y; };
+    const leaveN = {}, enterN = {};
+    const nodeRight = Math.max.apply(null, Object.values(P).map((q) => q.x + q.w)), nodeLeft = Math.min.apply(null, Object.values(P).map((q) => q.x));
+    // One line per pair of states: several events between the same two states share it (its tooltip lists them all).
+    const pairs = [];
+    g.edges.forEach((e) => { if (!e.to || e.from === '' || !P[e.from] || !P[e.to]) return; const key = e.from + '>' + e.to; let p = pairs.find((x) => x.key === key);
+      if (!p) pairs.push(p = { key, from: e.from, to: e.to, id: e.id, kind: e.kind, list: [] }); p.list.push(e); if (p.kind === 'error' || p.kind === 'after') p.kind = e.kind; });
+    const pairSteps = (p) => [].concat.apply([], p.list.map((e) => taken[e.id] || [])).sort((x, y) => x - y);
+    const backs = pairs.filter((e) => L.rank[L.topOf(e.to)] < L.rank[L.topOf(e.from)]);
+    pairs.forEach((e) => {
+      const a = P[e.from], b = P[e.to]; const stepsHere = pairSteps(e); const hot = stepsHere.length > 0;
+      let d, mx, my;
+      if (e.from === e.to) { const x = a.x + a.w, y0 = a.y + a.h / 2; d = 'M' + x + ',' + (y0 - 10) + ' c 34,-26 34,46 0,20'; mx = x + 30; my = y0; ext(x + 40, y0); }
+      else if (backs.indexOf(e) >= 0) {
+        // Up the page: leave the source's top into the gap above its row, run in a side channel, and come into the
+        // target from below, through the gap under the target's row. Never across a node.
+        const ln = (leaveN[e.from] = (leaveN[e.from] || 0) + 1), en = (enterN[e.to] = (enterN[e.to] || 0) + 1);
+        const off = (n, w) => ((n % 5) - 2) * Math.min(14, (w - 20) / 5);
+        const x1 = a.x + a.w / 2 + off(ln, a.w), x2 = b.x + b.w / 2 + off(en, b.w);
+        const side = (x1 + x2) / 2 >= (nodeLeft + nodeRight) / 2 ? 'r' : 'l'; const kk = ++k[side];
+        const bx = side === 'r' ? nodeRight + 14 + kk * 9 : nodeLeft - 14 - kk * 9;
+        const rf = L.rowBox[L.rank[L.topOf(e.from)]], rt = L.rowBox[L.rank[L.topOf(e.to)]];
+        const gy1 = rf.top - 8 - (kk % 7) * 7, gy2 = rt.bottom + 8 + (kk % 7) * 7;
+        d = 'M' + x1 + ',' + a.y + ' L' + x1 + ',' + gy1 + ' L' + bx + ',' + gy1 + ' L' + bx + ',' + gy2 + ' L' + x2 + ',' + gy2 + ' L' + x2 + ',' + (b.y + b.h + 3);
+        mx = bx; my = (gy1 + gy2) / 2; ext(bx - 30, gy1); ext(bx + 30, gy2);
+      }
+      else if (b.y > a.y + a.h - 1) { const x1 = a.x + a.w / 2, y1 = a.y + a.h, x2 = b.x + b.w / 2, y2 = b.y; d = 'M' + x1 + ',' + y1 + ' C' + x1 + ',' + (y1 + 40) + ' ' + x2 + ',' + (y2 - 40) + ' ' + x2 + ',' + (y2 - 2); mx = (x1 + x2) / 2; my = (y1 + y2) / 2; }
+      else { const x1 = a.x + a.w / 2, x2 = b.x + b.w / 2, y1 = a.y, y2 = b.y; const up = Math.min(y1, y2) - 18; d = 'M' + x1 + ',' + y1 + ' C' + x1 + ',' + up + ' ' + x2 + ',' + up + ' ' + x2 + ',' + (y2 - 2); mx = (x1 + x2) / 2; my = up + 4; }
+      const allErr = e.list.every((x) => x.kind === 'error' || x.kind === 'after');
+      const path = '<path class="e' + (hot ? ' hot' : '') + (allErr ? ' err' : '') + '" d="' + d + '" marker-end="url(#' + (hot ? 'ahh' : 'ah') + ')"><title>' + esc(st(e.from) + ' → ' + st(e.to) + ': ' + e.list.map((x) => evWords(x) + (x.guard ? ', if ' + x.guard : '') + (x.description ? ' (' + x.description + ')' : '')).join('; ')) + '</title></path>';
+      if (hot) hotEdges += path; else edges += path;
+      if (hot) labels.push({ x: mx, y: my, t: stepsHere.map((x) => '#' + x).join(' ') });
+    });
+    // Step badges: never on top of each other.
+    const placed = []; let lab = '';
+    labels.forEach((l) => { const w = 12 + l.t.length * 6.6; let y = l.y;
+      for (let n = 0; n < 12 && placed.some((p) => Math.abs(p.x - l.x) < (p.w + w) / 2 + 2 && Math.abs(p.y - y) < 19); n++) y += 20;
+      placed.push({ x: l.x, y, w }); ext(l.x - w / 2, y + 10); ext(l.x + w / 2, y + 10);
+      lab += '<g class="el"><rect x="' + (l.x - w / 2) + '" y="' + (y - 9) + '" width="' + w + '" height="18" rx="9"/><text x="' + l.x + '" y="' + y + '">' + esc(l.t) + '</text></g>'; });
+    let nodes = '';
+    const nodeOf = (n) => {
+      const p = P[n.id]; const ch = L.kids[n.id] || []; const v = visits[n.id];
+      const cls = (v ? ' visited' : '') + (sel === n.id ? ' sel' : '') + (n.type === 'final' ? ' final' : '');
+      const inv = n.invokes.length ? 'runs ' + n.invokes.map((i) => (i.src && i.id && i.src !== i.id ? i.id + ': ' + i.src : (i.id || i.src)) + (models.has(i.id || i.src) ? ' (model)' : '')).join(', ') : '';
+      const steps = r.steps.filter((s) => s.outcome === 'applied' && s.to.some((l) => l === n.id || l.indexOf(n.id + '.') === 0)).map((s) => s.seq);
+      const aria = n.name + (n.type === 'final' ? ', final state' : '') + (inv ? ', ' + inv : '') + (r.steps.length ? (steps.length ? ', entered at step ' + steps.join(', ') : ', not entered in this run') : '');
+      if (ch.length) {
+        return '<g class="grp n' + cls + '" data-state="' + esc(n.id) + '" tabindex="0" role="button" aria-label="' + esc(aria) + '"><rect x="' + p.x + '" y="' + p.y + '" width="' + p.w + '" height="' + p.h + '" rx="10"/><text class="gt" x="' + (p.x + 10) + '" y="' + (p.y + 16) + '">' + esc(n.name) + (n.type === 'parallel' ? ' (all at once)' : '') + '</text></g>' + ch.map(nodeOf).join('');
+      }
+      const cnt = v >= 1 ? '<g class="cnt"><circle cx="' + (p.x + p.w - 4) + '" cy="' + (p.y + 4) + '" r="9"/><text x="' + (p.x + p.w - 4) + '" y="' + (p.y + 4) + '">' + Math.round(v) + '</text></g>' : '';
+      return '<g class="n' + cls + '" data-state="' + esc(n.id) + '" tabindex="0" role="button" aria-label="' + esc(aria) + '"><rect x="' + p.x + '" y="' + p.y + '" width="' + p.w + '" height="' + p.h + '" rx="' + (n.type === 'final' ? 22 : 8) + '"/>' +
+        '<text class="nt" x="' + (p.x + p.w / 2) + '" y="' + (p.y + (inv ? 22 : 30)) + '">' + esc(n.name) + '</text>' + (inv ? '<text class="na" x="' + (p.x + p.w / 2) + '" y="' + (p.y + 40) + '">' + esc(inv.length > Math.max(12, Math.floor((p.w - 12) / 6.3)) ? inv.slice(0, Math.max(12, Math.floor((p.w - 12) / 6.3)) - 1) + '…' : inv) + '</text>' : '') + cnt + '</g>';
+    };
+    (L.kids[''] || []).forEach((n) => { nodes += nodeOf(n); });
+    const x0 = Math.floor(minX - 14), w = Math.ceil(maxX - minX + 28), h = Math.ceil(maxY + 16);
+    const box = $('graph');
+    box.innerHTML = '<svg width="' + w + '" height="' + h + '" viewBox="' + x0 + ' 0 ' + w + ' ' + h + '" role="group" aria-label="Workflow map of ' + esc(wf.name) + '" style="max-width:' + w + 'px">' +
+      '<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker><marker id="ahh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah-hot" d="M0,0 L10,5 L0,10 z"/></marker></defs>' +
+      edges + nodes + hotEdges + lab + '</svg>';
+    const any = g.edges.filter((e) => e.from === '');
+    $('anywhere').innerHTML = any.length ? '<p class="small"><b>In any state</b> (not drawn on the map): ' + any.map((e) => '<code>' + esc(e.event) + '</code>' + (e.description ? ' (' + esc(e.description) + ')' : '') + (taken[e.id] ? ' <span class="pill p-acc">used at step ' + taken[e.id].join(', ') + '</span>' : '')).join('; ') + '</p>' : '';
+    graphCue();
+  }
+  let fit = null; // null: decide per map (fit when the map is wider than its box)
+  function applyZoom() { if (fit == null) { const svg = $('graph').querySelector('svg'); fit = !!svg && svg.width.baseVal.value > $('graph').clientWidth && (window.innerWidth >= 480 || svg.width.baseVal.value < 1.6 * $('graph').clientWidth); }
+    $('graph').classList.toggle('fit', fit);
+    if (!fit) { const box = $('graph'); const wf = run && D.workflows[run.workflow.key]; const first = wf && (wf.graph.initial || (wf.graph.nodes[0] || {}).id);
+      const n = first && box.querySelector('[data-state="' + (window.CSS && CSS.escape ? CSS.escape(first) : first) + '"]');
+      if (n) { const a = n.getBoundingClientRect(), b = box.getBoundingClientRect(); box.scrollLeft += a.left + a.width / 2 - (b.left + box.clientWidth / 2); } } $('zoom').textContent = fit ? 'Show map at actual size' : 'Fit map to width';
+    graphCue(); }
+  function graphCue() { const b = $('graph'); const more = b.scrollHeight > b.clientHeight + 16 && b.scrollTop + b.clientHeight < b.scrollHeight - 16; $('graphwrap').classList.toggle('more', more);
+    $('zoomhint').textContent = (fit ? 'The whole map is scaled to fit its width.' : 'Actual size: scroll the map sideways to see all of it.') + (more ? ' The map continues below: scroll inside it.' : ''); }
+  $('graph').addEventListener('scroll', graphCue);
+  let autoFit = true;
+  $('zoom').addEventListener('click', () => { fit = !fit; autoFit = false; applyZoom(); });
+
+  const guardText = (wf, name) => { const gd = wf.spec && wf.spec.meta && wf.spec.meta.guards && wf.spec.meta.guards[name]; return gd ? name + ': ' + JSON.stringify(gd) : name; };
+  const gname = (wf, name) => '<code title="' + esc(guardText(wf, name)) + '">' + esc(name) + '</code>';
+  const evWords = (e) => e.kind === 'on' ? 'on ' + e.event : e.kind === 'done' ? 'when ' + e.event + ' finishes' : e.kind === 'error' ? 'when ' + e.event + ' fails' : e.kind === 'after' ? 'after ' + e.event : e.kind === 'join' ? 'when every inner state is done (join)' : 'at once';
+
+  // One way out, with its condition inline: its guard, and the needs of the state it enters (the engine checks both).
+  // Ways out for the same event are tried in order, so a conditional one says the next line is tried when it fails.
+  const wayOut = (wf, g, e) => {
+    const into = e.stays ? e.from : e.to; const n = g.nodes.find((x) => x.id === into); const needs = (n && n.needs) || [];
+    const conds = (e.guard ? [ab('guard') + ' ' + gname(wf, e.guard)] : []).concat(needs.length ? [needs.map((x) => gname(wf, x)).join(' and ') + ' (' + esc(st(into || e.rawTarget)) + ' ' + ab('needs') + (needs.length > 1 ? ' them' : ' it') + ')'] : []);
+    const same = g.edges.filter((x) => x.from === e.from && x.kind === e.kind && x.event === e.event);
+    const next = same.indexOf(e) < same.length - 1;
+    return esc(evWords(e)) + ' → <code>' + esc(e.stays ? '(stays)' : st(e.to || e.rawTarget)) + '</code>' + (conds.length ? ', only if ' + conds.join(' and ') + ((e.guard ? 1 : 0) + needs.length > 1 ? ' hold' : ' holds') + (next ? '; otherwise the next line' : '') : '') + (e.description ? ': <span class="muted">' + esc(e.description) + '</span>' : '');
+  };
+  const WAYS_HEAD = 'Ways out, tried in order; the first whose guard and needs all hold is taken';
+  // What an actor is, for a map with no run: as runs of the same name show it, or a child workflow, or unknown.
+  const kindsSeen = {}; D.runs.forEach((r) => r.steps.forEach((s) => s.actors.forEach((a) => { if (a.type === 'run') kindsSeen[a.actor] = a.model ? 'model' : 'host'; })));
+  const shelfNames = D.shelf.map((w) => String(w.file).split('/').pop().replace(/\.json$/, ''));
+  // "q1 (runs build; model in the captured runs)": an invoke id that differs from its actor names the actor it runs.
+  const invName = (i, kind) => '<code>' + esc(i.id || i.src) + '</code> <span class="muted">(' + (i.src && i.id && i.src !== i.id ? 'runs ' + esc(i.src) + '; ' : '') + esc(kind) + ')</span>';
+  const authored = (i) => Object.entries(i.input || {}).filter(([, v]) => v && typeof v === 'object' && typeof v.value === 'string' && v.value.length >= 20);
+  const authoredHtml = (i, full) => authored(i).map(([k, v]) => '<div class="small authored"><b>Text written in the workflow file</b> for <code>' + esc(i.id || i.src) + '</code>, <code>input.' + esc(k) + '</code>' +
+    (full ? ' (the only prompt text a workflow author writes; the engine template wraps it):<pre class="text" tabindex="0">' + esc(v.value) + '</pre>' : ': <span title="' + esc(v.value) + '">"' + esc(v.value.length > 90 ? v.value.slice(0, 89) + '…' : v.value) + '"</span>') + '</div>').join('');
+  const kindOf = (src, fromRun) => fromRun || (shelfNames.indexOf(src) >= 0 ? 'child workflow' : kindsSeen[src] ? (kindsSeen[src] === 'model' ? 'a model agent' : 'host code') + ' in other captured runs' : 'kind unknown without a run');
+
+  const runKind = (r, invoke) => { for (const s of r.steps) for (const a of s.actors) if (a.type === 'run' && a.invoke === invoke) return a.model ? 'model' : 'host'; return null; };
+  function statePanel(r, id) {
+    const wf = D.workflows[r.workflow.key]; const g = wf.graph; const n = g.nodes.find((x) => x.id === id); const box = $('statepanel');
+    if (!n) { box.hidden = true; return; }
+    const steps = r.steps.filter((s) => s.outcome === 'applied' && s.to.some((l) => l === id || l.indexOf(id + '.') === 0));
+    const outs = g.edges.filter((e) => e.from === id);
+    box.hidden = false;
+    box.innerHTML = '<h3>State: ' + esc(st(n.id)) + (n.type === 'final' ? ' (final)' : '') + '</h3>' + (n.description ? '<p class="small">' + esc(n.description) + '</p>' : '') +
+      (n.invokes.length ? '<p class="small">Starts (' + ab('invoke') + '): ' + n.invokes.map((i) => invName(i, kindOf(i.src || i.id, runKind(r, i.id || i.src)))).join(', ') + '</p>' + n.invokes.map((i) => authoredHtml(i, true)).join('') : '') +
+      (n.needs.length ? '<p class="small">' + ab('needs', 'Needs') + ' to enter: ' + n.needs.map((x) => gname(wf, x)).join(', ') + '</p>' : '') +
+      (r.steps.length ? '<div class="jumps">' + (steps.length ? steps.map((s) => '<button type="button" class="btn" data-jump="' + s.index + '">Go to step ' + esc(s.seq) + '</button>').join('') : '<span class="muted small">This run never entered this state.</span>') + '</div>' : '') +
+      (outs.length ? '<p class="small"><b>' + WAYS_HEAD + ':</b></p><ul>' + outs.map((e) => '<li>' + wayOut(wf, g, e) + '</li>').join('') + '</ul>' : '<p class="small muted">No ways out of its own' + (n.type === 'final' ? ': this is where an item ends.' : '.') + '</p>');
+    document.querySelectorAll('#trail button').forEach((b) => b.classList.toggle('hl', steps.some((s) => String(s.index) === b.dataset.jump)));
+    box.scrollIntoView({ block: 'nearest' });
+  }
+
+  function statesTable(r, open) {
+    const wf = D.workflows[r.workflow.key]; const g = wf.graph;
+    const kinds = {}; r.steps.forEach((s) => s.actors.forEach((a) => { if (a.type === 'run') kinds[a.invoke] = a.model ? 'model' : 'host'; }));
+    const rows = g.nodes.map((n) => {
+      const outs = g.edges.filter((e) => e.from === n.id);
+      return '<tr><td class="nw"><code>' + esc(st(n.id)) + '</code>' + (n.type === 'final' ? ' <span class="pill p-mute">final</span>' : n.type === 'compound' || n.type === 'parallel' ? ' <span class="pill p-mute">group</span>' : '') + '</td>' +
+        '<td><div class="cell starts">' + (n.invokes.map((i) => '<div>' + invName(i, kindOf(i.src || i.id, kinds[i.id || i.src])) + '</div>' + authoredHtml(i, false)).join('') || '<span class="muted">' + (n.type === 'final' ? 'none: this is where an item ends' : 'nothing (no invoke)') + '</span>') + '</div></td>' +
+        '<td class="nw">' + (n.needs.map((x) => gname(wf, x)).join('<br>') || '<span class="muted">—</span>') + '</td>' +
+        '<td>' + (outs.length ? '<div class="cell wide"><ul class="cand">' + outs.map((e) => '<li>' + wayOut(wf, g, e) + '</li>').join('') + '</ul></div>' : '<span class="muted">' + (n.type === 'final' ? 'none: this is where an item ends' : '—') + '</span>') + '</td></tr>';
+    }).join('');
+    const any = g.edges.filter((e) => e.from === '');
+    const anyRow = any.length ? '<tr><td class="nw"><i>In any state</i></td><td><span class="muted">—</span></td><td><span class="muted">—</span></td><td><div class="cell wide"><ul class="cand">' + any.map((e) => '<li>' + wayOut(wf, g, e) + '</li>').join('') + '</ul></div></td></tr>' : '';
+    $('statestable').innerHTML = sec('All states and ways out', '<div class="tblwrap"><table class="glance stack"><thead><tr><th scope="col">State</th><th scope="col">Starts</th><th scope="col">Needs</th><th scope="col"><div class="thwrap">' + WAYS_HEAD + '</div></th></tr></thead><tbody>' + rows + anyRow + '</tbody></table></div>',
+      { open, hint: g.nodes.length + ' states, ' + g.edges.length + ' ways out', note: 'Read from the workflow JSON. Hover or focus a guard or a need to see its test.' });
+  }
+
+  // ---- One run
+  let run = null, selState = null;
+  const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+  const prevSeq = (r, s) => { for (let i = s.index - 1; i >= 0; i--) if (r.steps[i].seq != null) return r.steps[i].seq; return null; };
+  const stepName = (r, s) => s.seq != null ? 'step ' + s.seq : (prevSeq(r, s) != null ? 'the ignored event after step ' + prevSeq(r, s) : 'the ignored event before step 0');
+  function summary(r) {
+    const scripted = r.kind === 'scripted';
+    const models = r.steps.reduce((n, s) => n + s.actors.filter((a) => a.model).length, 0);
+    const ok = r.replay.ok && r.replay.failedAt == null && !r.replay.mismatches.length;
+    return '<div class="badges"><span class="pill ' + (scripted ? 'p-acc' : 'p-ok') + '">' + (scripted ? 'Scripted scenario' : 'Real model run') + '</span>' +
+      '<span class="pill p-mute">' + plural(r.steps.length, 'step') + '</span><span class="pill p-mute">' + plural(models, 'model agent run') + '</span><span class="pill p-mute">ends in ' + esc(short(r.final)) + '</span>' +
+      '<span class="pill ' + (ok ? 'p-ok' : 'p-warn') + '">' + (ok ? 'replay matches the journal' : 'replay incomplete') + '</span></div>' +
+      (r.endNote ? '<p><b>How it ends:</b> ' + esc(r.endNote) + '</p>' : '') +
+      '<div class="' + (scripted ? 'scriptbox' : 'okbox') + '">' + esc(r.note) + '</div>' +
+      r.notes.map((n) => '<div class="warnbox">' + esc(n) + '</div>').join('') +
+      (r.workflow.note ? '<div class="warnbox">' + esc(r.workflow.note) + ' Every replay hash still matches, so the context is right; state names, labels and descriptions come from the current file.</div>' : '') +
+      '<dl class="facts"><dt>Item</dt><dd><code>' + esc(r.item) + '</code></dd>' +
+      '<dt>Workflow</dt><dd>' + esc(wfName(r)) + ', read from ' + esc(r.workflow.source) + '</dd>' +
+      '<dt>Engine</dt><dd><code>' + esc(r.engine.path) + '</code>' + (r.engine.commit ? ' at ' + esc(r.engine.commit) + (r.engine.branch ? ' on ' + esc(r.engine.branch) : '') : '') + (r.engine.loaded ? '' : ' <span class="pill p-bad">could not load: ' + esc(r.engine.error) + '</span>') + '</dd>' +
+      '<dt>Journal</dt><dd><code>' + esc(r.journal) + '</code>' + (r.items.length > 1 ? ' (' + r.items.length + ' items in this journal)' : '') + '</dd>' +
+      '<dt>Tool trace</dt><dd>' + (scripted ? 'none: no model ran' : r.sessionsFound ? 'live session capture found' : 'no live session capture in this journal') + '</dd></dl>';
+  }
+
+  function trailHtml(r) {
+    return r.steps.map((s) => '<button type="button" data-jump="' + s.index + '" class="' + (s.outcome === 'applied' ? '' : 'refused') + '" aria-label="' + esc(stepName(r, s).replace(/^./, (c) => c.toUpperCase())) + ': ' + esc(s.label) + '"><b>' + esc(s.seq == null ? '×' : s.seq) + '</b>' + esc(s.outcome === 'applied' ? short(s.to).split(' › ').pop() : 'ignored') + '</button>').join('');
+  }
+
+  const resultWords = (L) => {
+    const v = L.l6.result; if (v == null) return gloss(L.l6.short || L.l6.missing || 'nothing');
+    if (typeof v !== 'object') return String(v).slice(0, 40);
+    const host = (L.l6.hostWritten || []).map((h) => h.path).filter((p) => p.indexOf('.') < 0 && p.indexOf('[') < 0);
+    const plus = host.length ? ' + ' + host.join(', ') + ' (added by host)' : '';
+    if (typeof v.result === 'string') return v.result + plus;
+    const pr = v.pr && v.pr.url ? String(v.pr.url).match(/\/pull\/(\d+)/) : null; if (pr) return 'pr #' + pr[1] + plus;
+    const ks = Object.keys(v).filter((k) => host.indexOf(k) < 0); return (ks.length ? ks.slice(0, 3).join(', ') + (ks.length > 3 ? '…' : '') : '{}') + plus;
+  };
+  const RULE_WORDS = { 'no-return': 'it did not use the return tool', 'attested-reserved': 'it set a field only the host may write', 'reserved': 'it set a field only the host may write',
+    'schema': 'its answer did not fit the output schema', 'wrong-caller': 'another agent called the return tool for this run', 'already-returned': 'this run had already returned',
+    'already-failed': 'this run had already failed', 'unknown-run': 'the run id was not one the host knows', 'github-fact': 'a GitHub fact it claimed did not hold', 'ref': 'a reference it gave did not resolve',
+    'restated': 'it restated a value the host already holds', 'source': 'a source it named could not be checked', 'lane': 'it named the wrong lane' };
+  const gloss = (t) => String(t).replace(/\(([a-z]+(?:-[a-z]+)*)(?:, ([a-z]+(?:-[a-z]+)*))?\)/g, (m, a, b) => RULE_WORDS[a] ? '(' + [a, b].filter(Boolean).map((x) => RULE_WORDS[x] || x).join('; ') + ')' : m);
+  const hostWords = (L) => { const refs = L.l7.rows.filter((x) => x.verdict === 'refused'), ref = refs.length, acc = L.l7.rows.some((x) => x.verdict === 'accepted');
+    const why = [...new Set(refs.map((x) => x.payload && x.payload.rule).filter(Boolean))].map((r) => RULE_WORDS[r] || r).join('; ');
+    const failed = L.outcome && L.outcome.status === 'failed';
+    return ref && acc ? 'refused ' + ref + '×' + (why ? ' (' + why + ')' : '') + ', then stored' : ref ? 'refused' + (ref > 1 ? ' ' + ref + '×' : '') + (why ? ': ' + why : '') + (failed ? '; run failed' : '') : acc ? 'stored' : failed ? 'run failed' : '—'; };
+  function glance(r) {
+    const rows = r.steps.map((s) => {
+      const applied = s.outcome === 'applied';
+      const started = s.actors.filter((a) => a.type === 'run');
+      return '<tr><td class="nw"><button type="button" data-jump="' + s.index + '" aria-label="Go to ' + esc(stepName(r, s)) + '">' + esc(s.seq == null ? '×' : s.seq) + '</button></td>' +
+        '<td><div class="cell what">' + esc(s.words || s.eventType) + (applied ? '' : ' <span class="pill p-bad">ignored</span>') + '</div></td>' +
+        '<td class="mono"><div class="cell ft">' + esc(s.from.length ? short(s.from) : '(start)') + ' → ' + esc(applied ? short(s.to) : 'unchanged') + '</div></td>' +
+        '<td class="keyscell">' + (s.changed.length ? '<div class="chips">' + s.changed.map((k) => '<span class="chip">' + esc(k) + '</span>').join('') + '</div>' : '<span class="muted">—</span>') + '</td>' +
+        '<td class="nw">' + (started.map((a) => esc(a.actor) + (a.model ? (r.kind === 'scripted' ? ' <span class="pill p-acc" title="a model agent\'s slot, filled by a test fixture: no model ran">fixture</span>' : ' <span class="pill p-acc">model</span>') : ' <span class="pill p-mute">host</span>')).join('<br>') || '<span class="muted">—</span>') + '</td>' +
+        '<td><div class="cell ret">' + (started.filter((a) => a.model).map((a) => esc(resultWords(a.layers))).join('<br>') || '<span class="muted">—</span>') + '</div></td>' +
+        '<td><div class="cell host">' + (started.filter((a) => a.model).map((a) => esc(hostWords(a.layers))).join('<br>') || '<span class="muted">—</span>') + '</div></td></tr>';
+    }).join('');
+    return sec('Steps at a glance', '<div class="tblwrap"><table class="glance stack"><thead><tr><th scope="col">Step</th><th scope="col">What happened</th><th scope="col">From → to</th><th scope="col">Context keys changed</th><th scope="col">Started</th><th scope="col">Agent returned</th><th scope="col">Host</th></tr></thead><tbody>' + rows + '</tbody></table></div>',
+      { open: true, hint: plural(r.steps.length, 'step'), note: '"Agent returned" and "Host" belong to the agent the step started; its answer arrives at a later step.' });
+  }
+
+  const writeLine = (w) => '<li><code>' + esc(w.path) + '</code> ← ' + (typeof w.source === 'string' ? '<code>' + esc(w.source) + '</code>' : 'the value <code>' + esc(JSON.stringify(w.source && w.source.value !== undefined ? w.source.value : w.source)) + '</code>') + '</li>';
+  const findRun = (effect) => { for (const s of run.steps) for (const a of s.actors) if (a.effect === effect) return { s, a }; return null; };
+  const whoLine = (pv, scripted) => pv.kind === 'template' ? 'nobody. The engine filled in a template around the actor input.'
+    : pv.kind === 'template+workflow' ? 'the workflow author, as instructions in the workflow JSON (state ' + (pv.state || '?') + ', invoke ' + pv.invoke + ', input.' + (pv.literals || []).join(', input.') + '), wrapped by the engine template.'
+      : pv.kind === 'passthrough' ? (pv.producer && pv.producer.model ? 'the ' + pv.producer.actor + ' agent' + (scripted ? ' (a test fixture here)' : '') : pv.producer && pv.producer.event === 'xstate.init' ? 'whoever started the item' : 'an earlier step') : 'unknown';
+  const pillWho = (pv) => pv.kind === 'template' ? 'engine template, nobody wrote it' : pv.kind === 'template+workflow' ? 'workflow JSON + engine template' : pv.kind === 'passthrough' ? 'written by the ' + (pv.producer ? pv.producer.actor + (pv.producer.model ? ' agent' : ' step') : 'an earlier step') : '';
+
+  function layers(s, a) {
+    const L = a.layers; const out = [];
+    const scripted = run.kind === 'scripted';
+    out.push(sec('<span class="lnum">1</span> Claude Code system prompt', '<p class="small">' + esc(L.l1.note) + '</p>', { cls: 'layer nolog', hint: scripted ? 'none: no model ran' : 'not recorded' }));
+    const pv = L.l2.provenance;
+    let chain = '';
+    if (pv.kind === 'passthrough' && pv.producer && pv.producer.run) {
+      const pr = findRun(pv.producer.run);
+      if (pr && pr.a.layers) { const k = pr.a.layers.l2.provenance.kind;
+        chain = '<div class="chain"><span><b>And who prompted the ' + esc(pr.a.actor) + ' agent?</b> ' + (k === 'template' ? 'Nobody: it was started with only the bare engine template and its input. Without the input, its whole prompt reads: "' + esc(pieces(String(pr.a.layers.l2.text || '')).filter((x) => !x.value).map((x) => x.prose.trim()).filter(Boolean).join(' … ').slice(0, 240)) + '". No person wrote it instructions.' : k === 'template+workflow' ? 'The workflow author, through a task written into the workflow JSON, wrapped by the engine template.' : k === 'passthrough' ? 'Text passed on from an earlier step.' : 'Unknown.') + '</span>' +
+          '<span><button type="button" class="btn" data-jump="' + pr.s.index + '">See its prompt (step ' + esc(pr.s.seq) + ')</button></span></div>'; }
+    }
+    const who = '<div class="who ' + esc(pv.kind.replace('+', '-')) + '"><b>Who wrote this prompt: ' + esc(whoLine(pv, scripted)) + '</b><span>' + esc(pv.summary) + '</span>' +
+      (pv.producer && pv.producer.step != null ? (run.steps.findIndex((x) => x.seq === pv.producer.step) === s.index ? '<span class="small">It arrived at this very step: the event above carries it.</span>' : '<span><button type="button" class="btn" data-jump="' + run.steps.findIndex((x) => x.seq === pv.producer.step) + '">Go to step ' + esc(pv.producer.step) + ', where it arrived</button></span>') : '') +
+      (L.l2.resumeNote ? '<span class="resumed"><b>Not the whole conversation:</b> ' + esc(L.l2.resumeNote.text) + '</span>' : '') + '</div>' + chain;
+    const tmpl = pv.templateSource ? '<details class="sec"><summary>The engine code that wrote it <span class="hint">writtenBrief() in this engine\'s actors.js</span></summary><div class="inner"><pre class="text" tabindex="0">' + esc(pv.templateSource) + '</pre></div></details>' : (pv.templateNote ? '<p class="muted small">' + esc(pv.templateNote) + '</p>' : '');
+    const checks = (L.l2.checks || []).length ? '<ul class="checks">' + L.l2.checks.map((c) => '<li class="' + (c.ok ? '' : 'no') + '">' + esc(c.what) + (c.ok ? '' : ': it does NOT') + ' (' + ab('hash', 'hash check') + ')</li>').join('') + '</ul>' : '';
+    out.push(sec('<span class="lnum">2</span> Prompt', who + (L.l2.text != null ? textViews(L.l2.text, L.l2.segments, 'prompt') : '<p class="muted">brief.md is missing.</p>') + checks + tmpl,
+      { cls: 'layer', open: true, hint: esc(pillWho(pv)) + (L.l2.resumeNote ? ' · <span class="pill p-warn">' + esc(L.l2.resumeNote.chip) + '</span>' : ''), note: (scripted ? 'The exact text the engine wrote as this agent\'s prompt (<code>brief.md</code> in its run folder). No model ran in this scenario: a test fixture stood in for the agent, and this is the prompt the engine would start a real agent with.' : 'The exact first message Claude Code started the agent with (<code>brief.md</code> in its run folder).') + (L.l2.resumeNote ? ' It is the first message only: this agent was resumed later with a message that was not recorded.' : '') }));
+    const tmpl3 = L.l3.templateSource ? '<details class="sec"><summary>The engine code that writes it <span class="hint">contextOf() and the helpers it uses, from this engine\'s actors.js</span></summary><div class="inner"><pre class="text" tabindex="0">' + esc(L.l3.templateSource) + '</pre></div></details>' : '';
+    const checks3 = (L.l3.checks || []).length ? '<ul class="checks">' + L.l3.checks.map((c) => '<li class="' + (c.ok ? '' : 'no') + '">' + esc(c.what) + (c.ok ? '' : ': it does NOT') + '</li>').join('') + '</ul>' : '';
+    out.push(sec('<span class="lnum">3</span> Added context', (L.l3.text != null ? textViews(L.l3.text, L.l3.segments, 'added context') : '<p class="muted">context.md is missing.</p>') + checks3 + tmpl3,
+      { cls: 'layer', open: true, hint: 'engine code, with the workflow\'s schema and the input in it', note: 'Text the harness adds when the agent starts (<code>context.md</code>): its run, worktree, how to return, the output schema and its input. ' + (scripted ? 'In the main harness the SubagentStart hook hands it to the agent as added context beside the prompt; this lane\'s engine would hand it the same way, but no model ran here and no hook ran: this is what it would hand one.' : 'In this harness the SubagentStart hook hands it to the agent as added context beside the prompt, so layers 2 and 3 together are all the text the harness gives the model when it starts' + (L.l2.resumeNote ? ' (this agent was later resumed with a further message that is not recorded; see layer 2)' : '') + '.') + ' Engine code writes it, embedding the workflow\'s schema and the actor input; "Where each part came from" shows which is which.' }));
+    let l4 = '';
+    if (!L.l4.schema) l4 = '<p class="muted">No schema recorded.</p>';
+    else {
+      l4 = '<p class="small"><b>' + (L.l4.shownInContext ? 'The schema the agent was shown' : 'The schema') + '</b>' + (L.l4.shownInContext ? ' (in its added context):' : ' (from run.json):') + '</p>' + pre(L.l4.schema, null, 'output schema shown to the agent');
+      if (L.l4.diff) l4 += '<div class="warnbox">The host validates the result it stores against a different schema (run.json): ' + esc(L.l4.diff.text) + '. The agent is not shown ' + (L.l4.diff.removed.length ? 'that part' : 'the difference') + ' because the host writes it' + (L.l4.diff.removed.length ? ', and a return that carries ' + L.l4.diff.removed.map((k) => '"' + esc(k) + '"').join(', ') + ' is refused' : '') + '.</div>' +
+        sec('What the host validates its stored result against (run.json)', pre(L.l4.hostSchema, null, 'host schema'), {});
+      if (L.l4.defs && Object.keys(L.l4.defs).length) l4 += sec('Shared definitions the schema refers to ($ref)', pre(L.l4.defs, null, 'schema definitions'), {});
+    }
+    out.push(sec('<span class="lnum">4</span> Output schema', l4,
+      { cls: 'layer', hint: L.l4.diff ? 'agent-facing schema differs from the stored one' : 'from the ' + esc(L.l4.from), note: 'The shape the agent\'s answer must have. The return tool refuses anything else.' }));
+    const tr = L.l5.trace || [];
+    const calls = tr.filter((r) => r.kind === 'tool.call');
+    const table = tr.length ? '<div class="tblwrap"><table><thead><tr><th scope="col">time</th><th scope="col">by</th><th scope="col">what</th><th scope="col">ok</th><th scope="col">ms</th><th scope="col">input bytes</th><th scope="col">paths</th></tr></thead><tbody>' +
+      tr.map((r) => { const wordy = r.kind !== 'tool.call' && r.what && r.what !== r.kind;
+        return '<tr><td class="nw">' + esc(String(r.at || '').slice(11, 19)) + '</td><td class="nw">' + esc(r.by || '') + '</td><td' + (wordy ? '><div class="cell">' + esc(r.what) + ' <span class="muted">(' + esc(r.kind) + ')</span></div>' : ' class="nw">' + esc(r.what || (r.kind === 'tool.call' ? r.tool : r.kind))) + '</td><td class="nw">' + (r.ok === false ? '<span class="pill p-bad">failed</span>' : r.ok ? 'yes' : '<span class="muted">—</span>') + '</td><td class="nw">' + (r.ms == null ? '<span class="muted">—</span>' : esc(r.ms)) + '</td><td class="nw">' + (r.inputBytes == null ? '<span class="muted">—</span>' : esc(r.inputBytes)) + '</td><td><div class="cell">' + esc((r.paths || []).map((x) => String(x).split('/').pop()).join(' ')) + '</div></td></tr>'; }).join('') + '</tbody></table></div>' : '';
+    const nFin = tr.filter((r) => r.kind === 'agent.finish').length;
+    const tok = L.tokens ? ' Tokens' + (nFin > 1 ? ' at its last finish (the capture counts on across a resume)' : '') + ': ' + (L.tokens.output || 0).toLocaleString() + ' out, ' + ((L.tokens.input || 0) + (L.tokens.cacheRead || 0) + (L.tokens.cacheCreation || 0)).toLocaleString() + ' in (most from cache).' : '';
+    const finishes = tr.filter((r) => r.kind === 'agent.finish').length;
+    out.push(sec('<span class="lnum">5</span> What it did', table || '<p class="small">' + esc(L.l5.reason) + '</p>',
+      { cls: 'layer' + (tr.length ? '' : ' nolog'), open: !!tr.length, hint: tr.length ? plural(calls.length, 'tool call') + (L.ms ? ', ' + Math.round(L.ms / 1000) + ' s' + (nFin > 1 ? ' at last finish' : '') : '') : 'none recorded',
+        note: tr.length ? 'From the live session capture, rows of agent <code>' + esc(L.agentId) + '</code>. It keeps each tool\'s name, timing, size and the paths it touched, but only a hash of its input: <b>the exact commands are not stored</b>. "by" says who the row is about: the agent (its tool calls and finishes), the platform (Claude Code starting it), the capture (the capture hook saving a hash of the agent\'s prompt or final message, which is not the harness accepting anything) or the harness hook (refusing a handback that came without a return, and sending the agent back); times are the capture\'s clock, so they can differ by a few seconds from the journal times in layer 7.' + (L.l5.story ? ' ' + esc(L.l5.story) : '') + esc(tok) + (L.l5.hooks ? ' ' + plural(L.l5.hooks, 'more capture row') + ' of kind hook.run (the capture timing its own hooks) are left out of this table, so the capture holds ' + (tr.length + L.l5.hooks) + ' rows for this agent in all.' : '') : '' }));
+    const hw = L.l6.hostWritten || [];
+    const hwList = hw.length ? '<div class="warnbox"><b>Written by the host, not the agent:</b><ul class="onlylist">' + hw.map((h) => '<li><code>' + esc(h.path) + '</code>: ' + esc(h.why) + '</li>').join('') + '</ul></div>' : '';
+    out.push(sec('<span class="lnum">6</span> What the host stored as its result', L.l6.result != null ? hwList + pre(L.l6.result, { host: hw.map((h) => h.path) }, 'stored result') : '<p class="small">No result stored' + (L.l6.short ? ' (' + esc(L.l6.short) + ')' : '') + ': there is no result.json in the run folder. Layer 7 says why.</p>',
+      { cls: 'layer' + (L.l6.result != null ? '' : ' nolog'), open: true, hint: L.l6.result != null ? 'result.json' + (hw.length ? ', ' + plural(hw.length, 'field') + ' added by the host' : '') : 'no result',
+        note: L.l6.result != null ? 'The result as the host stored it (<code>result.json</code>) after it accepted the return. This engine does not keep the raw return separately' + (hw.length ? ', so the fields the host added are marked' : '') + '.' + (scripted ? ' In this scenario the test supplied what the "agent" returned.' : '') : '' }));
+    const failedAt = ((L.l7.files || []).find((f) => /^failed\b/.test(f.name)) || {}).value;
+    const failAt = failedAt ? String((failedAt && failedAt.at) || '9999') : null;
+    const v = L.l7.rows.map((r) => '<div class="verdict ' + r.verdict + '"><b>' + (r.verdict === 'accepted' ? 'Stored (passed the schema and the host\'s return checks)' : r.verdict === 'refused' ? (failAt && String(r.at || '').slice(0, 19) >= failAt.slice(0, 19) ? 'Refused; run failed' : 'Refused and sent back') : 'Recorded') + '</b> <span class="small">' + esc(String(r.at || '').slice(0, 19).replace('T', ' ')) + ' · <code>' + esc(r.kind) + '</code></span>' +
+      '<span class="small">' + esc(r.verdict === 'refused' ? (r.payload.rule ? 'rule ' + r.payload.rule + ': ' : '') + (r.payload.reason || '') : r.verdict === 'accepted' ? 'The result went to the item.' : r.kind === 'brief.stored' && r.payload.role ? 'The host stored the ' + r.payload.role + ' brief from this result (' + r.payload.bytes + ' bytes): it is fixed from now on.' : '') + '</span></div>').join('');
+    const after = L.after ? '<p class="small"><b>What the workflow did with it:</b> ' + (L.after.took ? 'at step ' + esc(L.after.step) + (/^xstate\.error\./.test(L.after.eventType || '') ? ' the engine took the failure: ' : ' the engine took this result: ') : 'at step ' + esc(L.after.step) + ' the item moved on without it: ') + esc(L.after.label) + ' <button type="button" class="btn" data-jump="' + L.after.index + '">Go to step ' + esc(L.after.step) + '</button></p>' : '';
+    const files = (L.l7.files || []).map((f) => sec('<code>' + esc(f.name) + '</code>', typeof f.value === 'string' ? '<pre class="text" tabindex="0">' + esc(f.value) + '</pre>' : pre(f.value, null, f.name), { hint: 'another file the host left in the run folder', open: true })).join('');
+    out.push(sec('<span class="lnum">7</span> Host check', (v || '<p class="small">' + esc(L.l7.empty || 'No accept or refuse row for this run.') + '</p>') + (v && L.l6.result == null && L.l6.missing ? '<p class="small"><b>What became of it:</b> ' + esc(L.l6.missing) + '</p>' : '') + files + after,
+      { cls: 'layer', open: true, hint: L.l7.rows.some((r) => r.verdict === 'refused') ? 'refused at least once' : L.l7.rows.some((r) => r.verdict === 'accepted') ? 'stored' : 'no answer recorded' }));
+    return out.join('');
+  }
+
+  // "xstate.after.buildTimeout.quick-fix@…building" -> "the build time limit was cancelled".
+  function timerWords(id, verb) {
+    const m = String(id || '').match(/xstate\.after\.([^.]+)/); const name = m ? m[1] : String(id || 'a timer');
+    const base = /timeout$/i.test(name) ? 'the ' + name.replace(/timeout$/i, '').replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase() + ' time limit' : /^\d+$/.test(name) ? 'a ' + name + ' ms timer' : 'the ' + name.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase() + ' timer';
+    return verb === 'set' ? 'Starts ' + base + '.' : base.charAt(0).toUpperCase() + base.slice(1) + ' was ' + verb;
+  }
+
+  function actorHtml(s, a) {
+    if (a.type !== 'run') {
+      const what = a.type === 'timer' ? 'Timer set' + (a.due ? ', due ' + esc(String(a.due).replace('T', ' ').slice(0, 19)) : '') : esc(a.type);
+      return '<div class="actor"><header><h4>' + what + '</h4><span class="pill p-mute">host</span></header><p class="small">' + esc(timerWords(a.timer || a.effect, 'set')) + ' <span class="muted">(id <code>' + esc(a.timer || a.effect) + '</code>)</span></p></div>';
+    }
+    const head = '<header><h4>' + esc(a.actor) + (a.invoke !== a.actor ? ' <span class="muted small">(invoke ' + esc(a.invoke) + ')</span>' : '') + '</h4>' +
+      (a.model ? '<span class="pill p-acc">model agent' + (a.layers.model ? ': ' + esc(a.layers.model) : run.kind === 'scripted' ? ': test fixture' : '') + '</span><span class="pill p-mute">' + esc(a.actor) + ' #' + a.occurrence + '</span>' : '<span class="pill p-mute">host code, no model</span>') + '</header>';
+    const input = sec('Input it was given', a.input != null ? pre(a.input, null, 'actor input') : '<p class="muted">Not recorded.</p>',
+      { note: (a.inputFrom ? esc(/^recomputed/.test(a.inputFrom) ? 'R' + a.inputFrom.slice(1) : 'From ' + a.inputFrom) + '. ' : '') + (a.inputMap ? 'The workflow builds it from the context with this map: ' + Object.entries(a.inputMap).map(([k, v]) => '<code>' + esc(k) + '</code> ← <code>' + esc(typeof v === 'string' ? v : JSON.stringify(v)) + '</code>').join(', ') : ''), open: !a.model });
+    if (!a.model) {
+      return '<div class="actor">' + head + '<p class="small">No model here: <code>' + esc(a.actor) + '</code> is plain code in the host. It has no prompt.' + (a.hostNote ? ' ' + esc(a.hostNote) : '') + '</p>' + input +
+        (a.card ? sec('The card it posted, word for word', pre(a.card, null, 'card'), { open: true }) : '') +
+        (a.outcome ? sec('What the host recorded when it finished starting', pre(a.outcome, null, 'host outcome'), { open: !a.card }) : '') + '</div>';
+    }
+    return '<div class="actor">' + head + input + '<p class="small"><b>The seven layers</b>, top to bottom: ' + (run.kind === 'scripted' ? 'what a model would have been given (1 to 4; no model ran here), what was recorded instead of its work (5), what the host kept from the test fixture\'s return (6)' : 'what the model saw (1 to 4), what it did (5), what the host kept (6)') + ' and what the host made of it (7). Run folder: <code>' + esc(a.layers.folder) + '</code></p>' + layers(s, a) + '</div>';
+  }
+
+  function candList(wf, list, taken) {
+    return '<ol class="cand">' + list.map((c) => {
+      const tests = (c.guard ? [ab('guard') + ' ' + gname(wf, c.guard)] : []).concat(c.needs.length ? [ab('needs') + ' ' + c.needs.map((x) => gname(wf, x)).join(', ')] : []);
+      const verdict = c.taken ? 'taken' + (c.failing && c.failing.length === 0 && tests.length ? ': all held' : '') : c.failing && c.failing.length ? 'skipped: ' + c.failing.map((x) => gname(wf, x)).join(', ') + ' failed' : 'skipped: its tests did not hold';
+      return '<li class="' + (c.taken ? 'taken' : '') + '">→ <code>' + esc(c.stays ? '(stays)' : st(c.to)) + '</code>' + (tests.length ? ' (' + tests.join('; ') + ')' : '') + ': ' + verdict + (c.description ? ' <span class="muted">"' + esc(c.description) + '"</span>' : '') + '</li>';
+    }).join('') + '</ol>';
+  }
+
+  function stepHtml(s, i) {
+    const applied = s.outcome === 'applied';
+    const wf = D.workflows[run.workflow.key];
+    const ev = '<p><b>What arrived:</b> ' + esc(s.words || s.eventType) + ' <code>' + esc(s.eventType) + '</code>' + (s.atNote ? ' <span class="muted small">' + esc(s.atNote) + '</span>' : '') + '</p>';
+    let what = '';
+    if (!applied) what = (s.candidates && s.candidates.length
+      ? '<p>The engine ignored this event. In <code>' + esc(short(s.from)) + '</code> it is listened for, but no way out had all its tests hold, so nothing changed. The ways out for this event, in the order the engine tried them:</p>' + candList(wf, s.candidates)
+      : '<p>The engine ignored this event: in <code>' + esc(short(s.from)) + '</code> (and the states around it) nothing listens for it. Nothing changed.</p>') + (s.reason ? '<p class="muted small">Journal reason: ' + esc(s.reason) + '</p>' : '');
+    else if (s.seq === 0 || s.eventType === 'xstate.init') what = '<p>The item starts in <code>' + esc(short(s.to)) + '</code>, and its context is created from the start input.</p>';
+    else if (s.edge) {
+      const cands = s.candidates || [];
+      what = (cands.length > 1 || cands.some((c) => c.guard || c.needs.length)
+        ? '<p class="small">The ways out of <code>' + esc(st(s.edge.from) || '(any state)') + '</code> for this event, in the order the engine tries them:</p>' + candList(wf, cands)
+        : '<p>It took the way out of <code>' + esc(st(s.edge.from) || '(any state)') + '</code> to <code>' + esc(s.edge.to ? st(s.edge.to) : '(stays)') + '</code>.</p>') +
+        (s.edge.description ? '<p class="small">The workflow describes it: "' + esc(s.edge.description) + '"</p>' : '');
+      if (s.edge.then) what += '<p class="small"><code>' + esc(st(s.edge.to)) + '</code> ' + (s.edge.then.kind === 'join' ? 'is a final state inside <code>' + esc(st(s.edge.then.from)) + '</code>, so the ' + esc(st(s.edge.then.from)) + ' group finished and the item left it (a ' + ab('join') + '). Its ways out:' : 'moves on at once (an eventless way out):') + '</p>' + candList(wf, s.thenCandidates && s.thenCandidates.length ? s.thenCandidates : [{ to: s.edge.then.to, needs: [], guard: s.edge.then.guard, taken: true }]);
+    } else what = '<p class="small">The page could not match this to one transition in the workflow JSON.</p>';
+    const happened = ev + what + (s.writes.length ? '<p class="small">This transition writes:</p><ul class="small">' + s.writes.map(writeLine).join('') + '</ul>' : '') + sec('The event itself', pre(s.event, null, 'event'), { open: false });
+    const ctx = !applied ? '' : s.context ? pre(s.context, { fold: true, mark: s.changed }, 'context after step ' + s.seq) : '<p class="muted small">Not recovered: the journal does not store the context, and ' + ab('replay') + ' did not reach this step.</p>';
+    const changed = !applied ? '<p class="small">Nothing changed: the engine ignored this event, so the context is as it was after the step before.</p>' : s.changed.length ? '<div class="chips" aria-label="Changed keys">' + s.changed.map((k) => '<span class="chip">' + esc(k) + '</span>').join('') + '</div>' : s.context ? '<p class="small muted">Nothing in the context changed.</p>' : '';
+    const hashNote = s.hashOk === false ? '<div class="warnbox">Replay gives hash ' + esc(s.replayHash) + ' here, and the journal recorded ' + esc(s.hash) + ': this context may differ from what the engine had.</div>' : '';
+    const started = s.actors.filter((a) => a.type !== 'cancel');
+    const stopped = s.actors.filter((a) => a.type === 'cancel');
+    const actors = (started.length ? started.map((a) => actorHtml(s, a)).join('') : '<p class="small muted">This step started no actor.</p>') +
+      (stopped.length ? '<p class="small muted"><b>Stopped by this step:</b> ' + stopped.map((a) => '<span title="' + esc(a.timer || a.effect) + '">' + esc(timerWords(a.timer || a.effect, 'cancelled')) + ' (by the host)</span>').join(', ') + '</p>' : '');
+    const modelNames = s.actors.filter((a) => a.model).map((a) => a.actor);
+    return '<details class="step" id="step-' + i + '" data-index="' + i + '"><summary><span class="sno' + (applied ? '' : ' ref') + '">' + esc(s.seq == null ? '×' : s.seq) + '</span><span class="story">' + esc(s.label) + '</span>' +
+      '<span class="smeta"><span>' + esc(s.words || '') + ' (' + esc(s.eventType) + ')</span><span>' + (applied ? '→ ' + esc(short(s.to)) : 'ignored') + '</span><span>' + esc(String(s.at || '').replace('T', ' ').slice(0, 19)) + (s.atNote ? ' (event time)' : '') + '</span>' + (s.changed.length ? '<span>changed: ' + esc(s.changed.join(', ')) + '</span>' : '') + (modelNames.length ? '<span>' + (run.kind === 'scripted' ? 'model agent slot (test fixture): ' : 'model agent: ') + esc(modelNames.join(', ')) + '</span>' : '') + '</span></summary>' +
+      '<div class="sbody">' + sec('What happened', happened, { open: true }) +
+      sec('Context after this step', changed + hashNote + ctx, { open: true, hint: !applied ? 'unchanged' : s.seq === 0 ? 'the context is created here' : s.changed.length ? plural(s.changed.length, 'key') + ' changed, highlighted; unchanged ones are folded' : 'unchanged' }) +
+      sec('Actors started by this step', actors, { open: true, hint: s.actors.filter((a) => a.type === 'run').map((a) => a.actor + (a.model ? ' (model)' : ' (host)')).join(', ') || 'none' }) +
+      sec('Journal rows for this step', (s.rows.length ? '<p class="small muted">Shown exactly as stored. The journal keeps each row\'s <code>state</code> as a JSON-encoded string, so a state reads <code>""building""</code> here: the inner quotes are part of the stored value, not a display fault.</p>' : '') + (s.rows.length ? s.rows.map((r) => pre(r, null, 'journal row')).join('') : '<p class="muted small">None besides the transition row.</p>'), { hint: s.rows.length + ' rows' }) + '</div></details>';
+  }
+
+  function showRun(id, stepIndex) {
+    run = runById[id] || null;
+    if (!run) { const def = defaultRun(); if (id) notice('There is no run called "' + id + '" in this build, so the default run is shown.'); run = def; } else notice(null);
+    if (!run) { $('summary').innerHTML = '<p>No runs in data.js. Run the build (docs/inspector.md).</p>'; return; }
+    $('pick').innerHTML = optionsHtml(run.id, true);
+    $('summary').innerHTML = summary(run);
+    $('stepsec').hidden = false;
+    $('mapnote').textContent = 'Every state of this workflow, from its JSON. The path this run took is highlighted, with step numbers on the arrows it used. Select a state to see its steps and its ways out. The full list is in "All states and ways out" below the map.';
+    selState = null; $('statepanel').hidden = true; $('legend-taken').hidden = false;
+    drawGraph(run, null); fit = autoFit ? null : fit; applyZoom();
+    statesTable(run, false);
+    $('glance').innerHTML = glance(run);
+    $('trail').innerHTML = trailHtml(run);
+    $('steps').innerHTML = run.steps.map(stepHtml).join('');
+    markTables();
+    if (stepIndex != null && run.steps[stepIndex]) goStep(stepIndex, false, true); else { const s0 = document.querySelector('details.step'); if (s0) s0.open = true; setCurrent(0); }
+  }
+  function showWorkflow(id) {
+    const w = shelfById[id]; if (!w) { showRun(null); return; }
+    run = { id: 'wf:' + w.id, kind: 'workflow', workflow: { key: w.key, name: D.workflows[w.key].name }, steps: [], label: w.label };
+    notice(null);
+    $('pick').innerHTML = optionsHtml(run.id, true);
+    const wf = D.workflows[w.key];
+    $('summary').innerHTML = '<div class="badges"><span class="pill p-mute">Workflow only</span><span class="pill p-mute">' + wf.graph.nodes.length + ' states</span></div>' +
+      '<p>' + (w.runs.length ? 'This is the map of the workflow on its own. ' + plural(w.runs.length, 'captured run') + (w.runs.length === 1 ? ' uses' : ' use') + ' these exact bytes: pick one above to see its steps.' : 'No run of this workflow was captured, so there are no steps to show: only its map and its states.') + '</p>' +
+      (wf.spec && wf.spec.description ? '<p class="small">' + esc(wf.spec.description) + '</p>' : '') +
+      '<dl class="facts"><dt>File</dt><dd><code>' + esc(w.file) + '</code></dd><dt>sha256</dt><dd><code>' + esc(w.key.slice(0, 16)) + '…</code></dd></dl>';
+    selState = null; $('statepanel').hidden = true; $('legend-taken').hidden = true;
+    drawGraph(run, null); fit = autoFit ? null : fit; applyZoom();
+    statesTable(run, true); markTables();
+    $('stepsec').hidden = true;
+    $('mapnote').textContent = 'Every state of this workflow, from its JSON. No run is shown, so nothing is highlighted. Select a state to see its ways out; the full list is in "All states and ways out" below the map.';
+  }
+  function notice(text) { const n = $('notice'); n.hidden = !text; n.className = text ? 'warnbox' : ''; n.textContent = text || ''; }
+  function setCurrent(i) {
+    document.querySelectorAll('#trail button').forEach((b) => { if (b.dataset.jump === String(i)) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    document.querySelectorAll('details.step').forEach((d) => d.classList.toggle('cur', d.dataset.index === String(i)));
+    const cur = document.querySelector('#trail button[aria-current]'); const tr = $('trail'); if (cur && tr) { const l = cur.offsetLeft - tr.offsetLeft; if (l < tr.scrollLeft || l + cur.offsetWidth > tr.scrollLeft + tr.clientWidth) tr.scrollLeft = Math.max(0, l - 24); }
+  }
+  // The trail's highlight follows the step on screen as the reader scrolls (the hash is left alone).
+  let scrollTick = false, jumpedAt = 0;
+  addEventListener('scroll', () => {
+    if (Date.now() - jumpedAt < 700 || scrollTick || !run || !run.steps || !run.steps.length || $('stepsec').hidden) return; scrollTick = true;
+    requestAnimationFrame(() => {
+      scrollTick = false;
+      const tr = $('trail'); const top = (tr ? tr.getBoundingClientRect().bottom : 0) + 40;
+      let cur = null; document.querySelectorAll('details.step').forEach((d) => { if (d.getBoundingClientRect().top <= top) cur = d; });
+      const first = document.querySelector('details.step');
+      if (!cur && first && first.getBoundingClientRect().top < innerHeight) cur = first;
+      if (cur && !cur.classList.contains('cur')) setCurrent(Number(cur.dataset.index));
+    });
+  }, { passive: true });
+  function goStep(i, push, focus) {
+    const el = $('step-' + i); if (!el) return;
+    el.open = true; setCurrent(i); jumpedAt = Date.now();
+    el.scrollIntoView({ block: 'start' });
+    if (focus !== false) el.querySelector('summary').focus({ preventScroll: true });
+    setHash({ run: run.id, step: i }, push !== false);
+  }
+
+  // ---- Compare
+  const tokens = (t) => t.match(/\s+|[A-Za-z0-9_]+|[^\sA-Za-z0-9_]/g) || [];
+  function lcs(A, B) {
+    const n = A.length, m = B.length; if (n * m > 4e6) return null;
+    const W = m + 1; const dp = new Uint32Array((n + 1) * W);
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) dp[i * W + j] = A[i] === B[j] ? dp[(i + 1) * W + j + 1] + 1 : Math.max(dp[(i + 1) * W + j], dp[i * W + j + 1]);
+    const ops = []; let i = 0, j = 0;
+    while (i < n && j < m) { if (A[i] === B[j]) { ops.push(['=', A[i], B[j]]); i++; j++; } else if (dp[(i + 1) * W + j] >= dp[i * W + j + 1]) ops.push(['-', A[i++]]); else ops.push(['+', B[j++]]); }
+    while (i < n) ops.push(['-', A[i++]]); while (j < m) ops.push(['+', B[j++]]);
+    return ops;
+  }
+  function wordDiff(a, b) {
+    const ops = lcs(tokens(a), tokens(b)); if (!ops) return ['<del class="d">' + esc(a) + '</del>', '<ins class="d">' + esc(b) + '</ins>'];
+    let L = '', R = ''; ops.forEach((o) => { if (o[0] === '=') { L += esc(o[1]); R += esc(o[2]); } else if (o[0] === '-') L += '<del class="d">' + esc(o[1]) + '</del>'; else R += '<ins class="d">' + esc(o[1]) + '</ins>'; });
+    return [L.replace(/<\/del><del class="d">/g, ''), R.replace(/<\/ins><ins class="d">/g, '')];
+  }
+  // Line by line; a run of removed lines next to a run of added ones is diffed word by word, pair by pair.
+  function proseDiff(a, b) {
+    const ops = lcs(a.split('\n'), b.split('\n')); if (!ops) return null;
+    const L = [], R = [], onlyL = [], onlyR = [], changed = [];
+    const GAP = '<span class="gapline" aria-hidden="true"> </span>';
+    for (let k = 0; k < ops.length;) {
+      if (ops[k][0] === '=') { L.push(esc(ops[k][1])); R.push(esc(ops[k][2])); k++; continue; }
+      const del = [], ins = []; while (k < ops.length && ops[k][0] !== '=') { (ops[k][0] === '-' ? del : ins).push(ops[k][1]); k++; }
+      const pairs = Math.min(del.length, ins.length);
+      for (let p = 0; p < Math.max(del.length, ins.length); p++) {
+        if (p < pairs && alike(del[p], ins[p])) { const w = wordDiff(del[p], ins[p]); L.push(w[0]); R.push(w[1]); changed.push([del[p], ins[p]]); }
+        else if (p < pairs) { L.push('<del class="d">' + esc(del[p]) + '</del>'); onlyL.push(del[p]); R.push('<ins class="d">' + esc(ins[p]) + '</ins>'); onlyR.push(ins[p]); }
+        else { if (p < del.length) { L.push('<del class="d">' + esc(del[p]) + '</del>'); onlyL.push(del[p]); } else L.push(GAP); if (p < ins.length) { R.push('<ins class="d">' + esc(ins[p]) + '</ins>'); onlyR.push(ins[p]); } else R.push(GAP); }
+      }
+    }
+    const clean = (h) => h.split(JM).join('');
+    return { L: clean(L.join('\n')), R: clean(R.join('\n')), onlyL, onlyR, changed };
+  }
+  // Two lines are partners (diffed word by word) only when they share most of their words; otherwise each is struck whole.
+  function alike(a, b) {
+    const wa = String(a).toLowerCase().split(/\W+/).filter(Boolean), wb = String(b).toLowerCase().split(/\W+/).filter(Boolean);
+    if (!wa.length || !wb.length) return false;
+    const sb = new Set(wb); const common = wa.filter((w) => sb.has(w)).length;
+    return common / Math.max(wa.length, wb.length) >= 0.5;
+  }
+  // Ids, paths, hashes and times that differ between runs for no design reason.
+  function normaliser(r, a) {
+    const L = a.layers; const subs = [];
+    if (L.runId) subs.push([L.runId, '<run>']);
+    if (L.worktree) subs.push([L.worktree, '<worktree>']);
+    if (L.folder) subs.push([L.folder, '<run folder>']);
+    return (t) => {
+      if (t == null) return t; let s = String(t);
+      subs.forEach(([x, y]) => { s = s.split(x).join(y); });
+      s = s.replace(/(?:\/tmp|\/home|\/mnt|\/var|\/private)\/[^\s"'`)\],]+/g, '<path>').replace(/\b[0-9a-f]{64}\b/g, '<hash>').replace(/\b[0-9a-f]{40}\b/g, '<sha>').replace(/\b\d{4}-\d\d-\d\dT[\d:.]+Z?\b/g, '<time>');
+      if (r.item) s = s.replace(new RegExp('(^|[^A-Za-z0-9_-])' + r.item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z0-9_])', 'g'), '$1<item>');
+      return s;
+    };
+  }
+  const flat = (v, p, out) => { out = out || {}; p = p || '';
+    if (v && typeof v === 'object' && Object.keys(v).length) { Object.keys(v).forEach((k) => flat(v[k], p ? p + (Array.isArray(v) ? '[' + k + ']' : '.' + k) : (Array.isArray(v) ? '[' + k + ']' : k), out)); }
+    else out[p || '(whole value)'] = JSON.stringify(v === undefined ? null : v);
+    return out; };
+  let NAME_L = 'Left', NAME_R = 'Right';
+  const runName = (r) => { const o = String(r.origin || ''); const lane = o.match(/^Lane ([A-Z])/); return (lane ? 'Lane ' + lane[1] : r.kind === 'scripted' ? 'Scripted' : 'Real') + ' · ' + String(r.label || r.item).split(/[,:]/)[0].trim(); };
+  function jsonDiff(title, va, vb, na, nb) {
+    if (va == null && vb == null) return '';
+    if (va == null || vb == null) return sec(esc(title), '<div class="cols"><div class="col"><h4>' + esc(NAME_L) + '</h4>' + (va == null ? '<div class="empty">Not on this side.</div>' : pre(va, null, title)) + '</div><div class="col"><h4>' + esc(NAME_R) + '</h4>' + (vb == null ? '<div class="empty">Not on this side.</div>' : pre(vb, null, title)) + '</div></div>', { hint: va == null ? 'only in ' + esc(NAME_R) : 'only in ' + esc(NAME_L) });
+    const A = flat(va), B = flat(vb); const keys = []; Object.keys(A).concat(Object.keys(B)).forEach((k) => { if (keys.indexOf(k) < 0) keys.push(k); });
+    let same = 0; const rows = [];
+    keys.forEach((k) => { const a = k in A ? na(A[k]) : null, b = k in B ? nb(B[k]) : null;
+      if (a === b) { same++; return; }
+      const status = a == null ? 'only in ' + NAME_R : b == null ? 'only in ' + NAME_L : 'value differs';
+      rows.push('<tr><td class="nw">' + esc(k) + '</td><td><div class="cell">' + (a == null ? '<span class="muted">—</span>' : esc(a)) + '</div></td><td><div class="cell">' + (b == null ? '<span class="muted">—</span>' : esc(b)) + '</div></td><td class="nw"><span class="pill ' + (status === 'value differs' ? 'p-warn' : 'p-acc') + '">' + status + '</span></td></tr>'); });
+    if (!rows.length) return sec(esc(title), '<p class="small"><span class="pill p-ok">identical</span> ' + same + ' keys, the same on both sides' + '.</p>', { hint: 'identical' });
+    return sec(esc(title), '<p class="small">' + plural(rows.length, 'key') + (rows.length === 1 ? ' differs; ' : ' differ; ') + same + (same === 1 ? ' is' : ' are') + ' the same and not listed.</p><div class="tblwrap"><table class="dtable"><thead><tr><th scope="col">Key</th><th scope="col">' + esc(NAME_L) + '</th><th scope="col">' + esc(NAME_R) + '</th><th scope="col"></th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>', { open: true, hint: plural(rows.length, 'key') + (rows.length === 1 ? ' differs' : ' differ') });
+  }
+  // Hard-wrapped prose (a line that does not end a sentence or a block) is joined to the next line before the summary.
+  const unwrap = (xs) => { const out = []; xs.forEach((l) => { const prev = out.length ? out[out.length - 1] : null;
+    if (prev != null && prev.trim() && l.trim() && !isPunct(prev) && !isPunct(l) && !/[.:;!?}\])]\s*$/.test(prev) && !/^\s*([-*•]|\d+[.)])\s/.test(l)) out[out.length - 1] = prev.replace(/\s+$/, '') + ' ' + l.trim(); else out.push(l); }); return out; };
+  const isPunct = (l) => l.indexOf(JM) >= 0 || /^[\s{}\[\],:".]*$/.test(l);
+  function proseBlock(title, ta, tb, na, nb, openSame) {
+    if (ta == null && tb == null) return '';
+    if (ta == null || tb == null) {
+      const side = (t) => t == null ? '<div class="empty">Not on this side.</div>' : '<pre class="json" tabindex="0">' + readableHtml(t) + '</pre>';
+      return sec(esc(title), '<div class="cols"><div class="col"><h4>' + esc(NAME_L) + '</h4>' + side(ta) + '</div><div class="col"><h4>' + esc(NAME_R) + '</h4>' + side(tb) + '</div></div>', { open: true, hint: ta == null ? 'only in ' + esc(NAME_R) : 'only in ' + esc(NAME_L) });
+    }
+    const a = na(readablePlain(ta)), b = nb(readablePlain(tb));
+    if (a === b) return sec(esc(title), '<p class="small"><span class="pill p-ok">identical</span>' + (ta !== tb ? ' once ids, paths, hashes and times are set aside.' : '') + '</p><pre class="json" tabindex="0">' + readableHtml(ta) + '</pre>', { open: openSame, hint: 'identical' });
+    const d = proseDiff(a, b);
+    if (!d) return sec(esc(title), '<p class="small">Too long to compare word by word.</p>', { hint: 'differs' });
+    const nLines = (xs) => { const n = unwrap(xs).filter((l) => l.trim() && !isPunct(l)).length; return n + (n === 1 ? ' line' : ' lines'); };
+    const list = (xs) => { const ys = unwrap(xs).filter((l) => l.trim() && !isPunct(l)); return ys.length ? '<ul class="onlylist">' + ys.map((l, i) => '<li' + (i >= 14 ? ' hidden' : '') + '>' + esc(l.trim()) + '</li>').join('') + (ys.length > 14 ? '<li><button type="button" class="btn showmore">Show ' + (ys.length - 14) + ' more</button></li>' : '') + '</ul>' : '<p class="small muted">' + (xs.length ? 'No sentences; only JSON values.' : 'None.') + '</p>'; };
+    const ch = d.changed.filter((c) => c[0].trim() && !isPunct(c[0]));
+    const chHtml = ch.length ? '<p class="small"><b>Changed between the two</b> (' + plural(ch.length, 'line') + ', ' + esc(NAME_L) + ' then ' + esc(NAME_R) + '):</p><ul class="onlylist changed">' + ch.map((c, i) => { const w = wordDiff(c[0].trim(), c[1].trim()).map((h) => h.split(JM).join('')); return '<li' + (i >= 14 ? ' hidden' : '') + '><span class="cl">' + w[0] + '</span><span class="cr">' + w[1] + '</span></li>'; }).join('') + (ch.length > 14 ? '<li><button type="button" class="btn showmore">Show ' + (ch.length - 14) + ' more</button></li>' : '') + '</ul>' : '';
+    const sum = chHtml + '<div class="cols"><div class="col"><h4>Only in ' + esc(NAME_L) + ' (' + nLines(d.onlyL) + ')</h4>' + list(d.onlyL) + '</div><div class="col"><h4>Only in ' + esc(NAME_R) + ' (' + nLines(d.onlyR) + ')</h4>' + list(d.onlyR) + '</div></div>';
+    return sec(esc(title), '<p class="small"><b>In short</b> (lines that differ, with hard-wrapped lines joined; JSON lines left out):</p>' + sum + '<p class="small"><b>Side by side</b>, in the readable layout:</p><div class="cols"><div class="col"><h4>' + esc(NAME_L) + '</h4><pre class="text" tabindex="0" role="region" aria-label="' + esc(title) + ', ' + esc(NAME_L) + '">' + d.L + '</pre></div><div class="col"><h4>' + esc(NAME_R) + '</h4><pre class="text" tabindex="0" role="region" aria-label="' + esc(title) + ', ' + esc(NAME_R) + '">' + d.R + '</pre></div></div>', { open: true, hint: 'differs' });
+  }
+  const modelRuns = (r) => { const out = []; r.steps.forEach((s) => s.actors.forEach((a) => { if (a.model) out.push({ key: a.actor + ' #' + a.occurrence, s, a }); })); return out; };
+  const whoShort = (r, a) => { const pv = a.layers.l2.provenance; return pv.kind === 'template' ? 'Engine template (nobody wrote it)' : pv.kind === 'template+workflow' ? 'Workflow author\'s task (in the workflow JSON) + engine template' : pv.kind === 'passthrough' ? 'Written by ' + (pv.producer ? 'the ' + pv.producer.actor + (pv.producer.model ? ' agent' : ' step') : 'an earlier step') + (r.kind === 'scripted' && pv.producer && pv.producer.model ? ' (a test fixture)' : '') : 'Unknown'; };
+  let cmpIds = null;
+  function compare(idA, idB, push) {
+    const A = runById[idA], B = runById[idB]; if (!A || !B) return;
+    cmpIds = [A.id, B.id];
+    NAME_L = runName(A); NAME_R = runName(B); if (NAME_L === NAME_R) { NAME_L += ' (left)'; NAME_R += ' (right)'; }
+    $('cmpa').innerHTML = optionsHtml(A.id, false); $('cmpb').innerHTML = optionsHtml(B.id, false);
+    const hide = $('incidental').checked;
+    const ma = modelRuns(A), mb = modelRuns(B);
+    const keys = []; ma.concat(mb).forEach((x) => { if (keys.indexOf(x.key) < 0) keys.push(x.key); });
+    const side = (r) => '<b>' + esc(r.label) + '</b> <span class="muted">(' + esc(r.origin) + ', ' + (r.kind === 'scripted' ? 'scripted' : 'real') + ', workflow ' + esc(wfName(r)) + ', ends in ' + esc(short(r.final)) + ')</span>';
+    $('cmpsum').innerHTML = '<p class="small">Left, called "' + esc(NAME_L) + '" below: ' + side(A) + '</p><p class="small">Right, called "' + esc(NAME_R) + '" below: ' + side(B) + '</p>' +
+      (A.id === B.id ? '<div class="warnbox">You picked the same run on both sides.</div>' : '') +
+      ((A.kind === 'scripted' || B.kind === 'scripted') ? '<div class="scriptbox">At least one side is a scripted scenario: brief texts written by its "brief agent" are test fixtures, so differences there say nothing about a model. Differences in engine templates (layer 2 template text, layer 3) and in workflow-authored text are real design differences.</div>' : '') +
+      '<p class="small">' + keys.length + ' model agent runs lined up by actor and occurrence.' + (hide ? ' Ids, paths, hashes and times are replaced by placeholders such as &lt;run&gt; and &lt;path&gt; before comparing.' : '') + '</p>';
+    $('pairs').innerHTML = keys.map((k) => {
+      const x = ma.find((m) => m.key === k), y = mb.find((m) => m.key === k);
+      const id = (t) => t;
+      const na = hide && x ? normaliser(A, x.a) : id, nb = hide && y ? normaliser(B, y.a) : id;
+      const p = (m, r) => m ? '<p class="small">' + esc(whoShort(r, m.a)) + '. Step ' + esc(m.s.seq) + ', state <code>' + esc(short(m.s.to)) + '</code>. <button type="button" class="btn" data-open="' + esc(r.id) + '" data-step="' + m.s.index + '">Open this step</button></p>' : '<div class="empty">This run has no ' + esc(k) + '.</div>';
+      const eq = (f) => x && y && (f(x, na) === f(y, nb));
+      const pt = eq((m, n) => n(readablePlain(m.a.layers.l2.text || ''))), ct = eq((m, n) => n(readablePlain(m.a.layers.l3.text || ''))), sct = eq((m) => JSON.stringify(m.a.layers.l4.schema));
+      const pill = (ok, what) => '<span class="pill ' + (ok ? 'p-ok' : 'p-warn') + '">' + what + ' ' + (ok ? 'same' : 'differs') + '</span>';
+      return '<article class="pair" aria-label="' + esc(k) + '"><header><h3>' + esc(k) + '</h3>' +
+        (x && y ? pill(pt, 'prompt') + pill(ct, 'added context') + pill(sct, 'schema') : '<span class="pill p-acc">only in ' + esc(x ? NAME_L : NAME_R) + '</span>') + '</header>' +
+        '<div class="cols"><div class="col"><h4>' + esc(NAME_L) + ': who wrote the prompt</h4>' + p(x, A) + '</div><div class="col"><h4>' + esc(NAME_R) + ': who wrote the prompt</h4>' + p(y, B) + '</div></div>' +
+        proseBlock('Prompt (brief.md)', x ? x.a.layers.l2.text : null, y ? y.a.layers.l2.text : null, na, nb, true) +
+        proseBlock('Added context (context.md)', x ? x.a.layers.l3.text : null, y ? y.a.layers.l3.text : null, na, nb, false) +
+        jsonDiff('Output schema the agent was shown', x ? x.a.layers.l4.schema : null, y ? y.a.layers.l4.schema : null, (t) => t, (t) => t) +
+        jsonDiff('Input it was given', x ? x.a.input : null, y ? y.a.input : null, na, nb) + '</article>';
+    }).join('') || '<div class="empty">Neither run has a model agent.</div>';
+    markTables();
+    setHash(hide ? { compare: A.id + ',' + B.id } : { compare: A.id + ',' + B.id, incidental: 'shown' }, push);
+  }
+
+  // Tables wider than their box scroll inside it: give each box a name and keyboard focus, and say when it scrolls.
+  function markTables() {
+    document.querySelectorAll('table.stack').forEach((t) => { if (t.dataset.labelled) return; t.dataset.labelled = '1';
+      const hs = Array.from(t.querySelectorAll('thead th')).map((h) => h.textContent.trim());
+      t.querySelectorAll('tbody tr').forEach((tr) => Array.from(tr.children).forEach((td, i) => { if (hs[i]) td.setAttribute('data-label', hs[i]); })); });
+    document.querySelectorAll('.tblwrap').forEach((w) => {
+      if (!w.hasAttribute('tabindex')) { w.tabIndex = 0; w.setAttribute('role', 'region');
+        const h = w.closest('details') && w.closest('details').querySelector('summary'); w.setAttribute('aria-label', (h ? h.textContent.replace(/\s+/g, ' ').trim().slice(0, 80) : 'Table') + ' (table; scrolls sideways when wide)'); }
+      const more = w.scrollWidth > w.clientWidth + 2;
+      w.classList.toggle('more-r', more && w.scrollLeft + w.clientWidth < w.scrollWidth - 2);
+      const prev = w.previousElementSibling; const has = prev && prev.classList.contains('scrollhint');
+      if (more && !has && w.clientWidth) w.insertAdjacentHTML('beforebegin', '<p class="scrollhint" aria-hidden="true">Wider than the screen: scroll sideways inside the table →</p>');
+      else if (!more && has && w.clientWidth) prev.remove();
+      if (!w.dataset.cue) { w.dataset.cue = '1'; w.addEventListener('scroll', () => w.classList.toggle('more-r', w.scrollLeft + w.clientWidth < w.scrollWidth - 2)); }
+    });
+  }
+  document.addEventListener('toggle', (e) => { if (e.target.open && e.target.querySelector && e.target.querySelector('.tblwrap')) markTables(); }, true);
+
+  // ---- Mode tabs, URL hash, events
+  function setMode(m) {
+    const one = m !== 'cmp';
+    $('tab-one').setAttribute('aria-selected', String(one)); $('tab-cmp').setAttribute('aria-selected', String(!one));
+    $('tab-one').tabIndex = one ? 0 : -1; $('tab-cmp').tabIndex = one ? -1 : 0;
+    $('view-one').hidden = !one; $('view-cmp').hidden = one;
+  }
+  function setHash(o, push) { const h = '#' + Object.entries(o).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&'); if (location.hash === h) return;
+    try { if (push) history.pushState(null, '', h); else history.replaceState(null, '', h); } catch (e) { /* file: urls in some browsers */ } }
+  const defaultRun = () => D.runs.find((r) => r.item === 'fri-jsonl-lint-2') || D.runs[0] || null;
+  function fromHash() {
+    const p = {}; location.hash.slice(1).split('&').forEach((kv) => { const i = kv.indexOf('='); if (i > 0) p[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
+    if (p.compare) { const [a, b] = p.compare.split(','); setMode('cmp'); $('incidental').checked = p.incidental !== 'shown'; if (!run) showRun((runById[a] || defaultRun() || {}).id); if (runById[a] && runById[b || a]) { compare(a, b || a, false); return; } notice('That comparison names a run this build does not have.'); const d = defaultPair(); compare(d[0], d[1], false); return; }
+    setMode('one');
+    if (p.wf) showWorkflow(p.wf);
+    else if (p.run) showRun(p.run, p.step != null ? Number(p.step) : null); else showRun((defaultRun() || {}).id, null);
+    if (p.state && run && D.workflows[run.workflow.key] && D.workflows[run.workflow.key].graph.nodes.some((n) => n.id === p.state)) { selState = p.state; drawGraph(run, selState); statePanel(run, selState); }
+  }
+  const defaultPair = () => { const q = D.runs.filter((r) => /Q1/.test(r.label)); return q.length >= 2 ? [q[0].id, q.find((r) => r.origin !== q[0].origin) ? q.find((r) => r.origin !== q[0].origin).id : q[1].id] : [D.runs[0].id, (D.runs[1] || D.runs[0]).id]; };
+  $('tab-one').addEventListener('click', () => { setMode('one'); if (!run) showRun((defaultRun() || {}).id); setHash(run.kind === 'workflow' ? { wf: run.id.slice(3) } : { run: run.id }, true); });
+  $('tab-cmp').addEventListener('click', () => { setMode('cmp'); const p = cmpIds || defaultPair(); compare(p[0], p[1], true); });
+  document.querySelector('.tabs').addEventListener('keydown', (e) => { if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; const t = e.target === $('tab-one') ? $('tab-cmp') : $('tab-one'); t.focus(); t.click(); });
+  $('pick').addEventListener('change', () => { const v = $('pick').value; if (v.indexOf('wf:') === 0) { showWorkflow(v.slice(3)); setHash({ wf: v.slice(3) }, true); } else { showRun(v); setHash({ run: run.id }, true); } });
+  $('cmpa').addEventListener('change', () => compare($('cmpa').value, $('cmpb').value, true));
+  $('cmpb').addEventListener('change', () => compare($('cmpa').value, $('cmpb').value, true));
+  $('incidental').addEventListener('change', () => { if (cmpIds) compare(cmpIds[0], cmpIds[1], true); });
+  $('openall').addEventListener('click', () => document.querySelectorAll('details.step').forEach((d) => { d.open = true; d.querySelectorAll('details.sec.layer').forEach((x) => { x.open = false; }); }));
+  $('closeall').addEventListener('click', () => document.querySelectorAll('details.step').forEach((d) => { d.open = false; }));
+  document.addEventListener('click', (e) => {
+    const j = e.target.closest('[data-jump]'); if (j) { goStep(Number(j.dataset.jump)); return; }
+    const o = e.target.closest('[data-open]'); if (o) { setHash({ run: o.dataset.open, step: Number(o.dataset.step) }, true); setMode('one'); showRun(o.dataset.open, Number(o.dataset.step)); const el = $('step-' + o.dataset.step); if (el) el.querySelector('summary').focus(); return; }
+    const m = e.target.closest('button.showmore'); if (m) { const ul = m.closest('ul'); const hid = Array.from(ul.querySelectorAll('li[hidden]')); hid.forEach((li) => { li.hidden = false; }); m.parentElement.remove(); if (hid[0]) { hid[0].tabIndex = -1; hid[0].focus(); } return; }
+  });
+  const pickState = (g) => { const id = g.dataset.state; selState = selState === id ? null : id; drawGraph(run, selState); if (selState) statePanel(run, selState); else { $('statepanel').hidden = true; document.querySelectorAll('#trail button').forEach((b) => b.classList.remove('hl')); }
+    const base = run.kind === 'workflow' ? { wf: run.id.slice(3) } : { run: run.id }; if (selState) base.state = selState; setHash(base, true);
+    const again = document.querySelector('#graph [data-state="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"]'); if (again) again.focus({ preventScroll: true }); };
+  $('graph').addEventListener('click', (e) => { const g = e.target.closest('[data-state]'); if (g) pickState(g); });
+  $('graph').addEventListener('keydown', (e) => { if (e.key !== 'Enter' && e.key !== ' ') return; const g = e.target.closest('[data-state]'); if (g) { e.preventDefault(); pickState(g); } });
+  $('steps').addEventListener('toggle', (e) => { if (e.target.matches && e.target.matches('details.step') && e.target.open) { setCurrent(Number(e.target.dataset.index)); } }, true);
+  addEventListener('popstate', fromHash);
+  addEventListener('resize', () => { graphCue(); markTables(); });
+  $('foot').textContent = 'Built ' + String(D.generated || '').replace('T', ' ').slice(0, 16) + ' UTC from ' + D.runs.length + ' runs and ' + D.shelf.length + ' workflow files.' + ((D.skipped || []).length ? ' Skipped: ' + D.skipped.join('; ') : '');
+  if (!D.runs.length && !D.shelf.length) { $('summary').innerHTML = '<p>No runs in data.js. Run the build (docs/inspector.md).</p>'; return; }
+  fromHash();
+})();
+</script>
+</body>
+</html>

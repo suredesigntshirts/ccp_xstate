@@ -8,6 +8,7 @@ workflows/          workflow files: XState machine config as JSON, loaded by pac
 verify/<item>/      the verifier's own tests for an item, and its verdict.json
 scripts/gates/      the PR gates verdict.yml runs, with their tests
 scripts/tournament/ the generic design-tournament kit: runner, args builder, measure, CI template (docs/tournaments.md)
+scripts/inspector/  the Workflow Inspector: exporter, build and page that show any run step by step (docs/inspector.md)
 tournaments/<id>/   one design tournament: pack, config, measure, result, scores; indexed in tournaments/README.md
 test/               repo-wide tests
 plan/               the plan (plan/README.md)
