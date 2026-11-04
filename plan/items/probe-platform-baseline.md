@@ -4,7 +4,7 @@
   "title": "Measure what the platform allows in a fresh v2 project",
   "stage": "s0-environment",
   "kind": "probe",
-  "status": "ready",
+  "status": "done",
   "outcome": "A dated report states, for the Claude Code version the v2 project runs, which of v2's platform assumptions hold in a real Projects thread and which don't.",
   "why": "Every later stage leans on platform behaviour v1 saw only partly or in another project. The riskiest one, whether the host may spawn workers on a wake no person asked for, decides the host design. A one-hour probe is cheaper than building on a guess.",
   "serves": [

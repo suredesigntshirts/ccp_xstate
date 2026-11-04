@@ -4,7 +4,7 @@
   "title": "Make design tournaments a reusable, recorded kit",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Any design question can be run as a tournament from a folder of inputs: a generic runner turns tournaments/<id>/ (pack, config, prompts, shared suite, measure) into one workflow run, the lanes land as branches and draft PRs in the scratch repo, and CI on those PRs, not an agent, produces each lane's suite results and measures. The first tournament (2026-11-03-context) is recorded this way.",
   "why": "The 2026-11-03 context tournament lived in one session: its prompts sat inside a workflow script, each lane's code sat in a scratchpad that dies with the container (rescued by hand to ccp_xstate_scratch #36-#41), each lane wrote its own tests, and a judge counted primitives by hand, so the ranking rested on counting rules and self-written tests. The person asked for the pattern organised in GitHub so it can be reused for different tournaments (thread 'Show what's waiting and the architecture', 2026-11-04 03:04-03:08Z). Generic runner plus per-tournament inputs keeps a new tournament to a new folder.",
   "serves": [
