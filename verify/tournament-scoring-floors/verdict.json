@@ -1,0 +1,49 @@
+{
+  "item": "tournament-scoring-floors",
+  "verified_sha": "6d7a6b7fdbb8f20ff8ebbe20774cc5e37e1dee17",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5Fm9VRReyPQgqu5nq7#agent=verifier-tournament-scoring-floors",
+    "model": "claude-opus-5-5"
+  },
+  "summary": "All six Expect lines hold at 6d7a6b7. I wrote my own toy tournament (toy/2026-11-04-recipe-cards, six lanes: three pass every floor, and one each fails a scenario, a contract test and a hard constraint) and my own judge file for 2026-11-04-stage-contract round 2 (rescore/judge-round2.json from result2.md, with rescore/scores-round2.json copied from the round-2 measure2.json files). I wrote both before reading the builder's tests. My tests (16) pass. npm test: 546 tests, 534 pass, 1 fail, which is the known environmental copy-not-link release-tags test. Doubts: primitive usage per model stage is a judgement call. My judge counts S 12 (13 weighted) and M 13 (14 weighted), and the builder's judge.json counts 13 and 14 with a different split between counted and special. Either reading gives the same qualified set and the same ranking. score.mjs trusts the judge's stage lists and does not check them against the workflow JSON (a risk the item already names).",
+  "results": [
+    {
+      "id": "floors",
+      "status": "MET",
+      "command": "node --test verify/tournament-scoring-floors/toy.test.mjs (runs node scripts/tournament/score.mjs verify/tournament-scoring-floors/toy/2026-11-04-recipe-cards --out <tmp>)",
+      "excerpt": "| X-scenario | no | scenarios S2: S2 failed: the half sign became 1/2 | / | Y-contract | no | contractTests C1: C1 failed: step 3 names no source line | / | Z-constraint | no | constraints H1: H1 broken: depends on left-pad |; P-pass, Q-lean and R-untried qualified. Z has 0 primitives, 1 prompt byte and 2 passed trials, yet it is not qualified and is absent from the trade-off table. A floor the judge leaves out, or a pass of 'yes', counts as failed. 7/7 toy tests ok."
+    },
+    {
+      "id": "primitive-rule",
+      "status": "MET",
+      "command": "node --test verify/tournament-scoring-floors/toy.test.mjs (test 'primitive-rule: ...')",
+      "excerpt": "P-pass Counted: step-list, source-ref (x2) -> 2 counted (3 weighted). Special cases: fraction-table: used by 2 of 4 model stages; menu-week-grid: used by 1 of 4 model stages ...; used in one workflow (menu); print-css: used by no model stage. Q-lean (stages only in workflow card): step-list: used in one workflow (card) -> special; source-ref with workflows [menu] -> counted; inline-units: 1 of 2 model stages; used in one workflow (card). counted + special equals every primitive listed, so none is dropped."
+    },
+    {
+      "id": "no-single-count",
+      "status": "MET",
+      "command": "Read scripts/tournament/score.mjs (dominates(), tiers); node --test verify/tournament-scoring-floors/toy.test.mjs (no-single-count tests)",
+      "excerpt": "score.mjs ranks only through dominates(): a lane must be at least as good on every trade-off and better on one, and a missing value blocks a rank. It computes no composite. Toy: Q-lean has fewer primitives (1 vs 3 weighted) but more bytes (200 vs 100), so neither ranks above the other and both are in tier 1. P beats R only because it equals R on primitives and bytes and is better on trials. The Markdown row shows all three: '| P-pass | 2 counted (3 weighted), 3 special | 100 | 1 passed of 1 | R-untried |'."
+    },
+    {
+      "id": "rescore",
+      "status": "MET",
+      "command": "node scripts/tournament/score.mjs tournaments/2026-11-04-stage-contract --judge verify/tournament-scoring-floors/rescore/judge-round2.json --scores verify/tournament-scoring-floors/rescore/scores-round2.json --out <tmp>; node --test verify/tournament-scoring-floors/rescore.test.mjs",
+      "excerpt": "| A-control | no | contractTests P1: ... (it has none); ... P6; constraints prompt-in-json ... | S-six-parts | yes | M-minimal | yes |. Trade-offs: '| S-six-parts | 12 counted (13 weighted), 13 special | 8471 | 2 passed of 2 | M-minimal |', '| M-minimal | 13 counted (14 weighted), 12 special | 9021 | 0 passed of 0 | none |'. covers is a special case for S ('used by 2 of 8 model stages'). The folder's scores.json matches measure2.json on promptInEngine and sha for all three lanes, and re-scoring from it gives the same result."
+    },
+    {
+      "id": "args-refuse",
+      "status": "MET",
+      "command": "node --test scripts/tournament/test/score.test.mjs test/tournament/kit.test.mjs (with and without the mutation); node --test verify/tournament-scoring-floors/args.test.mjs",
+      "excerpt": "Unmutated: all pass. kit.test.mjs buildArgs(tournaments/2026-11-03-context) passes, and so does my own args test ('args: 2026-11-03-context builds args', exit 0, scoring.text starts 'Floors'). Mutated: 'not ok 1 - args.mjs refuses scoring with no floors, a free-text rule alone, or a single trade-off' and 'not ok 9 - args.mjs refuses a config missing each pinned field'. Restored, and git status is clean outside verify/.",
+      "mutation": "scripts/tournament/args.mjs checkScoring(): replaced need(s.floors && typeof s.floors === 'object', 'config.scoring.floors is required...') with `s.floors = s.floors || {};` and deleted need(floors > 0, 'config.scoring.floors names no floor...'). Restored from a backup afterwards.",
+      "red_test": "scripts/tournament/test/score.test.mjs 'args.mjs refuses scoring with no floors, a free-text rule alone, or a single trade-off'; test/tournament/kit.test.mjs 'args.mjs refuses a config missing each pinned field'"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs on PR #72; gh run view 41858257726 --json name,headSha,conclusion",
+      "excerpt": "ci run 41858257726 (job 'test' 126672691803): {\"conclusion\":\"success\",\"event\":\"pull_request\",\"headSha\":\"6d7a6b7fdbb8f20ff8ebbe20774cc5e37e1dee17\",\"name\":\"ci\"}. The two verdict 'gates' runs (41858257788, 41858266543) failed only at step 'verdict at the head sha, from a separate session', because no verdict existed yet. 'no stubs' and 'contract freeze' passed."
+    }
+  ]
+}

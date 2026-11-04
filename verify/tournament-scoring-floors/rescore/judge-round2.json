@@ -1,0 +1,1294 @@
+{
+  "source": "Written by the verifier for plan item tournament-scoring-floors from /mnt/project-files/stage-contract-tournament/result2.md and the round-2 measure files; trials from trial/report.md and trial2/report.md.",
+  "scores": [
+    {
+      "lane": "A",
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "Q1",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q2",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q3",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q4",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q5",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q6",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q7",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q8",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q9",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F1",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F2",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "scenarios",
+          "id": "R1",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 27/27"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P1",
+          "pass": false,
+          "evidence": "result2.md \"What I reran\": contract tests P1-P6 0 (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P2",
+          "pass": false,
+          "evidence": "result2.md \"What I reran\": contract tests P1-P6 0 (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P3",
+          "pass": false,
+          "evidence": "result2.md \"What I reran\": contract tests P1-P6 0 (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P4",
+          "pass": false,
+          "evidence": "result2.md \"What I reran\": contract tests P1-P6 0 (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P5",
+          "pass": false,
+          "evidence": "result2.md \"What I reran\": contract tests P1-P6 0 (it has none)"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P6",
+          "pass": false,
+          "evidence": "result2.md \"What I reran\": contract tests P1-P6 0 (it has none)"
+        },
+        {
+          "kind": "constraints",
+          "id": "first-pack",
+          "pass": true,
+          "evidence": "result2.md: unchanged base; scenarios 12/12"
+        },
+        {
+          "kind": "constraints",
+          "id": "prompt-in-json",
+          "pass": false,
+          "evidence": "result2.md: promptInEngine 10787 bytes, actors.js 4100 of prompt wording in engine code; no contract"
+        },
+        {
+          "kind": "constraints",
+          "id": "load-check",
+          "pass": false,
+          "evidence": "no model stage parts to check; the control has no contract load check"
+        },
+        {
+          "kind": "constraints",
+          "id": "fixed-parts",
+          "pass": false,
+          "evidence": "critique fix 3 (data rule everywhere) P and fix 7 (return step) P for A; no fixed frame"
+        },
+        {
+          "kind": "constraints",
+          "id": "brief-fills-task",
+          "pass": false,
+          "evidence": "no task part; the brief is not confined to one part (critique fix 1 P)"
+        },
+        {
+          "kind": "constraints",
+          "id": "verify-covers",
+          "pass": false,
+          "evidence": "critique fix 2 N for A: no per-Expect-line result and no host coverage check"
+        }
+      ],
+      "modelStages": [
+        "quick-fix/brief",
+        "quick-fix/build",
+        "quick-fix/verify",
+        "feature/brief",
+        "research/brief",
+        "research/verify"
+      ],
+      "primitives": [
+        {
+          "name": "normal state",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "every model stage is invoked from a normal state"
+        },
+        {
+          "name": "final state",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "invoke onDone/onError list form",
+          "weight": 2,
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "a spec.js change, double weight"
+        },
+        {
+          "name": "on",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "set",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "each stage output is set into context on done"
+        },
+        {
+          "name": "present",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "same",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "in",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.needs",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.actors",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "meta.events",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.input",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "run effect",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "stop effect",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "xstate.done/error events",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "github.<kind> events",
+          "stages": [],
+          "workflows": [
+            "quick-fix"
+          ]
+        },
+        {
+          "name": "ref handle",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "accept-time check",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "child item",
+          "stages": [],
+          "workflows": [
+            "feature"
+          ]
+        },
+        {
+          "name": "pin (load-time check)",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "role-from-schema convention",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        }
+      ],
+      "trials": [],
+      "notes": "Control. Passes 12/12 scenarios; has no P1-P6 (result2.md)."
+    },
+    {
+      "lane": "S",
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "Q1",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q2",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q3",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q4",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q5",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q6",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q7",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q8",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q9",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F1",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F2",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "scenarios",
+          "id": "R1",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 43/43"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P1",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P1 read and verified, S 6/6"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P2",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P2 read and verified, S 6/6"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P3",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P3 read and verified, S 6/6"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P4",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P4 read and verified, S 6/6"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P5",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P5 read and verified, S 6/6"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P6",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P6 read and verified, S 6/6"
+        },
+        {
+          "kind": "constraints",
+          "id": "first-pack",
+          "pass": true,
+          "evidence": "result2.md: scenarios 12/12 and no spec.js/host.js change"
+        },
+        {
+          "kind": "constraints",
+          "id": "prompt-in-json",
+          "pass": true,
+          "evidence": "result2.md: P2 verified"
+        },
+        {
+          "kind": "constraints",
+          "id": "load-check",
+          "pass": true,
+          "evidence": "result2.md: P1 verified"
+        },
+        {
+          "kind": "constraints",
+          "id": "fixed-parts",
+          "pass": true,
+          "evidence": "result2.md: P3 verified"
+        },
+        {
+          "kind": "constraints",
+          "id": "brief-fills-task",
+          "pass": true,
+          "evidence": "result2.md: P4 verified"
+        },
+        {
+          "kind": "constraints",
+          "id": "verify-covers",
+          "pass": true,
+          "evidence": "result2.md: P5 verified"
+        }
+      ],
+      "modelStages": [
+        "quick-fix/brief",
+        "quick-fix/build",
+        "quick-fix/verify",
+        "feature/brief",
+        "research/brief",
+        "research/researcher",
+        "research/write",
+        "research/verify"
+      ],
+      "primitives": [
+        {
+          "name": "normal state",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "every model stage is invoked from a normal state"
+        },
+        {
+          "name": "final state",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "invoke onDone/onError list form",
+          "weight": 2,
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "a spec.js change, double weight"
+        },
+        {
+          "name": "on",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "set",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "each stage output is set into context on done"
+        },
+        {
+          "name": "present",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "same",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "in",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.needs",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.actors",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "meta.events",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.input",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "run effect",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "stop effect",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "xstate.done/error events",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "github.<kind> events",
+          "stages": [],
+          "workflows": [
+            "quick-fix"
+          ]
+        },
+        {
+          "name": "ref handle",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "accept-time check",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "child item",
+          "stages": [],
+          "workflows": [
+            "feature"
+          ]
+        },
+        {
+          "name": "pin (load-time check)",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "rules part",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "stages.js:12, required at :79-83"
+        },
+        {
+          "name": "task part",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "inputs part (name to meaning)",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "covers field attribute",
+          "stages": [
+            "quick-fix/verify",
+            "research/verify"
+          ],
+          "note": "stages.js:86, :101-115; only the verify stages declare it"
+        },
+        {
+          "name": "checkStages load-time check",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        }
+      ],
+      "trials": [
+        {
+          "ref": "/mnt/project-files/stage-contract-tournament/trial/report.md",
+          "passed": true,
+          "outcome": "S-cleanup at aac5572: merged on the first build; brief, build (one ref refusal, accepted on resume), verify PASS, merged at 6b939e71"
+        },
+        {
+          "ref": "/mnt/project-files/stage-contract-tournament/trial2/report.md",
+          "passed": true,
+          "outcome": "S-cleanup at 8d51cbf: merged on the first build; 3 runs, 0 refusals, verify PASS 4/4"
+        }
+      ],
+      "notes": "result2.md: 12/12 scenarios, P1-P6 6/6 read and verified; judge counted 25 primitives, 26 weighted under the old rule. Trials were run on S cleanup, the lane carried forward."
+    },
+    {
+      "lane": "M",
+      "floors": [
+        {
+          "kind": "scenarios",
+          "id": "Q1",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q2",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q3",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q4",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q5",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q6",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q7",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q8",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "Q9",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F1",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "F2",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "scenarios",
+          "id": "R1",
+          "pass": true,
+          "evidence": "result2.md \"What I reran\": scenarios Q1-Q9, F1, F2, R1 12/12, suite 47/47"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P1",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P1 read and verified, M 6/6"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P2",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P2 read and verified, M 6/6"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P3",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P3 read and verified, M 6/6"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P4",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P4 read and verified, M 6/6"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P5",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P5 read and verified, M 6/6"
+        },
+        {
+          "kind": "contractTests",
+          "id": "P6",
+          "pass": true,
+          "evidence": "result2.md \"Contract tests\": P6 read and verified, M 6/6"
+        },
+        {
+          "kind": "constraints",
+          "id": "first-pack",
+          "pass": true,
+          "evidence": "result2.md: scenarios 12/12 and no spec.js/host.js change"
+        },
+        {
+          "kind": "constraints",
+          "id": "prompt-in-json",
+          "pass": true,
+          "evidence": "result2.md: P2 verified"
+        },
+        {
+          "kind": "constraints",
+          "id": "load-check",
+          "pass": true,
+          "evidence": "result2.md: P1 verified"
+        },
+        {
+          "kind": "constraints",
+          "id": "fixed-parts",
+          "pass": true,
+          "evidence": "result2.md: P3 verified"
+        },
+        {
+          "kind": "constraints",
+          "id": "brief-fills-task",
+          "pass": true,
+          "evidence": "result2.md: P4 verified"
+        },
+        {
+          "kind": "constraints",
+          "id": "verify-covers",
+          "pass": true,
+          "evidence": "result2.md: P5 verified"
+        }
+      ],
+      "modelStages": [
+        "quick-fix/brief",
+        "quick-fix/build",
+        "quick-fix/verify",
+        "feature/brief",
+        "research/brief",
+        "research/researcher",
+        "research/write",
+        "research/verify"
+      ],
+      "primitives": [
+        {
+          "name": "normal state",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "every model stage is invoked from a normal state"
+        },
+        {
+          "name": "final state",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "invoke onDone/onError list form",
+          "weight": 2,
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "a spec.js change, double weight"
+        },
+        {
+          "name": "on",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "set",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "each stage output is set into context on done"
+        },
+        {
+          "name": "present",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "same",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "research"
+          ]
+        },
+        {
+          "name": "in",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.needs",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.actors",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "meta.events",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.input",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "run effect",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "stop effect",
+          "stages": [],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "xstate.done/error events",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "github.<kind> events",
+          "stages": [],
+          "workflows": [
+            "quick-fix"
+          ]
+        },
+        {
+          "name": "ref handle",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "accept-time check",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        },
+        {
+          "name": "child item",
+          "stages": [],
+          "workflows": [
+            "feature"
+          ]
+        },
+        {
+          "name": "pin (load-time check)",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "workflows": [
+            "quick-fix",
+            "feature",
+            "research"
+          ]
+        },
+        {
+          "name": "meta.stages key",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "metaKeys 7"
+        },
+        {
+          "name": "rules (meta.stages.X.task)",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "stage.js:58"
+        },
+        {
+          "name": "input meanings",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "stage.js:59, :67"
+        },
+        {
+          "name": "task invoke input",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ],
+          "note": "stage.js:68"
+        },
+        {
+          "name": "stageProblems load-time check",
+          "stages": [
+            "quick-fix/brief",
+            "quick-fix/build",
+            "quick-fix/verify",
+            "feature/brief",
+            "research/brief",
+            "research/researcher",
+            "research/write",
+            "research/verify"
+          ]
+        }
+      ],
+      "trials": [],
+      "notes": "result2.md: 12/12 scenarios, P1-P6 6/6 verified (P2 accepted in round 2). Known weaknesses: PASS over a FAIL line merges, coverage matched by value; P5 as the pack states it still holds. No real-model trial."
+    }
+  ]
+}
