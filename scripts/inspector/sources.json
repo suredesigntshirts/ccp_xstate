@@ -3,7 +3,8 @@
   "engines": {
     "/home/user/wi": "Main",
     "/home/user/lanes/A-minimalist": "Lane A",
-    "/home/user/lanes/C-provenance": "Lane C"
+    "/home/user/lanes/C-provenance": "Lane C",
+    "/home/user/sc/S-cleanup": "Lane S"
   },
   "sources": [
     {
@@ -33,6 +34,30 @@
       "engine": "/home/user/wi",
       "journal": "/mnt/project-files/toy-run-views/harness/journal",
       "label": "Item views, 31 Oct"
+    },
+    {
+      "origin": "Lane S cleaned up (scripted)",
+      "engine": "/home/user/sc/S-cleanup",
+      "scenario": "packages/engine/test/tourney/Q1.test.js",
+      "label": "Q1 happy path"
+    },
+    {
+      "origin": "Lane S cleaned up (scripted)",
+      "engine": "/home/user/sc/S-cleanup",
+      "scenario": "packages/engine/test/tourney/Q3.test.js",
+      "label": "Q3 red CI, rebuild"
+    },
+    {
+      "origin": "Lane S cleaned up (scripted)",
+      "engine": "/home/user/sc/S-cleanup",
+      "scenario": "packages/engine/test/tourney/Q5.test.js",
+      "label": "Q5 verifier misreports"
+    },
+    {
+      "origin": "Lane S cleaned up (scripted)",
+      "engine": "/home/user/sc/S-cleanup",
+      "scenario": "packages/engine/test/tourney/R1.test.js",
+      "label": "R1 research, three researchers"
     },
     {
       "origin": "Lane A: minimalist (scripted)",
