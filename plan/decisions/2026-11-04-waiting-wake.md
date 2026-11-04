@@ -14,7 +14,8 @@ Item: fix-waiting-wake. Two-way doors, decided by the building thread as the per
 1. **A `checkBack` timer of one hour on every state that invokes `ask`, with no target and no actions.** These are
    quick-fix's awaitingGates, awaitingMerge and replanning, feature's replanning, and research's awaitingPublish and
    replanning. The engine already turns a delayed transition into a timer effect and a cancel effect (host.js), and
-   any wake past the due time fires it (wake.js), so no engine code changes for this. When it fires, nothing moves:
+   any wake past the due time fires it (wake.js). One engine change: the host takes a set timer's event even when its
+   transition changes nothing, which XState's `can()` reports as not taken (host.js refusal). When it fires, nothing moves:
    the item stays in its state, its ask run stays open and its card stays up. The wake's work is the thread's: it is
    back with the item, sees what has changed (a missed GitHub event, a grant a stand-in can answer under, other
    items to advance) and does what doesn't need the answer (L-never-idle-on-person). One hour, because a lost
