@@ -143,7 +143,9 @@ test('every template segment of every model step is literally the engine\'s own 
         const where = `${r.id} ${a.effect} ${L}: ${JSON.stringify(seg.text).slice(0, 160)}`;
         if (!tiles(seg.text, eng.pieces.filter((p) => seg.text.includes(p)))) bad.push(`not made of engine string pieces: ${where}`);
         for (const p of eng.pieces.filter((p) => p.length >= 8 && seg.text.includes(p))) if (!eng.raw.includes(p)) bad.push(`piece not verbatim in source (${JSON.stringify(p).slice(0, 60)}): ${where}`);
-        if (/\b[0-9a-f]{40}\b|https?:\/\//.test(seg.text)) bad.push(`a SHA or URL inside template: ${where}`);
+        // A URL with a path is a run value; a bare host ("https://github.com/<owner>/...", a placeholder the newer
+        // engines' prompts spell out) is fixed text.
+        if (/\b[0-9a-f]{40}\b|https?:\/\/[\w.-]+\/[\w-]/.test(seg.text)) bad.push(`a SHA or URL inside template: ${where}`);
         for (const v of runVals) if (new RegExp(`(^|[^\\w-])${v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\w-])`).test(seg.text)) bad.push(`run value ${v} inside template: ${where}`);
       }
     }

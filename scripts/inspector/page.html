@@ -200,6 +200,7 @@ abbr[title]{text-decoration:underline dotted;text-underline-offset:2px;cursor:he
 .piece{border-left:4px solid var(--line);border-radius:4px;background:var(--bg);padding:6px 10px;display:grid;gap:4px;min-width:0}
 .piece.src-frame{border-left-color:var(--seg-template-line)} .piece.src-workflow{border-left-color:var(--seg-workflow-line)} .piece.src-input{border-left-color:var(--seg-input-line)}
 .piece .txt{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--f-body);font-size:13.5px;line-height:1.5;margin:0;max-height:240px;overflow:auto}
+.part-task .piece .txt{max-height:none}
 .srcline{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere;min-width:0}
 .srcline code{color:var(--fg)}
 .srctag{display:inline-block;font-size:11px;font-weight:600;padding:0 7px;border-radius:4px;margin-right:6px;white-space:nowrap}
@@ -895,7 +896,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     const nPieces = S.parts.reduce((n, p) => n + p.pieces.length, 0);
     const kinds = {}; S.parts.forEach((p) => p.pieces.forEach((x) => { kinds[x.source.kind] = (kinds[x.source.kind] || 0) + 1; }));
     const instr = '<div class="sblk"><h5><span class="lnum">1</span> Instructions <span class="hint">the prompt, part by part: ' + Object.entries(kinds).map(([k, n]) => n + ' from ' + (SRC_TAG[k] || k)).join(', ') + '</span></h5>' +
-      S.parts.map((p) => '<div class="part"><h6>' + esc(p.part) + '</h6>' + p.pieces.map((x) => '<div class="piece src-' + esc(x.source.kind) + '"><pre class="txt">' + linkify(x.text) + '</pre><div class="srcline">' + pieceSource(x.source) + '</div></div>').join('') + '</div>').join('') + '</div>';
+      S.parts.map((p) => '<div class="part part-' + esc(p.part) + '"><h6>' + esc(p.part) + '</h6>' + p.pieces.map((x) => '<div class="piece src-' + esc(x.source.kind) + '"><pre class="txt">' + linkify(x.text) + '</pre><div class="srcline">' + pieceSource(x.source) + '</div></div>').join('') + '</div>').join('') + '</div>';
     const inputs = '<div class="sblk"><h5><span class="lnum">2</span> Inputs <span class="hint">' + plural(S.inputs.length, 'input') + ', each with the run that produced it</span></h5>' +
       S.inputs.map((i) => '<div class="inp" id="' + aid(S.run) + '-in-' + esc(i.name) + '" tabindex="-1"><header><b>' + esc(i.name) + '</b>' + (i.name === 'task' ? '<span class="pill p-mute">fills the Task part</span>' : '') + '</header>' +
         (i.meaning ? '<p class="meaning">' + esc(i.meaning) + '</p>' : '') +
