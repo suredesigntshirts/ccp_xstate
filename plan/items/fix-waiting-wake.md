@@ -93,7 +93,7 @@
     },
     {
       "id": "parity",
-      "check": "packages/engine/test/parity/C-waiting-does-not-stall.test.js passes, gaps.json lists no case, verify/parity-cases/C-waiting-does-not-stall.gap.test.mjs is gone, the parity listing test passes, and every tourney scenario passes; any scenario or engine test assertion changed reads only the new timer, its cancel or the workflow's hash",
+      "check": "packages/engine/test/parity/C-waiting-does-not-stall.test.js passes, gaps.json lists no case, verify/parity-cases/C-waiting-does-not-stall.gap.test.mjs is gone, the parity listing test passes, and every tourney scenario passes; any scenario or engine test assertion changed reads only the new timer, its cancel or the workflow's hash, and the parity listing test's own checks make the gap entry they test now that gaps.json is empty",
       "how": "node --test packages/engine/test/ and the diff of packages/engine/test against main",
       "proof": "verifier"
     },
