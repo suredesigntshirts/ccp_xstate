@@ -4,7 +4,7 @@
   "title": "Install the documentation-downloader skill in every container",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Every new ccp_xstate container has the documentation-downloader skill (v2, skill-documentation-downloader PR #2 branch at e011667) at ~/.claude/skills/documentation-downloader with its npm dependencies installed, so sessions list the skill and can cache external docs verbatim and search them by section.",
   "why": "The person asked for it on 2026-11-04 15:15Z in the thread 'Research GAN and harness ideas for workflows' (\"Install documentation downloader in this harness … This branch.\"), after a research task could not use it because it was not installed and had to save sources with curl. Repo .claude/skills do not load in threads (L-repo-skills-dont-load), and the container is rebuilt from the setup script (L-container-is-ephemeral), so the copy has to live in the repo and be installed by setup, like the ccp-harness plugin.",
   "serves": ["L-container-is-ephemeral", "L-repo-skills-dont-load", "L-setup-script-stub"],

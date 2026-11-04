@@ -4,7 +4,7 @@
   "title": "Show each stage's record in the Workflow Inspector",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "For any run of the stage-contract engine, the Workflow Inspector shows each model stage's stage.json as three blocks, Instructions (each prompt piece with its source), Inputs (each with its meaning and the run that produced it) and Output (the stamped fields, each path written, what it replaced and the later runs that read it), plus a per-item data-flow strip of runs and the context paths between them; runs without stage.json render as before.",
   "why": "engine-stage-contract makes every model run write runs/<n>.<actor>/stage.json, which answers the person's four questions for each stage: what instructions it got, what data, what it returned, and where that went. A record nobody can see does not serve the person; the inspector is the page they already use to look at runs.",
   "serves": [

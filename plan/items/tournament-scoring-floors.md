@@ -4,7 +4,7 @@
   "title": "Score tournaments floors first, then on trade-offs",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A tournament's config states its scoring as floors and trade-offs, and scripts/tournament scores it that way: a lane qualifies only if it passes the scenarios, the contract tests and the hard constraints; qualified lanes are then laid side by side on primitives (counting only primitives every model stage uses, in more than one workflow), the bytes of prompt wording left in engine code, and real-trial outcomes, with no single count deciding alone.",
   "why": "In the 2026-11-04 stage-contract tournament the rule written before the run ranked on weighted primitive count alone (qualify at or below the control's 22). That made the formal answer 'no' to lane S, whose extra primitives each closed a real failure the control left open (coverage of Expect lines, inputs without meaning, a verdict routed on without being checked), and qualified the control, which failed the critique the tournament existed to fix. A count is a cost; a floor is what the design must do. Ranking on cost before checking the floors rewards doing less.",
   "serves": [
