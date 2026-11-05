@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "9270e7c5c8955cf3930d71a10eab35d30a01ef5d2f169611abb9e021164cee9c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands work as written. `npm test` maps to `node --test`. Checks 1, 2 and 4 use valid `node --input-type=module -e` imports of './index.js', which resolve from the repo root. Check 3 breaks because of shell escaping. Inside bash double quotes, `'^#+\\\\s+'` and `'\\\\b'` reach JavaScript as `'^#+\\s+'` and `'\\b'`. In a JS string literal, `\\s` becomes a plain `s` and `\\b` becomes a backspace character. The regex is therefore `/^#+s+name\\x08/m`, which can never match a README heading like `## padLeft(...)`. The command still runs, but it reports every export as missing, even for a correct PR. It does not work as written. The builder brief's commands (`npm test`) are fine.",
+  "model": "claude-opus-5-5",
+  "ms": 14664,
+  "tokens": {
+    "input": 2,
+    "output": 1156,
+    "cacheCreation": 3271,
+    "cacheRead": 783,
+    "fresh": 4429,
+    "total": 5212
+  },
+  "at": "2026-11-05T08:39:45.295Z"
+}

@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.1",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4 not quoted word for word in the builder brief: \"index.js exports padLeft(s, width, fill), which pads s on the left with fill (a \""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1 and 2 only assert values that the expect words require: left padding to width, a space as the default fill, and s returned unchanged when long enough. Check 3 breaks the criterion. Its PASS condition needs the regex `^#+\\s+<name>\\b` to print `missing: none`. The words only require \"a section for every function\". A valid section headed \"## `padLeft(...)`\" (in backticks) or \"## The padLeft function\" would fail. That is a heading-format rule the words don't force, and it is in PASS/FAIL rather than under Advisory. Check 4 also requires the summary to show the exact text `# fail 0` on top of exit 0. That is stricter than \"npm test passes\", and Node's spec reporter doesn't print that line.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Most commands work as written. `npm test` maps to `node --test`. Checks 1, 2 and 4 use valid `node --input-type=module -e` imports of './index.js', which resolve from the repo root. Check 3 breaks because of shell escaping. Inside bash double quotes, `'^#+\\\\s+'` and `'\\\\b'` reach JavaScript as `'^#+\\s+'` and `'\\b'`. In a JS string literal, `\\s` becomes a plain `s` and `\\b` becomes a backspace character. The regex is therefore `/^#+s+name\\x08/m`, which can never match a README heading like `## padLeft(...)`. The command still runs, but it reports every export as missing, even for a correct PR. It does not work as written. The builder brief's commands (`npm test`) are fine.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The output handles all three must_catch items. (1) Builder step 2 tells the builder to add `## padLeft(s, width, fill)` \"AND adding the missing `## slugify(s)` section\", and the context notes that README has \"NO section for slugify\". (2) Verifier Check 3 prints the exported functions and the missing ones. It requires \"this must include capitalize, slugify, truncate and padLeft\" and FAILs when any of them has no section. It also says outright that a PR adding only padLeft fails. (3) Verifier Check 1 calls `m.padLeft('42',5)` with no fill and expects `\"   42\"`. It FAILs on \"a non-space default fill\".",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Must_not 1 is avoided. Check 3 lists every exported function and says \"a PR that only adds padLeft fails this check\", so a README with no slugify section fails. Must_not 2 is broken. Check 3 decides PASS with the regex `^#+\\s+'+f+'\\b`, so each section must be a markdown heading whose text starts with the bare function name. A section headed \"## `padLeft(s, width, fill)`\" (name in backticks) or \"### The padLeft function\" would count as missing, even though line 3 only asks that a section exist. That is a required README layout. Check 4 also needs the summary to show `# fail 0`. That is TAP-reporter wording, and Node's spec reporter prints \"ℹ fail 0\" instead, so a passing `npm test` could fail the check. Line 4 only asks that npm test pass. Checks 1 and 2 test only behaviour the lines state, with no parameter-count or single-character-fill rule.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief. Builder step 1 gives the cases \"padLeft('42', 5, '0') === '00042'; padLeft('42', 5) === '   42'\". Verifier Check 1 runs those same two calls and expects \"00042\" \"   42\", so the builder gets inputs with expected outputs from the verifier's probe. Builder step 3 repeats '42', 5, '0' -> '00042' as a required test. Builder step 4 also tells the builder to \"confirm every name exported from index.js has a `## <name>(` heading in README.md\", which is the same check as the verifier's Check 3 probe (each exported name matched against a README heading). Running npm test is allowed, but these repeats hand the builder the checker's own methods.",
+      "cached": true
+    }
+  }
+}

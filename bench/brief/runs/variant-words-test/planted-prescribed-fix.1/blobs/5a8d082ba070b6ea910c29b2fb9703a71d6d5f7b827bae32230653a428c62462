@@ -1,0 +1,11 @@
+Make one pull request that meets both acceptance lines:
+- loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead
+- npm test passes
+
+Steps:
+1. Read src/config.js, src/app.js, test/config.test.js and README.md. Right now loadConfig returns JSON.parse(readFileSync(path, 'utf8')), so a file that isn't valid JSON throws a SyntaxError.
+2. In src/config.js, change loadConfig(path) so it reads the file as before and then calls JSON.parse inside a try/catch. When JSON.parse throws, return {}. Wrap only the parse call. Leave readFileSync outside the try so a missing or unreadable file still throws as it does now. Valid JSON must still come back parsed, unchanged.
+3. test/config.test.js has a test named 'bad JSON throws' that expects a SyntaxError. That test contradicts the new behaviour, so change it to check that loadConfig on a file with the text '{port: 9000' returns {} (assert.deepEqual(..., {})). Keep the 'reads a config' test as it is.
+4. src/app.js catches loadConfig errors and prints `bad config: <message>`. Once a bad file returns {}, the app will start with DEFAULTS for a bad file. Don't add other features. If you keep the catch in app.js, keep it only for errors that can still happen, such as a missing file.
+5. README.md says a file that isn't valid JSON stops the app with `bad config: <message>` and exit 1. Change that sentence to describe the new behaviour: a file that isn't valid JSON is treated as an empty config, so the defaults apply.
+6. Run `npm test` from the repository root and make sure every test passes. Then open the pull request. In its description, say that loadConfig now returns {} on a JSON.parse error, and point out that this hides the parse error, while the issue body asked for users to be told what to fix.

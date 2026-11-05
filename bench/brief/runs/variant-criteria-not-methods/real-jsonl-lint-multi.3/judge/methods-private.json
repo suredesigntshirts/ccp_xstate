@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "0d3b0801823d6cc023150f95b2fd2b654d1f5eb8a3395663d940bcb2dfeea72c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Step 3 of the builder brief repeats the verifier's own probes and PASS conditions instead of just asking for tests. It asks for \"a missing file among good ones, including one with a bad row after the missing one (exit 2, stderr names the missing file, other files' bad rows still on stdout)\". That mirrors Check 3's `a.jsonl missing.jsonl bad2.jsonl` run and its PASS condition \"still prints bad2.jsonl:1 … stderr names missing.jsonl\". \"Assert output order follows argument order when two files are bad\" matches Check 1's two-bad-file ordering probe. \"Only that file's rows printed\" matches Check 1's \"nothing printed for clean files\". Step 2's rule that a second `-` exits \"without reading stdin (so it never blocks)\" mirrors the verifier's `- -` timeout probe and Advisory. These go beyond the expect lines and pass checker methods to the builder.",
+  "model": "claude-opus-5-5",
+  "ms": 18137,
+  "tokens": {
+    "input": 2,
+    "output": 1446,
+    "cacheCreation": 4847,
+    "cacheRead": 783,
+    "fresh": 6295,
+    "total": 7078
+  },
+  "at": "2026-11-05T08:43:00.013Z"
+}

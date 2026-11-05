@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.2",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each verifier check's PASS and FAIL conditions with its expect line. Check 1 needs exact error lines at lines 2, 4 and 6, the right exit codes and the `<file>:<line>: <error>` form. That all comes from \"every row\", 1-based numbering, skipped blanks and the unterminated last line. Check 2 asks only for exit 2 and non-empty stderr. Check 3 asks only for an exported function returning objects with `line` and `error`; the correct line values and `[]` for clean text follow from expect 1's rules. Check 4 tests the name, type and `node --test` (extra arguments allowed), no dependencies, and `node:test` tests for the five listed cases. Check 5 asks only that the README exists and the root README lists the tool. Check 6 tests one PR, the Closes line, a green workflow and a green `npm test`. The stricter items (CRLF input, running from another cwd, the shebang and 100755 mode, mutation checks) all sit under \"Advisory\" as notes only.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs and all of them would run as written. The builder's steps (`npm install`, `npm ci && npm test`, `chmod +x`, `node --test` from the workspace) use files that exist at this commit or that earlier steps create. Node 22's `node --test` picks up `test/*.test.js` by default. In the verifier brief, the `printf` lines contain no stray `%` and produce the intended rows (for example, mix.jsonl puts the bad rows on lines 4 and 6). The quoting in `node --input-type=module -e '...'` gives valid JS, because `\\\"` and `\\n` reach JS inside double-quoted strings. `node -e 'require(\"./packages/jsonl-lint/package.json\")'` runs as CommonJS and resolves from the repo root. `gh pr list --search`, `gh pr view --json`, and `gh run list --workflow test --commit <sha> --json conclusion,status` are valid flags. `<n>` and `<headRefOid>` are values filled in from earlier steps. `mktemp -d` and `test -s` are valid.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items against the two briefs, and each one is covered.\n(1) Builder step 7 says \"Run `npm install` at the root to update `package-lock.json` for the new workspace, then `npm ci && npm test`\". The Context section also explains that npm ci fails if the lockfile is out of sync.\n(2) Builder step 6 says \"replace the 'No tools yet' line with a list of tools\", so it replaces the statement rather than adding a line.\n(3) Verifier Check 6 runs root `npm ci && npm test`, and its PASS condition requires it to exit 0 \"with the jsonl-lint tests running\". A run where --if-present skipped the tests would not pass. Check 4 also requires the workspace tests to run at least one test. The brief doesn't say how to confirm the tests ran (no test count to read, no lint() to break), but it does require it.\n(4) Check 6 reads the PR body and headRefOid with gh. It requires the exact Closes line and the `test` workflow run for the head commit to have concluded success.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I went through each verifier PASS/FAIL condition looking for anything stricter than its expect line and for checks that only read the diff. Check 1 runs the CLI on clean, bad-middle, mixed blank/torn and blank-only files and checks exit codes, line numbers and the `<file>:<line>: <error>` shape. It doesn't require any exact message text, only \"a non-empty message\". Check 2 only needs exit 2 and non-empty stderr. Check 3 imports and calls `lint`. Check 4 reads the package.json fields, runs `npm test` and reads the test files for coverage, and it allows extra args on the `node --test` script. Check 5 only needs to read files, and the line asks for nothing more. Check 6 asks for exactly one PR, the Closes line, a green workflow and a passing local `npm test`, all taken from the line. The mutation check is marked advisory, \"not a pass/fail condition\". There is no branch-name rule and no limit on which files the PR touches. The builder brief's extras (shebang, engines) are build steps, not pass/fail conditions.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with each verifier check and with the advisory items. None of the verifier's printf fixtures (clean.jsonl, mid.jsonl, mix.jsonl, blank.jsonl) appears in the builder brief. Neither does the `node --input-type=module -e` lint probe, the `node -e require(package.json)` field dump, the `test -s`/`grep` README check, the `gh pr list/run list` commands or `git ls-files -s`. The builder brief's only sample input is `{\"a\":`, which differs from the verifier's `{\"d\":` and `{\"b\":`. It includes no PASS/FAIL conditions. It does restate the expect lines and add behaviour requirements (CRLF stripping, no error from a trailing newline, mode 100755), but these are things to build, not checks. Its test list (\"clean file returns []\", \"missing file exits 2 with non-empty stderr\") tells the builder what tests to write, which is allowed. It also tells the builder to run `npm ci && npm test` and the workflow, which is allowed too. So the builder gets the bar but not the checker's methods.",
+      "cached": true
+    }
+  }
+}

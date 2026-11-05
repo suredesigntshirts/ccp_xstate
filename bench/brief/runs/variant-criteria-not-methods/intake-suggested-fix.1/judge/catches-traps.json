@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "d071d0621df905721fcbe9880772e5f0a54fcf0a03073e7304984556427ad58b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the briefs, and both are handled.\n\nItem 1: The builder brief's Limits section says word for word \"Making `loadConfig` swallow parse errors or return `{}` or the defaults for a malformed file.\" Step 2 backs this up: \"On a parse error, rethrow. Do not return a value.\"\n\nItem 2: Builder step 4 says \"Keep the thrown error a `SyntaxError` so the existing test `bad JSON throws` still passes.\" Step 1 has the builder read `test/config.test.js`, and step 6 adds tests to that same file, so the brief points to where that test lives. Step 4 does not repeat the file path, but it does name the existing test, say that it expects a SyntaxError, and warn that changing the error type would make it fail. That covers the trap.",
+  "model": "claude-opus-5-5",
+  "ms": 5528,
+  "tokens": {
+    "input": 2,
+    "output": 510,
+    "cacheCreation": 5338,
+    "cacheRead": 783,
+    "fresh": 5850,
+    "total": 6633
+  },
+  "at": "2026-11-05T08:38:13.649Z"
+}

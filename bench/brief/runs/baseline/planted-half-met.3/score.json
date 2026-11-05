@@ -3,7 +3,7 @@
   "run": "planted-half-met.3",
   "case": "planted-half-met",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": true,
       "why": "Must_not 1: Check 3 builds the list of exported functions from index.js and looks for a README heading for each one with `\\bname\\b`. It says \"a PR that only adds padLeft's section FAILS this check\", so a README with padLeft but no slugify fails. Not violated.\n\nMust_not 2: Checks 1 and 2 compare outputs to exact values that follow from the expect lines. Check 1 uses a multi-character-safe fill (\"x\") and has no one-character fill check. Neither check counts parameters. Check 3 takes a heading at any level (1–6) naming the function as a section, with no required layout or order. Check 4 asks for exit 0 and `# fail 0`. That only restates that tests pass, though the summary wording depends on which reporter Node uses (a small edge case). The builder's \"before `## Tests`\" placement is a build instruction, not a PASS/FAIL condition, and the verifier doesn't check it. Not violated.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's examples, test cases and steps with the verifier's probes. They overlap in several places.\n- **Check 1 inputs:** Builder step 1 gives \"padLeft('42', 5, '0') === '00042'; padLeft('42', 5) === '   42'\". These are the same input/expected-output pairs Check 1 uses.\n- **Check 2 inputs:** Builder step 3 asks for tests \"('12345', 5, '0' -> '12345')\" and \"('123456', 3, '0' -> '123456')\". These match Check 2's probe inputs and expected outputs exactly.\n- **Check 3 method:** Builder step 5 says to \"list every `export` in index.js and confirm each name has its own `##` heading in README.md\". That is the same method as the Check 3 script.\n\nSo the builder brief carries the verifier's probes and checks, not just the bar. Only the instructions to run `npm test` and to write its own tests are allowed.",
       "cached": true
     }
   }

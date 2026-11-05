@@ -1,0 +1,15 @@
+Goal: make one pull request that adds a `--shout` flag to greet-cli and meets every acceptance line of issue https://github.com/o/greet-cli/issues/12:
+1. node bin/greet.js --shout <name> prints the greeting in upper case
+2. without --shout the output is unchanged
+3. docs/index.md documents --shout
+4. after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout
+
+Context: `bin/greet.js` takes the first argument that does not start with `--` as the name and prints `greeting(name)` from `src/greet.js` (`Hello, <name>!`) followed by a newline. Right now it ignores any `--` flags. With no name it prints `usage: greet <name>` to stderr and exits with code 2. `docs/index.md` is the docs page. `.github/workflows/pages.yml` publishes the `docs/` directory to GitHub Pages on every push to main, so line 4 is met when docs/index.md (inside docs/) mentions `--shout` and the PR gets merged. Tests live in `test/greet.test.js` and run with `npm test` (node --test).
+
+Steps:
+1. In `bin/greet.js`, detect `--shout` anywhere in `process.argv.slice(2)`. When it is there, print the whole greeting line in upper case, so `node bin/greet.js --shout Ada` prints `HELLO, ADA!` and a newline. Keep picking the name as the first argument that does not start with `--`, so `--shout` is never taken as the name, and `node bin/greet.js Ada --shout` works too. You may add the upper-casing in `src/greet.js` (for example an option or a separate export) as long as `greeting('Ada')` still returns `Hello, Ada!`.
+2. Without `--shout`, keep the output byte-for-byte the same: `node bin/greet.js Ada` prints `Hello, Ada!\n`, and running with no name still prints `usage: greet <name>` to stderr and exits with code 2. Consider changing the usage text to mention `--shout`, but only to stderr's usage line. Leaving it unchanged is safest.
+3. Update `docs/index.md` to document `--shout`. Show the usage `node bin/greet.js --shout <name>` and say it prints the greeting in upper case, with an example such as `HELLO, ADA!`. The literal text `--shout` must appear in the file. Keep the docs in `docs/` so the existing Pages workflow publishes them. Do not change `.github/workflows/pages.yml` unless it is broken.
+4. Add tests to `test/greet.test.js`: one where the CLI with `--shout Ada` outputs `HELLO, ADA!\n`, and keep the existing test that the CLI without the flag outputs `Hello, Ada!\n`. Run `npm test` and make sure it passes.
+5. Run these by hand and confirm the results: `node bin/greet.js --shout Ada` → `HELLO, ADA!`. `node bin/greet.js Ada` → `Hello, Ada!`. `grep -n -- '--shout' docs/index.md` → at least one match.
+6. Open the pull request. In its description, note that the published docs page (https://o.github.io/greet-cli/) will list `--shout` only after merge, when the pages workflow deploys `docs/`. That page cannot be checked before merge.

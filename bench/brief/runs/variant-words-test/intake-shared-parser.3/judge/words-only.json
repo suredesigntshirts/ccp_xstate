@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "185d8501d82fc3f54f0e0f9944aaeadab632a95b886c378ea57c23bc0abb016b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the PASS and FAIL conditions of all seven verifier checks with the words of their expect lines. Checks 1–5 ask for the exact stdout plus one newline, and Check 1 also asks for exit=0. The expect lines say \"prints exactly … followed by a newline\", so the byte comparison with cmp is what the words require. Check 5 uses printf '%s\\n', which keeps the JSON escape as a literal backslash-t, and that matches the words. Check 6's PASS asks for exit=0 and a test that runs bin/csv2json.js with --tsv on tab input and asserts on the output, which is exactly what the expect line says. Check 7 only asks that README mentions --tsv and shows an example command. The stricter extras are all under \"Advisory\": the mutation test, other flag positions, the README saying \"tab-separated\", and the test:cli mismatch. No PASS or FAIL condition goes beyond what the words require.",
+  "model": "claude-opus-5-5",
+  "ms": 12244,
+  "tokens": {
+    "input": 2,
+    "output": 640,
+    "cacheCreation": 6155,
+    "cacheRead": 783,
+    "fresh": 6797,
+    "total": 7580
+  },
+  "at": "2026-11-05T08:37:56.128Z"
+}

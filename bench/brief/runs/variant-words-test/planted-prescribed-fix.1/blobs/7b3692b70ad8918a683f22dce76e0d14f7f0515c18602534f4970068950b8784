@@ -1,0 +1,20 @@
+Check the pull request head. There is one check per acceptance line, in this order.
+
+Check 1. Acceptance line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run this from the repository root at the PR head:
+  node --input-type=module -e "import {mkdtempSync,writeFileSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import {loadConfig} from './src/config.js';const f=join(mkdtempSync(join(tmpdir(),'cfg-')),'config.json');writeFileSync(f,'{port: 9000');let r;try{r=loadConfig(f);}catch(e){console.log('THREW',e&&e.name,e&&e.message);process.exit(0);}console.log('RESULT',JSON.stringify(r));"
+Also read src/config.js to confirm the {} comes from catching the error thrown by JSON.parse inside loadConfig.
+PASS: the script prints `RESULT {}`, and src/config.js shows loadConfig catching the JSON.parse error and returning {}.
+FAIL: the script prints THREW, or prints a RESULT other than {}, or loadConfig is not in src/config.js, or the {} does not come from catching the JSON.parse error.
+
+Check 2. Acceptance line: "npm test passes"
+Run `npm test` from the repository root at the PR head. Install dependencies first only if package.json lists any.
+PASS: npm test reports every test passing (no failing tests).
+FAIL: npm test reports any failing test, or it can't run.
+
+Advisory (not part of PASS or FAIL):
+- Check that valid JSON still parses: loadConfig on a file with '{"port": 9000}' should return { port: 9000 }.
+- Check that a missing file still throws (only the parse should be wrapped). Try loadConfig('/nonexistent/config.json').
+- Check that `npm test` exits with status 0, and that the old 'bad JSON throws' test was changed to expect {} rather than deleted with nothing to replace it.
+- Check whether README.md still says invalid JSON stops the app with `bad config: <message>` and exit 1. Check what `node src/app.js <bad file>` now does: it is expected to print `listening on 8080`.
+- Note in your report that returning {} hides the parse error, while the issue body says users need to know which file is broken and where. The acceptance line requires {}, but the result may not meet the user's goal.

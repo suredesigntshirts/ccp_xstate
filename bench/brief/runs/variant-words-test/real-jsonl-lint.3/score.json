@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.3",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line.\n\n- **Check 1** tests 1-based line numbers, skipped blank lines, the unterminated last line (\"one starting `bad.jsonl:5: `\") and exit codes 1 and 0. The issue does not fix the error wording, so the check accepts \"some error text\".\n- **Check 2** asks only for non-empty stderr and exit 2.\n- **Check 3** asks for the exported lint, the array shape and the 1-based line.\n- **Check 4** accepts \"extra flags or file arguments after `node --test`\". It also requires the tests to pass, which line 6's green `npm test` already forces.\n- **Check 5** asks only that the package README exists and the root README mentions the tool.\n- **Check 6** matches its expect line: one PR, the Closes line in the body, and green `npm test` and workflow at the head.\n\nThe stricter items sit under \"Advisory (not pass/fail)\": the lockfile, CRLF, the shebang and the stdout/naming checks. No PASS or FAIL condition requires exact wording, a mutation test or a branch rule.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs and all of them would run as written. The builder's steps only touch files that exist (root package.json, package-lock.json, the test workflow, README.md, CLAUDE.md) or that an earlier step creates (packages/jsonl-lint/*). `npm install`, `npm ci` and `npm test` are all valid. In the verifier brief, `node --input-type=module -e \"import { lint } from './packages/...'; ... lint('{\\\"a\\\":1}\\n{bad\\n') ...\"` quotes correctly in bash and is valid JS, and the relative import resolves from the repo root. `npm test -w jsonl-lint`, `gh pr view --json body,headRefOid,state`, `gh pr list --search 102 --state all`, `gh pr checks` and `gh run list --commit` all take those arguments. One small tension in Check 1: it says to use a scratch directory but runs `node packages/... clean.jsonl` with relative paths. The command still works as long as the inputs are created where the command runs, so it isn't a broken command.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked all four must_catch items. Items 1, 2 and 4 are handled. Item 1: builder step 6 says \"run `npm install` so package-lock.json records the new workspace (otherwise `npm ci` in CI fails…)\". Item 2: step 5 says \"replace the 'No tools yet' bullet\". Item 4: Check 6 uses `gh pr view … --json body,headRefOid`, reads the PR body and checks the workflow run at the head commit.\n\nItem 3 is missed. Check 4 runs the tests directly with `npm test -w jsonl-lint`, not through the root script. Check 6 only requires that root \"`npm test` locally succeeds\". Neither check reads the test count, confirms the jsonl-lint tests appear in the root `npm test` output, or breaks lint() to see a test fail. So if `--if-present` caused the tests to be skipped, the verifier would not notice.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared every verifier check against both must_not items. Nothing is stricter than its line. Check 1 accepts \"each followed by some error text\", so no exact error wording is required. Check 2 only needs stderr to be non-empty and exit status 2. Check 4 allows \"extra flags or file arguments after `node --test`\". No check tests branch names, uses mutation tests or limits which files the PR may touch. The CRLF case, shebang and lockfile are marked \"Advisory (not pass/fail)\". One edge case: blank.jsonl includes a whitespace-only line, which fairly counts as blank. The behaviour lines (1, 2, 3 and the test run in 4) are checked by running the CLI, lint() and npm test, not just by reading the diff. Reading files is used only where the line itself is about files (package.json fields, test coverage, READMEs), and line 6 is checked through gh and npm test. The builder brief adds no rules stricter than the lines.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion is met. I compared the builder brief with the verifier brief's PASS/FAIL conditions and probes. None of the verifier's concrete probes appear in the builder brief:\n- the clean.jsonl, bad.jsonl and blank.jsonl inputs;\n- the expected `bad.jsonl:3:`/`bad.jsonl:5:` lines;\n- the inline `node --input-type=module -e \"import { lint }…\"` script;\n- the `grep -n jsonl-lint README.md` and `gh pr list --search 102` commands.\n\nThe builder gets the expect lines and an implementation plan. Its testing steps (\"Write node:test tests… 0 for a clean file, 1… 2 with stderr output\") tell it to write its own tests, which is allowed, and it is told to run `npm ci`/`npm test`, which is also allowed. Some builder statements overlap with verifier advisory notes: \"strip a trailing \\r\", \"A trailing newline… must not produce an extra row or error\" and the package-lock update. These are implementation requirements, not PASS/FAIL conditions or concrete probe inputs with expected outputs, so the builder brief has the bar without the checker's methods.",
+      "cached": true
+    }
+  }
+}

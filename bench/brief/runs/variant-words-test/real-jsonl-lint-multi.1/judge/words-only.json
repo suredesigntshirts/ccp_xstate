@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "68f1b70729da17202858e3d1c70cf5ae5dcc37bfac25e3bd0e4a2ae1c0a9f335",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS/FAIL conditions with the words of its expect line. Checks 2, 4 and 6 stay within their expect lines. Check 3 breaks the criterion. Its PASS condition says \"the missing-file runs exit 2\", and that includes `node $BIN missing.jsonl bad.jsonl`. In that run one file can't be read and the other has bad rows. Expect line 3 gives exit 2 for an unreadable file and exit 1 for a bad row, but it doesn't say which code wins when both happen. So requiring exit 2 is stricter than the words. The brief's own Advisory even lists this exact case (\"Check whether exit status is 2 when one file is unreadable and another has bad rows\") as not pass/fail, yet Check 3's PASS condition still enforces it. Check 5's \"they pass\" may also go slightly past its words. The Check 3 precedence rule alone means the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 11274,
+  "tokens": {
+    "input": 2,
+    "output": 1056,
+    "cacheCreation": 5338,
+    "cacheRead": 783,
+    "fresh": 6396,
+    "total": 7179
+  },
+  "at": "2026-11-05T08:41:35.876Z"
+}

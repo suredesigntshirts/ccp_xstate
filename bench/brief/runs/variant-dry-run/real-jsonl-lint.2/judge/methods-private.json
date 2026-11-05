@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "cece8acb9dba1aa71ee02cf7dc3b3eaf0bce6254dc4e6c4185d726d61c2bb8e6",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with each verifier check. The builder brief gives away some of the checker's own methods. Step 8 says `npm test` \"must show the jsonl-lint tests running, not `no workspaces under packages/`\". That is word for word one of Check 6's PASS conditions (\"its output shows the jsonl-lint tests ran rather than `no workspaces under packages/`\"), and it goes beyond just running the tests. Step 1 uses the torn row `{\"b\":` as its example, which is the same input Check 1's torn.jsonl and Check 3's lint call use. Step 2's \"printing nothing to stdout on a clean file\" repeats Check 1's PASS condition for clean.jsonl. Step 4's exit-code assertions (2 with non-empty stderr for a missing file and for no argument) match Check 2's PASS condition. Telling the builder to run the tests is allowed, but these lines also hand it the verifier's specific pass conditions and probe inputs.",
+  "model": "claude-opus-5-5",
+  "ms": 10775,
+  "tokens": {
+    "input": 2,
+    "output": 967,
+    "cacheCreation": 6691,
+    "cacheRead": 783,
+    "fresh": 7660,
+    "total": 8443
+  },
+  "at": "2026-11-05T08:43:43.028Z"
+}

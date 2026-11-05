@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "7ed46e9670d7ff0ca99e0122a1f3462e2ca5a31c34be34f7d95e8a9726874e33",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's step 2 with the verifier's checks, and the builder brief hands over the verifier's probe inputs. Step 2 lists clamp(50, 0, 100) === 50, clamp(-5, 0, 100) === 0, clamp(140, 0, 100) === 100, clamp(0,0,100) === 0 and clamp(100,0,100) === 100. These are the same input/expected-output tuples as Check 1's cases array: [50,0,100,50], [-5,0,100,0], [140,0,100,100], [0,0,100,0], [100,0,100,100]. Step 2 also gives assert.throws(() => clamp(5, 10, 0), RangeError), which matches Check 2's first case, [5,10,0]. Step 3 says every export must have a \"### name(\" heading, which mirrors Check 3's regex. The builder may write its own tests, but naming the exact inputs and expected outputs the verifier uses puts checker probes in the builder brief. The criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 7151,
+  "tokens": {
+    "input": 2,
+    "output": 700,
+    "cacheCreation": 3481,
+    "cacheRead": 783,
+    "fresh": 4183,
+    "total": 4966
+  },
+  "at": "2026-11-05T08:29:29.990Z"
+}

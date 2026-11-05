@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "db845665f2f1c794711d92e7b377df616926fdbae676e95249dae75dcfabc6c2",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 3 and 4 stay within their lines. Check 2 does not. The expect line only says \"without --shout the output is unchanged\", but the FAIL condition also includes \"`npm test` reports a failure\", and PASS requires that `npm test` passes. That means any failing test, including a new --shout test, would fail Check 2 even if the no-flag output were exactly `Hello, Ada!\\n`. The words of the line do not require a passing test suite, so this belongs under Advisory. Check 1 also goes further than its line by requiring \"the command exits 0\", which \"prints the greeting in upper case\" does not demand. The Advisory section exists, but these stricter tests sit in PASS and FAIL conditions, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 8033,
+  "tokens": {
+    "input": 2,
+    "output": 676,
+    "cacheCreation": 3426,
+    "cacheRead": 783,
+    "fresh": 4104,
+    "total": 4887
+  },
+  "at": "2026-11-05T08:38:44.409Z"
+}

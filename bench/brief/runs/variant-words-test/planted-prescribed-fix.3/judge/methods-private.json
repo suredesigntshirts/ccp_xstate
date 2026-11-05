@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "850da1dcc593192b896215a8bc26c475ba03f15b20824e21189bd31c54531553",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared every builder step against the verifier brief. Builder step 5 gives a probe with an expected output: \"printf '{port: 9000' > /tmp/bad.json && node src/app.js /tmp/bad.json and confirm it prints `listening on 8080` with no stack trace.\" The verifier brief has the same probe in its advisory list: \"Run `node src/app.js /tmp/v_bad.json`: expect `listening on 8080` and no stack trace.\" That item is advisory, but it is still a check in the verifier brief, so the builder is being handed the checker's method. Neither expect line names this command, and nothing provided shows the issue names it either. Running `npm test` and writing its own tests (step 3's missing-file test) are allowed. Step 6's note about the trade-off is fine. The shared app.js probe is what breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 8520,
+  "tokens": {
+    "input": 2,
+    "output": 643,
+    "cacheCreation": 2997,
+    "cacheRead": 783,
+    "fresh": 3642,
+    "total": 4425
+  },
+  "at": "2026-11-05T08:41:27.246Z"
+}

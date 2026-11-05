@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "12007683f3a671f3aba890d4a7c06c929344e9e083cd8b1bea593be7e66115d4",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS/FAIL conditions with its expect line. Check 3 matches its line's words. Check 4 uses the workflow as a stand-in for the live page, which is reasonable. Checks 1 and 2 go further than their words.\n\nCheck 1's expect line only says the CLI \"prints the greeting in upper case\". Its PASS still requires that \"each exits 0\", and its FAIL includes \"a non-zero exit\". The exit status isn't part of what gets printed.\n\nCheck 2's expect line says \"the output is unchanged\". Its PASS requires that \"stdout, stderr and exit code are identical\", and it expects \"the usage message with exit 2\". An exit code is not output, so the words don't force this comparison. The builder brief's \"must still exit 2\" adds to it.\n\nThese exit-code requirements belong under Advisory, but they sit inside the PASS and FAIL conditions, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 10769,
+  "tokens": {
+    "input": 2,
+    "output": 809,
+    "cacheCreation": 3105,
+    "cacheRead": 783,
+    "fresh": 3916,
+    "total": 4699
+  },
+  "at": "2026-11-05T08:38:49.046Z"
+}

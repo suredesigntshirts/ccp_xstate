@@ -122,6 +122,9 @@ test('mechanical check: the builder brief quotes every expect line, in any order
   assert.equal(half.met, false);
   assert.match(half.why, /expect line 2/);
   assert.equal(builderCriteria({ verifier: 'a b c d' }, expect).met, false);
+  // A line with double quotes, quoted inside double quotes, may have them escaped.
+  assert.equal(builderCriteria({ builder: 'Meet "say \\"hi\\" twice".' }, ['say "hi" twice']).met, true);
+  assert.equal(oneCheckPerLine({ verifier: 'Check 1. "say \\"hi\\" twice"' }, ['say "hi" twice']).met, true);
 });
 
 test('score: mechanical then judge per criterion; verdicts are kept and reused while prompt and model are the same', async () => {
@@ -132,16 +135,16 @@ test('score: mechanical then judge per criterion; verdicts are kept and reused w
   writeFileSync(join(out, 'set.json'), JSON.stringify({ k: 1 }));
   const first = await scoreRuns({ stage: 'brief', dir: out, model: 'fake-judge' });
   const calls = () => readFileSync(join(dir, 'out/judge-calls.jsonl'), 'utf8').trim().split('\n').length;
-  assert.equal(calls(), 4);
+  assert.equal(calls(), 5, 'one judge session per judged criterion');
   const s = first[0].score;
   assert.equal(s.returned.met, true);
   assert.equal(s['one-check-per-line'].met, false);
   assert.equal(s['words-only'].met, true);
   assert.deepEqual(readJson(join(out, 'planted-half-met.1/score.json')).criteria, s);
   await scoreRuns({ stage: 'brief', dir: out, model: 'fake-judge' });
-  assert.equal(calls(), 4, 'kept verdicts are reused');
+  assert.equal(calls(), 5, 'kept verdicts are reused');
   await scoreRuns({ stage: 'brief', dir: out, model: 'other-judge' });
-  assert.equal(calls(), 8, 'another judge model asks again');
+  assert.equal(calls(), 10, 'another judge model asks again');
   const md = reportOf({ stage: 'brief', dir: out, scored: first });
   assert.match(md, /\| one-check-per-line \| mechanical \| 0\/1 \|/);
   assert.match(md, /Ambient instructions reached 1 of 1 runs \(attribution\)/);

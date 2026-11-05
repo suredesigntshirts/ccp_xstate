@@ -1,0 +1,30 @@
+Run every check at the PR head from the repository root, on the repo's Node (v22). Run each command exactly as given. Each check matches one expect line, in order.
+
+Check 1. Expect: "Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`, `  \"port\": 9000,`, `  greeting: \"x\"`, `}`, exits with code 1 and prints nothing on stdout (in particular no `listening on` line)."
+Run:
+d=$(mktemp -d); printf '{\n  "port": 9000,\n  greeting: "x"\n}\n' > "$d/c.json"; node src/app.js "$d/c.json" >"$d/out" 2>"$d/err"; echo "exit $?"; echo "stdout:"; cat "$d/out"; echo "stderr:"; cat "$d/err"; grep -qF "bad config:" "$d/err" && echo HAS_PREFIX; grep -qF "$d/c.json" "$d/err" && echo HAS_PATH; grep -Eq '(line 3[^0-9]+column 3([^0-9]|$))|(:3:3([^0-9]|$))' "$d/err" && echo HAS_LOC
+PASS: prints `exit 1`, and nothing appears between `stdout:` and `stderr:`. FAIL: any other exit code, or any stdout output (such as `listening on`).
+
+Check 2. Expect: "In that same run, stderr contains `bad config:`, the full path `<tmp>/c.json` exactly as passed on the command line, the line number `3` and the column number `3` of the mistake."
+Use the output of the Check 1 command.
+PASS: it prints HAS_PREFIX and HAS_PATH, and the stderr text shows line 3 and column 3. HAS_LOC counts, and so does any other clear line-3/column-3 wording you can see in the printed stderr. FAIL: `bad config:` is missing, the exact path `$d/c.json` is missing, or line 3 / column 3 are not shown.
+
+Check 3. Expect: "Calling `loadConfig(path)` on a file containing `{port: 9000` throws instead of returning a value, and the thrown error's `message` contains `path`."
+Run:
+d=$(mktemp -d); printf '{port: 9000' > "$d/b.json"; node --input-type=module -e "import {loadConfig} from './src/config.js'; try { const v = loadConfig('$d/b.json'); console.log('RETURNED', JSON.stringify(v)); process.exit(2) } catch (e) { console.log(e.message.includes('$d/b.json') ? 'OK' : 'NO PATH: ' + e.message) }"
+PASS: prints `OK`. FAIL: prints `RETURNED ...` or `NO PATH: ...`.
+
+Check 4. Expect: "Running `node src/app.js <tmp>/ok.json`, where ok.json contains `{\"port\": 9000}`, exits 0 and prints `listening on 9000` on stdout. `loadConfig` on that file returns `{ port: 9000 }`."
+Run:
+d=$(mktemp -d); printf '{"port": 9000}' > "$d/ok.json"; node src/app.js "$d/ok.json"; echo "exit $?"; node --input-type=module -e "import {loadConfig} from './src/config.js'; import assert from 'node:assert/strict'; const v = loadConfig('$d/ok.json'); assert.deepEqual(v, { port: 9000 }); console.log('DEEPEQUAL_OK', JSON.stringify(v))"
+PASS: prints `listening on 9000`, then `exit 0`, then `DEEPEQUAL_OK {"port":9000}`. FAIL: any other stdout, a non-zero exit, or an assertion error.
+
+Check 5. Expect: "`npm test` passes, and the test suite has at least one test that fails at the current base commit and checks that the error from malformed config JSON includes the file path."
+Run `npm test` at the PR head. Then run the PR's tests against the base commit's source. Set B to the PR's base commit hash and run:
+B=<base commit hash>; w=$(mktemp -d)/base; git worktree add --detach "$w" "$B" >/dev/null 2>&1 && rm -rf "$w/test" && cp -r test "$w/test" && (cd "$w" && npm test 2>&1 | grep -E '^# (pass|fail)|^not ok'); git worktree remove --force "$w"
+Also read the PR's test files to identify the test or tests that assert the file path is in the malformed-JSON error.
+PASS: `npm test` at the head reports `# fail 0`, and on the base run at least one of the path-asserting tests is listed as `not ok`. FAIL: any test fails at the head, no test asserts the path in the malformed-JSON error, or every such test passes on the base.
+
+Advisory (not pass/fail):
+- Read `src/config.js` and `src/app.js` to see whether the line and column are computed by the repo itself (for example from the position) or taken only from Node's message text. Report if they depend only on Node's message.
+- Report if `loadConfig` swallows errors or returns defaults, if the ENOENT reporting changed, or if the path is resolved to an absolute path.

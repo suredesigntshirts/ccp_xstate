@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.3",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1, 2 and 4 hold: their PASS values follow directly from the expect lines (left padding, a space when fill is omitted, length equal to width, s unchanged when it is at or above width, and npm test exiting 0). Check 3 breaks the criterion. Its PASS condition needs the regex to print `missing: none`. That regex (`^#{1,6}\\s+`?name\\b`, case-sensitive) only matches ATX headings that begin with the exact function name. The expect line only says README.md has \"a section for every function\". A real padLeft section titled \"## Padding strings with padLeft\", \"## PadLeft\", or written as a setext (underlined) heading would fail the PASS condition even though the words are met. That heading-wording rule is stricter than the expect line, so it belongs under Advisory, not in PASS/FAIL.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command against the repo. The named files all exist (index.js, README.md, test/strutil.test.js, package.json with a `test` script). `npm test` and the Check 1, 2 and 4 commands look runnable. Check 3 breaks. Its JavaScript sits inside a double-quoted shell string, and bash turns `\\\\` into `\\`. So node receives `'^#{1,6}\\s+\\x60?'+f+'\\b'` as plain JS string literals. There `\\s` becomes just `s` and `\\b` becomes a backspace character. The regex is then `^#{1,6}s+`?name<BS>`, which matches no README heading. The command runs, but it always reports every export as missing. A correct README would get a false FAIL, so the quoting doesn't produce the command the brief intends. Because the shell and JS escaping in Check 3 is wrong, the criterion does not hold for the whole output.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs cover all three must_catch items.\n1. Builder step 3 has the builder add a \"`## slugify(s)` section\" alongside padLeft's. Step 1 says why: slugify is \"already undocumented\".\n2. Verifier Check 3 lists the exports at the PR head. PASS needs \"capitalize, slugify, truncate and padLeft\" each with its own heading section. FAIL applies if \"any exported function (note: slugify had no section before this change)\" has no section.\n3. Verifier Check 1 calls `p('42',5)` with no fill and expects `\"   42\"`. FAIL covers \"a fill other than space when fill is omitted\".\n\nOne flaw outside this criterion: shell quoting turns the Check 3 regex escapes into `\\s`/`\\b` in a JS string literal, so the regex may not match as intended. The check still has the right exports and FAIL condition, plus a manual README review, so the trap is still caught.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Must_not 1 is avoided. Check 3 lists every function index.js exports, including slugify, and fails if any of them has no README heading.\n\nMust_not 2 breaks in Check 3. The command is wrapped in bash double quotes, which turn `\\\\s` and `\\\\b` into `\\s` and `\\b`. Inside a JavaScript string, `'\\s'` is just `s` and `'\\b'` is a backspace character. The regex therefore looks for \"#…s+ then the name then a backspace\", which no README heading can match. The script always reports every function as missing, so the required PASS output `missing: none` can never appear, even on a correct PR. That makes the PASS condition stricter than line 3.\n\nChecks 1, 2 and 4 are fine. They have no parameter-count check and no single-character fill check, and multi-character fill is only advisory.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier's probes. Builder step 2 gives \"padLeft('42', 5, '0') === '00042'; padLeft('42', 5) === '   42'\". Verifier Check 1 tests these same calls, p('42',5,'0') and p('42',5), and expects the same results, \"00042\" and \"   42\". Step 4 repeats \"('42', 5, '0' -> '00042')\" as a test case to write. So the builder brief contains inputs with expected outputs that are also in the verifier brief. The builder's other example, ('12345',3,'0'), isn't a verifier input, but the two shared pairs are enough to break the criterion. Running npm test and writing its own tests are allowed, but these shared probe pairs are not.",
+      "cached": true
+    }
+  }
+}

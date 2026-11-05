@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "384c32975f6afe7a68375d0f6b80c4864c893ab02f50efaaa1bb2eedaea0cb12",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Items 1, 2 and 4 are met. Item 1: builder step 7 says \"Run npm install at the repo root so package-lock.json includes the new workspace\". Item 2: builder step 6 says \"replace the 'No tools yet' bullet\". Item 4: Check 6 uses gh pr view (body, headRefOid) and requires the workflow at the head commit to be successful. Item 3 is not met. The verifier's only check that the root npm test really runs the jsonl-lint tests, plus the mutation test, sit under \"Advisory (not pass/fail conditions)\". Check 6 passes as long as the root npm test passes, which would still happen if --if-present skipped the tests. Check 4 runs npm test inside the workspace, not at the root. So no pass/fail check would catch the tests being skipped under the root npm test.",
+  "model": "claude-opus-5-5",
+  "ms": 14588,
+  "tokens": {
+    "input": 2,
+    "output": 948,
+    "cacheCreation": 4890,
+    "cacheRead": 783,
+    "fresh": 5840,
+    "total": 6623
+  },
+  "at": "2026-11-05T08:42:27.405Z"
+}

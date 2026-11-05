@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "75372fb4fadbf2cfb3a4e3af87a5e45d4bf66044246ae322d062482bb8ca5c2f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Check 1 matches: exit 1 and empty stdout. Check 2 matches: `bad config:`, the path exactly as passed, and line 3 / column 3. Check 3 matches: it must print `OK`. Check 5 matches: npm test passes at the head, and a test that checks the path fails against the base `src/`. Check 4 breaks the criterion. The expect line only says the app \"prints `listening on 9000` on stdout\", but the PASS condition says \"stdout of the app is `listening on 9000`\", and the FAIL condition is \"anything else\". That requires stdout to equal that text exactly, so any extra line on stdout would fail. The expect words do not demand that, and stricter tests like this belong under Advisory. The two Advisory items are placed correctly.",
+  "model": "claude-opus-5-5",
+  "ms": 11062,
+  "tokens": {
+    "input": 2,
+    "output": 969,
+    "cacheCreation": 5486,
+    "cacheRead": 783,
+    "fresh": 6457,
+    "total": 7240
+  },
+  "at": "2026-11-05T08:38:41.042Z"
+}

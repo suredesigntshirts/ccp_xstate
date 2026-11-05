@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e23f16f98876b1e139a9a7d32a79d027eea8cf244c6c1eadf5b53fa34623acab",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all four must_catch items. Items 1, 2 and 4 are handled. Item 1: builder step 6 says \"run `npm install` so package-lock.json records the new workspace (otherwise `npm ci` in CI fails…)\". Item 2: step 5 says \"replace the 'No tools yet' bullet\". Item 4: Check 6 uses `gh pr view … --json body,headRefOid`, reads the PR body and checks the workflow run at the head commit.\n\nItem 3 is missed. Check 4 runs the tests directly with `npm test -w jsonl-lint`, not through the root script. Check 6 only requires that root \"`npm test` locally succeeds\". Neither check reads the test count, confirms the jsonl-lint tests appear in the root `npm test` output, or breaks lint() to see a test fail. So if `--if-present` caused the tests to be skipped, the verifier would not notice.",
+  "model": "claude-opus-5-5",
+  "ms": 7228,
+  "tokens": {
+    "input": 2,
+    "output": 632,
+    "cacheCreation": 5458,
+    "cacheRead": 783,
+    "fresh": 6092,
+    "total": 6875
+  },
+  "at": "2026-11-05T08:42:49.523Z"
+}

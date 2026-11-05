@@ -1,0 +1,30 @@
+Check out the PR head and run every command from the repository root. Run `npm install` first only if package.json now lists dependencies. There is one check per expect line below, in the same order. Report PASS or FAIL for each check, along with the output you saw.
+
+Check 1. Expect line: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+node --input-type=module -e "import * as m from './index.js'; const p=m.padLeft; console.log(typeof p); if(typeof p==='function'){console.log(JSON.stringify([p('42',5,'0'), p('42',5), p('a',4,'*'), p('',3,'x')]));}"
+PASS: the first line printed is `function`, and the array is ["00042","   42","***a","xxx"]. That means each result is s padded on the left with fill (or with spaces when no fill is given) to exactly width characters.
+FAIL: padLeft is not exported, the command throws, or any of the values differs from the expected ones.
+
+Check 2. Expect line: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+node --input-type=module -e "import {padLeft} from './index.js'; console.log(JSON.stringify([padLeft('abc',3,'0'), padLeft('12345',3,'0'), padLeft('hello',2), padLeft('xy',0,'-')]));"
+PASS: it prints ["abc","12345","hello","xy"].
+FAIL: any value differs from its input s (for example, it got truncated or padded), or the command throws.
+
+Check 3. Expect line: "README.md has a section for every function index.js exports"
+List the exported functions by running:
+node --input-type=module -e "import * as m from './index.js'; console.log(Object.keys(m).filter(k=>typeof m[k]==='function').join('\n'))"
+Then read README.md, including its heading lines (`grep -n '^#' README.md`).
+PASS: every name in the list has its own section in README.md, meaning a markdown heading that names the function, followed by text about it. At the base commit, slugify had no section, so check slugify and padLeft in particular.
+FAIL: any exported function, slugify included, has no README section of its own.
+
+Check 4. Expect line: "npm test passes"
+Run: npm test
+PASS: the command exits with status 0 and reports no failing tests.
+FAIL: it exits non-zero, or any test fails.
+
+Advisory (none of this affects PASS or FAIL):
+- See whether test/strutil.test.js now has tests for padLeft, including the already-long-enough case.
+- See whether a multi-character fill (for example padLeft('7',4,'ab')) still gives a result exactly 4 characters long.
+- See whether the existing functions capitalize, slugify and truncate are unchanged in behaviour.

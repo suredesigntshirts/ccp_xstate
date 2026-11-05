@@ -1,0 +1,14 @@
+Criteria the build must meet (from the issue, word for word):
+- node bin/greet.js --shout <name> prints the greeting in upper case
+- without --shout the output is unchanged
+- docs/index.md documents --shout
+- after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout
+
+Steps:
+1. Read bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml. Today the CLI takes the first argument that does not start with `--` as the name and prints `Hello, <name>!` followed by a newline. The pages workflow publishes the docs/ directory to GitHub Pages on every push to main.
+2. In bin/greet.js, check whether `--shout` is among the arguments. If it is, print the whole greeting line in upper case (for `Ada` that is `HELLO, ADA!` followed by a newline). The flag must work whether it comes before or after the name. Keep finding the name the same way, so `--shout` is never read as the name. If you put the upper-casing in src/greet.js, add it as a separate export or an optional parameter so that `greeting(name)` still returns exactly `Hello, <name>!`.
+3. Without `--shout`, keep the output byte-for-byte the same: `Hello, <name>!` followed by a newline on stdout. Keep the usage message and exit code 2 when no name is given.
+4. In test/greet.test.js, add tests for `node bin/greet.js --shout Ada` (expect `HELLO, ADA!\n`) and `node bin/greet.js Ada --shout`. Keep the existing tests unchanged. Run `npm test` and make sure every test passes.
+5. Update docs/index.md to document the `--shout` flag: show a usage line such as `node bin/greet.js --shout <name>` and say that it prints the greeting in upper case, with an example. Keep the docs in docs/ so the existing pages workflow publishes them. Do not change .github/workflows/pages.yml unless it is needed for docs/index.md to be published.
+6. The last criterion can only come true after the PR is merged and the pages workflow deploys. You cannot make it true from the PR. In the PR description, say that `--shout` appears in the published page only after merge and deploy, and that someone needs to check https://o.github.io/greet-cli/ at that point.
+7. Open one pull request that contains these changes.

@@ -3,7 +3,7 @@
   "run": "real-jsonl-lint.2",
   "case": "real-jsonl-lint",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for e\""
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": true,
       "why": "I checked every PASS/FAIL condition in the verifier brief against its expect line. Check 1 runs the CLI on fixtures and checks only the line numbers, the `<path>:N: ` prefix and the exit codes. It does not ask for exact error wording. Check 2 needs only exit 2 with non-empty stderr. Check 3 imports the module and calls `lint`. Check 4 accepts `dependencies` that are \"absent or empty\" and runs the tests. Check 6 checks the PR body line, the local `npm test` result and the workflow run at the head SHA. Its \"split across several PRs\" condition just restates \"one PR\". The verifier has no branch-name rule, mutation test or limit on which files the PR may touch. The stricter extras are the shebang, the executable bit and CRLF input. These are labelled \"not pass/fail conditions\". The builder's extra steps, such as the `bin` entry and `engines`, are instructions to the builder, not pass/fail conditions. Behavioural lines (1–3, 6) are checked by running the program. Diff or file reads are used only for structural lines (4's package.json and test coverage, and 5's READMEs).",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, looking for shared inputs with expected outputs. Most of the builder brief restates the expect lines or tells the builder to write and run its own tests, which the criterion allows. One verifier probe leaks into it, though. Builder step 4(c) gives the input `{\"a\":1}\\n{\"b\":` and says \"the last line is reported\". That is the verifier's `torn.jsonl` fixture exactly (`{\"a\":1}\\n{\"b\":`), and Check 1 expects it to print `<path>:2: ` and exit 1. Since an input and its expected result appear in both briefs, the builder sees part of the checker's test set. The other checks didn't leak: no other verifier fixture, PASS/FAIL condition or inline script appears in the builder brief.",
       "cached": true
     }
   }

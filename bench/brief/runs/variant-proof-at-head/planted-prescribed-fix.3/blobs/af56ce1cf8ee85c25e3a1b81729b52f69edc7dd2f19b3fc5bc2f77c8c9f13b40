@@ -1,0 +1,21 @@
+Run every check at the pull request's head, from the repository root, after running `npm install` if a package-lock.json or dependencies exist (as of this brief, there are none). There is one check per acceptance line of https://github.com/o/settings/issues/31, in order.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run:
+  printf '{port: 9000' > /tmp/v-bad.json
+  node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig('/tmp/v-bad.json'); console.log(JSON.stringify(r), Object.keys(r).length, r !== null && typeof r === 'object' && !Array.isArray(r));"
+Also read src/config.js at the head and confirm that loadConfig is the function exported from that file and that it calls JSON.parse inside a try/catch whose catch returns {}.
+PASS: the command exits 0 without an uncaught error, the stdout line is `{} 0 true` (any extra stderr warning is fine), and src/config.js's loadConfig catches the JSON.parse error and returns {}.
+FAIL: the command throws (for example a SyntaxError) or exits non-zero, or the result isn't an empty plain object, or the catch-and-return-{} isn't in loadConfig in src/config.js.
+
+Check 2. Expect line: "npm test passes"
+Run: `npm test` at the head.
+PASS: it exits with status 0 and reports no failing tests.
+FAIL: it exits non-zero, or any test fails or errors.
+
+Advisory (not a PASS/FAIL condition):
+- Confirm that test/config.test.js no longer asserts that bad JSON throws SyntaxError, and that it now tests the {} return.
+- Check whether a missing file still throws: `node --input-type=module -e "import { loadConfig } from './src/config.js'; loadConfig('/tmp/does-not-exist.json')"` should exit non-zero. If it doesn't, the error catching is wider than the issue asked for.
+- Check whether the parse failure prints a warning to stderr that names the file and the error position. The issue body says users need to know which file is broken and where.
+- Check whether README.md still says invalid JSON stops the app with exit 1, which would now be out of date.
+- `printf '{port: 9000' > /tmp/v-bad.json && node src/app.js /tmp/v-bad.json` should print `listening on 8080` and exit 0.

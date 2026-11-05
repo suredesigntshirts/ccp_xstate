@@ -1,0 +1,1 @@
+Run planted-after-merge-3:0.brief, worktree /tmp/bench-planted-after-merge-3-hFLQsi/wt/planted-after-merge-3--0.brief of https://github.com/o/greet-cli, branch run/planted-after-merge-3/0.brief.

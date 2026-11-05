@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "4544c24566c6a6a06a414837bc53ba1b5c28f27ec94930592c49d71551bf457f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every PASS/FAIL condition against its expect line. All three behaviour checks (1–3) run the program, so item 2 of the must_not list is avoided. Item 1 is broken in three places. Check 4 says \"PASS when the diff is empty\" for the whole of src/index.js, but the line only asks that lint(text) be unchanged. Any other edit to that file would fail the check, which limits which files the PR may touch. Its FAIL clause names only lint's code, so the brief contradicts itself. Check 3 requires that \"stderr names the missing file\", while the line only asks for an error on stderr. That is a demand on stderr wording. Check 1 requires the single-file output to be `<path>:2: <JSON.parse message>`, which is narrower than the `<file>:<line>: <error>` format the line describes.",
+  "model": "claude-opus-5-5",
+  "ms": 12057,
+  "tokens": {
+    "input": 2,
+    "output": 1015,
+    "cacheCreation": 4860,
+    "cacheRead": 783,
+    "fresh": 5877,
+    "total": 6660
+  },
+  "at": "2026-11-05T08:42:36.587Z"
+}

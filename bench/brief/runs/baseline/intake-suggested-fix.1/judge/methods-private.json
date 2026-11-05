@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "7bc8294f95ddee99dff5008c856e53d20d814f596f83990421dafaf4720d45a1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with each verifier check. Step 6 has the builder run the commands from proofs 1 and 4 (`printf '{\\n  \"port\": 9000,...' > $d/c.json; node src/app.js $d/c.json` and the ok.json run) plus `npm test`. The criterion allows proof commands and the repo's own tests. The expected results it gives there only repeat expect lines 1, 2 and 4, which are the bar. The verifier's own probes do not appear in the builder brief: the `wc -c`/`grep -F` stdout and stderr checks, the Check 3 `node --input-type=module` try/catch script, and the base-checkout procedure (`git checkout <base> -- src`). Step 4 tells the builder to write its own tests from the expect-line inputs, which is allowed. The idea of computing the location from `at position N` shows up in the builder brief as an implementation instruction and in the verifier brief only as advice, so it is not a PASS/FAIL condition. No verifier PASS/FAIL wording is copied into the builder brief.",
+  "model": "claude-opus-5-5",
+  "ms": 13133,
+  "tokens": {
+    "input": 2,
+    "output": 1031,
+    "cacheCreation": 5412,
+    "cacheRead": 783,
+    "fresh": 6445,
+    "total": 7228
+  },
+  "at": "2026-11-05T08:28:37.660Z"
+}

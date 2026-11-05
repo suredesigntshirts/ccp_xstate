@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "94688da6419eb8baa42bbfa106d5bab180c347043fde2f552c7f0967b2dbd39a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. `npm test` maps to the script `node --test`, which exists, and test/config.test.js is tracked. The builder edits only tracked files: src/config.js, test/config.test.js and README.md. In the verifier, `printf '{port: 9000' > /tmp/bad-config.json` is valid shell, and the quoting is sound. `node --input-type=module -e \"import { loadConfig } from './src/config.js'; ...\"` uses real Node flags and valid JavaScript. It runs from the repository root, so the relative path resolves to src/config.js. A named import works whether config.js uses ESM exports or CommonJS `exports.loadConfig`. The conditional `npm install` is a valid command. The advisory checks give no exact commands to run. I found no missing files, wrong arguments or syntax errors.",
+  "model": "claude-opus-5-5",
+  "ms": 10363,
+  "tokens": {
+    "input": 2,
+    "output": 648,
+    "cacheCreation": 2656,
+    "cacheRead": 783,
+    "fresh": 3306,
+    "total": 4089
+  },
+  "at": "2026-11-05T08:40:37.765Z"
+}

@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-missing-line.2",
+  "case": "planted-missing-line",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with its expect line. Check 2 is fine: \"documents --tsv\" reasonably requires that README.md mention the flag and say what it does. Check 1 asks for more than the expect line's words. Its PASS condition requires that \"both commands exit with status 0\", but the line says nothing about exit status. It also requires \"byte-identical stdout\", while the line only asks for \"the same JSON array\", so output with different whitespace but the same array would wrongly fail. Finally, it ties the result to the exact literal `[{\"a\":\"1\",\"b\":\"2\"}]` instead of to whatever the CSV run prints. These stricter tests belong under Advisory, not in PASS or FAIL. The Advisory section itself is placed correctly, but the extra conditions in Check 1 mean the criterion is not met.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository. They name only bin/csv2json.js, test/csv.test.js, README.md and package.json, and all four are tracked files. `npm test` maps to the script \"node --test\". Each pipeline, such as `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv`, is valid shell: printf turns the \\t and \\n escapes inside single quotes into tabs and newlines. The `--tsv` argument is the flag that step 1 of the builder brief adds. In the README, `node bin/csv2json.js --tsv < table.tsv` is example text to document, not a command to run. The JavaScript the briefs describe, `parse(text, '\\t')`, fits the signature of the existing export `parse(text, sep = ',')`. I found no command that names a missing file or tool, or that uses a bad argument or bad syntax.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each of the three must_catch items against the two briefs. Item 2 is a borderline pass.\n(1) Builder brief: it keeps CSV behaviour the same (\"runs without the flag must behave exactly as before\") and keeps tests passing (\"Run `npm test` and make sure every test passes\"). Met.\n(2) Verifier brief: the npm test advice and the CSV no-regression check sit only under \"Advisory (not part of PASS or FAIL)\", which says to \"Run `npm test`\" and \"Confirm that running without --tsv still behaves as before\". Neither appears in any PASS or FAIL condition. The brief never says in so many words that no expect line covers these. I counted it as met because the Advisory heading keeps them apart from the per-line checks.\n(3) Check 1 feeds two tables, each as TSV and as CSV, and requires byte-identical stdout for each pair. Met.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the verifier brief against both must_not items. It has exactly two checks, and each one maps to an expect line: Check 1 covers the --tsv output, and Check 2 covers the README. Neither PASS nor FAIL condition mentions npm test or the CSV tests. Check 1 passes on exit status 0, byte-identical output and the expected JSON array. Check 2 passes when README.md mentions `--tsv` and says what it does. The verifier does run npm test, but only in a section labelled \"Advisory (not part of PASS or FAIL)\". That doesn't decide the verdict, so I don't count it as a third check, though a stricter grader might. The builder brief does ask the builder to run `npm test`. Neither must_not item covers builder steps, so that doesn't break the criterion.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, and the builder brief carries the verifier's probe. Builder step 4 tells it to run `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` and `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` and check that both print the same output. That is the same command pair, with the same inputs, as verifier Check 1a. Builder step 2 also gives the same input and expected output, `'[{\"a\":\"1\",\"b\":\"2\"}]\\n'`, that Check 1a's PASS condition uses. The expect line names only `node bin/csv2json.js --tsv`. It doesn't name these inputs or this expected output, so the allowance for commands named by an expect line doesn't cover them. Telling the builder to run `npm test` and write its own tests is allowed, but handing it the verifier's exact inputs and expected output is not.",
+      "cached": true
+    }
+  }
+}

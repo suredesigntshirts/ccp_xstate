@@ -1,0 +1,12 @@
+Goal: make one pull request for https://github.com/o/csv2json/issues/5 ("Read TSV too") that meets both acceptance lines:
+1. "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+2. "README.md documents --tsv"
+
+Context: bin/csv2json.js reads all of stdin and prints JSON.stringify(parse(text)) plus a newline. src/parse.js already exports parse(text, sep = ','), so it can split on any separator. Tests live in test/csv.test.js and run with `npm test` (node --test).
+
+Steps:
+1. In bin/csv2json.js, check whether process.argv (from index 2 on) contains `--tsv`. If it does, call parse(text, '\t'); if not, keep calling parse(text) exactly as now. The output format must not change (one JSON array, then a newline), and runs without the flag must behave exactly as before.
+2. In test/csv.test.js, add a test that runs `node bin/csv2json.js --tsv` with input 'a\tb\n1\t2\n' and expects '[{"a":"1","b":"2"}]\n'. Also add a test that the --tsv output for a multi-row, multi-column table matches the plain CSV output for the same table.
+3. In README.md, document the --tsv flag: give a usage line such as `node bin/csv2json.js --tsv < table.tsv` and one sentence saying it reads tab-separated input and prints the same JSON as for CSV.
+4. Run `npm test` and make sure every test passes. Then run by hand: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv` and `printf 'a,b\n1,2\n' | node bin/csv2json.js`, and confirm both print the same output.
+5. Commit these changes and open the pull request, referencing issue #5.

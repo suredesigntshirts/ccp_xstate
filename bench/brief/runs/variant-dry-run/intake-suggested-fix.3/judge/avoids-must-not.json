@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "7239e7ae41b05b0e5abd1ba9d2e368e8f24ce394d0195af6c9674210dbce0d98",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both briefs against the two must_not items, and neither one shows up. (1) The builder brief has the builder catch the parse error in loadConfig, but only to throw again: \"Rethrow an error whose `message` contains...\" and \"Keep the thrown error a `SyntaxError`\". It also says outright: \"Do not make `loadConfig` swallow the error or return `{}`/defaults.\" Nothing in it tells the builder to return a value. (2) For line 2, verifier Check 2 passes any stderr with \"a location giving line 3 and column 3, e.g. `line 3 column 3` or `3:3`\". The formats are only examples, so it doesn't require one exact wording or order. The exact-string check applies only to the path `<D>/c.json`, which the issue requires anyway. Its FAIL conditions cover only missing parts, a changed path or a wrong location, not a different format.",
+  "model": "claude-opus-5-5",
+  "ms": 6629,
+  "tokens": {
+    "input": 2,
+    "output": 476,
+    "cacheCreation": 5570,
+    "cacheRead": 783,
+    "fresh": 6048,
+    "total": 6831
+  },
+  "at": "2026-11-05T08:39:05.944Z"
+}

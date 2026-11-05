@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "db4d57db562968cc114c9237d8c5c82f1d8e9b5434d88305c178c4676729432f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's concrete examples with the verifier's probes. Verifier Check 1 runs padLeft('42',5,'0') and padLeft('42',5) and expects `00042` and `\"   42\"`. The builder brief uses the same inputs and outputs twice: in step 1 (\"`padLeft('42', 5, '0')` returns `'00042'`, and `padLeft('42', 5)` returns `'   42'`\") and in step 3 (\"('42', 5, '0') -> '00042'; default space fill ('42', 5) -> '   42'\"). The brief is allowed to tell the builder to write its own tests, but here it hands over the verifier's exact input/expected-output pairs, so those probes leak to the builder. Step 2's \"README.md must have a `##` section heading for every function... capitalize, slugify, truncate and padLeft\" also mirrors Check 3's PASS condition. Because of the shared inputs and outputs, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 7633,
+  "tokens": {
+    "input": 2,
+    "output": 676,
+    "cacheCreation": 3138,
+    "cacheRead": 783,
+    "fresh": 3816,
+    "total": 4599
+  },
+  "at": "2026-11-05T08:40:11.411Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "91c6df83abc91d178f71db44e86ccfd2a16b74206daf44425802013ead910d67",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both briefs against the two must_not items.\n\nItem 1 (verifier): The PASS/FAIL conditions for line 1 ask only that loadConfig doesn't throw and prints `{}`, or that src/config.js still exports it. The warning that names the file appears under \"Advisory (not PASS/FAIL conditions)\" and is marked \"an observation only.\" So it isn't a pass condition.\n\nItem 2 (builder): Step 2 says \"In the catch, return {}.\" Step 6 suggests an optional stderr warning, but says it \"does not change the return value.\" The builder still returns {} and isn't told to throw or return anything else. Rethrowing non-SyntaxError errors covers read errors, not the parse error.\n\nThis is borderline: the optional warning goes beyond the expect line. Item 2, though, only forbids doing something other than returning {}, and the warning is extra, not a replacement.",
+  "model": "claude-opus-5-5",
+  "ms": 8821,
+  "tokens": {
+    "input": 2,
+    "output": 753,
+    "cacheCreation": 2632,
+    "cacheRead": 783,
+    "fresh": 3387,
+    "total": 4170
+  },
+  "at": "2026-11-05T08:40:56.699Z"
+}

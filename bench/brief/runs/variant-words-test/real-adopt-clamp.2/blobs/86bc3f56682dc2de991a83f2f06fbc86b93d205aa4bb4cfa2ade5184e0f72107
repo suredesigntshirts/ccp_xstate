@@ -1,0 +1,13 @@
+Make one pull request that meets every line of the issue's expect list:
+- math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+- clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+- README.md documents every function math.js exports
+- npm test passes
+
+Steps:
+1. Read math.js, README.md, package.json and test/math.test.js. math.js currently exports add, subtract and multiply via `module.exports = { add, subtract, multiply };`. The tests run with `node --test` (`npm test`).
+2. In math.js add a function `clamp(x, lo, hi)`, with a short doc comment like the others. If `lo > hi` it throws a `RangeError` with a clear message. Otherwise it returns `lo` when `x < lo`, `hi` when `x > hi`, and `x` otherwise. Keep `lo === hi` valid (it returns that value). Add `clamp` to `module.exports` and keep the existing exports.
+3. In README.md's `## API` section, document every function math.js exports. Note that `subtract` is exported but has no README entry right now, so add a `### subtract(a, b)` entry as well as a `### clamp(x, lo, hi)` entry. Follow the style of the existing entries: a heading with the signature, one sentence on what it returns, and a short example. The clamp entry should say it throws a RangeError when lo is greater than hi. Leave the existing add and multiply entries as they are.
+4. In test/math.test.js add tests for clamp: a value below the range returns lo, above returns hi, inside returns x, the boundary values, lo === hi, and `assert.throws(() => clamp(5, 10, 1), RangeError)`.
+5. Run `npm test` and make sure every test passes. Also check that each name in `Object.keys(require('./math.js'))` appears in README.md.
+6. Commit and open the pull request, referencing https://github.com/o/r/issues/23.

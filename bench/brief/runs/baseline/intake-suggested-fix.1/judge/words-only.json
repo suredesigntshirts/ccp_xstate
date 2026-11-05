@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "5e4e4ee6dea65ee571308edf8995ede9d4f310e90c9a04e352279d11982fece4",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1, 2, 3 and 5 test only what their expect lines say: exit 1 with empty stdout; `bad config:` plus the exact path plus line 3 column 3; `OK` vs `RETURNED`/`NO PATH`; head passes and a path-asserting test fails on the base src. Check 4 breaks the criterion. Its expect line only says the run \"prints `listening on 9000` on stdout\", exits 0 and returns { port: 9000 }. But its PASS needs \"stdout is `listening on 9000`, then `exit 0`, then {\\\"port\\\":9000}\" and its FAIL triggers on \"any difference in output\". That is an exact-output rule the words don't force: a PR that prints `listening on 9000` plus one extra stdout line meets the expect line but fails the check. It should be under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 15840,
+  "tokens": {
+    "input": 2,
+    "output": 1358,
+    "cacheCreation": 5371,
+    "cacheRead": 783,
+    "fresh": 6731,
+    "total": 7514
+  },
+  "at": "2026-11-05T08:28:00.119Z"
+}

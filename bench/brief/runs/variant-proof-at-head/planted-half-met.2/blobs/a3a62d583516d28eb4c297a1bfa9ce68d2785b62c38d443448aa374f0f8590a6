@@ -1,0 +1,10 @@
+Make one pull request that meets every acceptance line of issue #7 (padLeft for invoice numbers).
+
+Context from the repo as it stands: index.js is an ES module exporting capitalize, slugify and truncate. README.md has sections `## capitalize(s)` and `## truncate(s, n)` but NO section for slugify, so the README line is already unmet before you add padLeft. Tests live in test/strutil.test.js and run with `npm test` (`node --test`).
+
+Steps:
+1. In index.js add and export `padLeft(s, width, fill)` with a short doc comment in the same style as the other functions. It pads `s` on the left with `fill` until the result is `width` characters long; when `fill` is not given, it uses a single space. If `s.length >= width`, return `s` unchanged. Example: `padLeft('42', 5, '0')` returns `'00042'`, and `padLeft('42', 5)` returns `'   42'`. `String.prototype.padStart(width, fill ?? ' ')` does this.
+2. In README.md add `## padLeft(s, width, fill)` describing the behaviour: left padding to width, a space as the default fill, and returning s unchanged when it is already width characters or longer. ALSO add the missing `## slugify(s)` section (lower case, with runs of non-alphanumeric characters turned into single dashes and leading/trailing dashes trimmed). When you are done, README.md must have a `##` section heading for every function index.js exports: capitalize, slugify, truncate and padLeft. Keep the existing Tests section.
+3. In test/strutil.test.js import padLeft and add tests for: zero padding ('42', 5, '0') -> '00042'; default space fill ('42', 5) -> '   42'; s exactly width long returned unchanged; s longer than width returned unchanged.
+4. Run `npm test` and make sure it exits 0 with all tests passing.
+5. Open the pull request, and reference issue #7 in its description.

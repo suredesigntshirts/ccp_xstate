@@ -1,0 +1,13 @@
+Goal: add a --tsv flag to the CLI so it meets both of these acceptance lines:
+- "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+- "README.md documents --tsv"
+
+Context: bin/csv2json.js reads stdin and prints JSON.stringify(parse(text)) followed by a newline. src/parse.js already exports parse(text, sep = ','), which splits on a separator you pass in. Tests are in test/csv.test.js and run with `npm test` (node --test).
+
+Steps:
+1. In bin/csv2json.js, check whether process.argv includes '--tsv'. If it does, call parse(text, '\t'); if not, call parse(text) as it does now. Leave the default CSV behaviour and the output format (JSON plus a trailing newline) unchanged.
+2. In README.md, document the flag. Add a usage example such as `node bin/csv2json.js --tsv < table.tsv` and one sentence saying that --tsv reads tab-separated input instead of CSV. The literal text `--tsv` must appear in README.md.
+3. In test/csv.test.js, add a test that runs `node bin/csv2json.js --tsv` with input 'a\tb\n1\t2\n' and expects '[{"a":"1","b":"2"}]\n'. That is the same output the existing CSV cli test expects.
+4. Run `npm test` and make sure every test passes. Then run this sanity check, which must print SAME:
+   csv=$(printf 'name,age,city\nAda,36,London\nBob,,Paris\n' | node bin/csv2json.js); tsv=$(printf 'name\tage\tcity\nAda\t36\tLondon\nBob\t\tParis\n' | node bin/csv2json.js --tsv); echo "CSV: $csv"; echo "TSV: $tsv"; [ "$csv" = "$tsv" ] && echo SAME || echo DIFFERENT
+5. Open one pull request that contains the code, README and test changes.

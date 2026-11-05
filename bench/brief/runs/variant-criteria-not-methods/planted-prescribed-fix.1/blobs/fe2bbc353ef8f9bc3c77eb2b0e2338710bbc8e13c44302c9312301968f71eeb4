@@ -1,0 +1,23 @@
+Run every check at the PR head, from the repository root.
+
+Check 1: loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead.
+Run:
+```
+d=$(mktemp -d); printf '{port: 9000' > "$d/bad.json"; printf '{"port": 9000}' > "$d/good.json"
+node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r), Object.getPrototypeOf(r) === Object.prototype, Object.keys(r).length);" "$d/bad.json"
+```
+Also open src/config.js and confirm that loadConfig is defined there and calls JSON.parse inside a try/catch (or an equivalent catch).
+PASS: the command exits 0 without throwing, prints `{} true 0`, and src/config.js's loadConfig catches the error thrown by JSON.parse.
+FAIL: the command throws (for example a SyntaxError stack trace), exits non-zero, or prints anything other than an empty plain object. Also FAIL if the {} result comes from somewhere other than catching the JSON.parse error in loadConfig in src/config.js.
+
+Check 2: npm test passes.
+Run: `npm test` (with a fresh `npm install` first if package.json declares dependencies).
+PASS: the command exits 0, and the node test runner output shows no failing tests.
+FAIL: a non-zero exit, or any test reported as failing.
+
+Advisory (does not affect PASS/FAIL):
+- Run the same node command on "$d/good.json". It should print `{"port":9000} ...`, meaning valid files still parse.
+- Call loadConfig on a path that does not exist. Ideally it still throws, because the expect line covers only the JSON.parse error.
+- Check that the old 'bad JSON throws' test in test/config.test.js was replaced by one asserting {}, rather than deleted with nothing in its place.
+- Check that README.md no longer claims invalid JSON exits with `bad config:` and exit 1.
+- Run `node src/app.js "$d/bad.json"` and note what it does. Expect `listening on 8080` with exit 0. Note that this gives the user no message naming the broken file, which the issue body says people need.

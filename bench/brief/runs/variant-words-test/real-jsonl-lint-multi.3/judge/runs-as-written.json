@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "e5c733e6a6711a7582607585d9dbfd85503d9aa9a238b814e0d2cc5f9c89d38e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs against the 15 tracked files and the scripts. Most hold up: `npm test` at the root and `node --test` in the package, `npm ci` (package-lock.json exists), `readFileSync(0,'utf8')`, the `spawnSync` `input` option, the `printf` pipes, `gh pr view/checks` and `git diff` with placeholders.\n\nThe verifier's Checks 1–3 fail as written. It says to \"Make temporary files in a scratch directory outside the repo\" and that \"BIN is packages/jsonl-lint/bin/jsonl-lint.js\", a path relative to the repo root. It then runs `node BIN a.jsonl b.jsonl c.jsonl`. From the scratch directory, BIN does not resolve. From the repo root, a.jsonl and missing.jsonl's neighbours are not found. Check 1 also expects `a.jsonl:2` exactly as typed, which rules out swapping in absolute file paths. In neither working directory do these commands run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 9685,
+  "tokens": {
+    "input": 2,
+    "output": 901,
+    "cacheCreation": 5012,
+    "cacheRead": 783,
+    "fresh": 5915,
+    "total": 6698
+  },
+  "at": "2026-11-05T08:41:54.757Z"
+}

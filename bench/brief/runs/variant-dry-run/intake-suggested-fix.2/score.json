@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "intake-suggested-fix.2",
+  "case": "intake-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 5 lines quoted in order, checks numbered 1 to 5"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5 not quoted word for word in the builder brief: \"Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 tests only `exit 1` and empty stdout. The stderr greps run there are used only in Check 2. Check 2 tests `bad config:`, the exact path, and line 3 / column 3, and it accepts any clear wording for the location. Check 3 tests only that the call throws and that the message includes the path (`OK` vs `RETURNED`/`NO PATH`). Check 4 requires `listening on 9000`, exit 0, and a deepEqual against `{ port: 9000 }`. Its \"any other stdout\" reads as stdout that differs from the expected line, which the expect line covers. Check 5 requires `# fail 0` at the head and at least one path-asserting test that is `not ok` on the base. The stricter items are under \"Advisory (not pass/fail)\": whether line and column are computed by the repo, swallowed errors, ENOENT changes, and absolute paths. No PASS or FAIL condition adds an extra requirement.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the six tracked files and the `node --test` script. The paths they use (`src/app.js`, `src/config.js`, `test/`, `npm test`) all exist.\n\n- **Shell syntax:** the `printf` setups, redirections and the `grep -qF` / `grep -Eq` patterns in single quotes are valid. `$d` expands correctly inside the double-quoted `node --input-type=module -e \"...\"` scripts.\n- **JavaScript:** the import of `loadConfig` from `'./src/config.js'`, the try/catch and the `assert.deepEqual` are valid ESM. This matches the issue's own proofs.\n- **Check 5:** it uses `git worktree add --detach \"$w\" \"$B\"` with a fresh path, then `rm`/`cp test`, `npm test` piped to grep, and `git worktree remove --force`. These are valid git commands. On Node v22, piped output uses TAP format, so the `# pass|fail` and `not ok` lines will be there for grep to match.\n- **Placeholder:** `B=<base commit hash>` is a labelled value the verifier is told to fill in, not a broken command.\n\nI found no missing tools, bad arguments or syntax errors.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the builder brief, and both are handled.\n\nItem 1: The builder brief states the non-goal directly: \"Do NOT make `loadConfig` catch the error and return `{}` or the defaults\". It also gives the reason: doing so \"would hide the typo and break the README's documented exit 1\". That covers both swallowing the error and returning defaults.\n\nItem 2: The brief lists `test/config.test.js` under relevant files. Step 1 then says to \"Keep the thrown error a `SyntaxError` (for example `new SyntaxError(msg, { cause: err })`) so the existing test `bad JSON throws` still passes.\" This names the existing test that expects a SyntaxError on bad JSON. It also makes clear that wrapping the error in a different type would change that test's result.\n\nThe verifier brief doesn't repeat item 2, but the criterion allows either brief to carry it.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Neither must_not item shows up in the briefs. First item: the builder brief does have the builder catch the error, but only to throw it again: \"Wrap only the `JSON.parse` call in try/catch. On a parse error, throw a new error…\". It also forbids the bad fix outright: \"Do NOT make `loadConfig` catch the error and return `{}` or the defaults\". So loadConfig never catches the error and returns a value. Second item: the verifier's Check 2 isn't tied to one exact format. The grep for HAS_LOC accepts both `line 3 … column 3` and `:3:3`. The PASS rule also says \"HAS_LOC counts, and so does any other clear line-3/column-3 wording you can see in the printed stderr.\" It fails only when the prefix, the path or the line/column is missing, not when the wording or order is different. Check 1's FAIL conditions cover only the exit code and stdout.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared every command and expected result in the builder brief against the verifier brief's checks. The verifier-only probes are absent from the builder brief: the grep markers (HAS_PREFIX/HAS_PATH/HAS_LOC), the `HAS_LOC` regex, the proof-3 inline `loadConfig` script, the `assert.deepEqual` script and the git-worktree base run. The builder's step 5 commands are the issue's own proof 1 and proof 4 commands, plus `npm test`. Its \"copy your test/ onto the original src/\" step is proof 5. All of these are allowed. Its expected results (\"exit 1\", \"nothing on stdout\", `listening on 9000`, line 3/column 3) restate the expect lines. The \":3:3\" hint matches the issue proof's \"e.g. `3:3`\". The worked offset example (\"position is 20… line 3, column 3\"; \"{port: 9000… line 1, column 2\") is guidance for the builder and does not appear in the verifier brief. Asking the builder to write tests is allowed. No PASS/FAIL condition or verifier probe leaks into the builder brief.",
+      "cached": true
+    }
+  }
+}

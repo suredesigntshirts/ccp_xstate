@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "0d6e353b924dfbc4494cd42df95f8936f05d980f35835d1cfd5fe096c676c08e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier brief's checks. Step 3 of the builder brief tells the builder to write a test that \"asserts loadConfig on a file containing `{port: 9000` deep-equals {}\". That is the same input and expected output the verifier uses in Check 1, which writes \"invalid JSON (for example `{port: 9000`)\" and needs `{}` to PASS. The rule allows telling the builder to write its own tests, but here the builder is handed the checker's exact probe, so the brief gives away the method, not just the bar. Step 3 also suggests a valid-JSON test, which matches the verifier's advisory valid-JSON probe. Steps 2, 4, 5 and 6 are fine: running `npm test` is allowed because an expect line names it. The leaked `{port: 9000` → {} probe breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 8958,
+  "tokens": {
+    "input": 2,
+    "output": 759,
+    "cacheCreation": 2664,
+    "cacheRead": 783,
+    "fresh": 3425,
+    "total": 4208
+  },
+  "at": "2026-11-05T08:41:35.651Z"
+}

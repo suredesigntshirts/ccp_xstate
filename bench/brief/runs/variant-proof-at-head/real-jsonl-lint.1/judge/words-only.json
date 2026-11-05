@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "06845167638a8f0850bfb6cb1a258fb4b37aa03e22ca086d9abceb703ceec3e5",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1 to 5 stay within those words. Line numbers, exit codes, stderr output, the package.json fields and the five listed test cases are all required by the expect lines. Strict extras such as the shebang, CRLF handling and the lockfile are correctly placed under Advisory. Check 6 goes further than its line. Its PASS requires \"exactly one open PR\". The expect line only says \"one PR\", so a merged or closed PR would fail a condition the words do not force. It also makes `npm ci` a FAIL condition (\"`npm ci` or `npm test` failing\"), but the expect line only requires npm test and the workflow to be green. These stricter tests should sit under Advisory, not in PASS or FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 10713,
+  "tokens": {
+    "input": 2,
+    "output": 951,
+    "cacheCreation": 5270,
+    "cacheRead": 783,
+    "fresh": 6223,
+    "total": 7006
+  },
+  "at": "2026-11-05T08:42:20.047Z"
+}

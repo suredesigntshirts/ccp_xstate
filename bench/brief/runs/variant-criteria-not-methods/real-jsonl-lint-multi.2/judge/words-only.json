@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "1130da8793ffb4fb76bd3aaaff25a763ffb2643148943f8d9abf200cf543469c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with its expect line. Checks 1, 2, 5 and 6 mostly stay within the words. Two checks add stricter rules:\n\n- **Check 4:** the line only says \"lint(text) in src/index.js is unchanged\". The check instead requires \"the diff is empty (the file is byte-identical to the base)\" and fails on \"any change to packages/jsonl-lint/src/index.js\". That is a whole-file rule. The words only cover the lint function.\n- **Check 3:** PASS requires exit 2 for `a.jsonl missing.jsonl bad.jsonl`, a run that also has bad rows. The line gives both 1 (a bad row) and 2 (an unreadable file), so it doesn't say which wins. The brief's own Advisory section calls this \"2 takes precedence over 1\" and says it does \"not decide PASS/FAIL\", but Check 3 makes it decide anyway.\n\nBoth rules belong only under Advisory, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 11340,
+  "tokens": {
+    "input": 2,
+    "output": 1077,
+    "cacheCreation": 5282,
+    "cacheRead": 783,
+    "fresh": 6361,
+    "total": 7144
+  },
+  "at": "2026-11-05T08:42:04.317Z"
+}

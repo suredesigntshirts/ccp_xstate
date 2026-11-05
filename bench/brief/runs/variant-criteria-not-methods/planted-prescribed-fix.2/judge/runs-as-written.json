@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "737d5ee3a3e6a288603aeebff397ec539cde25227fb22a40bef887a66d9d7180",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. `npm test` maps to the existing script `\"test\":\"node --test\"`, and that will pick up test/config.test.js. The files the briefs name all exist at this commit: src/config.js, src/app.js, test/config.test.js and README.md. The verifier's `node --input-type=module -e \"import { loadConfig } from './src/config.js'; ... process.argv[1] ...\" <tempfile>` is valid. With `-e`, the first extra argument is process.argv[1], and the relative import resolves from the repository root. The JavaScript inside the double quotes is valid and uses only single quotes, with no `$` or backticks. `node src/app.js <badfile>` and the temp file are placeholders the verifier fills in at run time. `npm install` only runs if there are dependencies. One small risk: package.json may not set a module type, but Node can import either module style here, so I found no command that would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 11523,
+  "tokens": {
+    "input": 2,
+    "output": 1031,
+    "cacheCreation": 2682,
+    "cacheRead": 783,
+    "fresh": 3715,
+    "total": 4498
+  },
+  "at": "2026-11-05T08:41:04.631Z"
+}

@@ -1,0 +1,12 @@
+Goal: one pull request that adds padLeft to strutil and makes README.md document every exported function. It must meet all of these lines:
+- index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+- padLeft returns s unchanged when s is already width characters or longer
+- README.md has a section for every function index.js exports
+- npm test passes
+
+Steps:
+1. Read index.js, README.md, package.json and test/strutil.test.js. The package is ESM ("type": "module"), and `npm test` runs `node --test`.
+2. In index.js, add and export `padLeft(s, width, fill = ' ')`, with a short doc comment like the other functions have. It returns s with fill added on the left until the result is width characters long. When s.length >= width, it returns s unchanged. Examples: padLeft('42', 5, '0') === '00042', padLeft('42', 5) === '   42', padLeft('12345', 3, '0') === '12345', padLeft('abc', 3, '0') === 'abc'. If fill has more than one character, the result must still be exactly width characters long (for example, use String.prototype.padStart). Leave the existing functions unchanged.
+3. README.md: index.js already exports capitalize, slugify and truncate, but README.md has no section for slugify right now. Add a `## slugify(s)` section that describes what it does (lower case, with runs of non-alphanumeric characters turned into single dashes and leading and trailing dashes trimmed). Add a `## padLeft(s, width, fill)` section that describes the padding, the space default and the unchanged-when-long-enough behaviour, and shows an example such as 42 -> 00042. Match the style of the existing sections, and put both above the `## Tests` section. Then check that every function exported from index.js has its own `##` heading that names it.
+4. In test/strutil.test.js, import padLeft and add tests: zero padding, the default space fill, s exactly width long, and s longer than width.
+5. Run `npm test` and make sure it passes. Then commit and open the pull request, and reference https://github.com/o/strutil/issues/7 in it.

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9eac7920be2e9edf1691e6ef96e8f32bf0cedb191691365b1b7d95725812e4c4",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all three must_catch items. Item 1 holds: the builder brief says \"keep calling parse with ',' so the CSV output does not change\" and \"Run `npm test` and confirm every test passes\". Item 3 holds: Check 1 pipes the same name/age/city table through `--tsv` and through CSV mode, then compares the two outputs with `cmp`. Item 2 is only partly met. The verifier brief does put `npm test` and unchanged CSV behaviour under \"Advisory (does not change PASS or FAIL)\". But it never says that no expect line covers CSV behaviour or `npm test`, which the item requires. It also turns `npm test` into a step (\"First run `npm test` once and note the result\"), when the item asks for it to be offered as advice. The verifier is never told why these items are advisory, so item 2 fails.",
+  "model": "claude-opus-5-5",
+  "ms": 9793,
+  "tokens": {
+    "input": 2,
+    "output": 903,
+    "cacheCreation": 2782,
+    "cacheRead": 783,
+    "fresh": 3687,
+    "total": 4470
+  },
+  "at": "2026-11-05T08:40:41.919Z"
+}

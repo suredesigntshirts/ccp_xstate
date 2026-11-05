@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "c4a9d9cb7f84075f18b9cd9de8211b185a86c0dba0eaf6160b90b11d9db4d74d",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS/FAIL conditions with the words of its expect line. Checks 1, 2 and 4 hold. Check 1 only tests that clamp is exported and clamps values. Check 2 only tests that a RangeError is thrown when lo > hi. Check 4 only needs `npm test` to exit 0. Check 3 breaks the criterion. Its PASS needs \"the script reports nothing missing\", and the script counts a function as documented only if README.md matches the regex `\\bname\\s*\\(`, meaning the name followed by a parenthesis. \"README.md documents every function math.js exports\" does not require that format. For example, a README entry like \"subtract — returns a minus b\" documents subtract but would fail. That is an exact-wording rule the words don't force, and it sits in a PASS/FAIL condition instead of under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 8921,
+  "tokens": {
+    "input": 2,
+    "output": 683,
+    "cacheCreation": 3310,
+    "cacheRead": 783,
+    "fresh": 3995,
+    "total": 4778
+  },
+  "at": "2026-11-05T08:41:18.712Z"
+}

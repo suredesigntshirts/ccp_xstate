@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "e8f2532a6616882492eae8e63ba313500d4bbe688583c4dc405e2146b7da2710",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The builder brief gives the requirements but none of the verifier's checks. The verifier's fixtures (clean.jsonl `{\"a\":1}\\n{\"b\":2}\\n`, bad.jsonl with `{oops` on line 3, torn.jsonl, multi.jsonl) appear nowhere in the builder brief. Neither do its inline `node --input-type=module -e` lint probe, the package.json `node -e` field dump, the `grep -n jsonl-lint README.md` check or the `gh pr` commands. The builder brief only restates the expect lines as specs, such as \"exit 2\" and \"print a message to stderr\", and tells the builder what its own tests should cover (\"check stderr is non-empty and stdout empty for exit 2\"). Writing its own tests is allowed. The commands it names, `npm install`, `npm ci` and `npm test`, are the repo's own tests or come from expect line 6, which is also allowed. Some advisory points overlap, such as CRLF handling and no phantom error from a trailing newline. In the builder brief these are implementation specs, not shared probes, and in the verifier brief they are not pass/fail.",
+  "model": "claude-opus-5-5",
+  "ms": 9022,
+  "tokens": {
+    "input": 2,
+    "output": 734,
+    "cacheCreation": 4947,
+    "cacheRead": 783,
+    "fresh": 5683,
+    "total": 6466
+  },
+  "at": "2026-11-05T08:43:13.981Z"
+}

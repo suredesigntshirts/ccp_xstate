@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "333e330e312f41d3b74d65d74466b081b8d16d1e429266c9afa64be5613eee21",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each builder step with the verifier's checks. The verifier's Check 1 probe writes `{port: 9000` to a file, calls loadConfig on it and asserts `deepEqual(r, {})` and that it does not throw. Builder step 4 gives the builder that same probe: assert that loadConfig on malformed JSON \"(for example '{port: 9000') returns {} (assert.deepEqual) and does not throw\". The input, the expected output and the assertion method all match, so this is a verifier probe handed to the builder, not the builder writing its own tests. There is more overlap with the verifier's advisory list. Step 4's \"Add a test that a missing file still throws\" and step 6's `node src/app.js <file containing {port: 9000>` match the advisory probes for a missing file and for running the app on a bad file. Running `npm test` is allowed, but the shared probe breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 8665,
+  "tokens": {
+    "input": 2,
+    "output": 671,
+    "cacheCreation": 2951,
+    "cacheRead": 783,
+    "fresh": 3624,
+    "total": 4407
+  },
+  "at": "2026-11-05T08:41:36.833Z"
+}

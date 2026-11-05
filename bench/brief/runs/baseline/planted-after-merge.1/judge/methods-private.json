@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "ddcb915834ed58dad52b419d4d3773bb10950fcdbd9287292173ced979c9d66b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for probes that appear in both. The builder brief reuses the verifier's probes. Builder step 2 tells it to test that \"`node bin/greet.js --shout Ada` gives `HELLO, ADA!\\n`\". Verifier Check 1 runs `node bin/greet.js --shout Ada` and passes only on `HELLO, ADA!` plus a newline. That is the same input and expected output. Builder step 1 also fixes the no-flag output as \"`Hello, Ada!\\n`\", which is the PASS value in verifier Check 2. The builder brief also lists `Ada --shout` and the missing-name exit code 2, which match the verifier's advisory probes. The criterion does allow telling the builder to write its own tests and to run `npm test`. It does not allow giving the builder the checker's exact inputs and expected outputs, so the builder brief carries the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 8096,
+  "tokens": {
+    "input": 2,
+    "output": 724,
+    "cacheCreation": 3318,
+    "cacheRead": 783,
+    "fresh": 4044,
+    "total": 4827
+  },
+  "at": "2026-11-05T08:28:44.860Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "f7f0eca66385b815120c75498ff7c41a94fb6cafbc0a4660fc1c6bf064aaaf67",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs and found neither one.\n\nVerifier Check 1: PASS requires only that the command prints `{} true 0` and that loadConfig in src/config.js catches the JSON.parse error. FAIL covers only throwing, a non-zero exit, a non-empty result, or a {} that doesn't come from that catch. Neither condition asks for a file name, a line number or a warning. The missing message is raised only under \"Advisory (does not affect PASS/FAIL)\".\n\nBuilder brief: step 2 says that when JSON.parse throws, the error is caught and loadConfig returns {}. Step 6 asks the builder to note the lack of a warning in the PR description as \"a possible follow-up\". It also says \"Do not implement anything beyond the criteria above\", so it never tells the builder to throw a clearer error or do anything other than return {}.",
+  "model": "claude-opus-5-5",
+  "ms": 6726,
+  "tokens": {
+    "input": 2,
+    "output": 460,
+    "cacheCreation": 2873,
+    "cacheRead": 783,
+    "fresh": 3335,
+    "total": 4118
+  },
+  "at": "2026-11-05T08:41:05.310Z"
+}

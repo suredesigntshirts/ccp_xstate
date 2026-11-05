@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "6d7bf6f37795a2b6f089dd63816d17156eeb65b067def52d212679945d2f3159",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's examples, test cases and steps with the verifier's probes. They overlap in several places.\n- **Check 1 inputs:** Builder step 1 gives \"padLeft('42', 5, '0') === '00042'; padLeft('42', 5) === '   42'\". These are the same input/expected-output pairs Check 1 uses.\n- **Check 2 inputs:** Builder step 3 asks for tests \"('12345', 5, '0' -> '12345')\" and \"('123456', 3, '0' -> '123456')\". These match Check 2's probe inputs and expected outputs exactly.\n- **Check 3 method:** Builder step 5 says to \"list every `export` in index.js and confirm each name has its own `##` heading in README.md\". That is the same method as the Check 3 script.\n\nSo the builder brief carries the verifier's probes and checks, not just the bar. Only the instructions to run `npm test` and to write its own tests are allowed.",
+  "model": "claude-opus-5-5",
+  "ms": 12476,
+  "tokens": {
+    "input": 4,
+    "output": 665,
+    "cacheCreation": 6803,
+    "cacheRead": 1566,
+    "fresh": 7472,
+    "total": 9038
+  },
+  "at": "2026-11-05T08:29:07.000Z"
+}

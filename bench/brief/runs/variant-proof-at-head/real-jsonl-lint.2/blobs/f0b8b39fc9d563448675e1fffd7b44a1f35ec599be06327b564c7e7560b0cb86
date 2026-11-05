@@ -1,0 +1,30 @@
+Build a new standalone tool, jsonl-lint, as an npm workspace under packages/jsonl-lint, and open one pull request for it. The repo has no packages yet. The root package.json already lists packages/* as workspaces, and .github/workflows/test.yml runs `npm ci` then `npm test` on Node 22. Use plain ES modules with zero runtime dependencies and no build step.
+
+1. packages/jsonl-lint/package.json: name "jsonl-lint", "type": "module", "scripts": { "test": "node --test" }, a "bin" entry { "jsonl-lint": "bin/jsonl-lint.js" }, engines node >=22. Leave out any "dependencies" field (devDependencies are not needed either). Mark it private: true.
+
+2. packages/jsonl-lint/src/index.js: export a named function `lint(text)` that returns an array of `{ line, error }`, one for each row that is not valid JSON:
+   - Split on "\n" and strip a trailing "\r" from each row. `line` is the 1-based row number in the original file, so blank rows still count toward numbering.
+   - Skip rows that are empty or only whitespace.
+   - Check the last row even when the file does not end with a newline (a torn or unterminated last row like `{"a":` must be reported). A file that ends with "\n" must not produce an extra blank row error.
+   - `error` is a short message string, for example the JSON.parse error message.
+   - Return [] for clean input.
+
+3. packages/jsonl-lint/bin/jsonl-lint.js (start it with `#!/usr/bin/env node` and make it executable): usage `jsonl-lint <file>`.
+   - With no argument: print a usage message to stderr and exit 2.
+   - If the file is missing or unreadable: print an error to stderr and exit 2.
+   - Otherwise read the file as utf8, call lint, and print one stdout line per error, formatted exactly as `<file>:<line>: <error>`, where `<file>` is the argument exactly as the user gave it. Exit 1 if there were any errors, 0 if there were none. Use process.exitCode or exit after the output has flushed.
+
+4. Tests in packages/jsonl-lint/test/*.test.js using node:test and node:assert. `node --test` run from the package directory must pick them up. Cover:
+   - a clean file → []
+   - a bad middle row → reported with the right 1-based line
+   - a torn last row with no trailing newline → reported
+   - blank lines → skipped, but they still advance the line numbers
+   - exit codes, by spawning the bin with child_process (process.execPath) against temp files: 0 for clean, 1 for bad (and check the stdout format `<file>:<line>: <error>`), 2 for a missing file, 2 for no argument (with stderr non-empty in both exit-2 cases).
+
+5. packages/jsonl-lint/README.md: what the tool does, usage, output format, exit codes (0/1/2), and the lint(text) API.
+
+6. Root README.md: update the "What is here" section. It currently says there are no tools yet and packages/ is empty; replace that with a list that includes jsonl-lint (packages/jsonl-lint) and a one-line description.
+
+7. Run `npm install` at the root so package-lock.json includes the new workspace; otherwise `npm ci` in CI will fail. Commit the updated package-lock.json. Then run `npm ci && npm test` at the root and confirm it passes.
+
+8. Open one PR on suredesigntshirts/ccp_machine_test. Its body must contain the line `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102`. Wait for the `test` workflow check on the PR head to finish green, and fix and push if it fails.

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "a3d3385d3fe840aedf18ba258d4e604096246cf53248aed8323c444f06fd9415",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1–2 test only what their words require: padding with fill, the space default, and returning s unchanged when long enough. Check 3 breaks: the expect line asks for \"a section for every function\", but the regex '^#{1,6} +' + f + '\\\\b' also requires an ATX heading that starts with the function name. A section titled \"The padLeft function\", or one with an underlined (setext) heading, would fail. Its FAIL condition \"a heading with no describing text\" adds a further judgement. Check 4 breaks: \"npm test passes\" needs only a passing run (exit=0), yet PASS also requires \"the output shows `# fail 0`\", exact reporter wording the words don't force. None of these stricter conditions is under the Advisory heading.",
+  "model": "claude-opus-5-5",
+  "ms": 14964,
+  "tokens": {
+    "input": 2,
+    "output": 1155,
+    "cacheCreation": 3515,
+    "cacheRead": 783,
+    "fresh": 4672,
+    "total": 5455
+  },
+  "at": "2026-11-05T08:39:37.210Z"
+}

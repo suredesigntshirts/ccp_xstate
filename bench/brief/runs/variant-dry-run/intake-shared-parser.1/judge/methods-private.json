@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "275f3c76bbdff964aa292b221e293c328e8a84a924a1b0a9f88b480fa39d8357",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief and found no shared check. The builder brief has no PASS or FAIL wording. It also leaves out every probe that belongs only to the verifier: the `cmp - <(printf ...)` byte comparisons, the `printf '%s\\n'` trick, `grep -n -- '--tsv' test/*.js` and README.md, and the advisory `foo --tsv` case. Step 4 asks the builder to run the exact commands named in the expect lines and proofs (for example `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \"exit=$?\"`), which the criterion allows. Step 2 tells the builder to write its own tests. Those tests use inputs and outputs taken straight from the issue's expect lines, so they are the issue's bar, not something the verifier added. Running `npm test` is also allowed.",
+  "model": "claude-opus-5-5",
+  "ms": 9043,
+  "tokens": {
+    "input": 2,
+    "output": 825,
+    "cacheCreation": 5485,
+    "cacheRead": 783,
+    "fresh": 6312,
+    "total": 7095
+  },
+  "at": "2026-11-05T08:38:29.621Z"
+}

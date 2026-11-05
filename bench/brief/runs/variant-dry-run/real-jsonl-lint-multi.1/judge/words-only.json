@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "f0caece7805d84300b3839620b78392c422d9fac50c9600a46266ca755fa2747",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 3, 5 and 6 mostly stay within those words. Check 4 does not. Expect line 4 says only \"lint(text) in src/index.js is unchanged\", but Check 4 fails the PR on \"any diff in packages/jsonl-lint/src/index.js\", which it tests with `git diff --exit-code <base sha> HEAD -- packages/jsonl-lint/src/index.js`. That is a file-scope rule: an edit elsewhere in the file that leaves lint(text) alone would fail. Check 4 also makes `node --test packages/jsonl-lint/test/lint.test.js` passing a PASS condition, which is a test the words don't require. The criterion says such stricter rules belong under Advisory, but here they are pass/fail conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 9741,
+  "tokens": {
+    "input": 2,
+    "output": 870,
+    "cacheCreation": 5619,
+    "cacheRead": 783,
+    "fresh": 6491,
+    "total": 7274
+  },
+  "at": "2026-11-05T08:42:04.437Z"
+}

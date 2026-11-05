@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "06f8ae22961400eaeec27718ac02565b4ca16678b02fc4b5d192489fdcddd6f9",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The builder brief does not copy any of the verifier's probes. It has none of the verifier's inline scripts: no `node --input-type=module -e \"...includes('$d/b.json')...\"` check, no `wc -c` or `grep -F` of stderr, and no `git merge-base` / `git checkout <base> -- src` procedure. It also gives no PASS/FAIL wording. Step 7 has the builder run `node src/app.js <tmp>/c.json` and `ok.json`. Both commands are named by the expect lines and proofs, which the criterion allows. The outcomes it gives (exit 1, empty stdout, line 3 column 3, `listening on 9000`) only restate the expect lines, which is the bar the builder must meet. The four-line file and the \"position 20 → line 3, column 3\" example in step 2 come from the issue's own proof input. Step 5 asks the builder to write its own tests, which is allowed. The verifier's advisory about computing the location from the position comes from issue proof 2, and it is not a PASS/FAIL check.",
+  "model": "claude-opus-5-5",
+  "ms": 13178,
+  "tokens": {
+    "input": 2,
+    "output": 976,
+    "cacheCreation": 5429,
+    "cacheRead": 783,
+    "fresh": 6407,
+    "total": 7190
+  },
+  "at": "2026-11-05T08:38:38.276Z"
+}

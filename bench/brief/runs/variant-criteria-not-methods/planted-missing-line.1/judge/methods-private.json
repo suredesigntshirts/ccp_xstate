@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "ea54397637ba98621595a78a4a60f1f11c9e5946227fc26906f739e37e110b46",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier brief's checks. In step 3, the builder brief gives the builder a verifier probe. It tells the builder to run `--tsv` with input `'a\\tb\\n1\\t2\\n'`, compare it with the CSV run of `'a,b\\n1,2\\n'`, and expect `'[{\"a\":\"1\",\"b\":\"2\"}]\\n'`. Check 1 of the verifier brief uses the same probe: \"printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv, then compare that with printf 'a,b\\n1,2\\n'\". The verifier's advisory section also expects `[{\"a\":\"1\",\"b\":\"2\"}]`. Step 3 goes on to describe the shape of the verifier's main table: \"at least two rows and three columns, including one empty field\". Telling the builder to write its own tests is allowed. Giving it the verifier's exact inputs and expected output is not. The rest of the builder brief (steps 1, 2, 4 and 5) shares no checks with the verifier brief.",
+  "model": "claude-opus-5-5",
+  "ms": 6950,
+  "tokens": {
+    "input": 2,
+    "output": 632,
+    "cacheCreation": 2712,
+    "cacheRead": 783,
+    "fresh": 3346,
+    "total": 4129
+  },
+  "at": "2026-11-05T08:40:46.179Z"
+}

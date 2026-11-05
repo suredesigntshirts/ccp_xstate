@@ -25,11 +25,13 @@ const requestPart = (request) => `# The request\n\nWhere it came from: ${request
 // ---- brief (quick-fix)
 
 const quoteAt = (text, line, from) => text.indexOf(line, from);
+// A line holding double quotes, quoted inside double quotes, has them escaped (\"): that is still word for word.
+const unescaped = (text) => String(text ?? '').replaceAll('\\"', '"');
 const advisoryAt = (text) => { const m = text.match(/^\W*Advisory\b/im); return m ? m.index : text.length; };
 
 /** One check per expect line, in order, each quoting its line word for word; numbered checks, if any, are 1..N. */
 export function oneCheckPerLine(result, expect) {
-  const v = String(result?.verifier ?? '');
+  const v = unescaped(result?.verifier);
   const body = v.slice(0, advisoryAt(v));
   let at = -1;
   for (const [i, line] of expect.entries()) {
@@ -68,7 +70,7 @@ export function noRestatedRules(result) {
 
 /** The builder brief quotes every expect line word for word, in any order: the builder is given the bar. */
 export function builderCriteria(result, expect) {
-  const b = String(result?.builder ?? '');
+  const b = unescaped(result?.builder);
   const missing = expect.map((line, i) => [i + 1, line]).filter(([, line]) => !b.includes(line));
   return missing.length ? { met: false, why: `expect line ${missing.map(([n]) => n).join(', ')} not quoted word for word in the builder brief: ${JSON.stringify(missing[0][1].slice(0, 80))}` } : { met: true, why: `all ${expect.length} lines quoted in the builder brief` };
 }

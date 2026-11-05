@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "c1199a9243801644ec5e49cc9d680081080f2ca5764ee18cf57f938234f98619",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1–5 use cmp against exactly the bytes the expect lines name, and check 1 also requires \"exit=0\". Nothing in them is stricter than the words. Check 6 requires that `npm test` exits 0 and that some test runs bin/csv2json.js with --tsv on tab input and \"asserts on the output\". The expect line asks for exactly this. Check 7 requires that README \"mentions --tsv, describes what it does, and includes an example invocation\". \"Documents the flag with an example invocation\" covers both the description and the example. The form `node bin/csv2json.js --tsv < table.tsv` is offered only as an example (\"such as\"), not required. The non-goal diff check and the flag-position check are both under \"Advisory (not part of any PASS or FAIL)\". No check adds a mutation test, a branch or file-scope rule, or a demand for exact wording.",
+  "model": "claude-opus-5-5",
+  "ms": 10175,
+  "tokens": {
+    "input": 2,
+    "output": 750,
+    "cacheCreation": 5507,
+    "cacheRead": 783,
+    "fresh": 6259,
+    "total": 7042
+  },
+  "at": "2026-11-05T08:37:54.195Z"
+}

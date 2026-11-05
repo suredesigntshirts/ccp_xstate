@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "d18f696c652c2bfad6e5517df26a94a655638ac3a7c508b837199843c767476e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief's checks and found no overlap. The builder brief has no PASS/FAIL wording. It doesn't include Check 3's inline `node --input-type=module -e` script, Check 2's `grep -F` step, or Check 5's `git checkout <base> -- src` procedure. What it does include is allowed. The expect lines are copied word for word. Step 5 has the builder write its own tests, using the four-line c.json content from expect line 1. Step 7 says to run `npm test` and `node src/app.js` by hand on the bad and ok files, which are commands the expect lines name. Step 3 tells the builder to compute line and column itself. That matches the issue's proof and the verifier's Advisory, but the Advisory is a non-verdict note, not a check. The builder's \"preferably still a SyntaxError\" also mirrors an advisory note, not a check. The builder brief gives the bar without the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 7378,
+  "tokens": {
+    "input": 2,
+    "output": 668,
+    "cacheCreation": 5411,
+    "cacheRead": 783,
+    "fresh": 6081,
+    "total": 6864
+  },
+  "at": "2026-11-05T08:39:10.787Z"
+}

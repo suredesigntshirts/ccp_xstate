@@ -88,9 +88,11 @@ calls, cut down).
 
 | Stage | Workflow | Bench | What its cases plant |
 |---|---|---|---|
-| brief | quick-fix | `bench/brief/` | Half-met lines, after-merge lines, a missing line, a prescribed fix, real product-repo issues |
+| brief | quick-fix | `bench/brief/` | Half-met lines, after-merge lines, a missing line, a prescribed fix, real product-repo issues, and two issues as intake writes them (`intake-*`: proofs, non-goals and assumptions, one with a proof command that cannot run) |
 | shape | intake | `bench/shape/` | Raw requests: a rule the repo half-breaks, a suggested fix that defeats the need, a shared parser with no old-path line, a bug with no regression asked for, an after-merge ask, a question that is no change, one real request |
 | challenge | intake | `bench/challenge/` | Shaped issues with one planted hole each (half-met, ambiguous, after-merge, missing regression, adopted wrong fix) and two sound issues that must PASS; per-line verdicts are scored mechanically against the case's `must_fail`, `must_pass` and `result` |
+
+The brief's rubric also scores the builder brief (plan item refine-brief-stage): `builder-criteria` (mechanical) wants every expect line quoted in it, as the bar the build must meet, and `methods-private` (judged) wants none of the verifier's checks in it, no PASS or FAIL condition and no probe or set of inputs with expected outputs that the verifier brief also uses. The brief judge sees an issue's proofs, non-goals and assumptions only when the issue has them, so the verdicts kept for the older cases still match their prompts. Each variant tried is kept under `bench/brief/variants/<name>/` (a copy of `workflows/` with the one change), and its runs under `bench/brief/runs/variant-<name>/`.
 
 The intake workflow (`workflows/intake.json`, plan item wf-intake) turns a request into a frozen issue before any
 build: shape writes it, challenge tries to break it, shape revises at most twice, and the frozen issue starts a

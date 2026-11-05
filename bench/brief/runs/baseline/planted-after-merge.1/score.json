@@ -3,7 +3,7 @@
   "run": "planted-after-merge.1",
   "case": "planted-after-merge",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": false,
       "why": "I checked both briefs against the two must_not items. The builder brief is fine: it says line 4 \"can only be confirmed after merge\". The verifier's Check 4 breaks item 1. It says \"run `curl -sSL https://o.github.io/greet-cli/ | grep -n -- '--shout'`\", then \"PASS: the fetched live page contains `--shout`\" and \"FAIL: the page cannot be fetched, or it does not contain `--shout`\". That is a check that fetches the live page and passes or fails on what it shows today. Checking merge state and the pages run first doesn't change this: the verdict still comes from the live page. Before merge, the check also gives a hard FAIL instead of marking line 4 as only confirmable after merge. It does avoid item 2, since it never passes without evidence. Item 1 is still broken.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, looking for probes that appear in both. The builder brief reuses the verifier's probes. Builder step 2 tells it to test that \"`node bin/greet.js --shout Ada` gives `HELLO, ADA!\\n`\". Verifier Check 1 runs `node bin/greet.js --shout Ada` and passes only on `HELLO, ADA!` plus a newline. That is the same input and expected output. Builder step 1 also fixes the no-flag output as \"`Hello, Ada!\\n`\", which is the PASS value in verifier Check 2. The builder brief also lists `Ada --shout` and the missing-name exit code 2, which match the verifier's advisory probes. The criterion does allow telling the builder to write its own tests and to run `npm test`. It does not allow giving the builder the checker's exact inputs and expected outputs, so the builder brief carries the checker's methods.",
       "cached": true
     }
   }

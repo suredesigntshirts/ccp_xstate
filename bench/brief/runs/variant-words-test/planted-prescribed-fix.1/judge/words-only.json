@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "996734a878b55e426c7c3109267279ec32865414e9716bb3e30bbf0e065545c8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1's PASS requires \"RESULT {}\" for a bad-JSON file, plus a source read showing that loadConfig catches the JSON.parse error and returns {}. Its FAIL covers a throw, a result other than {}, loadConfig not being in src/config.js, or a {} that doesn't come from the catch. The line's words (\"in src/config.js catches the JSON.parse error and returns {}\") require each of these. Check 2's PASS is \"every test passing\" and its FAIL is \"any failing test, or it can't run\", which matches \"npm test passes\". Every stricter test sits under the Advisory heading and not in any condition: valid JSON still parsing, a missing file still throwing, only the parse being wrapped, exit status 0, the old test being replaced rather than deleted, the README and app behaviour, and the note about the hidden parse error. Nothing stricter appears in any PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 9832,
+  "tokens": {
+    "input": 2,
+    "output": 623,
+    "cacheCreation": 2880,
+    "cacheRead": 783,
+    "fresh": 3505,
+    "total": 4288
+  },
+  "at": "2026-11-05T08:40:14.248Z"
+}

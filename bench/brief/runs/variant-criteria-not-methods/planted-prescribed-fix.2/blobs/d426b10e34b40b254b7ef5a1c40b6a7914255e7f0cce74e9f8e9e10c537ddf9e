@@ -1,0 +1,11 @@
+Criteria the build must meet (from the issue, word for word):
+- loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead
+- npm test passes
+
+Steps:
+1. Read src/config.js, src/app.js, test/config.test.js and README.md. Right now loadConfig is `return JSON.parse(readFileSync(path, 'utf8'));`. The existing test 'bad JSON throws' in test/config.test.js expects a SyntaxError. src/app.js already catches errors from loadConfig and prints `bad config: <message>` with exit 1.
+2. In src/config.js, change loadConfig(path) so that only the JSON.parse call sits inside a try/catch. When parsing fails, catch the error and return {}. Leave readFileSync outside the try, so a missing or unreadable file still throws as it does now. Keep the export name and signature the same.
+3. In test/config.test.js, replace the 'bad JSON throws' test with one that asserts loadConfig on a file containing `{port: 9000` deep-equals {}. Keep the 'reads a config' test. You may add a test showing that valid JSON still parses.
+4. Update README.md so it describes the new behaviour: invalid JSON in the config file is treated as an empty config, so the defaults apply.
+5. Run `npm test` and make sure every test passes.
+6. In the PR description, note one trade-off for the reviewer. The issue body says people need to know which file is broken and where, but returning {} means src/app.js no longer prints `bad config: ...` for invalid JSON; the app starts on defaults with no message. Do not change behaviour beyond the criteria to fix this. Just flag it.

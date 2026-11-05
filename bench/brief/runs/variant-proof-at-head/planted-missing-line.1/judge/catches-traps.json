@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "1021338d8c75d3c6ff6383d6807978e87ea367e04a501002bc64d5fc06671472",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and all are handled. Item 1: the builder brief says \"Plain CSV behaviour must not change at all\" and \"Run `npm test` and make sure every test passes\", though no expect line asks for either. Item 2: the verifier brief has an \"Advisory (not pass/fail)\" section that says to run `npm test` and check that plain CSV output is unchanged. Neither appears in any PASS or FAIL condition. It never says outright that no expect line covers them, but the \"not pass/fail\" label makes clear they are advice, which is what this item is after. Item 3: Check 1 feeds the same table as TSV with --tsv and as CSV without the flag, then compares the two outputs with `cmp`, for two different tables.",
+  "model": "claude-opus-5-5",
+  "ms": 6942,
+  "tokens": {
+    "input": 2,
+    "output": 627,
+    "cacheCreation": 2858,
+    "cacheRead": 783,
+    "fresh": 3487,
+    "total": 4270
+  },
+  "at": "2026-11-05T08:40:26.496Z"
+}

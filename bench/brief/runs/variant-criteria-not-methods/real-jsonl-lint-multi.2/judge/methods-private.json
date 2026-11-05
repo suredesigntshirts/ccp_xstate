@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "a01c1593d0bdc6e522f96a8238f9774043bf75c7d749378150764d750718d757",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief gives the builder several of the verifier's own probes, with expected outputs. These go past the issue's expect lines. Step 4 tells the builder to test \"`-` mixed with a file argument in order\", which matches Check 2's `node $BIN a.jsonl - < bad.jsonl`. It also asks for \"a missing file among good ones, including one where a good file has a bad row (exit 2, stderr names the missing file, the other files' bad rows still on stdout)\". That is the PASS condition of Check 3's `a.jsonl missing.jsonl bad.jsonl` run, plus the advisory point that exit 2 beats exit 1. Step 3 says `- -` should fail \"before reading anything… nothing is printed on stdout\", and step 3 also mentions error newlines being replaced by spaces. Both repeat the verifier's advisory checks. The builder is allowed to write its own tests, but these input/expected-output cases also appear in the verifier brief, so the methods are not kept private.",
+  "model": "claude-opus-5-5",
+  "ms": 11417,
+  "tokens": {
+    "input": 2,
+    "output": 1103,
+    "cacheCreation": 5324,
+    "cacheRead": 783,
+    "fresh": 6429,
+    "total": 7212
+  },
+  "at": "2026-11-05T08:42:42.701Z"
+}

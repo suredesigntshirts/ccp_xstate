@@ -1,0 +1,40 @@
+Check out the PR head of the PR on suredesigntshirts/ccp_machine_test for issue 102. Run every check at that head, from the repo root, after `npm ci`. Make temp files under a fresh temp dir (mktemp -d).
+
+Check 1. Expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for every row that is not valid JSON (1-based lines, blank lines skipped, an unterminated last line checked) and exits 1 if any, 0 if none"
+Run it on these files:
+(a) clean.jsonl = `{"a":1}\n{"b":2}\n`
+(b) bad.jsonl = `{"a":1}\n\n{bad\n{"c":3}\n{"d":` with no trailing newline: line 2 is blank, line 3 is bad, line 5 is the unterminated last row
+(c) blank.jsonl = `{"a":1}\n\n   \n{"b":2}\n`
+For each, run `node packages/jsonl-lint/bin/jsonl-lint.js <path>; echo $?`.
+PASS: (a) exits 0 and prints no error lines. (b) exits 1, and stdout has exactly two lines, starting `<path>:3: ` and `<path>:5: `, each followed by a non-empty error, where <path> is the argument as given. (c) exits 0 with no output, so the blank and whitespace rows produce no error.
+FAIL: any other exit code, a missing or extra line, wrong line numbers, a blank row reported, the unterminated last row not reported, or a different line format.
+
+Check 2. Expect: "A missing file or no argument prints to stderr and exits 2"
+Run `node packages/jsonl-lint/bin/jsonl-lint.js /nonexistent/x.jsonl` and `node packages/jsonl-lint/bin/jsonl-lint.js`, capturing stdout, stderr and the exit code separately.
+PASS: both exit 2 and both write a non-empty message to stderr.
+FAIL: either exits with something other than 2, or writes nothing to stderr.
+
+Check 3. Expect: "packages/jsonl-lint/src/index.js exports lint(text) returning [{ line, error }]"
+Run `node --input-type=module -e "import {lint} from './packages/jsonl-lint/src/index.js'; console.log(JSON.stringify(lint('{\"a\":1}\n{bad\n')), JSON.stringify(lint('{\"a\":1}\n')))"`.
+PASS: `lint` is an exported function. The first result is an array with one object whose `line` is 2 and whose `error` is a non-empty string. The second result is [].
+FAIL: the import fails, lint is not exported, or the shape or values differ.
+
+Check 4. Expect: "The workspace has its own package.json (jsonl-lint, type module, test script node --test), no runtime dependencies, and node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes"
+Read packages/jsonl-lint/package.json, then run `npm test -w jsonl-lint`.
+PASS: name is "jsonl-lint", type is "module", scripts.test is "node --test", and there is no non-empty "dependencies" field. The test files import from node:test, and there are test cases covering each of: a clean file, a bad middle row, a torn or unterminated last row, blank lines, and exit codes (via the bin). `npm test -w jsonl-lint` exits 0 with all tests passing.
+FAIL: any of these fields is wrong, runtime dependencies are present, any of the five test topics is missing, or the tests fail.
+
+Check 5. Expect: "packages/jsonl-lint/README.md exists and the root README lists the tool"
+Run `test -f packages/jsonl-lint/README.md` and read the root README.md.
+PASS: the file exists and is non-empty, and the root README.md names jsonl-lint as one of the tools.
+FAIL: the file is missing, or the root README does not list jsonl-lint.
+
+Check 6. Expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, and npm test and the test workflow are green at its head"
+Run `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state`, `gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test`, and `npm ci && npm test` locally at the head.
+PASS: there is one PR, its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102`, the `test` workflow check at the head commit has concluded success, and the local `npm ci && npm test` exits 0.
+FAIL: the body line is missing, the test check is failing, pending or absent at the head, or the local npm ci or npm test fails.
+
+Advisory
+- Check that package-lock.json was updated for the new workspace; if it was not, `npm ci` fails.
+- CRLF line endings would ideally not cause false errors.
+- A file ending with a single trailing newline should not report a phantom extra line.

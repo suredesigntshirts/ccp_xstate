@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "930ae3e5c857627376de02967442d13f7628897d9177e35a594a25f488f69b5d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs and found nothing that would fail as written. The files they name all exist at this commit: src/config.js, src/app.js, test/config.test.js and README.md. `npm test` maps to `node --test`, and `npm install` works even with no dependencies. The shell lines are valid: `printf '{port: 9000' > /tmp/bad.json && node src/app.js /tmp/bad.json` quotes correctly. In the verifier's `node --input-type=module -e \"import { loadConfig } from './src/config.js'; ...\"`, the single quotes nest correctly inside the double quotes. The JS has no `$` or `!` that the shell would expand. The import resolves from the repository root, and the try/catch and console.log calls are valid. The missing-file advisory command is also well-formed. One unverified risk: package.json shows no \"type\" field. The ESM import should still work, since Node can import named exports from CommonJS and detects ESM syntax, but I couldn't confirm which module system src/config.js uses.",
+  "model": "claude-opus-5-5",
+  "ms": 14748,
+  "tokens": {
+    "input": 2,
+    "output": 1064,
+    "cacheCreation": 3012,
+    "cacheRead": 783,
+    "fresh": 4078,
+    "total": 4861
+  },
+  "at": "2026-11-05T08:40:57.047Z"
+}

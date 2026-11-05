@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "8fd36a049bc7c3bdc9b230e47ba964f30f60e09fd3ef1758fb656b897c9359ed",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS/FAIL conditions against the words of its expect line. Checks 1, 3 and 4 stay within their words. Several conditions go further than the words require:\n- Check 5's PASS requires the README to show \"the `<file> [<file> ...]` usage\". That is exact wording, while the expect line only says the README \"documents the usage\".\n- Check 5 also requires \"the tests pass\", which is not in line 5's words (it comes from line 6).\n- Check 6's PASS requires \"one open PR\", but the expect line only says \"one PR\" and never mentions its state.\n- Check 2's PASS adds exit 1 conditions for the stdin runs, which come from a different expect line.\nThese stricter tests should have been under Advisory, not in PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 13074,
+  "tokens": {
+    "input": 2,
+    "output": 1059,
+    "cacheCreation": 5337,
+    "cacheRead": 783,
+    "fresh": 6398,
+    "total": 7181
+  },
+  "at": "2026-11-05T08:41:49.911Z"
+}

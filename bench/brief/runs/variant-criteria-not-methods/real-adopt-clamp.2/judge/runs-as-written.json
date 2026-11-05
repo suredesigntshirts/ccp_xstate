@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "5ef50e8352774ac3fb816ea15b590f5009943ae3207f288ca736a5044f3d1640",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands are fine. `npm test` runs `node --test` from package.json, the builder's `node -e \"console.log(Object.keys(require('./math.js')))\"` is valid, and the verifier's Check 1 and Check 2 one-liners are valid JS inside double quotes. Check 3 breaks. Its `node -e \"...\"` string contains one backtick in `'^#+\\\\s*`?'+n+...`. Inside double quotes, bash reads a backtick as the start of command substitution. Since there is no closing backtick, bash fails with \"unexpected EOF while looking for matching ``'\" and node never runs. Even with the backtick escaped, `\\\\s` and `\\\\(` inside double quotes reach JS as `\\s` and `\\(` in a single-quoted string, where they become plain `s` and `(`. The regex would then not match `\\s*` as intended. So Check 3 does not run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 10384,
+  "tokens": {
+    "input": 2,
+    "output": 734,
+    "cacheCreation": 3514,
+    "cacheRead": 783,
+    "fresh": 4250,
+    "total": 5033
+  },
+  "at": "2026-11-05T08:41:33.443Z"
+}

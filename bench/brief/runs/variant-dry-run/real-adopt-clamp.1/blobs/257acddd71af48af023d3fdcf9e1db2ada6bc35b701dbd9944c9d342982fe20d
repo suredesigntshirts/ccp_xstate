@@ -1,0 +1,26 @@
+Check out the PR head and run every command from the repository root. There is one check per acceptance line, in order.
+
+Check 1 — expect line: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi"
+Run:
+`node -e "const m=require('./math.js');const a=require('node:assert/strict');a.equal(typeof m.clamp,'function');a.equal(m.clamp(5,0,10),5);a.equal(m.clamp(-5,0,100),0);a.equal(m.clamp(140,0,100),100);a.equal(m.clamp(0,0,100),0);a.equal(m.clamp(100,0,100),100);a.equal(m.clamp(7,7,7),7);a.equal(m.clamp(-3.5,-10,-1),-3.5);a.equal(m.clamp(-20,-10,-1),-10);console.log('CHECK1 OK')"`
+PASS: it prints `CHECK1 OK` and exits 0. FAIL: any AssertionError, a TypeError (clamp missing or not a function), or a non-zero exit.
+
+Check 2 — expect line: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi"
+Run:
+`node -e "const {clamp}=require('./math.js');const a=require('node:assert/strict');a.throws(()=>clamp(5,10,0),RangeError);a.throws(()=>clamp(0,1,0.5),RangeError);console.log('CHECK2 OK')"`
+PASS: it prints `CHECK2 OK` and exits 0. FAIL: an AssertionError (nothing thrown, or an error that is not a RangeError) or a non-zero exit.
+
+Check 3 — expect line: "README.md documents every function math.js exports"
+Run:
+`node -e "const fs=require('fs');const m=require('./math.js');const r=fs.readFileSync('README.md','utf8');const missing=Object.keys(m).filter(k=>typeof m[k]==='function'&&!new RegExp('^#+\\s*\`?'+k+'\\s*\\(','m').test(r));if(missing.length){console.log('MISSING: '+missing.join(', '));process.exit(1)}console.log('CHECK3 OK: '+Object.keys(m).join(', '))"`
+This lists every exported function and looks for a Markdown heading `name(` for it in README.md. Then open README.md and confirm each exported function listed (add, subtract, multiply, clamp, and any others) has an entry that describes what it does.
+PASS: every function exported by math.js is documented in README.md with a description (the script prints `CHECK3 OK` and your reading confirms it; if the script reports a name MISSING only because it is documented without a heading, read README.md and PASS if that function is clearly described there). FAIL: any exported function, e.g. `subtract` (undocumented before this change) or `clamp`, has no description in README.md.
+
+Check 4 — expect line: "npm test passes"
+Run: `npm test`
+PASS: exit code 0 and the summary shows `# fail 0`. FAIL: non-zero exit or any failing test.
+
+Advisory (not part of any PASS/FAIL condition):
+- Whether clamp(3, 2, 2) returns 2 without throwing (lo === hi should be a valid range).
+- Whether test/math.test.js gained tests for clamp, including the RangeError case.
+- Whether the README clamp entry mentions the RangeError behaviour.

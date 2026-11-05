@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "17e7ebcd9bba27f67bd0669d9b976ef77261d8cf3db5bda23cb72a2cde742ca0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both briefs against the two must_not items and found neither. Item 1: Check 3 lists every exported function and requires each one to appear in README.md. Its FAIL condition names the gap directly: \"subtract is exported but missing from the README\". So a README that covers clamp but not subtract cannot pass. Item 2: no PASS condition goes beyond its line. Check 2 asks only for instanceof RangeError, not a particular error message. Check 1's exact values follow from what clamp is defined to do. Check 4 asks only for exit 0 with no failing tests. Check 3 asks for \"a description of what it does\", which is what \"documents\" means. There is no parameter count and no fixed README layout. The per-function heading and the lo === hi case are marked \"Advisory (does not affect PASS or FAIL)\". The builder's \"clear message\" is a build instruction, not a verifier condition.",
+  "model": "claude-opus-5-5",
+  "ms": 6135,
+  "tokens": {
+    "input": 2,
+    "output": 525,
+    "cacheCreation": 2945,
+    "cacheRead": 783,
+    "fresh": 3472,
+    "total": 4255
+  },
+  "at": "2026-11-05T08:41:33.758Z"
+}

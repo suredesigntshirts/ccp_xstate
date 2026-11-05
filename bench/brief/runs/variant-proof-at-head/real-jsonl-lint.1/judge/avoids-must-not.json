@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "819a81a9ec85def2958ba6ab2c9ab1022884d02a30ce39ebe2f094af49d41511",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier check against the expect lines. None is stricter than its line. Check 1 asks only for a non-empty error after `<file>:<line>: `, not exact wording. Check 2 asks only that stderr is non-empty and the exit code is 2. Check 3 checks the line numbers and the `{line, error}` shape. Check 4 allows `dependencies` to be \"absent or empty\". Check 6 has no branch-name or file-scope rule, though \"exactly one open PR\" is slightly narrower than \"one PR\". The builder's \"avoid devDependencies too\" is guidance, not a pass or fail condition. The checks for run-time behaviour execute the program: lines 1 and 2 run the bin on temp files and check stdout, stderr and exit codes. Line 3 imports and calls `lint`, and line 6 runs `npm ci && npm test` and reads the CI checks. Only lines 4 and 5 read files, and those lines ask about file contents (package.json fields, tests present, READMEs), and line 4 also runs the tests.",
+  "model": "claude-opus-5-5",
+  "ms": 16321,
+  "tokens": {
+    "input": 2,
+    "output": 1140,
+    "cacheCreation": 5307,
+    "cacheRead": 783,
+    "fresh": 6449,
+    "total": 7232
+  },
+  "at": "2026-11-05T08:42:59.685Z"
+}

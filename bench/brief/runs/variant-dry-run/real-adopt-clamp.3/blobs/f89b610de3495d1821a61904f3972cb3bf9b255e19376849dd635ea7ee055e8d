@@ -1,0 +1,16 @@
+Goal: one pull request for issue https://github.com/o/r/issues/23 that meets every one of these acceptance lines:
+- math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+- clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+- README.md documents every function math.js exports
+- npm test passes
+
+Current state: math.js (CommonJS, 'use strict') exports { add, subtract, multiply }. README.md has an "## API" section with "### add(a, b)" and "### multiply(a, b)" entries but NO entry for subtract. Tests live in test/math.test.js and run with `npm test` (node --test).
+
+Steps:
+1. In math.js add a function clamp(x, lo, hi) with a short doc comment, matching the existing style. If lo > hi, throw new RangeError(...) with a clear message. Otherwise return x limited to [lo, hi]: lo when x < lo, hi when x > hi, else x (bounds inclusive; lo === hi is valid and returns that value). Add clamp to module.exports, keeping add, subtract and multiply exported.
+2. In README.md's "## API" section add a "### subtract(a, b)" entry (it is exported but undocumented today) and a "### clamp(x, lo, hi)" entry, each in the same style as the existing entries: a heading of the form `### name(args)`, a one-line description, and a short js example. The clamp entry must say it throws a RangeError when lo is greater than hi, and show e.g. clamp(-5, 0, 100) // 0 and clamp(140, 0, 100) // 100. Every function exported from math.js must end up with its own `### name(` heading.
+3. In test/math.test.js add tests for clamp: value inside range returned unchanged, below lo returns lo, above hi returns hi, values equal to the bounds, lo === hi, and assert.throws(() => clamp(5, 10, 0), RangeError).
+4. Run these and make sure all succeed before opening the PR:
+   npm test
+   node -e "const m=require('./math.js');const r=require('fs').readFileSync('README.md','utf8');const names=Object.keys(m).filter(k=>typeof m[k]==='function');const miss=names.filter(k=>!new RegExp('^#+\\s*'+k+'\\s*\\(','m').test(r));console.log('exports: '+names.join(', '));if(miss.length){console.log('MISSING: '+miss.join(', '));process.exit(1)}console.log('README OK')"
+5. Commit and open one pull request referencing the issue.

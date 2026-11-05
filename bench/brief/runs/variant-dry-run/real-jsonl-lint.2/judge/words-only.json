@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "307d018b16d9c5aeec6eb14ec7e8eb9d20992e0b4ece2bf5f8167bc9f859db44",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 5 stay within their lines. Three checks go further than their words, and none of these extras is moved under Advisory:\n- Check 4 requires `npm test -w jsonl-lint` to print `exit=0` and fails if \"the tests fail\". Expect 4 only asks that node:test tests exist for the five scenarios. Passing tests belong to expect 6.\n- Check 6 adds that the output \"shows the jsonl-lint tests ran rather than `no workspaces under packages/`\". Expect 6 only asks that npm test and the workflow are green at the head.\n- Check 3 requires \"the lines are 3 and 5\" and a non-empty string `error`. Expect 3 only says lint(text) is exported and returns [{ line, error }].\n\nBecause these stricter conditions sit inside PASS and FAIL conditions, the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 16473,
+  "tokens": {
+    "input": 2,
+    "output": 1282,
+    "cacheCreation": 6650,
+    "cacheRead": 783,
+    "fresh": 7934,
+    "total": 8717
+  },
+  "at": "2026-11-05T08:42:59.347Z"
+}

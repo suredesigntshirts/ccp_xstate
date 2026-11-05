@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "e3d997c936b4307a1efe99babeff9be9f64e615dfc187b229d478cc441f4b537",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier brief. Running `npm test` (step 5) is allowed because an expect line names it, and the new unit test in step 3 is allowed because the builder writes it. Step 5 also tells the builder to run `printf '{port: 9000' > /tmp/bad.json && node src/app.js /tmp/bad.json` and confirm that a stderr warning appears, the app prints `listening on 8080`, and it exits 0. The verifier brief's advisory uses the same probe: the same `{port: 9000` input written with printf, then \"try `node src/app.js /tmp/verify-bad.json`\" to check for a stderr message naming the path. Neither the issue nor its expect lines name this command, so it is a verifier probe passed on to the builder. That breaks the rule that the builder brief carries no probe that also appears in the verifier brief.",
+  "model": "claude-opus-5-5",
+  "ms": 8876,
+  "tokens": {
+    "input": 2,
+    "output": 752,
+    "cacheCreation": 3038,
+    "cacheRead": 783,
+    "fresh": 3792,
+    "total": 4575
+  },
+  "at": "2026-11-05T08:41:09.790Z"
+}

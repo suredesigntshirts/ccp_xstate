@@ -3,7 +3,7 @@
   "run": "real-jsonl-lint-multi.1",
   "case": "real-jsonl-lint-multi",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": false,
       "why": "I checked every PASS/FAIL condition in both briefs against the must_not list.\n\nItem 2 holds. Checks 1–3 all run the program (`node $B ...`) and compare the real stdout, stderr and exit code, not the diff.\n\nItem 1 breaks in Check 3. Line 3 only asks for an \"error on stderr\" when a file can't be read. Check 3's PASS condition goes further: \"For the runs with missing.jsonl, stderr mentions missing.jsonl\". That is a rule about what stderr must say, which line 3 never sets, so the condition is stricter than its line.\n\nThe other conditions match their lines:\n- Check 1 compares output to lint() output.\n- Check 4 fails only on a diff to src/index.js.\n- Check 6 adds no branch rule or limit on which files the PR may touch.\n- The builder's exact stderr wording (`jsonl-lint: cannot read ...`) is guidance in its steps, not a pass/fail condition.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief against each verifier check. The builder brief repeats the issue's six expect lines word for word. The criterion allows that, since those lines are the bar. It does not include any of the verifier's own checks: no fixture contents (a.jsonl, bad.jsonl with bad rows on lines 2 and 4, bad2.jsonl), no `node -e` script that computes expected lines from lint(), no `git diff` against baseRefOid, no `gh pr checks` commands, and no PASS/FAIL wording. Some of its test cases overlap with verifier checks, such as \"two bad files to check that output follows argument order\" and \"add a bad file to the mix and assert its lines still appear\". These are tests the builder writes itself, which the criterion allows, and they come straight from expect lines 1, 3 and 5. They give no inputs or exact outputs. The rest is steps the builder is allowed to run: `npm test` and waiting for the test workflow. The criterion holds for the whole output.",
       "cached": true
     }
   }

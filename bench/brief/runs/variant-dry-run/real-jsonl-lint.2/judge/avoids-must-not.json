@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "f71fa1c822e78675cd8286d8c8ecbfd87f5e97d16484556e8248bf6b75b421eb",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line. Check 1 runs the CLI on fixtures and requires the `<path>:N: ` prefix, the correct line numbers, non-empty error text and the right exit code. It does not require any exact error wording. Check 2 needs only exit 2 and a non-empty stderr. Check 3 imports and calls `lint`. Check 4 accepts \"`node --test` (optionally followed by arguments)\", accepts `{}` for dependencies, and runs the tests. Reading the test files there is acceptable because the line asks for tests to exist. Check 5 reads the READMEs, which is right for a line about files. Check 6 looks at the PR body, the check-run conclusion, and runs `npm ci && npm test` at the head. No check adds a branch-name rule, a mutation test or a limit on touched files, and the Advisory items are explicitly non-binding. Extra builder steps like `private` and `chmod` are build guidance, not PASS/FAIL conditions. No behaviour line is passed on the diff alone.",
+  "model": "claude-opus-5-5",
+  "ms": 12278,
+  "tokens": {
+    "input": 2,
+    "output": 923,
+    "cacheCreation": 6687,
+    "cacheRead": 783,
+    "fresh": 7612,
+    "total": 8395
+  },
+  "at": "2026-11-05T08:43:32.253Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "d230b50aafa1a89a4d658481e2f693a3b65b39b71b4dfe4dbb813adda015666a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 2 is fine: grep plus a requirement that a line actually documents the flag matches \"README.md documents --tsv\". Check 1 goes further than its expect line in three places. Its PASS condition requires \"exit=0\", but the words only say the command reads input and prints a JSON array, not how it exits. It requires the outputs to be \"byte-identical\" via cmp, but \"the same JSON array\" would also be met by the same array with different whitespace. It also fixes the exact CSV output \"(here [{\\\"name\\\":\\\"Ada\\\",...}])\", which the words never specify, since they only compare against whatever the CSV run prints. The exit-code and byte-identity checks belong under Advisory, not in PASS or FAIL. The FAIL condition repeats the \"exits non-zero\" test. So the criterion does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 9852,
+  "tokens": {
+    "input": 2,
+    "output": 772,
+    "cacheCreation": 3025,
+    "cacheRead": 783,
+    "fresh": 3799,
+    "total": 4582
+  },
+  "at": "2026-11-05T08:39:59.029Z"
+}

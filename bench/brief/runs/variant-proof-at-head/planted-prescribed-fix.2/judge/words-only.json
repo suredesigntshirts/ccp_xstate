@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "e7edb079d158961a944b9d6a318f84b29e568bb0decc32b45cbdd25d412c461e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1's PASS needs the command to print `{}` and src/config.js to show \"loadConfig catching the error thrown by JSON.parse and returning {}\". Its FAIL cases are a throw or non-zero exit, output other than `{}`, the function not being exported, and the result not coming from the catch. The \"not exported\" case is the closest to being stricter than the words. I still count it as within them: the line names loadConfig(path) in src/config.js as the module's function, and the code already exports it. Check 2 only requires that `npm test` exits 0 with no failing tests. Every stricter item sits under \"Advisory (not part of PASS or FAIL)\": valid JSON still parsing, a missing file still throwing, the replaced test, the README and the error-reporting gap.",
+  "model": "claude-opus-5-5",
+  "ms": 10230,
+  "tokens": {
+    "input": 2,
+    "output": 893,
+    "cacheCreation": 2766,
+    "cacheRead": 783,
+    "fresh": 3661,
+    "total": 4444
+  },
+  "at": "2026-11-05T08:40:49.141Z"
+}

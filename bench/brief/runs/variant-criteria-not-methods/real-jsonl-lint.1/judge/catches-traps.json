@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "0cb6ad99ed9c4d1bb1f857557f1a7c7aadfd2d437cadad9189eb725eb4d6f72b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all four must_catch items. Items 1, 2 and 4 are handled:\n- Builder step 8 runs `npm install` so package-lock.json picks up the new workspace, then commits the lock file.\n- Builder step 7 says \"replace the 'No tools yet' bullet\".\n- Verifier Check 6 reads the PR body and head.sha through the GitHub API and checks the `test` workflow conclusion at that sha.\n\nItem 3 is missed. The verifier never confirms that the jsonl-lint tests actually run under the root `npm test`. Check 4 runs the tests with `npm test --workspace jsonl-lint` and inside the package directory, which is not the root path. Check 6 runs the root `npm test` but only checks \"exit=$?\" equals 0. Because the root script uses `--if-present`, a skipped workspace would still exit 0. The verifier reads no test count from the root run and never breaks lint() to see a test fail, so skipped tests would go unnoticed.",
+  "model": "claude-opus-5-5",
+  "ms": 6223,
+  "tokens": {
+    "input": 2,
+    "output": 585,
+    "cacheCreation": 6079,
+    "cacheRead": 783,
+    "fresh": 6666,
+    "total": 7449
+  },
+  "at": "2026-11-05T08:42:48.299Z"
+}

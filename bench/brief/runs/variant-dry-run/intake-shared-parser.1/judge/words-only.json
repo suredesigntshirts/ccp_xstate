@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "97e3e175ef9548bb18ffecb865e41bb3499adecb86a0ec0e0134996c991c2f23",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1–5 compare the exact bytes with cmp. That is what \"prints exactly … followed by a newline\" requires. Only Check 1 adds \"exit=0\", and its expect line asks for that (\"exits 0\"). Check 2's FAIL clause \"or the command errors\" is slightly loose, but it adds no test the words don't already require. Check 6 asks only for \"exit=0\" plus a test under test/ that runs --tsv on input containing tabs and asserts on the output, matching the expect line. Check 7 needs README.md to document --tsv with \"an example command line that uses it\". The \"such as\" example is only illustrative. The stricter items are all under \"Advisory (does not affect PASS or FAIL)\": the README saying the flag means tab-separated input, the flag working in a non-first position, and scope creep. No PASS or FAIL condition uses mutation, branch or exact-wording rules.",
+  "model": "claude-opus-5-5",
+  "ms": 12416,
+  "tokens": {
+    "input": 2,
+    "output": 954,
+    "cacheCreation": 5444,
+    "cacheRead": 783,
+    "fresh": 6400,
+    "total": 7183
+  },
+  "at": "2026-11-05T08:37:56.393Z"
+}

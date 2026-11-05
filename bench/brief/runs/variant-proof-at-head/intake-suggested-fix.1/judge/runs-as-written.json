@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "e8a8eed50648d73a134c17f1f90a56e078589f4945ef5cf16eed0ed796c05893",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files. Everything they name exists at this commit: `src/app.js`, `src/config.js`, `test/config.test.js` and `npm test` (which runs `node --test`). The verifier's shell lines are valid as written: `mktemp -d`, the `printf` with `\\n` escapes, the redirects, `wc -c < $d/out` and `grep -F \"$d/c.json\"`. Its `node --input-type=module -e \"import {loadConfig} from './src/config.js'; ...\"` commands are copied from the issue's own proofs, and their JavaScript parses. The git steps (`git merge-base HEAD <target>`, `git checkout <base> -- src`, `git checkout HEAD -- src`) only leave refs to fill in, and their syntax is correct. The builder's regex `/position (\\d+)/` is valid JavaScript. Its worked example is also right: position 20 in the four-line file is line 3, column 3. Nothing in either brief would fail to run because of a missing file or bad syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 11918,
+  "tokens": {
+    "input": 2,
+    "output": 813,
+    "cacheCreation": 5446,
+    "cacheRead": 783,
+    "fresh": 6261,
+    "total": 7044
+  },
+  "at": "2026-11-05T08:38:05.334Z"
+}

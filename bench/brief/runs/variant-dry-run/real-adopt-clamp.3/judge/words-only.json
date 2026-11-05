@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "3d3d8396ab92feb45009a030237257fe7fb576c92f0133e3533804ba9797cb02",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all four checks. Check 1 only asserts that clamp is exported and returns the clamped value: inside the range, below it, above it, at each bound, lo === hi via clamp(3,3,3), and decimals. The words force all of these, since lo === hi is not \"lo greater than hi\" and a range of 3 to 3 still returns 3. Check 2 passes or fails only on whether a RangeError is thrown when lo > hi. Check 3 runs a heading script, but its PASS condition falls back to judging \"whether that function is actually documented\", so no exact heading format is required. Check 4 needs only an exit code of 0 with no failing tests. The stricter items (clamp tests in the test file, the RangeError mention in README) are under \"Advisory\". One flaw: the Advisory list includes clamp(2,2,2), which Check 1 already enforces with clamp(3,3,3). That is redundant, not a requirement beyond the words.",
+  "model": "claude-opus-5-5",
+  "ms": 10910,
+  "tokens": {
+    "input": 2,
+    "output": 868,
+    "cacheCreation": 3401,
+    "cacheRead": 783,
+    "fresh": 4271,
+    "total": 5054
+  },
+  "at": "2026-11-05T08:41:25.197Z"
+}

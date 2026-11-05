@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "719011b8ee943a356c55b0c072b3bb1b46f335f2e6565905309a3e411b8172bf",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the verifier brief's Check 4 against the two must_not items. Check 4 breaks item 1. It tells the verifier to \"Run `curl -sSL https://o.github.io/greet-cli/` and search the response for `--shout`\". It then sets PASS as \"the PR is merged and the fetched published page contains `--shout`\". It sets FAIL for an unmerged PR or a page without the flag, and adds \"Only the live page counts.\" So the check passes or fails on what the live page shows today, which item 1 forbids. It does not break item 2, because it never passes silently without evidence. The builder brief is fine: it correctly marks line 4 as true only after merge and deploy. But the verifier brief breaks the criterion, so the output as a whole does not meet it.",
+  "model": "claude-opus-5-5",
+  "ms": 4449,
+  "tokens": {
+    "input": 2,
+    "output": 360,
+    "cacheCreation": 3324,
+    "cacheRead": 783,
+    "fresh": 3686,
+    "total": 4469
+  },
+  "at": "2026-11-05T08:39:00.123Z"
+}

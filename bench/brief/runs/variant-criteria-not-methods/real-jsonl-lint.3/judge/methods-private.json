@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "1063aec9123145e629f0b6fbc3085ebd1edf197f91b264781335677430dc1d89",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared the builder brief with each verifier check. The builder brief has no PASS or FAIL conditions. It also leaves out every verifier probe: the exact `printf` fixtures (e.g. `bad.jsonl` with line 4 bad and line 6 torn), the Check 3 inline `node --input-type=module -e \"import { lint }...\"` script, the Check 4 `node -e require(package.json)` script, and the `gh pr view`/`gh pr checks`/`gh pr list` commands. What the builder gets is implementation guidance, plus the allowed items: write its own node:test tests, run `npm ci && npm test` (expect line 6 names npm test), and wait for the test workflow to pass. Step 7 asks for a hand run of the CLI on a clean file, a bad file, a missing file and no argument. That is generic self-testing with no fixed inputs or expected outputs, so it does not reuse a verifier probe.",
+  "model": "claude-opus-5-5",
+  "ms": 11959,
+  "tokens": {
+    "input": 2,
+    "output": 688,
+    "cacheCreation": 5720,
+    "cacheRead": 783,
+    "fresh": 6410,
+    "total": 7193
+  },
+  "at": "2026-11-05T08:43:39.209Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "2eb5fe456ed035cb7f0c45c5fb20fd0a7618c583642a607af89065dd5e888543",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Every check-like line in the builder brief comes from the issue, not from the verifier's own methods. Step 4 lists the proof commands (`printf ... | node bin/csv2json.js --tsv; echo \"exit=$?\"`, `npm test exits 0`) with their expected outputs. Running commands the expect lines or proofs name is explicitly allowed. Step 2 asks the builder to write its own tests. Its inputs and outputs are the issue's expect lines, which are the bar, and writing its own tests is allowed. The brief leaves out everything the verifier adds: the `od -c`/`cat -A` byte checks, the PASS/FAIL wording, the `grep -n -- '--tsv' test/*.js` and `grep ... README.md` probes, and the FAIL rule for tests that \"only call parse() directly\". None of the verifier's PASS/FAIL conditions or extra probes appear in the builder brief.",
+  "model": "claude-opus-5-5",
+  "ms": 10912,
+  "tokens": {
+    "input": 2,
+    "output": 974,
+    "cacheCreation": 5363,
+    "cacheRead": 783,
+    "fresh": 6339,
+    "total": 7122
+  },
+  "at": "2026-11-05T08:28:28.605Z"
+}

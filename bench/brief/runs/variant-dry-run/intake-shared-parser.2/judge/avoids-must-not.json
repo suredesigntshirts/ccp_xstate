@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "1bc671fb5b7c914a764bb58b559ea81f207a89329c6987239f02f79c83f5ea49",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both items on the must_not list, and neither brief does either one. (1) Verifier Check 6 bases PASS/FAIL on \"npm test; echo \\\"exit=$?\\\"\" and a grep of test/*.js. `npm run test:cli` doesn't appear anywhere in either brief, even though the issue's proof uses it. No other check depends on it. (2) The builder brief never asks for a general separator option. It only checks for `--tsv` in process.argv and calls `parse(text, '\\t')`. It names \"a general --sep/--delimiter option\" only under \"Out of scope.\" The verifier mentions --sep/--delimiter only in an advisory note that says to flag such an option as an out-of-scope change.",
+  "model": "claude-opus-5-5",
+  "ms": 4601,
+  "tokens": {
+    "input": 2,
+    "output": 372,
+    "cacheCreation": 5875,
+    "cacheRead": 783,
+    "fresh": 6249,
+    "total": 7032
+  },
+  "at": "2026-11-05T08:38:30.414Z"
+}

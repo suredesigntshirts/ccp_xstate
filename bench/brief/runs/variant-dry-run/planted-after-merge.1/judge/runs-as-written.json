@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "86bf640b2ee65c8c84078b4d5cb2226a469ceb07b00bd20c175ff3db4a0c35e8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository facts. Every file they name exists at this commit: bin/greet.js, docs/index.md, test/greet.test.js, src/greet.js, README.md and .github/workflows/pages.yml. `npm test` maps to the existing \"node --test\" script. The shell syntax is valid: `test \"$(node bin/greet.js --shout Ada)\" = \"HELLO, ADA!\" && echo PASS || echo FAIL` is correct quoting and test usage, and `grep -n -- '--shout' docs/index.md` uses `--` so the pattern isn't read as an option. `node bin/greet.js Ada | od -c | head -2`, `cat docs/index.md` and `echo \"exit=$?\"` are all well-formed. The curl calls use real flags (`-sS -m 20 -o /dev/null -w '%{http_code}\\n'`), and `grep -c -- '--shout'` is valid. The `--shout` invocations rely on flag support that the builder's step 1 adds. No command depends on a missing file or a malformed argument.",
+  "model": "claude-opus-5-5",
+  "ms": 8986,
+  "tokens": {
+    "input": 2,
+    "output": 549,
+    "cacheCreation": 3508,
+    "cacheRead": 783,
+    "fresh": 4059,
+    "total": 4842
+  },
+  "at": "2026-11-05T08:38:53.422Z"
+}

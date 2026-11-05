@@ -1,0 +1,11 @@
+Goal: one pull request that meets both acceptance lines:
+- loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead
+- npm test passes
+
+Steps:
+1. Read src/config.js, src/app.js, test/config.test.js and README.md. Right now loadConfig is `return JSON.parse(readFileSync(path, 'utf8'));`. src/app.js wraps it in try/catch and prints `bad config: <message>` then exits 1. README.md documents that behaviour.
+2. In src/config.js, read the file with readFileSync outside the try block, so read errors such as a missing file still throw as before. Wrap only the JSON.parse call in try/catch. In the catch, return {}. Only catch the parse error (a SyntaxError); any other error should be rethrown. Valid JSON must still be returned parsed, unchanged.
+3. Update test/config.test.js. The existing test 'bad JSON throws' expects a SyntaxError, which goes against the new behaviour. Replace it with a test that loadConfig on invalid JSON (for example `{port: 9000`) deep-equals {}. Keep the 'reads a config' test.
+4. README.md says invalid JSON stops the app with `bad config: <message>` and exit 1. Since loadConfig no longer throws on bad JSON, update that sentence to describe the new behaviour: the app starts with its defaults. Leave the catch in src/app.js alone, because read errors still reach it.
+5. Run `npm test` from the repository root and make sure every test passes.
+6. Open the pull request. In its description, note that returning {} hides the parse error: the user is not told which file is broken or where. Optionally, before returning {}, write a one-line warning to stderr that names the path and the parse error message. That does not change the return value.

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "76e61811a4092a8cac3fb42e9c250038c83a79132b1d0aefa8d98ea1110107f6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked Check 4 in the verifier brief against both items on the must_not list. Item 1 (fetching the live page): the brief says \"Do not fetch or read the live page.\" It judges Check 4 on what the PR head contains instead: pages.yml must still publish docs/ on push to main, and `grep -n -- --shout docs/index.md` must find the flag. Item 2 (a silent PASS with no evidence): PASS needs that workflow and grep evidence. FAIL conditions are spelled out, and the report must \"say that the live result can only be seen after merge.\" So the PASS is neither silent nor unsupported. The builder brief doesn't add any check for line 4 that would break either item. It only tells the builder to leave the docs and workflow in place and to mention in the PR that the page updates after merge. Neither must_not item is broken.",
+  "model": "claude-opus-5-5",
+  "ms": 7076,
+  "tokens": {
+    "input": 2,
+    "output": 430,
+    "cacheCreation": 3223,
+    "cacheRead": 783,
+    "fresh": 3655,
+    "total": 4438
+  },
+  "at": "2026-11-05T08:39:42.710Z"
+}

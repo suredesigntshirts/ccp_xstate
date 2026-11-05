@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "182372c303b199b6df58a07511b34c5c33febc07d7b35fdcef4612e6541b20c1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief. The builder's \"Criteria\" section is the issue's seven expect lines, word for word, so that is the bar. Step 3's test inputs and expected outputs come straight from expect lines 1–3 and 5, and step 3 is about the builder writing its own tests, which is allowed. Step 5 says to run `npm test` and \"each command in criteria 1-5\", and those are commands the expect lines name, so that is allowed too. Step 4, adding a README example and a sentence about tab-separated input, follows the issue's proof 7 and is written as a task, not a PASS/FAIL rule. None of the verifier's checks appear in the builder brief: no PASS/FAIL conditions, no `cmp`/`/tmp/exp` scripts, no `grep -n -- '--tsv' test/*`, no FAIL examples such as \"only parse() is called directly\", and none of the advisory notes.",
+  "model": "claude-opus-5-5",
+  "ms": 12399,
+  "tokens": {
+    "input": 2,
+    "output": 897,
+    "cacheCreation": 5845,
+    "cacheRead": 783,
+    "fresh": 6744,
+    "total": 7527
+  },
+  "at": "2026-11-05T08:38:40.340Z"
+}

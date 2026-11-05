@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e8c7cf0523ff5e68f3bfcdccbc31dcc794a5c43429382a929a92552df8d113cb",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the two briefs. Item 1: `npm run test:cli` appears nowhere. Even though the issue's proof 6 uses `npm run test:cli`, the verifier's Check 6 runs \"npm test; echo \\\"exit=$?\\\"\" and then greps test/ for `--tsv`. The builder's step 4 also checks \"npm test exits 0\". So no PASS or FAIL depends on test:cli. Item 2: the builder brief never asks for a general separator option. Its step 1 says \"add no --help, --sep or auto-detection\", and its out-of-scope list rules out \"a general delimiter option\". It only asks for checking '--tsv' and calling parse(text, '\\t'). The verifier's advisory section also flags any --sep/--delimiter as a non-goal. Neither brief does anything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 7456,
+  "tokens": {
+    "input": 2,
+    "output": 404,
+    "cacheCreation": 5593,
+    "cacheRead": 783,
+    "fresh": 5999,
+    "total": 6782
+  },
+  "at": "2026-11-05T08:28:22.331Z"
+}

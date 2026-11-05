@@ -1,0 +1,1 @@
+Run real-adopt-clamp-3:0.brief, worktree /tmp/bench-real-adopt-clamp-3-4Ptyl9/wt/real-adopt-clamp-3--0.brief of https://github.com/o/r, branch run/real-adopt-clamp-3/0.brief.

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "b83105035fd3831b2c69e0cc1b11a941c74d51b42d1822c16d485aebcd9c0f22",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "must_not item 1 is avoided: Check 3 reads the exports at runtime, including subtract, and fails if any is missing. Item 2 is broken: Check 3's PASS needs the script to print OK, and that script only accepts a heading matching `'^#+\\\\s*'+n+'\\\\s*\\\\('`, so each exported function must have its own markdown heading like \"### name(\". A README that documents subtract or clamp in a list, a table or prose would FAIL. That demands a specific README layout, which is stricter than \"README.md documents every function math.js exports\". Check 4 also requires the output to show `# fail 0`, slightly more than \"npm test passes\", though that is minor. Checks 1 and 2 test behaviour and the RangeError type only, not exact messages.",
+  "model": "claude-opus-5-5",
+  "ms": 15234,
+  "tokens": {
+    "input": 2,
+    "output": 898,
+    "cacheCreation": 3300,
+    "cacheRead": 783,
+    "fresh": 4200,
+    "total": 4983
+  },
+  "at": "2026-11-05T08:41:45.685Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "209b0f0bbd5f536d6e1301498900a5f7213a3bc555f3948ab8954f366978dd75",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, and the criterion breaks at step 5. That step tells the builder to run \"printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv and compare it with printf 'a,b\\n1,2\\n' | node bin/csv2json.js; the two outputs must be identical\". This is the same input pair and the same pass condition as the first probe in the verifier's Check 1. The expect line names only the bare commands, not these inputs, so the allowance for commands the issue names does not cover them. Step 3 also hands the builder the same input 'a\\tb\\n1\\t2\\n' and the expected output '[{\"a\":\"1\",\"b\":\"2\"}]\\n', and that output appears in the verifier's advisory probe. As a result, the builder brief carries the checker's methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 6562,
+  "tokens": {
+    "input": 2,
+    "output": 623,
+    "cacheCreation": 2736,
+    "cacheRead": 783,
+    "fresh": 3361,
+    "total": 4144
+  },
+  "at": "2026-11-05T08:40:21.796Z"
+}

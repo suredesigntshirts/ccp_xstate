@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "6634882a802caeedfb60f9db82771ff2bec8eba01d4a7d81a2e55edb5d5d6938",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all four must_catch items and the briefs handle each one. (1) Verifier Check 3 runs `node $BIN a.jsonl missing.jsonl bad.jsonl` and requires exit 2, missing.jsonl named on stderr, and `bad.jsonl:2:`/`bad.jsonl:4:` still on stdout. That is the combined case, not each case alone. (2) Check 4 runs `git diff <merge-base with the PR base branch> HEAD -- packages/jsonl-lint/src/index.js` and passes only on an empty diff. (3) Builder step 5 says \"Update packages/jsonl-lint/README.md\" and lists the multi-file usage, `-` and the exit codes. (4) Check 6 uses `gh pr view ... --json body,headRefOid` to find the `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104` line. It also reads check-runs at headRefOid and requires the `test` workflow to have concluded success at the head SHA.",
+  "model": "claude-opus-5-5",
+  "ms": 8787,
+  "tokens": {
+    "input": 2,
+    "output": 558,
+    "cacheCreation": 5463,
+    "cacheRead": 783,
+    "fresh": 6023,
+    "total": 6806
+  },
+  "at": "2026-11-05T08:42:22.078Z"
+}

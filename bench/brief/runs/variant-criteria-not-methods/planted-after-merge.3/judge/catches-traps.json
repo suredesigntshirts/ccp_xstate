@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9a3bb24d4157165d8f1b6e3539f3657748624a077a5f303b33735eaafa67b9de",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 2 is handled. Check 2 runs the same commands at the base commit (\"check out the PR's base commit ... run the same three commands there, and compare\"). Item 1 is missed. Check 4 bases its result on the live page: \"run `curl -sSL https://o.github.io/greet-cli/` ... PASS: the fetched published page contains `--shout`\". If the PR isn't merged yet, the check says to report FAIL. It never checks at the PR head that docs/index.md lists --shout and that .github/workflows/pages.yml publishes docs/ from main as the thing that will publish the page. The pages.yml check appears only as an advisory note and isn't part of Check 4's pass or fail conditions. So the briefs don't handle every must_catch item.",
+  "model": "claude-opus-5-5",
+  "ms": 7292,
+  "tokens": {
+    "input": 2,
+    "output": 433,
+    "cacheCreation": 3527,
+    "cacheRead": 783,
+    "fresh": 3962,
+    "total": 4745
+  },
+  "at": "2026-11-05T08:39:36.160Z"
+}

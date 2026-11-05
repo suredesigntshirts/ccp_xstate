@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "ed5e87fbf3e477efe5e3f05d50eff109d63ef6574cef9977e4ea302efe15e4e7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and each one is handled.\n\nItem 1: The verifier's Advisory section is outside any PASS/FAIL condition. It has the verifier run `node src/app.js /tmp/v_bad.json`, expect `listening on 8080`, and notes that \"people need to know what to fix, and returning {} silently drops the old `bad config` message.\" That says the app now starts on defaults instead of surfacing the broken file. Builder step 6 also asks for this trade-off to be noted in the PR.\n\nItem 2: Builder step 3 says to \"replace the 'bad JSON throws' test with one asserting `loadConfig(file('{port: 9000'))` deep-equals `{}`\". Step 5 requires `npm test` to pass.\n\nItem 3: Verifier Check 1 calls loadConfig on `{port: 9000`. It PASSes when the output contains `BAD {}` with no throw, and FAILs on `THREW`.",
+  "model": "claude-opus-5-5",
+  "ms": 11962,
+  "tokens": {
+    "input": 2,
+    "output": 559,
+    "cacheCreation": 3094,
+    "cacheRead": 783,
+    "fresh": 3655,
+    "total": 4438
+  },
+  "at": "2026-11-05T08:41:09.010Z"
+}

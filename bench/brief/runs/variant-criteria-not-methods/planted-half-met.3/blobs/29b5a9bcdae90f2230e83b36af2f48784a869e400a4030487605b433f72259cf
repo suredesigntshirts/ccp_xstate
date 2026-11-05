@@ -1,0 +1,26 @@
+Check out the PR head, run `npm install` if a lockfile or dependencies were added (none are expected), and run each check below in order. Report PASS or FAIL for each with the command output.
+
+Check 1 — expect: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run: `node --input-type=module -e "import * as m from './index.js'; const p=m.padLeft; console.log(typeof p, JSON.stringify([p('42',5,'0'), p('42',5), p('a',4,'x'), p('',3,'0')]))"`
+PASS: prints `function ["00042","   42","xxxa","000"]`.
+FAIL: padLeft is not exported as a function, the command errors, or any value differs (padding on the wrong side, wrong length, or a fill other than space when fill is omitted).
+
+Check 2 — expect: "padLeft returns s unchanged when s is already width characters or longer"
+Run: `node --input-type=module -e "import {padLeft as p} from './index.js'; console.log(JSON.stringify([p('12345',5,'0'), p('123456',5,'0'), p('abc',2), p('abc',0,'*')]))"`
+PASS: prints `["12345","123456","abc","abc"]`.
+FAIL: the command errors or any result differs from its input s (e.g. truncated or padded).
+
+Check 3 — expect: "README.md has a section for every function index.js exports"
+Run: `node --input-type=module -e "import * as m from './index.js'; import fs from 'node:fs'; const r=fs.readFileSync('README.md','utf8'); const fns=Object.keys(m).filter(k=>typeof m[k]==='function'); const missing=fns.filter(f=>!new RegExp('^#{1,6}\\s+\x60?'+f+'\\b','m').test(r)); console.log('exports:',fns.join(','),'missing:',missing.join(',')||'none')"`
+Also open README.md and confirm each heading found is a section about that function.
+PASS: the output reports `missing: none`, and the exports list includes capitalize, slugify, truncate and padLeft (plus any others), each with its own README heading section.
+FAIL: any exported function (note: slugify had no section before this change) lacks a README heading section.
+
+Check 4 — expect: "npm test passes"
+Run: `npm test`
+PASS: exit code 0 with no failing tests reported.
+FAIL: non-zero exit code or any failing test.
+
+Advisory (not part of PASS/FAIL):
+- Check that the new tests in test/strutil.test.js actually exercise padLeft (default fill, explicit fill, s at and above width).
+- Note whether padLeft with a multi-character fill behaves sensibly (e.g. result length exactly width), and whether the README sections describe behaviour accurately.

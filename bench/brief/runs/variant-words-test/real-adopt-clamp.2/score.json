@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.2",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 only tests that clamp is exported as a function and that sample values (including the boundaries and decimals) come back \"limited to [lo, hi]\". That is what the words require. Check 2 only tests that a RangeError is thrown for three cases where lo > hi. Check 3 requires each exported function to have a README entry that \"names it and describes what it does\". That is a fair reading of \"documents\"; the hard-coded list of names is only a note. Check 4 only requires \"fail 0 and exits 0\". The stricter items sit under \"Advisory (not part of PASS/FAIL)\": that lo===hi doesn't throw, how clear the error message is, that tests exist, and the README style and RangeError mention. No PASS or FAIL condition has a test, mutation, branch or file-scope rule, or exact-wording rule beyond what the words require.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "Every command would run as written. `npm test` maps to the existing script `node --test`. math.js and README.md are both tracked, and test/math.test.js exists. In the verifier's three `node -e` commands, the JavaScript sits inside double quotes and uses only single quotes inside. None contains `$`, a backtick or `!`, so bash passes them through unchanged. Their syntax is valid: destructuring the require, the spread `clamp(...a)`, try/catch, `instanceof RangeError`, and `filter(k=>typeof ...==='function')`. The expected outputs in Check 1 are correct too: clamp(-3.5,-10,-1) gives -3.5 and clamp(2.5,1,3) gives 2.5. The builder's `assert.throws(() => clamp(5, 10, 1), RangeError)` is valid test code. Its `Object.keys(require('./math.js'))` is a valid expression and runs from the repository root.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one. (1) Builder step 3 says \"`subtract` is exported but has no README entry right now, so add a `### subtract(a, b)` entry as well as a `### clamp(x, lo, hi)` entry.\" (2) Verifier Check 3 gets the exports at the PR head with Object.keys(require('./math.js')). It says the list \"should include add, subtract, multiply and clamp\" and FAILs if \"any exported function is missing from README.md\". It also notes that subtract had no entry before this change. (3) Verifier Check 2 calls clamp with lo > hi in three cases and prints `e instanceof RangeError ? 'RangeError' : 'OTHER '`. It FAILs on `OTHER ...` or `NO THROW`, so an error of any other type fails the check.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against the verifier's checks. Item 1: Check 3 gets every exported function from Object.keys(require('./math.js')) and fails if \"any exported function is missing from README.md\". It also says plainly that subtract had no README entry. So a README that documents clamp but not subtract would fail. Item 2: Check 2 passes on any `RangeError`, with no exact message. Check 1 tests the returned values and `typeof`, not the parameter count. Check 3 asks only that each entry \"names it and describes what it does\", which is what \"documents\" means, and sets no layout. Check 4 asks only for fail 0 and exit 0. The stricter points (the lo===hi case, the message being clear, README style, tests) are all listed under \"Advisory (not part of PASS/FAIL)\". The builder brief's style guidance tells the builder what to do; it doesn't add a PASS or FAIL condition. Neither item is broken.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief's checks, and the builder brief contains two of the verifier's probes. First, step 5 tells the builder to \"check that each name in `Object.keys(require('./math.js'))` appears in README.md\". That is the probe from Check 3, which runs Object.keys on math.js and tests `r.includes(k)` for each name. Second, step 4 gives the exact input and expected result `assert.throws(() => clamp(5, 10, 1), RangeError)`, and Check 2 uses the same case, [5,10,1] → RangeError. The rule does let the builder write its own tests. But spelling out an input/expected-output pair that the verifier also uses hands the builder the checker's method, not just the bar. Running `npm test` is allowed. The two items above are not, so the criterion fails.",
+      "cached": true
+    }
+  }
+}

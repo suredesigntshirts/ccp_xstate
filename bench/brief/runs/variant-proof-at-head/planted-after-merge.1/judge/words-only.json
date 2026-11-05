@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "74cb5638d76768dfc5f3e4df95907705be647fec5fb93fa9ca9a263cd8af3cf4",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Check 1's expect line names only the order \"--shout <name>\". Its PASS and FAIL still require `node bin/greet.js Ada --shout` to work too: \"FAIL: either --shout run exits non-zero…\". The Advisory confirms this: \"both are covered in Check 1\". The words don't require that second order. Check 2's expect line only says output without --shout is unchanged. Its PASS also requires \"`npm test` passes\" and its FAIL includes \"or `npm test` fails\". That test-suite requirement goes beyond the words and belongs under Advisory. Checks 3 and 4 stay within their lines: docs mention --shout and say what it does, and the workflow still publishes docs/. Checks 1 and 2 add stricter conditions to PASS/FAIL, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 8008,
+  "tokens": {
+    "input": 2,
+    "output": 684,
+    "cacheCreation": 3194,
+    "cacheRead": 783,
+    "fresh": 3880,
+    "total": 4663
+  },
+  "at": "2026-11-05T08:38:39.669Z"
+}

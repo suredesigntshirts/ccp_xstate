@@ -1,0 +1,19 @@
+Goal: one pull request for issue https://github.com/o/greet-cli/issues/12 (--shout flag) that meets these expect lines:
+1. node bin/greet.js --shout <name> prints the greeting in upper case
+2. without --shout the output is unchanged
+3. docs/index.md documents --shout
+4. after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout
+
+Context: bin/greet.js picks the first argv entry not starting with `--` as the name and prints `greeting(name)` from src/greet.js (`Hello, <name>!`). Tests are in test/greet.test.js and run with `npm test` (node --test). .github/workflows/pages.yml publishes the docs/ directory to GitHub Pages on push to main.
+
+Steps:
+1. In bin/greet.js, detect a `--shout` argument anywhere in argv (before or after the name). When present, print the greeting upper-cased (e.g. `node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline). Keep the name selection so `--shout` is never taken as the name. Leave the usage message/exit code for a missing name intact.
+2. Without `--shout`, output must stay byte-for-byte the same: `node bin/greet.js Ada` prints `Hello, Ada!\n`. Do not change src/greet.js's `greeting` behaviour.
+3. Add tests in test/greet.test.js: `--shout Ada` gives `HELLO, ADA!\n`, `Ada --shout` gives the same, and the existing no-flag test still passes. Run `npm test` and make sure all tests pass.
+4. Update docs/index.md to document `--shout`: show the usage line `node bin/greet.js --shout <name>` and say it prints the greeting in upper case (e.g. `HELLO, <NAME>!`). The literal text `--shout` must appear in the file. Optionally mirror this in README.md.
+5. Expect line 4 can only be met after merge, when the pages workflow deploys docs/. Do not edit .github/workflows/pages.yml unless it is actually broken; making sure the --shout docs live in docs/index.md (the published directory) is what this PR can do. In the PR description, list each expect line and how it is met, and state plainly that line 4 is verifiable only after merge and the Pages deploy (at the time of writing the page returned HTTP 404, so Pages may also need enabling in repository settings, which a PR cannot do).
+6. Self-check before opening the PR:
+   test "$(node bin/greet.js --shout Ada)" = "HELLO, ADA!" && echo PASS || echo FAIL
+   test "$(node bin/greet.js Ada)" = "Hello, Ada!" && echo PASS || echo FAIL
+   grep -n -- '--shout' docs/index.md
+   npm test

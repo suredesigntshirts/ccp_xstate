@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "b98674d14e40ac43d5116b3c1875a7b85e669dad8223b62c325f414746e12f5e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Criterion met: I compared the builder brief with the verifier brief's checks. The builder brief repeats the expect lines word for word, and the commands it tells the builder to run are the ones those lines name, which is allowed. Step 3 tells the builder to write its own tests (allowed), using inputs taken from the expect lines. Step 5 says to run `npm test` and the criteria commands, both allowed. The README example `node bin/csv2json.js --tsv < table.tsv` and the wording \"tab-separated\" come from proof 7's form `node bin/csv2json.js --tsv < file`. Proofs are allowed sources. The verifier-only methods do not appear in the builder brief: the `od -c` byte inspection, `grep -n -- '--tsv' test/*.js`, `grep` on README, the PASS/FAIL wording, and the advisory `foo --tsv` placement probe. The builder gets the bar, not the checker's probes.",
+  "model": "claude-opus-5-5",
+  "ms": 8623,
+  "tokens": {
+    "input": 2,
+    "output": 804,
+    "cacheCreation": 5503,
+    "cacheRead": 783,
+    "fresh": 6309,
+    "total": 7092
+  },
+  "at": "2026-11-05T08:38:30.220Z"
+}

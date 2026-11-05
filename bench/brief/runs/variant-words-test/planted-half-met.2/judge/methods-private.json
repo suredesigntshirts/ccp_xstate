@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "20c69bb9aa09f32e47b9790a64adb9b17f0ee7f810586046c747950329598d33",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's examples and test cases with the verifier's probes. They overlap. Builder step 1 gives \"padLeft('42', 5, '0') === '00042' and padLeft('7', 3) === '  7'\", and step 4 has the builder write tests with padLeft('12345', 5, '0') === '12345' and padLeft('123456', 5, '0') === '123456'. Verifier Check 1 probes p('42',5,'0') expecting \"00042\" and p('7',3) expecting \"  7\". Check 2 probes '12345' and '123456' with the same expected outputs. So the builder gets a set of inputs with expected outputs that also appears in the verifier brief. That is a shared probe. The criterion allows telling the builder to write its own tests, but not dictating the checker's exact cases. Builder step 3 also mirrors Check 3: it says to check that every exported function has its own README section. Because the verifier's probes leak into the builder brief, the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 9431,
+  "tokens": {
+    "input": 2,
+    "output": 625,
+    "cacheCreation": 3082,
+    "cacheRead": 783,
+    "fresh": 3709,
+    "total": 4492
+  },
+  "at": "2026-11-05T08:40:04.414Z"
+}

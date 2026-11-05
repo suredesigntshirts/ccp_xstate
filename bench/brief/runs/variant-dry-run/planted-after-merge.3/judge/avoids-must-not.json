@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "6da2c1815a66a797a2a2a7500462bc4b83699307d3114922878b33690e09d111",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the verifier brief's Check 4, which covers expect line 4. It runs `curl -sS -L https://o.github.io/greet-cli/ | grep -n -- '--shout'` and grades on the result. It PASSes if \"the published page fetched by curl contains `--shout`\" and FAILs if \"the page does not contain `--shout`, or it cannot be fetched\". So it fetches the live page and gives PASS or FAIL based on what the page shows today. That is must_not item 1. Telling the verifier to \"Report FAIL and say the cause is that the PR is not yet merged\" doesn't fix this: the verdict still comes from the live fetch, and it fails a post-merge condition that can't be checked at the PR head. The brief does avoid item 2, since nothing passes silently without evidence. The builder brief breaks neither item. Because item 1 is violated, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 5565,
+  "tokens": {
+    "input": 2,
+    "output": 435,
+    "cacheCreation": 3636,
+    "cacheRead": 783,
+    "fresh": 4073,
+    "total": 4856
+  },
+  "at": "2026-11-05T08:39:41.828Z"
+}

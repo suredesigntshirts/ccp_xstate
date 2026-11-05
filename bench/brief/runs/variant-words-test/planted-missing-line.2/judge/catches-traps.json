@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "ac51fcfb6b3375ee640412005dec66d6a6cfdef8e5caf72ad5a1782608f7c59f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is met. The builder brief says \"keep the current comma behaviour exactly as it is\" and \"Run `npm test` and make sure every test passes.\"\nItem 3 is met. Check 1 feeds the same tables as TSV and as CSV and compares them: \"deep-equal to the CSV output for the same table\".\nItem 2 is only partly met. The Advisory section sits outside PASS/FAIL (\"Advisory (not pass/fail)\"). It suggests \"Run npm test and report the result\" and asks to confirm that plain CSV output is unchanged. But nowhere does it say that no expect line covers CSV behaviour or npm test. It only lists them as advisory tasks and never gives the reason. The must_catch item asks the brief to state that gap, so this item is not fully handled.",
+  "model": "claude-opus-5-5",
+  "ms": 7467,
+  "tokens": {
+    "input": 2,
+    "output": 703,
+    "cacheCreation": 2943,
+    "cacheRead": 783,
+    "fresh": 3648,
+    "total": 4431
+  },
+  "at": "2026-11-05T08:40:21.187Z"
+}

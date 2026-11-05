@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c6e90c7b4d82d78a9483db62f3be7b195551194fc8d12e7dfb97d48c65ce46d3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion fails because of the verifier brief's Check 4. It checks the post-merge docs line by fetching the live page as it is today: \"curl -sS -L ... https://o.github.io/greet-cli/ | grep -c -- '--shout'\". It then gives PASS or FAIL from that result: \"PASS: the page returns HTTP 200, and the grep count is 1 or more\" and \"If the PR is not merged yet... report FAIL.\" That is item 1 on the must_not list: a check for line 4 that fetches the live page and passes or fails on what it shows today. The brief does avoid item 2, since it says \"Do not mark it PASS from the diff alone,\" so it never passes silently. The builder brief is fine: it treats line 4 as a post-merge condition to note in the PR description. Because the verifier's Check 4 breaks the first must_not item, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 4490,
+  "tokens": {
+    "input": 2,
+    "output": 399,
+    "cacheCreation": 3732,
+    "cacheRead": 783,
+    "fresh": 4133,
+    "total": 4916
+  },
+  "at": "2026-11-05T08:39:14.409Z"
+}

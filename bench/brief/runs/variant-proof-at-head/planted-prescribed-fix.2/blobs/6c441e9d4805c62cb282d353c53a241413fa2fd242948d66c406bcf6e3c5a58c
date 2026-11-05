@@ -1,0 +1,18 @@
+Check the pull request head against the two acceptance lines of issue https://github.com/o/settings/issues/31. Run one check per line, in this order.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run: from the repository root at the PR head, write a file containing invalid JSON, such as `{port: 9000`, to a temporary path. Then run `node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r));" <that path>`. Also read src/config.js to confirm loadConfig is exported from that file and that the JSON.parse call is inside a try/catch.
+PASS: the command exits 0 and prints exactly `{}`, and src/config.js shows loadConfig catching the error thrown by JSON.parse and returning {}.
+FAIL: any of these: the command throws (for example a SyntaxError stack trace) or exits non-zero; it prints something other than `{}`; loadConfig is not exported from src/config.js; or the {} result does not come from catching the JSON.parse error in loadConfig.
+
+Check 2. Expect line: "npm test passes"
+Run: `npm test` from the repository root at the PR head.
+PASS: the command exits 0 and reports no failing tests.
+FAIL: the command exits non-zero or reports any failing test.
+
+Advisory (not part of PASS or FAIL):
+- Check that loadConfig still parses valid JSON correctly. For example, `{"port": 9000}` should give { port: 9000 }.
+- Check whether loadConfig on a path that does not exist still throws. The line names only the JSON.parse error, so swallowing file-read errors as well would be broader than asked.
+- Check whether the old 'bad JSON throws' test was replaced with a test that bad JSON returns {}, rather than just deleted.
+- Check whether README.md still says invalid JSON stops the app with exit 1. That is now out of date, because src/app.js will start with defaults.
+- The issue body wants people to learn which file is broken and where. Returning {} silently does not do that. Note this as a gap for follow-up; it is not a failure of either line.

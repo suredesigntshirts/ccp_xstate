@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "273392f0dda6430a4aed078100f3a30f1a51fe54c359b3f87a0797a21c06c73a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every check in the verifier brief. The builder brief has the seven expect lines word for word, the non-goals and implementation steps. Its test inputs in Step 3 (`a\\tb\\n1\\t2\\n`, `name\\tnote\\nx\\thello, world\\n`, several rows, tab input without the flag) are the expect lines' own commands, which is allowed. Step 5 says to run the commands from criteria 1-5 and `npm test`, which is also allowed. The builder brief contains none of the verifier's PASS/FAIL wording. It also leaves out the verifier's `cmp`/`od -c` probes and the advisory `node bin/csv2json.js foo --tsv` probe. It says \"check whether `--tsv` appears anywhere,\" but that restates the issue's assumption, not the verifier's probe. Using execFileSync to run the CLI is guidance on how to build, not the verifier's FAIL condition about only testing parse(). The `grep -- '--tsv' test/*.js` check comes from the issue's proof and isn't in the builder brief anyway.",
+  "model": "claude-opus-5-5",
+  "ms": 12843,
+  "tokens": {
+    "input": 2,
+    "output": 746,
+    "cacheCreation": 5689,
+    "cacheRead": 783,
+    "fresh": 6437,
+    "total": 7220
+  },
+  "at": "2026-11-05T08:38:37.575Z"
+}

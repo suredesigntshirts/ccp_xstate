@@ -1,0 +1,16 @@
+Goal: one pull request that meets every one of these acceptance lines:
+- math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+- clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+- README.md documents every function math.js exports
+- npm test passes
+
+Context (current repo): math.js is CommonJS and ends with `module.exports = { add, subtract, multiply };`. README.md has an `## API` section with `### add(a, b)` and `### multiply(a, b)` entries, each with a one-line description and a short js example. Note that `subtract` is exported but NOT documented in README.md today, so it must be added too. Tests live in test/math.test.js and run with `npm test` (`node --test`, Node 22).
+
+Steps:
+1. In math.js, add a function `clamp(x, lo, hi)` with a short doc comment like the others. If `lo > hi`, throw `new RangeError(...)` with a clear message (e.g. that lo must not be greater than hi). Otherwise return `Math.min(Math.max(x, lo), hi)`, so values below lo return lo, above hi return hi, and values inside the range (including exactly lo or hi) return x unchanged. lo === hi is a valid range and returns that value. Add `clamp` to `module.exports` and keep add, subtract and multiply exported unchanged.
+2. In README.md, under `## API`, add `### subtract(a, b)` (returns `a` minus `b`, with a small example) and `### clamp(x, lo, hi)` (returns `x` limited to the range `lo` to `hi`; throws a `RangeError` when `lo` is greater than `hi`; example such as `clamp(-5, 0, 100); // 0` and `clamp(140, 0, 100); // 100`). Use the same `### name(args)` heading style as the existing entries. Make sure every function exported from math.js has such an entry.
+3. In test/math.test.js, import clamp and add tests: value inside the range is unchanged; below lo returns lo; above hi returns hi; boundaries; lo === hi; `assert.throws(() => clamp(5, 10, 0), RangeError)`.
+4. Run these and make sure each succeeds before opening the PR:
+   - `npm test`
+   - `node -e "const fs=require('fs');const m=require('./math.js');const r=fs.readFileSync('README.md','utf8');const missing=Object.keys(m).filter(k=>typeof m[k]==='function'&&!new RegExp('^#+\\s*\`?'+k+'\\s*\\(','m').test(r));if(missing.length){console.log('MISSING: '+missing.join(', '));process.exit(1)}console.log('CHECK3 OK: '+Object.keys(m).join(', '))"`
+5. Commit math.js, README.md and test/math.test.js and open one pull request describing the change and referencing https://github.com/o/r/issues/23.

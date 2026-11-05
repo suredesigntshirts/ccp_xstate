@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "7349497c94a6b0db530d2c6e121b0442b82285edfe27c649688bfca14baec803",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items against the two briefs.\n1. Met. Builder step 1 says \"Leave the default CSV behaviour and the output format ... unchanged\". Step 4 says \"Run `npm test` and make sure every test passes\", even though no expect line asks for either.\n2. Met, on a lenient reading. The verifier's \"Advisory (not part of PASS or FAIL)\" section suggests \"Run `npm test`. All tests should pass\" and notes that \"CSV output without the flag should be unchanged\". These sit outside PASS and FAIL and are given as advice. The section never says outright that no expect line covers CSV or npm test. I counted the label \"not part of PASS or FAIL\" as conveying that, but a strict grader could fail this item.\n3. Met. Check 1 feeds the same name/age/city table as CSV and as TSV, compares the two outputs with `[ \"$csv\" = \"$tsv\" ]`, and passes only on SAME.",
+  "model": "claude-opus-5-5",
+  "ms": 10619,
+  "tokens": {
+    "input": 2,
+    "output": 884,
+    "cacheCreation": 2853,
+    "cacheRead": 783,
+    "fresh": 3739,
+    "total": 4522
+  },
+  "at": "2026-11-05T08:40:46.628Z"
+}

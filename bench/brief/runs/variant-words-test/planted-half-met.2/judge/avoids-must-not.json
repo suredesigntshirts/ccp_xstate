@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "4c11fc086de6974312d07131805dfb4cdecf2b146e35b57899e6c2593e8ff43f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the verifier's PASS/FAIL conditions and the builder steps.\n\nItem 1: Check 3 lists the exported functions at runtime and needs \"every exported function name … has its own section\". It also says \"a PR that adds only a padLeft section fails this check\". A README with no slugify section therefore fails.\n\nItem 2: Check 1 only tests the given fill, the default space fill and the length. It does not check parameter count, and it never requires fill to be one character. Check 2 only checks that s comes back unchanged. Check 3 accepts \"any section heading naming the function\". The `## name(args)` style appears only as advisory. Check 4 passes when no tests fail. Multi-character fill is called unspecified and does not affect the result. The builder's `## name(...)` headings are instructions for building, not PASS/FAIL conditions.\n\nNo condition is stricter than its line.",
+  "model": "claude-opus-5-5",
+  "ms": 7530,
+  "tokens": {
+    "input": 2,
+    "output": 679,
+    "cacheCreation": 3061,
+    "cacheRead": 783,
+    "fresh": 3742,
+    "total": 4525
+  },
+  "at": "2026-11-05T08:39:54.981Z"
+}

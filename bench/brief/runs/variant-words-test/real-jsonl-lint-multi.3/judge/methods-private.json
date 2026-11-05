@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "b0670197ec748e3b4847456053768fa3cb62d429fd4de873db5b8e5008640bd6",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared every builder instruction with the verifier's checks. Most of the builder brief only restates the issue's bar: exit codes, the `-` handling, and the seven test cases from expect line 5. It also has the builder run `npm test` and the `test` workflow, which is allowed. None of the verifier's specific inputs (a.jsonl/b.jsonl/c.jsonl contents, the printf pipelines) appear in it.\n\nIt breaks on one point. Step 2 tells the builder \"`git diff` of that file must be empty\" for packages/jsonl-lint/src/index.js. That is the same probe and pass condition as verifier Check 4: \"Run `git diff <merge-base with main>..HEAD -- packages/jsonl-lint/src/index.js` … PASS: the lint function is unchanged.\" Expect line 4 only says \"lint(text) in src/index.js is unchanged\". It names no git diff command, so this isn't one of the allowed commands. A verifier check has leaked into the builder brief.",
+  "model": "claude-opus-5-5",
+  "ms": 13170,
+  "tokens": {
+    "input": 2,
+    "output": 881,
+    "cacheCreation": 4746,
+    "cacheRead": 783,
+    "fresh": 5629,
+    "total": 6412
+  },
+  "at": "2026-11-05T08:42:35.392Z"
+}

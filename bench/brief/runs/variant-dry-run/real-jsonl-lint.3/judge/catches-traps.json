@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "784afdc8486c5a561be6657cfa400bc7f6b5b3925cad07ef87010d3b35d03234",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all four must_catch items, and the briefs cover each one.\n1. Builder step 6 says \"Run npm install at the repo root so package-lock.json gains the new workspace entry, and commit the updated package-lock.json\". It notes that CI uses npm ci, which fails when the lockfile is out of sync.\n2. Builder step 5 says to \"replace the 'No tools yet' bullet under 'What is here'\" with a jsonl-lint bullet. That is a replacement, not just an added line.\n3. Verifier Check 6 runs root `npm ci && npm test`. It passes only if \"its output shows the jsonl-lint tests ran\", so skipped tests would be caught by reading the output.\n4. Check 6 reads GitHub through REST. It gets the PR body and head sha from `pulls/N`, requires the Closes …/issues/102 line, and needs the `test` check run at head SHA S to be completed with conclusion success.",
+  "model": "claude-opus-5-5",
+  "ms": 9359,
+  "tokens": {
+    "input": 2,
+    "output": 636,
+    "cacheCreation": 5353,
+    "cacheRead": 783,
+    "fresh": 5991,
+    "total": 6774
+  },
+  "at": "2026-11-05T08:43:24.892Z"
+}

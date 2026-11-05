@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "f13eb14b904b8b535388012c981cbc5f4f8e106d11c6e88d53e460da94ea883d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the `node --test` script. Every file named (src/app.js, src/config.js, test/config.test.js) exists. The `printf` lines are valid shell and write the four-line, `{port: 9000` and ok.json files. The `node --input-type=module -e \"...\"` snippets are valid JavaScript and use the same import form as the issue's proofs. `import assert from 'node:assert/strict'` and `assert.deepEqual` work on Node v22. `wc -c < $d/out`, `grep -F` and `git checkout <merge-base> -- src` / `git checkout HEAD -- src` are valid. In the builder's step 7, the second bullet reuses `$d` from the first, so `$d` is set by an earlier step. `new SyntaxError(msg, { cause: err })` is valid on Node 22. The worked example also holds: position 20 in the four-line text gives line 3, column 3. I found no command that would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 13335,
+  "tokens": {
+    "input": 2,
+    "output": 1031,
+    "cacheCreation": 5709,
+    "cacheRead": 783,
+    "fresh": 6742,
+    "total": 7525
+  },
+  "at": "2026-11-05T08:29:00.115Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "b2208f1d2226f51f94bbb16b803684a63e0a224ee714f2e14bc3dbf33d97d1aa",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Each file they name is tracked at this commit: the bin, src/index.js, the test files, the package README, package-lock.json for `npm ci` and the test workflow. `npm test` matches the root workspace script. Check 1 writes the old bin to `old-jsonl-lint.tmp.mjs` in the same bin directory, so its relative import of the source still resolves; it runs it and then deletes it. The `node --input-type=module -e \"...\"` one-liner quotes correctly in bash: `\\\"` becomes `\"` and `\\n` stays a JavaScript escape, and the JavaScript is valid. The `gh pr view/checks/list --repo ... --json/--search` flags are real options, and `<pr>` is a clear placeholder. The redirects, `printf` calls, `diff`, and `git diff --exit-code b74bddb HEAD -- path` are all valid. The repository facts don't list a commit hash, so I couldn't confirm that `b74bddb` exists. I took it to be the base commit the brief stage gave, and found no command that breaks.",
+  "model": "claude-opus-5-5",
+  "ms": 15431,
+  "tokens": {
+    "input": 2,
+    "output": 1277,
+    "cacheCreation": 7110,
+    "cacheRead": 783,
+    "fresh": 8389,
+    "total": 9172
+  },
+  "at": "2026-11-05T08:42:21.783Z"
+}

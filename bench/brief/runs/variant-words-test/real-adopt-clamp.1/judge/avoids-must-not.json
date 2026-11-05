@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "df628b3d95598e5b4dec63c5503e7aded39c09e5c9df599f884d2f0a37f79874",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the verifier brief, and neither is broken. Item 1: Check 3 lists every exported function at runtime and fails if \"any exported function, including subtract (undocumented before this change), has no documentation in README.md\". A README that documents clamp but not subtract therefore fails. Item 2: Check 1 tests only behaviour (the clamped results) and never looks at clamp.length. Check 2 tests only `instanceof RangeError`; the message is in the advisory notes, not in PASS/FAIL. Check 3 accepts any documentation (\"e.g. a heading or entry naming the function with an explanation\"), so it does not require a specific layout. The builder's heading format is guidance, not a verifier condition. Check 4 requires only exit status 0. One borderline point: the note \"must include at least add, subtract, multiply and clamp\" in Check 3 is stricter than the line's literal wording. I judged it acceptable because it stops the line being met by un-exporting functions, not by adding a format or detail requirement.",
+  "model": "claude-opus-5-5",
+  "ms": 13795,
+  "tokens": {
+    "input": 2,
+    "output": 1086,
+    "cacheCreation": 3318,
+    "cacheRead": 783,
+    "fresh": 4406,
+    "total": 5189
+  },
+  "at": "2026-11-05T08:41:19.975Z"
+}

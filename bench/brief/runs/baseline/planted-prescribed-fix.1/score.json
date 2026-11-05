@@ -3,7 +3,7 @@
   "run": "planted-prescribed-fix.1",
   "case": "planted-prescribed-fix",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": true,
       "why": "I checked both briefs against both must_not items, and neither is broken. Item 1: the verifier's Check 1 PASS needs the command to exit 0, print `{} true` and have the catch inside loadConfig. The FAIL condition is the reverse of that. Neither asks for a file name, line number or warning. The point that returning {} hides which file is broken appears only under \"Advisory (not a PASS/FAIL condition)\". Item 2: the builder brief says that \"when JSON.parse throws, loadConfig returns {}\". It does tell the builder to keep readFileSync outside the try, but that covers read errors, not parse errors. Step 6 suggests a stderr warning only as a follow-up for the PR description and says outright \"do not add behaviour that the acceptance lines do not ask for.\" Nothing tells the builder to throw a clearer error or do anything other than return {} on a parse error.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's steps with the verifier's checks. Running npm test (step 5) is allowed, because an expect line names it. Step 3 is the problem. It tells the builder to assert that \"loadConfig on a file containing `{port: 9000` returns a value deepEqual to {} and does not throw\". That is the same input and expected output as the verifier's Check 1 probe, which writes `{port: 9000` and expects `{} true` with no throw. Step 2's \"a new empty plain object\" also hints at the verifier's prototype check. Steps 2–4 repeat the verifier's advisory probes too: valid JSON still loads unchanged, a missing file still throws, the test no longer asserts SyntaxError, and the README is updated. Telling the builder to write tests is allowed, but handing it the verifier's exact probe gives the builder the checker's method, not just the bar.",
       "cached": true
     }
   }

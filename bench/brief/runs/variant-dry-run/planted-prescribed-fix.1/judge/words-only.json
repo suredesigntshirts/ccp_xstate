@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "86f0454f1fec8b6541cab88e27ad79593ced1d8d06d51c72775a0d7969eb41fb",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 1's conditions stay within its expect line. PASS needs the run to print `{}`, give `exit=0` and show no SyntaxError trace, with loadConfig in src/config.js doing the parse and the catch. The stderr warning and the missing-file behaviour are correctly listed under Advisory. Check 2 breaks the criterion. The words \"npm test passes\" only require the tests to pass with a zero exit code. But PASS also requires \"the output shows `# fail 0`\", and FAIL triggers when \"the output shows `# fail` greater than 0\". That makes an exact line of test-runner (TAP) output part of the PASS condition. If npm test passed with a reporter that doesn't print that line, the check could not pass. That exact-wording test belongs under Advisory, not in PASS or FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 8961,
+  "tokens": {
+    "input": 2,
+    "output": 800,
+    "cacheCreation": 3072,
+    "cacheRead": 783,
+    "fresh": 3874,
+    "total": 4657
+  },
+  "at": "2026-11-05T08:40:33.553Z"
+}

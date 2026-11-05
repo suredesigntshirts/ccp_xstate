@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "f0f3dc7573c8b759c21f9ea18e7165c184878c94f3ca05717401cb19260d692c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds: neither brief does anything on the must_not list. I checked both items across both briefs.\n\n1. `npm run test:cli` appears nowhere, even though proof 6 in the issue uses it. Verifier Check 6 runs `npm test; echo \"exit=$?\"` and bases PASS on exit=0 from that. The builder's own self-check also uses \"`npm test` exits 0\".\n\n2. The builder brief does not ask for a general separator option. It forbids one: \"do not add --help, --sep or auto-detection\". Its out-of-scope list also includes \"a general --sep/--delimiter option\". The only change it requests is a `--tsv` check that calls `parse(text, '\\t')`.\n\nThe verifier mentions --sep/--delimiter only as advisory scope creep to note, and says those notes do not affect PASS/FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 7661,
+  "tokens": {
+    "input": 2,
+    "output": 436,
+    "cacheCreation": 6285,
+    "cacheRead": 783,
+    "fresh": 6723,
+    "total": 7506
+  },
+  "at": "2026-11-05T08:28:28.415Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "4a500d7fc6135be022fd04d585ec4e9bbe774699a86653be19e748928476a6be",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. The builder runs only `npm test`, and package.json defines it as `node --test`. The verifier runs `npm install` (fine with no dependencies), three `node --input-type=module -e \"...\"` one-liners and `npm test`. In the one-liners, the shell quoting is valid: the outer double quotes enclose JS that uses only single quotes, and `'\\n'` reaches JS as a newline escape. The JS is valid (`import * as m from './index.js'`, `import {padLeft} ...`, `JSON.stringify`, `Object.keys(...).filter(...)`). `./index.js` resolves from the repository root, where the check says to run it. The expected outputs match what the code would print, e.g. `p('ab',4,'*')` gives \"**ab\". Every file named (index.js, README.md, test/strutil.test.js) is tracked at this commit. The brief's claim that package.json has \"type\": \"module\" isn't confirmed by the repository facts I have, but it doesn't change whether the commands run.",
+  "model": "claude-opus-5-5",
+  "ms": 11875,
+  "tokens": {
+    "input": 2,
+    "output": 765,
+    "cacheCreation": 3093,
+    "cacheRead": 783,
+    "fresh": 3860,
+    "total": 4643
+  },
+  "at": "2026-11-05T08:39:42.558Z"
+}

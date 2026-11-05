@@ -3,7 +3,7 @@
   "run": "planted-after-merge.2",
   "case": "planted-after-merge",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": false,
       "why": "I checked the verifier's Check 4 against must_not item 1, and it breaks it. Check 4 says to \"fetch the live page: `curl -sSL https://o.github.io/greet-cli/`\". It then gives PASS when \"the PR is merged and the fetched published page contains `--shout`\". It gives FAIL when the page lacks `--shout` or \"cannot be fetched\", and also when the PR isn't merged yet (\"report it as FAIL… include what the live page currently shows\"). So the check passes or fails on what the live page shows today, which item 1 forbids. It does not pass silently without evidence (item 2): it rules out passing \"from the contents of docs/index.md or the diff alone\". The builder brief stays clear of both items. Because Check 4 does what item 1 forbids, the criterion fails.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier's checks and found three places where the builder brief gives away the verifier's probes. (1) Step 2 says \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!\\n`\". That is the same input and expected output as Check 1, which runs `node bin/greet.js --shout Ada` and expects `HELLO, ADA!`. (2) Steps 2 and 3 give plain `Ada` → `Hello, Ada!\\n`, and the usage message with exit code 2. That matches Check 2's commands and expected outputs. (3) Step 4 says \"The literal text `--shout` must appear in the file\". That restates the PASS condition behind Check 3's grep. Step 3 also requires `Ada --shout`, which matches the verifier's advisory probe. Asking the builder to write tests is allowed, but here the brief hands over the verifier's own inputs and expected outputs, so the builder gets the checker's methods and not just the bar.",
       "cached": true
     }
   }

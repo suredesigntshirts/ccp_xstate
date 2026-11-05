@@ -1,0 +1,18 @@
+Goal: make one pull request that meets both acceptance lines of issue #31:
+- "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+- "npm test passes"
+
+Context from the current code:
+- src/config.js: `loadConfig(path)` returns `JSON.parse(readFileSync(path, 'utf8'))` and does not catch anything.
+- src/app.js wraps loadConfig in try/catch. On a bad file it currently prints `bad config: <message>` and exits 1. Its config is `{ ...DEFAULTS, ...loadConfig(...) }`, so once loadConfig returns {}, the app will start on DEFAULTS.
+- test/config.test.js has `test('bad JSON throws', ...)`, which asserts a SyntaxError. That test will fail after this change.
+- README.md says an invalid JSON file stops the app with `bad config: <message>` and exit 1.
+- `npm test` runs `node --test`.
+
+Steps:
+1. In src/config.js, read the file as now, but wrap only the `JSON.parse` call in try/catch so that a JSON.parse error makes loadConfig return `{}`. Do not catch errors from readFileSync (for example, a missing file). Those should still throw as they do today. A valid file must still return its parsed object.
+2. The issue says people need to know which file is broken and where. So when the parse fails, write one line to stderr before returning {}. The line must name the path and include the parse error message, which holds the position, for example `bad config in <path>: <message>; using defaults`. Do not print a stack trace.
+3. Update test/config.test.js. Replace the 'bad JSON throws' test with one that asserts `loadConfig` on `{port: 9000` returns `{}` (deepEqual) and does not throw. Keep the 'reads a config' test.
+4. Update README.md so it describes the new behaviour: an invalid JSON file prints a warning naming the file and the app starts with the defaults. Leave the try/catch in src/app.js as it is, since it still handles read errors.
+5. Run `npm test` from the repository root and make sure every test passes.
+6. In the PR description, say plainly that a malformed config.json now gives a warning and starts the app on default settings instead of exiting 1. Reviewers need to see this behaviour change.

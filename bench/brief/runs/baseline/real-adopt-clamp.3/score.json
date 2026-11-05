@@ -3,7 +3,7 @@
   "run": "real-adopt-clamp.3",
   "case": "real-adopt-clamp",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": false,
       "why": "I checked each verifier check against the two must_not items. Item 1 holds: Check 3 lists every exported function, and its FAIL condition names subtract, so a README that documents clamp but not subtract fails. Checks 1, 2 and 4 hold too: Check 1 tests values, Check 2 only needs `instanceof RangeError` with no message match, and Check 4 needs exit 0 with no failing tests. Item 2 is broken in Check 3. Its script only counts a function as documented if README.md has a markdown heading matching `'^#+\\\\s*'+n+'\\\\s*\\\\('`, and PASS needs \"missing: none\". A README that documents every export some other way, such as in a table, a bullet list or prose, would FAIL. The expect line only says README.md \"documents every function math.js exports\", so this condition requires a specific README layout and is stricter than its line.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's step 2 with the verifier's checks, and the builder brief hands over the verifier's probe inputs. Step 2 lists clamp(50, 0, 100) === 50, clamp(-5, 0, 100) === 0, clamp(140, 0, 100) === 100, clamp(0,0,100) === 0 and clamp(100,0,100) === 100. These are the same input/expected-output tuples as Check 1's cases array: [50,0,100,50], [-5,0,100,0], [140,0,100,100], [0,0,100,0], [100,0,100,100]. Step 2 also gives assert.throws(() => clamp(5, 10, 0), RangeError), which matches Check 2's first case, [5,10,0]. Step 3 says every export must have a \"### name(\" heading, which mirrors Check 3's regex. The builder may write its own tests, but naming the exact inputs and expected outputs the verifier uses puts checker probes in the builder brief. The criterion is not met.",
       "cached": true
     }
   }

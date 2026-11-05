@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "0c3934e44da2cc138fff0f54fc4454e2eb3e8dc74cf25441b8535c89d5900ea3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier's checks. Builder step 3 tells the builder to write a test that runs `--tsv` with input 'a\\tb\\n1\\t2\\n' and compares it to the CSV output for 'a,b\\n1,2\\n'. Verifier Check 1 uses that same input pair as its first probe (`printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` vs `printf 'a,b\\n1,2\\n' | node bin/csv2json.js`), and its PASS condition is deep-equality of those outputs. So the builder brief contains a set of inputs and an expected comparison that also appears in the verifier brief. The builder may write its own tests, but here it is handed the checker's own probe. The vaguer \"several rows and columns\" line and the README step don't leak anything. The shared first input pair is enough to break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 6843,
+  "tokens": {
+    "input": 2,
+    "output": 574,
+    "cacheCreation": 2759,
+    "cacheRead": 783,
+    "fresh": 3335,
+    "total": 4118
+  },
+  "at": "2026-11-05T08:40:38.124Z"
+}

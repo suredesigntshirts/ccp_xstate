@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "2813a8610129b0cb888249a900158af9f9e07f8e597de7effd04d565d9fdc219",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier's checks. Mostly the builder brief restates expect lines and asks for tests, which is allowed. It breaks the criterion in two places where it hands over the verifier's own probes:\n\n1. Step 6 gives a hand probe with its expected output: `printf '{bad}\\n' | node ... jsonl-lint.js packages/jsonl-lint/package.json -` \"(expect `-:1: ...`, exit 1)\". This is close to Verifier Check 2's third run (`printf '{bad}\\n' | node $B \"$T/a.jsonl\" - ...`, PASS on `-:1: ...`, exit 1). The command is the builder's own, not one named by an expect line or the issue.\n2. Step 4 says to \"put a bad file after the missing one and assert its rows are still printed\". This copies Check 3's PASS condition for the last run (missing.jsonl then c.jsonl, c.jsonl still reported). The expect lines don't ask for that case.\n\nStep 3's \"git diff for that file must be empty\" also echoes Check 4's PASS condition.",
+  "model": "claude-opus-5-5",
+  "ms": 9294,
+  "tokens": {
+    "input": 2,
+    "output": 860,
+    "cacheCreation": 5661,
+    "cacheRead": 783,
+    "fresh": 6523,
+    "total": 7306
+  },
+  "at": "2026-11-05T08:42:42.872Z"
+}

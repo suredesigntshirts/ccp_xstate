@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "5388dd207f7c693d797b895ecaf92ad14dfeffcf0aa0b540f2dabdb966e96669",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The output avoids must_not 1 but breaks must_not 2. On item 1: verifier Check 3 builds its list from every export and fails when any function is listed under `missing:`. It also says \"Watch for slugify\", so a README with only a padLeft section would fail. On item 2: Checks 1 and 2 use only single-character fills and don't add a parameter-count check, so they're fine. Check 3 is stricter than its line. Its regex only accepts a heading that starts with the exact, case-sensitive function name, optionally after a backtick. A real slugify section headed \"## Slugify\" or \"## The slugify helper\" would fail, so a README layout is effectively required. Check 4 is also stricter than \"npm test passes\". It requires the output to show the literal `# fail 0`, which depends on the test reporter: node --test's spec reporter doesn't print that line even when every test passes.",
+  "model": "claude-opus-5-5",
+  "ms": 11407,
+  "tokens": {
+    "input": 2,
+    "output": 1029,
+    "cacheCreation": 3592,
+    "cacheRead": 783,
+    "fresh": 4623,
+    "total": 5406
+  },
+  "at": "2026-11-05T08:40:08.275Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "4fc684a1054e24a9c75238000b57ac786ae4d760a9d443633ffa0c67cd29d618",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's probes, and some probes appear in both. In step 2 the builder brief suggests README examples \"clamp(140, 0, 100) // 100 and clamp(-5, 0, 100) // 0\". Those are the same inputs and expected outputs as Check 1's c(140,0,100) and c(-5,0,100), whose PASS array expects 100 and 0. In step 3 it tells the builder to write \"assert.throws(() => clamp(5, 10, 0), RangeError)\", which is the [5,10,0] case that Check 2 tests for RANGEERROR. Step 3's boundary cases (x === lo, x === hi, lo === hi) also match Check 1's c(0,0,100), c(100,0,100) and c(7,3,3). Repeating the expect lines and asking the builder to write tests is allowed. Handing it the verifier's specific inputs and expected outputs is not, so the builder gets part of the checker.",
+  "model": "claude-opus-5-5",
+  "ms": 8996,
+  "tokens": {
+    "input": 2,
+    "output": 633,
+    "cacheCreation": 3341,
+    "cacheRead": 783,
+    "fresh": 3976,
+    "total": 4759
+  },
+  "at": "2026-11-05T08:41:28.972Z"
+}

@@ -1,0 +1,13 @@
+Criteria the build must meet (from the issue, word for word):
+- math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+- clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+- README.md documents every function math.js exports
+- npm test passes
+
+Steps:
+1. Read math.js, README.md, package.json and test/math.test.js. math.js is CommonJS and currently exports add, subtract and multiply via module.exports. Tests use node:test (`npm test` runs `node --test`).
+2. In math.js add a function clamp(x, lo, hi) with a short doc comment, in the same style as the others. If lo > hi, throw a RangeError (e.g. `throw new RangeError('clamp: lo must not be greater than hi')`). Otherwise return lo when x < lo, hi when x > hi, and x itself when it is in range (lo and hi inclusive). Add clamp to module.exports alongside the existing functions; do not remove or rename any existing export.
+3. In test/math.test.js import clamp and add tests: a value below the range returns lo (e.g. clamp(-5, 0, 100) === 0), a value above returns hi (clamp(140, 0, 100) === 100), a value inside returns itself (clamp(42, 0, 100) === 42), boundary values return themselves, lo === hi returns that value, and clamp(5, 10, 0) throws a RangeError (assert.throws(..., RangeError)).
+4. In README.md, under the existing `## API` section, document every function math.js exports. Note that subtract is exported but currently missing from the README: add a `### subtract(a, b)` section (returns `a` minus `b`, with a short example) and a `### clamp(x, lo, hi)` section (returns `x` limited to the range `lo` to `hi`, inclusive; throws a RangeError when `lo` is greater than `hi`; with an example such as `clamp(140, 0, 100); // 100`). Keep add and multiply sections. Use the same `### name(params)` heading style.
+5. Run `npm test` and make sure it exits 0 with all tests passing. Also check by hand that `node -e "console.log(Object.keys(require('./math.js')))"` lists names that each have a README `###` heading.
+6. Open one pull request containing these changes.

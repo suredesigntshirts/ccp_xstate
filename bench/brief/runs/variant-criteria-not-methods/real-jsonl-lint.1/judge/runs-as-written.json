@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "41d96f30f5ce296949f5788bd89c546743e515fdd74fbb6e0bdfd8c53d5d43b5",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands would run as written: `npm install`/`npm ci`/`npm test`, `npm test --workspace jsonl-lint`, the `node -e` package.json read, the Check 3 `--input-type=module` import (the bash quoting works out), and the `gh api` REST calls. Two problems remain. First, builder step 5 says to make temp files with `fs.mkdtempSync(os.tmpdir())`. That argument is wrong: mkdtemp treats it as a prefix and tries to create something like `/tmpXXXXXX` at the filesystem root. As a non-root user, such as on the GitHub CI runner, that fails with EACCES. The brief should use `path.join(os.tmpdir(), 'x-')`. Second, every verifier command uses `$T`, but no command ever sets it (\"Use a scratch directory from `mktemp -d`\" is only prose). Run as written, `$T` is empty and fixtures go to `/clean.jsonl` and similar paths at the root.",
+  "model": "claude-opus-5-5",
+  "ms": 13292,
+  "tokens": {
+    "input": 2,
+    "output": 1112,
+    "cacheCreation": 6067,
+    "cacheRead": 783,
+    "fresh": 7181,
+    "total": 7964
+  },
+  "at": "2026-11-05T08:42:42.075Z"
+}

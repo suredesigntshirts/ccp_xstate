@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9c545ff318f406a02bfadecfc518c5449fc948698a31bd3284bac1054e33eefd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The output handles all three must_catch items. (1) Builder step 2 tells the builder to add `## padLeft(s, width, fill)` \"AND adding the missing `## slugify(s)` section\", and the context notes that README has \"NO section for slugify\". (2) Verifier Check 3 prints the exported functions and the missing ones. It requires \"this must include capitalize, slugify, truncate and padLeft\" and FAILs when any of them has no section. It also says outright that a PR adding only padLeft fails. (3) Verifier Check 1 calls `m.padLeft('42',5)` with no fill and expects `\"   42\"`. It FAILs on \"a non-space default fill\".",
+  "model": "claude-opus-5-5",
+  "ms": 4577,
+  "tokens": {
+    "input": 2,
+    "output": 391,
+    "cacheCreation": 3307,
+    "cacheRead": 783,
+    "fresh": 3700,
+    "total": 4483
+  },
+  "at": "2026-11-05T08:39:49.873Z"
+}

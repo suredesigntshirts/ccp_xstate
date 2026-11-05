@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e35366602f0574277bebe0e3fb2a4ab0909ac55ea7749eb666f2bae2b90ebbf6",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Items 1, 2 and 4 are covered. Builder step 7 says \"Run `npm install` at the repo root so package-lock.json records the new workspace\". Step 6 says \"replace the 'No tools yet' bullet\". Verifier Check 6 reads the PR body and headRefOid and runs `gh pr checks` against the workflow at the head commit. Item 3 is missing. The verifier never confirms that the jsonl-lint tests actually run under the root `npm test`. Check 4 runs `npm test -w jsonl-lint`, which is the workspace-scoped command, not the root one. Check 6 only looks at the exit status of the root `npm test` (\"local npm test exits 0\"). It does not read the test count from the root run or break lint() to see a test fail. So a silent skip caused by `--if-present`, or a run that finds zero tests, would still pass.",
+  "model": "claude-opus-5-5",
+  "ms": 12082,
+  "tokens": {
+    "input": 2,
+    "output": 821,
+    "cacheCreation": 5088,
+    "cacheRead": 783,
+    "fresh": 5911,
+    "total": 6694
+  },
+  "at": "2026-11-05T08:42:54.674Z"
+}

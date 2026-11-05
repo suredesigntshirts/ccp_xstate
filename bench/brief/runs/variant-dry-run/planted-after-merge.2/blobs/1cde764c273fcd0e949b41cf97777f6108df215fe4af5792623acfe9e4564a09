@@ -1,0 +1,28 @@
+Goal: one pull request that adds a --shout flag to the greet CLI and documents it in docs/index.md.
+
+What the repository has now:
+- bin/greet.js treats the first argument that does not start with `--` as the name and prints `greeting(name)` followed by a newline. With no name it prints `usage: greet <name>` to stderr and exits 2.
+- src/greet.js exports `greeting = (name) => `Hello, ${name}!``.
+- test/greet.test.js has node:test tests. Run them with `npm test`.
+- docs/index.md is the docs page. .github/workflows/pages.yml publishes the `docs/` directory to GitHub Pages (https://o.github.io/greet-cli/) on every push to main.
+
+Steps:
+1. In bin/greet.js, detect `--shout` among `process.argv.slice(2)`. When it is present, print the greeting in upper case, so `node bin/greet.js --shout Ada` prints `HELLO, ADA!` and a newline. Make it work whether `--shout` comes before or after the name. The name lookup already skips `--` arguments, so `--shout` must never be taken as the name.
+2. Without `--shout`, keep the output byte-for-byte the same: `node bin/greet.js Ada` must still print `Hello, Ada!\n`, and running with no name must still print the usage line to stderr and exit 2. Do not change `greeting()` in src/greet.js in a way that alters its current return value. Either do the upper-casing in the CLI, or add a separate option or function for it.
+3. Add tests to test/greet.test.js:
+   - a CLI test that `node bin/greet.js --shout Ada` outputs `HELLO, ADA!\n`
+   - a test with the flag after the name, `Ada --shout`
+   Keep the existing tests unchanged and passing. Run `npm test`; every test must pass.
+4. Update docs/index.md to document the flag. Add the usage line `node bin/greet.js --shout <name>` and a sentence saying it prints the greeting in upper case (e.g. `HELLO, <NAME>!`). Keep the existing usage text. The literal text `--shout` must appear in docs/index.md.
+5. Do not change .github/workflows/pages.yml. It already publishes `docs/` to https://o.github.io/greet-cli/ when the PR is merged to main, and that is how the last acceptance line ("after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout") gets met. Nothing in the PR can make the live page change before the merge. In the PR description, say that this line is a post-merge condition met by the existing pages workflow, and that it needs checking on the live page after the merge.
+6. Before opening the PR, run these checks and confirm that each one prints PASS:
+   test "$(node bin/greet.js --shout Ada)" = "HELLO, ADA!" && echo PASS || echo FAIL
+   test "$(node bin/greet.js Ada)" = "Hello, Ada!" && echo PASS || echo FAIL
+   grep -n -- '--shout' docs/index.md && echo PASS || echo FAIL
+   npm test
+
+Acceptance lines the PR must meet (quoted from the issue):
+- node bin/greet.js --shout <name> prints the greeting in upper case
+- without --shout the output is unchanged
+- docs/index.md documents --shout
+- after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout

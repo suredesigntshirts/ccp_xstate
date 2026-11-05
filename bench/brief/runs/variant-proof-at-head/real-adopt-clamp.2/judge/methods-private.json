@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "3e630e40e47ae006c5d87d23f38b3fcc5d9938c21058fc688970ad011df78d0c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief contains probes taken from the verifier brief. Step 1 lists exact input/output pairs: \"clamp(-5, 0, 100) === 0, clamp(140, 0, 100) === 100, clamp(50, 0, 100) === 50, and lo === hi is allowed\". The first three cases are, word for word, the first three cases in Check 1's script ([-5,0,100,0],[140,0,100,100],[50,0,100,50]), so the builder gets the checker's own test vectors. Step 4 also gives the builder an inline `node -e` script that runs Object.keys over math.js and compares the names against README headings. That is essentially the probe in Check 3 (exported names checked against README.md). Telling the builder to run `npm test` and write its own tests is allowed, but these shared inputs/expected outputs and the near-copy of the README probe break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 6799,
+  "tokens": {
+    "input": 2,
+    "output": 545,
+    "cacheCreation": 3352,
+    "cacheRead": 783,
+    "fresh": 3899,
+    "total": 4682
+  },
+  "at": "2026-11-05T08:42:01.166Z"
+}

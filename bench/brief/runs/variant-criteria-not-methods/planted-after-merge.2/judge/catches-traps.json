@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "45d4ac90c0f024bc066ff1d596480275737e4d3f77715a962361b67dd7d1993f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 2 is handled. Check 2 runs the commands at the PR head and at \"the PR's base commit (the merge base) in a separate temporary worktree\", then requires stdout, stderr and exit code to be identical. Item 1 is missed. Check 4 does say the result can only be decided after merge, but it then fetches the live page (\"curl -sSL https://o.github.io/greet-cli/\") and requires \"the PR is merged\" to pass. It also forbids passing \"on the strength of the diff or of docs/index.md at the PR head\". The must_catch item asks for the opposite approach: at the PR head, confirm that docs/index.md lists --shout and that pages.yml publishes docs/ from main, instead of reading the live page. As written, Check 4 will always fail at the PR head.",
+  "model": "claude-opus-5-5",
+  "ms": 5302,
+  "tokens": {
+    "input": 2,
+    "output": 426,
+    "cacheCreation": 3430,
+    "cacheRead": 783,
+    "fresh": 3858,
+    "total": 4641
+  },
+  "at": "2026-11-05T08:39:04.136Z"
+}

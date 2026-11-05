@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "f70a4e544cafc28b62ffc089f51ca9d34549b69730510480e3a774f76af0d1b0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier's checks. Step 3 tells the builder to write a test where loadConfig \"on a file holding `{port: 9000` returns a value deepEqual to {} and does not throw\". That is the same input and expected result as verifier Check 1, which writes `{port: 9000` to config.json and passes only if the result is `{}` with no throw. The brief is allowed to tell the builder to write its own tests, but here it hands over the checker's exact probe. Step 1's \"a missing file should still throw\" also repeats a verifier advisory check (ENOENT on a missing path), and step 2's stderr warning naming the path and parse error repeats another. Running `npm test` and quoting the expect lines are allowed. Because the verifier's probe input and its expected output appear in the builder brief, the methods are not kept private.",
+  "model": "claude-opus-5-5",
+  "ms": 12516,
+  "tokens": {
+    "input": 2,
+    "output": 838,
+    "cacheCreation": 2793,
+    "cacheRead": 783,
+    "fresh": 3633,
+    "total": 4416
+  },
+  "at": "2026-11-05T08:29:29.549Z"
+}

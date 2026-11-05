@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "df57a4b45bcdb1b4a803a1bf3d39109280246174884f82c770ec593d1666c704",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs. Item 1: verifier Check 6 runs \"npm test; echo \\\"exit=$?\\\"\", not `npm run test:cli`, even though the issue's proof uses that script. test:cli comes up only in the advisory note \"package.json has no test:cli script. Use npm test.\", which has no effect on PASS or FAIL. No other check depends on test:cli. Item 2: the builder brief never asks for a general separator option. It says outright \"do not add --help or a general --sep option\", and the verifier lists --sep/--delimiter only as things to flag if the PR adds them. Both items are avoided across the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 5157,
+  "tokens": {
+    "input": 2,
+    "output": 363,
+    "cacheCreation": 5446,
+    "cacheRead": 783,
+    "fresh": 5811,
+    "total": 6594
+  },
+  "at": "2026-11-05T08:38:14.288Z"
+}

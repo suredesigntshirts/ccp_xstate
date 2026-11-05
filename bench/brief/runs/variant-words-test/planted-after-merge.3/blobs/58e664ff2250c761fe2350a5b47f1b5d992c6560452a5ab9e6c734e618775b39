@@ -1,0 +1,27 @@
+Check out the PR head and run each check from the repository root, in this order. Report PASS or FAIL for each one, with the command output you saw.
+
+Check 1. Expect line: "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run: `node bin/greet.js --shout ada`, `node bin/greet.js --shout Bob` and `node bin/greet.js ada` (the last one shows the normal greeting to compare against).
+PASS: each --shout run prints the greeting, meaning the same text the run without the flag prints for that name, in upper case (for example `HELLO, ADA!`).
+FAIL: the output is not in upper case, is not the greeting, is missing, or the command errors.
+
+Check 2. Expect line: "without --shout the output is unchanged"
+Run `node bin/greet.js ada`, `node bin/greet.js 'Bob Smith'` and `node bin/greet.js` (no name), both at the PR head and at the PR's base commit (for example with `git stash`-free `git worktree add` of the base commit, or `git show <base>:bin/greet.js` plus `src/greet.js` into a temp directory). Compare stdout, stderr and exit status.
+PASS: for each invocation without --shout, the PR head output matches the base output.
+FAIL: any of these outputs differs from the base.
+
+Check 3. Expect line: "docs/index.md documents --shout"
+Run: `cat docs/index.md` and `grep -n -- '--shout' docs/index.md` at the PR head.
+PASS: docs/index.md mentions --shout and describes what it does (upper-case greeting) or shows how to use it.
+FAIL: --shout is not in docs/index.md, or the file only names it without documenting it.
+
+Check 4. Expect line: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+Run: check whether the PR is merged (`gh pr view <number> --json state,mergedAt`). If it is merged, check the latest `pages` workflow run on the default branch (`gh run list --workflow pages.yml`), then run `curl -sSL https://o.github.io/greet-cli/ | grep -n -- '--shout'`.
+PASS: the published page at https://o.github.io/greet-cli/ contains --shout.
+FAIL: the page does not contain --shout or cannot be fetched. If the PR is not merged yet, or the Pages deploy has not finished, report FAIL with the note "not yet verifiable: requires merge and Pages deploy" and give the state you observed.
+
+Advisory (not pass/fail):
+- Run `npm test` at the PR head and report whether it passes and whether it has tests for --shout with and without the flag.
+- Try the flag after the name (`node bin/greet.js ada --shout`) and report the result.
+- Note whether `greeting(name)` in src/greet.js still returns `Hello, <name>!` when called without new arguments.
+- Note whether .github/workflows/pages.yml still publishes docs/ on push to main.

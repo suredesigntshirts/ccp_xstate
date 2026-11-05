@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "65e8a48d340769907cc58d0b35243424bb40957217a76f594cbd5472a407470a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief. Telling the builder to run `npm test` is allowed, because that command is an expect line. The problem is step 3, which gives the builder the verifier's probe. It tells the builder to test that loadConfig \"on a file containing `{port: 9000` returns a value deep-equal to `{}` and does not throw\". Check 1 in the verifier brief uses the same input, writeFileSync(f,'{port: 9000'), and passes only if the result is an empty object and nothing was thrown. The builder may write its own tests, but here the brief hands it the verifier's exact input and expected output. Neither the expect lines nor the repository facts give that input. The builder brief also repeats an advisory probe from the verifier brief: that a missing file must still throw. So the builder brief carries the checker's methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 8644,
+  "tokens": {
+    "input": 2,
+    "output": 803,
+    "cacheCreation": 3074,
+    "cacheRead": 783,
+    "fresh": 3879,
+    "total": 4662
+  },
+  "at": "2026-11-05T08:29:22.836Z"
+}

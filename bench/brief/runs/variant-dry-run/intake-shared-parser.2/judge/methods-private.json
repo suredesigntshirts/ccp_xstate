@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "98aa9c2fad21d3e8231c9b6eaa34c5e065175a25902c18aeed89c0c2ffceeb35",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The builder brief has no PASS/FAIL wording and none of the verifier's probes. The verifier's `cmp`-against-expected scripts, the `/tmp/vN.out` captures, `grep -n -- '--tsv' test/*.js` and `grep -n -- '--tsv' README.md` are all missing from it. The builder's step 4 runs only the expect-line commands (e.g. `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \"exit=$?\"`) and `npm test; echo \"exit=$?\"`. The expect lines and proofs name all of these, so they are allowed. Step 2 tells the builder to write its own tests on the expect-line inputs, which is allowed. The README instruction (`node bin/csv2json.js --tsv < table.tsv`, plus saying the flag means tab-separated input) repeats issue proof 7. It is the bar for the work, not a verifier check. The advisory probes (flag not first, mutation check) are absent from the builder brief.",
+  "model": "claude-opus-5-5",
+  "ms": 13138,
+  "tokens": {
+    "input": 2,
+    "output": 848,
+    "cacheCreation": 5906,
+    "cacheRead": 783,
+    "fresh": 6756,
+    "total": 7539
+  },
+  "at": "2026-11-05T08:38:43.555Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "cb362bba506308153d75462d6cb8057a5f63136169d924438a744ae4df9b2ee9",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the builder brief for checks or probes that also appear in the verifier brief. Most of it is allowed. Step 5's `npm test` is named by expect line 2, and the test edits in step 3 are the builder writing its own tests. Step 5 also tells the builder to run `printf '{port: 9000' > /tmp/bad.json && node src/app.js /tmp/bad.json` and expect a stderr warning, `listening on 8080` and exit 0. The verifier brief's advisory list has the same probe: `printf '{port: 9000' > /tmp/v-bad.json && node src/app.js /tmp/v-bad.json` should print `listening on 8080` and exit 0. That is a probe with expected output, and no expect line or proof in the issue names it. Only the file path differs. Because the builder gets one of the checker's probes, the criterion breaks.",
+  "model": "claude-opus-5-5",
+  "ms": 7341,
+  "tokens": {
+    "input": 2,
+    "output": 602,
+    "cacheCreation": 3147,
+    "cacheRead": 783,
+    "fresh": 3751,
+    "total": 4534
+  },
+  "at": "2026-11-05T08:41:48.355Z"
+}

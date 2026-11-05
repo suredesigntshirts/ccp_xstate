@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "ad1fe13614724a5502b19836d79b35471dc5d192c52d84374af579dccfe3bc5f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the single `test` script. They all use files and tools that exist. The `printf … | node bin/csv2json.js [--tsv]` pipelines are valid shell, and bin/csv2json.js exists. `npm test` maps to the real \"test\" script. `grep -rn -- '--tsv' test/` and `cat README.md` are valid. The `| od -c` pipes and `; echo \"exit=$?\"` are fine. The issue's proof names `npm run test:cli`, which isn't in package.json, but the verifier brief avoids it and says to use `npm test` instead. The builder's JavaScript is valid: `execFileSync('node', ['bin/csv2json.js', '--tsv'], { input, encoding: 'utf8' })` and the escaped literal `'[{\"a\\\\tb\":\"1\\\\t2\"}]\\n'`. The one loose spot is the hint `out=$(...; printf x)`, which has a `...` placeholder. It's offered as a capture pattern, not a step to run, so it doesn't break the criterion. Nothing depends on a file that a step creates without an earlier step making it.",
+  "model": "claude-opus-5-5",
+  "ms": 8434,
+  "tokens": {
+    "input": 2,
+    "output": 742,
+    "cacheCreation": 5557,
+    "cacheRead": 783,
+    "fresh": 6301,
+    "total": 7084
+  },
+  "at": "2026-11-05T08:38:03.122Z"
+}

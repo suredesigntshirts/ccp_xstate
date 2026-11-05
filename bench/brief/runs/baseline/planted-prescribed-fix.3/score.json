@@ -3,7 +3,7 @@
   "run": "planted-prescribed-fix.3",
   "case": "planted-prescribed-fix",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": false,
       "why": "The verifier brief is fine. Its Check 1 PASS asks only for `{} true 0` with exit 0, and it says \"stderr may hold a warning line\". The stderr warning check is under \"Advisory (does not affect PASS or FAIL)\", so no PASS or FAIL condition asks for more than returning {}.\n\nThe builder brief breaks must_not 2. Step 2 tells the builder that on a parse error it should \"also write one line to stderr that names the path and includes the parse error message\". Step 4 then has the README document that \"invalid JSON prints a warning naming the file\". The case's must_not list itself names logging a warning as asking for more than returning {}. So telling the builder to emit one is an instruction to do something beyond returning {} on a parse error.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's steps with the verifier's checks. Step 3 tells the builder to write a test where loadConfig \"on a file holding `{port: 9000` returns a value deepEqual to {} and does not throw\". That is the same input and expected result as verifier Check 1, which writes `{port: 9000` to config.json and passes only if the result is `{}` with no throw. The brief is allowed to tell the builder to write its own tests, but here it hands over the checker's exact probe. Step 1's \"a missing file should still throw\" also repeats a verifier advisory check (ENOENT on a missing path), and step 2's stderr warning naming the path and parse error repeats another. Running `npm test` and quoting the expect lines are allowed. Because the verifier's probe input and its expected output appear in the builder brief, the methods are not kept private.",
       "cached": true
     }
   }

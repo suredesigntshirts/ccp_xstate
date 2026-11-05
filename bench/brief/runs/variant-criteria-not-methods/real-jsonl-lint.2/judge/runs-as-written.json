@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "1e75a40e73bd5e1ad9d0a0bd1f6d30bdbf588b9bc90b995b7cfc62368e60e55d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs and all of them would run as written. The builder's steps (`npm install`, `npm ci && npm test`, `chmod +x`, `node --test` from the workspace) use files that exist at this commit or that earlier steps create. Node 22's `node --test` picks up `test/*.test.js` by default. In the verifier brief, the `printf` lines contain no stray `%` and produce the intended rows (for example, mix.jsonl puts the bad rows on lines 4 and 6). The quoting in `node --input-type=module -e '...'` gives valid JS, because `\\\"` and `\\n` reach JS inside double-quoted strings. `node -e 'require(\"./packages/jsonl-lint/package.json\")'` runs as CommonJS and resolves from the repo root. `gh pr list --search`, `gh pr view --json`, and `gh run list --workflow test --commit <sha> --json conclusion,status` are valid flags. `<n>` and `<headRefOid>` are values filled in from earlier steps. `mktemp -d` and `test -s` are valid.",
+  "model": "claude-opus-5-5",
+  "ms": 12281,
+  "tokens": {
+    "input": 2,
+    "output": 1128,
+    "cacheCreation": 6293,
+    "cacheRead": 783,
+    "fresh": 7423,
+    "total": 8206
+  },
+  "at": "2026-11-05T08:42:56.368Z"
+}

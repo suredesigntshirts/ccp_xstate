@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "08fe5c6813a593869e788c38e6768cfe3f1a6c2892e0e2bbea52cf90a1aa966b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 3's command fails as written. I checked each command against the repo (math.js, README.md, test/math.test.js, `npm test` → `node --test`), and those targets exist. Checks 1, 2 and 4 look valid. The problem is the regex in Check 3: `new RegExp('^#{1,6}\\\\s.*\\\\b'+n+'\\\\s*\\\\(','m')` sits inside a double-quoted shell string. Bash turns each `\\\\` into `\\`, so JavaScript receives `'\\s'`, `'\\b'` and `'\\('`. In a JS string these become `s`, a backspace and `(`. The pattern ends up as `^#{1,6}s.*<BS>add s*(`, which has an unclosed group. RegExp throws \"SyntaxError: Invalid regular expression\", so the script crashes instead of listing exports and missing headings. The criterion requires every command to run as written, so it is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 11088,
+  "tokens": {
+    "input": 2,
+    "output": 1042,
+    "cacheCreation": 3511,
+    "cacheRead": 783,
+    "fresh": 4555,
+    "total": 5338
+  },
+  "at": "2026-11-05T08:41:30.793Z"
+}

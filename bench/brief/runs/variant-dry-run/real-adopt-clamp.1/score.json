@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.1",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1–3 stay within their expect lines. Check 1 asserts only clamping behaviour: values inside, below, above, at the boundaries, lo===hi, and negative ranges. Check 2 asserts RangeError only for lo>hi. Check 3 has a fallback so a function documented without a heading still passes, and the stricter items sit under Advisory. Check 4 breaks the criterion. \"npm test passes\" only requires the command to succeed (exit 0), but the PASS condition also demands that \"the summary shows `# fail 0`\". That depends on exact output wording, which the expect line doesn't require. Node 22's `node --test` may use the spec reporter, which prints \"ℹ fail 0\" instead of \"# fail 0\", so a passing run could be marked as failing. This exact-output requirement belongs under Advisory, not in the PASS condition.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "The criterion fails on the README check command, which appears in builder step 4 and verifier Check 3. Checks 1, 2 and 4 are valid as written.\n\nThe README command is wrapped in bash double quotes, and there `\\\\s` and `\\\\(` each become a single backslash: `\\s` and `\\(`. JavaScript then reads the string `'\\s*\\('` as plain `s*(` with no backslashes. That leaves `new RegExp('^#+s*`?'+k+'s*(','m')` with an unclosed group. It throws \"SyntaxError: Invalid regular expression: Unterminated group\" for every export, so the command always fails, even on a correct PR. The verifier's fallback only covers a function that is documented without a heading; it does not cover the script crashing.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "Item 1: the builder brief says \"`subtract` is exported but NOT documented in README.md today, so it must be added too\", and step 2 asks for `### subtract(a, b)` and `### clamp(x, lo, hi)` entries. Item 2: verifier Check 3 lists exported functions \"(add, subtract, multiply, clamp, and any others)\" and FAILs if \"any exported function, e.g. `subtract` ... or `clamp`, has no description in README.md\". It allows a function documented without a heading, but every function still needs an entry. Item 3: Check 2 calls clamp(5,10,0) and clamp(0,1,0.5), where lo is greater than hi, using `a.throws(..., RangeError)`, an instanceof check. It FAILs on \"an error that is not a RangeError\". All three items are handled.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the verifier brief against both must_not items.\n\n1. Check 3 doesn't pass when subtract is undocumented. Its script loops over every function math.js exports, subtract included, and exits 1 if any is MISSING. The FAIL condition names `subtract` outright. The one fallback (a function described without a heading) still needs subtract \"clearly described\" in README.md, so the README layout isn't fixed either.\n\n2. No condition is stricter than its line. Check 1 only tests clamp values inside, below, above and at the range edges, plus lo === hi. Check 2 needs only a RangeError, with no exact message and no parameter count. Check 4 needs exit 0 and no failing tests. The `# fail 0` wording is a little specific to the reporter, but it is just the normal summary from `node --test`, so it adds no real requirement. The lo === hi throw case and the test-file and README-wording items are marked advisory and are outside PASS/FAIL.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief against the verifier brief's checks. Step 4 of the builder brief has the builder run a `node -e \"const fs=require('fs');const m=require('./math.js');const r=fs.readFileSync('README.md','utf8');const missing=...` script. It is the same, character for character, as the Check 3 probe in the verifier brief, down to the 'CHECK3 OK' output. That is a verifier probe leaking into the builder brief. It isn't the repository's own tests or a command named by an expect line (only `npm test` is). The builder's `assert.throws(() => clamp(5, 10, 0), RangeError)` test also matches one of Check 2's inputs. Telling the builder to write its own tests is allowed, though, so the Check 3 script alone is enough to fail the criterion. The rest of the builder brief (goal, context, implementation steps, `npm test`) is fine.",
+      "cached": true
+    }
+  }
+}

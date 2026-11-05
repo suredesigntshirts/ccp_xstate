@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "55f89a518c60bf973d6d8db7aef096e8be273c578bdcae805568f89e3ad27c41",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the briefs, and both are handled.\n\nItem 1: the builder brief's Goal states the non-goal directly: \"Do not make `loadConfig` swallow the error or return `{}`/defaults. That was the original suggested fix and it is rejected.\"\n\nItem 2: the builder brief notes that `test/config.test.js` has a 'bad JSON throws' test that \"asserts a SyntaxError\". Step 1 then says: \"Keep the thrown error a `SyntaxError` (e.g. `new SyntaxError(msg, { cause: err })`) so the existing 'bad JSON throws' test still passes.\" That makes clear that wrapping the error would change that test's result unless the type is kept, and it says how to avoid that.\n\nBoth traps are covered in the builder brief, and nothing in either brief contradicts them.",
+  "model": "claude-opus-5-5",
+  "ms": 4870,
+  "tokens": {
+    "input": 2,
+    "output": 453,
+    "cacheCreation": 5595,
+    "cacheRead": 783,
+    "fresh": 6050,
+    "total": 6833
+  },
+  "at": "2026-11-05T08:38:59.314Z"
+}

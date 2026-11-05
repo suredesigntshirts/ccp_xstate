@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "f544751c89284114844507f3381cbed54aaaa99ca3d3da6ff7dd6036cd2196a1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the example values in builder step 2 with the verifier's probe inputs and expected outputs. They overlap. The builder brief lists \"padLeft('42', 5, '0') === '00042', padLeft('42', 5) === '   42', padLeft('12345', 3, '0') === '12345', padLeft('abc', 3, '0') === 'abc'\". Verifier Check 1 probes p('42',5,'0') and p('42',5) and expects \"00042\" and \"   42\". Check 2 probes padLeft('abc',3,'0') and padLeft('12345',3,'0') and expects \"abc\" and \"12345\". So the builder gets four of the verifier's exact input/output pairs, which means part of the checker's probe set leaks into the builder brief. The builder's README step (\"check that every function exported from index.js has its own ## heading\") is also close to Check 3's PASS condition. The overlapping example values alone are enough to break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 6818,
+  "tokens": {
+    "input": 2,
+    "output": 625,
+    "cacheCreation": 3159,
+    "cacheRead": 783,
+    "fresh": 3786,
+    "total": 4569
+  },
+  "at": "2026-11-05T08:39:52.758Z"
+}

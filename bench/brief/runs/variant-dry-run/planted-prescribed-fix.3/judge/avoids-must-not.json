@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "bddeaf60709dc820a303d1fccdcc44f56194eaa696e87ff4bea10c7179c8bc10",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked both briefs against the two must_not items. The verifier brief passes: its PASS/FAIL for Check 1 asks only for `RETURNED {}` and `exit=0`. The checks on the stderr line, file name and position appear only under \"Advisory (does not affect PASS or FAIL)\", so item 1 is not broken. The builder brief breaks item 2. Step 2 tells the builder to do more than return {} on a parse error: \"when the parse fails, write one line to stderr before returning {}. The line must name the path and include the parse error message\". The expect line only asks for the parse error to be caught and {} returned. A required warning that names the file and position is the extra behaviour the must_not list warns about (item 1 names \"logging a warning\" as going too far). Step 4's README text about \"prints a warning naming the file\" adds to the same overreach.",
+  "model": "claude-opus-5-5",
+  "ms": 9547,
+  "tokens": {
+    "input": 2,
+    "output": 643,
+    "cacheCreation": 3032,
+    "cacheRead": 783,
+    "fresh": 3677,
+    "total": 4460
+  },
+  "at": "2026-11-05T08:41:45.271Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "cb1b4100d0ed0a0078e658aeb056b0b6917e675c9f568c2f0319371121ddef76",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Every command in both briefs looks like it would run as written. The builder brief only runs `npm test`, and package.json defines that script as `node --test`. It reads and edits only tracked files: index.js, README.md, package.json and test/strutil.test.js. The verifier brief has three `node --input-type=module -e \"...\"` one-liners. Each is double-quoted with single-quoted strings inside. None contains `$`, a backtick or `!`, so the shell won't expand or break them. Their JavaScript is valid: the `import * as m` and `import {padLeft as p}` forms, the arrow filter and the `JSON.stringify` calls. A relative `./index.js` import inside eval resolves from the current directory, and the brief says to run everything from the repository root. `grep -n '^#' README.md` is quoted correctly and README.md exists. `npm test` exists. padLeft is created by the builder's earlier step. I found nothing in either brief that breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 10725,
+  "tokens": {
+    "input": 2,
+    "output": 715,
+    "cacheCreation": 3215,
+    "cacheRead": 783,
+    "fresh": 3932,
+    "total": 4715
+  },
+  "at": "2026-11-05T08:39:38.378Z"
+}

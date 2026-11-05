@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "837f9276b436b959988eef2699d9559e8e9530581fe3eaa87e8744131ab32e5f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion is not met. I checked the PASS and FAIL conditions of both verifier checks against their expect lines.\n\nCheck 2 holds. \"Documents --tsv\" reasonably means saying what the flag does, and the PASS/FAIL wording (\"says or shows that it is for tab-separated input\") stays within that.\n\nCheck 1 mostly holds: the TSV output must deep-equal the CSV output for the same table. But its PASS condition also says \"The first pair should be an array of two objects with keys name, age, city.\" The expect line only requires --tsv output to equal what the CSV run prints. It does not require any particular structure or keys. This extra assertion tests the existing CSV parser's output shape, which the expect line's words don't force. It belongs under Advisory, not in PASS. The other extras (npm test, byte-for-byte output, CSV unchanged) are correctly placed under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 11870,
+  "tokens": {
+    "input": 2,
+    "output": 785,
+    "cacheCreation": 2860,
+    "cacheRead": 783,
+    "fresh": 3647,
+    "total": 4430
+  },
+  "at": "2026-11-05T08:40:04.629Z"
+}

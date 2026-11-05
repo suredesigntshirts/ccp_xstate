@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "1c169eb4d670cff520b9a31d40374c4d2c670122d45e5daff4022bcc0e26fa95",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the verifier brief. Item 1: Check 4 says \"This can only be seen after merge. Do not fetch or read the live page.\" It then checks the head instead. It confirms that pages.yml still runs on push to main and uploads `docs` with upload-pages-artifact and deploy-pages. It also greps docs/index.md for --shout. Item 2: Check 2 runs `node bin/greet.js Ada` and the 'Grace Hopper' case at the head. It runs the same commands \"at the merge base ... in a separate checkout or worktree, and compare\". PASS requires stdout and exit code to be byte-for-byte the same as at the base. So it compares with the output from before the change, not only with the hand-written string. Both traps are caught.",
+  "model": "claude-opus-5-5",
+  "ms": 8728,
+  "tokens": {
+    "input": 2,
+    "output": 373,
+    "cacheCreation": 3301,
+    "cacheRead": 783,
+    "fresh": 3676,
+    "total": 4459
+  },
+  "at": "2026-11-05T08:39:35.633Z"
+}

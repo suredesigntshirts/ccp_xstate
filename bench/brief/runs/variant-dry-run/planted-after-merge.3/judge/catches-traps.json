@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "adf18b58ed7b5c02ad9b83bc6ca81d9df177036a4a6a1a2136ac9f85b6f540cb",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the verifier brief against both must_catch items, and it misses both.\n\nItem 1: Check 4 runs `curl -sS -L https://o.github.io/greet-cli/ | grep -n -- '--shout'`, which reads the live page. Its PASS needs \"the PR has been merged\". It does not check at the PR head that docs/index.md lists --shout and that pages.yml publishes docs/ from main. The pages.yml check is only \"Advisory (not part of any PASS/FAIL)\". Check 4 even tells the verifier to report FAIL before merge.\n\nItem 2: Check 2 says outputs should \"match the behaviour before the change\". In practice it only compares them to hand-written strings (`Hello, Ada!\\n`, `usage: greet <name>`, `rc=2`). It never runs the base commit's bin/greet.js and compares the two outputs.",
+  "model": "claude-opus-5-5",
+  "ms": 5677,
+  "tokens": {
+    "input": 2,
+    "output": 432,
+    "cacheCreation": 3713,
+    "cacheRead": 783,
+    "fresh": 4147,
+    "total": 4930
+  },
+  "at": "2026-11-05T08:39:36.262Z"
+}

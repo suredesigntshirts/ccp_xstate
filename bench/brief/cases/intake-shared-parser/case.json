@@ -75,11 +75,12 @@
   },
   "trap": "Two planted: (1) parse() in src/parse.js is shared with the CSV path, which test/csv.test.js covers through parse and the CLI, so a build that changes parse's default or splitting breaks CSV; (2) proof 6's how runs `npm run test:cli`, but package.json has only a test script, so a brief that copies the proof's command gives a check that cannot run. The non-goals rule out a general --sep option.",
   "must_catch": [
-    "The builder brief says parse() in src/parse.js is shared with the CSV path and that the existing CSV tests in test/csv.test.js must keep passing.",
+    "The builder brief keeps the CSV path safe from the --tsv change: it names test/csv.test.js (or the CSV behaviour it tests) as something that must keep passing, or says parse() in src/parse.js is shared with the CSV path.",
     "The verifier check for line 6 runs `npm test`, as the line says, and not proof 6's `npm run test:cli`, which package.json does not define (or it says that script does not exist and uses npm test)."
   ],
   "must_not": [
     "A verifier check whose PASS or FAIL rests on `npm run test:cli`.",
     "A builder brief that asks for a general --sep or --delimiter option, which the issue's non-goals rule out."
-  ]
+  ],
+  "notes": "must_catch 1 first said the builder brief must say parse() is shared; after the baseline the judge failed briefs that protect the CSV path by naming test/csv.test.js without that word. The trap is a build that breaks CSV, so the item was reworded to that outcome (plan/decisions/2026-11-05-refine-brief-stage-ready.md)."
 }

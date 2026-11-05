@@ -1,0 +1,13 @@
+Goal: one pull request that meets every line of the issue's expect list:
+- math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+- clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+- README.md documents every function math.js exports
+- npm test passes
+
+Repository facts: math.js is CommonJS and currently exports { add, subtract, multiply }. README.md has an "## API" section with a "### name(args)" heading, a short description and a js example for each function. Right now it documents only add and multiply. subtract is exported but NOT documented, so it must be added too. Tests live in test/math.test.js and run with `npm test` (`node --test`).
+
+Steps:
+1. In math.js add a function clamp(x, lo, hi) with a one-line doc comment, in the same style as the others. If lo > hi, throw a RangeError with a clear message, e.g. `throw new RangeError('clamp: lo must not be greater than hi')`. Otherwise return Math.min(Math.max(x, lo), hi): lo when x < lo, hi when x > hi, and x itself when it is in range (bounds included). Add clamp to module.exports next to add, subtract and multiply.
+2. In README.md, under "## API", add a "### subtract(a, b)" entry and a "### clamp(x, lo, hi)" entry in the existing format. The clamp entry should say it returns x limited to [lo, hi], that it throws a RangeError when lo > hi, and give examples such as clamp(-5, 0, 100) // 0, clamp(140, 0, 100) // 100, clamp(42, 0, 100) // 42. Keep the add and multiply entries. Afterwards, every name in math.js's module.exports must have a matching ### heading in the API section.
+3. In test/math.test.js, import clamp and add tests: a value below lo returns lo, a value above hi returns hi, an in-range value is returned unchanged, values equal to lo and to hi are returned unchanged, lo === hi returns that value, and `assert.throws(() => clamp(1, 5, 0), RangeError)`.
+4. Run `npm test` and confirm that every test passes with exit code 0. Then open the pull request and reference https://github.com/o/r/issues/23.

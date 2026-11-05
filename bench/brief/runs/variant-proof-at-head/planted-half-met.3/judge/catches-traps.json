@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "8bf9e1d03d0a0805237e01bf93b0e566b2b1a3d16e9be006dcd56574b85fb31b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the briefs against each must_catch item. All three are handled.\n1. Builder step 3 says README.md has no section for slugify even though index.js exports it, and tells the builder to \"Add a `## slugify(s)` section\" along with the padLeft section.\n2. Verifier Check 3 lists the exported functions at the head and passes only if each one (\"at least capitalize, slugify, truncate, padLeft\") has a README section. It fails if any exported function has none, and adds: \"check slugify in particular.\"\n3. Verifier Check 1 runs p('42',5) with no fill argument and expects \"   42\" in the output. It also fails if padLeft doesn't use a space when fill is missing.",
+  "model": "claude-opus-5-5",
+  "ms": 6121,
+  "tokens": {
+    "input": 2,
+    "output": 352,
+    "cacheCreation": 3250,
+    "cacheRead": 783,
+    "fresh": 3604,
+    "total": 4387
+  },
+  "at": "2026-11-05T08:39:44.500Z"
+}

@@ -1,0 +1,26 @@
+Check the pull request head against the four acceptance lines of issue https://github.com/o/r/issues/23. Make one check per line, in this order. Run every command from the repository root at the PR head. Report PASS or FAIL for each line with the output you saw.
+
+Check 1. Expect line: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi".
+Run: node -e "const m=require('./math.js'); const c=m.clamp; if(typeof c!=='function') throw new Error('clamp not exported'); const cases=[[-5,0,100,0],[140,0,100,100],[42,0,100,42],[0,0,100,0],[100,0,100,100],[7,3,3,3],[-10,-20,-5,-10],[-30,-20,-5,-20],[0.5,0,1,0.5]]; for(const [x,lo,hi,want] of cases){const got=c(x,lo,hi); if(got!==want) throw new Error('clamp('+x+','+lo+','+hi+') = '+got+', want '+want);} console.log('ok')"
+PASS: it prints ok and exits 0. That means clamp is exported as a function and returns lo for values below the range, hi for values above it, and x unchanged when lo <= x <= hi.
+FAIL: clamp is missing or not a function, any case returns the wrong value, or the command throws or exits non-zero.
+
+Check 2. Expect line: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi".
+Run: node -e "const {clamp}=require('./math.js'); for (const args of [[5,10,0],[0,1,0],[50,100,-100]]) { let e=null; try { clamp(...args); } catch (err) { e=err; } if (!(e instanceof RangeError)) throw new Error('clamp('+args+') did not throw RangeError: '+e); } console.log('ok')"
+PASS: it prints ok and exits 0, so every call with lo > hi throws an instance of RangeError.
+FAIL: any of these calls returns normally or throws something that is not a RangeError.
+
+Check 3. Expect line: "README.md documents every function math.js exports".
+Run: node -e "const m=require('./math.js'); const fs=require('fs'); const r=fs.readFileSync('README.md','utf8'); const names=Object.keys(m).filter(k=>typeof m[k]==='function'); const missing=names.filter(n=>!new RegExp('^#+\\s*'+n+'\\s*\\(','m').test(r)); console.log('exports:',names.join(',')); if(missing.length){console.log('missing:',missing.join(','));process.exit(1)} console.log('ok')"
+Then read README.md and confirm that each exported function (this should include add, subtract, multiply and clamp) has a description of what it does, not just a bare heading.
+PASS: the script prints ok, and each exported function has a heading with a description in README.md.
+FAIL: any exported function has no heading in README.md or no description. Note that subtract was undocumented before this PR, so it must be documented now too.
+
+Check 4. Expect line: "npm test passes".
+Run: npm test
+PASS: the command exits 0 and the node:test summary reports fail 0.
+FAIL: it exits non-zero or reports any failing test.
+
+Advisory (not part of PASS/FAIL):
+- Check that test/math.test.js actually covers clamp (below, above, inside the range, and the RangeError case), and that existing tests were not deleted or weakened.
+- Check that clamp's README entry mentions the RangeError, and that add, subtract and multiply behave as before.

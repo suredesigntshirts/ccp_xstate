@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "0b2a2f25531899d01bfc7bfdae4c9708977598677f0561df810574fa516f0e58",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Neither must_not item shows up. Checks 1–3 (the behaviour lines) all run the program: `node $CLI` on temp files, stdin via `-`, `- -`, no arguments and a missing file. None of them passes on reading the diff. Their PASS/FAIL conditions match the issue lines. Check 3 only asks for \"an error message about the unreadable file\" on stderr, not exact wording. No check sets a branch-name rule, a mutation test or a limit on which files the PR may touch. Check 6 fails only if the change is \"split over several PRs\". The advisory section says outright that rejecting `- -` before reading and the exact usage wording \"are not required by the lines\". The builder brief's \"Rewrite only the CLI\" and \"e.g.\" message text are build guidance, not PASS/FAIL conditions. Check 4 reads the diff, but line 4 is not a behaviour line, and it also runs `lint` at head and at base to compare the outputs.",
+  "model": "claude-opus-5-5",
+  "ms": 12807,
+  "tokens": {
+    "input": 2,
+    "output": 860,
+    "cacheCreation": 5530,
+    "cacheRead": 783,
+    "fresh": 6392,
+    "total": 7175
+  },
+  "at": "2026-11-05T08:42:08.691Z"
+}

@@ -1,0 +1,26 @@
+Check the PR head against issue https://github.com/o/r/issues/23. Run every command from the repository root at the PR head (run `npm install` first only if package.json now declares dependencies). Do one check per expect line, in this order, and report PASS or FAIL for each with the output you saw.
+
+Check 1 — expect: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi"
+Run:
+node -e "const {clamp}=require('./math.js');const a=require('assert');a.strictEqual(typeof clamp,'function');a.strictEqual(clamp(5,0,10),5);a.strictEqual(clamp(-5,0,100),0);a.strictEqual(clamp(140,0,100),100);a.strictEqual(clamp(0,0,100),0);a.strictEqual(clamp(100,0,100),100);a.strictEqual(clamp(3,3,3),3);a.strictEqual(clamp(-2.5,-1.5,1.5),-1.5);console.log('CLAMP OK')"
+PASS: prints CLAMP OK and exits 0. FAIL: clamp is not an exported function, or any assertion fails (non-zero exit).
+
+Check 2 — expect: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi"
+Run:
+node -e "const {clamp}=require('./math.js');const a=require('assert');a.throws(()=>clamp(5,10,0),RangeError);a.throws(()=>clamp(0,1,0.5),RangeError);console.log('RANGE OK')"
+PASS: prints RANGE OK and exits 0. FAIL: either call does not throw, or throws something that is not a RangeError (non-zero exit).
+
+Check 3 — expect: "README.md documents every function math.js exports"
+Run:
+node -e "const m=require('./math.js');const r=require('fs').readFileSync('README.md','utf8');const names=Object.keys(m).filter(k=>typeof m[k]==='function');const miss=names.filter(k=>!new RegExp('^#+\\s*'+k+'\\s*\\(','m').test(r));console.log('exports: '+names.join(', '));if(miss.length){console.log('MISSING: '+miss.join(', '));process.exit(1)}console.log('README OK')"
+Then open README.md and read the entry for each listed export (note: subtract was undocumented before this change, so it must now be covered too).
+PASS: every exported function listed has a README entry that describes what it does (the script prints README OK; if it prints MISSING for a name that README.md does document under a differently formatted heading or text, read it and judge by whether that function is actually documented). FAIL: any exported function has no description in README.md.
+
+Check 4 — expect: "npm test passes"
+Run: npm test
+PASS: exits 0 with fail 0. FAIL: non-zero exit or any failing test.
+
+Advisory (does not affect PASS/FAIL):
+- Whether test/math.test.js adds tests for clamp, including the RangeError case.
+- Whether clamp(2,2,2) (lo === hi) returns 2 without throwing.
+- Whether the README clamp entry mentions the RangeError.

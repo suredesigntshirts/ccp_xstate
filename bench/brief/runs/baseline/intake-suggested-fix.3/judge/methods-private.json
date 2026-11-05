@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "a57532eff244e5b33d334dedb14a1382d61fdaa5837ee425032b98310994a1fb",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared the builder brief with the verifier's checks. None of the verifier's own methods show up in the builder brief: not the `wc -c`/`grep -F` probes, the inline `node --input-type=module -e` script that prints OK/NO PATH, the `assert.deepEqual` script, or the merge-base `git checkout <merge-base> -- src` test. The builder's step-7 manual commands (the `printf '{\\n  \"port\": 9000,...' > $d/c.json; node src/app.js $d/c.json` run, the ok.json run and `npm test`) come straight from the issue's proofs 1 and 4 and expect line 5, which the criterion allows. The builder's expected outcomes (\"must exit 1, print nothing on stdout\", \"listening on 9000\") restate the expect lines, which is the bar, not a checker method. The new tests in step 5 are tests the builder writes itself, which is also allowed. The builder brief never uses PASS/FAIL wording.",
+  "model": "claude-opus-5-5",
+  "ms": 8751,
+  "tokens": {
+    "input": 2,
+    "output": 845,
+    "cacheCreation": 5691,
+    "cacheRead": 783,
+    "fresh": 6538,
+    "total": 7321
+  },
+  "at": "2026-11-05T08:29:19.874Z"
+}

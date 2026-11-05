@@ -1,0 +1,26 @@
+Check the pull request's head checkout. Run every command from the repository root. Run `npm install` first only if package.json has dependencies (currently it has none).
+
+Check 1: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi"
+Run: node -e "const m=require('./math.js'); const c=m.clamp; if(typeof c!=='function') throw new Error('clamp not exported'); const cases=[[-5,0,100,0],[140,0,100,100],[42,0,100,42],[0,0,100,0],[100,0,100,100],[7,7,7,7],[-3,-10,-1,-3],[2.5,0,1,1]]; for(const [x,lo,hi,want] of cases){const got=c(x,lo,hi); if(got!==want) throw new Error('clamp('+x+','+lo+','+hi+')='+got+' want '+want);} console.log('OK')"
+PASS: prints OK and exits 0.
+FAIL: clamp is not exported as a function, any case returns a wrong value, or the command errors.
+
+Check 2: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi"
+Run: node -e "const {clamp}=require('./math.js'); for(const a of [[1,5,0],[50,100,0],[0,1,-1]]){let e=null; try{clamp(...a)}catch(err){e=err} if(!(e instanceof RangeError)) throw new Error('no RangeError for '+JSON.stringify(a)+': '+e);} console.log('OK')"
+PASS: prints OK and exits 0. Every call with lo > hi throws an instance of RangeError.
+FAIL: any of these calls returns normally, or throws something that is not a RangeError.
+
+Check 3: "README.md documents every function math.js exports"
+Run: node -e "const fs=require('fs'); const names=Object.keys(require('./math.js')).filter(k=>typeof require('./math.js')[k]==='function'); const r=fs.readFileSync('README.md','utf8'); const missing=names.filter(n=>!new RegExp('^#+\\s*'+n+'\\s*\\(','m').test(r)); console.log('exports:',names.join(','),'missing:',missing.join(',')); process.exit(missing.length?1:0)"
+Then read README.md at the head. Confirm that each exported function (this should include add, subtract, multiply and clamp) has its own entry describing what it does.
+PASS: the script exits 0 with nothing missing, and each export has a real description in README.md.
+FAIL: any exported function has no heading or no description in README.md. For example, subtract is still undocumented, as it is on the base.
+
+Check 4: "npm test passes"
+Run: npm test
+PASS: exits 0 and reports no failing tests.
+FAIL: a non-zero exit or any failing test.
+
+Advisory (not part of PASS/FAIL):
+- Check whether test/math.test.js now has tests for clamp: below, above and in range, the bounds, and the RangeError case.
+- Check whether the README's clamp entry mentions the RangeError behaviour.

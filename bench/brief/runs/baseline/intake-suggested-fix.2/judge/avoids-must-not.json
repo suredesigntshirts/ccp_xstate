@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "afc9f4e2d9b623081c01158e1f915bd5910e61159bf05bf4f02798d82516d7ba",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Neither brief does anything on the must_not list. Item 1: the builder brief wraps JSON.parse in try/catch only to \"throw a new error\" with the path and location. It says \"`loadConfig` must keep throwing on malformed JSON\" and \"Do not adopt the suggested fix of catching the error and returning `{}`\", and it lists returning {} or the defaults as out of scope. It never tells the builder to return a value. Item 2: Check 2's PASS condition accepts any form of line 3 and column 3, \"for example `line 3 column 3` or `c.json:3:3`\". It fails only if something is missing, the path is altered, or the location is wrong, never because wording or order differs from one exact format.",
+  "model": "claude-opus-5-5",
+  "ms": 9277,
+  "tokens": {
+    "input": 2,
+    "output": 722,
+    "cacheCreation": 5599,
+    "cacheRead": 783,
+    "fresh": 6323,
+    "total": 7106
+  },
+  "at": "2026-11-05T08:29:02.841Z"
+}

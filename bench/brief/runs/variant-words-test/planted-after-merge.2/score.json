@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.2",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. I compared each check's PASS and FAIL conditions with the words of its expect line. Check 1 only requires the greeting for the name in upper case. Check 2 compares output without --shout against the base and fails on \"any difference\", which is what \"unchanged\" means. Including the no-name case is still within \"without --shout\". Check 3 requires that docs/index.md mentions --shout and explains its effect. That is a fair reading of \"documents\"; it doesn't demand exact wording or a usage example, which are listed under Advisory. Check 4 requires the PR to be merged and the published page to list --shout, and says to report it as not verifiable before merge. The stricter items are all under \"Advisory (not pass/fail conditions)\": passing `npm test`, adding a --shout test, the flag working after the name, and a docs usage example. Running `npm test` first is only noted, not graded.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Most commands are fine: `node bin/greet.js --shout Ada`, `npm test` (the script is `node --test`), `cat`/`grep -n -- --shout docs/index.md`, `gh pr view <number> --json state,mergedAt` and `curl -sSL …` are all valid and name files that exist. The builder brief's commands are fine too. Check 2 in the verifier brief breaks the criterion. It gives \"`git stash`-free: `git worktree add` or `git show <base>:bin/greet.js` with src/greet.js from base\". `git worktree add` with no path is missing a required argument, so it fails with a usage error. `git show <base>:bin/greet.js` only prints the file's contents. It does not run the base version, and the brief gives no runnable steps for running the base with src/greet.js from base. So the base comparison command would not run as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked both must_catch items against the verifier brief. Item 2 is met: Check 2 runs `node bin/greet.js Ada` at the PR head and at the base commit and compares them (\"identical to the base's output\"). Item 1 is not met. Check 4 reads the live page with `curl -sSL https://o.github.io/greet-cli/` and checks merge state with `gh pr view`. It never checks at the PR head the things that will publish the page: it doesn't confirm that docs/index.md lists --shout or that .github/workflows/pages.yml publishes docs/ from main. pages.yml comes up only as something to cite when the line \"cannot be tested\", not as something to inspect. The check still treats the live page as the real test, so it fails the trap.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked Check 4 of the verifier brief against both must_not items. It does fetch the live page (`curl -sSL https://o.github.io/greet-cli/`), but it only gives PASS or FAIL once the PR is merged, and FAIL also needs \"the pages deploy has finished\". Before merge it says to report the line \"as not verifiable before merge (not PASS)\". It also says the result depends on the merge and on pages.yml, and asks for what the current page shows. So it never grades the PR at its head on what the page shows today (item 1). It never passes silently without evidence (item 2). The builder brief agrees: the PR description must say this line can't be confirmed before merge and must \"not claim it is already met\". Checks 1–3 don't involve line 4. Neither brief does anything on the must_not list.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief and found probes that appear in both. Step 2 of the builder brief gives the input and expected output \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\". That is the exact probe and PASS condition of verifier Check 1. Step 3 says \"`node bin/greet.js Ada` must still print `Hello, Ada!`\", which is the probe and expected output of verifier Check 2. Step 4 tells the builder to write a test, and writing its own tests is allowed. But the brief fixes that test to the verifier's own input and expected output (\"expecting `HELLO, ADA!\\n`\"). Step 2's \"in any position relative to the name\" also mirrors the verifier's advisory check of `Ada --shout`. So the builder brief gives the builder the checker's probes, not just the bar.",
+      "cached": true
+    }
+  }
+}

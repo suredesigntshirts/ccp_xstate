@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "58bb37b1dd26a073443692bae2ddcbce36ebb34d1d2201929ab30526337ada76",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief against each verifier check. The builder brief never uses the verifier's fixtures (T/a.jsonl, T/bad.jsonl with `{bad}`/`{oops}`). It has none of its shell probes: no `printf ... | node $BIN`, no `git diff --exit-code`, no `gh pr checks`. It also has no PASS/FAIL wording and no advisory items. What it does give is the expected behaviour, taken from the expect lines: the exit codes, the `<name>:<line>: <error>` format, `-` handling, and continuing after a read failure. The test cases it lists, such as \"missing file among good ones … exit 2, stderr names the missing file\", are cases for the builder to write as its own node:test tests, and that is allowed. They are the issue's expect line 5 cases, not the verifier's concrete inputs and outputs. The commands it names, `npm test` and `npm ci && npm test`, are the repository's own tests or commands the issue names, which is also allowed. So the builder gets the bar, not the checker.",
+  "model": "claude-opus-5-5",
+  "ms": 14448,
+  "tokens": {
+    "input": 2,
+    "output": 1130,
+    "cacheCreation": 5152,
+    "cacheRead": 783,
+    "fresh": 6284,
+    "total": 7067
+  },
+  "at": "2026-11-05T08:29:43.999Z"
+}

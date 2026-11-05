@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "188bad64467bf995c5526c9f66769ffa5f0a540d74a0f748902fc99a4e419c42",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier PASS/FAIL condition with the words of its expect line. Checks 1, 2, 3 and 5 test only what their words require. Check 2 fails an \"altered\" path, which matches \"exactly as passed\". Check 5 says to read the failing test to confirm it asserts the file path, which the words require. The advisory items are correctly kept under \"Advisory\". Check 4 goes further than its words. The expect line says the app \"prints `listening on 9000` on stdout\", but the PASS condition says \"stdout is `listening on 9000`\" and the FAIL condition is \"anything else\". That demands exact stdout equality. An app that printed `listening on 9000` plus another line would meet the expect line's words but fail this check. So an exact-output test the words do not force sits inside a PASS/FAIL condition instead of under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 11154,
+  "tokens": {
+    "input": 2,
+    "output": 1001,
+    "cacheCreation": 5651,
+    "cacheRead": 783,
+    "fresh": 6654,
+    "total": 7437
+  },
+  "at": "2026-11-05T08:28:46.779Z"
+}

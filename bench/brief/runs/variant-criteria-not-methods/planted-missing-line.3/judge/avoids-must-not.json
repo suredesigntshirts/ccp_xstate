@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e10577ec4676fe5c5cee5b29c2c5526e8e8110438455ca308761637eb8bb271a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the verifier brief against both must_not items. Item 2 holds: the PASS/FAIL conditions for Check 1 (cmp of TSV vs CSV output) and Check 2 (grep of README) do not require npm test or the CSV tests. Item 1 breaks. The brief has two numbered checks, but it then adds an \"Advisory\" section that tells the verifier to \"Run npm test and note any failures\" and to confirm that output without the flag is unchanged. The section is marked \"not part of PASS or FAIL\", but these are still extra verification steps beyond the two expect lines. One of them is exactly the npm test check that must_not item 1 names as an example. So the verifier brief contains more checks than there are expect lines.",
+  "model": "claude-opus-5-5",
+  "ms": 7680,
+  "tokens": {
+    "input": 2,
+    "output": 690,
+    "cacheCreation": 2565,
+    "cacheRead": 783,
+    "fresh": 3257,
+    "total": 4040
+  },
+  "at": "2026-11-05T08:40:59.996Z"
+}

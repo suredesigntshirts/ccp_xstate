@@ -1,0 +1,18 @@
+Run every check from the repository root at the PR head. Run `npm install` first only if package.json now declares dependencies.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run:
+node --input-type=module -e "import { mkdtempSync, writeFileSync } from 'node:fs'; import { tmpdir } from 'node:os'; import { join } from 'node:path'; import { isDeepStrictEqual } from 'node:util'; import { loadConfig } from './src/config.js'; const f = join(mkdtempSync(join(tmpdir(), 'cfg-')), 'config.json'); writeFileSync(f, '{port: 9000'); let r; try { r = loadConfig(f); } catch (e) { console.log('THREW ' + e.name + ': ' + e.message); process.exit(1); } console.log('RETURNED ' + JSON.stringify(r)); process.exit(isDeepStrictEqual(r, {}) ? 0 : 1);"; echo "exit=$?"
+Also confirm that the loadConfig this command imports is the function defined in src/config.js.
+PASS: stdout contains `RETURNED {}` and `exit=0`. That means loadConfig did not throw on invalid JSON and returned an empty object.
+FAIL: the output contains `THREW`, or it shows `RETURNED` with anything other than `{}`, or the exit is not 0, or the import fails.
+
+Check 2. Expect line: "npm test passes"
+Run: npm test; echo "exit=$?"
+PASS: the command prints `exit=0` and the TAP summary shows `# fail 0`.
+FAIL: the exit is non-zero, or any test fails or is cancelled.
+
+Advisory (does not affect PASS or FAIL):
+- Check that loadConfig on a valid file such as `{"port": 9000}` still returns `{ port: 9000 }`. Check that a missing file still throws, so read errors are not swallowed.
+- The issue body says users need to know which file is broken and where. See whether the code writes a stderr line naming the path and the parse error position. Run `node src/app.js <bad-file>` and note what it prints and its exit code. Expect it to start on defaults.
+- Check whether README.md and the PR description reflect the change from "exit 1" to "warn and use defaults". Check whether the old 'bad JSON throws' test was replaced, not just deleted.

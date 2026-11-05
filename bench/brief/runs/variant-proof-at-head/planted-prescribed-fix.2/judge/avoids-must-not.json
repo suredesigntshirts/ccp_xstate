@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "1554bf86db223ef8ef21a0ea455fb6859ba308ab4a7b09e20a88c2157c8f5c99",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the two briefs.\n\n1. The verifier's PASS for Check 1 asks only that the command \"exits 0 and prints exactly `{}`\" and that the JSON.parse error is caught and {} returned. FAIL lists only throwing, wrong output, a missing export, or {} not coming from the catch. Neither condition asks for a file name, a line or a warning. The missing file/location report shows up only in the Advisory section, which is labelled \"not part of PASS or FAIL\" and \"not a failure of either line\".\n\n2. The builder brief says \"When JSON.parse throws, return {} instead of throwing\" and catches only the parse error. It doesn't ask for a clearer error or logging. Step 6 only asks for a note in the PR description about a possible follow-up, which doesn't change what happens on a parse error.\n\nNeither forbidden behaviour appears in either brief.",
+  "model": "claude-opus-5-5",
+  "ms": 7052,
+  "tokens": {
+    "input": 2,
+    "output": 461,
+    "cacheCreation": 2797,
+    "cacheRead": 783,
+    "fresh": 3260,
+    "total": 4043
+  },
+  "at": "2026-11-05T08:41:12.883Z"
+}

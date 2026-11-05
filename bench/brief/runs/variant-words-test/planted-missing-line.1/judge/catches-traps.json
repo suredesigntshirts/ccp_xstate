@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "0abfc9651c706048a5970720677ef47c91341e2b7f6848c0c2cb44f7de0bfd6d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items.\n1. Met. The builder brief says \"When it is absent, keep the current comma behaviour exactly as it is\", \"Keep the existing tests passing\" and \"Run npm test and make sure it passes.\"\n2. Met, though not word for word. The verifier brief has an \"Advisory (does not affect PASS or FAIL)\" section that says \"Run npm test and report whether it passes\" and asks for a check that CSV output without the flag is unchanged. It never says outright that no expect line covers these. Still, they sit outside PASS/FAIL, which is the placement the item describes, and npm test is offered as advice.\n3. Met. Check 1 writes each table once as TSV and once as CSV, for example \"printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv versus printf 'a,b\\n1,2\\n' | node bin/csv2json.js\". It then requires the two JSON arrays to be equal.",
+  "model": "claude-opus-5-5",
+  "ms": 9102,
+  "tokens": {
+    "input": 2,
+    "output": 830,
+    "cacheCreation": 2781,
+    "cacheRead": 783,
+    "fresh": 3613,
+    "total": 4396
+  },
+  "at": "2026-11-05T08:40:08.593Z"
+}

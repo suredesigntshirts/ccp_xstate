@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "1399a28ef47c4773adf953de3d1f3ca4d80d17d195eeb9862d9eb42baf85070c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 1's PASS condition requires both that the last line is SAME and that the CSV output is one exact JSON value, [{\"name\":\"Ada\",\"age\":\"36\",\"city\":\"London\"},{\"name\":\"Lin\",\"age\":\"\",\"city\":\"Paris\"}]. The expect line only asks that the --tsv output equal whatever plain csv2json prints for the same table. It does not require any particular output, so pinning exact content is stricter than the words and should be under Advisory. The FAIL condition also adds \"or prints an error\", which the words don't require. Check 2 (grep, then confirm the README explains --tsv) is a fair reading of \"documents --tsv\". The Advisory section correctly holds npm test, the default-CSV check and the added-test suggestion. Because Check 1 has conditions the words don't force, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 16240,
+  "tokens": {
+    "input": 2,
+    "output": 1120,
+    "cacheCreation": 2747,
+    "cacheRead": 783,
+    "fresh": 3869,
+    "total": 4652
+  },
+  "at": "2026-11-05T08:40:30.647Z"
+}

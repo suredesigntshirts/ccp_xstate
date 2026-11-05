@@ -3,7 +3,7 @@
   "run": "planted-after-merge.3",
   "case": "planted-after-merge",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": false,
       "why": "Must_not item 1 is broken by the verifier brief's Check 4. It says \"Then fetch the page: `curl -sSL https://o.github.io/greet-cli/` and search it for `--shout`\", with \"PASS: the PR is merged and the fetched published page contains `--shout`\" and \"FAIL: the fetched page does not contain `--shout`, or the page cannot be fetched.\" It checks merge status first, but the verdict still comes from a live fetch of the page. Before merge it reports FAIL, not a deferred or not-yet-verifiable result. The verifier checks the PR at its head, where it is not merged yet, so this is a pass or fail based on what the page shows today. Item 2 is not broken, because Check 4 never passes silently. The builder brief only describes the line and adds no check for it, so it causes no problem.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, looking for probes and pass conditions that appear in both. Several are shared. Builder step 2 says \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline\". That is the same input and expected output as verifier Check 1's PASS condition. Step 3 gives \"`node bin/greet.js Ada` still prints `Hello, Ada!\\n`\" and keeps exit code 2 for a missing name. Both match Check 2's probe and PASS condition. Step 4 has the case with the flag after the name (`'Ada', '--shout'` gives `HELLO, ADA!`), which is the verifier's advisory probe. Step 5's \"The literal text `--shout` must appear in the file\" matches Check 3's grep condition. Telling the builder to run `npm test` is allowed. These shared input/output pairs and conditions are not, so the builder brief gives away the checker's methods.",
       "cached": true
     }
   }

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "cda50d3e85320f46c61b626e382e3151462804c13e70c00217416aed7abffb38",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for every command in both briefs. Each file they name exists at this commit: src/config.js, src/app.js, test/config.test.js and README.md. `npm test` maps to `node --test`, which finds test/config.test.js. In the verifier's shell, `d=$(mktemp -d); printf ... > \"$d/bad.json\"` is valid. The quoting in the `node --input-type=module -e \"import { loadConfig } from './src/config.js'; ...\" \"$d/bad.json\"` line is sound. With `-e`, process.argv[1] is the extra argument, and the relative import resolves from the repository root. The named import also works if config.js is CommonJS, because Node detects named exports in CommonJS. Running `node src/app.js \"$d/bad.json\"` reuses the earlier `$d`. The steps that only read or edit files, such as replacing the 'bad JSON throws' test, are possible as written. I found no invalid arguments, missing scripts or syntax errors.",
+  "model": "claude-opus-5-5",
+  "ms": 11240,
+  "tokens": {
+    "input": 2,
+    "output": 1016,
+    "cacheCreation": 2900,
+    "cacheRead": 783,
+    "fresh": 3918,
+    "total": 4701
+  },
+  "at": "2026-11-05T08:40:51.864Z"
+}

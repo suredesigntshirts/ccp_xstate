@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "0d7991407b49e50f20848f1b3c059822d0e657de6b7fc34a47b1172a12f92e56",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not 1 holds. Check 3 fails whenever any export has no heading (\"for example slugify or padLeft\"), so a README with a padLeft section but no slugify section cannot pass. Checks 1 and 2 do not demand a one-character fill or a parameter count, and the multi-character fill case is only advisory. Must_not 2 breaks, though. Check 3's command is wrapped in bash double quotes, so `'\\\\b'` reaches JS as `'\\b'`, which is a backspace character, not a word boundary. No heading can match, so every function is reported missing and even a correct README fails. That FAIL condition is stricter than line 3. Check 4 also requires the output to show `# fail 0`, which only appears in TAP reporter output. Node's spec reporter prints `ℹ fail 0` instead, so a passing `npm test` with exit 0 could still fail. That is stricter than \"npm test passes\".",
+  "model": "claude-opus-5-5",
+  "ms": 17323,
+  "tokens": {
+    "input": 2,
+    "output": 1324,
+    "cacheCreation": 3165,
+    "cacheRead": 783,
+    "fresh": 4491,
+    "total": 5274
+  },
+  "at": "2026-11-05T08:40:00.773Z"
+}

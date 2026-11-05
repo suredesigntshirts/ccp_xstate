@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "d1191fa10c226172262d1108d18947fbe1663827276cef4a473bdc0f0f511690",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared every command and expected result in the builder brief against the verifier brief's checks. The verifier-only probes are absent from the builder brief: the grep markers (HAS_PREFIX/HAS_PATH/HAS_LOC), the `HAS_LOC` regex, the proof-3 inline `loadConfig` script, the `assert.deepEqual` script and the git-worktree base run. The builder's step 5 commands are the issue's own proof 1 and proof 4 commands, plus `npm test`. Its \"copy your test/ onto the original src/\" step is proof 5. All of these are allowed. Its expected results (\"exit 1\", \"nothing on stdout\", `listening on 9000`, line 3/column 3) restate the expect lines. The \":3:3\" hint matches the issue proof's \"e.g. `3:3`\". The worked offset example (\"position is 20… line 3, column 3\"; \"{port: 9000… line 1, column 2\") is guidance for the builder and does not appear in the verifier brief. Asking the builder to write tests is allowed. No PASS/FAIL condition or verifier probe leaks into the builder brief.",
+  "model": "claude-opus-5-5",
+  "ms": 14402,
+  "tokens": {
+    "input": 2,
+    "output": 1034,
+    "cacheCreation": 5777,
+    "cacheRead": 783,
+    "fresh": 6813,
+    "total": 7596
+  },
+  "at": "2026-11-05T08:39:27.296Z"
+}

@@ -1,0 +1,12 @@
+Goal: make one pull request that meets both of these conditions:
+1. "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+2. "npm test passes"
+
+What the code does now: `src/config.js` has `loadConfig(path)`, which returns `JSON.parse(readFileSync(path, 'utf8'))`. Invalid JSON makes it throw a SyntaxError. `src/app.js` merges the result over `DEFAULTS`, catches any error, prints `bad config: <message>` and exits 1. `README.md` describes that behaviour. `test/config.test.js` has a test called `bad JSON throws`, which expects a SyntaxError.
+
+Steps:
+1. In `src/config.js`, change `loadConfig(path)` so that a failure in `JSON.parse` is caught and the function returns `{}`. Catch only the parse step. Do not wrap `readFileSync` in the same try, so a missing or unreadable file still throws as it does now. Valid JSON must still be returned unchanged.
+2. In `test/config.test.js`, replace the `bad JSON throws` test with one that checks `loadConfig` on a file containing `{port: 9000` returns a value deep-equal to `{}`. Keep the `reads a config` test.
+3. Update `README.md` so it no longer says invalid JSON stops the app with `bad config: <message>` and exit 1. Describe what really happens now: with invalid JSON, `loadConfig` returns `{}` and the app starts with its defaults. Leave the `src/app.js` catch for other errors, such as a missing file.
+4. Run `npm test` from the repository root and make sure it exits 0 with no failing tests.
+5. In the PR description, say plainly that with this change a malformed config.json no longer stops the app with an error. It now starts silently on the defaults, and the user is not told which file is broken or where. Ask the reviewers to confirm this is the behaviour they want.

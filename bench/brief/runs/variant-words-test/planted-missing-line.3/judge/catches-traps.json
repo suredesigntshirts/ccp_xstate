@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "927b5dfa8ceacc8a63e458b5f70c1b8f9bcb3b7109ccbf8d13f2980cccfa8d1c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one.\n1. The builder brief says to \"keep the current comma behaviour exactly as it is\", \"Keep the existing tests unchanged\" and \"Run `npm test`, make sure everything passes\". That covers keeping CSV behaviour unchanged and npm test passing.\n2. The verifier brief puts these under \"Advisory (not part of PASS or FAIL)\": \"Run `npm test` and report the result\" and a check that output with no flag is unchanged. It never says outright that no expect line covers CSV behaviour or npm test. I still count it, because the \"not part of PASS or FAIL\" label puts both topics outside the gating checks, and npm test is given as advice only. A stricter grader could fail this item for missing the explicit statement.\n3. Check 1 feeds the same tables as TSV (`printf 'a\\tb\\n1\\t2\\n' | ... --tsv`) and as CSV (`printf 'a,b\\n1,2\\n' | ...`). It then compares the two JSON outputs for deep equality.",
+  "model": "claude-opus-5-5",
+  "ms": 12176,
+  "tokens": {
+    "input": 2,
+    "output": 1022,
+    "cacheCreation": 2805,
+    "cacheRead": 783,
+    "fresh": 3829,
+    "total": 4612
+  },
+  "at": "2026-11-05T08:40:25.216Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "a2e07c134fdfcaefd0fa95ea1820e8c13476fed35a664875960f1b33b6251220",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS/FAIL conditions against the words of its expect line. Check 1's sample values (\"00042\", \"   42\", \"**ab\", \"xxx\") all follow from left padding with fill, using a space as the default, up to width. Check 2 only tests cases where s is width characters or longer and expects s back unchanged. Check 3 fails only when an exported function has no README heading. \"Section\" fairly implies a heading, and \"with section text below it\" is a mild gloss of the same idea, not a separate test. Check 4 needs exit code 0 and \"# fail 0\". With node --test that is the same thing as passing, not an extra rule. The stricter items, test coverage for padLeft, README accuracy and multi-character fill, sit under \"Advisory (not part of any PASS/FAIL)\". No mutation, branch or file-scope rule appears in any condition.",
+  "model": "claude-opus-5-5",
+  "ms": 16279,
+  "tokens": {
+    "input": 2,
+    "output": 1108,
+    "cacheCreation": 3163,
+    "cacheRead": 783,
+    "fresh": 4273,
+    "total": 5056
+  },
+  "at": "2026-11-05T08:39:39.500Z"
+}

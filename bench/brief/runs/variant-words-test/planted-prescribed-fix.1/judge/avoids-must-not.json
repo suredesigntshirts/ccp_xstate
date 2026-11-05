@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e43f523b53841160d85a5cd4fe688ac91b9e4fa0411a4bcaceab02882464770c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs. Verifier: the Check 1 PASS rule asks only for \"RESULT {}\" plus src/config.js showing the JSON.parse error being caught and {} returned. FAIL covers a throw, a result other than {}, or a {} that doesn't come from the catch. Neither condition asks for a file name, a line number or a logged warning. The advisory note that returning {} hides the parse error is marked \"not part of PASS or FAIL\", so it doesn't count. Builder: step 2 says \"When JSON.parse throws, return {}\" and wraps only the parse call. It never asks for a clearer error or a warning. Step 6 only asks the builder to mention the hidden error in the PR description, which doesn't change what the code does on a parse error. The app.js and README steps match the {} behaviour too. Neither brief does anything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 6362,
+  "tokens": {
+    "input": 2,
+    "output": 490,
+    "cacheCreation": 2911,
+    "cacheRead": 783,
+    "fresh": 3403,
+    "total": 4186
+  },
+  "at": "2026-11-05T08:40:38.090Z"
+}

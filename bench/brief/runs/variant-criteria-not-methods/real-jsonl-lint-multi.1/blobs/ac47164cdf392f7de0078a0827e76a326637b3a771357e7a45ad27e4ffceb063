@@ -1,0 +1,34 @@
+Work at the PR's head commit in a checkout of suredesigntshirts/ccp_machine_test. Run `npm ci` first. Let BIN=packages/jsonl-lint/bin/jsonl-lint.js. Make a scratch directory with: c1.jsonl = `{"a":1}\n{"b":2}\n`, c2.jsonl = `[1,2]\n\n"x"\n`, b1.jsonl = `{"a":1}\n{bad}\n{"torn":`, b2.jsonl = `nope\n{"ok":true}\n`. Record exit codes, stdout and stderr separately for every command.
+
+## Check 1 — expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before"
+Run `node $BIN b1.jsonl c1.jsonl b2.jsonl` and, separately, `node $BIN b2.jsonl b1.jsonl`. For each bad file compute the expected lines with `node -e` importing `lint` from packages/jsonl-lint/src/index.js: `<arg>:<line>: <error>` per problem, using the argument exactly as typed. Also run `node $BIN b1.jsonl` alone and compare to the same expectation.
+PASS: stdout of each multi-file run equals the concatenation of each bad file's expected lines in argument order (b1's lines before b2's in the first run, b2's before b1's in the second), nothing printed for c1.jsonl, and the single-file run gives exactly b1's lines.
+FAIL: any file not checked, lines out of argument order, a wrong prefix/line/error, or extra/missing lines.
+
+## Check 2 — expect: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)"
+Run `node $BIN - < b1.jsonl`, `node $BIN c1.jsonl - < b2.jsonl`, and `node $BIN - - < c1.jsonl`.
+PASS: the first prints b1's expected lines with prefix `-:` (e.g. `-:2: ...`, `-:3: ...`) and exits 1; the second prints b2's expected lines with prefix `-:` and exits 1; the third exits 2 with a non-empty stderr.
+FAIL: stdin not read, the prefix isn't `-`, or `- -` doesn't exit 2.
+
+## Check 3 — expect: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)"
+Run: (a) `node $BIN c1.jsonl c2.jsonl`; (b) `node $BIN c1.jsonl b2.jsonl c2.jsonl`; (c) `node $BIN` with no arguments; (d) `node $BIN c1.jsonl missing.jsonl c2.jsonl`; (e) `node $BIN b1.jsonl missing.jsonl b2.jsonl`.
+PASS: (a) exit 0, empty stdout; (b) exit 1; (c) exit 2 with non-empty stderr; (d) exit 2, stderr mentions missing.jsonl, stdout empty; (e) exit 2, stderr mentions missing.jsonl, and stdout still holds b1's and b2's expected lines in order.
+FAIL: any exit code differs, the read error isn't on stderr, or processing stops at the missing file (b2's lines absent in (e)).
+
+## Check 4 — expect: "lint(text) in src/index.js is unchanged"
+Run `git fetch origin main` and `git diff $(git merge-base HEAD origin/main) HEAD -- packages/jsonl-lint/src/index.js`.
+PASS: the diff is empty.
+FAIL: any change to that file.
+
+## Check 5 — expect: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage"
+Run `node --test` in packages/jsonl-lint and read the test files under packages/jsonl-lint/test/ and packages/jsonl-lint/README.md.
+PASS: the tests pass and there are node:test tests that run the CLI on each of: two clean files; one bad file among several; `-` with clean stdin; `-` with bad stdin; a missing file among good ones; two `-` arguments; no arguments — each asserting the outcome; and the README shows the `<file> [<file> ...]` usage and the `-` stdin form.
+FAIL: any of those cases has no test, tests fail, or the README doesn't document multi-file and `-` usage.
+
+## Check 6 — expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head"
+Run `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state`, `gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test`, and `npm test` at the repository root at the head commit. Also `gh pr list --repo suredesigntshirts/ccp_machine_test --search 104 --state open` to confirm there is only one PR for the issue.
+PASS: one open PR whose body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`, the `test` workflow run for headRefOid concluded success, and local `npm test` exits 0.
+FAIL: the body lacks that line, the workflow is failing/missing/pending for the head, `npm test` fails, or the change is split over several PRs.
+
+## Advisory
+- Worth noting (not a pass/fail condition): whether `- -` is rejected before any file is read, whether error messages containing newlines are flattened as before, and whether the README's exit-code section explains that 2 takes priority over 1.

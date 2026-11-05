@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "b3c94a8435a0dbdab5440b4c72761f061c26557cb0c39eb819185c52fa82e143",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Item 1: the builder brief says \"`subtract` is exported but NOT documented in README.md today, so it must be added too\", and step 2 asks for `### subtract(a, b)` and `### clamp(x, lo, hi)` entries. Item 2: verifier Check 3 lists exported functions \"(add, subtract, multiply, clamp, and any others)\" and FAILs if \"any exported function, e.g. `subtract` ... or `clamp`, has no description in README.md\". It allows a function documented without a heading, but every function still needs an entry. Item 3: Check 2 calls clamp(5,10,0) and clamp(0,1,0.5), where lo is greater than hi, using `a.throws(..., RangeError)`, an instanceof check. It FAILs on \"an error that is not a RangeError\". All three items are handled.",
+  "model": "claude-opus-5-5",
+  "ms": 13939,
+  "tokens": {
+    "input": 2,
+    "output": 856,
+    "cacheCreation": 3742,
+    "cacheRead": 783,
+    "fresh": 4600,
+    "total": 5383
+  },
+  "at": "2026-11-05T08:41:42.555Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "89ee320462373943701b403fd834723b9213d0479d610535a76a0a5f2735ff6c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the tracked files and package.json. `node bin/greet.js --shout Ada`, `node bin/greet.js Ada`, `node bin/greet.js 'Ada Lovelace'` and `node bin/greet.js; echo rc=$?` all run bin/greet.js, which exists, and the shell syntax is valid. `npm test` maps to the existing script `\"test\":\"node --test\"`, and test/greet.test.js exists. In `grep -n -- '--shout' docs/index.md` the `--` stops grep from reading the pattern as an option, and docs/index.md exists. `node bin/greet.js Ada | od -c` is a valid pipe. `curl -sS -L https://o.github.io/greet-cli/ | grep -n -- '--shout'` uses valid curl flags. The briefs contain no JavaScript snippets. Every file they name is tracked, and none needs to be created by an earlier step. No command breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 7173,
+  "tokens": {
+    "input": 2,
+    "output": 521,
+    "cacheCreation": 3719,
+    "cacheRead": 783,
+    "fresh": 4242,
+    "total": 5025
+  },
+  "at": "2026-11-05T08:39:30.584Z"
+}

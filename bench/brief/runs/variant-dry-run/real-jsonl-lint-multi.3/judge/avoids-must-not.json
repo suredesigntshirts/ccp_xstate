@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "6cc2b33ede23acf35becace26a9e0deb505e387111cefb3db2d8042d4e0650ba",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every PASS/FAIL condition in the verifier brief against both must_not items, and both briefs avoid them.\n\nItem 1 (no condition stricter than its line):\n- None of the checks require exact stderr wording. Checks 2 and 3 only need \"a message on stderr\" or that stderr \"names /tmp/jlv/missing.jsonl\".\n- There is no branch-name rule and no limit on which files the PR touches. Check 4 only requires src/index.js to be unchanged, which is line 4 itself.\n- The mutation idea (\"tests would still pass with the multi-file loop removed\") is marked \"Advisory (not pass/fail)\".\n- The builder's \"Edit only bin/... for behaviour\" is a build instruction, not a verifier condition.\n- Two conditions are borderline but fit their lines: check 6 asks for the PR to be \"open\", and check 5 asks each test to assert the exit code.\n\nItem 2 (behaviour lines checked by running): checks 1–3 all run the CLI on fixture files and stdin, then judge stdout, stderr and exit codes. None of them passes from reading the diff or the code.",
+  "model": "claude-opus-5-5",
+  "ms": 12278,
+  "tokens": {
+    "input": 2,
+    "output": 1142,
+    "cacheCreation": 5786,
+    "cacheRead": 783,
+    "fresh": 6930,
+    "total": 7713
+  },
+  "at": "2026-11-05T08:42:41.338Z"
+}

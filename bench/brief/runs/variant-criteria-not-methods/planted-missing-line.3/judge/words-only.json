@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "22eeff9d3a5b0ef1b59c1eb2c4dbf21618c8f26b5714197bb13ad4a29b83f37c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 2 holds: grepping for --tsv and confirming the README describes the flag is what \"documents --tsv\" requires. Check 1 goes further than its expect line. That line only asks that --tsv output be \"the same JSON array that node bin/csv2json.js prints\" for the same table as CSV. The PASS condition also requires \"both commands exit 0\" and that \"/tmp/csv.out is a JSON array of objects keyed by name, age and city (two rows)\". The FAIL condition matches, failing on \"either command exits non-zero\". The words don't require any exit code, and they don't say what the baseline CSV output must contain. They only require that the two outputs match and are a JSON array. Both extra tests are stricter than the words and belong under Advisory, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 11178,
+  "tokens": {
+    "input": 2,
+    "output": 881,
+    "cacheCreation": 2546,
+    "cacheRead": 783,
+    "fresh": 3429,
+    "total": 4212
+  },
+  "at": "2026-11-05T08:40:30.545Z"
+}

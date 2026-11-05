@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "d20cf7bb6b57209de59d266f84e3537a4c67dd606943a2c14acbae27febc2116",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Not met: at least two checks test more than their expect lines' words. Check 4's expect line says only that lint(text) is unchanged. But its PASS condition requires \"the diff is empty\" for all of packages/jsonl-lint/src/index.js, so a change elsewhere in that file (e.g. a new export) would fail. That is a file-scope rule and belongs under Advisory. Check 3 requires that \"stderr names the missing file\" (twice), while the words only say \"error on stderr\". Check 1 also pins the error text to \"<JSON.parse message>\", which may be stricter than \"as for one file before\". Checks 2, 5 and 6 stay within their words.",
+  "model": "claude-opus-5-5",
+  "ms": 16130,
+  "tokens": {
+    "input": 2,
+    "output": 1079,
+    "cacheCreation": 4819,
+    "cacheRead": 783,
+    "fresh": 5900,
+    "total": 6683
+  },
+  "at": "2026-11-05T08:42:04.486Z"
+}

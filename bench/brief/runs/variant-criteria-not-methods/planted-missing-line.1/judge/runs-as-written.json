@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "cf4ccef578328a05f192a3409aafcab1ad81fd28e63281cfb90f167a16321bed",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and package.json. The builder brief names bin/csv2json.js, src/parse.js, test/csv.test.js and README.md, and all four are tracked. It calls `execFileSync('node', ['bin/csv2json.js', '--tsv'], {input, encoding})`, which is valid JavaScript with the right argument shape. The `npm test` it relies on exists as `node --test`. In the verifier brief, the `printf '...\\t...'` pipelines into `node bin/csv2json.js [--tsv] > /tmp/...; echo \"... $?\"` are valid shell, and `$?` there is node's exit status. `cmp /tmp/tsv.out /tmp/csv.out && echo SAME` is correct, and so is `grep -n -- '--tsv' README.md`, where `--` keeps grep from reading the pattern as an option. The `--tsv` flag itself is added by the builder before the verifier runs at the PR head. Step 3 has a mismatch: its example table has two columns, but it asks for three. That affects what goes in the test, not whether any command runs. Every command would run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 9963,
+  "tokens": {
+    "input": 2,
+    "output": 757,
+    "cacheCreation": 2734,
+    "cacheRead": 783,
+    "fresh": 3493,
+    "total": 4276
+  },
+  "at": "2026-11-05T08:40:19.213Z"
+}

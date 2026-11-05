@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "437b47147f66024893f2d6f14453be0da26efa2a8a505b8c84d15b88b63e8f08",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repo. Every file they name exists in the tracked list: `src/app.js`, `src/config.js`, `test/config.test.js` and `README.md`. `npm test` maps to `node --test`. The shell commands are well formed: `d=$(mktemp -d); printf '{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n' > $d/c.json; node src/app.js $d/c.json >$d/out 2>$d/err`, plus `wc -c < $d/out` and `grep -F`. The `node --input-type=module -e \"import {loadConfig} from './src/config.js'; ...\"` snippets are valid JavaScript inside double quotes, with `$d` expanding and the inner quotes being single. The git steps `git merge-base HEAD <default branch>`, `git checkout <base> -- src` and `git checkout HEAD -- src` use valid arguments; the placeholders mirror the issue's own proof. The builder's regex hint `position (\\d+)` is valid JavaScript. I found no reference to a missing script or tool, and no syntax errors.",
+  "model": "claude-opus-5-5",
+  "ms": 11190,
+  "tokens": {
+    "input": 2,
+    "output": 758,
+    "cacheCreation": 5427,
+    "cacheRead": 783,
+    "fresh": 6187,
+    "total": 6970
+  },
+  "at": "2026-11-05T08:38:50.714Z"
+}

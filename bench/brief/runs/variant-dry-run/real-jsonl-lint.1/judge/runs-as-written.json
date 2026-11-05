@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "b12ecb0512477ab4f136a4f85af8683d0303951b61111258d6cc6ebdb4d8c760",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Builder: `chmod +x`, `npm install`, `npm ci && npm test` and the `gh api .../check-runs --jq` call all run as written. The files they use are created in earlier steps, or are tracked: package-lock.json, the root README and the workflow. Verifier: the `printf` setup has no stray `%`. The `grep -E \"^$d/bad.jsonl:...\"` and `sed \"s|...|\\1|\"` lines quote correctly. In check 3, `node --input-type=module -e \"... lint('{\\\"a\\\":1}\\n...')\"` reaches JS as valid code, with `\\n` kept as escapes, and the expected lines 3 and 5 are correct. Check 4's `node -e \"require(...)\"` is valid CommonJS. `npm test -w packages/jsonl-lint` is a valid npm call, since the root script's `--workspaces` shows workspaces are configured. Check 6's `gh api` calls with quoted URLs and `//` in jq are valid. `node --test` will find `test/*.test.js`. I found no syntax errors, missing files or bad arguments.",
+  "model": "claude-opus-5-5",
+  "ms": 16489,
+  "tokens": {
+    "input": 2,
+    "output": 1341,
+    "cacheCreation": 6777,
+    "cacheRead": 783,
+    "fresh": 8120,
+    "total": 8903
+  },
+  "at": "2026-11-05T08:42:29.777Z"
+}

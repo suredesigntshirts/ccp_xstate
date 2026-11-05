@@ -1,0 +1,11 @@
+Make one pull request that adds a --shout flag to greet-cli and meets every line of issue #12's expect list.
+
+Context: bin/greet.js picks the first argument that does not start with `--` as the name and prints `${greeting(name)}\n` (greeting is in src/greet.js and returns `Hello, <name>!`). docs/index.md is the usage page. .github/workflows/pages.yml publishes the docs/ directory to GitHub Pages on push to main. Tests use `node --test` (test/greet.test.js).
+
+Steps:
+1. In bin/greet.js, detect `--shout` in process.argv.slice(2). When it is present, print the greeting converted to upper case (for example `node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline). The flag must work whether it comes before or after the name. When `--shout` is absent, the output must stay byte-for-byte the same as now (`Hello, Ada!\n` for `Ada`). The usage error and exit code 2 for a missing name stay the same.
+2. Leave the `greeting` export in src/greet.js unchanged in behaviour. If you add a helper, keep the existing test passing.
+3. Add tests to test/greet.test.js: `--shout Ada` gives `HELLO, ADA!\n`, `Ada --shout` gives the same, and plain `Ada` still gives `Hello, Ada!\n`.
+4. Update docs/index.md to document `--shout`: show the usage line `node bin/greet.js --shout <name>` and say that it prints the greeting in upper case. Keep the existing plain usage. Do not move the docs out of docs/ and do not change .github/workflows/pages.yml: that workflow publishes docs/ to https://o.github.io/greet-cli/ after merge, which is how the last expect line gets met.
+5. Run `npm test` and make sure it passes. Also run `node bin/greet.js --shout Ada` and `node bin/greet.js Ada` by hand to confirm the outputs.
+6. Open the pull request. Put a link to https://github.com/o/greet-cli/issues/12 in the description, and note that the published docs page updates only after merge, through the pages workflow.

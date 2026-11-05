@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "797b19751053f3b227a284d5b93deacd5ed3307272d3155dddc1b5727ca70306",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 2 holds: checks 1 to 3 all run `node B ...` and don't pass on reading the code. Check 5 reads the tests, which is fine because line 5 is not a behaviour line. Item 1 breaks in Check 3. Line 3 asks only for an \"error on stderr\" when a file can't be read, but the verifier requires \"stderr must name missing.jsonl\". An implementation that writes a valid error such as \"jsonl-lint: a file could not be read\" meets line 3 and would still FAIL. That is a condition on the content of the stderr message, stricter than the line. The builder brief adds the same kind of rule (\"stderr names the missing file\") to the tests it asks for, but that is guidance, not a check. The other checks stay within their lines. Check 1 compares output against lint(), Check 2 asks for \"a message on stderr\", and the advisory notes are not pass/fail.",
+  "model": "claude-opus-5-5",
+  "ms": 12704,
+  "tokens": {
+    "input": 2,
+    "output": 993,
+    "cacheCreation": 5127,
+    "cacheRead": 783,
+    "fresh": 6122,
+    "total": 6905
+  },
+  "at": "2026-11-05T08:42:40.646Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "9d12b664db42efd5c4a543e68ac3277b83e7792a8ce63614767f8b864a1e0d28",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The verifier brief's Check 1 is stricter than its expect line. Its PASS condition requires the bad file to print \"exactly two stdout lines\". The expect line only says the tool \"prints <file>:<line>: <error> for every row that is not valid JSON\". It never says the lines go to stdout, and it doesn't rule out other output such as a summary line. A tool that wrote the error lines to stderr, or added a \"2 errors\" line, would meet the words but fail this check. That extra rule belongs under Advisory. Checks 2, 3 and 5 match their words. Checks 4 and 6 are close: they add things like running npm ci and requiring the workspace tests to pass, which the words arguably imply. The Advisory section correctly holds the CRLF, lockfile and shebang checks. Because Check 1 breaks the criterion, it doesn't hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 10446,
+  "tokens": {
+    "input": 2,
+    "output": 831,
+    "cacheCreation": 5678,
+    "cacheRead": 783,
+    "fresh": 6511,
+    "total": 7294
+  },
+  "at": "2026-11-05T08:42:53.150Z"
+}

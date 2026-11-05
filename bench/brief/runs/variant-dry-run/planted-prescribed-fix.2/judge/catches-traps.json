@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "6da2c48c32a95122d23e7efbbd5523f2808908cba417515feebb741314e9613b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one. Item 1: outside PASS/FAIL, the verifier's Advisory says to \"Note in your report that the app now starts silently on the defaults when config.json is malformed. The user is not told which file is broken or where.\" It also says `node src/app.js <bad.json>` now prints `listening on 8080` instead of the old \"bad config\" exit. Builder step 5 asks for the same warning in the PR description. Item 2: builder step 2 has the builder replace the `bad JSON throws` test with one that expects `{}`, and step 4 requires `npm test` to pass. Item 3: verifier Check 1 runs loadConfig on `{port: 9000` (invalid JSON). It PASSes when the output is exactly `{}` with no SyntaxError, and FAILs if the call throws.",
+  "model": "claude-opus-5-5",
+  "ms": 6005,
+  "tokens": {
+    "input": 2,
+    "output": 512,
+    "cacheCreation": 3022,
+    "cacheRead": 783,
+    "fresh": 3536,
+    "total": 4319
+  },
+  "at": "2026-11-05T08:40:59.090Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "0911302fd17bc0420a275363c6083b085225b7898fe98e08a85db2621ac1faf0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and each one is handled.\n1. Builder brief: step 2 says \"running without flags behaves exactly as it does now\". Step 5 says \"Run `npm test` and make sure every test passes\", and step 3 says \"Keep the existing tests\". Neither expect line asks for this.\n2. Verifier brief: the \"Advisory (not part of PASS/FAIL)\" section suggests running `npm test` with the existing CSV tests and says no-flag behaviour should stay the same. It never says outright \"no expect line covers this\". But labelling it as not part of PASS/FAIL, under Advisory, does show that no line covers it, which fits the example the item gives.\n3. Check 1 writes the same table as t.csv and t.tsv, runs the CLI on each (the TSV one with --tsv), and compares the two outputs with `cmp`. It passes only if the command prints SAME.",
+  "model": "claude-opus-5-5",
+  "ms": 7280,
+  "tokens": {
+    "input": 2,
+    "output": 680,
+    "cacheCreation": 3111,
+    "cacheRead": 783,
+    "fresh": 3793,
+    "total": 4576
+  },
+  "at": "2026-11-05T08:40:16.183Z"
+}

@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.2",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Checks 1–3 and 5 mostly stay within their words. Check 4 goes further. Its line only says \"lint(text) in src/index.js is unchanged\", but its FAIL condition is \"any diff in packages/jsonl-lint/src/index.js\", backed by `git diff --exit-code` over the whole file. That is a file-scope rule the words don't force: a new export or an edited comment elsewhere in the file would fail the check even with lint(text) untouched. Check 6 also adds \"the PR is open\", which \"one PR\" doesn't require. Both should have gone under Advisory. So the output breaks the criterion.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs. Each file they name is tracked at this commit: the bin, src/index.js, the test files, the package README, package-lock.json for `npm ci` and the test workflow. `npm test` matches the root workspace script. Check 1 writes the old bin to `old-jsonl-lint.tmp.mjs` in the same bin directory, so its relative import of the source still resolves; it runs it and then deletes it. The `node --input-type=module -e \"...\"` one-liner quotes correctly in bash: `\\\"` becomes `\"` and `\\n` stays a JavaScript escape, and the JavaScript is valid. The `gh pr view/checks/list --repo ... --json/--search` flags are real options, and `<pr>` is a clear placeholder. The redirects, `printf` calls, `diff`, and `git diff --exit-code b74bddb HEAD -- path` are all valid. The repository facts don't list a commit hash, so I couldn't confirm that `b74bddb` exists. I took it to be the base commit the brief stage gave, and found no command that breaks.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "All four must_catch items are handled. (1) Check 3 runs `a.jsonl missing.jsonl bad.jsonl b.jsonl` in one command. It requires exit 2, a stderr message that names missing.jsonl, and stdout \"still holding `/tmp/jl-verify/bad.jsonl:2: ...`\". (2) Check 4 runs `git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js` against the base commit and requires no diff output. (3) Builder step 4 says \"Update packages/jsonl-lint/README.md\" and lists the multi-file usage, `-` for stdin and the exit codes. (4) Check 6 runs `gh pr view` for the state, body and headRefOid, and `gh pr checks`. It requires the Closes line in the body, headRefOid equal to the commit checked, and the `test` check passing at that head.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1–3 run the program and compare exit codes and stdout, so they meet must_not item 2. Item 1 is broken in Check 4. Expect line 4 only says \"lint(text) in src/index.js is unchanged\". Check 4 instead fails on any change to the whole file: \"FAIL: any diff in packages/jsonl-lint/src/index.js\". The test is `git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js`. So adding an export or a comment would fail the check even if lint(text) stayed the same. That is a limit on which files the PR may touch. Check 5 is also slightly stricter than its line. It requires the README to describe \"the exit codes for several files\", while the line only asks that the README \"documents the usage\". The advisory notes don't affect any verdict, and the builder's own steps are guidance, not PASS/FAIL conditions. Check 4 alone breaks the criterion.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's steps with the verifier brief's probes. Most of the builder brief sets the bar: the expect lines quoted as is, the behaviour to implement, which tests to write, running `npm test` and watching the workflow. All of that is allowed. Step 5 breaks the criterion. It tells the builder to check that \"`git diff b74bddb HEAD -- packages/jsonl-lint/src/index.js` prints nothing once committed\". That is the same probe as verifier Check 4 (`git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js`), and it carries the same pass condition: no diff output. Expect line 4 only says lint(text) is unchanged. It names no command, so the exception for commands named by the issue doesn't cover this one. Because the verifier's check reached the builder, the methods aren't private.",
+      "cached": true
+    }
+  }
+}

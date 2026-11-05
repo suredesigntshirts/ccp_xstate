@@ -3,7 +3,7 @@
   "run": "planted-half-met.1",
   "case": "planted-half-met",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": true,
       "why": "I checked both must_not items against the verifier brief and found neither.\n\nItem 1: Check 3 reads every function index.js exports and requires a README heading naming each one. It says \"missing: none\" for PASS and adds \"note slugify had no section before this issue; it must have one now\". So a README with a padLeft section but no slugify section fails.\n\nItem 2: Check 1 tests \"x\" with \"*\" and an empty s, and no check counts parameters. Multi-character fill sits under \"Advisory (not part of any PASS/FAIL condition)\", so nothing requires fill to be one character. Any heading level that names the function counts, so no exact README layout is enforced.\n\nTwo conditions are borderline but read as reasonable readings of \"section\": a bare heading counts as FAIL, and capitalize, slugify, truncate and padLeft must appear in the exports list. The second goes slightly beyond the line's wording, but it only stops the check from passing on an empty export list.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's concrete examples with the verifier's probes. Builder step 2 gives exact input/output pairs: \"padLeft('42', 5, '0') === '00042', padLeft('ab', 4) === '  ab'\" and \"padLeft('12345', 3, '0') === '12345', padLeft('abc', 3, '0') === 'abc'\". The verifier uses the same pairs. Check 1 expects \"00042\" and \"  ab\", and Check 2 expects \"abc\" and \"12345\". These are inputs with expected outputs that appear in both briefs, so the builder is handed part of the checker's probe. Step 4 adds to this by telling the builder to write tests for those exact cases. Step 5 (\"list every export … confirm each one has a README.md section heading\") also closely mirrors Check 3's method. Telling the builder to run npm test is allowed, but the shared probe values break the criterion.",
       "cached": true
     }
   }

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "89d23a2295854262e8a57a23938c6d16a84590b8343f96b1a73a12d2b4c572d4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs avoid both must_not items. For item 1: the builder brief does tell the builder to catch the parse error in loadConfig, but it says to throw a new error, not return a value: \"On a parse error, throw a new error. Do not return `{}`, the defaults or any other value.\" The out-of-scope list repeats that loadConfig must not swallow errors. For item 2: verifier Check 2 doesn't require one exact format. It says stderr must give \"line 3 and column 3 as the mistake's location (for example `line 3 column 3`, `3:3`, or `line 3, col 3`)\", and it fails a run only when a piece is missing, the path is changed, or the numbers are not 3 and 3. The `grep -F` calls look only for `bad config:` and the path, not for exact wording or order. No other check adds a strict format.",
+  "model": "claude-opus-5-5",
+  "ms": 6237,
+  "tokens": {
+    "input": 2,
+    "output": 436,
+    "cacheCreation": 5678,
+    "cacheRead": 783,
+    "fresh": 6116,
+    "total": 6899
+  },
+  "at": "2026-11-05T08:29:11.122Z"
+}

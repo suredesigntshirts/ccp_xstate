@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "f3bbe932a5567f52661ea5c86009a7d4c99e6c73cd78081f453e95c42145d8c4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Every command in both briefs should run as written. The builder brief names bin/csv2json.js, src/parse.js, test/csv.test.js, package.json and README.md, and all five are tracked at this commit. It uses `npm test`, which package.json defines. It avoids the issue's nonexistent `npm run test:cli`. Its JS string '[{\"a\\\\tb\":\"1\\\\t2\"}]\\n' correctly gives literal backslash-t escapes. `node bin/csv2json.js --tsv < table.tsv` is only README text, not a step to run. In the verifier brief, each `printf ... | node bin/csv2json.js [--tsv] > /tmp/oN; printf '%s\\n' '...' > /tmp/eN; cmp ... && echo SAME` is valid shell. In Check 5, `%s` with single quotes keeps \\t as two literal characters, which matches JSON.stringify's escaping. `echo \"exit=$?\"` after a pipeline reports node's exit status. `grep -n -- '--tsv' test/*` and `cat README.md` are valid.",
+  "model": "claude-opus-5-5",
+  "ms": 10956,
+  "tokens": {
+    "input": 2,
+    "output": 782,
+    "cacheCreation": 5868,
+    "cacheRead": 783,
+    "fresh": 6652,
+    "total": 7435
+  },
+  "at": "2026-11-05T08:38:10.434Z"
+}

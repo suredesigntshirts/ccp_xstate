@@ -1,0 +1,37 @@
+Check out the pull request head for https://github.com/suredesigntshirts/ccp_machine_test/issues/104 and run `npm ci` or `npm install` at the repository root if needed. Make a scratch directory outside the repo (e.g. `T=$(mktemp -d)`) with: `$T/good1.jsonl` = `{"a":1}\n{"b":2}\n`, `$T/good2.jsonl` = `[1,2]\n`, `$T/bad.jsonl` = `{"a":1}\n{bad\n3\n` (row 2 bad). Let `CLI=packages/jsonl-lint/bin/jsonl-lint.js`. For each check, record the command, its stdout, stderr and exit status. There is exactly one check per acceptance line, in order.
+
+Check 1 — "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before"
+Run `node $CLI $T/good1.jsonl $T/bad.jsonl $T/good2.jsonl`, then `cp $T/bad.jsonl $T/bad2.jsonl` and `node $CLI $T/bad.jsonl $T/bad2.jsonl`, and also `node $CLI $T/bad.jsonl` alone.
+PASS: every file named is checked; each bad row appears as a line `<file>:<line>: <error>` with the file as named and the right line number (`$T/bad.jsonl:2: ...`); in the two-bad-file run, all of bad.jsonl's lines come before bad2.jsonl's; the single-file run still prints `<file>:<line>: <error>` lines for bad rows.
+FAIL: any file named is skipped, a bad row is missing or shows a wrong file name or line, output is out of argument order, or the single-file format is not `<file>:<line>: <error>`.
+
+Check 2 — "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)"
+Run `node $CLI - < $T/bad.jsonl`, `node $CLI $T/good1.jsonl - < $T/bad.jsonl`, and `node $CLI - - < $T/good1.jsonl`.
+PASS: the first two runs report the bad row as `-:2: <error>` (stdin read, named `-`); the `- -` run exits with status 2.
+FAIL: stdin is not read for `-`, the bad row is reported under any name other than `-`, or `- -` exits with a status other than 2.
+
+Check 3 — "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)"
+Run: `node $CLI $T/good1.jsonl $T/good2.jsonl` (expect 0); `node $CLI $T/good1.jsonl $T/bad.jsonl` (expect 1); `node $CLI` (expect 2); `node $CLI $T/good1.jsonl $T/missing.jsonl $T/bad.jsonl` (expect 2).
+PASS: the exit statuses are 0, 1, 2 and 2 respectively; in the last run stderr holds an error message about the unreadable file, and stdout still reports `$T/bad.jsonl:2: ...` (the file after the missing one was still checked and reported).
+FAIL: any exit status differs, the unreadable-file error is not on stderr, or the bad row of `$T/bad.jsonl` is not reported in the run with a missing file.
+
+Check 4 — "lint(text) in src/index.js is unchanged"
+Run `git diff $(git merge-base HEAD origin/main) HEAD -- packages/jsonl-lint/src/index.js` and inspect it; also run `node -e "import('./packages/jsonl-lint/src/index.js').then(m=>console.log(JSON.stringify(m.lint('{\"a\":1}\n{bad\n\n3'))))"` and compare with the same command run at the base commit (`git stash`-free: e.g. `git worktree add $T/base $(git merge-base HEAD origin/main)` and run it there).
+PASS: the diff makes no change to the `lint` function's code (its body and signature are identical to the base), and the two outputs are identical.
+FAIL: the `lint` function's code is changed in any way, or the outputs differ.
+
+Check 5 — "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage"
+Read the test files under `packages/jsonl-lint/test/` and run `npm test --workspace packages/jsonl-lint` (or `cd packages/jsonl-lint && node --test`). Read `packages/jsonl-lint/README.md`.
+PASS: the tests use `node:test` and include cases for each of: two clean files; one bad file among several; stdin via `-` with clean input; stdin via `-` with bad input; a missing file among good ones; two `-` arguments; no arguments — and those tests run (they appear in the test run output); and the README describes invoking the CLI with several files and with `-` for stdin.
+FAIL: any of the seven listed cases has no test, the tests are not node:test, or the README does not document the multi-file / `-` usage.
+
+Check 6 — "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head"
+Run `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state`, `gh pr list --repo suredesigntshirts/ccp_machine_test --search 104 --state all`, `npm test` at the repository root at the PR head, and `gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test`.
+PASS: the change is in a single PR on suredesigntshirts/ccp_machine_test, its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`, `npm test` passes locally at the PR head, and the test workflow run for the head commit has succeeded.
+FAIL: the change is split over several PRs, the body lacks that text, `npm test` fails, or the test workflow is failing, missing or not finished for the head commit.
+
+Advisory (not pass/fail conditions):
+- Whether `- -` rejects before reading any file, and the exact usage message wording, are not required by the lines.
+- Note whether an error message from JSON.parse containing newlines is flattened onto one line as before.
+- Note whether a file with both unreadable and bad rows across arguments prints all bad rows before exiting 2.
+- Clean up any worktree you added (`git worktree remove $T/base`).

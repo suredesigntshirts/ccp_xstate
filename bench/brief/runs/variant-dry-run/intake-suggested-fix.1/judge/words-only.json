@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "fdfe39205e70e0b48622fcc1b2cf72cd5f34976c2236823e9b78714401ae46ba",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1–4 hold. Check 1 asks for exit 1 and empty stdout. Check 2 asks for `bad config:`, the exact path, and line 3 and column 3 marked as line and column. Check 3 asks for the path in the message. Check 4 asks for `listening on 9000`, exit 0 and deepEqual `{port:9000}`. Each tests only what its line says.\n\nCheck 5 breaks the criterion. The expect line says only \"`npm test` passes\", but Step 1, which PASS depends on, says \"It must exit 0 with `# fail 0`.\" That ties passing to one output format, the TAP summary line. Node 22's spec reporter prints `ℹ fail 0` instead, so a passing suite could be marked as failing. Exact wording that the expect line doesn't require belongs under Advisory, not in a PASS condition.",
+  "model": "claude-opus-5-5",
+  "ms": 13660,
+  "tokens": {
+    "input": 2,
+    "output": 1045,
+    "cacheCreation": 5748,
+    "cacheRead": 783,
+    "fresh": 6795,
+    "total": 7578
+  },
+  "at": "2026-11-05T08:37:57.687Z"
+}

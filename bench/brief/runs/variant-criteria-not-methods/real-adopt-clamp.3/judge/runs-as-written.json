@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "f054c42e1ce642e511a065fecb9e276708bc1eef92b43775f7d2794c33e096d3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. Most of them would run: `npm test` exists as `node --test`, `math.js` and `README.md` exist, and the JavaScript in Checks 1 and 2 is valid. Check 3 does not run as written.\n\nIts `node -e \"...\"` is wrapped in double quotes, and inside double quotes bash turns `\\\\` into a single `\\`. Node therefore receives `'^#+\\s*'+n+'\\s*\\('`. In a JavaScript string, `\\s` becomes `s` and `\\(` becomes `(`. The resulting pattern, such as `^#+s*adds*(`, has an unclosed `(`. `new RegExp` then throws \"Invalid regular expression: Unterminated group\" for every exported function, so the check always fails, even when the README is correct. The fallback of reading the README by hand doesn't fix the command itself. One command is broken, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 12884,
+  "tokens": {
+    "input": 2,
+    "output": 1166,
+    "cacheCreation": 3116,
+    "cacheRead": 783,
+    "fresh": 4284,
+    "total": 5067
+  },
+  "at": "2026-11-05T08:41:55.760Z"
+}

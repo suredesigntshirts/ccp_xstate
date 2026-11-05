@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "2a26b202b096585404053ac1f81795c0234b733b59ca474fb6a5117dd62207e2",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, and the builder brief shares the verifier's probes. Builder step 5 tells the builder to run `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` and `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` and check that they print identical output. The verifier's Check 1 runs those same two commands and compares their outputs. Builder step 3 also gives the same inputs with the expected output '[{\"a\":\"1\",\"b\":\"2\"}]\\n', and the verifier's advisory CSV check expects that same output. The expect line names only `node bin/csv2json.js --tsv` as a command. It does not name these inputs or this expected output, so they aren't covered by the allowance for running commands the expect lines name. Because these inputs and expected outputs appear in both briefs, the builder can see the verifier's check, which breaks methods-private.",
+  "model": "claude-opus-5-5",
+  "ms": 6552,
+  "tokens": {
+    "input": 2,
+    "output": 604,
+    "cacheCreation": 2899,
+    "cacheRead": 783,
+    "fresh": 3505,
+    "total": 4288
+  },
+  "at": "2026-11-05T08:40:34.199Z"
+}

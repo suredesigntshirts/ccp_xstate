@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "6cd3caed4fc78ed9e6f9448c60355960bf858b7730f890d588cec484e9ab93fb",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "All four must_catch items are handled. (1) Check 3 runs `a.jsonl missing.jsonl bad.jsonl b.jsonl` in one command. It requires exit 2, a stderr message that names missing.jsonl, and stdout \"still holding `/tmp/jl-verify/bad.jsonl:2: ...`\". (2) Check 4 runs `git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js` against the base commit and requires no diff output. (3) Builder step 4 says \"Update packages/jsonl-lint/README.md\" and lists the multi-file usage, `-` for stdin and the exit codes. (4) Check 6 runs `gh pr view` for the state, body and headRefOid, and `gh pr checks`. It requires the Closes line in the body, headRefOid equal to the commit checked, and the `test` check passing at that head.",
+  "model": "claude-opus-5-5",
+  "ms": 10538,
+  "tokens": {
+    "input": 2,
+    "output": 565,
+    "cacheCreation": 6982,
+    "cacheRead": 783,
+    "fresh": 7549,
+    "total": 8332
+  },
+  "at": "2026-11-05T08:42:32.322Z"
+}

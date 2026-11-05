@@ -1,0 +1,11 @@
+Goal: add a --tsv flag to the CLI so tab-separated input works, and document it. The pull request must meet both of these acceptance lines:
+1. "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+2. "README.md documents --tsv"
+
+Steps:
+1. Read bin/csv2json.js, src/parse.js, test/csv.test.js and README.md. parse(text, sep = ',') in src/parse.js already takes a separator argument, and bin/csv2json.js currently calls parse on stdin with no arguments.
+2. In bin/csv2json.js, check process.argv for --tsv. If it is present, call parse(input, '\t'). If it is absent, keep the current comma behaviour exactly as it is. Read stdin the same way in both cases and print the same output format.
+3. In test/csv.test.js, add a test that runs `node bin/csv2json.js --tsv` with input 'a\tb\n1\t2\n' and checks that the output equals what the CLI prints for 'a,b\n1,2\n' with no flag ('[{"a":"1","b":"2"}]\n'). A table with a few rows and columns is better, if you want one.
+4. In README.md, add a usage line such as `node bin/csv2json.js --tsv < table.tsv` and a sentence saying that --tsv reads tab-separated input.
+5. Run `npm test` and make sure every test passes. Also check by hand: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv` and `printf 'a,b\n1,2\n' | node bin/csv2json.js` should print identical output.
+6. Open one pull request that contains these changes.

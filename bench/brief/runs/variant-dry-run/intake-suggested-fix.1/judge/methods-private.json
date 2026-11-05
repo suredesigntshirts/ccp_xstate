@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "9a3639405c50b74588aff7fb49fd04c76377b92a9fa044c48b85f1f7736ce706",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief. The builder brief has no PASS or FAIL conditions. It also leaves out the verifier's own probes: the `grep -F ... HAS_PREFIX/HAS_PATH` check, the `wc -c` stdout byte count, the `assert.deepEqual` inline script and the `git archive` base-commit test run. The commands in step 6 come straight from issue proofs 1 and 4 (\"node src/app.js \\\"$d/c.json\\\"; echo \\\"exit $?\\\"\" and the ok.json run), and the criterion allows those. The expected results it names (\"exit 1\", \"bad config:\", \"line 3 and column 3\", \"listening on 9000\") just repeat the issue's expect lines. Step 4 asks the builder to write its own tests on inputs taken from those expect lines, which the criterion allows. It also tells the builder to run `npm test`, which is allowed. The builder brief sets the bar without handing over the verifier's checks.",
+  "model": "claude-opus-5-5",
+  "ms": 8750,
+  "tokens": {
+    "input": 2,
+    "output": 752,
+    "cacheCreation": 5789,
+    "cacheRead": 783,
+    "fresh": 6543,
+    "total": 7326
+  },
+  "at": "2026-11-05T08:38:31.820Z"
+}

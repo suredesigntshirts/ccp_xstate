@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "3d18160edffa773bfcfb6d348dbec10197019d1f75e17f2837386998630fb5df",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for probes that appear in both. Step 3 of the builder brief gives specific inputs and an expected output: TSV input 'a\\tb\\n1\\t2\\n', compared against CSV 'a,b\\n1,2\\n', which should print '[{\"a\":\"1\",\"b\":\"2\"}]\\n'. Check 1 of the verifier brief uses the same table as its second case (\"Repeat with a second table, a\\tb / 1\\tb against a,b / 1,2\"). The verifier's advisory also expects the same output, [{\"a\":\"1\",\"b\":\"2\"}]. Step 5 also has the builder confirm the outputs are byte-identical, which matches the verifier's cmp check. Telling the builder to write its own tests is allowed. But putting the verifier's exact inputs and expected output in the builder brief hands it a probe, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 6178,
+  "tokens": {
+    "input": 2,
+    "output": 562,
+    "cacheCreation": 2815,
+    "cacheRead": 783,
+    "fresh": 3379,
+    "total": 4162
+  },
+  "at": "2026-11-05T08:40:38.909Z"
+}

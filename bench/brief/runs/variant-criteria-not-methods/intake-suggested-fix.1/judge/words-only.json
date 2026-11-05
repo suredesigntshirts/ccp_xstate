@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "c02d3ad61d1ef705f6c579483376805c332cf979f299fef123379bfb08776cbe",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with its expect line. Check 1 tests only exit 1 and empty stdout, which is what line 1 asks. Check 2 tests for `bad config:`, the exact \"$d/c.json\" and line 3 / column 3. It accepts any recognisable form, so it adds no exact-wording rule. Its \"different line or column is reported\" FAIL just restates that the location must be 3/3. Check 3 tests only that the call throws and that the message includes the path. Check 4 tests `listening on 9000`, exit 0 and `{\"port\":9000}`, all from line 4. Check 5 tests that head passes and that at least one test asserting the path fails on base `src/`. The worktree steps say how to run it and add no condition. The stricter items all sit under Advisory: computing the line and column yourself instead of using Node's message, the ENOENT behaviour, and the no-defaults and no-JSON5 limits. None of them appears in a PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 11766,
+  "tokens": {
+    "input": 2,
+    "output": 804,
+    "cacheCreation": 5283,
+    "cacheRead": 783,
+    "fresh": 6089,
+    "total": 6872
+  },
+  "at": "2026-11-05T08:37:55.639Z"
+}

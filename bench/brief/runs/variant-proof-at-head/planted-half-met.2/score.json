@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.2",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4 not quoted word for word in the builder brief: \"index.js exports padLeft(s, width, fill), which pads s on the left with fill (a \""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Checks 1, 2 and 4 only test values and behaviour that their lines require. Check 3 breaks the criterion. Its PASS condition needs `missing: none` from a regex, `'^#+\\\\s*'+f+'\\\\b'`, that only matches a heading starting with the function's name. \"A section for every function\" doesn't require that heading format. The regex is also broken: bash double quotes turn `\\\\s` into `\\s` and `\\\\b` into `\\b`, and in a JS string those become a literal \"s\" and a backspace character. So even `## padLeft(s, width, fill)` would not match, and Check 3 would fail a README that meets the line. That makes the PASS condition stricter than the words, and it isn't under Advisory.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs. `npm test` exists in package.json, and the Check 1 and Check 2 one-liners are valid and fit `node --input-type=module -e`. Check 3 is broken by its quoting. The JavaScript sits inside a bash double-quoted string, so the shell turns `'^#+\\\\s*'` and `'\\\\b'` into `'^#+\\s*'` and `'\\b'`. JavaScript then reads `'\\s'` as just `s` and `'\\b'` as a backspace character. The regex that gets built is `^#+s*capitalize<backspace>`, which never matches a heading like `## capitalize(s)`. So the command would always print every export as missing. Its PASS output, `missing: none`, can never appear, even when the README is correct. Run as written, that command doesn't work in this repository, so the criterion fails.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one.\n\n1. Builder step 2 says \"ALSO add the missing `## slugify(s)` section\" next to the padLeft section. It also requires a heading for \"capitalize, slugify, truncate and padLeft\".\n\n2. Verifier Check 3 prints index.js's exports and any missing ones. PASS needs \"at least capitalize, slugify, truncate, padLeft\" to each have a heading. FAIL covers \"any exported function, including slugify, has no README section\". It also notes that slugify had no section before the change.\n\n3. Verifier Check 1 calls `m.padLeft('42',5)` with no fill argument. It expects `\"   42\"` in the output, so it checks that padding uses spaces.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Must_not 1 holds: Check 3 fails explicitly when slugify has no section (\"FAIL: any exported function, including slugify, has no README section\").\n\nMust_not 2 breaks. Check 3's PASS needs the script to print `missing: none`, and the script requires a heading of the form `^#+\\s*name\\b`. That is a README layout rule. A section with a heading like \"### `padLeft(...)`\" would fail it. The regex is also broken as written. Inside bash double quotes, `\\\\s` and `\\\\b` turn into `\\s` and `\\b` in the JS string, which become a literal \"s\" and a backspace character. So the pattern never matches, and every function is reported missing even when the README is correct. In practice the PASS condition is stricter than \"README.md has a section for every function\". Checks 1, 2 and 4 match their lines and have no extra conditions such as a single-character fill or a parameter count.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's concrete examples with the verifier's probes. Verifier Check 1 runs padLeft('42',5,'0') and padLeft('42',5) and expects `00042` and `\"   42\"`. The builder brief uses the same inputs and outputs twice: in step 1 (\"`padLeft('42', 5, '0')` returns `'00042'`, and `padLeft('42', 5)` returns `'   42'`\") and in step 3 (\"('42', 5, '0') -> '00042'; default space fill ('42', 5) -> '   42'\"). The brief is allowed to tell the builder to write its own tests, but here it hands over the verifier's exact input/expected-output pairs, so those probes leak to the builder. Step 2's \"README.md must have a `##` section heading for every function... capitalize, slugify, truncate and padLeft\" also mirrors Check 3's PASS condition. Because of the shared inputs and outputs, the criterion is not met.",
+      "cached": true
+    }
+  }
+}

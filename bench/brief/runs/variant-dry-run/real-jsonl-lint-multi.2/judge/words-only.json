@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "add85c3c3501776681d8c743ee3dd4dc30f13eaa8dcc2349c7f82d6f1eea8cac",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Checks 1–3 and 5 mostly stay within their words. Check 4 goes further. Its line only says \"lint(text) in src/index.js is unchanged\", but its FAIL condition is \"any diff in packages/jsonl-lint/src/index.js\", backed by `git diff --exit-code` over the whole file. That is a file-scope rule the words don't force: a new export or an edited comment elsewhere in the file would fail the check even with lint(text) untouched. Check 6 also adds \"the PR is open\", which \"one PR\" doesn't require. Both should have gone under Advisory. So the output breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 11508,
+  "tokens": {
+    "input": 2,
+    "output": 902,
+    "cacheCreation": 6802,
+    "cacheRead": 783,
+    "fresh": 7706,
+    "total": 8489
+  },
+  "at": "2026-11-05T08:42:06.350Z"
+}

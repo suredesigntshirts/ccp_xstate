@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "a9563dab7efcabfbcf891ee21e2a66e1a62f7a9480f2c2ceea69e2c3ac55eb67",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs. I checked every command they give against the repository facts. Builder: `npm install` and `npm ci && npm test` work with the root package.json's test script. The root runs tests with `--workspaces`, which suggests packages/* is set up as workspaces. The listing shows only scripts, so the brief's claim that packages/* is listed is likely but not confirmed. Verifier: `node packages/jsonl-lint/bin/jsonl-lint.js <path>; echo $?` targets a file the builder creates. The Check 3 one-liner quotes correctly in bash: `\\\"` becomes `\"` and `\\n` stays a JS escape, so `lint('{\"a\":1}\\n{bad\\n')` is valid JavaScript. With `--input-type=module -e`, the relative import resolves from the current directory, which is the repo root. `npm test -w jsonl-lint` uses the workspace name the builder sets. `gh pr view ... --json body,headRefOid,state`, `gh pr checks`, `test -f` and `mktemp -d` are all valid. The `<pr>` and `<path>` placeholders are clearly meant to be filled in.",
+  "model": "claude-opus-5-5",
+  "ms": 11134,
+  "tokens": {
+    "input": 2,
+    "output": 1071,
+    "cacheCreation": 4871,
+    "cacheRead": 783,
+    "fresh": 5944,
+    "total": 6727
+  },
+  "at": "2026-11-05T08:43:10.749Z"
+}

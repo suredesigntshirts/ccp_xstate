@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "65e8374dac53f8bd043a73d76aa72b1bad504e81e3cee31cb95af8f0b23bacb2",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS/FAIL conditions against the words of its expect line. Checks 1, 2, 4, 5 and 6 stay mostly within their words. Check 3 goes further than expect line 3, \"exports lint(text) returning [{ line, error }]\". Its PASS condition requires `Object.keys(x).sort().join()==='error,line'`, so an object with any extra key fails. It also requires `typeof x.error==='string' && x.error.length>0`, which the words don't ask for: they don't say error must be a non-empty string rather than, say, an Error object. These are tests the words do not force, and they sit in a PASS/FAIL condition instead of under Advisory. The builder brief's \"(exactly those two keys)\" shows the stricter reading was a choice, not something the words demand. So the criterion breaks at Check 3.",
+  "model": "claude-opus-5-5",
+  "ms": 10978,
+  "tokens": {
+    "input": 2,
+    "output": 958,
+    "cacheCreation": 5170,
+    "cacheRead": 783,
+    "fresh": 6130,
+    "total": 6913
+  },
+  "at": "2026-11-05T08:43:02.455Z"
+}

@@ -1,0 +1,16 @@
+Run every check at the PR head, in a clean checkout, after `npm install` if package.json has dependencies.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run: write a file containing invalid JSON (for example `{port: 9000`) to a temp path. Then run `node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r)); process.exit(JSON.stringify(r) === '{}' && r !== null && typeof r === 'object' && !Array.isArray(r) ? 0 : 2)" <tempfile>` from the repository root. Also open src/config.js and confirm that loadConfig is exported from that file and that the {} comes from catching the error JSON.parse throws.
+PASS: the command exits 0 with no thrown error and prints `{}`, and the code in src/config.js catches the JSON.parse error and returns {}.
+FAIL: the call throws (for example, a SyntaxError), returns anything other than an empty plain object, or loadConfig is not in src/config.js.
+
+Check 2. Expect line: "npm test passes"
+Run: `npm test` from the repository root.
+PASS: the command exits 0 and reports no failing tests.
+FAIL: a non-zero exit status, or any test reported as failing.
+
+Advisory (not part of PASS or FAIL):
+- Confirm that valid JSON still parses, e.g. loadConfig on `{"port": 9000}` returns { port: 9000 }.
+- Note whether a missing file still throws (readFileSync left outside the try), and whether the old 'bad JSON throws' test was updated rather than deleted with nothing in its place.
+- Run `node src/app.js <badfile>` and note that it now starts on the defaults with no error message. The issue body asked that people be told which file is broken, so point out this gap in your report.

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "275a6853ea6a7a232f5f9b808d5667ac1a3462ef92dc1ded868e2c2653450bdc",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2 and 4 only test what their lines say: clamp is exported and limits x to the range, it throws a RangeError when lo > hi, and npm test passes. Check 3 is stricter than its line. \"README.md documents every function math.js exports\" says nothing about format. But the script's regex '^#+\\s*name\\s*\\(' requires a Markdown heading for each function. The PASS condition says \"each exported function has a heading\", and FAIL says \"any exported function has no heading in README.md\". A README that documented subtract or clamp in a list, a table or prose would fail even though the line's words are met. This heading-format rule belongs under Advisory, not in the PASS/FAIL conditions, so the criterion does not hold.",
+  "model": "claude-opus-5-5",
+  "ms": 8815,
+  "tokens": {
+    "input": 2,
+    "output": 603,
+    "cacheCreation": 3334,
+    "cacheRead": 783,
+    "fresh": 3939,
+    "total": 4722
+  },
+  "at": "2026-11-05T08:41:31.106Z"
+}

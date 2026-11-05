@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "4a0d28988695940a7e64bd10b56f0669b7d580dcf87db1dfbfef832877efc92f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, and the builder brief carries the verifier's probe. Builder step 4 tells it to run `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` and `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` and check that both print the same output. That is the same command pair, with the same inputs, as verifier Check 1a. Builder step 2 also gives the same input and expected output, `'[{\"a\":\"1\",\"b\":\"2\"}]\\n'`, that Check 1a's PASS condition uses. The expect line names only `node bin/csv2json.js --tsv`. It doesn't name these inputs or this expected output, so the allowance for commands named by an expect line doesn't cover them. Telling the builder to run `npm test` and write its own tests is allowed, but handing it the verifier's exact inputs and expected output is not.",
+  "model": "claude-opus-5-5",
+  "ms": 6320,
+  "tokens": {
+    "input": 2,
+    "output": 589,
+    "cacheCreation": 2738,
+    "cacheRead": 783,
+    "fresh": 3329,
+    "total": 4112
+  },
+  "at": "2026-11-05T08:40:54.683Z"
+}

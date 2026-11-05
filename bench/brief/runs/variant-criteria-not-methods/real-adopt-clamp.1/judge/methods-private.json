@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "a73c66eb21e6e8e8d43d89b7984a69c10e67382cbde1a8739b54fc9130dfd699",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's probes and found two overlaps. First, builder step 2 gives input/output examples, \"clamp(-5, 0, 100) is 0, clamp(140, 0, 100) is 100, clamp(50, 0, 100) is 50\", and the lo === hi case. All of these also appear in the case list of the verifier's Check 1 script. Second, builder step 5 tells the builder to run `node -e \"console.log(Object.keys(require('./math.js')))\"` and confirm each name appears as a heading in README.md's API section. That is the same probe as verifier Check 3, which lists the exports from Object.keys and matches each against a README heading. Neither of these is a repo test, a command named by an expect line, or a test the builder writes itself, so the exemptions don't cover them. Running `npm test` is allowed, but these shared checks break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 7639,
+  "tokens": {
+    "input": 2,
+    "output": 542,
+    "cacheCreation": 3325,
+    "cacheRead": 783,
+    "fresh": 3869,
+    "total": 4652
+  },
+  "at": "2026-11-05T08:41:53.325Z"
+}

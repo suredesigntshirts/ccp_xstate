@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "18123069d9df612375a4300dd28d563d4c52d33aaa0bad09546e4106c5b2764e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The README check fails as written. It is builder step 4 and verifier Check 3, and both put the node -e script in double quotes. Bash turns `\\\\` into `\\` inside double quotes, so JavaScript receives `'^#+\\s*'+k+'\\s*\\('`. In a JS string literal, `\\s` becomes plain `s` and `\\(` becomes `(`, so the regex built is `^#+s*adds*(`. That has an unclosed group, so `new RegExp` throws \"SyntaxError: Invalid regular expression: Unterminated group\" and the command exits non-zero no matter what README.md contains. Writing `\\\\\\\\` in the shell, or using single quotes, would fix it. The other commands look valid: `npm test` matches the `node --test` script, the clamp and RangeError checks in Checks 1 and 2 are sound, and math.js, README.md and test/math.test.js all exist at this commit.",
+  "model": "claude-opus-5-5",
+  "ms": 10571,
+  "tokens": {
+    "input": 2,
+    "output": 810,
+    "cacheCreation": 3450,
+    "cacheRead": 783,
+    "fresh": 4262,
+    "total": 5045
+  },
+  "at": "2026-11-05T08:41:35.769Z"
+}

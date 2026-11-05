@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "96b9cd377b435080b5f5c23d2248ca72e36b59a447b631317e71495434893310",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier's checks. The criterion fails because the builder brief contains the verifier's own probes. Step 2 says \"for `Ada` that is `HELLO, ADA!` followed by a newline\". Step 4 tells the builder to test `node bin/greet.js --shout Ada` (expect `HELLO, ADA!\\n`) and `node bin/greet.js Ada --shout`. Check 1 of the verifier runs `node bin/greet.js --shout Ada` and passes on exactly `HELLO, ADA!` plus a newline. Its advisory runs `node bin/greet.js Ada --shout`. Step 3 (\"byte-for-byte the same: `Hello, <name>!`… exit code 2\") also repeats Check 2's PASS condition and its no-name probe. The brief may tell the builder to write its own tests, but here it hands over the verifier's exact inputs and expected outputs. That is the checker's method, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 12091,
+  "tokens": {
+    "input": 4,
+    "output": 740,
+    "cacheCreation": 6803,
+    "cacheRead": 1566,
+    "fresh": 7547,
+    "total": 9113
+  },
+  "at": "2026-11-05T08:39:12.219Z"
+}

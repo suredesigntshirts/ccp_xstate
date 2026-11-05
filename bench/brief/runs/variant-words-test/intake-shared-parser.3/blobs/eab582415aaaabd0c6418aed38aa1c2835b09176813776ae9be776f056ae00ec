@@ -1,0 +1,30 @@
+Goal: add a --tsv flag to the CLI so tab-separated stdin is parsed with a tab separator. Without the flag, behaviour must not change at all.
+
+Current state: bin/csv2json.js reads stdin with readFileSync(0, 'utf8') and calls parse(text) with no separator. It ignores process.argv. src/parse.js exports parse(text, sep = ','). test/csv.test.js uses node:test and execFileSync to run the CLI. package.json has "test": "node --test". README.md documents only `node bin/csv2json.js < table.csv`.
+
+Steps:
+1. In bin/csv2json.js, check whether '--tsv' appears anywhere in process.argv.slice(2). If it does, call parse(text, '\t'). If not, call parse(text) exactly as now. Keep the output format as it is: JSON.stringify of the result followed by a single '\n'. Do not add handling for unknown arguments, --help, --sep/--delimiter, separator auto-detection, or quoting rules (all out of scope). The simplest change is to src/parse.js not at all.
+2. Add tests to test/ (for example in test/csv.test.js, using the same execFileSync pattern with cwd at the repo root) that run `node bin/csv2json.js --tsv` on tab-separated input and assert on the exact stdout. Cover:
+   - input 'a\tb\n1\t2\n' -> '[{"a":"1","b":"2"}]\n'
+   - input 'name\tnote\nx\thello, world\n' -> '[{"name":"x","note":"hello, world"}]\n'
+   - input 'a\tb\n1\t2\n3\t4\n' -> '[{"a":"1","b":"2"},{"a":"3","b":"4"}]\n'
+   - no flag with tab input 'a\tb\n1\t2\n' -> the JSON text [{"a\tb":"1\t2"}] (JSON tab escapes) plus '\n'; build the expected value as JSON.stringify([{ 'a\tb': '1\t2' }]) + '\n' to avoid escaping mistakes.
+   Keep the existing tests passing.
+3. Update README.md: add a section on the --tsv flag that says it reads tab-separated input, with an example such as `node bin/csv2json.js --tsv < table.tsv`. Leave the CSV example in place.
+4. Check from the repo root before opening the PR:
+   - printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv; echo "exit=$?"  -> [{"a":"1","b":"2"}] then exit=0
+   - printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv  -> [{"name":"x","note":"hello, world"}]
+   - printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv  -> [{"a":"1","b":"2"},{"a":"3","b":"4"}]
+   - printf 'a,b\n1,2\n' | node bin/csv2json.js  -> [{"a":"1","b":"2"}]
+   - printf 'a\tb\n1\t2\n' | node bin/csv2json.js  -> [{"a\tb":"1\t2"}]
+   - npm test exits 0
+5. Open one pull request with these changes. Its description should list the expect lines and how each one is met.
+
+Acceptance lines (all must hold):
+- `printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv` prints exactly `[{"a":"1","b":"2"}]` followed by a newline and exits 0.
+- With --tsv, commas inside a field stay literal: `printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv` prints exactly `[{"name":"x","note":"hello, world"}]` followed by a newline.
+- With --tsv and several data rows, every row comes out in order: `printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv` prints exactly `[{"a":"1","b":"2"},{"a":"3","b":"4"}]` followed by a newline.
+- Without the flag, CSV still works as before: `printf 'a,b\n1,2\n' | node bin/csv2json.js` prints exactly `[{"a":"1","b":"2"}]` followed by a newline.
+- Without the flag, tabs are not treated as separators: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js` prints exactly `[{"a\tb":"1\t2"}]` followed by a newline, which is the current output.
+- `npm test` exits 0, and test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and checks its output.
+- README.md documents the --tsv flag with an example invocation.

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "6f91be3d0a9367bbf334e1be9541a963d00c6d395449f28ab7c8ca234502af89",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs do neither of the two banned things. Item 1: no verifier check uses `npm run test:cli` to decide PASS or FAIL. Check 6 runs `npm test; echo \"exit=$?\"` and then the grep. `test:cli` comes up only under \"Advisory (none of this affects PASS or FAIL)\", which notes that the script doesn't exist. Item 2: the builder brief never asks for a general separator option. It does the opposite, saying \"do not add --help, --sep/--delimiter, auto-detection or quoting rules\". It asks only for a `--tsv` flag that calls `parse(text, '\\t')`. The verifier brief also lists `--sep` as something to note if it shows up outside the non-goals. One line in builder step 3 is garbled (`[{\"a\\\\tb\":\"1\\\\tb\"...`), but that is a quality problem, not a must_not breach.",
+  "model": "claude-opus-5-5",
+  "ms": 8210,
+  "tokens": {
+    "input": 2,
+    "output": 461,
+    "cacheCreation": 5642,
+    "cacheRead": 783,
+    "fresh": 6105,
+    "total": 6888
+  },
+  "at": "2026-11-05T08:38:19.521Z"
+}

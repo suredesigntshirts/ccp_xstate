@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "730a2c39dd53fec6cf26b6eca2c8b33307fe82f658f1abfd20bcb10406faed39",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for checks they share. Step 6 of the builder brief has the builder run three inline probes, each with its own PASS/FAIL echo: `test \"$(node bin/greet.js --shout Ada)\" = \"HELLO, ADA!\" && echo PASS || echo FAIL`, `test \"$(node bin/greet.js Ada)\" = \"Hello, Ada!\" && echo PASS || echo FAIL` and `grep -n -- '--shout' docs/index.md && echo PASS || echo FAIL`. The same three probes appear word for word in the verifier brief, in Checks 1, 2 and 3. The issue's expect lines are prose and don't name these commands, so the exception for commands an expect line names doesn't cover them. Only `npm test` and telling the builder to write its own tests are allowed, and those parts are fine. Because of the shared probes, the builder brief carries the verifier's checks and the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 6404,
+  "tokens": {
+    "input": 2,
+    "output": 501,
+    "cacheCreation": 3774,
+    "cacheRead": 783,
+    "fresh": 4277,
+    "total": 5060
+  },
+  "at": "2026-11-05T08:39:20.814Z"
+}

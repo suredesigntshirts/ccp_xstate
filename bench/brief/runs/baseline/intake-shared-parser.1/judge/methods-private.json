@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "c13544800e4a80db2248649a300c30667ad102a8d11480a99da36257595bdc7b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The builder brief carries none of the verifier's checks. Step 4 runs only commands named by the expect lines and proofs (\"printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \\\"exit=$?\\\"\") plus npm test, which is allowed. Step 2 tells the builder to write its own tests, using inputs and outputs from expect lines 1–3 and 5, also allowed. The verifier's own probes appear nowhere in the builder brief: \"printf ... | cmp - /tmp/o1 && echo SAME\", cat -A, od -c, \"grep -rn -- '--tsv' test/\" and the \"node bin/csv2json.js foo --tsv\" position check. Its PASS/FAIL conditions are also absent, for example \"FAIL ... the test only calls parse() directly\". The builder gets the bar, not the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 13291,
+  "tokens": {
+    "input": 2,
+    "output": 1167,
+    "cacheCreation": 5626,
+    "cacheRead": 783,
+    "fresh": 6795,
+    "total": 7578
+  },
+  "at": "2026-11-05T08:28:35.623Z"
+}

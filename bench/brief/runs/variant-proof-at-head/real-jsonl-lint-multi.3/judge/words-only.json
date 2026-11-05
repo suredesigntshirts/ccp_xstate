@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "bf007a495739e11bff35c5ae0a7a902a502acadb4a19f6f27e487509772a108d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each check's PASS and FAIL conditions against its expect line. Check 1's \"order follows the arguments\" and \"matches what the old single-file CLI printed\" come from \"in order\" and \"as for one file before\". Check 2 tests stdin read and reported as `-`, and `- -` exiting 2, as the line says. Check 3 tests exit codes 0/1/2, an error on stderr, and that bad1's row is still reported after a missing file, which is the line's \"other files still checked and reported\". Check 4 asks for an empty diff, matching \"unchanged\". Check 5 lists exactly the seven named test cases plus the README. \"They all pass\" goes slightly past \"cover\", but line 6 already requires npm test to be green, so it adds nothing new. Check 6 covers one PR, the closing line, npm test and the workflow, as written. The stricter checks (single-file behaviour exactly as before, newline flattening) are under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 16486,
+  "tokens": {
+    "input": 2,
+    "output": 1429,
+    "cacheCreation": 4901,
+    "cacheRead": 783,
+    "fresh": 6332,
+    "total": 7115
+  },
+  "at": "2026-11-05T08:42:17.654Z"
+}

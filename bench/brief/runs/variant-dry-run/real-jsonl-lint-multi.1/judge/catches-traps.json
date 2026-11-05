@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "53e03ea8b53e1394d6574c4e1a69a2be9b355289697eda89057f92ba8ecd0f74",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs handle all four must_catch items.\n(1) Verifier Check 3 runs `\"$T/a.jsonl\" \"$T/missing.jsonl\" \"$T/c.jsonl\"`, where c.jsonl holds the bad row `nope`. It requires exit 2, an error on stderr naming missing.jsonl, and `$T/c.jsonl:1: ...` still printed on stdout. So it tests the missing file and the bad row together, not each alone.\n(2) Check 4 gets the PR's base sha with gh api and runs `git diff --exit-code <base sha> HEAD -- packages/jsonl-lint/src/index.js`. It passes only if the diff is empty.\n(3) Builder step 5 tells the builder to update packages/jsonl-lint/README.md with the multi-file usage, the `-` stdin form and the exit codes.\n(4) Check 6 reads the PR body through gh api and requires it to contain the Closes line. It also requires the `test` check run at the head sha to be completed with conclusion success.",
+  "model": "claude-opus-5-5",
+  "ms": 6492,
+  "tokens": {
+    "input": 2,
+    "output": 651,
+    "cacheCreation": 5802,
+    "cacheRead": 783,
+    "fresh": 6455,
+    "total": 7238
+  },
+  "at": "2026-11-05T08:42:22.854Z"
+}

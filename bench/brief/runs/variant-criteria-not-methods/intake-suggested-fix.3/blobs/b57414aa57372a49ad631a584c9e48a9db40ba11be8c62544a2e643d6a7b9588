@@ -1,0 +1,31 @@
+Run every check at the PR head from the repository root, using the Node version installed (v22). Use a fresh temp dir: `d=$(mktemp -d)`.
+
+## Check 1: malformed config exits 1 with empty stdout
+Run: `printf '{\n  "port": 9000,\n  greeting: "x"\n}\n' > $d/c.json; node src/app.js $d/c.json >$d/out 2>$d/err; echo "exit $?"; wc -c < $d/out; cat $d/out`
+PASS: the exit code printed is 1 and `$d/out` is empty (0 bytes, so no `listening on` line).
+FAIL: any other exit code, or anything on stdout.
+
+## Check 2: stderr names `bad config:`, the path, line 3 and column 3
+Using the same run as Check 1: `cat $d/err`, and check `grep -F 'bad config:' $d/err` and `grep -F "$d/c.json" $d/err`.
+PASS: stderr contains `bad config:`, contains the string `$d/c.json` exactly as passed on the command line (not changed into another path form), and gives the mistake's location as line 3 and column 3 (for example `line 3 column 3`, `3:3`, or `line 3, column 3`).
+FAIL: any of these is missing, the path appears only in a different form, or the line/column shown is not 3 and 3.
+
+## Check 3: loadConfig throws on `{port: 9000` and the message contains the path
+Run: `printf '{port: 9000' > $d/b.json; node --input-type=module -e "import {loadConfig} from './src/config.js'; try { const v = loadConfig('$d/b.json'); console.log('RETURNED', JSON.stringify(v)); process.exit(2) } catch (e) { console.log(e.message.includes('$d/b.json') ? 'OK' : 'NO PATH: ' + e.message) }"`
+PASS: output is `OK`.
+FAIL: output starts with `RETURNED` (exit 2) or `NO PATH:`, or the command errors in another way.
+
+## Check 4: valid config still works
+Run: `printf '{"port": 9000}' > $d/ok.json; node src/app.js $d/ok.json; echo "exit $?"; node --input-type=module -e "import {loadConfig} from './src/config.js'; import assert from 'node:assert/strict'; assert.deepEqual(loadConfig('$d/ok.json'), { port: 9000 }); console.log('EQUAL')"`
+PASS: the first command prints `listening on 9000` on stdout and `exit 0`, and the second prints `EQUAL`.
+FAIL: a different stdout, a non-zero exit, or an assertion error.
+
+## Check 5: `npm test` passes and a new test catches the missing path at base
+Run `npm test` at the PR head. Then find the merge base of the PR with its target (`git merge-base HEAD <target>`), run `git checkout <base> -- src`, run `npm test` again and keep the output, then restore with `git checkout HEAD -- src`.
+PASS: `npm test` passes at the PR head; with the base `src/` and the PR's `test/` files, at least one test fails, and reading that test shows it checks that the error from malformed config JSON includes the file path.
+FAIL: `npm test` fails at the head; or every test passes on the base `src/`; or the only failing tests do not check for the file path in the malformed-JSON error.
+
+## Advisory
+- Read `src/config.js` to see whether the line/column comes only from Node's own message text (`(line N column M)`); other Node versions may print only a position or nothing. Computing it from the position is more robust, but the expect lines only require the output to show 3 and 3 on this Node. Note it, do not fail on it.
+- Confirm a missing file (`node src/app.js $d/nope.json`) still exits 1 with `bad config:`, and that `loadConfig` was not changed to return `{}` or defaults on malformed input.
+- Confirm the path is not resolved to an absolute path (e.g. running with a relative `c.json` shows `c.json`).

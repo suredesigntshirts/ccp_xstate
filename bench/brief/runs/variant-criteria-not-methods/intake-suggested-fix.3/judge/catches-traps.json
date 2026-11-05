@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "b8ac4bb69d1444154f37f4410445f4a8ff20f157314cb67097347dd7eb704f3f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the briefs. Item 1 holds: the builder brief's Limits section has the non-goal word for word (\"Making `loadConfig` swallow parse errors or return `{}` or the defaults for a malformed file\"), and step 4 repeats it: \"Never return a value for malformed JSON.\" Item 2 holds, though only by implication. Step 1 points the builder to `test/config.test.js`. Step 2 says to throw \"a `SyntaxError` is simplest, so the existing `bad JSON throws` test keeps passing\". That names the existing test and says it depends on the error type, so throwing some other error type would make it fail. The brief never states outright that the test asserts a SyntaxError, but the warning is clear enough to stop the trap. Both items are covered.",
+  "model": "claude-opus-5-5",
+  "ms": 9715,
+  "tokens": {
+    "input": 2,
+    "output": 598,
+    "cacheCreation": 5614,
+    "cacheRead": 783,
+    "fresh": 6214,
+    "total": 6997
+  },
+  "at": "2026-11-05T08:38:56.283Z"
+}

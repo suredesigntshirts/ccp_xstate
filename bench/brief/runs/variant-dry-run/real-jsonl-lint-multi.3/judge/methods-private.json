@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "fea1780fce105d28bd3befa0cb310ff1cba96fd98f63aa48b02cbea47cdd16f7",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared every command and expected result in the builder brief with the verifier's checks. Most of the builder brief is fine. The test scenarios in step 3 repeat expect line 5, and telling the builder to run `npm test` is allowed. Step 5 breaks the criterion. It gives the builder an inline probe with an expected result: `printf '{bad}\\n' | node packages/jsonl-lint/bin/jsonl-lint.js packages/jsonl-lint/package.json -; echo $?` \"(expect `-:1: ...` and exit 1)\". This is essentially the verifier's Check 2 probe, `printf '{bad}\\n' | node ... /tmp/jlv/c1.jsonl -; echo \"exit=$?\"`, which passes on a line starting `-:1: ` and exit=1. Both use the same stdin input, the same `<file> -` shape and the same expected output. Only the file name differs. Neither the issue nor its expect lines name this command, so the builder brief carries one of the verifier's checks.",
+  "model": "claude-opus-5-5",
+  "ms": 13722,
+  "tokens": {
+    "input": 4,
+    "output": 1002,
+    "cacheCreation": 11641,
+    "cacheRead": 1566,
+    "fresh": 12647,
+    "total": 14213
+  },
+  "at": "2026-11-05T08:42:55.061Z"
+}

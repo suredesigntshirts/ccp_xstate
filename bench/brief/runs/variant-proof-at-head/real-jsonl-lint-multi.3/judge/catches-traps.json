@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "b9ad1eb480807fa7ae1f667efb23a5d50f4361b7f0317197e819a047b6113e32",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs handle all four must_catch items.\n1. Verifier Check 3 runs `node BIN clean1.jsonl missing.jsonl bad1.jsonl` in one command. It requires exit 2, stderr naming missing.jsonl, and \"stdout still contains bad1's `:2:` line\". This is the combined case, not each case on its own.\n2. Verifier Check 4 runs `git diff <base>...HEAD -- packages/jsonl-lint/src/index.js` and passes only if the diff is empty.\n3. Builder step 4 says \"Update packages/jsonl-lint/README.md\", covering multi-file usage, `-` for stdin and the exit codes.\n4. Verifier Check 6 reads GitHub with `gh pr view ... --json body,headRefOid` and `gh pr checks`. It requires the body to contain \"Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104\" and \"The `test` workflow check at the head SHA has succeeded.\"",
+  "model": "claude-opus-5-5",
+  "ms": 7936,
+  "tokens": {
+    "input": 2,
+    "output": 586,
+    "cacheCreation": 5081,
+    "cacheRead": 783,
+    "fresh": 5669,
+    "total": 6452
+  },
+  "at": "2026-11-05T08:42:37.220Z"
+}

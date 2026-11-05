@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "1d29b7affce9048e5bd5b36975658a4eb847199a8228110b67462e446623b604",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every check in the verifier brief. The builder brief has no PASS or FAIL wording. It also contains none of the verifier's probes: no scratch-file contents such as `{\"a\":1}\\n{bad\\n3\\n`, no `node -e` lint comparison, no `git diff`/merge-base check, no `git worktree` base run and no grep. Its step 4 tells the builder to write its own node:test cases. The expectations given there (e.g. \"exit 2, stderr names the missing file, a bad row in another given file is still reported on stdout\", \"lines start with `-:`\") restate the issue's expect lines. They do not copy a verifier input set. The remaining commands are allowed: `npm test` and `gh pr checks --watch`, which the issue's proofs name. The builder brief gives the bar, not the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 7609,
+  "tokens": {
+    "input": 2,
+    "output": 686,
+    "cacheCreation": 5531,
+    "cacheRead": 783,
+    "fresh": 6219,
+    "total": 7002
+  },
+  "at": "2026-11-05T08:42:16.301Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "08ec35b05c4a568eb7bab1c718803a91d2f6f7c845eaa8b8bde4cfbe92f07e05",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. The builder's step-4 commands use bin/csv2json.js and `npm test`, and both exist (\"test\": \"node --test\"). The verifier's checks 1–4 use bash process substitution, `cmp /tmp/oN <(printf '...\\n')`. That syntax is valid, and none of the printf format strings contain `%`. Check 5 uses `printf '%s\\n' '[{\"a\\tb\":\"1\\t2\"}]'`, which keeps the backslash-t as two literal characters, so it matches the JSON escape. Check 6 uses `npm test` and `grep -rn -- '--tsv' test/`. Both are valid, and the brief correctly drops the nonexistent `npm run test:cli` script. `npm install` only runs if package.json declares dependencies. The advisory notes describe actions in prose and give no concrete command, so they can't break the criterion. No file, script or argument named in either brief is missing or misused.",
+  "model": "claude-opus-5-5",
+  "ms": 8355,
+  "tokens": {
+    "input": 2,
+    "output": 762,
+    "cacheCreation": 6219,
+    "cacheRead": 783,
+    "fresh": 6983,
+    "total": 7766
+  },
+  "at": "2026-11-05T08:38:04.484Z"
+}

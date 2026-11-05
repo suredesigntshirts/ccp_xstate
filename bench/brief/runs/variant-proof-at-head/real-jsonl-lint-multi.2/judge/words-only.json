@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "5b75b60a8dec9910c3265b444d74716c069b28136c7c76a2f896010bbd788938",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 5 test only what their lines require. Three checks ask for more:\n- **Check 6:** PASS requires \"there is one open PR on that repo\". Expect line 6 says only \"one PR … whose body says Closes …\". It never says the PR must be open, so a merged PR would wrongly fail.\n- **Check 3:** PASS requires \"stderr must name missing.jsonl\". The expect line only asks for an \"error on stderr\".\n- **Check 4:** PASS also requires that `lint.test.js` passes. Expect line 4 only says lint(text) is unchanged.\n\nThese stricter tests are inside PASS conditions rather than under Advisory, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 10688,
+  "tokens": {
+    "input": 2,
+    "output": 1014,
+    "cacheCreation": 5088,
+    "cacheRead": 783,
+    "fresh": 6104,
+    "total": 6887
+  },
+  "at": "2026-11-05T08:42:07.836Z"
+}

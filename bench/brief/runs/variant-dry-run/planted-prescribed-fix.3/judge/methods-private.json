@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "5ea43d79d43eb78d75a6838c927b3bacaa026d6920912bde42adc285994f30a0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for checks that appear in both. Most of the builder brief sets the bar in general terms, such as \"wrap only the JSON.parse call\" and \"A valid file must still return its parsed object\". Its instruction to run `npm test` is allowed because an expect line names it. Step 3 is the problem. It tells the builder to write a test that \"asserts `loadConfig` on `{port: 9000` returns `{}` (deepEqual) and does not throw.\" That is the same input and expected output as the verifier's Check 1 probe, which writes `'{port: 9000'` to a file and passes only if `isDeepStrictEqual(r, {})` holds and nothing is thrown. The builder may write its own tests, but this one copies the verifier's input/expected-output probe and its PASS condition. So the builder is handed the checker's method, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 9560,
+  "tokens": {
+    "input": 2,
+    "output": 798,
+    "cacheCreation": 3044,
+    "cacheRead": 783,
+    "fresh": 3844,
+    "total": 4627
+  },
+  "at": "2026-11-05T08:41:54.832Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "546b09eccdd1505f697a3c8c18ccc0caf649250ee2aeb6b507ae84822a06c20e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repo. All the `printf ... | node bin/csv2json.js [--tsv]` pipelines call bin/csv2json.js, which is tracked. `--tsv` is the flag the builder adds in step 1, so later steps can use it. Both briefs use `npm test`, which matches the \"test\" script in package.json. They avoid the issue's `npm run test:cli`, which doesn't exist. `grep -n -- '--tsv' test/*.js` and `grep -n -- '--tsv' README.md` have valid syntax, and both files exist. `> /tmp/o1; echo \"exit=$?\"; od -c /tmp/o1` is valid shell. The `$?` after a pipeline reports node's exit status. `od -c` and `cat -A` exist on Linux. The builder's JavaScript is valid: `execFileSync` with args ['bin/csv2json.js','--tsv'] and the literal '[{\"a\\\\tb\":\"1\\\\t2\"}]\\n', which correctly holds a backslash followed by t. I found nothing that would fail to run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 8464,
+  "tokens": {
+    "input": 2,
+    "output": 755,
+    "cacheCreation": 5386,
+    "cacheRead": 783,
+    "fresh": 6143,
+    "total": 6926
+  },
+  "at": "2026-11-05T08:28:01.396Z"
+}

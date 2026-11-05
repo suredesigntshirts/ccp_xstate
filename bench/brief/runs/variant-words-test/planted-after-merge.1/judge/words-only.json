@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "1f8dc7a18f2e407a47bc1202a2639a9bbf23e1fa86d584c627cb04d5b589fbc5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Each of the four verifier checks only tests what its expect line requires. Check 1 passes if the greeting for the name prints \"in upper case\". Comparing it to the upper-cased normal output is just what \"the greeting\" means. Check 2 compares the head output with the base output exactly, which is what \"unchanged\" requires. Check 3 asks that docs/index.md mention --shout and explain it, which is a fair reading of \"documents\". Check 4 requires \"the PR is merged and the fetched published page lists --shout\", which is what \"after merge... lists --shout\" requires. Its FAIL rule for an unmerged PR only reports the line as not yet shown and adds nothing stricter. The stricter items are all under \"Advisory (not pass/fail conditions)\": npm test, the flag placed after the name, exact outputs, the exit code and pages.yml. None of them appears in a PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 7942,
+  "tokens": {
+    "input": 2,
+    "output": 671,
+    "cacheCreation": 3234,
+    "cacheRead": 783,
+    "fresh": 3907,
+    "total": 4690
+  },
+  "at": "2026-11-05T08:38:37.685Z"
+}

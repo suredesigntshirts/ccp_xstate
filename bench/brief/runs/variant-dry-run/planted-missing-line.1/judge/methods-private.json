@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "9f1b089376f274eeb8dd07c5795ac348670dc6ab6bfcb0c3509d0e2458faff6a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, and the criterion breaks. Builder step 5 copies verifier Check 1's probe almost word for word: the inline script `d=$(mktemp -d); printf 'name,age,city\\nAda,36,London\\nBob,,Paris\\n' > \"$d/t.csv\"; printf 'name\\tage\\tcity...' ... cmp \"$d/csv.out\" \"$d/tsv.out\" && echo SAME`. It uses the same inputs, and it adds the pass condition \"The command must print SAME\", which matches the verifier's PASS. The exceptions don't cover this. It isn't the repo's own tests, it isn't a test the builder writes, and no expect line names it, since expect line 1 only names `node bin/csv2json.js --tsv`, not this script or these inputs. Step 4's \"The literal text `--tsv` must appear in README.md\" also matches the verifier's grep check. So the builder is handed the checker's method, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 6227,
+  "tokens": {
+    "input": 2,
+    "output": 531,
+    "cacheCreation": 3066,
+    "cacheRead": 783,
+    "fresh": 3599,
+    "total": 4382
+  },
+  "at": "2026-11-05T08:40:32.860Z"
+}

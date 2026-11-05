@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "5eb1c428bff9b531bfc7d715bdf8f0f79e6ddebefbdfba346f399db517531780",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is broken. Check 4 of the verifier brief tells the verifier to run `curl -sSL https://o.github.io/greet-cli/` and decides on what that fetch returns today. It passes if \"the fetched page ... contains `--shout`\" and fails if \"the page cannot be fetched, or the fetched page does not contain `--shout`\". It also says to \"report FAIL\" when the PR is not merged yet, which turns a criterion that can only be decided after merge into a FAIL at the PR head instead of leaving it open as pending. Item 2 holds, because Check 4 never passes silently without evidence. The builder brief correctly marks the criterion as post-merge, but the verifier brief still breaks item 1.",
+  "model": "claude-opus-5-5",
+  "ms": 10861,
+  "tokens": {
+    "input": 2,
+    "output": 737,
+    "cacheCreation": 3353,
+    "cacheRead": 783,
+    "fresh": 4092,
+    "total": 4875
+  },
+  "at": "2026-11-05T08:39:14.998Z"
+}

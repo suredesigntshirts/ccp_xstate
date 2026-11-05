@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "b5dcc331eebefe3e8c486151890dbb3ef129fe258f8c99aa450f118fed496d67",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs and all of them would run as written. The builder's steps only touch files that exist (root package.json, package-lock.json, the test workflow, README.md, CLAUDE.md) or that an earlier step creates (packages/jsonl-lint/*). `npm install`, `npm ci` and `npm test` are all valid. In the verifier brief, `node --input-type=module -e \"import { lint } from './packages/...'; ... lint('{\\\"a\\\":1}\\n{bad\\n') ...\"` quotes correctly in bash and is valid JS, and the relative import resolves from the repo root. `npm test -w jsonl-lint`, `gh pr view --json body,headRefOid,state`, `gh pr list --search 102 --state all`, `gh pr checks` and `gh run list --commit` all take those arguments. One small tension in Check 1: it says to use a scratch directory but runs `node packages/... clean.jsonl` with relative paths. The command still works as long as the inputs are created where the command runs, so it isn't a broken command.",
+  "model": "claude-opus-5-5",
+  "ms": 12481,
+  "tokens": {
+    "input": 2,
+    "output": 1154,
+    "cacheCreation": 5446,
+    "cacheRead": 783,
+    "fresh": 6602,
+    "total": 7385
+  },
+  "at": "2026-11-05T08:42:42.294Z"
+}

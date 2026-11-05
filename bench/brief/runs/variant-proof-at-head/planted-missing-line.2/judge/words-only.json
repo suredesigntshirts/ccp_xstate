@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "b86281974866a3e13b64bd506cc5dec2e9baafbd6eaca72bef442490d519e93f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with its expect line. Check 2 is fine: \"documents --tsv\" reasonably requires that README.md mention the flag and say what it does. Check 1 asks for more than the expect line's words. Its PASS condition requires that \"both commands exit with status 0\", but the line says nothing about exit status. It also requires \"byte-identical stdout\", while the line only asks for \"the same JSON array\", so output with different whitespace but the same array would wrongly fail. Finally, it ties the result to the exact literal `[{\"a\":\"1\",\"b\":\"2\"}]` instead of to whatever the CSV run prints. These stricter tests belong under Advisory, not in PASS or FAIL. The Advisory section itself is placed correctly, but the extra conditions in Check 1 mean the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 8991,
+  "tokens": {
+    "input": 2,
+    "output": 859,
+    "cacheCreation": 2696,
+    "cacheRead": 783,
+    "fresh": 3557,
+    "total": 4340
+  },
+  "at": "2026-11-05T08:40:20.403Z"
+}

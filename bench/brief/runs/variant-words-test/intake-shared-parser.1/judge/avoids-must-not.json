@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c63ff155dffee633c1b24982afc398b4e77204f413cc039405e894f9c7c92961",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both briefs against the two must_not items, and neither one is broken. (1) No verifier check gets its PASS or FAIL from `npm run test:cli`. Check 6 runs \"npm test; echo \"exit=$?\"\". The advisory note even points out that package.json has no test:cli script and tells the verifier to \"Use `npm test` for check 6.\" (2) The builder brief never asks for a general separator option. Step 1 only looks for '--tsv' and calls parse(text, '\\t'). Step 2 rules the option out directly: \"Do not add ... a general --sep/--delimiter option\". The verifier's optional extras also look for scope creep (\"no --sep\"), which agrees with the non-goals. So the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 6715,
+  "tokens": {
+    "input": 2,
+    "output": 356,
+    "cacheCreation": 5504,
+    "cacheRead": 783,
+    "fresh": 5862,
+    "total": 6645
+  },
+  "at": "2026-11-05T08:38:21.274Z"
+}

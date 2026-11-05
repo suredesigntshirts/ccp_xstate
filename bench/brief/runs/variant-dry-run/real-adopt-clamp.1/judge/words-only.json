@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "95e80376aab0c1ae6bca96c092139d428f11c907619d25c70906c2f118567656",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1–3 stay within their expect lines. Check 1 asserts only clamping behaviour: values inside, below, above, at the boundaries, lo===hi, and negative ranges. Check 2 asserts RangeError only for lo>hi. Check 3 has a fallback so a function documented without a heading still passes, and the stricter items sit under Advisory. Check 4 breaks the criterion. \"npm test passes\" only requires the command to succeed (exit 0), but the PASS condition also demands that \"the summary shows `# fail 0`\". That depends on exact output wording, which the expect line doesn't require. Node 22's `node --test` may use the spec reporter, which prints \"ℹ fail 0\" instead of \"# fail 0\", so a passing run could be marked as failing. This exact-output requirement belongs under Advisory, not in the PASS condition.",
+  "model": "claude-opus-5-5",
+  "ms": 12839,
+  "tokens": {
+    "input": 2,
+    "output": 980,
+    "cacheCreation": 3614,
+    "cacheRead": 783,
+    "fresh": 4596,
+    "total": 5379
+  },
+  "at": "2026-11-05T08:41:17.960Z"
+}

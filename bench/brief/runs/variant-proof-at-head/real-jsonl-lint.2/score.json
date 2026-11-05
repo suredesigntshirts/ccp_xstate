@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.2",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for e\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 2–6 stay within their expect lines, and the extras (lockfile, CRLF, phantom trailing line) are correctly placed under Advisory. Check 1 goes further than its words. Expect line 1 only requires that `<file>:<line>: <error>` is printed for every bad row, plus the exit codes. It does not say nothing else may be printed. Yet Check 1's PASS condition for (b) demands \"stdout has exactly two lines\", and its FAIL condition includes \"a missing or extra line\". For (c) it requires \"exits 0 with no output\". So a correct tool that also prints a summary line, or an \"OK\" message on clean input, would fail. Those output-only-these-lines rules are stricter than the words and should have been Advisory.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both briefs. I checked every command they give against the repository facts. Builder: `npm install` and `npm ci && npm test` work with the root package.json's test script. The root runs tests with `--workspaces`, which suggests packages/* is set up as workspaces. The listing shows only scripts, so the brief's claim that packages/* is listed is likely but not confirmed. Verifier: `node packages/jsonl-lint/bin/jsonl-lint.js <path>; echo $?` targets a file the builder creates. The Check 3 one-liner quotes correctly in bash: `\\\"` becomes `\"` and `\\n` stays a JS escape, so `lint('{\"a\":1}\\n{bad\\n')` is valid JavaScript. With `--input-type=module -e`, the relative import resolves from the current directory, which is the repo root. `npm test -w jsonl-lint` uses the workspace name the builder sets. `gh pr view ... --json body,headRefOid,state`, `gh pr checks`, `test -f` and `mktemp -d` are all valid. The `<pr>` and `<path>` placeholders are clearly meant to be filled in.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked all four must_catch items, and the third one fails. Item 1 is handled: builder step 7 says \"Run `npm install` at the root so package-lock.json includes the new workspace\". Item 2 is handled: step 6 says \"replace that with a list that includes jsonl-lint\". Item 4 is handled: verifier check 6 uses `gh pr view` (body, headRefOid) and `gh pr checks` to confirm the test check succeeded at the head commit. Item 3 is missed. The verifier runs `npm test -w jsonl-lint` directly and requires only that root `npm test` \"exits 0\". With `--if-present`, the root script could skip the jsonl-lint tests and still exit 0. Nothing in the verifier brief reads the test count from the root run or breaks lint() to see a test fail, so skipped tests would go unnoticed.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every PASS/FAIL condition in the verifier brief against its line and found nothing stricter. Check 1 requires the `<path>:3: ` and `<path>:5: ` prefixes and \"a non-empty error\", which matches the line's `<file>:<line>: <error>` format. It does not require exact error wording. Check 2 requires exit 2 and some stderr output, with no fixed message text. Checks 3–6 test the listed fields, the five test topics, the README and the PR body line. None adds a branch-name rule, a mutation test or a limit on which files the PR may touch. The builder's extra choices (bin entry, engines, private) are build instructions, not verifier gates. Every behaviour line is checked by running the program: Check 1 and Check 2 run the bin on temp files, Check 3 imports lint, Check 4 runs `npm test -w jsonl-lint`, and Check 6 runs `npm ci && npm test` and `gh pr checks`. No behaviour line passes on the diff or file names alone.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with every verifier check. The builder brief never uses the verifier's probe inputs. It doesn't include clean.jsonl `{\"a\":1}\\n{\"b\":2}\\n`, bad.jsonl with lines 3 and 5 expected, the whitespace-only blank.jsonl, or the inline `node --input-type=module -e \"import {lint}...\"` script with `lint('{\"a\":1}\\n{bad\\n')`. It also has no PASS or FAIL wording. Its torn-row example `{\"a\":` is not the verifier's `{\"d\":` file. It does state requirements: CRLF stripping, no phantom blank row at the end, and the 0/1/2 exit codes with stderr output. These describe the bar from the expect lines, not the verifier's checks. The commands it gives are allowed: `npm ci && npm test`, waiting for the `test` workflow, and the tests the builder writes itself. The criterion holds for the whole output.",
+      "cached": true
+    }
+  }
+}

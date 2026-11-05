@@ -1,0 +1,1 @@
+Run real-jsonl-lint-3:0.brief, worktree /tmp/bench-real-jsonl-lint-3-vKb2K7/wt/real-jsonl-lint-3--0.brief of https://github.com/suredesigntshirts/ccp_machine_test, branch run/real-jsonl-lint-3/0.brief.

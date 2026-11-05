@@ -1,0 +1,25 @@
+Check the pull request at its head. Run `npm test` once first and note the result; the checks below don't depend on it.
+
+Check 1. Expect: "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run from the repo root: `node bin/greet.js --shout Ada` and `node bin/greet.js --shout 'Grace Hopper'`.
+PASS: each exits 0 and its stdout is the normal greeting for that name in upper case, i.e. `HELLO, ADA!` and `HELLO, GRACE HOPPER!` (to get the normal greeting, run the same name without the flag and upper-case it).
+FAIL: a non-zero exit, output that isn't the upper-cased greeting, or the name or the literal `--shout` showing up wrongly in the output.
+
+Check 2. Expect: "without --shout the output is unchanged"
+Run at the head: `node bin/greet.js Ada; echo "exit=$?"` and `node bin/greet.js; echo "exit=$?"`. Then make a copy of the base version (for example `git worktree add /tmp/base-greet $(git merge-base HEAD origin/HEAD)`, or check out the PR's base commit some other way) and run the same two commands there.
+PASS: stdout, stderr and exit code are identical between head and base for both commands. Expected: `Hello, Ada!` with exit 0, and the usage message with exit 2.
+FAIL: any difference.
+
+Check 3. Expect: "docs/index.md documents --shout"
+Read docs/index.md at the head (`cat docs/index.md`).
+PASS: the file mentions `--shout` and says what it does (prints the greeting in upper case).
+FAIL: `--shout` isn't mentioned, or is mentioned without saying what it does.
+
+Check 4. Expect: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+The live page can only be seen after merge, so don't fetch it. Check what the head contains that will produce it: read .github/workflows/pages.yml at the head and confirm it still publishes the docs folder (upload-pages-artifact with `path: docs`, deploy-pages, triggered on push to main). Also confirm docs/index.md at the head contains `--shout`.
+PASS: the workflow still publishes docs/ on push to main, and docs/index.md contains `--shout`. In your report, say the live page itself can only be confirmed after merge.
+FAIL: the workflow no longer publishes docs/ (removed, path changed, or trigger changed so the merge won't deploy), or docs/index.md lacks `--shout`.
+
+Advisory (does not affect PASS/FAIL):
+- Try `node bin/greet.js Ada --shout` (flag after the name); it should also print `HELLO, ADA!`.
+- Note whether the PR adds tests for --shout and whether `npm test` passes.

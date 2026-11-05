@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "749b1901764bd0dec50a11478281c0e969de615e7bcfeb81be8adbb020bd49da",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier's six checks. The builder brief contains none of the verifier's scripts: no `printf` fixture files, no `node --input-type=module` lint probe, no `gh api` check-runs query and no PASS/FAIL wording. It states requirements such as \"exactly those two keys\", \"non-empty string\" and \"<file> is the path argument as given\". Those are the target the builder must meet, not the verifier's checking method. It tells the builder to write its own node:test tests, run `npm ci && npm test` and sanity-check the CLI by hand, and the criterion allows all of these. The closest overlap is the example torn row `{\"c\":`, which also appears inside the verifier's torn fixture. It is one illustrative fragment, not the verifier's input file with its expected line numbers. I counted it as describing the requirement, not as copying a probe, but it is a borderline call. Overall the criterion holds.",
+  "model": "claude-opus-5-5",
+  "ms": 10493,
+  "tokens": {
+    "input": 2,
+    "output": 929,
+    "cacheCreation": 5212,
+    "cacheRead": 783,
+    "fresh": 6143,
+    "total": 6926
+  },
+  "at": "2026-11-05T08:43:48.334Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "47dc55a2f644febfe52262664eb2482e8adf8c744944cf1d92e873ab435d72c0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 holds. The builder brief says \"Running with no flag must work exactly as it does now\", \"Keep the existing tests\" and \"Run `npm test` and confirm every test passes\". Item 3 holds. Check 1 feeds the same name/age/city table as CSV and as TSV and compares the two outputs with `[ \"$c\" = \"$t\" ]`. Item 2 is only partly met. The verifier's Advisory section suggests running `npm test` and checking the default CSV output, and keeps both outside PASS/FAIL (\"does not affect PASS or FAIL\"). But it never says that no expect line covers CSV behaviour or npm test. It doesn't name that gap, and the item asks for it to be stated, so one must_catch item is not fully handled.",
+  "model": "claude-opus-5-5",
+  "ms": 7869,
+  "tokens": {
+    "input": 2,
+    "output": 713,
+    "cacheCreation": 2832,
+    "cacheRead": 783,
+    "fresh": 3547,
+    "total": 4330
+  },
+  "at": "2026-11-05T08:40:49.092Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "984d5d4e8d75c4513acfcd54da0744ac76fce0b34c5d2a26326e66fc9fffa13f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every check, PASS/FAIL condition and probe in the verifier brief, and the criterion holds. None of the verifier's specific probes show up in the builder brief: not its fixture files (a.jsonl, b.jsonl, bad.jsonl with set contents), not the `printf … | node $BIN -` runs, not the `git diff`/`git merge-base` or `node -e \"import(...lint...)\"` checks, and not the gh pr commands. The builder's behaviour steps restate the issue's expect lines as the bar, e.g. \"Exit status: 2 if any file couldn't be read, else 1…\". Its step 4 tells the builder to write its own node:test tests, and the expectations it lists (\"exit 0, empty stdout\", \"a bad row in another file is still reported\") come from expect lines 1, 3 and 5, not from the verifier's PASS wording. The only commands it names are `npm test` and the test workflow, which the criterion allows. \"Unreadable takes precedence\" is a design choice that follows from expect line 3; the verifier only mentions it as an advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 12703,
+  "tokens": {
+    "input": 2,
+    "output": 1074,
+    "cacheCreation": 5378,
+    "cacheRead": 783,
+    "fresh": 6454,
+    "total": 7237
+  },
+  "at": "2026-11-05T08:42:17.855Z"
+}

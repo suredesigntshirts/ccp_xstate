@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "faca6d1fa9cfad39a99c70794db77a1a476932477b1417496c19c3f204eb00c3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion fails because the builder brief reuses probes from the verifier brief. Builder step 8 gives the verifier's exact Check 1 fixture and its expected result: a file containing `{\"a\":1}`, an empty line, `{bad`, `[1,2]`, an empty line and an unterminated `{\"x\":` \"must print exactly two lines, for lines 3 and 6, and exit 1\". This is the verifier's `bad.jsonl` with the same expected output (\"3 6\", exit 1). Builder step 10 also repeats the verifier's Check 6 command almost word for word: `gh api repos/.../commits/<head-sha>/check-runs --jq '[.check_runs[] | {name, status, conclusion}]'`. Neither the issue nor its expect lines name that command. Telling the builder to run `npm ci && npm test` and to write its own tests is allowed. Sharing a set of inputs with expected outputs is not.",
+  "model": "claude-opus-5-5",
+  "ms": 6456,
+  "tokens": {
+    "input": 2,
+    "output": 591,
+    "cacheCreation": 6647,
+    "cacheRead": 783,
+    "fresh": 7240,
+    "total": 8023
+  },
+  "at": "2026-11-05T08:42:56.786Z"
+}

@@ -1,0 +1,18 @@
+Goal: make one pull request for https://github.com/o/settings/issues/31 that meets both acceptance lines:
+1. "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+2. "npm test passes"
+
+Context from the repository as it stands:
+- src/config.js exports loadConfig(path), which is currently `return JSON.parse(readFileSync(path, 'utf8'));`.
+- src/app.js merges loadConfig's result over DEFAULTS ({ port: 8080, greeting: 'hi' }) and wraps the call in a try/catch that prints `bad config: <message>` and exits 1.
+- test/config.test.js has a test 'bad JSON throws' that asserts loadConfig throws SyntaxError on `{port: 9000`. That test contradicts line 1 and must change.
+- package.json runs tests with `node --test` (ES modules).
+- README.md says an invalid JSON file stops the app with `bad config: <message>` and exit 1.
+
+Steps:
+1. In src/config.js, read the file with readFileSync as before, then wrap only the JSON.parse call in try/catch. When parsing fails, return {} (a fresh empty object). Leave readFileSync outside the try so that a missing or unreadable file still throws as it does now; the issue only asks to catch the parse error.
+2. The issue says people need to know which file is broken and where. Inside the catch, before returning {}, write one line to stderr (for example with console.warn or process.stderr.write) that names `path` and includes the parse error's message, since that message gives the position. This doesn't change the return value, so line 1 still holds.
+3. In test/config.test.js, replace 'bad JSON throws' with a test that loadConfig on a file containing `{port: 9000` returns a value deepEqual to {} and doesn't throw. Keep 'reads a config' as it is. You may also add a test that a missing file still throws.
+4. Update README.md so it no longer says invalid JSON stops the app with exit 1. Say that the app warns on stderr, naming the file, and starts with the defaults. Leave the try/catch in src/app.js in place, since it still handles read errors.
+5. Run `npm test` from the repository root and confirm it exits 0 with no failing tests. Also run `printf '{port: 9000' > /tmp/bad.json && node src/app.js /tmp/bad.json`. It should print a warning naming /tmp/bad.json to stderr, print `listening on 8080` and exit 0.
+6. Commit and open the pull request, referencing issue #31 in its description.

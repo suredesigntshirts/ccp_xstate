@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "983c7077edae66caf9478e68e3ba69042cb74bd025ced791c83b8797418e9879",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command against the repo. The named files all exist (index.js, README.md, test/strutil.test.js, package.json with a `test` script). `npm test` and the Check 1, 2 and 4 commands look runnable. Check 3 breaks. Its JavaScript sits inside a double-quoted shell string, and bash turns `\\\\` into `\\`. So node receives `'^#{1,6}\\s+\\x60?'+f+'\\b'` as plain JS string literals. There `\\s` becomes just `s` and `\\b` becomes a backspace character. The regex is then `^#{1,6}s+`?name<BS>`, which matches no README heading. The command runs, but it always reports every export as missing. A correct README would get a false FAIL, so the quoting doesn't produce the command the brief intends. Because the shell and JS escaping in Check 3 is wrong, the criterion does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 15111,
+  "tokens": {
+    "input": 2,
+    "output": 1325,
+    "cacheCreation": 3057,
+    "cacheRead": 783,
+    "fresh": 4384,
+    "total": 5167
+  },
+  "at": "2026-11-05T08:39:49.129Z"
+}

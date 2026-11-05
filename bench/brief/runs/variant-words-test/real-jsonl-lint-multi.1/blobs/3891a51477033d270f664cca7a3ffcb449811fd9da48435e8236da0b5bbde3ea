@@ -1,0 +1,37 @@
+Check out the PR head. Let BIN=packages/jsonl-lint/bin/jsonl-lint.js and make a temp dir with: a.jsonl = '{"a":1}\n', b.jsonl = '{"b":2}\n\n{"c":3}\n', bad.jsonl = '{"a":1}\n{bad}\n{"b":2}\n{oops\n'. Run `npm ci` (or `npm install`) at the root first if needed.
+
+Check 1 — expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before"
+Run `node $BIN a.jsonl bad.jsonl b.jsonl`, and `node $BIN bad.jsonl a.jsonl bad2.jsonl` where bad2.jsonl is a copy of bad.jsonl. Also run `node $BIN bad.jsonl` alone.
+PASS: each bad row appears on stdout as `<file>:<line>: <error>` with the file argument as given and the 1-based line (bad.jsonl rows 2 and 4), every file named is checked (both bad.jsonl and bad2.jsonl rows appear in the second run), output follows argument order (all bad.jsonl lines before bad2.jsonl lines), clean files print nothing, and the single-file output has the same format as the multi-file lines for that file.
+FAIL: any bad row missing, a file skipped, output out of argument order, or a line not in `<file>:<line>: <error>` form.
+
+Check 2 — expect: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)"
+Run `printf '{"a":1}\n{bad}\n' | node $BIN -` and `printf '{bad}\n' | node $BIN a.jsonl -`; then `printf '{"a":1}\n' | node $BIN - -` and check `echo $?`.
+PASS: the stdin bad rows are reported with the prefix `-:` (e.g. `-:2: ...` and `-:1: ...`), and the `- -` run exits 2.
+FAIL: stdin not read, stdin rows reported under any name other than `-`, or `- -` exits with a status other than 2.
+
+Check 3 — expect: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)"
+Run and record exit statuses: `node $BIN a.jsonl b.jsonl` ; `node $BIN a.jsonl bad.jsonl b.jsonl` ; `node $BIN` ; `node $BIN a.jsonl missing.jsonl b.jsonl` ; `node $BIN missing.jsonl bad.jsonl` (capture stdout and stderr separately).
+PASS: first exits 0; second exits 1; `node $BIN` with no args exits 2 with a message on stderr; the missing-file runs exit 2 with an error on stderr, and in `missing.jsonl bad.jsonl` the bad rows of bad.jsonl are still printed on stdout (the other file was still checked and reported).
+FAIL: any status different from the above, no stderr message for the missing file / no-args case, or the run stops before checking and reporting the other files.
+
+Check 4 — expect: "lint(text) in src/index.js is unchanged"
+Run `git diff <merge-base with the PR's base>..HEAD -- packages/jsonl-lint/src/index.js` (find the merge base with `git merge-base HEAD origin/main`), and run `node -e "import('./packages/jsonl-lint/src/index.js').then(m=>console.log(JSON.stringify(m.lint('{\"a\":1}\n{bad}\n'))))"`.
+PASS: the lint function in packages/jsonl-lint/src/index.js is unchanged by the PR (the diff shows no change to it) and it still returns one problem at line 2.
+FAIL: the PR changes the lint function.
+
+Check 5 — expect: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage"
+Read the test files under packages/jsonl-lint/test/ and run `npm test -w packages/jsonl-lint` (or `node --test` in packages/jsonl-lint). Read packages/jsonl-lint/README.md.
+PASS: the tests use node:test, they pass, and there are tests exercising each of: two clean files, one bad file among several, stdin via - with clean input, stdin via - with bad input, a missing file among good ones, two - arguments, and no arguments; and the README documents the multi-file usage (several files and - for stdin).
+FAIL: any of those cases has no test, the tests fail, or the README does not document the usage.
+
+Check 6 — expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head"
+Run `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state`, `gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test`, and `npm test` at the repository root at the PR head.
+PASS: it is a single PR on suredesigntshirts/ccp_machine_test, its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`, `npm test` passes locally at the head, and the test workflow run for the head commit has succeeded.
+FAIL: the body lacks that line, npm test fails, or the test workflow for the head is failing or missing.
+
+Advisory (not pass/fail):
+- Check whether exit status is 2 when one file is unreadable and another has bad rows (the builder was told unreadable takes precedence).
+- Check stderr is empty and stdout contains only report lines on success; that the usage message mentions `<file> [<file> ...]`; that `- -` reads nothing and prints nothing on stdout.
+- Check error messages containing newlines are flattened to one line, and `\r\n` input still works for stdin.
+- Mutation idea: break the stdin label or the continue-after-unreadable logic and confirm the new tests fail.

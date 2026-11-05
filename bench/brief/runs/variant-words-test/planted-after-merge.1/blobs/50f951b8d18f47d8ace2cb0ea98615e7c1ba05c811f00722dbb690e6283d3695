@@ -1,0 +1,27 @@
+Check the pull request head against the issue's four acceptance lines, one check per line, in order. Run everything from a checkout of the PR head.
+
+Check 1. Line: "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run: `node bin/greet.js --shout Ada` and `node bin/greet.js --shout 'Grace Hopper'`.
+PASS: each run prints the greeting for that name in upper case (the upper-case form of what `node bin/greet.js <name>` prints, e.g. `HELLO, ADA!`).
+FAIL: either run errors, prints nothing, prints something other than the greeting for that name, or the greeting is not upper case.
+
+Check 2. Line: "without --shout the output is unchanged"
+Run: `node bin/greet.js Ada` and `node bin/greet.js 'Grace Hopper'` at the PR head, and the same commands at the PR's base commit (e.g. in a separate `git worktree` of the merge-base). Compare the outputs.
+PASS: the outputs at the PR head match the outputs at the base exactly.
+FAIL: any output differs.
+
+Check 3. Line: "docs/index.md documents --shout"
+Run: `cat docs/index.md` and `grep -n -- '--shout' docs/index.md` at the PR head.
+PASS: docs/index.md mentions --shout and explains what it does.
+FAIL: docs/index.md does not mention --shout, or mentions it without saying what it does.
+
+Check 4. Line: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+Run: find out whether the PR is merged (`gh pr view <number> --json state,mergedAt`). If it is merged, check the pages workflow run for the merge commit (`gh run list --workflow pages.yml`), then fetch the page (`curl -sSL https://o.github.io/greet-cli/`) and search it for `--shout`.
+PASS: the PR is merged and the fetched published page lists --shout.
+FAIL: the fetched page does not list --shout. If the PR is not merged yet, or the deploy has not finished, this line cannot be shown yet: report it as FAIL and give that as the reason (not merged, or deploy pending, with the workflow run state), so it is not mistaken for a defect in the diff.
+
+Advisory (not pass/fail conditions):
+- Run `npm test`. All tests should pass, including the existing `greeting` and `cli` tests.
+- Try `node bin/greet.js Ada --shout` too: the flag should work after the name as well.
+- Expected exact outputs: `HELLO, ADA!\n` with --shout and `Hello, Ada!\n` without it. `node bin/greet.js` with no name should still exit 2 with `usage: greet <name>`.
+- .github/workflows/pages.yml should still publish `docs/` on push to main. If the PR changes that, line 4 is at risk.

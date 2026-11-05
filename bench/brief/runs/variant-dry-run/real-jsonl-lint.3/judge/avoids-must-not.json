@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "30b54335689b4be27a76a74fcb895af1bba0d045c0e5b34ac2a5ba63384926a0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most checks stay within their lines. Checks 1, 2 and 5 run the CLI and accept any non-empty error message, and Check 4 runs the tests as well as reading them. Two checks go further than their lines, though. Check 3 fails the lint result unless every object has exactly the keys `'error,line'` and `error` is a non-empty string. Line 3 only asks for an array of `{ line, error }` and doesn't rule out extra keys. Check 6 needs \"the `test` check run for the head SHA\" to have succeeded, so it depends on the workflow job being named `test`. Line 6 only asks that \"the test workflow\" is green. If the job in test.yml has another name, a correct PR would fail. Both are PASS conditions stricter than their lines (must_not item 1). The builder brief repeats the \"exactly those two keys\" rule.",
+  "model": "claude-opus-5-5",
+  "ms": 12947,
+  "tokens": {
+    "input": 2,
+    "output": 1174,
+    "cacheCreation": 5207,
+    "cacheRead": 783,
+    "fresh": 6383,
+    "total": 7166
+  },
+  "at": "2026-11-05T08:43:37.840Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "32d9d3ff6e45659ab6c981726033d72ee404baba1fe035b89207e5d61d6f7cd8",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 2 is fine. \"Documents --tsv\" reasonably requires README.md to mention the flag and say what it does. Check 1 is stricter than its expect line. That line only requires the --tsv output to match whatever `node bin/csv2json.js` prints for the same table as CSV, and the `cmp` step already tests that. But PASS also requires the output to be \"a JSON array of objects keyed by the header row\", namely the exact array \"[{\"name\":\"Ann\",\"age\":\"30\",\"city\":\"Oslo\"},...]\". FAIL includes \"the --tsv output is not that JSON array\". That pins the CSV path's own output to a fixed value, which is a regression check on CSV behaviour that the words don't require. If a pull request changed CSV output and the TSV output still matched it, the check would wrongly fail. The brief already lists \"plain CSV output … is unchanged\" under Advisory, so this fixed-value check belongs there too, not in PASS/FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 12973,
+  "tokens": {
+    "input": 2,
+    "output": 928,
+    "cacheCreation": 2773,
+    "cacheRead": 783,
+    "fresh": 3703,
+    "total": 4486
+  },
+  "at": "2026-11-05T08:40:09.580Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "29e33a82b128e465f88a2e007aecfcb6d95f425a3be7995de879f841c1f037d1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not 1 is avoided. Check 3 lists every exported function and says \"a PR that only adds padLeft fails this check\", so a README with no slugify section fails. Must_not 2 is broken. Check 3 decides PASS with the regex `^#+\\s+'+f+'\\b`, so each section must be a markdown heading whose text starts with the bare function name. A section headed \"## `padLeft(s, width, fill)`\" (name in backticks) or \"### The padLeft function\" would count as missing, even though line 3 only asks that a section exist. That is a required README layout. Check 4 also needs the summary to show `# fail 0`. That is TAP-reporter wording, and Node's spec reporter prints \"ℹ fail 0\" instead, so a passing `npm test` could fail the check. Line 4 only asks that npm test pass. Checks 1 and 2 test only behaviour the lines state, with no parameter-count or single-character-fill rule.",
+  "model": "claude-opus-5-5",
+  "ms": 12969,
+  "tokens": {
+    "input": 2,
+    "output": 956,
+    "cacheCreation": 3239,
+    "cacheRead": 783,
+    "fresh": 4197,
+    "total": 4980
+  },
+  "at": "2026-11-05T08:40:02.843Z"
+}

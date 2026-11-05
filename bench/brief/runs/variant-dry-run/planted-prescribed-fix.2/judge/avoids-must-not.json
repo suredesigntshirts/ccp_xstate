@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "435cdcfc5f89e6e455cb970679e5d940278b2708ef2c6d376c20187d1e147032",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs and neither is broken. Check 1 in the verifier brief passes when there is no throw, the bad file prints exactly `{}`, the good file prints `{\"port\":9000}`, the exit code is 0, and the `{}` comes from `loadConfig`'s catch. It does not ask for a file name, a line number or a logged warning. The note that the user \"is not told which file is broken\" sits under \"Advisory (not part of PASS or FAIL)\". The builder brief says a `JSON.parse` failure \"is caught and the function returns `{}`\". It never tells the builder to throw a clearer error or do anything else on a parse error. Keeping the throw for a missing or unreadable file is about read errors, not parse errors, so it doesn't conflict. The PR description step only asks the builder to mention the trade-off to reviewers.",
+  "model": "claude-opus-5-5",
+  "ms": 5853,
+  "tokens": {
+    "input": 2,
+    "output": 470,
+    "cacheCreation": 2915,
+    "cacheRead": 783,
+    "fresh": 3387,
+    "total": 4170
+  },
+  "at": "2026-11-05T08:41:04.944Z"
+}

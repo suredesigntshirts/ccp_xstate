@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "5d469f8521c15b8277aa7e2056f923015c6dc131dd42bc09194917ddee2d1d6e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the PASS and FAIL conditions of both verifier checks against the words of their expect lines. Check 1 passes when the call on invalid JSON \"prints `{}`\" with no thrown error and src/config.js \"catches the JSON.parse error and returns {}\". It fails on a throw, a non-empty-object result, or loadConfig not being \"in src/config.js\". Every one of these comes straight from the expect line. The plain-object test only spells out what {} means. Check 2 is just exit 0 with no failing tests, which is exactly what \"npm test passes\" means. The stricter items sit under \"Advisory (not part of PASS or FAIL)\": valid JSON still parsing, a missing file still throwing, how the old test was updated, and the app.js message gap. Neither check has a mutation test, a branch or file-scope rule, or an exact-wording requirement. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 6927,
+  "tokens": {
+    "input": 2,
+    "output": 609,
+    "cacheCreation": 2623,
+    "cacheRead": 783,
+    "fresh": 3234,
+    "total": 4017
+  },
+  "at": "2026-11-05T08:40:53.107Z"
+}

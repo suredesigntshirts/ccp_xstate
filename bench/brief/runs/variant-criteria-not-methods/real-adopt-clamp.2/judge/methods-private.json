@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "8d982d03e9cf68e16417c4df7ad3721e01f07ede20be858527d0369036449a38",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's concrete inputs and checks with the verifier's probes. Builder step 3 tells it to test exactly \"clamp(-5, 0, 100) === 0\", \"clamp(140, 0, 100) === 100\", \"clamp(42, 0, 100) === 42\" and \"clamp(5, 10, 0) throws a RangeError\". Those input/expected-output pairs also appear in the verifier's Check 1 cases ([-5,0,100,0], [140,0,100,100], [42,0,100,42]) and Check 2 inputs ([5,10,0]). Step 5 also gives the builder a node -e probe that compares exported names with README headings. That is close to Check 3's script. Telling the builder to write tests is allowed, but handing it the verifier's own probe inputs and outputs gives the builder the checker's methods. The verifier's checks are not kept private, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 6436,
+  "tokens": {
+    "input": 2,
+    "output": 591,
+    "cacheCreation": 3505,
+    "cacheRead": 783,
+    "fresh": 4098,
+    "total": 4881
+  },
+  "at": "2026-11-05T08:41:52.975Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9c7a8e107da66a89e3d11819b28332cbaaa72e87e65f7c55ff5a34dd442dd642",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the builder brief, and both are handled.\n\nItem 1 (the non-goal): the builder brief tells the builder to rethrow on a parse error (\"throw a new error\"). It also says \"Never return `{}` or defaults for a malformed file.\" So loadConfig must still throw, which rules out swallowing the error. This covers the non-goal.\n\nItem 2 (the existing test): the builder brief names `test/config.test.js` and says \"One of them asserts that bad JSON throws a `SyntaxError`.\" In Step 1 it adds \"keeping it a `SyntaxError` is simplest, since the existing test expects one.\" That warns the builder that wrapping the error in a different type would change that test's outcome. It also says to keep the existing tests passing.\n\nSince the brief covers both items, the criterion holds.",
+  "model": "claude-opus-5-5",
+  "ms": 9441,
+  "tokens": {
+    "input": 2,
+    "output": 539,
+    "cacheCreation": 5440,
+    "cacheRead": 783,
+    "fresh": 5981,
+    "total": 6764
+  },
+  "at": "2026-11-05T08:38:14.776Z"
+}

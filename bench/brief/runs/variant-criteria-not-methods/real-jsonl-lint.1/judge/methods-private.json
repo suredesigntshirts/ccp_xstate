@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "d815bbc1977c562d5fc503c92e38954aad50d06d8b95d03881b2eaf47213591d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief's checks. The builder brief has no PASS/FAIL conditions. It also reuses none of the verifier's probes: no printf fixtures (clean.jsonl, bad.jsonl, end.jsonl, the CRLF sample), no inline `node --input-type=module -e \"import { lint }...\"` script, no `grep -rl \"node:test\"`, and no gh api queries. It does spell out behaviour, such as stripping a trailing `\\r`, reporting a torn last row, using a shebang and mode 100755, and exit codes 0/1/2. Those are requirements, not copies of the verifier's inputs and expected outputs. The commands it does give are allowed: `npm install`, `npm ci` and `npm test`, waiting for the `test` workflow to pass (both named in expect line 6), and writing its own node:test tests. So the builder gets the bar without the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 7967,
+  "tokens": {
+    "input": 2,
+    "output": 704,
+    "cacheCreation": 5937,
+    "cacheRead": 783,
+    "fresh": 6643,
+    "total": 7426
+  },
+  "at": "2026-11-05T08:43:10.099Z"
+}

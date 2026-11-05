@@ -1,0 +1,34 @@
+## Criteria the build must meet (from issue https://github.com/suredesigntshirts/ccp_machine_test/issues/102)
+1. packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for every row that is not valid JSON (1-based lines, blank lines skipped, an unterminated last line checked) and exits 1 if any, 0 if none
+2. A missing file or no argument prints to stderr and exits 2
+3. packages/jsonl-lint/src/index.js exports lint(text) returning [{ line, error }]
+4. The workspace has its own package.json (jsonl-lint, type module, test script node --test), no runtime dependencies, and node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes
+5. packages/jsonl-lint/README.md exists and the root README lists the tool
+6. The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, and npm test and the test workflow are green at its head
+
+## Context
+- `packages/` does not exist yet; this is the first workspace. The root `package.json` already declares `"workspaces": ["packages/*"]` and its `test` script runs `npm test --workspaces --if-present`.
+- CI (`.github/workflows/test.yml`) runs `npm ci` then `npm test` on Node 22. `npm ci` fails if `package-lock.json` is out of sync with the workspaces, so the lockfile must be updated.
+- Read `CLAUDE.md` and `README.md` at the root first. Rules: Node 22+, plain ES modules, no build step, zero runtime dependencies, tests with `node:test`.
+
+## Steps
+1. Create `packages/jsonl-lint/package.json`: `"name": "jsonl-lint"`, `"type": "module"`, `"scripts": { "test": "node --test" }`, a `"bin": { "jsonl-lint": "bin/jsonl-lint.js" }` entry, `"engines": { "node": ">=22" }`. Include no `dependencies` field (no devDependencies needed either).
+2. Create `packages/jsonl-lint/src/index.js` exporting `lint(text)`:
+   - Split the text on `\n` (strip a trailing `\r` from each row so CRLF files work).
+   - Line numbers are 1-based. Skip rows that are empty or whitespace-only (they still count toward numbering).
+   - The last row is checked even when the text does not end in a newline (a torn/unterminated last row such as `{"a":` must be reported). A single trailing newline at the end of the file must not create a phantom error.
+   - For each other row, `JSON.parse` it; on failure push `{ line, error }` where `error` is the parse error's message (a string).
+   - Return the array (empty when the text is clean).
+3. Create `packages/jsonl-lint/bin/jsonl-lint.js` with a `#!/usr/bin/env node` shebang, made executable (`chmod +x`, and make sure git records mode 100755):
+   - No argument: print a usage message to stderr, exit 2.
+   - File cannot be read (missing, etc.): print a message to stderr naming the file, exit 2.
+   - Otherwise run `lint` on the content and, for each problem, print `<file>:<line>: <error>` to stdout, where `<file>` is the argument exactly as given. Exit 1 if there were any problems, 0 if none. Print nothing on stdout for a clean file.
+   - Import `lint` from `../src/index.js` with a path relative to the script (`import.meta.url`), so it works from any cwd.
+4. Add tests under `packages/jsonl-lint/test/` (e.g. `test/lint.test.js`, `test/cli.test.js`) using `node:test` and `node:assert/strict`:
+   - `lint`: clean file returns `[]`; bad middle row reports exactly that line number; torn last row without a trailing newline is reported with its line number; blank lines (including whitespace-only) are skipped and do not shift numbering of later errors; trailing newline produces no error.
+   - CLI via `child_process.spawnSync(process.execPath, [binPath, file])` on temp files (`fs.mkdtempSync(os.tmpdir())`): clean file exits 0 with empty stdout; bad file exits 1 and stdout contains `<file>:<line>: ` lines; missing file exits 2 with non-empty stderr; no argument exits 2 with non-empty stderr.
+   - Make sure `node --test` run from `packages/jsonl-lint` finds them (files in `test/` named `*.test.js`).
+5. Write `packages/jsonl-lint/README.md`: what it does, usage (`node packages/jsonl-lint/bin/jsonl-lint.js <file>`), output format, exit codes 0/1/2, and the `lint(text)` API.
+6. Update the root `README.md`: replace the "No tools yet" line with a list of tools that includes `packages/jsonl-lint` with a one-line description.
+7. Run `npm install` at the root to update `package-lock.json` for the new workspace, then `npm ci && npm test` at the root and confirm it passes and the jsonl-lint tests actually ran. Also try the CLI by hand on a clean, bad, missing and no-argument case.
+8. Commit, push and open one PR to the repository whose body contains the line `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102`. Wait for the `test` workflow on the PR head to finish; if it fails, fix and push until it is green.

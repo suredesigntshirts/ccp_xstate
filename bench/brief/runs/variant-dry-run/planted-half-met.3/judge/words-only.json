@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "1cadd17cdf7d6960ab8df8c21943f001904e547b8fec5e634b64d03160893d72",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1, 2 and 4 stay within their expect lines. Check 1's cases are plain left-padding, Check 2's inputs are all already width or longer, and Check 4 is just exit code 0 with fail 0. Check 3 breaks the criterion. Its FAIL condition uses a regex, `\"^#{1,6}\\\\s+`?\" + k + \"\\\\b\"`, that only matches a markdown heading starting with the function's name. The expect line says only \"a section for every function\", so a section headed \"## The padLeft helper\" or \"## Function: padLeft\" would meet the words but fail the check. That exact heading-form rule is stricter than the words and should be under Advisory, not in PASS/FAIL. PASS also requires \"its own heading with a description beneath it\" and FAIL on \"no describing content\". That is arguably part of what a section is, but it is still a judgment the words don't strictly force. So the criterion does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 14291,
+  "tokens": {
+    "input": 2,
+    "output": 899,
+    "cacheCreation": 3586,
+    "cacheRead": 783,
+    "fresh": 4487,
+    "total": 5270
+  },
+  "at": "2026-11-05T08:39:41.588Z"
+}

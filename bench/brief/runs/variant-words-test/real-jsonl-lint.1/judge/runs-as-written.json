@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "a281c93fd0292d2386e013cb5a83925267f44f76aa6579c2cf4348aec1ac531d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs, and each one would run as written. The files they name either exist (README.md, package-lock.json, .github/workflows/test.yml) or are created in an earlier builder step (packages/jsonl-lint/bin/jsonl-lint.js, src/index.js, test/*.test.js). The commands use valid arguments: `git update-index --chmod=+x`, `npm install`/`npm ci`/`npm test` (the root script runs workspaces), `cd packages/jsonl-lint && npm test`, `test -f`, `grep -n jsonl-lint README.md`, and `gh pr view <pr> --repo ... --json body,headRefOid,state` and `gh pr checks`. Shell quoting in Check 3 is valid: `\\n` stays literal inside bash double quotes, so JS reads it as a newline. The relative import `./packages/...` resolves from the current directory under `--input-type=module -e`, and the JS syntax is valid. `spawnSync(process.execPath, [binPath, ...])` is valid. `node --test`'s default discovery finds `test/**/*.test.js`. The `<pr>` and `<path>` placeholders are meant to be filled in.",
+  "model": "claude-opus-5-5",
+  "ms": 11043,
+  "tokens": {
+    "input": 2,
+    "output": 977,
+    "cacheCreation": 4879,
+    "cacheRead": 783,
+    "fresh": 5858,
+    "total": 6641
+  },
+  "at": "2026-11-05T08:42:12.816Z"
+}

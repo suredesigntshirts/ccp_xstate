@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "c49afd8e8aea5542e12bd4197bdc839806050da0bbd7c55ed3ed458f0647d90f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief shares probes with the verifier brief. Step 2 tells the builder to test \"clamp(-5, 0, 100) === 0\", \"clamp(140, 0, 100) === 100\" and \"clamp(42, 0, 100) === 42\". These are the same inputs and expected outputs as the node -e probe in Check 1 of the verifier brief (expected 0 100 42). Step 2 also gives \"assert.throws(() => clamp(5, 10, 0), RangeError)\", and [5,10,0] is one of the probes in Check 2. Telling the builder to write its own tests is allowed, but handing it the verifier's exact inputs and expected outputs leaks the checks. The note that subtract is missing from the README is a fact about the repository and is fine on its own.",
+  "model": "claude-opus-5-5",
+  "ms": 14726,
+  "tokens": {
+    "input": 2,
+    "output": 886,
+    "cacheCreation": 2969,
+    "cacheRead": 783,
+    "fresh": 3857,
+    "total": 4640
+  },
+  "at": "2026-11-05T08:41:48.485Z"
+}

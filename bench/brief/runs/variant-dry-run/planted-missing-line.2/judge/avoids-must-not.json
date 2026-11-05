@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "793ce4e9ad6f9051af10d8778cea02648d560ae7b2636819cf194a073c38898b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Neither must_not item applies. Item 1: the verifier brief has exactly two checks, \"Check 1\" and \"Check 2\", one for each expect line. `npm test`, the default CSV run and the test suggestion appear only under \"Advisory (does not affect PASS or FAIL)\". That section is marked as not affecting the result, so it doesn't count as a third check. Item 2: Check 1 passes when the output compares as SAME and the CSV output is a JSON array. It fails when the output is DIFFERENT, a command errors, or tabs are left in the output. Check 2 passes or fails on whether grep finds --tsv in README.md and the text explains it. Neither condition depends on `npm test` or the CSV tests. The builder brief does ask the builder to run `npm test`, but that is a builder step, not a verifier PASS or FAIL condition, so neither item covers it.",
+  "model": "claude-opus-5-5",
+  "ms": 6859,
+  "tokens": {
+    "input": 2,
+    "output": 602,
+    "cacheCreation": 2764,
+    "cacheRead": 783,
+    "fresh": 3368,
+    "total": 4151
+  },
+  "at": "2026-11-05T08:40:55.952Z"
+}

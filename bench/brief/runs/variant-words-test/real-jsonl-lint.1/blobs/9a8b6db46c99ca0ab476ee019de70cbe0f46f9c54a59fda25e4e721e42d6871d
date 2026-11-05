@@ -1,0 +1,42 @@
+Check out the PR head. Run every check below at that head, in order, and report PASS or FAIL for each with the evidence (commands and output).
+
+Setup: at the repo root run npm ci. Create temp files in a scratch dir outside the repo, e.g.:
+- clean.jsonl: {"a":1}\n[2]\n"x"\n
+- badmid.jsonl: {"a":1}\n{bad\n{"c":3}\n
+- torn.jsonl: {"a":1}\n{"b":2}\n{"c": (no trailing newline)
+- blanks.jsonl: {"a":1}\n\n   \n{oops\n\n (row 4 bad; rows 2, 3, 5 blank)
+
+Check 1 — expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for every row that is not valid JSON (1-based lines, blank lines skipped, an unterminated last line checked) and exits 1 if any, 0 if none".
+Run node packages/jsonl-lint/bin/jsonl-lint.js <path> for each temp file and record stdout and exit status.
+PASS if: clean.jsonl prints no error lines and exits 0; badmid.jsonl prints a line starting with <path>:2: followed by an error text, no line for rows 1 or 3, and exits 1; torn.jsonl prints a line starting with <path>:3: and exits 1; blanks.jsonl prints a line starting with <path>:4: , no lines for blank rows 2, 3 or 5, and exits 1. Also try a file with two bad rows and confirm both are printed.
+FAIL if any of those outputs or exit statuses differ (wrong line number, missing row, blank row reported, torn last row ignored, wrong exit code).
+
+Check 2 — expect: "A missing file or no argument prints to stderr and exits 2".
+Run node packages/jsonl-lint/bin/jsonl-lint.js /nonexistent/x.jsonl, and node packages/jsonl-lint/bin/jsonl-lint.js with no argument, capturing stderr and exit status separately.
+PASS if both exit 2 and both write something non-empty to stderr.
+FAIL if either exits with any other status or writes nothing to stderr.
+
+Check 3 — expect: "packages/jsonl-lint/src/index.js exports lint(text) returning [{ line, error }]".
+Run: node --input-type=module -e "import {lint} from './packages/jsonl-lint/src/index.js'; console.log(JSON.stringify(lint('{}\n{bad\n')), JSON.stringify(lint('{}\n')))" at the repo root.
+PASS if lint is an exported function, the first call returns an array of objects each having a line property (2 for the bad row) and an error property, and the clean call returns an empty array.
+FAIL if the import fails, lint is not exported, or the return shape is not an array of { line, error } objects.
+
+Check 4 — expect: "The workspace has its own package.json (jsonl-lint, type module, test script node --test), no runtime dependencies, and node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes".
+Read packages/jsonl-lint/package.json and run cd packages/jsonl-lint && npm test. Read the test files.
+PASS if package.json has name jsonl-lint, type module, a test script that runs node --test, no non-empty dependencies field; npm test passes; and the tests (using node:test) cover a clean file, a bad middle row, a torn last row, blank lines, and the CLI exit codes.
+FAIL if any field is wrong or missing, there are runtime dependencies, tests fail, or any of the five listed cases has no test.
+
+Check 5 — expect: "packages/jsonl-lint/README.md exists and the root README lists the tool".
+Run test -f packages/jsonl-lint/README.md and grep -n jsonl-lint README.md.
+PASS if the package README exists and the root README.md mentions jsonl-lint as a tool.
+FAIL if either is missing.
+
+Check 6 — expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, and npm test and the test workflow are green at its head".
+Run gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state, gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test, and npm test at the repo root at the PR head.
+PASS if the change is in a single PR on that repo, its body contains Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, local npm test passes, and the test workflow run for the head commit is successful.
+FAIL if the body lacks that line, npm test fails, or the test workflow at the head is failing, missing or still pending at the end of your check.
+
+Advisory (not pass/fail conditions):
+- Confirm npm test at the root actually runs the jsonl-lint tests (look for its test output), and that package-lock.json lists the workspace so npm ci works in CI.
+- Mutation test: in a scratch copy, make lint skip the last row when it has no trailing newline, and confirm the torn-row test fails.
+- Check the bin file has a node shebang and the executable bit, and that CRLF files do not cause spurious errors.

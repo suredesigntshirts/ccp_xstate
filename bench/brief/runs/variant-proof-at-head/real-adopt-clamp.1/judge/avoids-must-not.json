@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e102e22408c9c7f81f0ca490b654eed3d1020b76d0d0f32a5e7a011de8920d69",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not 1 holds. Check 3 runs over every exported function, and its FAIL condition names subtract outright (\"subtract is still undocumented\"). A README that covers clamp but not subtract therefore cannot pass. Checks 1, 2 and 4 are no stricter than their lines. Check 2 only needs an `instanceof RangeError` and doesn't care about the message. Check 3 does break must_not 2. Its PASS needs the script to \"exit 0 with nothing missing\", and the script only counts a function as documented if it finds a Markdown heading that matches `^#+\\s*name\\s*\\(`. The verifier brief also lists \"no heading\" as a FAIL reason. That ties the check to one README layout. A README that documents every export in a table, a bullet list or prose would fail, even though line 3 only says README.md must document every exported function. This is the \"specific README layout\" condition that must_not 2 forbids.",
+  "model": "claude-opus-5-5",
+  "ms": 7580,
+  "tokens": {
+    "input": 2,
+    "output": 594,
+    "cacheCreation": 3276,
+    "cacheRead": 783,
+    "fresh": 3872,
+    "total": 4655
+  },
+  "at": "2026-11-05T08:41:46.156Z"
+}

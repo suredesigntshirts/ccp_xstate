@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "1cbb3b129530b99d00b62f52f5a9bfe2ae37dd27442c2e965fde3be1a084e295",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs; all would run as written. Builder: `chmod +x`, `npm install`, `npm ci && npm test` use files that exist or that earlier steps create. The root test script already runs `npm test --workspaces`, so workspaces are configured. Verifier: the printf/`node packages/jsonl-lint/bin/jsonl-lint.js $T/...; echo $?` commands are valid. In Check 3, `node --input-type=module -e \"import {lint} from './packages/jsonl-lint/src/index.js'; ...\"` quotes correctly in bash: `\\\"` becomes `\"` and `\\n` stays a JS escape. The JS is valid, and a relative import from eval resolves against the current directory. `npm test -w jsonl-lint` works once the workspace exists. `gh pr list --search \"102 in:body\" --state all`, `gh pr view --json body,headRefOid,state` and `gh pr checks -R` use real flags and fields. The `cd packages/jsonl-lint` step is covered by \"run every check from the repository root\". The `<n>` placeholders are filled from the earlier `gh pr list` result.",
+  "model": "claude-opus-5-5",
+  "ms": 14158,
+  "tokens": {
+    "input": 2,
+    "output": 1206,
+    "cacheCreation": 5439,
+    "cacheRead": 783,
+    "fresh": 6647,
+    "total": 7430
+  },
+  "at": "2026-11-05T08:42:34.251Z"
+}

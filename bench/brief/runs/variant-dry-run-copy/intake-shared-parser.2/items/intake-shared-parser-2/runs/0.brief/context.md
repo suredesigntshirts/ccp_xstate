@@ -1,0 +1,1 @@
+Run intake-shared-parser-2:0.brief, worktree /tmp/bench-intake-shared-parser-2-L8AjPP/wt/intake-shared-parser-2--0.brief of https://github.com/o/csv2json, branch run/intake-shared-parser-2/0.brief.

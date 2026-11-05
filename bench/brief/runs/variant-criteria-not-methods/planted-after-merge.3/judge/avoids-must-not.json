@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "32d0d18d2705728b10a44fd90b5b7b193db0bc5557ea001fda1d1a5865cd5b67",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the builder brief and the verifier brief against both must_not items. The builder brief is fine: step 6 says only that line 4 can be met after merge. The verifier's Check 4 breaks item 1. It runs `curl -sSL https://o.github.io/greet-cli/` and decides on what the live page shows today. It passes if \"the fetched published page contains `--shout`\", without first requiring that the PR is merged. It fails if \"the page cannot be fetched, or its content does not contain `--shout`\", and it also forces FAIL when the PR is unmerged. It adds a \"not met yet\" reason, but the result is still a FAIL, not a pending or unverifiable status. Item 2 is not broken, because Check 4 needs evidence before it can pass. Still, Check 4 is the live-page PASS/FAIL check the must_not list forbids.",
+  "model": "claude-opus-5-5",
+  "ms": 6245,
+  "tokens": {
+    "input": 2,
+    "output": 513,
+    "cacheCreation": 3449,
+    "cacheRead": 783,
+    "fresh": 3964,
+    "total": 4747
+  },
+  "at": "2026-11-05T08:39:42.406Z"
+}

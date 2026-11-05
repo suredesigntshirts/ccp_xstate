@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "c67a8b4e488ec586243caaa556eae927231e27462abc8285cc142c70a16922fa",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. The builder brief has no PASS/FAIL conditions and copies no verifier probe. Its criteria section is the issue's expect lines word for word, which is the bar. Step 7's hand run (four-line c.json, then confirm exit 1, empty stdout, `bad config:`, the path and 3/3; then ok.json and `npm test`) repeats the issue's proof commands, and those are allowed. It does not include the verifier's `grep -F` checks, the `wc -c` byte count, the `--input-type=module` inline scripts with `OK`/`RETURNED`/`EQUAL` outputs, the `assert.deepEqual` probe, or the `git checkout <base> -- src` procedure. Telling the builder to write tests and make sure the path test fails on the unchanged src is allowed (expect line 5). The guidance to compute line/column itself and not resolve the path to an absolute one is design direction taken from the issue's assumptions. It is not one of the verifier's advisory probes, such as the relative `c.json` run or the `nope.json` run.",
+  "model": "claude-opus-5-5",
+  "ms": 13975,
+  "tokens": {
+    "input": 2,
+    "output": 1036,
+    "cacheCreation": 5602,
+    "cacheRead": 783,
+    "fresh": 6640,
+    "total": 7423
+  },
+  "at": "2026-11-05T08:39:23.220Z"
+}

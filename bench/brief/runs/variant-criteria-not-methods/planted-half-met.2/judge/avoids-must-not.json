@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "fdf2fee3249236de0cd1f0afd7dd089a790d21c4b6d74f624fd8b5102cf43647",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the two briefs.\n\nItem 1: Check 3 builds the list from the module's actual exports and compares it with the README headings. A README that has padLeft but no slugify gives \"missing: slugify\". The brief also says outright: \"if it is still missing, this check FAILS.\" So this item is not broken.\n\nItem 2: Check 1's values ('00042', '   42', '**ab', 'xxx') all follow from line 1, and nothing tests a multi-character fill or limits fill to one character. Check 2 only asks that s comes back unchanged. Check 3 accepts a heading at any level that names the function, so it doesn't force a layout. \"With section text below it\" is a reasonable reading of \"section\". Check 4 asks for exit code 0 and zero failures. The parameter count isn't checked, and the multi-character fill note is advisory only. The builder's `## name(...)` instruction isn't a PASS/FAIL condition, so I didn't count it.\n\nOne weak spot, which I judged minor: Check 4 looks for the literal \"# fail 0\", which some test output formats don't print even when all tests pass.",
+  "model": "claude-opus-5-5",
+  "ms": 14755,
+  "tokens": {
+    "input": 2,
+    "output": 1173,
+    "cacheCreation": 3182,
+    "cacheRead": 783,
+    "fresh": 4357,
+    "total": 5140
+  },
+  "at": "2026-11-05T08:40:13.041Z"
+}

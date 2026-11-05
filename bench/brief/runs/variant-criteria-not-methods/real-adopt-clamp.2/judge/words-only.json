@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "f49bc5d1bcea82651c7beb7062d0239981017f62d674cd63fcaeacc7f16311c1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2 and 4 hold. They test clamping, a RangeError when lo > hi, and the npm test exit code with no failing tests. Check 3 breaks the criterion. Its script only counts a function as documented if a markdown heading matches `'^#+\\\\s*`?'+n+'\\\\s*\\\\('`, and its FAIL condition is \"the script prints MISSING for any function\". The expect line \"README.md documents every function math.js exports\" doesn't require headings in any format. A README that covers a function in a list, a table or a paragraph would still fail. This format rule is stricter than the words, but it sits in a PASS/FAIL condition instead of under Advisory. The Advisory section itself is fine, but Check 3's heading rule is enough to fail the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 7575,
+  "tokens": {
+    "input": 2,
+    "output": 609,
+    "cacheCreation": 3463,
+    "cacheRead": 783,
+    "fresh": 4074,
+    "total": 4857
+  },
+  "at": "2026-11-05T08:41:23.052Z"
+}
