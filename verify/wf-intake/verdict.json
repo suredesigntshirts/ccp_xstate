@@ -1,0 +1,52 @@
+{
+  "item": "wf-intake",
+  "verified_sha": "13c4ffd850c72300533f0ee7d91fcadf7dffa66e",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5JvWQ3Hg75qR9yxdwL",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "chart",
+      "status": "MET",
+      "command": "npm ci; node --test verify/wf-intake/chart.test.mjs (my own lib.mjs: real loadWorkflow, restore, offer, pump and handlers with workflows ['quick-fix'], so the child is a real child item via effects/item.js; shape and challenge are real agent runs (prepare, spawn, bind, accept) whose stub agents return through accept(); the intake card is a stub that stays open and is answered by an offered ask done event; the child's stages are stubs that finish at once)",
+      "excerpt": "11 pass. loadWorkflow('intake') passes checkStages, id intake@<sha256>, states shaping/challenging/stuck/fixing/done/dropped, both stage files composed in. A start without request.url or text is not applied. shape (issue with a wrong url) then a PASS challenge: exactly one child, its seq-0 row applied on quick-fix@<pin> with input.issue == shape's issue with url = request.url (the wrong url is overwritten); a second drive starts no second child. Three FAILs: 3 shape runs and 3 challenge runs, shape runs 2 and 3 get the failing challenge exactly as returned, then state stuck with one card (choices revise / build as is / drop, carrying the last challenge); no child. FAIL then PASS: child gets version 2. Card: revise with why -> shaping, run 4's input.answer is the answer; that round's FAIL goes straight back to the card (one revise buys one round). revise with no why is not applied (state stays stuck). build as is -> one child with the last (third) issue, intake ends done. drop -> dropped, final, no child. shape blocked -> stuck, card's failure carries the reason, no challenge run; build as is is then not applied (no issue); revise goes back to shaping with the answer. The child's end (stub brief/build/verify PASS, merge card approved, merge) ends intake done, output.fix deep-equal to the child's output, output.issue the frozen issue, output.challenge PASS."
+    },
+    {
+      "id": "independent",
+      "status": "MET",
+      "command": "node --test verify/wf-intake/independent.test.mjs (a revised round: shape returns its issue plus an extra `notes` field holding a marker, three FAIL challenges whose evidence holds a second marker, a revise card answer holding a third; then the fourth challenge run's brief.md, context.md and run.json are read, and accept() is called with 8 bad results through the real spawn/bind/accept)",
+      "excerpt": "2 pass. The challenge run's input keys are exactly task, request, issue; its prompt holds the request's url and text and every issue field (title, problem, outcome, each expect line, non_goals, assumptions), and neither brief.md nor context.md holds shape's notes, the earlier challenges' evidence, the card answer or an earlier issue version (the same round's shape prompt does hold the answer and the evidence, so the markers are live). accept() refused: skip, add, reorder, contradict (one line's text changed), PASS with a FAIL line, FAIL with every line PASS: rule `covers`; no lines and no wrong_build: rule `schema`. Each refusal is a journal `refusal` row (8), the item stays in challenging, and a good result is then accepted."
+    },
+    {
+      "id": "frozen",
+      "status": "MET",
+      "command": "node --test verify/wf-intake/frozen.test.mjs (first-PASS and PASS-after-a-revision routes; the child's stages are real runs, so its brief run is prepared by the real run handler; the issue carries unicode quotes and a tab)",
+      "excerpt": "2 pass. The PASS challenge run's run.json input.issue == shape's issue + request url; JSON.stringify of it equals JSON.stringify of the child's seq-0 engine.transition event.input.issue, the start input is exactly { issue }, and the raw child .jsonl contains those bytes. The child sits in briefing; its brief run's run.json input.issue serialises identically and carries title, problem, reason, outcome, proofs, non_goals and assumptions unchanged, and its brief.md holds title, problem, reason, outcome, a proof's how and both assumptions."
+    },
+    {
+      "id": "benches",
+      "status": "MET",
+      "command": "node scripts/bench/score.mjs --stage shape|challenge|brief --judge-check; cp -r bench/<stage>/runs/<set> <scratch>; node scripts/bench/score.mjs --stage <stage> --runs <scratch> --no-judge --report <scratch>.md for shape baseline + variant-observable, challenge baseline + variant-good-faith, brief baseline; diff of table lines with the committed reports; read each case.json and its seed repo",
+      "excerpt": "judge-check exit 0 for all three. shape: 10 hand-graded entries, 5 planted bad, agreement full on every criterion, 'Planted faults caught: 12 of 12'. challenge: 8 entries, 4 planted bad, 'Planted faults caught: 11 of 11'. brief: unchanged, 10/10, 9 of 9. Recomputed baseline reports for shape, challenge and brief have every table line identical to the committed baseline.md; variant per-case sums equal the B column of the compare reports (shape states-problem 18/21, grounded 20/21; challenge verdict-right 20/21, avoids-must-not 19/21). Each set: 7 cases x 3 runs. Rubrics: decision file 'After the build' records both approved by the stand-in. shape cases (7): half-met rule (strutil index.js exports slugify; README has only capitalize and truncate), fix stated as requirement (settings: app.js already prints 'bad config: <message>' exit 1, test asserts throws SyntaxError), missing regression (mathlib average divides by xs.length, no test calls average), after-merge (pages.yml publishes on push to main only), shared parser, not-one-change, real jsonl-lint at b772aff. challenge cases (7): 2 clean (clean-average, clean-shout, result PASS), half-met, ambiguous, after-merge, missing regression, suggested fix, all with planted lines in must_fail. Defect noted, not failing: bench/challenge/cases/planted-ambiguous has must_fail [3] and line 3 is the vague one ('average handles bad input sensibly'), but its trap and must_catch still say 'Line 2 FAILs as ambiguous', stale from before the case was corrected; the judge's catches-traps reads must_catch."
+    },
+    {
+      "id": "chosen",
+      "status": "MET",
+      "command": "diff bench/shape/variants/observable/intake/shape.md workflows/intake/shape.md; diff bench/challenge/variants/good-faith/intake/challenge.md workflows/intake/challenge.md; node scripts/bench/run.mjs --stage <s> --prompt-only --case <c> vs a committed variant run's brief.md; read bench/*/reports/variant-*.md and blind-*/(packet, key, answer); brief --no-judge recompute (above)",
+      "excerpt": "Kept stage files are byte-identical to the variants (shape: observable, aimed at states-problem 15/21 -> 18/21; challenge: good-faith, aimed at verdict-right 17/21 -> 20/21), and today's --prompt-only renders equal the variant runs' brief.md except the run id. Both compares ran on the same 7 cases, with written trades in the decision; blind packets, keys and answers are committed. Brief still scores and compares as before (baseline report identical, judge-check 10/10). Note: the decision says 'Both blind reads preferred the variant', but X/Y is shuffled per case, so the reader's 'Overall: X' does not name a version. Unblinded per case: shape B wins 3 (bug-regression, half-rule, jsonl-lint), A wins 1 (shared-parser) plus 2 slight edges, 1 even; challenge B wins clean-shout plus 2 slight edges, A wins half-met plus 1 slight edge, 2 even. Both lean to the variant, but narrowly; the sentence should say that."
+    },
+    {
+      "id": "real",
+      "status": "NOT MET",
+      "command": "my own case verifier-thermo-table (verify/wf-intake/evidence/verifier-cases.json): node scripts/bench/run.mjs --stage shape --case verifier-thermo-table --k 1 --model claude-opus-5-5; a challenge case from shape's issue (url set from the request as intake.json does); run.mjs --stage challenge, same; scripts/inspector/build.mjs on both run folders, read with Playwright; node --test verify/wf-intake/inspector.test.mjs",
+      "excerpt": "Trap planted: thermo-table (bin/table.js) prints cToF with the same float noise as `thermo 37` (31 -> 87.80000000000001), so lines that check only `thermo 37` pass a build rounding one command. Shape (48 s, 17,668 fresh tokens, first return accepted, changed []) closed the trap: expect lines 4 and 5 check `node bin/table.js 30 40` and `-5 -3` row by row, and assumptions say 'temperatures we print' covers all three outputs. Challenge (52 s, 20,066 fresh tokens, accepted) PASSed the table line ('Tried a build that rounds thermo but leaves the table alone ... caught') and FAILed line 3 for a real gap: no line checks a negative result, so a half-up `((x*10+0.5)|0)/10` rounds negatives toward zero. So the model half holds. The Inspector half does not: the shape run folder builds and shows (1 step, prompt and result). The challenge run folder fails `build.mjs` with 'cannot find the workflow null for verifier-thermo-table-1'; with the pinned blob given as the source's workflow it builds but shows '0 steps, 0 model agent runs, ends in ?' and its result is not in data.js. Cause: scripts/bench/lib.mjs prepareRun prepares a stage that is not in the initial state directly, with no engine.transition row. The builder's committed bench/challenge/runs/* folders have the same gap. Fix needed: a challenge bench run folder the Inspector shows (e.g. the bench starts the item and offers a stub shape result so the journal reaches challenging, or the Inspector shows a run folder without transitions). The todo test in verify/wf-intake/inspector.test.mjs is the check."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub MCP pull_request_read get_check_runs, PR #117",
+      "excerpt": "Head 13c4ffd850c72300533f0ee7d91fcadf7dffa66e: check run 'test' (workflow ci) completed, conclusion success (07:44:52-07:46:51Z). 'gates' (workflow verdict) failure, as expected before a verdict exists."
+    }
+  ]
+}
