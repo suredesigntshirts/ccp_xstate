@@ -80,14 +80,16 @@ test('retry-route: replan and drop on the blocked card do what replanning does; 
   } finally { await w.close(); }
 });
 
-test('retry-route (note): a stand-in grant cannot answer the blocked card, which carries no PR', async () => {
+// Changed by fix-blocked-card-grant (its decision 5): this test pinned the gap that item closes. A card with no PR now
+// takes its repository from the item's GitHub issue, so the same grant is taken.
+test('retry-route (note): a stand-in grant answers the blocked card, reading the repository from the issue', async () => {
   const w = await world();
   try {
     await toBlocked(w);
     const host = w.host('a');
     const run = [...host.runs.values()].find((r) => r.actor === 'ask');
     const grants = [{ id: 'g1', workflow: 'quick-fix', ask: 'ask', choices: ['retry'], repos: ['o/r'], until: '2999-01-01T00:00:00Z' }];
-    assert.throws(() => standinInput(host, { effect: run.id, choice: 'retry', by: 'standin', grants }), /repo \(none\) not granted/);
+    assert.equal(standinInput(host, { effect: run.id, choice: 'retry', by: 'standin', grants }).event.output.grant, 'g1');
   } finally { await w.close(); }
 });
 
