@@ -4,7 +4,7 @@
   "title": "Make agent.finish ms the agent's real run time",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A capture journal's agent.finish ms is the time from the agent's brief to its last user or assistant message, so an entry stamped with a relayed message's old time no longer stretches it: for a foreground agent it is within a second of the parent's Agent tool.call ms, and for any agent within a second of its agent.finish row's at minus its agent.spawn row's at, for named and built-in agents alike.",
   "why": "In probe-plugin-agents-thread the verifier's agent ran about 5 s but its agent.finish row says ms 508057022 (about 5.9 days); four such rows exist across three sessions, and each one's earliest time is the written_at of a person's message the coordinator relayed into the thread (plan/decisions/2026-11-05-agent-finish-ms.md). capture-rows.mjs finish() takes max minus min over every timestamp in the subagent transcript, including attachment and other non-message rows. Time per item is one of v1's parity numbers, so the measure has to be right.",
   "serves": [

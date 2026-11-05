@@ -46,3 +46,11 @@ timestamped at the run. Which entry type carries the old time was not seen direc
 5. **A resumed agent keeps today's span.** An agent continued by SendMessage writes to the same transcript, so its
    second SubagentStop measures from the first brief (session_01KfkB5F7WKxovGpwv21dn's a129d8ff0841bab02: 26734, then
    53605). Splitting runs is not this item; it is in non_goals.
+
+## After the build
+
+Build PR #137 merged at 2a79815. The verifier thread (session_01KfkB5Ff7r5kBYQQeSNA136) found all 5 Expect lines MET at
+85a68ab (verdict commit d40559a). On the same inputs main gave 508117022 ms and the head gave 4944. In two headless
+runs, each with a foreground named agent, a foreground built-in agent and a background built-in agent, every ms was
+within 250 ms of finish.at minus spawn.at and of the Agent call. Released as harness-v0.1.29 by Actions on merge.
+Nothing new was drafted.
