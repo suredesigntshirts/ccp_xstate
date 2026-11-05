@@ -83,3 +83,8 @@ not from entering awaitingMerge. Both are open for the next item that needs them
 **Lesson:** One agent can carry two `agent.finish` rows with cumulative tokens, so summing rows overcounts.
 **Evidence:** first-real-issue's brief agent a2ebf056 finished at 02:45:12Z and 02:45:17Z; summing both overstates the item by 76,459 tokens, 9% (retro-first-item finding 3).
 **Fate:** test. engine-item-views takes the last finish row per agent, with a test on this fixture.
+
+### L-agent-time-from-messages
+**Lesson:** A subagent transcript holds rows that aren't the agent's own messages, and one can carry an old time, so a run's span over every row can read days.
+**Evidence:** Four agent.finish rows across three sessions read 5.7 to 5.9 days for agents that ran seconds; each one's earliest time is a relayed person message's written_at (plan/decisions/2026-11-05-agent-finish-ms.md).
+**Fate:** test. fix-agent-finish-ms counts only user and assistant rows from the brief, with a test on an injected old row.
