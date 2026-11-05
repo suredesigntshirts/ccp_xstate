@@ -77,3 +77,21 @@ proves; they are not a rule that no later item may change a workflow, or no work
    checks that every changed line in them is the hash, the blocked line or the blocked state. This holds only for an
    item whose Expect changes a workflow; any other item keeps them as they are
    (plan/decisions/2026-11-05-waiting-lines-owner.md).
+
+## After the build
+
+Build PR #141 merged at cadb67e. The verifier thread (session_01KfkB5Fss4RHv8crv6ez4m7) found all 5 Expect lines MET
+at e4fd1c0 (verdict commit 61ec8f3). It used its own stub-agent tests through restore and offer, compared the
+not-blocked routes with main's recorded output, and read the committed real run. Breaking the retry's `built` set, or
+narrowing `blockedBuild` to `event.blocked`, turned its tests red. The real run
+(tournaments/2026-11-04-stage-contract/trials/blocked-retry/) went blocked, retry, build, verify PASS and merge with
+four real agents, each bound and captured by the harness's own hooks. Released as harness-v0.1.30.
+
+Two findings, drafted as items:
+
+- **fix-blocked-card-grant.** The blocked card has no `pr` input, so a stand-in's answer under a grant
+  (`bin/host.js answer`) can't cover it: a grant names repos, and `repoOf` reads the card's `pr`. Today only a tap
+  answers it, although the outcome names a stand-in's answer as a way in.
+- **fix-handback-after-return.** In the real run, three of the four agents (both builds and the verify agent) had
+  their final `SubagentHandback` refused `no-return`, after their `return` had already been accepted. The handback
+  check doesn't see a result accepted earlier in the same turn, and the journal gains a false refusal per agent.
