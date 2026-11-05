@@ -19,6 +19,12 @@
       "excerpt": "Unchanged: 'ok 1 - a guarded transition without a description names its guard in quotes', pass 1 fail 0. Reverted: 'not ok 1 ...' expected 'The verify actor finished, and the guard \"failed\" held; the item moves to building', actual 'The verify actor finished, and its guard failed held; the item moves to building', pass 0 fail 1.",
       "mutation": "const why = edge?.guard ? `, and its guard ${edge.guard} held` : '';",
       "red_test": "scripts/inspector/test/label.test.mjs: a guarded transition without a description names its guard in quotes"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 99",
+      "excerpt": "PR 99 head sha ab5fc91692adbc2871035ae02576e306a4faea53 (verdict commit on d3bb9a4): check run \"test\" (id 127035382130, actions run 41963599479) status completed, conclusion success, 03:45:49Z to 03:47:43Z. \"gates\" (run 41963599308) failure, for the missing ci verdict."
     }
   ]
 }
