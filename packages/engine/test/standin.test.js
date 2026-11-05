@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { restore, offer, pending } from '../src/index.js';
 import { handlers, relay, recordCard } from '../src/effects/index.js';
-import { standinInput, repoOf } from '../src/standin.js';
+import { standinInput, repoOf, issueRepoOf, cardRepo } from '../src/standin.js';
 import { readFile } from '../../journal/src/index.js';
 import { workflow, ISSUE, BRIEFS, A, pr, verdict } from './flow.js';
 import { loadWorkflow } from '../src/index.js';
@@ -158,5 +158,113 @@ test('a tap first still answers the ask, and a stand-in answer after it is refus
     assert.deepEqual(gh.merges, [A]);
   } finally {
     await gh.close();
+  }
+});
+
+// Plan item fix-blocked-card-grant: a card with no PR (quick-fix's blocked card) takes its repository from the item's
+// GitHub issue, and answer --why carries a why, so a stand-in's grant answers the blocked card.
+const BLOCK = 'push refused: the token lacks the workflow scope; grant it, then retry';
+
+async function toBlocked({ issue = ISSUE, grants = [] } = {}) {
+  const harness = mkdtempSync(join(tmpdir(), 'engine-standin-blocked-'));
+  const root = join(harness, 'journal');
+  writeFileSync(join(harness, 'grants.json'), JSON.stringify({ grants }));
+  const host = restore({ root, item: 'it-1', spec: loadWorkflow('quick-fix', { root }), session: 'owner', release: '0.2.0' });
+  const brief = { brief: { start: async (e) => ({ ref: e.id, output: BRIEFS }) } };
+  await offer(host, [{ event: { type: 'xstate.init', input: { issue } }, source: { system: 'claude-code', ref: 'owner' } }],
+    handlers({ hearth: relay({ root }), actors: brief }));
+  const build = pending(host).runs.find((r) => r.actor === 'build');
+  // The error event resultsOf() makes from a blocked return.
+  await offer(host, [{ event: { type: 'xstate.error.actor.build', error: `build blocked: ${BLOCK}`, blocked: BLOCK }, run: build.id, source: { system: 'harness', ref: 'return b' } }],
+    handlers({ hearth: relay({ root }) }));
+  assert.equal(host.snapshot.value, 'blocked');
+  const ask = askRun(host);
+  recordCard({ host, effect: ask.id, ref: CARD });
+  await offer(host, [], handlers({ hearth: relay({ root }) }));
+  return { root, host, ask };
+}
+
+test('issueRepoOf reads owner/repo from a GitHub issue URL only', () => {
+  assert.equal(issueRepoOf('https://github.com/o/r/issues/7'), 'o/r');
+  assert.equal(issueRepoOf('https://github.com/o/r/pull/7'), null);
+  assert.equal(issueRepoOf('https://example.com/o/r/issues/7'), null);
+  assert.equal(issueRepoOf('plan/items/x.md'), null);
+  assert.equal(issueRepoOf(undefined), null);
+});
+
+test('the blocked card, which has no PR, is checked against the issue\'s repository', async () => {
+  const { host, ask } = await toBlocked();
+  const at = '2026-11-05T16:00:00Z';
+  const g = { ...GRANT, id: 'g-blocked', choices: ['retry', 'replan', 'drop'] };
+  assert.deepEqual(cardRepo(host, ask), { repo: 'o/r', from: 'issue' });
+  assert.equal(standinInput(host, { effect: ask.id, choice: 'retry', by: 's', grants: [g], at }).event.output.grant, 'g-blocked');
+  assert.throws(() => standinInput(host, { effect: ask.id, choice: 'retry', by: 's', grants: [{ ...g, repos: ['o/other'] }], at }),
+    /repo o\/r not granted \(read from the issue\)/);
+  assert.deepEqual(standinInput(host, { effect: ask.id, choice: 'replan', by: 's', why: '  five whys  ', grants: [g], at }).event.output,
+    { choice: 'replan', by: 's', grant: 'g-blocked', why: 'five whys' });
+  assert.deepEqual(standinInput(host, { effect: ask.id, choice: 'drop', by: 's', why: ' ', grants: [g], at }).event.output,
+    { choice: 'drop', by: 's', grant: 'g-blocked' }, 'a blank why is left out');
+});
+
+test('an item whose issue is not a GitHub issue URL has no repository on a card with no PR', async () => {
+  const { host, ask } = await toBlocked({ issue: { ...ISSUE, url: 'plan/items/some-item.md' } });
+  assert.deepEqual(cardRepo(host, ask), { repo: null, from: null });
+  assert.throws(() => standinInput(host, { effect: ask.id, choice: 'retry', by: 's', grants: [{ ...GRANT, choices: ['retry'] }] }),
+    /repo \(none\) not granted \(the card has no pr/);
+});
+
+test('a card with a PR is still checked against the PR\'s repository, not the issue\'s', async () => {
+  const { host } = await toAwaitingMerge();
+  const ask = askRun(host);
+  const other = { ...ask, input: { ...ask.input, pr: { ...ask.input.pr, url: 'https://github.com/o/s/pull/1' } } };
+  assert.deepEqual(cardRepo(host, other), { repo: 'o/s', from: 'pr' });
+  assert.deepEqual(cardRepo(host, { ...ask, input: { ...ask.input, pr: { url: 'not a url' } } }), { repo: null, from: 'pr' }, 'a pr with no repository does not fall back to the issue');
+});
+
+test('bin/host.js answer on the blocked card: retry builds again, replan needs --why, drop ends it; refusals change nothing', async () => {
+  const g = { ...GRANT, id: 'g-blocked', choices: ['retry', 'replan', 'drop'] };
+  const answer = (root, ask, choice, extra = []) => hostCli(root, ['answer', '--effect', ask.id, '--choice', choice, '--by', 'standin-session', ...extra]);
+
+  {
+    const { root, host, ask } = await toBlocked({ grants: [{ ...g, repos: ['o/other'] }] });
+    const before = readFile(host.file).rows.length;
+    const refused = await answer(root, ask, 'retry');
+    assert.equal(refused.status, 2);
+    assert.match(refused.stderr, /repo o\/r not granted \(read from the issue\)/);
+    assert.equal(readFile(host.file).rows.length, before, 'a refused answer writes nothing');
+  }
+  {
+    const { root, host, ask } = await toBlocked({ grants: [g] });
+    const r = await answer(root, ask, 'retry');
+    assert.equal(r.status, 0, r.stderr);
+    const after = restore({ root, item: 'it-1', spec: loadWorkflow('quick-fix', { root }), session: 'owner', release: '0.2.0' });
+    assert.equal(after.snapshot.value, 'building');
+    assert.equal(after.snapshot.context.failure, `build blocked: ${BLOCK}`);
+    assert.deepEqual(after.snapshot.context.briefs, BRIEFS);
+    const applied = r.json.results.find((x) => x.event === 'xstate.done.actor.ask');
+    assert.deepEqual(applied.source, { system: 'standin', ref: `g-blocked ${CARD}` });
+    const row = readFile(host.file).rows.find((x) => x.kind === 'engine.transition' && x.payload.event.type === 'xstate.done.actor.ask');
+    assert.deepEqual(row.payload.event.output, { choice: 'retry', by: 'standin-session', grant: 'g-blocked' });
+  }
+  {
+    const { root, host, ask } = await toBlocked({ grants: [g] });
+    const before = readFile(host.file).rows.length;
+    const nowhy = await answer(root, ask, 'replan');
+    // The grant covers it, but the chart's replan guard needs a why: refused before anything is written, so the same
+    // grant can still answer the card.
+    assert.equal(nowhy.status, 2);
+    assert.match(nowhy.stderr, /does not take "replan".*--why/);
+    assert.equal(readFile(host.file).rows.length, before);
+    const r = await answer(root, ask, 'replan', ['--why', 'the brief named the wrong file']);
+    assert.equal(r.status, 0, r.stderr);
+    const after = restore({ root, item: 'it-1', spec: loadWorkflow('quick-fix', { root }), session: 'owner', release: '0.2.0' });
+    assert.equal(after.snapshot.value, 'briefing');
+    assert.equal(after.snapshot.context.why, 'the brief named the wrong file');
+  }
+  {
+    const { root, ask } = await toBlocked({ grants: [g] });
+    assert.equal((await answer(root, ask, 'drop')).status, 0);
+    const after = restore({ root, item: 'it-1', spec: loadWorkflow('quick-fix', { root }), session: 'owner', release: '0.2.0' });
+    assert.equal(after.snapshot.value, 'dropped');
   }
 });

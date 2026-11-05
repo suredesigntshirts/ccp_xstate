@@ -22,7 +22,7 @@ node packages/engine/bin/host.js wake --item <id> --workflow quick-fix < <hook i
 node packages/engine/bin/host.js show --item <id> --workflow quick-fix
 node packages/engine/bin/host.js card --item <id> --workflow quick-fix --effect <ask run id> --ref <card id>
 node packages/engine/bin/host.js closed --item <id> --workflow quick-fix --effect <ask run id>
-node packages/engine/bin/host.js answer --item <id> --workflow quick-fix --effect <ask run id> --choice <c> --by <session> [--grants <file>]
+node packages/engine/bin/host.js answer --item <id> --workflow quick-fix --effect <ask run id> --choice <c> --by <session> [--why <text>] [--grants <file>]
 ```
 
 `--root` defaults to `$CCP_JOURNAL_DIR` or `/mnt/project-files/harness/journal`.
@@ -78,8 +78,12 @@ run. The grants file defaults to `grants.json` beside the journal folder (`<harn
   "repos": ["owner/repo"], "until": "<ISO time>", "granted_by": "…", "said": "the person's words", "said_at": "…" }] }
 ```
 
-An entry covers an answer when its workflow and ask (the invoke id) match, it lists the choice and the PR's repo, and
-`until` is still ahead. The person sets the file; the first one is `plan/decisions/2026-10-31-first-grant.md`.
+An entry covers an answer when its workflow and ask (the invoke id) match, it lists the choice and the card's repo, and
+`until` is still ahead. The card's repo is its PR's when the card has a `pr` input; a card asked before any PR (quick-fix's
+`blocked` card) takes the repo of the item's issue when that is a `https://github.com/<owner>/<repo>/issues/<n>` URL,
+and otherwise has none, so no grant covers it (plan item fix-blocked-card-grant). `--why <text>` adds a `why` to the
+answer's output, which quick-fix's replan needs. An answer the chart would not take as given (a replan with no why) is
+refused before anything is written, so the same grant can answer the card again. The person sets the file; the first one is `plan/decisions/2026-10-31-first-grant.md`.
 
 The journal check (`packages/journal/bin/journal-check.js --repo <owner/name>`) lists every merge the host's merge
 effect didn't make, and with `--host` fails on one.

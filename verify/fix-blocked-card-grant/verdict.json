@@ -1,0 +1,39 @@
+{
+  "item": "fix-blocked-card-grant",
+  "verified_sha": "d4bf39ee1e4b88ab5326a0ae120868267bfad674",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GR9FLaAKoj1hQt7ZX",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "blocked-card-answered",
+      "status": "MET",
+      "command": "npm ci; node --test verify/fix-blocked-card-grant/grant.test.mjs (lib.mjs: real restore/offer/pump, real handlers with the CLI's own relay hearth, spawn/bind/accept; local bare origin, stub GitHub REST for any owner/repo; quick-fix driven to blocked by a builder returning { blocked: { reason } }, card put up with `bin/host.js card`, answered with `bin/host.js answer --grants <file>` as a separate process). Same file in a worktree of main bd518c8: these tests red there",
+      "excerpt": "Issue https://github.com/o/r/issues/7, grant { workflow quick-fix, ask ask, repos [o/r] }. retry: exit 0, state building, context.briefs unchanged, failure 'build blocked: <reason>', a new build run whose input.task equals the first build's and input.failure names the block. replan --why '<five whys>': state briefing, context.why is that text, a new brief run. drop: state dropped. Each time exactly one row with source { system: 'standin', ref: 'vg cmsg_vcard1' } (grant id + card id), an applied engine.transition of xstate.done.actor.ask on the ask run, output exactly { choice, by: 'standin-session', grant: 'vg' } plus why for replan.",
+      "mutation": "packages/engine/src/standin.js cardRepo: issue fallback replaced by null (main's behaviour); separately bin/host.js answer stops passing --why to standinInput",
+      "red_test": "first mutation: tests 1-4 (retry, replan, drop, refusals-then-taken) red; second: 'replan with --why moves to briefing' red"
+    },
+    {
+      "id": "refused-when-not-covered",
+      "status": "MET",
+      "command": "node --test verify/fix-blocked-card-grant/grant.test.mjs, the refused-when-not-covered tests: item file bytes compared before and after each answer",
+      "excerpt": "On the blocked card: grant repos [o/x] -> exit 2 'vg: repo o/r not granted (read from the issue)'; grant choices [replan, drop] for retry -> exit 2 'does not grant \"retry\"'; until an hour ago -> exit 2 'expired'; replan with no --why and with '   ' -> exit 2 'the workflow does not take \"replan\" ... (does it need --why?)'. Each: item file byte-identical, state blocked, no standin row; afterwards a covering grant with the same id is still taken (building), so a refusal does not make the next answer a duplicate. Issue urls https://gitlab.com/o/r/issues/7, https://github.com/o/r/pull/7, https://github.com/o/r and 'o/r#7' under a grant naming o/r: exit 2 'repo (none) not granted (the card has no pr, and the item's issue is not a GitHub issue URL)', file unchanged, still blocked."
+    },
+    {
+      "id": "pr-cards-unchanged",
+      "status": "MET",
+      "command": "node --test verify/fix-blocked-card-grant/grant.test.mjs 'pr-cards-unchanged' at head and (refusal-text regex loosened, the '(read from the pr)' suffix being new) in the main worktree; npm test at head d4bf39e (with verify/fix-blocked-card-grant/) and at main bd518c8; passing test names compared with comm; git diff origin/main HEAD -- verify/",
+      "excerpt": "Issue in o/r, PR https://github.com/o/s/pull/1 -> awaitingMerge; card input.pr in o/s. Grant repos [o/r] for approve: exit 2 'o/s not granted (read from the pr)', file unchanged, still awaitingMerge; grant repos [o/s]: exit 0, done, stub merged o/s#1 once, row output { choice: approve, by, grant: vg }. Same behaviour on main. npm test head: 1575 tests, 1562 pass, 12 skipped, 1 fail; main: 1561, 1548 pass, 12 skipped, 1 fail; the one failure on both is test/setup.test.mjs copy-not-link (this container's clone). The only test passing on main and not on head by name is fix-blocked-retry's 'retry-route (note): a stand-in grant cannot answer the blocked card...', renamed and inverted as the item's outputs line says; the verify/ diff vs main is that one file, 6 lines."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 144 at d4bf39e",
+      "excerpt": "Check run 'test' (id 127364496739) completed success at d4bf39e. 'gates' (127364496421) failed only because no verdict existed yet at that sha."
+    }
+  ],
+  "notes": [
+    "Not an Expect line, for a later item if wanted: a grants file entry whose repos list holds JSON null covers every card with no repository (repos.includes(null) when the repo is none), on main as at head. Only the person writes grants, so this was left out of the tests."
+  ]
+}

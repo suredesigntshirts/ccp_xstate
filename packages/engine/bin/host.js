@@ -6,7 +6,7 @@
 //   host.js show  --item <id> --workflow <name> [--root <dir>]
 //   host.js card  --item <id> --workflow <name> --effect <ask run id> --ref <card id> [--root <dir>]
 //   host.js closed --item <id> --workflow <name> --effect <ask run id> [--root <dir>]
-//   host.js answer --item <id> --workflow <name> --effect <ask run id> --choice <c> --by <session> [--grants <file>]
+//   host.js answer --item <id> --workflow <name> --effect <ask run id> --choice <c> --by <session> [--why <text>] [--grants <file>]
 //   start and wake also take [--repo <git clone>] [--worktrees <dir>] for the actors' worktrees.
 //
 // wake reads a Claude Code hook's input on stdin: UserPromptSubmit (the wake is its prompt) or PostToolUse of
@@ -31,6 +31,7 @@
 // answer is a stand-in's answer to an open ask whose card is up (src/standin.js, plan item engine-cards-standin): taken
 // only if it is one of the ask's choices and an entry in the grants file (default <root>/../grants.json) covers it.
 // It is applied as the item's owner, like a tap the owner's hook reads, so the host runs what follows itself.
+// A card with no PR is checked against the item's GitHub issue's repo, and --why goes with the answer (fix-blocked-card-grant).
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { loadWorkflow, workflowOf } from '../src/index.js';
@@ -56,7 +57,8 @@ const { positionals: [command], values: opts } = parseArgs({
     ref: { type: 'string' },
     choice: { type: 'string' },
     by: { type: 'string' },
-    grants: { type: 'string' }
+    grants: { type: 'string' },
+    why: { type: 'string' }
   }
 });
 
@@ -118,7 +120,7 @@ if (command === 'answer') {
   host = restore({ root: opts.root, item: opts.item, spec, session: host.owner, release });
   const grants = readGrants(opts.grants ?? grantsFileFor(opts.root));
   // Read after the open effects run, so a card recorded since the last call is up before the answer is checked.
-  inputs = (h) => [standinInput(h, { effect: opts.effect, choice: opts.choice, by: opts.by, grants })];
+  inputs = (h) => [standinInput(h, { effect: opts.effect, choice: opts.choice, by: opts.by, why: opts.why, grants })];
 }
 let card = null;
 if (command === 'card') {
