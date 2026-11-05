@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "2e6ea53b2cdfe94ffca1094dc525971aecb16c8a80e5f47bce8ae362ef381384",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all seven expect lines. Each can be checked at the PR head, and none needs a release, deploy or published page. The publishing work is listed under non_goals. Lines 1–4 have runnable `node --input-type=module` assertions against ./index.js, and each gives one clear answer. Line 7 runs `npm test` and checks the exit code, '# fail 0' and the ok lines for capitalize, slugify and truncate, all of which can be seen at head. Line 6 is a read of test/strutil.test.js with clear steps (padLeft is imported, called inside test(), and asserted). Line 5 (\"README.md has a `## padLeft(` section that says what it does\") has a thin proof: just \"README.md\". Still, reading that file at head is a valid way to check it, and one careful reader would reach the same answer. Whether the README's slugify section is covered by an expect line is a separate coverage question, not part of this criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 9244,
+  "tokens": {
+    "input": 2,
+    "output": 593,
+    "cacheCreation": 3154,
+    "cacheRead": 783,
+    "fresh": 3749,
+    "total": 4532
+  },
+  "at": "2026-11-05T07:06:58.301Z"
+}

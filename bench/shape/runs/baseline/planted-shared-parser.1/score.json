@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-shared-parser.1",
+  "case": "planted-shared-parser",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "7 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every expect line and the problem field. The expect lines only describe what users see. They give CLI input and output for `--tsv` (which the request asks for), say default CSV behaviour must stay the same, and require a test and README docs. None of them says how to build the fix. The parse() line only says the exported function \"keeps its comma default and separator argument\". That protects existing public behaviour and does not tell the builder to route the flag through parse(). The problem field says what's wrong (\"ignores its command-line arguments… the CLI exposes no way to choose it\"), not how to fix it. Reusing parse()'s separator argument is a suggested approach, and it appears under assumptions as \"suggested approach but not required\". So the criterion holds for the whole output.",
+      "cached": false
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for all seven expect lines. Each one can be checked at the PR head with a single clear answer.\n- Lines 1–4 are local `printf … | node bin/csv2json.js` commands with exact expected output. Their \"run\" proofs repeat those commands. The CRLF proof pipes the output to `od -c`, which shows every byte, so the exact output can still be confirmed.\n- Line 5 is a local `node -e` import of `src/parse.js` with a fixed expected result.\n- Line 6 is `npm test` plus a grep and a read of `test/csv.test.js`, all done in the repo checkout.\n- Line 7 is a read of `README.md` at head.\nNo line needs a release, deploy, published page or anything else that only exists after merge. Publishing a release is explicitly listed as a non-goal (\"Publishing a new npm release…\").",
+      "cached": false
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every path and command the issue names against the 6 tracked files and the package.json scripts. bin/csv2json.js, src/parse.js, README.md and test/csv.test.js are all tracked. `npm test` maps to the \"test\":\"node --test\" script. The issue asks for new things (the --tsv flag, a new test, a README section) but names no new files. The problem statement says the CLI \"always calls parse(readFileSync(0,'utf8'))\", that parse has the signature `parse(text, sep = ',')`, and that the \"README.md documents only CSV usage\". These are specific claims about file contents. The repository facts I was given list only file names and scripts, so they neither confirm nor contradict these claims. Nothing in the issue points to a missing file, script or function. The criterion holds across the problem, the expect lines and the proofs.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the expect list.\n\nItem 1 (CSV conversion unchanged) is covered twice. One line says \"Without --tsv, CSV behaviour is unchanged: printf 'a,b\\n1,2\\n' | node bin/csv2json.js prints exactly [{\"a\":\"1\",\"b\":\"2\"}]\" and adds a case where tabs are not treated as separators. Another says \"npm test passes\".\n\nItem 2 (--tsv gives the same JSON as the CSV path for the same table) is covered. The first expect line pins `printf 'a\\tb\\n1\\t2\\n' | ... --tsv` to exactly [{\"a\":\"1\",\"b\":\"2\"}]. The CSV line pins the same table in CSV form to the identical exact string. Because both outputs are fixed to the same exact text, the two paths must match. The outcome also states that --tsv \"prints the same JSON array of header-keyed objects that CSV input produces.\" Both items are handled.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not item is an issue whose lines would still pass for a build that breaks plain CSV input. I checked whether any expect line would fail on such a build. The fourth expect line does: \"Without --tsv, CSV behaviour is unchanged: printf 'a,b\\n1,2\\n' | node bin/csv2json.js prints exactly [{\"a\":\"1\",\"b\":\"2\"}]\". It also checks that tabs are not treated as separators by default. Its paired proof is a \"run\" that executes those exact commands. The fifth expect line adds another guard: parse('a,b\\n1,2\\n') must keep its comma default. \"npm test passes\" also covers the existing CSV tests. A build that broke plain CSV input would fail these lines, so the output does not do the forbidden thing.",
+      "cached": false
+    }
+  }
+}

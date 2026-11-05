@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "3f02004c63e05726a3fcf83d7fa243b2a9c2aed6d975574771a5753d80f1c2fc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items against the expect lines.\n1. Tests must really run: one line requires a `node:test` suite under `packages/jsonl-lint` and says \"`npm test` at the repo root runs it and passes\". Its proof expects \"jsonl-lint tests in the output\", so a suite that `--if-present` skips would fail the check.\n2. README: one line says \"README.md no longer says `packages/` is empty or that there are no tools. It lists `jsonl-lint` and shows how to run it.\"\n3. Output form and exit codes: lines pin \"a line starting with `F:2:`… F is the path exactly as passed, and line numbers are 1-based\" and exit 1 for bad rows. Separate lines pin exit 2 for a missing file (message on stderr, no stack trace) and exit 2 with a usage message when there is no argument.\nAll three are covered.",
+  "model": "claude-opus-5-5",
+  "ms": 12557,
+  "tokens": {
+    "input": 2,
+    "output": 514,
+    "cacheCreation": 6036,
+    "cacheRead": 783,
+    "fresh": 6552,
+    "total": 7335
+  },
+  "at": "2026-11-05T07:11:58.539Z"
+}

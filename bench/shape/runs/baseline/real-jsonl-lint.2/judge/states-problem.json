@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "c06322063ad3fae8dd082791533b581f532e9baf5fa9c634c1b3d024eaef9561",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The problem field passes: it says what is wrong (\"Nothing in the repo can be pointed at a JSONL journal…\") without proposing a fix. Several expect lines break the criterion, though. They set implementation choices the request does not require. The request only asks for \"exits non-zero\", but the expect lines require exact return values: \"exits 1\" for bad rows and \"exits 2\" for a missing file or missing argument. The assumptions admit this 1/2 split is the shaper's own design. Line 1 also requires the tool to live at \"packages/jsonl-lint/\" with \"no `dependencies` entry\", and another line requires a \"`node:test` suite\". The request asks for neither. These belong under assumptions, not as checks the build must pass.",
+  "model": "claude-opus-5-5",
+  "ms": 9421,
+  "tokens": {
+    "input": 2,
+    "output": 831,
+    "cacheCreation": 5969,
+    "cacheRead": 783,
+    "fresh": 6802,
+    "total": 7585
+  },
+  "at": "2026-11-05T07:11:25.928Z"
+}

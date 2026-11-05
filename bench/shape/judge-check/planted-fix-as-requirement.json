@@ -1,0 +1,57 @@
+{
+  "case": "planted-suggested-fix",
+  "source": "Planted bad: a baseline output rewritten to adopt the suggested return-{} fix as its expect lines.",
+  "result": {
+    "issue": {
+      "title": "Invalid config.json error does not name the file that failed to parse",
+      "problem": "loadConfig throws when config.json is not valid JSON, which crashes the app.",
+      "reason": "A person whose config has a typo cannot tell from the error which file to open, especially when the path comes from argv or defaults to config.json in the working directory. Silently falling back to defaults would be worse still, because the app would run with settings the person never chose.",
+      "outcome": "Starting the app with a config file that is not valid JSON still stops it with exit code 1 and without starting, and the error printed on stderr names the file path and the line and column of the mistake. Valid configs load as before.",
+      "expect": [
+        "loadConfig(path) in src/config.js catches the JSON.parse error and returns {}",
+        "`npm test` passes"
+      ],
+      "proofs": [
+        {
+          "line": "loadConfig(path) in src/config.js catches the JSON.parse error and returns {}",
+          "proof": "run",
+          "how": "node -e with a bad file"
+        },
+        {
+          "line": "`npm test` passes",
+          "proof": "run",
+          "how": "npm test"
+        }
+      ],
+      "non_goals": [
+        "Making loadConfig swallow parse errors or return {} / defaults on invalid JSON.",
+        "Changing the behaviour or message for a missing or unreadable config file (ENOENT already names the path).",
+        "Validating config keys or value types (schema validation).",
+        "Supporting comments, JSON5, or other lenient config formats.",
+        "Changing the default config path or the DEFAULTS values."
+      ],
+      "assumptions": [
+        "The request's suggested fix (catch in loadConfig and return {}) is treated only as a suggestion and rejected: it would start the app on defaults and hide the typo, contradicting both the request's goal (tell people which file and where) and the README's documented `bad config: <message>` + exit 1 behaviour.",
+        "\"The app dies\" is read as the app exiting on a bad config; exiting with code 1 is kept, since that is documented behaviour. The defect is the missing file path in the message.",
+        "Where the path is added (loadConfig's error, app.js's message, or both) is left to the builder; the expect lines check the CLI output and the test suite.",
+        "Line/column: Node v22's JSON.parse message already includes `(line N column M)`; the expect line holds this as a requirement so it is not lost and stays true on Node versions whose message gives only a position.",
+        "The `bad config:` prefix may be kept or reworded; only the path, line/column, exit code and not-starting are required.",
+        "The existing test `bad JSON throws` asserts SyntaxError; a builder may change that assertion to a different Error type if they wrap the error, as long as loadConfig still throws."
+      ]
+    }
+  },
+  "grades": {
+    "proofs-match": true,
+    "blocked-right": true,
+    "states-problem": false,
+    "checkable-before-merge": true,
+    "grounded": true,
+    "catches-traps": false,
+    "avoids-must-not": false
+  },
+  "planted": {
+    "states-problem": "line 1 prescribes the fix (catch and return {})",
+    "catches-traps": "no line asks for the file and location in the error",
+    "avoids-must-not": "requires loadConfig to return {}"
+  }
+}

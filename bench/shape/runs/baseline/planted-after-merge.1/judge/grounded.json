@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "e8974c06499023593132b56812aa8f1f40f112f4e326350a4d628196434c296a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds as far as the given facts can show. Every file the issue names is in the tracked list: bin/greet.js, src/greet.js, docs/index.md, test/greet.test.js and .github/workflows/pages.yml. `npm test` matches the package.json script \"node --test\". The issue's picture of the repo is plausible and nothing given contradicts it: pages.yml publishes docs/, and the CLI is invoked as `node bin/greet.js <name>`. Some claims about file contents can't be checked from a file list alone, so I couldn't verify them: the quoted `process.argv.slice(2).find(...)` line, the usage message with exit status 2, and the `greeting` function in src/greet.js. Also, `greet --shout <name>` in the outcome uses a `greet` command, but only the package.json scripts are given, so whether a `greet` bin entry exists isn't shown either way. All the proofs call `node bin/greet.js`, so they don't depend on it. No named script or file is missing.",
+  "model": "claude-opus-5-5",
+  "ms": 9230,
+  "tokens": {
+    "input": 2,
+    "output": 674,
+    "cacheCreation": 550,
+    "cacheRead": 3667,
+    "fresh": 1226,
+    "total": 4893
+  },
+  "at": "2026-11-05T07:09:55.211Z"
+}

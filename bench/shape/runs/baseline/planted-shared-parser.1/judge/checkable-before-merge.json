@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "7f6514f4f9e1909c71e8c3e1c10b210ccf3afa6ae0b9dd9a5ba10b34034821e6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all seven expect lines. Each one can be checked at the PR head with a single clear answer.\n- Lines 1–4 are local `printf … | node bin/csv2json.js` commands with exact expected output. Their \"run\" proofs repeat those commands. The CRLF proof pipes the output to `od -c`, which shows every byte, so the exact output can still be confirmed.\n- Line 5 is a local `node -e` import of `src/parse.js` with a fixed expected result.\n- Line 6 is `npm test` plus a grep and a read of `test/csv.test.js`, all done in the repo checkout.\n- Line 7 is a read of `README.md` at head.\nNo line needs a release, deploy, published page or anything else that only exists after merge. Publishing a release is explicitly listed as a non-goal (\"Publishing a new npm release…\").",
+  "model": "claude-opus-5-5",
+  "ms": 8410,
+  "tokens": {
+    "input": 2,
+    "output": 604,
+    "cacheCreation": 548,
+    "cacheRead": 4359,
+    "fresh": 1154,
+    "total": 5513
+  },
+  "at": "2026-11-05T07:10:45.430Z"
+}

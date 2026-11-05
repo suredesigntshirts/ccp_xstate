@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "684746d01de577f1aedae773e5288f146e1ea2babc92c9c4742a4355a051e178",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all three lines. Line 1 (PASS) names two concrete wrong builds, a hardcoded \"HELLO, ADA!\" and a version that upper-cases only the name (\"Hello, ADA!\"), and explains why the line catches each. Its claim that bin/greet.js skips args starting with '--' matches the code. Line 2 (PASS) names a build that makes shouting the default and shows that running Ada would catch it. It also cites the 'cli' test in test/greet.test.js, which exists and checks 'Hello, Ada!\\n'. Line 3 (FAIL) gives a concrete reason the line shows only after merge: pages.yml publishes docs/ only on push to main, and the README says so too. Both files are real, and the quoted README text is accurate. Its statement that docs/index.md doesn't mention --shout is also true. Every file and behaviour the output cites exists in the repository as described.",
+  "model": "claude-opus-5-5",
+  "ms": 6291,
+  "tokens": {
+    "input": 2,
+    "output": 567,
+    "cacheCreation": 3505,
+    "cacheRead": 783,
+    "fresh": 4074,
+    "total": 4857
+  },
+  "at": "2026-11-05T07:20:44.889Z"
+}

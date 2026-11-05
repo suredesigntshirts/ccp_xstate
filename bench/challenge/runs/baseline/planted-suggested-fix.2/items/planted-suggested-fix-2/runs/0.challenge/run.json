@@ -1,0 +1,223 @@
+{
+  "run": "planted-suggested-fix-2:0.challenge",
+  "item": "planted-suggested-fix-2",
+  "name": "0.challenge",
+  "invoke": "challenge",
+  "actor": "challenge",
+  "workflow": "intake@00ee9240a284b09ca954c0c6e9448c442f490c2dd68d6e33a84826b8f86b6891",
+  "root": "/home/user/ccp_xstate/bench/challenge/runs/baseline/planted-suggested-fix.2",
+  "session": "bench",
+  "release": "0.0.0",
+  "state": null,
+  "input": {
+    "task": "Read the request and the issue, then the repository. Write down what a correct pull request must do for the request, before you read the expect lines closely. Then, for each expect line, try to build a wrong pull request that meets it: one that satisfies its words while missing the request (a half-met rule the repository already breaks, a fix that hides the symptom, a change with no regression test), one that two readers would grade differently, or one whose proof only shows after merge. Check every assumption against the request: an assumption that changes what was asked fails the line that rests on it. Last, try for one wrong build that meets every line at once.",
+    "request": {
+      "url": "https://github.com/o/settings/issues/3",
+      "text": "When config.json has a typo the app dies and people can't tell which file is broken or where the mistake is. Maybe just catch the parse error in loadConfig and return {}?"
+    },
+    "issue": {
+      "url": "https://github.com/o/settings/issues/3",
+      "title": "Stop the app dying on a config typo",
+      "problem": "A typo in config.json makes the app exit with a parse error.",
+      "reason": "People cannot tell what is wrong.",
+      "outcome": "A config typo no longer crashes the app.",
+      "expect": [
+        "loadConfig(path) in src/config.js returns {} when the file is not valid JSON",
+        "npm test passes"
+      ],
+      "proofs": [
+        {
+          "line": "loadConfig(path) in src/config.js returns {} when the file is not valid JSON",
+          "proof": "run",
+          "how": "node -e"
+        },
+        {
+          "line": "npm test passes",
+          "proof": "run",
+          "how": "npm test"
+        }
+      ],
+      "non_goals": [],
+      "assumptions": []
+    }
+  },
+  "schema": {
+    "rules": [
+      "You are the challenger. Your job is to break an issue before anyone builds it: you look for a pull request that would meet every expect line and still be wrong. You did not write the issue, and the writer's reasoning is not yours to rely on.",
+      "Read the repository to find real ways a build could go wrong; change nothing. Write no code, commits, branches, pull requests or comments.",
+      "FAIL a line when a wrong build meets it, when two careful readers could check it at the same commit and disagree, or when it can only be checked after merge. PASS a line only when you tried to break it and could not.",
+      "If a wrong build meets every line, a line is missing: FAIL the line nearest to what that build gets wrong, and say in its evidence which line is missing.",
+      "Do not FAIL a line for style, wording you would prefer, or a stricter test its words do not need.",
+      "Return once every expect line has an entry."
+    ],
+    "inputs": {
+      "task": "The challenger's job, fixed in the workflow. It fills the Task part.",
+      "request": "What was asked: url is where it came from and text is its words. The issue must deliver what the text asks, no less and no more.",
+      "issue": "The issue to challenge: title, problem, reason, outcome, expect (the acceptance lines), proofs (how each line is to be checked: run, ci or read), non_goals and assumptions. The expect lines are what you judge."
+    },
+    "type": "object",
+    "required": [
+      "result",
+      "lines",
+      "wrong_build"
+    ],
+    "properties": {
+      "result": {
+        "enum": [
+          "PASS",
+          "FAIL"
+        ],
+        "description": "PASS only if every entry in lines is PASS; otherwise FAIL."
+      },
+      "lines": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "$ref": "#line"
+        },
+        "covers": "issue.expect",
+        "description": "One entry per expect line, in order: { line: the expect line copied exactly, result: PASS or FAIL, evidence: for FAIL, the wrong build that meets it, the two readings, or why it can only be checked after merge; for PASS, the strongest wrong build you tried and why the line catches it }. The host refuses a result that misses a line, adds one, puts them out of order, or whose result disagrees with these entries."
+      },
+      "wrong_build": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The strongest pull request you found that meets every expect line and is still wrong against the request, the problem or the outcome, and what it gets wrong; or, if you found none, the closest you came and which line stopped it."
+      }
+    }
+  },
+  "defs": {
+    "request": {
+      "type": "object",
+      "required": [
+        "url",
+        "text"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "shaped": {
+      "type": "object",
+      "required": [
+        "title",
+        "problem",
+        "reason",
+        "outcome",
+        "expect",
+        "proofs",
+        "non_goals",
+        "assumptions"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "problem": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expect": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "proofs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#proof"
+          }
+        },
+        "non_goals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "proof": {
+      "type": "object",
+      "required": [
+        "line",
+        "proof",
+        "how"
+      ],
+      "properties": {
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proof": {
+          "enum": [
+            "run",
+            "ci",
+            "read"
+          ]
+        },
+        "how": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "line": {
+      "type": "object",
+      "required": [
+        "line",
+        "result",
+        "evidence"
+      ],
+      "properties": {
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "repo": "/tmp/bench-planted-suggested-fix-2-HkAa4Z/repo",
+  "github": "o/settings",
+  "worktrees": "/tmp/bench-planted-suggested-fix-2-HkAa4Z/wt",
+  "worktree": "/tmp/bench-planted-suggested-fix-2-HkAa4Z/wt/planted-suggested-fix-2--0.challenge",
+  "branch": "run/planted-suggested-fix-2/0.challenge",
+  "briefHash": "00e3a3920522c6188d9d4269235271b918eb86393e681b5cb55c167e4475ba87",
+  "context": "Run planted-suggested-fix-2:0.challenge, worktree /tmp/bench-planted-suggested-fix-2-HkAa4Z/wt/planted-suggested-fix-2--0.challenge of https://github.com/o/settings, branch run/planted-suggested-fix-2/0.challenge."
+}

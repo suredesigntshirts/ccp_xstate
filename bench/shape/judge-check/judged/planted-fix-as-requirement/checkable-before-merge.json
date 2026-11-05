@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "8346c47451110b17ef3ac389cf72f0a740383b468f5b65b7763d4967be708526",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. Both expect lines can be checked at the PR head before merge, and neither needs a release, deploy or published page.\n\n- **Line 1**, \"loadConfig(path) in src/config.js catches the JSON.parse error and returns {}\", has proof \"run\" via \"node -e with a bad file\". One reader can run that at head, and it gives one yes/no answer. The \"how\" is terse but is still a real way to check it.\n- **Line 2**, \"`npm test` passes\", has proof \"run\" via \"npm test\". That runs at head and gives one answer.\n\nLine 1 contradicts the outcome and non_goals, which reject returning {}. That is a consistency problem for other criteria, not a checkability problem, so it doesn't fail this one.",
+  "model": "claude-opus-5-5",
+  "ms": 6117,
+  "tokens": {
+    "input": 2,
+    "output": 548,
+    "cacheCreation": 2373,
+    "cacheRead": 783,
+    "fresh": 2923,
+    "total": 3706
+  },
+  "at": "2026-11-05T07:06:50.515Z"
+}

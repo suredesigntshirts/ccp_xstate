@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "9d2ac2941849a9438f58ac84db7bcd7203001720066e09de7dd819725651cd55",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I checked all five expect lines and the problem field. Expect 1 says average([]) returns the number 0, which the request itself requires (\"An empty list should average to 0\"). It doesn't name a technique such as a length guard or early return. Expect 2 and 3 check that existing behaviour is unchanged. Expect 4 and 5 ask for a test that catches the bug if it comes back. Expect 5 quotes the original buggy body only to undo the fix in a scratch copy, not to say how to write the fix. No expect line names an internal function or a way to implement the fix. The problem field only describes what is wrong: `0/0` for an empty array prints NaN, and \"average has no tests at all\". It doesn't suggest a fix. Choices that go beyond the request, such as where the test goes, are kept under assumptions.",
+  "model": "claude-opus-5-5",
+  "ms": 7965,
+  "tokens": {
+    "input": 2,
+    "output": 521,
+    "cacheCreation": 3306,
+    "cacheRead": 783,
+    "fresh": 3829,
+    "total": 4612
+  },
+  "at": "2026-11-05T07:09:38.351Z"
+}

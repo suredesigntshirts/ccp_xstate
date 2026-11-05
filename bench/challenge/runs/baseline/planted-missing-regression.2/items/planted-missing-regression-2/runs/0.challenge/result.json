@@ -1,0 +1,22 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints a JSON array with one object per row, keyed by the header row",
+        "result": "FAIL",
+        "evidence": "Wrong build: bin/csv2json.js changed to `parse(input, '\\t')` unconditionally (or `parse(input, /[\\t,]/)` regardless of flag), with no test added. `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints [{\"a\":\"1\",\"b\":\"2\"}], so this line passes. But plain `node bin/csv2json.js < table.csv` no longer splits on commas (or with the regex, splits CSV fields that contain tabs, and splits TSV fields that contain commas). The existing test/csv.test.js 'cli' test would catch the unconditional-tab version, but no expect line says `npm test` must pass or that CSV with no flag must keep working. Nothing requires a regression test for --tsv either: a PR with no test meets every line, and later edits can break --tsv silently. Missing lines: (a) running node bin/csv2json.js without --tsv on comma input gives the same output as before (or `npm test` passes, existing tests unchanged); (b) test/ has a test that runs the CLI with --tsv on tab input and checks the JSON output. The proof's `printf ...` also leaves the input unspecified. One reader could check a single row and another a multi-row input with an empty trailing field, and they could grade the same PR differently."
+      },
+      {
+        "line": "README.md documents --tsv",
+        "result": "PASS",
+        "evidence": "Tried a README that only mentions the word, e.g. 'see also --tsv'. A reader of README.md checking whether it 'documents --tsv' would expect a usage line like `node bin/csv2json.js --tsv < table.tsv`, in the style of the existing usage block, and would see that a bare mention doesn't document anything. The repo has one short README with a single usage block, so this check is easy to make and two careful readers should agree. I found no wrong build that meets this line on its own and misses the request's documentation need."
+      }
+    ],
+    "wrong_build": "A PR that changes bin/csv2json.js to call parse(input, '\\t') whenever process.argv includes --tsv, and also to split on /[\\t,]/ by default \"to be lenient\". It adds a --tsv usage line to README.md and adds no test. `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints [{\"a\":\"1\",\"b\":\"2\"}] and the README documents --tsv, so both expect lines pass. But default CSV parsing has changed: comma input whose fields contain tabs now gets split wrongly. No regression test guards --tsv, and nothing requires the existing CSV behaviour or `npm test` to stay green. A simpler variant always splits on tab and breaks CSV entirely; only the existing test, which no line requires anyone to run, would catch it."
+  },
+  "hash": "e7db31c98cd4725ea65cffa23cc5172c3de7558cf0cb70a3c9927fc5141b0e46",
+  "caller": "bench-planted-missing-regression-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:06:18.351Z"
+}

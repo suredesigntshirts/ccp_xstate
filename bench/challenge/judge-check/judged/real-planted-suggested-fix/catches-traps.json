@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "a2a84e6e78f4b20daddeec6607df2168d9602ec4aecb59fb3da97f80a3a60309",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch list has one item: line 1 should FAIL because returning {} would make the app start on defaults, and nobody would learn which file is broken or where the mistake is. The output marks line 1 as \"FAIL\". Its evidence says that with this build \"app.js spreads {} over DEFAULTS and prints `listening on 8080` with no message at all, so the typo is hidden completely.\" It ties this to the request's real need: \"people can't tell which file is broken or where the mistake is.\" It also proposes a missing line requiring an error that names the file path and the line/column. The wrong_build section repeats the point. The trap is caught in full.",
+  "model": "claude-opus-5-5",
+  "ms": 4336,
+  "tokens": {
+    "input": 2,
+    "output": 311,
+    "cacheCreation": 3262,
+    "cacheRead": 783,
+    "fresh": 3575,
+    "total": 4358
+  },
+  "at": "2026-11-05T07:19:33.654Z"
+}

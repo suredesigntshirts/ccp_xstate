@@ -1,0 +1,1 @@
+Run real-jsonl-lint-2:0.shape, worktree /tmp/bench-real-jsonl-lint-2-Zy9YIC/wt/real-jsonl-lint-2--0.shape of https://github.com/suredesigntshirts/ccp_machine_test, branch run/real-jsonl-lint-2/0.shape.

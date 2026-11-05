@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "3e5ae4c3cf8cc759ee3bfe0d55dd97618ae8adcf340ab86ab573c93802c694a3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The PASS and FAIL entries are built the right way. Each PASS names a wrong build that was tried, such as a padder that always uses '0', a fill that overshoots width, or a build that truncates long input, and says why the line catches it. The README FAIL names a concrete wrong build: it adds only the padLeft section and still leaves slugify out. That gap is real, since index.js exports slugify and README.md doesn't document it. But the criterion also requires every cited script and behaviour to be real in the repository, and that breaks in two places. The npm test PASS quotes the script as \"npm test (node --test test/)\", but package.json defines it as \"node --test\", so the cited script is wrong. The line 1 PASS also rests on \"Node v22.23.4\", and nothing in the repository facts supports that version. So the whole output doesn't meet the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 10841,
+  "tokens": {
+    "input": 2,
+    "output": 641,
+    "cacheCreation": 3594,
+    "cacheRead": 783,
+    "fresh": 4237,
+    "total": 5020
+  },
+  "at": "2026-11-05T07:19:12.106Z"
+}

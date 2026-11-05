@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "a3138e49c6b15a10abbec827faf067e490c77b8164b004bfac9c1ac94ae2659a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items, and the output handles each one. Item 1: the docs request becomes something the verifier can check at the head. One expect line reads \"docs/index.md documents the `--shout` option: its usage ... and that it prints the greeting in uppercase\", and its proof is a read of docs/index.md at the PR head. The published page goes to the non_goals (\"Checking that the live site at https://o.github.io/greet-cli/ shows the change. That happens only after merge\") and to the outcome (\"the published site will show it after the next deploy from main\"). Item 2: the expect line \"`node bin/greet.js Ada` still exits 0 and prints exactly `Hello, Ada!` followed by a newline\" protects the default greeting. A run proof backs it, and the outcome says \"Running greet without --shout works as it does now.\"",
+  "model": "claude-opus-5-5",
+  "ms": 5812,
+  "tokens": {
+    "input": 2,
+    "output": 376,
+    "cacheCreation": 549,
+    "cacheRead": 3629,
+    "fresh": 927,
+    "total": 4556
+  },
+  "at": "2026-11-05T07:10:01.024Z"
+}

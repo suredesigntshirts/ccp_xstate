@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "6eca6e611a8b1bd6863eb5243326fd4bf793735ed95bd90af2197037be15b8f8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every expect line and the problem field. The expect lines only describe what users see. They give CLI input and output for `--tsv` (which the request asks for), say default CSV behaviour must stay the same, and require a test and README docs. None of them says how to build the fix. The parse() line only says the exported function \"keeps its comma default and separator argument\". That protects existing public behaviour and does not tell the builder to route the flag through parse(). The problem field says what's wrong (\"ignores its command-line arguments… the CLI exposes no way to choose it\"), not how to fix it. Reusing parse()'s separator argument is a suggested approach, and it appears under assumptions as \"suggested approach but not required\". So the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 6406,
+  "tokens": {
+    "input": 2,
+    "output": 520,
+    "cacheCreation": 549,
+    "cacheRead": 4358,
+    "fresh": 1071,
+    "total": 5429
+  },
+  "at": "2026-11-05T07:10:37.018Z"
+}

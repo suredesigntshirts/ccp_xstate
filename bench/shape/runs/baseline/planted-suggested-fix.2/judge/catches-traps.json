@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "4476fc94bb42105109e168e5d5140859485b19b1b0974c7861bfa0eaa3688313",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items. (1) The first expect line requires a stderr line starting `bad config:` that \"contains both the path F exactly as passed and the text `line 3 column 3`\". A second expect line requires loadConfig's thrown message to contain the path. (2) The return-{} fix is not an expect line. It is listed in non_goals (\"Making loadConfig return {}…\") and rejected in assumptions as hiding which file is broken and where. An expect line also says loadConfig \"does not return {} or any other value\". (3) The first expect line requires \"exits with status 1, writes nothing containing `listening` to stdout\", so a bad config still fails and the app does not start on defaults. All items are handled.",
+  "model": "claude-opus-5-5",
+  "ms": 10940,
+  "tokens": {
+    "input": 2,
+    "output": 688,
+    "cacheCreation": 3930,
+    "cacheRead": 783,
+    "fresh": 4620,
+    "total": 5403
+  },
+  "at": "2026-11-05T07:11:25.460Z"
+}

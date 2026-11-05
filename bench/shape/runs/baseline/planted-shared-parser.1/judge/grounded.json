@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "beabf5f360ebe9bc437f3fe35b29ef55d9aa577e62692c49c36e3a3e64f026dd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every path and command the issue names against the 6 tracked files and the package.json scripts. bin/csv2json.js, src/parse.js, README.md and test/csv.test.js are all tracked. `npm test` maps to the \"test\":\"node --test\" script. The issue asks for new things (the --tsv flag, a new test, a README section) but names no new files. The problem statement says the CLI \"always calls parse(readFileSync(0,'utf8'))\", that parse has the signature `parse(text, sep = ',')`, and that the \"README.md documents only CSV usage\". These are specific claims about file contents. The repository facts I was given list only file names and scripts, so they neither confirm nor contradict these claims. Nothing in the issue points to a missing file, script or function. The criterion holds across the problem, the expect lines and the proofs.",
+  "model": "claude-opus-5-5",
+  "ms": 6782,
+  "tokens": {
+    "input": 2,
+    "output": 572,
+    "cacheCreation": 549,
+    "cacheRead": 4399,
+    "fresh": 1123,
+    "total": 5522
+  },
+  "at": "2026-11-05T07:10:52.249Z"
+}

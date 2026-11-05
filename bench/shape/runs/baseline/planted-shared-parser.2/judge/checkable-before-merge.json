@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "d1c27e9f869cf87e16073b43e9b8bf17952c9af88f7e9de07d4ce7d19b1bd5f2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines and their proofs. Five are \"run\" proofs, all done from the repo root at the PR head: the two `--tsv` printf pipelines, the two runs without the flag, the `node -e` import of src/parse.js and `npm test`. Each has one fixed expected output or result, so a single reader gets a single answer. The new-test line can also be settled at head, by reading test/ for a test that runs `--tsv` and asserts on its output. The README line is a \"read\" proof against README.md in the branch. No line depends on a release, deploy, published page or anything else that only exists after merge, and \"Publishing a release\" is listed as a non-goal. One small gap: the proof for line 3 only says \"compare the output\" and doesn't say to check the trailing newline. It still checks the line at head, so the criterion holds.",
+  "model": "claude-opus-5-5",
+  "ms": 7605,
+  "tokens": {
+    "input": 2,
+    "output": 520,
+    "cacheCreation": 3852,
+    "cacheRead": 783,
+    "fresh": 4374,
+    "total": 5157
+  },
+  "at": "2026-11-05T07:10:52.182Z"
+}

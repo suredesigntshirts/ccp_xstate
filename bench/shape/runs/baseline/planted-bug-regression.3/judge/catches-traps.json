@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "85d33841d3bf42d2c203b621eec4a908b6749de003c056ab697fa1674ad338d4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the expect list, and both are covered. Item 1 (a regression test that calls average([]) and expects 0) is handled by the expect line \"The test suite under test/ includes a test that calls average([]) and asserts the result is 0. That test fails when run against the base commit's math.js.\" Item 2 (non-empty averages stay correct) is handled by \"For non-empty arrays, average returns exactly what it returns at base commit 47d473e: ... average([2,4]) === 3 ...\". That line names the example given in the must_catch list. Each of these expect lines also has a matching runnable proof. No must_catch item is missing.",
+  "model": "claude-opus-5-5",
+  "ms": 4576,
+  "tokens": {
+    "input": 2,
+    "output": 320,
+    "cacheCreation": 3616,
+    "cacheRead": 783,
+    "fresh": 3938,
+    "total": 4721
+  },
+  "at": "2026-11-05T07:09:57.474Z"
+}

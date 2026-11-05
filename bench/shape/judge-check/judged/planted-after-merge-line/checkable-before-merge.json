@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "8d91e3c3213d284d81fa17515bde2d9dfd98953aeddddf7557b681679f2f369b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each expect line and its proof. The first five can all be checked at the PR head with run proofs: the exact stdout and exit-code checks for `--shout Ada`, `Ada --shout`, plain `Ada`, the usage error with exit 2, and `npm test` plus a grep. The sixth line breaks the criterion: \"After merge, the published docs page at https://o.github.io/greet-cli/ lists --shout.\" Its proof is \"read … open https://o.github.io/greet-cli/\". That needs a deploy from main, which only happens after merge, so no one can check it at the PR head. The output's own assumption even says \"The live site can only be checked after merge.\" A line that can be checked before merge would read something like \"docs/index.md documents --shout\", but the output never includes one.",
+  "model": "claude-opus-5-5",
+  "ms": 5094,
+  "tokens": {
+    "input": 2,
+    "output": 320,
+    "cacheCreation": 3220,
+    "cacheRead": 783,
+    "fresh": 3542,
+    "total": 4325
+  },
+  "at": "2026-11-05T07:06:45.931Z"
+}

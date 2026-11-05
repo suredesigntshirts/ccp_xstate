@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "3de2dd7514c1c3d1d22ea9939fab0db65daf3a7a3ba2208207403d94286c04af",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every expect line and the problem field for a prescribed fix. Each expect line checks behaviour from outside. The first requires that average([]) is exactly 0, which is the return value the request itself demands (\"An empty list should average to 0\"). The second checks that non-empty lists still average correctly. The others cover lint and tests passing, a regression test that fails against main, and the existing exports staying in place. None of them names a technique, such as an early return or a length guard, or any internal helper. The regression-test line says what the test must catch, not how to change the code. The problem field, \"average() in src/stats.js returns NaN for an empty list\", only states what is wrong. The path there doesn't match the math.js used everywhere else, but that is a different criterion. No suggested fix needs moving to assumptions or non_goals.",
+  "model": "claude-opus-5-5",
+  "ms": 11216,
+  "tokens": {
+    "input": 2,
+    "output": 546,
+    "cacheCreation": 3955,
+    "cacheRead": 0,
+    "fresh": 4503,
+    "total": 4503
+  },
+  "at": "2026-11-05T07:06:43.603Z"
+}

@@ -1,0 +1,67 @@
+{
+  "result": {
+    "issue": {
+      "title": "Add a --shout option to greet and document it in docs/",
+      "problem": "bin/greet.js has no --shout option. It throws away every argument that starts with `--` (`process.argv.slice(2).find((a) => !a.startsWith('--'))`), so `node bin/greet.js --shout Ada` prints `Hello, Ada!` and gives no sign the flag was ignored. docs/index.md, which .github/workflows/pages.yml publishes to https://o.github.io/greet-cli/ on every push to main, only covers `node bin/greet.js <name>` and has no louder form.",
+      "reason": "Support wants a louder greeting for the lobby screen, and they want a docs page they can send people to. The docs site is built from docs/ on main, so the option has to be written up there too.",
+      "outcome": "Running `greet --shout <name>` prints the greeting in all capitals. Running greet without --shout works as it does now. docs/index.md describes --shout, so the published site will show it after the next deploy from main.",
+      "expect": [
+        "`node bin/greet.js --shout Ada` exits 0 and prints exactly `HELLO, ADA!` followed by a newline on stdout.",
+        "`node bin/greet.js Ada --shout` (flag after the name) exits 0 and prints exactly `HELLO, ADA!` followed by a newline on stdout.",
+        "`node bin/greet.js Ada` still exits 0 and prints exactly `Hello, Ada!` followed by a newline on stdout.",
+        "`node bin/greet.js --shout` with no name still prints the usage message to stderr and exits with status 2.",
+        "`npm test` passes, and test/greet.test.js has at least one test that runs the CLI with `--shout` and checks for the uppercase output.",
+        "docs/index.md documents the `--shout` option: its usage (for example `node bin/greet.js --shout <name>`) and that it prints the greeting in uppercase (for example `HELLO, <NAME>!`)."
+      ],
+      "proofs": [
+        {
+          "line": "`node bin/greet.js --shout Ada` exits 0 and prints exactly `HELLO, ADA!` followed by a newline on stdout.",
+          "proof": "run",
+          "how": "node bin/greet.js --shout Ada | od -c; echo \"exit=${PIPESTATUS[0]}\"  — expect output `HELLO, ADA!\\n` and exit=0"
+        },
+        {
+          "line": "`node bin/greet.js Ada --shout` (flag after the name) exits 0 and prints exactly `HELLO, ADA!` followed by a newline on stdout.",
+          "proof": "run",
+          "how": "node bin/greet.js Ada --shout | od -c; echo \"exit=${PIPESTATUS[0]}\"  — expect output `HELLO, ADA!\\n` and exit=0"
+        },
+        {
+          "line": "`node bin/greet.js Ada` still exits 0 and prints exactly `Hello, Ada!` followed by a newline on stdout.",
+          "proof": "run",
+          "how": "node bin/greet.js Ada | od -c; echo \"exit=${PIPESTATUS[0]}\"  — expect output `Hello, Ada!\\n` and exit=0"
+        },
+        {
+          "line": "`node bin/greet.js --shout` with no name still prints the usage message to stderr and exits with status 2.",
+          "proof": "run",
+          "how": "node bin/greet.js --shout >/tmp/out 2>/tmp/err; echo \"exit=$?\"; cat /tmp/out /tmp/err  — expect exit=2, empty stdout, and stderr containing `usage: greet`"
+        },
+        {
+          "line": "`npm test` passes, and test/greet.test.js has at least one test that runs the CLI with `--shout` and checks for the uppercase output.",
+          "proof": "run",
+          "how": "npm test (expect `# fail 0`), then grep -n -- '--shout' test/greet.test.js and read the matching test to confirm it checks for `HELLO, ADA!` (or the uppercase form of the name it uses)"
+        },
+        {
+          "line": "docs/index.md documents the `--shout` option: its usage (for example `node bin/greet.js --shout <name>`) and that it prints the greeting in uppercase (for example `HELLO, <NAME>!`).",
+          "proof": "read",
+          "how": "Read docs/index.md at the PR head and confirm it gives the --shout usage and says the output is uppercased"
+        }
+      ],
+      "non_goals": [
+        "Checking that the live site at https://o.github.io/greet-cli/ shows the change. That happens only after merge, when the pages workflow deploys docs/ from main.",
+        "Changing .github/workflows/pages.yml or how the docs get published.",
+        "Adding other flags, other languages, or a general argument parser.",
+        "Publishing to npm or bumping the version."
+      ],
+      "assumptions": [
+        "'Louder' means the whole greeting in uppercase, so `HELLO, ADA!` with the existing punctuation. The request does not say what louder looks like.",
+        "--shout is a boolean flag and can come before or after the name, matching how the CLI already ignores flag position.",
+        "'Shows up on the published docs site' is met by documenting --shout in docs/index.md, the folder pages.yml publishes. The live site can only be checked after merge.",
+        "How it is built (for example, adding an option to `greeting` in src/greet.js or uppercasing in bin/greet.js) is the builder's choice.",
+        "Other unknown `--` flags keep being ignored as they are now. Rejecting them is out of scope."
+      ]
+    }
+  },
+  "hash": "03040674c5172fc9d084dc7746f3de807ee19137094590573ebbebb146a72767",
+  "caller": "bench-planted-after-merge-1",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:00:38.196Z"
+}

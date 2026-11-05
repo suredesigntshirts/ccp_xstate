@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e284889f24c0df7311e1a85c17ebb9e8d59f6b1a94fda9381826b2c578f75ee3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the expect list. Item 1 (a regression test that calls average([]) and expects 0) is covered by expect line 4: \"`npm test` exits 0 and its output shows at least one test under test/ that calls average([]) and asserts the result is 0\". The regression-guard line backs it up: npm test must fail if the original body of average is put back. Item 2 (a non-empty average stays correct) is covered by expect line 2: \"average of non-empty arrays is unchanged: average([2,4])===3, average([1,2,3,4])===2.5…\". Each line also has a run proof. Nothing in the output conflicts with either item.",
+  "model": "claude-opus-5-5",
+  "ms": 6286,
+  "tokens": {
+    "input": 2,
+    "output": 325,
+    "cacheCreation": 3313,
+    "cacheRead": 783,
+    "fresh": 3640,
+    "total": 4423
+  },
+  "at": "2026-11-05T07:10:00.545Z"
+}

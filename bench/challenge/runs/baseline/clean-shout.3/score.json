@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-shout.3",
+  "case": "clean-shout",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": false,
+      "why": "FAIL, where the case expects PASS"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": false,
+      "why": "line 3 not PASS: \"Wrong build that meets the words: add a separate '## Options' section at the bottom of docs/index.md that says '--shout: louder greeting' with the example `node\""
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every line's evidence. Each PASS names a wrong build it tried and says why the line catches it. Line 1 tries a hardcoded 'HELLO, ADA!', which a second name such as Bob would expose because the line covers any <name>. Line 2 tries uppercasing every greeting, which the run proof and the existing 'cli' test catch. Line 4 tries a test that only calls a helper, which fails the \"runs node bin/greet.js\" wording. The one FAIL (docs) gives a concrete wrong build: a separate '## Options' section with the wrong output 'Hello, Ada!'. It also gives two readings, one about placement next to the usage and one about whether the example is accurate. The repository facts it cites are real: bin/greet.js's `find((a) => !a.startsWith('--'))`, the 'cli' test asserting 'Hello, Ada!\\n', `\"test\": \"node --test\"`, pages.yml running only on push to main, and the usage block in docs/index.md. The criterion holds for the whole output.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "The must_catch item says every line should PASS, with evidence that names the wrong build tried. Lines 1, 2 and 4 do this: they PASS and name the wrong build tried (hardcoded 'HELLO, ADA!', always-uppercase output, a helper-only test). Line 3 (\"docs/index.md documents the --shout option with an example\") is judged \"FAIL\" instead. The output says a disconnected '## Options' section with a wrong example would meet the words. Because of that, the overall result is \"FAIL\", and the wrong_build section rests on the same docs complaint. Per the case, the docs line should have passed, so the output does not handle the must_catch item for all lines.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The output's only FAIL is on the docs line, and it isn't about wording, style, or a test stricter than the words need. It names a real wrong build that meets the line as written but misses the request. That build puts the docs in a disconnected section instead of \"next to the existing usage\", which the request explicitly asks for. Its example also shows the wrong output (`Hello, Ada!` instead of HELLO, ADA!), so the published docs \"would mislead the support folks\". The gap is between the request and how loosely the line is worded, which is a real gap in the line. The other three lines get PASS, each with a wrong build that their proofs catch. None of them is failed on phrasing, and none demands more than its words require. For example, the output notes that \"Argument order is not part of the request\" rather than adding that as a requirement.",
+      "cached": true
+    }
+  }
+}

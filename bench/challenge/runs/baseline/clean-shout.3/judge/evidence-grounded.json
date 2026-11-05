@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "d5651da965ddea8342b96e3baf6d2a631f4e72789fb9b125bb0ffc1b40a51b0f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every line's evidence. Each PASS names a wrong build it tried and says why the line catches it. Line 1 tries a hardcoded 'HELLO, ADA!', which a second name such as Bob would expose because the line covers any <name>. Line 2 tries uppercasing every greeting, which the run proof and the existing 'cli' test catch. Line 4 tries a test that only calls a helper, which fails the \"runs node bin/greet.js\" wording. The one FAIL (docs) gives a concrete wrong build: a separate '## Options' section with the wrong output 'Hello, Ada!'. It also gives two readings, one about placement next to the usage and one about whether the example is accurate. The repository facts it cites are real: bin/greet.js's `find((a) => !a.startsWith('--'))`, the 'cli' test asserting 'Hello, Ada!\\n', `\"test\": \"node --test\"`, pages.yml running only on push to main, and the usage block in docs/index.md. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 15306,
+  "tokens": {
+    "input": 2,
+    "output": 700,
+    "cacheCreation": 3908,
+    "cacheRead": 783,
+    "fresh": 4610,
+    "total": 5393
+  },
+  "at": "2026-11-05T07:20:25.776Z"
+}

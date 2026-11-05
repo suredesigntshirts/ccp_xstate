@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "2055cc45f3f300f37c40d111eabd661c78d51915f5d65706ed311b3afae70d3e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The problem field is fine. It describes the current behaviour (an unnamed file, line and column coming only from Node 22) and proposes no fix. The rejected \"return {}\" suggestion correctly appears only under assumptions and non_goals.\n\nThe expect lines break the criterion. Expect 2 says \"`loadConfig(<path>)` … throws (it does not return a value), and the thrown error's message contains `<path>`\". Expect 4 requires a test \"asserting that the error loadConfig throws … includes the file path\". Both dictate how an internal function must behave: what it returns and what its error message says. The request asks only that people can tell which file is broken and where. It never requires that the path be added inside loadConfig. The output even contradicts itself: an assumption says \"Whether the path is added in loadConfig or in app.js is left to the builder\", yet expect 2 and expect 4 force it into loadConfig. That is an implementation choice the request does not require.",
+  "model": "claude-opus-5-5",
+  "ms": 7409,
+  "tokens": {
+    "input": 2,
+    "output": 661,
+    "cacheCreation": 3615,
+    "cacheRead": 783,
+    "fresh": 4278,
+    "total": 5061
+  },
+  "at": "2026-11-05T07:11:02.964Z"
+}

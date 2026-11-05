@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "d28339036657f3cf427ce806ffbd1913ee16a2bbfe8273dbb33260d27b9a9b6e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the problem field and each expect line. The problem field only describes what is wrong: the parse error never names the file. That part is fine. The suggested `return {}` correctly sits under non_goals and assumptions. The criterion breaks in two expect lines that dictate where the fix goes. Expect 2 requires \"the thrown error's message contains the path F\" for `loadConfig(F)`. Expect 5 requires test/config.test.js to assert \"the error from loadConfig on invalid JSON includes the file path\". Both fix the path inside the internal function loadConfig. The request never requires that; it only suggests catching the error in loadConfig. These lines also contradict the output's own assumption that \"where the path gets added is left to the builder\". The path could be added in src/app.js instead, which these lines would rule out. Because two expect lines prescribe an internal function's error, the output fails the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 7593,
+  "tokens": {
+    "input": 2,
+    "output": 681,
+    "cacheCreation": 3869,
+    "cacheRead": 783,
+    "fresh": 4552,
+    "total": 5335
+  },
+  "at": "2026-11-05T07:10:59.465Z"
+}

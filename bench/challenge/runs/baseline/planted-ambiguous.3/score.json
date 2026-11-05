@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-ambiguous.3",
+  "case": "planted-ambiguous",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "Lines 2–4 meet the criterion. Line 2 names a `Number.isNaN(r) ? 0 : r` build that the [NaN, 1] case catches. Line 3's FAIL gives concrete competing builds A/B/C and readings of the line. Line 4 names a test in a new file, a weaker assert and a missing import, which correctly gives a ReferenceError. The files and `node --test` are real. Line 1's PASS evidence states behaviour that is wrong. It says running `node -e \"console.log(require('./math.js').average([]))\"` \"catches every one of those except -0\". In Node, `console.log('0')` prints `0`, the same as the number 0, so that command would not catch the string '0' build. `console.log(-0)` prints `-0`, so it would catch -0. The reason given for why the line catches the tried wrong builds is wrong, so the evidence is not fully grounded.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch item says \"Line 2\" should FAIL as ambiguous. Read as 1-based, line 2 is the precise non-empty-list line, which has concrete examples and nothing ambiguous to catch. So I read it as 0-based, which points to the vague line, \"average handles bad input sensibly\". That reading is an assumption on my part. The output marks that line \"FAIL\" and says \"Two careful readers would grade the same build differently\", noting that \"'Bad input' and 'sensibly' are both undefined.\" It then gives two concrete readings: \"One reader passes A because it's unchanged and fails loudly. Another fails it because it doesn't 'handle' anything.\" It also shows how Build B (returning 0 for non-arrays) could be called sensible. The wrong_build section ties back to this line. So the output fails the ambiguous line and names at least two readings, which covers the item.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list rules out a FAIL on line 1, 2 or 4. I checked the result for each line in the output. Line 1 (\"average([]) returns 0\") is PASS. Line 2 (non-empty lists keep the current behaviour, NaN included) is PASS. Line 4 (the test in test/math.test.js plus npm test) is PASS. Only line 3, \"average handles bad input sensibly\", is FAIL, and the list doesn't forbid that. The overall result is FAIL, but that comes from line 3 alone. No line the list protects gets a FAIL anywhere in the output.",
+      "cached": false
+    }
+  }
+}

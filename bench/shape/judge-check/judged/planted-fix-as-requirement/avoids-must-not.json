@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "f5a7340d9eedf6cf66338f41463b0ebd5dd3069575f97a30a4c9472cf2aecfb9",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each expect line and proof against the must_not list. The first expect line says \"loadConfig(path) in src/config.js catches the JSON.parse error and returns {}\", and a matching \"run\" proof backs it up. That is exactly must_not item 1: an expect line that requires loadConfig to return {} on a parse error. It also leads to item 2, because returning {} would let the app start on defaults when config.json is broken. The outcome says the app \"still stops it with exit code 1\", and the non_goals and assumptions reject the {} fallback. But those parts contradict the expect line rather than cancel it, and the builder and verifier would be held to the expect line. Since one part of the output breaks the criterion, it is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 6934,
+  "tokens": {
+    "input": 2,
+    "output": 324,
+    "cacheCreation": 2360,
+    "cacheRead": 783,
+    "fresh": 2686,
+    "total": 3469
+  },
+  "at": "2026-11-05T07:07:19.145Z"
+}

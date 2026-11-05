@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "ac6f6a40e326ab08a9ae5519294f4d95e1ea65634dfe667f440e0689d9d84044",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The problem field is fine. It says what is missing (\"there is nothing that finds a torn or hand-edited row in a JSONL file\") and proposes no fix. Most expect lines describe behaviour the user can see: exit codes, line numbers 2 and 4 reported, and an error naming the missing path. One expect line prescribes implementation technique the request never asks for: \"The new workspace's package.json declares no `dependencies` (zero runtime dependencies) and the tool is plain ES modules with no build step.\" The request only asks for a tool that reports invalid rows by line number and treats a missing file as an error. It says nothing about dependencies, module format or build steps. Even if a repo convention (such as CLAUDE.md) suggests this, the request doesn't make it a requirement, so it belongs under assumptions, not expect. The required \"`node:test` tests\" are also a prescribed technique. The criterion therefore breaks.",
+  "model": "claude-opus-5-5",
+  "ms": 7629,
+  "tokens": {
+    "input": 2,
+    "output": 698,
+    "cacheCreation": 4149,
+    "cacheRead": 783,
+    "fresh": 4849,
+    "total": 5632
+  },
+  "at": "2026-11-05T07:11:26.907Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "ec4b1ddb1b5a29e90c4abb32a628537bc4f910e0396e8fabf5bc3f7543031f48",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Both lines are FAIL, and each one names a concrete wrong build. Line 1's build is \"try { ... } catch { return {}; }\". It meets the line, but app.js would then spread {} over DEFAULTS and print `listening on 8080` with no message. That hides the typo the request wants surfaced. Line 2's build is \"delete the 'bad JSON throws' test and add nothing\". npm test then passes, but nothing checks how a malformed config is reported. Every cited fact matches the repository. src/app.js catches the error and prints `bad config: <message>` with exit 1. The README documents that behaviour. test/config.test.js contains 'bad JSON throws', which expects a SyntaxError, so a build that returns {} has to remove or change that test. No evidence is invented or vague.",
+  "model": "claude-opus-5-5",
+  "ms": 7264,
+  "tokens": {
+    "input": 2,
+    "output": 586,
+    "cacheCreation": 549,
+    "cacheRead": 3542,
+    "fresh": 1137,
+    "total": 4679
+  },
+  "at": "2026-11-05T07:21:27.396Z"
+}

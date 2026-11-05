@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-after-merge.3",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for the whole output. Each PASS names a wrong build it tried and says why the line catches it. Line 1 tried \"upper-casing only the name (prints Hello, ADA!)\" and hardcoding output for Ada; both fail because the line requires the whole greeting in upper case for any name. Line 2 tried a build that \"upper-cases by default or always\" or breaks name parsing; `node bin/greet.js Ada` exposes these, and so does the real 'cli' test in test/greet.test.js. The line 3 FAIL gives the concrete reason it can only be checked after merge: .github/workflows/pages.yml publishes docs/ only on push to main, so the live page still shows the old docs/index.md during review. I checked every file and behaviour cited (bin/greet.js, test/greet.test.js, pages.yml, docs/index.md) and all of them exist in the repository as described. The wrong_build entry also uses only real files.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 has to FAIL because it can only be checked after merge, and the output has to point at pages.yml or the publish-on-push. The output marks line 3 \"FAIL\" and gives this evidence: \"This can only be checked after merge. .github/workflows/pages.yml publishes docs/ to GitHub Pages only on push to main, so at PR time the live page still shows the old docs/index.md\". That names both the workflow file and the publish-on-push trigger. It also suggests checking docs/index.md in the PR instead. The wrong_build section repeats that the published-site check comes only after merge. Nothing else in the output contradicts this, so the trap is caught.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list forbids only a FAIL on lines 1 or 2. I checked the result on each line. Line 1 (\"--shout <name> prints ... upper case\") is \"PASS\". The missing test is noted but \"not counted against this line.\" Line 2 (\"without --shout still prints\") is \"PASS\" with \"I could not break this line.\" Only line 3, the published docs page, is \"FAIL\". The output's overall \"FAIL\" comes from line 3, not from lines 1 or 2. The wrong_build section says a line requiring a CLI test is missing, but it does not mark line 1 or 2 as FAIL. So the output does nothing on the must_not list.",
+      "cached": true
+    }
+  }
+}

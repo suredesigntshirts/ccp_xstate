@@ -1,0 +1,27 @@
+{
+  "result": {
+    "result": "PASS",
+    "lines": [
+      {
+        "line": "average([]) returns 0",
+        "result": "PASS",
+        "evidence": "math.js average is reduce(sum)/xs.length, so [] gives 0/0 = NaN today. I tried builds that would only look right: returning the string '0' or '0.00' (console.log shows 0 or 0.00 under node -e), returning -0, and catching every NaN result and turning it into 0. If 'returns 0' is read as the number 0, it rejects '0' and '0.00'. -0 behaves as 0 in any invoice sum, so it does not miss the request. The catch-all-NaN build is stopped by line 2. I could not find a wrong build that gets past this line."
+      },
+      {
+        "line": "average of a non-empty list returns what the current math.js returns for it, NaN included: average([2, 4]) is 3, average([5]) is 5 and average([NaN, 1]) is NaN",
+        "result": "PASS",
+        "evidence": "Strongest wrong build I tried: hide the symptom with `const r = sum/len; return Number.isNaN(r) ? 0 : r`. This gives average([]) = 0, but average([NaN, 1]) = 0 instead of NaN, so the named example catches it. Other wrong builds that change non-empty results (rounding, a different summing loop that treats sparse holes differently) break the line's general rule, 'what the current math.js returns', which a reader checks by comparing against the current code, not only the three examples. Nothing I tried both met this line and was wrong."
+      },
+      {
+        "line": "test/math.test.js has a test that calls average([]) and expects 0, and npm test passes",
+        "result": "PASS",
+        "evidence": "Today test/math.test.js imports only add, subtract and multiply and has no average test, so this line forces a new regression test. package.json runs `node --test`, which finds test/math.test.js. Wrong builds I tried: a test that never calls average([]), and a fix with no test at all. The line's words reject both. A test.skip build can be argued, but a skipped test does not 'expect' anything when it runs, and the file uses node:assert/strict, so a string '0' would fail. I could not find a wrong build that meets this line."
+      }
+    ],
+    "wrong_build": "None found. The closest was a PR where average returns the string '0' for [] (it prints 0 under node -e) with a test that uses loose assert.equal from plain node:assert, so '0' == 0 passes. In an invoice, '0' + 5 = '05'. Line 1 stops it if 'returns 0' is read as the number 0, which is the natural reading. The NaN-to-0 masking build is stopped by line 2's average([NaN, 1]) is NaN example."
+  },
+  "hash": "f14df378878a5eff2cc982fdb0630f17be5f0c0ca16e2711140c4a515dbd583f",
+  "caller": "bench-clean-average-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:09:22.043Z"
+}

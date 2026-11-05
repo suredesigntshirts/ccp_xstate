@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "8f1aa9045279b8c8ea4c7e224860af56815947a7480b9c971e8cbf9c7cae0bcf",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Every path the issue names is in the tracked list: bin/greet.js, src/greet.js, docs/index.md, .github/workflows/pages.yml, test/ (test/greet.test.js) and README.md. `npm test` is a real command, because package.json defines the script \"test\": \"node --test\". The function `greeting(name)` and the option `--shout` are what the issue asks to add or change. Nothing names a file or script that doesn't exist. The issue also describes file contents, such as bin/greet.js \"silently ignores every '--' flag\", the \"usage: greet <name>\" message with exit status 2, and the pages workflow publishing docs/ on every push to main. I can't check those against the file contents because I only have the file list. They fit the files and scripts that are there, and nothing in the listed facts contradicts them. The non-goals keep \"verify the live site\" out of scope, which matches a repo where the PR can't show the live site.",
+  "model": "claude-opus-5-5",
+  "ms": 10097,
+  "tokens": {
+    "input": 2,
+    "output": 651,
+    "cacheCreation": 3320,
+    "cacheRead": 783,
+    "fresh": 3973,
+    "total": 4756
+  },
+  "at": "2026-11-05T07:09:56.419Z"
+}

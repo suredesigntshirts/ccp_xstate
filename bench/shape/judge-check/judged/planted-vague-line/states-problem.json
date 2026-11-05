@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "f2dca92eea3257789fd54078cbd045ff954109571fbfcbc372a4bc531992e46a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every expect line and the problem field. The expect lines describe behaviour you can see: CLI output for --tsv, CRLF input, commas inside fields and the unchanged no-flag case. They also require a README entry, a test in test/csv.test.js and the vague \"handles TSV input well\". The --tsv flag counts because the request asks for it. The parse() line only says existing behaviour must stay the same (\"keeps its comma default and separator argument\"), so it doesn't tell the builder how to fix anything. The suggested approach, \"Reusing the existing separator parameter of parse()… is the suggested approach but not required\", sits under assumptions. The problem field explains what's wrong: the CLI ignores its arguments and always splits on commas. It mentions that parse() already takes a separator as a fact about the code, not as a fix. No expect line names a technique, internal function or return value as the fix.",
+  "model": "claude-opus-5-5",
+  "ms": 8268,
+  "tokens": {
+    "input": 2,
+    "output": 606,
+    "cacheCreation": 4967,
+    "cacheRead": 0,
+    "fresh": 5575,
+    "total": 5575
+  },
+  "at": "2026-11-05T07:06:40.658Z"
+}

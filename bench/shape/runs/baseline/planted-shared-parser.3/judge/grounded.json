@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "65e905bf09140f6eef590177c367459893f6bee50f9fee5cc59135763876233a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every path and command the issue names against the 6 tracked files. bin/csv2json.js, src/parse.js, README.md, test/ (test/csv.test.js) and package.json are all tracked. The issue uses `npm test`, and package.json defines that script (\"node --test\"). The --tsv flag and the new test are things the issue asks the builder to create. `table.tsv` appears only as an example input in the outcome and README guidance, and every proof feeds data through printf, so no proof needs that file to exist. Some claims need the file contents, which this material doesn't show: that `parse(text, sep = ',')` exists, that the CLI ignores its arguments, and that 'parse' and 'cli' tests exist. They fit the repo's size and layout, and nothing in the material contradicts them. I found no named file, script or function that is missing, and no description of the repository that is wrong.",
+  "model": "claude-opus-5-5",
+  "ms": 8401,
+  "tokens": {
+    "input": 2,
+    "output": 573,
+    "cacheCreation": 4003,
+    "cacheRead": 783,
+    "fresh": 4578,
+    "total": 5361
+  },
+  "at": "2026-11-05T07:11:01.839Z"
+}

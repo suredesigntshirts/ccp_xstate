@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "14ed2360412b7833fe84e928f9f185a15a0b064525870421ab87cd1230423dd3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The output is a \"blocked\" answer, so it has no expect lines that could prescribe a fix and no problem field that could describe one. The blocked reason states the actual situation: the request \"is a question\", it \"does not ask for any change\", and it \"needs an answer from a maintainer\". It names possible changes (\"migrate mathlib to ES modules\", \"document why we use CommonJS\") only as separate requests the asker could file later. It doesn't present either as the fix this issue requires. Nothing in the output sets a technique, internal function or return value as a requirement, so the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 4280,
+  "tokens": {
+    "input": 2,
+    "output": 312,
+    "cacheCreation": 1603,
+    "cacheRead": 783,
+    "fresh": 1917,
+    "total": 2700
+  },
+  "at": "2026-11-05T07:10:14.911Z"
+}

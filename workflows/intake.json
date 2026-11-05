@@ -3,7 +3,7 @@
   "description": "One request to a frozen issue, then one quick-fix child item. Shape writes the issue; challenge, seeing only the request and the issue, tries to break it before anything is built; shape revises at most twice before the card (plan/decisions/2026-11-05-wf-intake-ready.md).",
   "initial": "shaping",
   "context": {
-    "request": null, "issue": null, "challenge": null, "answer": null, "failure": null, "revised": null, "rerevised": null, "fix": null, "decision": null
+    "request": null, "issue": null, "challenge": null, "answer": null, "failure": null, "failed1": null, "failed2": null, "failed3": null, "fix": null, "decision": null
   },
   "output": { "issue": "context.issue", "challenge": "context.challenge", "fix": "context.fix" },
   "states": {
@@ -29,7 +29,7 @@
         },
         "onDone": [
           { "target": "fixing", "guard": "passed", "description": "every expect line held: the issue is frozen", "actions": [{ "type": "set", "params": { "challenge": "event.output", "failure": { "value": null } } }] },
-          { "target": "shaping", "guard": "reviseAgain", "description": "FAIL with a revision left: shape again with this challenge", "actions": [{ "type": "set", "params": { "challenge": "event.output", "rerevised": "context.revised", "revised": { "value": true } } }] },
+          { "target": "shaping", "guard": "revisionLeft", "description": "FAIL with a revision left: shape again with this challenge. failed1..3 shift once per FAIL, so failed3 is set by the third", "actions": [{ "type": "set", "params": { "challenge": "event.output", "failed3": "context.failed2", "failed2": "context.failed1", "failed1": { "value": true } } }] },
           { "target": "stuck", "description": "FAIL after two revisions", "actions": [{ "type": "set", "params": { "challenge": "event.output" } }] }
         ],
         "onError": { "target": "stuck", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
@@ -47,7 +47,7 @@
         "onDone": [
           { "target": "shaping", "guard": "revise", "description": "the answer's words go to shape; one more round", "actions": [{ "type": "set", "params": { "answer": "event.output", "failure": { "value": null } } }] },
           { "target": "fixing", "guard": "buildAsIs", "description": "build the last issue as it stands", "actions": [{ "type": "set", "params": { "decision": "event.output" } }] },
-          { "target": "dropped", "actions": [{ "type": "set", "params": { "decision": "event.output" } }] }
+          { "target": "dropped", "guard": "drop", "actions": [{ "type": "set", "params": { "decision": "event.output" } }] }
         ],
         "onError": "dropped"
       }
@@ -70,8 +70,9 @@
       "hasRequest": ["context.request.url", "context.request.text"],
       "hasIssue": ["context.issue.expect"],
       "passed": [{ "path": "event.output.result", "in": ["PASS"] }],
-      "reviseAgain": [{ "path": "event.output.result", "in": ["FAIL"] }, { "path": "context.rerevised", "in": [null] }],
+      "revisionLeft": [{ "path": "event.output.result", "in": ["FAIL"] }, { "path": "context.failed3", "in": [null] }],
       "revise": [{ "path": "event.output.choice", "in": ["revise"] }, "event.output.why"],
+      "drop": [{ "path": "event.output.choice", "in": ["drop"] }],
       "buildAsIs": [{ "path": "event.output.choice", "in": ["build as is"] }, "context.issue.expect"]
     },
     "input": {
@@ -99,6 +100,7 @@
           "wrong_build": { "type": "string", "minLength": 1 }
         }
       },
+      "quick-fix": { "type": "object", "required": ["issue"], "properties": { "issue": { "type": "object" } } },
       "ask": { "type": "object", "required": ["choice", "by"], "properties": { "choice": { "type": "string" }, "by": { "type": "string", "minLength": 1 }, "why": { "type": "string" } } }
     },
     "schemas": {

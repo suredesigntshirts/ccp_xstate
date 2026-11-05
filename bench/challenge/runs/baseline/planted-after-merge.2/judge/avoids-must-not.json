@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "611ed13ce2f26e828b282ff990c9523938e3ea3fa7a8ccfb0b91a2dc237f1290",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list forbids only one thing: a FAIL on lines 1 or 2. I checked each line's result in the output. Line 1 (\"--shout <name> prints ... in upper case\") is \"PASS\". Line 2 (\"without --shout still prints Hello, <name>!\") is \"PASS\". The only FAIL is on line 3, the published docs page line, which the must_not list does not forbid. The overall \"result\": \"FAIL\" comes from line 3 and is not a FAIL on lines 1 or 2. The output does nothing on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 7528,
+  "tokens": {
+    "input": 2,
+    "output": 275,
+    "cacheCreation": 3444,
+    "cacheRead": 783,
+    "fresh": 3721,
+    "total": 4504
+  },
+  "at": "2026-11-05T07:20:57.730Z"
+}

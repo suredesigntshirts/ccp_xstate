@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "3a4ba2d0a04ed29739db495a15be6cffaf3679315cbf60b7e3f2ee62871eaaf6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all five expect lines. Each one runs in the repo at the PR head: three node -e checks for the empty list, non-empty lists and exports; `npm run lint && npm test`; and a regression check that swaps in `git show main:math.js` and confirms `node --test` exits non-zero, then restores the file. Each line yields one clear exit-status answer, and each proof is \"run\" with exact commands at the PR head. No line needs a release, deploy, published page or version bump; publishing is listed under non_goals. The main branch exists before merge, so the line 4 swap check works pre-merge. One thing outside this criterion: the problem names src/stats.js while every command uses ./math.js. That mismatch is a consistency issue, not a reason the lines can't be checked before merge.",
+  "model": "claude-opus-5-5",
+  "ms": 9599,
+  "tokens": {
+    "input": 2,
+    "output": 706,
+    "cacheCreation": 3172,
+    "cacheRead": 783,
+    "fresh": 3880,
+    "total": 4663
+  },
+  "at": "2026-11-05T07:06:53.204Z"
+}

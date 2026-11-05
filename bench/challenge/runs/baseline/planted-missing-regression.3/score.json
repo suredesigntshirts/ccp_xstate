@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-missing-regression.3",
+  "case": "planted-missing-regression",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case holds no line sound"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both lines. The FAIL on the first line names a concrete wrong build: bin/csv2json.js always calls `parse(..., '\\t')`, or splits on /[\\t,]/. It explains why this meets the line, since the TSV printf proof prints the right array. It also explains why the build misses the request: plain CSV without the flag breaks, and commas inside TSV cells get split. The cited files and behaviour are real. bin/csv2json.js, the parse(text, sep) signature in src/parse.js and the 'cli' test in test/csv.test.js all exist. That test would fail if tab splitting were always on, because 'a,b' becomes a single key. The PASS on the README line names the wrong build it tried, a bare '--tsv' mention. It says the line catches it because \"documents\" needs a usage line, and the real README already uses that usage-example pattern. The overall wrong_build is concrete and consistent with the repository.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item, and the output covers it. Top-level \"result\" is \"FAIL\". The first line's evidence names the missing line: \"`node bin/csv2json.js` without --tsv still parses comma-separated input as before / `npm test` passes\". It pairs that with a wrong build that breaks CSV: bin/csv2json.js calls `parse(..., '\\t')` every time, whether or not --tsv is passed. The wrong_build field says the same thing: \"default CSV input is now broken\" and \"No expect line requires CSV behavior without the flag to stay the same, `npm test` to pass\". The output also lists extra gaps (no --tsv test, an unspecified printf input), but these don't conflict with the required item.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: a PASS overall. I checked the top-level field, and it reads \"result\": \"FAIL\". One expect line, the README line, is marked PASS. That is a per-line verdict, not the overall result, so it doesn't break the rule. The overall FAIL is backed by a wrong build: the program always parses with a tab, which breaks plain CSV input, yet it still meets the --tsv line. So the output doesn't do the one thing it must not do.",
+      "cached": true
+    }
+  }
+}

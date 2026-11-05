@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "7e532d4df891f1c9adea643dae7c1741ffec66bfa9d1f5c86fb8f98250de6661",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all five expect lines and their proofs. Each one can be checked at the PR head with a single pass/fail answer. Lines 1, 2 and 5 are `node -e` commands with clear exit-0 checks, and each proof runs exactly that command and reads `echo $?`. Line 3 is \"`npm test` exits 0 on the pull request head\", proved by running it. Line 4 has the reader open test/math.test.js, then run `git show main:math.js > math.js && node --test` and expect a non-zero status. It only needs the main branch, which exists before merge and is the base the PR is compared against, and it says how to restore the file afterwards. No line needs a release, a deploy or a published page. Version publishing is even listed as a non-goal. Every proof is a way to check its line at the head before merge.",
+  "model": "claude-opus-5-5",
+  "ms": 11387,
+  "tokens": {
+    "input": 2,
+    "output": 524,
+    "cacheCreation": 549,
+    "cacheRead": 3503,
+    "fresh": 1075,
+    "total": 4578
+  },
+  "at": "2026-11-05T07:09:52.528Z"
+}

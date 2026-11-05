@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-after-merge.2",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "6 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. I checked the problem field and all six expect lines. The problem field only says what is wrong: \"bin/greet.js has no --shout option\", unknown flags are \"silently drop[ped]\", and the docs show only `<name>`. It proposes no fix. Each expect line states observable behavior: exit codes, exact stdout/stderr, what docs/index.md contains, and that the tests pass. None names a technique, an internal function or a return value. The upper-case output and the exit-2 usage error are behaviors the verifier can see, not implementation choices. The one implementation choice, whether to change src/greet.js (new option or export) or only bin/greet.js, is left to the builder and sits under assumptions. The pages-workflow reasoning sits under assumptions and non_goals, not in expect. The test-file line asks for a test to exist but doesn't say how to fix the problem.",
+      "cached": false
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all six expect lines and their proofs. Four lines are about CLI behaviour (`--shout Ada`, `Ada --shout`, plain `Ada`, and `--shout` with no name). Each has a \"run\" proof that runs the CLI locally and checks exact stdout bytes with `od -c`, the exit status, and stderr. All of this can be done at the PR head and gives one answer. The docs line is a \"read\" of docs/index.md at the PR head, not of the published site. The npm test line uses `npm test` plus a grep of test/greet.test.js, which is also local. Only \"outcome\" mentions the published site (\"after the next push to main\"), not any expect line. The non_goals state plainly that publishing or checking the live page at o.github.io is out of scope. No expect line needs a release, a deploy or a published page.",
+      "cached": false
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every path and command the issue names against the 8 tracked files and the package.json scripts. bin/greet.js, src/greet.js, docs/index.md, .github/workflows/pages.yml and test/greet.test.js are all tracked. `npm test` maps to the existing `node --test` script. The `--shout` option is the thing the issue asks to create. The `greeting(name)` export is described as being in src/greet.js, which exists. I could not see file contents, so some claims are unchecked: that bin/greet.js drops '--' arguments, that pages.yml publishes docs/ on push to main, and that a call with no arguments exits 2. Still, nothing I was given contradicts them. Calling out pages.yml for docs publishing fits the workflow file being there. The issue invents no script, file or function that isn't in the repo and isn't marked as new work.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items. Item 1 holds. The docs ask is turned into an expect line that can be checked at the head: \"docs/index.md documents the `--shout` option, with an example command...\" and it is proved by reading the file. The published page is kept out of scope: the outcome says the site \"shows it after the next push to main publishes docs/\", and a non_goal excludes \"Publishing or deploying the docs site, or checking the live page\". Item 2 holds. One expect line says \"Running `node bin/greet.js Ada` without the flag still exits 0 and writes exactly `Hello, Ada!\\n`\", and a run proof backs it up, so the default greeting is protected.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all six expect lines against the must_not item, which rules out any expect line that can only be checked on the published page or after merge. Four lines run the CLI (`--shout Ada`, `Ada --shout`, plain `Ada`, and `--shout` with no name). One reads docs/index.md, and its proof says \"Read docs/index.md at the PR head.\" One runs `npm test` and greps the test file. All six can be checked at the PR head. The published docs site comes up only in the outcome (\"after the next push to main\"), in the non_goals (\"Publishing or deploying the docs site, or checking the live page\" is excluded), and in the assumptions. None of these is an expect line. The criterion holds for the whole output.",
+      "cached": false
+    }
+  }
+}

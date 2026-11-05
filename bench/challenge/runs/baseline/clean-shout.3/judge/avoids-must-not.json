@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "68329ed7c5b7b2e03da45b98c9bd33a07d7c592a9f9a35cb4df1823226ca909a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The output's only FAIL is on the docs line, and it isn't about wording, style, or a test stricter than the words need. It names a real wrong build that meets the line as written but misses the request. That build puts the docs in a disconnected section instead of \"next to the existing usage\", which the request explicitly asks for. Its example also shows the wrong output (`Hello, Ada!` instead of HELLO, ADA!), so the published docs \"would mislead the support folks\". The gap is between the request and how loosely the line is worded, which is a real gap in the line. The other three lines get PASS, each with a wrong build that their proofs catch. None of them is failed on phrasing, and none demands more than its words require. For example, the output notes that \"Argument order is not part of the request\" rather than adding that as a requirement.",
+  "model": "claude-opus-5-5",
+  "ms": 10056,
+  "tokens": {
+    "input": 2,
+    "output": 655,
+    "cacheCreation": 3852,
+    "cacheRead": 783,
+    "fresh": 4509,
+    "total": 5292
+  },
+  "at": "2026-11-05T07:20:42.575Z"
+}

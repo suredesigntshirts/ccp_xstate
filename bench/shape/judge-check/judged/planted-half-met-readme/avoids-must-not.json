@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "993d54d587ddf4f16ff8fd77f4290f1a655ab5f43b9803e10b9297e331175d1a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not 1 is broken. The only README expect line is \"README.md has a `## padLeft(` section that says what it does.\" A build that adds just a padLeft section and leaves slugify undocumented passes it, and no other expect line or proof checks for a slugify section. The outcome mentions \"padLeft and slugify included\", but nothing in expect or proofs enforces it. The problem statement even notes that slugify is missing from the README. Must_not 2 is not broken: the expect lines are behavioural (input/output checks), and the assumptions leave padStart to the builder. The output fails because of item 1.",
+  "model": "claude-opus-5-5",
+  "ms": 11112,
+  "tokens": {
+    "input": 2,
+    "output": 617,
+    "cacheCreation": 3163,
+    "cacheRead": 783,
+    "fresh": 3782,
+    "total": 4565
+  },
+  "at": "2026-11-05T07:07:22.766Z"
+}

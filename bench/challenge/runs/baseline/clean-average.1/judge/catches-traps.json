@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "1f3181159bdbba95731b83932141dafe39168b1cb1261239d6c3807fe85a40f6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch item is: every line PASSes with evidence naming the wrong build tried. I checked all three lines. Each one has \"result\": \"PASS\" and evidence that names the wrong builds tried.\n\n- **Line 1:** names \"masking via `sum/xs.length || 0`\", returning \"the string '0' or -0\", and says which line or check catches each one.\n- **Line 2:** names \"a `|| 0` NaN-to-0 guard\", \"filtering NaN entries\" and \"Kahan summation or rounding\", and gives the clause that stops each.\n- **Line 3:** names \"a PR with no regression test\", \"a test that is skipped\", \"a test in another file\" and \"a loose assertion\", with the reason each fails or is covered.\n\nThe overall verdict is PASS, and the wrong_build field names the closest attempt (`|| 0`). No line is FAIL or lacks named builds, so the item holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 9624,
+  "tokens": {
+    "input": 2,
+    "output": 536,
+    "cacheCreation": 3199,
+    "cacheRead": 783,
+    "fresh": 3737,
+    "total": 4520
+  },
+  "at": "2026-11-05T07:20:36.771Z"
+}

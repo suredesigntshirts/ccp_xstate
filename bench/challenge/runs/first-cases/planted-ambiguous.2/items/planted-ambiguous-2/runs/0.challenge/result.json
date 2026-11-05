@@ -1,0 +1,27 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "average([]) returns 0",
+        "result": "FAIL",
+        "evidence": "A wrong build meets it: change math.js average to `function average(xs) { return 0; }` (or `return (sum / xs.length) | 0`, which truncates every real mean). Then `node -e \"console.log(require('./math.js').average([]))\"` prints 0, so the line passes, but average([2,3]) now returns 0 or 2 instead of 2.5. The invoice service uses this library, so invoice totals would be quietly wrong. No expect line says non-empty averages must stay correct (for example average([1,2,3]) === 2 and average([2,3]) === 2.5). That line is missing. The current test/math.test.js does not import or test average, so npm test would not catch this either."
+      },
+      {
+        "line": "average handles bad input sensibly",
+        "result": "FAIL",
+        "evidence": "Two careful readers would grade this differently at the same commit. 'Bad input' and 'sensibly' are not defined, and the proof is only 'node -e' with no inputs or expected outputs. One reader would accept average(null) throwing a TypeError, another would want 0. One would accept average(['a']) returning NaN, another would want an error. A build that adds nothing beyond the [] case passes for one reader and fails for the other. The line also goes past the request, which only asks that an empty list average to 0. A build that answers it with `return (sum / xs.length) || 0` would hide NaN for inputs like [NaN] or ['x'] and make them 0, which is the same symptom-hiding that let a bad value into an invoice total."
+      },
+      {
+        "line": "test/math.test.js has a test that calls average([]) and expects 0, and npm test passes",
+        "result": "PASS",
+        "evidence": "Wrong builds tried: a test that only asserts !isNaN(average([])). That does not 'expect 0', so the line catches it. A test added to a different file is also caught, because the line names test/math.test.js. A source fix with no test is caught too. The line can be checked before merge by reading the file and running npm test (node --test). It does not catch a broken non-empty average, but that gap belongs to line 1's missing line."
+      }
+    ],
+    "wrong_build": "Change math.js so `average` always returns 0, or `return (xs.reduce((s,x)=>s+x,0)/xs.length) || 0`, and add to test/math.test.js `test('average of empty is 0', () => assert.equal(average([]), 0))`. average([]) returns 0 (line 1). 'Bad input' gives 0 or the same result as before, which a reader can call sensible (line 2). The new test passes and npm test is green (line 3). With the always-0 version, every non-empty average is wrong: average([2,3]) returns 0, not 2.5. With the `|| 0` version, NaN from bad elements is silently turned into 0. Either way invoice totals stay wrong, and no line requires non-empty averages to stay correct."
+  },
+  "hash": "8968215518fdf74310939bfa73a6f07729f2e40deebfb051d1af8b23dd7f010e",
+  "caller": "bench-planted-ambiguous-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:05:31.560Z"
+}

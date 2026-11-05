@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "13f658d29651102bf777fc658bcc6b16bd80eb7cf7bee95333ab73525860c8c5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The only must_not item bans an issue whose lines a build that breaks plain CSV input would still meet. I looked for expect lines that pin down CSV behaviour without the flag. One does: \"Without --tsv, CSV behaviour is unchanged: printf 'a,b\\n1,2\\n' | node bin/csv2json.js prints exactly [{\"a\":\"1\",\"b\":\"2\"}]\". It also requires that tabs are not treated as separators by default. Another line checks that the exported parse() still defaults to a comma, and both lines have run proofs. A build that broke plain CSV would fail these checks, so the must_not is avoided. The line \"csv2json handles TSV input well.\" is vague, but it doesn't let a CSV-breaking build pass, because the other lines still apply. CRLF handling for CSV without the flag isn't pinned. That is a small gap, but it isn't plain CSV input.",
+  "model": "claude-opus-5-5",
+  "ms": 7193,
+  "tokens": {
+    "input": 2,
+    "output": 653,
+    "cacheCreation": 4151,
+    "cacheRead": 783,
+    "fresh": 4806,
+    "total": 5589
+  },
+  "at": "2026-11-05T07:07:10.481Z"
+}

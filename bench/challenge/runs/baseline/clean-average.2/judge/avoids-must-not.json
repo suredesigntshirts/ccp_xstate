@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "54ca856608f264def58776bf4c15074f979901fec5df504c14d6a168f866ae15",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list bans one thing: a FAIL given for wording, for style, or for a stricter test than the words need. I checked every result in the output. All three lines are marked PASS, and so is the overall result. Because there is no FAIL anywhere, the output cannot have given a FAIL for wording or style. The output does point out ambiguities, such as \"If 'returns 0' is read as the number 0\" and test.skip being arguable. In each case it settles on the natural reading and still marks the line PASS, so it never asks for a stricter test than the words need. The criterion holds across the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 5503,
+  "tokens": {
+    "input": 2,
+    "output": 283,
+    "cacheCreation": 3370,
+    "cacheRead": 783,
+    "fresh": 3655,
+    "total": 4438
+  },
+  "at": "2026-11-05T07:20:30.409Z"
+}

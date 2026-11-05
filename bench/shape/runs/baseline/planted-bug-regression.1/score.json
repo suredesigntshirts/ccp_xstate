@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-bug-regression.1",
+  "case": "planted-bug-regression",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "5 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I read the problem field and each of the five expect lines. The problem field only describes what is wrong: the reduce/length code gives \"0/0 and returns NaN\", and \"average has no tests at all\". It does not propose a fix. The one return value the expect lines name is 0 for average([]), and the request requires exactly that: \"An empty list should average to 0\". Ruling out -0, null and undefined just pins down what \"0\" means, and the assumptions record that reading. The other expect lines check results you can observe: non-empty means, `npm test` passing, the exports staying in place, and a regression test that fails against main. None of them prescribes a technique, such as an early-return guard or a length check, or an internal function. The regression-test line names a file to check, but it does not say how to fix math.js. No part of the output prescribes a fix, so the criterion holds.",
+      "cached": false
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all five expect lines and their proofs. Each one can be checked at the PR head with a single pass/fail answer. Lines 1, 2 and 5 are `node -e` commands with clear exit-0 checks, and each proof runs exactly that command and reads `echo $?`. Line 3 is \"`npm test` exits 0 on the pull request head\", proved by running it. Line 4 has the reader open test/math.test.js, then run `git show main:math.js > math.js && node --test` and expect a non-zero status. It only needs the main branch, which exists before merge and is the base the PR is compared against, and it says how to restore the file afterwards. No line needs a release, a deploy or a published page. Version publishing is even listed as a non-goal. Every proof is a way to check its line at the head before merge.",
+      "cached": false
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every file, script and command the issue names against the repository facts. math.js, test/math.test.js and package.json are all tracked files. `npm test` maps to the real script \"node --test\", and the expect lines only use `node -e`, `node --test`, `npm test` and git commands. The functions named are add, subtract, multiply and average. The request confirms average exists, and nothing in the given facts contradicts the other exports. The problem says average does `xs.reduce(...)/xs.length` and that the tests import \"only add, subtract and multiply\". The facts I was given don't include file contents, so I can't confirm these details, but nothing contradicts them. The issue treats the 'main' branch as an assumption rather than stating it as fact. No missing or invented file, script or command is presented as existing.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the expect lines. Item 1 is met by expect line 4: \"test/math.test.js contains a test that calls average([]) and asserts the result is 0\". That line also requires the test to fail against main's math.js, so it works as a regression test. Item 2 is met by expect line 2. It runs a node check of average([1,2,3])===2, average([5])===5, average([-2,2])===0 and average([1,2])===1.5, which keeps non-empty averages correct. Both lines have matching run proofs. Nothing in the output contradicts either item.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The only item on must_not is an issue that has no regression test line for the empty-list bug. The output has one. Expect line 4 says \"test/math.test.js contains a test that calls average([]) and asserts the result is 0,\" and that the test must fail when math.js is put back to its main version (running node --test then gives a non-zero exit). A matching proof backs it: read the test file, run the suite against main's math.js, then restore the file. The outcome also asks for \"a regression test that fails if the empty-list behaviour goes back to NaN.\" Since the output does not do the one forbidden thing, the criterion holds.",
+      "cached": false
+    }
+  }
+}

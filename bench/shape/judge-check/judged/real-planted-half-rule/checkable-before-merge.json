@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "e8d8e53fc6e72d877ec4980c27276533f7d79b8aadb23e2a149be6a4da4bda00",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all seven expect lines and their proofs. Each one is about the code at the PR head: the padLeft export, its return values for '42', 42, '12345' and '123456', the README section headings, the tests in test/strutil.test.js, and `npm test` passing. Every proof is a run or read step done on the checked-out repo. None needs a release, deploy or published page, and publishing a release is listed under non_goals. The README check (\"the padLeft section says what it does\") has a concrete read step: confirm it \"describes left-padding to a width with a fill character\". That makes it answerable one way. One small risk: the README regex proof's escaping (`'\\\\\\\\('`) could end up as an unbalanced `(` if pasted into a shell. It is still a check at head, and a careful reader can repair it. So the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 11236,
+  "tokens": {
+    "input": 2,
+    "output": 953,
+    "cacheCreation": 3515,
+    "cacheRead": 783,
+    "fresh": 4470,
+    "total": 5253
+  },
+  "at": "2026-11-05T07:07:32.859Z"
+}

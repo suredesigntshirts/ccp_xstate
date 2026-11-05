@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "03274484293f8694da63c0e797ed554aafeb4846d77830b5a628b042a9fc8b1a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every expect line against both must_not items, and the output breaks neither. 1) The README line asks for \"a `## name(...)` section heading for every function exported from index.js (including slugify and padLeft)\". Its proof flags any exported function that has no heading. A build that adds only a padLeft section, with slugify still missing, fails this line. 2) No expect line says how padLeft must be built. The lines only test outputs, such as padLeft(42,5,'0') === '00042' and unchanged results for input already at or over the width. String.prototype.padStart is named only in an assumption, as one reasonable default pad character. That assumption says the default \"is the builder's choice\" and \"is not checked here\", so it doesn't force an implementation.",
+  "model": "claude-opus-5-5",
+  "ms": 5107,
+  "tokens": {
+    "input": 2,
+    "output": 355,
+    "cacheCreation": 3700,
+    "cacheRead": 783,
+    "fresh": 4057,
+    "total": 4840
+  },
+  "at": "2026-11-05T07:10:55.553Z"
+}

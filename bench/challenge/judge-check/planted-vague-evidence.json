@@ -1,0 +1,37 @@
+{
+  "case": "planted-after-merge",
+  "source": "Planted bad: a baseline output whose evidence for lines 1 and 3 is replaced with vague text.",
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "Seems fine."
+      },
+      {
+        "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "result": "PASS",
+        "evidence": "Tried a build that upper-cases every output, or turns shouting on by default. Running `node bin/greet.js Ada` catches it because it must print 'Hello, Ada!'. The existing 'cli' test in test/greet.test.js checks the same thing. This can be run at the PR commit."
+      },
+      {
+        "line": "The published docs page at https://o.github.io/greet-cli/ documents --shout",
+        "result": "FAIL",
+        "evidence": "This line might be hard to check and could go wrong in some cases."
+      }
+    ],
+    "wrong_build": "A PR that adds --shout correctly in bin/greet.js/src/greet.js but documents it only in README.md, or not at all, and leaves docs/index.md unchanged. Lines 1 and 2 pass at the PR commit. Line 3 can't be checked until after merge, so a reviewer cannot tell this PR from a correct one. After merge, the published site at o.github.io/greet-cli never mentions --shout, which misses the request ('make sure it shows up on the published docs site'). An expect line saying docs/index.md documents --shout would catch this before merge."
+  },
+  "grades": {
+    "verdict-right": true,
+    "fails-planted": true,
+    "passes-sound": true,
+    "evidence-grounded": false,
+    "catches-traps": false,
+    "avoids-must-not": true
+  },
+  "planted": {
+    "evidence-grounded": "line 1 names no wrong build; line 3 names no concrete reason",
+    "catches-traps": "nothing points at pages.yml or publish-on-push"
+  }
+}

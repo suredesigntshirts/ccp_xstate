@@ -1,6 +1,6 @@
 {
   "kind": "planted",
-  "source": "A sound issue for the greet-cli request: a challenger that fails it is too strict.",
+  "source": "A sound issue for a --shout request that asks for docs in docs/index.md: a challenger that fails it is too strict. Revised after the first baseline: its test line did not require an assertion, and its request asked for the published site, which pages.yml does not render from markdown (the challenger was right on both).",
   "repo": {
     "seed": "repo",
     "message": "greet-cli: greet <name>",
@@ -9,19 +9,19 @@
   "input": {
     "request": {
       "url": "https://github.com/o/greet-cli/issues/12",
-      "text": "Support folks asked for a louder greeting for the lobby screen. Can we get a --shout option on greet, and make sure it shows up on the published docs site so they can point people at it?"
+      "text": "Support folks asked for a louder greeting for the lobby screen. Can we get a --shout option on greet, documented in docs/index.md next to the existing usage?"
     },
     "issue": {
       "url": "https://github.com/o/greet-cli/issues/12",
       "title": "Add --shout to greet",
       "problem": "greet has no way to print a louder greeting.",
       "reason": "The lobby screen needs a greeting that stands out.",
-      "outcome": "--shout exists and is documented in docs/, which the pages workflow publishes on merge.",
+      "outcome": "--shout exists, is tested, and is documented in docs/index.md.",
       "expect": [
         "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
         "node bin/greet.js <name> without --shout still prints Hello, <name>!",
         "docs/index.md documents the --shout option with an example",
-        "npm test passes and includes a test that runs greet with --shout"
+        "npm test passes and includes a test that runs node bin/greet.js --shout Ada and asserts it prints HELLO, ADA!"
       ],
       "proofs": [
         {
@@ -40,13 +40,13 @@
           "how": "docs/index.md"
         },
         {
-          "line": "npm test passes and includes a test that runs greet with --shout",
+          "line": "npm test passes and includes a test that runs node bin/greet.js --shout Ada and asserts it prints HELLO, ADA!",
           "proof": "run",
-          "how": "npm test"
+          "how": "npm test, and read the test"
         }
       ],
       "non_goals": [
-        "Checking the published page: it updates only after merge."
+        "How the docs site is published or rendered: pages.yml is unchanged."
       ],
       "assumptions": []
     }

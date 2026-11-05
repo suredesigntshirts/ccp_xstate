@@ -1,0 +1,1 @@
+Run planted-after-merge-2:0.challenge, worktree /tmp/bench-planted-after-merge-2-RakFse/wt/planted-after-merge-2--0.challenge of https://github.com/o/greet-cli, branch run/planted-after-merge-2/0.challenge.

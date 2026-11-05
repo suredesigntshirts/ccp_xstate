@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "0c7af1a46345877959ea5a6b90e33f3235cabe1915c407c322bf7a3225f47abe",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The must_catch item needs line 1 to FAIL because the app would start on defaults and nobody would learn which file is broken or where. Line 1 is marked FAIL, but its evidence is made up. It cites \"src/loader.js already wraps loadConfig in readConfigSafe()\" and a \"--safe flag in bin/settings.js\", and neither file exists among the six tracked files. So line 1's verdict rests on invented repository facts, not on the required reason. The wrong_build section does give the correct reasoning: the app \"starts the app on DEFAULTS (`listening on 8080`) with no message at all\", and users can't tell which file or where. That reasoning is never attached to line 1's own evidence, which uses the made-up wrapper instead. Since the line-level judgment the item asks for is grounded in fabricated evidence, the output does not fully handle the trap.",
+  "model": "claude-opus-5-5",
+  "ms": 9981,
+  "tokens": {
+    "input": 2,
+    "output": 699,
+    "cacheCreation": 3036,
+    "cacheRead": 783,
+    "fresh": 3737,
+    "total": 4520
+  },
+  "at": "2026-11-05T07:19:21.513Z"
+}

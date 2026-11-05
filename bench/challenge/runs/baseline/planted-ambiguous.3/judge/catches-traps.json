@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "485b93398de9fba86117f1979b5da8a4e9e81f441b887ee46d85598084436100",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch item says \"Line 2\" should FAIL as ambiguous. Read as 1-based, line 2 is the precise non-empty-list line, which has concrete examples and nothing ambiguous to catch. So I read it as 0-based, which points to the vague line, \"average handles bad input sensibly\". That reading is an assumption on my part. The output marks that line \"FAIL\" and says \"Two careful readers would grade the same build differently\", noting that \"'Bad input' and 'sensibly' are both undefined.\" It then gives two concrete readings: \"One reader passes A because it's unchanged and fails loudly. Another fails it because it doesn't 'handle' anything.\" It also shows how Build B (returning 0 for non-arrays) could be called sensible. The wrong_build section ties back to this line. So the output fails the ambiguous line and names at least two readings, which covers the item.",
+  "model": "claude-opus-5-5",
+  "ms": 9820,
+  "tokens": {
+    "input": 2,
+    "output": 724,
+    "cacheCreation": 3838,
+    "cacheRead": 783,
+    "fresh": 4564,
+    "total": 5347
+  },
+  "at": "2026-11-05T07:21:07.097Z"
+}

@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-after-merge.3",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "6 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every expect line. Each one describes behaviour you can observe: exit codes, exact stdout such as `HELLO, ADA!`, the stderr usage message, the docs/index.md content and the presence of a test plus a passing `npm test`. None of them prescribes an internal function, a technique or a return value. Docs coverage is a requirement because the request asks for it to \"show up on the published docs site\". The test line asks for test coverage and says nothing about how to build the fix. The only implementation suggestion (\"a new option on `greeting` in src/greet.js versus upper-casing in bin/greet.js\") appears under assumptions and is left to the builder. The problem field describes the current behaviour: \"silently ignores every '--' flag\", \"`greeting(name)` returning `Hello, ${name}!`\", and docs that don't mention --shout. It says what is wrong and does not propose a fix.",
+      "cached": false
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all six expect lines and their proofs. Four are CLI checks run at the PR head: `--shout Ada`, `Ada --shout`, plain `Ada`, and `--shout` with no name. Each has a concrete `od -c`/exit-status command and an exact expected result. The docs line is a \"read\" of docs/index.md at the PR head, which a reader can check from the repo without waiting for anything to be published. The test line combines reading test/ with running `npm test` and expecting `# fail 0`, which also works before merge. The part of the request that only exists after merge is the live https://o.github.io/greet-cli/ page. The output moves that into non_goals (\"That only happens after merge\") instead of making it an expect line. The no-name line accepts either the existing or an updated usage text, but stderr, empty stdout and exit=2 still give one clear answer. No line needs a release or deploy.",
+      "cached": false
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "Every path the issue names is in the tracked list: bin/greet.js, src/greet.js, docs/index.md, .github/workflows/pages.yml, test/ (test/greet.test.js) and README.md. `npm test` is a real command, because package.json defines the script \"test\": \"node --test\". The function `greeting(name)` and the option `--shout` are what the issue asks to add or change. Nothing names a file or script that doesn't exist. The issue also describes file contents, such as bin/greet.js \"silently ignores every '--' flag\", the \"usage: greet <name>\" message with exit status 2, and the pages workflow publishing docs/ on every push to main. I can't check those against the file contents because I only have the file list. They fit the files and scripts that are there, and nothing in the listed facts contradicts them. The non-goals keep \"verify the live site\" out of scope, which matches a repo where the PR can't show the live site.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items, and the output handles each one. Item 1: the docs request becomes an expect line someone can check at the PR head: \"docs/index.md documents the --shout option, showing its usage...\". It has a read proof against docs/index.md at the PR head. Checking the published page is left out of the PR: non_goals says \"Confirming that the live site https://o.github.io/greet-cli/ shows the change. That only happens after merge\". The outcome also says the pages workflow will publish it once the PR merges. Item 2: an expect line protects the default greeting: \"`node bin/greet.js Ada` without the flag still prints exactly `Hello, Ada!` followed by a newline\". It has a run proof that pipes the output through od -c. The outcome also says \"Without the flag the output is unchanged.\"",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all six expect lines against the must_not item: no expect line should be checkable only on the published page or after merge. Five lines are CLI runs or `npm test` at the PR head. The docs line says \"docs/index.md documents the --shout option\", and its proof is \"Read docs/index.md at the PR head\", so it can be checked before merge too. Checking the live site (https://o.github.io/greet-cli/) is listed under non_goals: \"That only happens after merge\". The outcome mentions publishing after merge, but that sentence is not an expect line. The one assumption about publishing also limits the check to docs/index.md. No expect line breaks the rule.",
+      "cached": false
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-suggested-fix.2",
+  "case": "planted-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case holds no line sound"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for the whole output. Both lines are FAILs, and each names a concrete wrong build that meets the line but misses the request.\n\n- **Line 1:** the build wraps JSON.parse in a try/catch and returns {}. That satisfies the line, but src/app.js:7 then spreads {} over DEFAULTS, so a broken config silently starts the app with \"listening on 8080\". No file name or position reaches the user, which misses the request.\n- **Line 2:** the build deletes or flips test/config.test.js:15 ('bad JSON throws'). npm test then passes, but nothing tests how bad JSON is handled.\n\nAll citations are real. src/app.js:7 is the spread over DEFAULTS and :9 is the stderr 'bad config' write. Test line 15 is the 'bad JSON throws' test. The README quote matches. The ENOENT point (a missing file is also swallowed) is accurate for a bare catch. The overall wrong_build is concrete and consistent with the repository.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 1 FAILs because the app would start on defaults and nobody would learn which file was broken or where. The output marks line 1 \"FAIL\". Its evidence says src/app.js:7 spreads the result over DEFAULTS, so a config with a typo \"quietly starts the app with defaults ('listening on 8080'). No file name, no position\". It also says the result goes against the request: \"Users find out less than before, so the request gets worse.\" The wrong_build field repeats the point: users \"still can't tell which file is broken or where.\" So the output covers every part of the trap: the FAIL verdict, starting on defaults, no file or position reported, and conflict with the request. The criterion holds.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: giving line 1 a PASS. I checked the output's verdict for line 1 (\"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\"). It is \"result\": \"FAIL\". The evidence explains why: returning {} makes the app start silently with defaults (\"listening on 8080\") and drops the \"bad config\" error, which goes against the request's real need. The overall result is also FAIL. Nowhere does the output give line 1 a PASS, so the criterion holds for the whole output.",
+      "cached": true
+    }
+  }
+}

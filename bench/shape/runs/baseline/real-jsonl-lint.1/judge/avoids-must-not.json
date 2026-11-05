@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "bd8d08f6df7b76c157aeca2df270dbd854a4e21776feebbed411b697b5772025",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all ten expect lines against both must_not items.\n\nItem 1 (a line that can only be checked after merge): none found. Every line can be checked at the PR head, either by running something locally, reading files, or reading \"The `test` GitHub Actions check passes on the pull request's head commit.\" Publishing to npm is ruled out in non_goals (\"Publishing the package to npm\").\n\nItem 2 (a tool with no tests run by npm test could meet the issue): not possible. One expect line requires \"`node:test` tests covering an all-valid file, multiple invalid rows with correct line numbers, and a missing file\", and says \"`npm test` at the repo root runs them (its output shows tests from the new workspace)\". A tool without tests would fail that line.\n\nNeither banned item appears anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 7112,
+  "tokens": {
+    "input": 2,
+    "output": 408,
+    "cacheCreation": 5170,
+    "cacheRead": 783,
+    "fresh": 5580,
+    "total": 6363
+  },
+  "at": "2026-11-05T07:11:53.984Z"
+}

@@ -1,0 +1,1 @@
+Run clean-shout-3:0.challenge, worktree /tmp/bench-clean-shout-3-WZia7l/wt/clean-shout-3--0.challenge of https://github.com/o/greet-cli, branch run/clean-shout-3/0.challenge.

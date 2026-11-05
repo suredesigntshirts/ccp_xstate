@@ -1,0 +1,79 @@
+{
+  "result": {
+    "issue": {
+      "title": "Add padLeft for zero-padding invoice numbers, and make the README list every exported function",
+      "problem": "index.js exports capitalize, slugify and truncate. None of them pads a string to a fixed width, so there is no way to turn invoice number 42 into 00042. The README already fails to list everything: it has a section for capitalize(s) and one for truncate(s, n), but none for slugify, which index.js does export. The tests in test/strutil.test.js (run with `npm test`, which runs `node --test`) cover only those three functions.",
+      "reason": "Invoice numbers have to be zero-padded to a fixed width, and every caller currently writes its own padding. People find functions through the README, so a function missing from it (slugify today, padLeft next) is hard to discover.",
+      "outcome": "strutil exports padLeft, which left-pads a value to a given width with a given character (for example 42 -> 00042). The README has one section for each exported function (capitalize, slugify, truncate, padLeft). `npm test` passes and includes tests for padLeft.",
+      "expect": [
+        "`import { padLeft } from './index.js'` gives a function, and padLeft('42', 5, '0') returns '00042'.",
+        "padLeft(42, 5, '0') (number input) returns the string '00042'.",
+        "When the input is already at least the width it comes back unchanged and is never cut: padLeft('12345', 5, '0') returns '12345' and padLeft('123456', 5, '0') returns '123456'.",
+        "With no pad character, padLeft pads with spaces: padLeft('42', 5) returns '   42'.",
+        "capitalize, slugify and truncate behave as before: capitalize('abc') === 'Abc', slugify(' Hello World! ') === 'hello-world', truncate('abcdef', 4) === 'abc…', truncate('ab', 4) === 'ab'.",
+        "Every function exported by index.js has its own `## name(` heading in README.md. At the PR head that means capitalize, slugify, truncate and padLeft, and the README has no heading for a function index.js does not export.",
+        "The padLeft section of README.md names its parameters (value, width, pad character), says that the pad character defaults to a space, and shows the 42 -> 00042 example.",
+        "`npm test` exits 0, and test/strutil.test.js contains at least one test that calls padLeft."
+      ],
+      "proofs": [
+        {
+          "line": "`import { padLeft } from './index.js'` gives a function, and padLeft('42', 5, '0') returns '00042'.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import assert from 'node:assert/strict'; assert.equal(typeof padLeft,'function'); assert.equal(padLeft('42',5,'0'),'00042'); console.log('ok')\""
+        },
+        {
+          "line": "padLeft(42, 5, '0') (number input) returns the string '00042'.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import assert from 'node:assert/strict'; assert.equal(padLeft(42,5,'0'),'00042'); console.log('ok')\""
+        },
+        {
+          "line": "When the input is already at least the width it comes back unchanged and is never cut: padLeft('12345', 5, '0') returns '12345' and padLeft('123456', 5, '0') returns '123456'.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import assert from 'node:assert/strict'; assert.equal(padLeft('12345',5,'0'),'12345'); assert.equal(padLeft('123456',5,'0'),'123456'); console.log('ok')\""
+        },
+        {
+          "line": "With no pad character, padLeft pads with spaces: padLeft('42', 5) returns '   42'.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import assert from 'node:assert/strict'; assert.equal(padLeft('42',5),'   42'); console.log('ok')\""
+        },
+        {
+          "line": "capitalize, slugify and truncate behave as before: capitalize('abc') === 'Abc', slugify(' Hello World! ') === 'hello-world', truncate('abcdef', 4) === 'abc…', truncate('ab', 4) === 'ab'.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {capitalize,slugify,truncate} from './index.js'; import assert from 'node:assert/strict'; assert.equal(capitalize('abc'),'Abc'); assert.equal(slugify(' Hello World! '),'hello-world'); assert.equal(truncate('abcdef',4),'abc…'); assert.equal(truncate('ab',4),'ab'); console.log('ok')\""
+        },
+        {
+          "line": "Every function exported by index.js has its own `## name(` heading in README.md. At the PR head that means capitalize, slugify, truncate and padLeft, and the README has no heading for a function index.js does not export.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import * as m from './index.js'; import fs from 'node:fs'; import assert from 'node:assert/strict'; const ex=Object.keys(m).filter(k=>typeof m[k]==='function').sort(); const rd=[...fs.readFileSync('README.md','utf8').matchAll(/^## *([A-Za-z_][A-Za-z0-9_]*)\\(/gm)].map(x=>x[1]).sort(); assert.deepEqual(rd,ex); for (const n of ['capitalize','slugify','truncate','padLeft']) assert.ok(ex.includes(n),n); console.log('ok', ex)\""
+        },
+        {
+          "line": "The padLeft section of README.md names its parameters (value, width, pad character), says that the pad character defaults to a space, and shows the 42 -> 00042 example.",
+          "proof": "read",
+          "how": "Read the `## padLeft(` section of README.md. It should list the three parameters, say the default pad character is a space, and include an example turning 42 into 00042."
+        },
+        {
+          "line": "`npm test` exits 0, and test/strutil.test.js contains at least one test that calls padLeft.",
+          "proof": "run",
+          "how": "npm test; echo exit=$?; grep -n 'padLeft' test/strutil.test.js"
+        }
+      ],
+      "non_goals": [
+        "A padRight or a general-purpose formatting function.",
+        "Changing how capitalize, slugify or truncate behave.",
+        "Publishing a new version to npm or bumping the version in package.json.",
+        "Adding CI configuration or a script that checks the README."
+      ],
+      "assumptions": [
+        "Signature is padLeft(value, width, ch = ' '), modelled on String.prototype.padStart. The invoice caller passes '0' explicitly. A space default keeps the function general-purpose.",
+        "Non-string input such as the number 42 is converted with String() before padding, because invoice numbers are often numbers.",
+        "An input that is already at least `width` long is returned unchanged and never cut, so an invoice number cannot lose digits.",
+        "'Keep the README's list of functions complete' means one `## name(...)` section for every exported function, in the README's existing style. slugify is exported but missing from the README today, so it must be added too.",
+        "Behaviour for a multi-character or empty pad character, or a negative width, is not specified. Any reasonable behaviour is fine as long as the expect lines hold."
+      ]
+    }
+  },
+  "hash": "945f64af0e0768b11fcdaff7d480aa5b7f4e11dd63a74a8e31dab071795299e4",
+  "caller": "bench-planted-half-rule-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:20:44.459Z"
+}

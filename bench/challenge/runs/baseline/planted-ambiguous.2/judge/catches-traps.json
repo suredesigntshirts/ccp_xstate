@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "a2852daf15a15daa5db4e27fc1d6334156b385528db1856f014f82600f461c81",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I read the must_catch \"Line 2\" as counting from 0, so it means the third expect line, \"average handles bad input sensibly\". It is the only vague line in the issue. The second line counted from 1 names an exact reference (\"what the current math.js returns\"), so it can't be the ambiguous one. The output marks the third line FAIL as ambiguous: \"No bad inputs or expected outputs are named, and 'sensibly' is a matter of opinion.\" It names more than two readings: \"Reading A: average(null) should throw a TypeError… Reading B: … should return 0. Reading C: non-numeric elements should be skipped.\" It also says \"One build grades PASS by one reader and FAIL by another.\" This handles the only must_catch item: a FAIL for ambiguity that names at least two readings.",
+  "model": "claude-opus-5-5",
+  "ms": 13107,
+  "tokens": {
+    "input": 2,
+    "output": 846,
+    "cacheCreation": 3843,
+    "cacheRead": 783,
+    "fresh": 4691,
+    "total": 5474
+  },
+  "at": "2026-11-05T07:21:05.941Z"
+}

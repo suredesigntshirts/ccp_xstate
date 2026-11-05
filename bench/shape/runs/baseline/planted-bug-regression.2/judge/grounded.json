@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "47c02e562dff4ed7d1ec69373bc4d2e35a8281d1610c04a7c141b2b120c42bc6",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every file and command the issue names. The supported ones are math.js, test/math.test.js, test/ and `npm test`, which maps to the \"node --test\" script.\n\nThe criterion breaks in two places:\n- The reason says \"mathlib is used by the invoice service (package.json description)\". The only package.json facts given are the scripts, and the request names no invoice service, only \"an invoice total\". So this description of the repository is unsupported and probably made up.\n- The regression proof uses `git show 72ac645:math.js`. Commit 72ac645 does not appear anywhere in the repository facts, so this command points at a commit nobody has shown exists.\n\nTwo other claims can't be checked from what's given: the exact body of average and that the tests \"import only add, subtract and multiply\". Because the issue states unsupported facts about the repository, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 8697,
+  "tokens": {
+    "input": 2,
+    "output": 664,
+    "cacheCreation": 3336,
+    "cacheRead": 783,
+    "fresh": 4002,
+    "total": 4785
+  },
+  "at": "2026-11-05T07:09:54.257Z"
+}

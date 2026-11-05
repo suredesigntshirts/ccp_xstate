@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "a044cb5b6e4c0b04e00800098fef93d6ef31594431493bd418a93edba068eef3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every expect line and the problem field. The expect lines describe behaviour you can observe: an export named padLeft (the request asks for that name), padLeft('42'/42, 5, '0') returning '00042' (the request's own example), input at or over the width coming back uncut, a README section for each export (the request asks for a complete list, and the heading format follows the existing style), a padLeft test, and `npm test` passing. None of them names a technique or internal helper. String.prototype.padStart and the default fill appear only under assumptions, which also leave them \"up to the builder\". The 3-argument signature is interface behaviour that the assumptions explain, not a way of building it. The problem field says only what is wrong: no left-pad export, slugify missing from the README, tests covering only the three existing functions. It proposes no fix.",
+  "model": "claude-opus-5-5",
+  "ms": 11139,
+  "tokens": {
+    "input": 2,
+    "output": 704,
+    "cacheCreation": 3514,
+    "cacheRead": 783,
+    "fresh": 4220,
+    "total": 5003
+  },
+  "at": "2026-11-05T07:07:21.622Z"
+}

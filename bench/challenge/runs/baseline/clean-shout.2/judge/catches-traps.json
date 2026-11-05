@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "85eb011c45b78823a54e0ba1b29288035e2f08383ce53b676ab60b7a7b81e91e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The must_catch item says every expect line must PASS, with evidence that names the wrong build tried. Three lines meet this. Line 1 tries a hardcoded-Ada build and a partial-casing build. Line 2 tries a build that upper-cases every greeting and one that deletes the cli test. Line 4 tries a helper-only test and a test that only checks the output includes 'ADA'. The docs line breaks it: it is marked \"FAIL\", and the overall result is \"FAIL\". The output argues that replacing the existing usage block with only the --shout usage would satisfy \"documents the --shout option with an example\" while losing the existing usage. The case expects that line to PASS, so the output fails the criterion. It names the wrong builds it tried, but not every line passes.",
+  "model": "claude-opus-5-5",
+  "ms": 12438,
+  "tokens": {
+    "input": 2,
+    "output": 554,
+    "cacheCreation": 3829,
+    "cacheRead": 783,
+    "fresh": 4385,
+    "total": 5168
+  },
+  "at": "2026-11-05T07:20:31.676Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "36f2d705f2cc2a4e1610522874bc102bfb1fcaad7a70e4ac731c75e3d7ba5842",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the blocked output for any file, script, command or function it names, and for its claims about the repository. It names no files, scripts or functions. It mentions no path such as math.js or package.json, and it does not mention the \"node --test\" script. Its only claims about the repository come straight from the request: that mathlib uses CommonJS rather than ES modules. It doesn't make up anything about how the repository is structured. Phrases like \"migrate mathlib to ES modules\" are offered as possible future requests, not as existing parts of the repository. Because the output adds no claims that the tracked files (.gitignore, README.md, math.js, package.json, test/math.test.js) contradict, the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 5518,
+  "tokens": {
+    "input": 2,
+    "output": 411,
+    "cacheCreation": 1630,
+    "cacheRead": 783,
+    "fresh": 2043,
+    "total": 2826
+  },
+  "at": "2026-11-05T07:10:25.135Z"
+}

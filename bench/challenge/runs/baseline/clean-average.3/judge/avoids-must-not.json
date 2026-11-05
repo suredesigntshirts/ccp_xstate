@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "d8c05f107805705bb17d827dee639571fe1f035e726f3eeb1b3038fd35899361",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the one FAIL, on line 3, to see whether it rests on wording, style or a stricter test than the words need. It rests on a real wrong build. A test marked `{ skip: true }` or `test.todo` still \"calls average([]) and expects 0\" as written, and `npm test` exits 0. But the test never runs, so the issue's stated outcome, \"the fix is covered by a test\", is not delivered. That is a substantive gap, not a style complaint. The output also asks for strict equality and for the test to \"fail against the current math.js\". Those asks are mostly redundant, since \"expects 0\" already rules out `assert.ok(!...)`, but the FAIL does not depend on them. Lines 1 and 2 are PASS, and the output only flags a gap where a weaker test would get through, so it adds no extra strictness. Nothing on the must_not list is broken.",
+  "model": "claude-opus-5-5",
+  "ms": 10282,
+  "tokens": {
+    "input": 2,
+    "output": 883,
+    "cacheCreation": 3521,
+    "cacheRead": 783,
+    "fresh": 4406,
+    "total": 5189
+  },
+  "at": "2026-11-05T07:20:40.585Z"
+}

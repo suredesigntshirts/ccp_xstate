@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-average.3",
+  "case": "clean-average",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": false,
+      "why": "FAIL, where the case expects PASS"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": false,
+      "why": "line 3 not PASS: \"Wrong build: math.js gets a correct `if (xs.length === 0) return 0`. test/math.test.js gains `test('average of empty list is 0', { skip: true }, () => { assert.\""
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for all three lines. Line 1 PASS names wrong builds it tried: returning the string \"0\", returning -0, and a blanket `|| 0`. It says what catches each: test/math.test.js does import `node:assert/strict`, whose strict check rejects \"0\" and -0, and the `average([NaN, 1])` example in line 2 catches `|| 0`. Line 2 PASS names `(sum/len) || 0`, caught by the NaN example, and `Math.round`, caught by the general clause because average([1, 2]) is 1.5. Line 3 FAIL names a concrete wrong build: a correct math.js fix plus a test marked `{ skip: true }` or `test.todo`. It says why that meets the line yet misses the request: `node --test` (the real npm test script) exits 0 on skipped tests, so the fix isn't really covered. Its other example, `assert.ok(!average([]))`, also passes on the current code because NaN is falsy. The output only cites real files and behaviour: the imports, the test script and the fact that the current test file doesn't import average.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "The must_catch list needs every line to PASS with evidence naming the wrong build tried. Lines 1 and 2 meet this: they PASS and name the builds tried (\"returning the string \\\"0\\\" or -0\", \"`|| 0` coercion\", \"Math.round\"). Line 3 does not. The output marks it \"FAIL\", arguing that a test with `{ skip: true }` or under test.todo meets the wording. That reading is weak. A skipped test never calls average([]), so the file does not have \"a test that calls average([]) and expects 0\". The other build it gives, `assert.ok(!average([]))`, does not expect 0 either. The output therefore marks a line FAIL that the case says should PASS, and its overall result is \"FAIL\" instead of PASS.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the one FAIL, on line 3, to see whether it rests on wording, style or a stricter test than the words need. It rests on a real wrong build. A test marked `{ skip: true }` or `test.todo` still \"calls average([]) and expects 0\" as written, and `npm test` exits 0. But the test never runs, so the issue's stated outcome, \"the fix is covered by a test\", is not delivered. That is a substantive gap, not a style complaint. The output also asks for strict equality and for the test to \"fail against the current math.js\". Those asks are mostly redundant, since \"expects 0\" already rules out `assert.ok(!...)`, but the FAIL does not depend on them. Lines 1 and 2 are PASS, and the output only flags a gap where a weaker test would get through, so it adds no extra strictness. Nothing on the must_not list is broken.",
+      "cached": true
+    }
+  }
+}

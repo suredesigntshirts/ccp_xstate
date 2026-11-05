@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "2b390c1ee5ea3ebe68e727110a90b0db2aafa252d3a6ecf7634e9669524a5123",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The output's only FAIL is on line 3, the docs line. I checked whether that FAIL is about wording, style, or a stricter test than the request needs. It isn't. It names two concrete wrong builds that meet the line's words. One replaces the existing usage block with only a --shout example, which goes against the request's \"next to the existing usage\". The other gives an example showing the wrong output (\"Prints Hello, Ada!\"), which still counts as \"documented with an example\". Both are real gaps between the line and the request, not wording preferences. The fix it asks for (keep the existing usage, put --shout next to it, show HELLO, ADA!) comes straight from the request and the line-1 behavior. The other three lines get PASS without nitpicking. Nothing on the must_not list is done.",
+  "model": "claude-opus-5-5",
+  "ms": 10581,
+  "tokens": {
+    "input": 2,
+    "output": 607,
+    "cacheCreation": 3914,
+    "cacheRead": 783,
+    "fresh": 4523,
+    "total": 5306
+  },
+  "at": "2026-11-05T07:20:44.234Z"
+}

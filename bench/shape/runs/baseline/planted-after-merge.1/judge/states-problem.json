@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "2e708ce82bd732846614461f265f7bc074f52e908c4be6a66b7622688a43b8f3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion is met. I checked all six expect lines and the problem field. Each expect line describes behaviour that can be observed from outside: exact stdout, exit codes, stderr usage, `npm test` passing with a `--shout` test, and docs/index.md covering the option. None of them names a technique, an internal function or a return value. The documentation line comes straight from the request (\"shows up on the published docs site\"). docs/index.md is just where that site is built from, not a way of fixing the code. The problem field only describes what is wrong: the CLI ignores every `--` argument, so `--shout Ada` prints `Hello, Ada!`, and the docs have no louder form. Quoting the line that drops the flags explains the bug without proposing a fix. The possible ways to build it (\"adding an option to `greeting` in src/greet.js or uppercasing in bin/greet.js\") appear only under assumptions, as the builder's choice.",
+  "model": "claude-opus-5-5",
+  "ms": 8908,
+  "tokens": {
+    "input": 2,
+    "output": 524,
+    "cacheCreation": 549,
+    "cacheRead": 3608,
+    "fresh": 1075,
+    "total": 4683
+  },
+  "at": "2026-11-05T07:09:39.272Z"
+}

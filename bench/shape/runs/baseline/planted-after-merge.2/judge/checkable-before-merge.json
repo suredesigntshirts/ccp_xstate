@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "63526f111348149592423b8cc51f5404ffa13ad19bd181c4e0e185f96f9530fd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines and their proofs. Four lines are about CLI behaviour (`--shout Ada`, `Ada --shout`, plain `Ada`, and `--shout` with no name). Each has a \"run\" proof that runs the CLI locally and checks exact stdout bytes with `od -c`, the exit status, and stderr. All of this can be done at the PR head and gives one answer. The docs line is a \"read\" of docs/index.md at the PR head, not of the published site. The npm test line uses `npm test` plus a grep of test/greet.test.js, which is also local. Only \"outcome\" mentions the published site (\"after the next push to main\"), not any expect line. The non_goals state plainly that publishing or checking the live page at o.github.io is out of scope. No expect line needs a release, a deploy or a published page.",
+  "model": "claude-opus-5-5",
+  "ms": 6106,
+  "tokens": {
+    "input": 2,
+    "output": 474,
+    "cacheCreation": 3475,
+    "cacheRead": 783,
+    "fresh": 3951,
+    "total": 4734
+  },
+  "at": "2026-11-05T07:09:46.577Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9b072d327134bb09ae69c6e9e9b72c55eb7273cb35d1a69838b0bb830e140b12",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch item asks for line 2 to FAIL as ambiguous, with two readings. Counting the expect lines from 0, line 2 is \"average handles bad input sensibly\". That is the only vague line. The line at 1-based position 2 is exact, with NaN examples, so it cannot be the intended trap. The output gives the bad-input line \"result\": \"FAIL\" and calls it ambiguous: \"'Bad input' and 'sensibly' are not defined.\" It names two readings. In one, \"throwing as sensible\", so the current code or any fix would PASS. In the other, null and non-arrays \"return 0, or a typed error\", so the same build would FAIL. It also notes that \"Two careful readers grading the same commit can disagree.\" Its wrong_build repeats both readings. The single must_catch item is handled.",
+  "model": "claude-opus-5-5",
+  "ms": 8862,
+  "tokens": {
+    "input": 2,
+    "output": 726,
+    "cacheCreation": 3636,
+    "cacheRead": 783,
+    "fresh": 4364,
+    "total": 5147
+  },
+  "at": "2026-11-05T07:21:10.246Z"
+}

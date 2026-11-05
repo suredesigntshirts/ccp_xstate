@@ -1,0 +1,1 @@
+Run planted-shared-parser-2:0.shape, worktree /tmp/bench-planted-shared-parser-2-9BPj9o/wt/planted-shared-parser-2--0.shape of https://github.com/o/csv2json, branch run/planted-shared-parser-2/0.shape.

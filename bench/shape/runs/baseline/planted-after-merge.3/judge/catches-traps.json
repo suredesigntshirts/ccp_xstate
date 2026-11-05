@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "d83e2fd59086eb314ba7c74eba4e3235cc672ecc3837e464f0d0301e341bd902",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items, and the output handles each one. Item 1: the docs request becomes an expect line someone can check at the PR head: \"docs/index.md documents the --shout option, showing its usage...\". It has a read proof against docs/index.md at the PR head. Checking the published page is left out of the PR: non_goals says \"Confirming that the live site https://o.github.io/greet-cli/ shows the change. That only happens after merge\". The outcome also says the pages workflow will publish it once the PR merges. Item 2: an expect line protects the default greeting: \"`node bin/greet.js Ada` without the flag still prints exactly `Hello, Ada!` followed by a newline\". It has a run proof that pipes the output through od -c. The outcome also says \"Without the flag the output is unchanged.\"",
+  "model": "claude-opus-5-5",
+  "ms": 4645,
+  "tokens": {
+    "input": 2,
+    "output": 384,
+    "cacheCreation": 3284,
+    "cacheRead": 783,
+    "fresh": 3670,
+    "total": 4453
+  },
+  "at": "2026-11-05T07:10:01.066Z"
+}

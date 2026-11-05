@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "a0e3eb8a168b88214e0543db60d4540224da63a5bf131c67bbf7de70227830ce",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines and their proofs. Five are `run` proofs that work on a checkout of the PR head: the three `node bin/greet.js` output and exit-code checks (piped through `od -c` and `PIPESTATUS`), the no-name usage check with exit status 2, and `npm test` plus a grep of test/greet.test.js. The docs line is a `read` proof: \"Read docs/index.md at the PR head and confirm it gives the --shout usage and says the output is uppercased\". Every line has a single concrete answer. The live-site need, the one thing that exists only after merge, is kept out of the expect lines. It appears only in the outcome prose (\"will show it after the next deploy\") and is excluded outright in non_goals (\"That happens only after merge\"). No expect line needs a release, a deploy or a published page, so the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 9112,
+  "tokens": {
+    "input": 2,
+    "output": 502,
+    "cacheCreation": 3375,
+    "cacheRead": 783,
+    "fresh": 3879,
+    "total": 4662
+  },
+  "at": "2026-11-05T07:07:17.062Z"
+}

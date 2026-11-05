@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "1b62b80b071e2243b8d6bb1265a2e06d250df645ea1016813f3b701c4d79f7ff",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all 11 expect lines and their proofs. Nine are \"run\" proofs that work on a local checkout of the PR head after `npm ci`. They write temporary files with `printf`, run `./node_modules/.bin/jsonl-lint`, and check the exit code and output prefixes like `^$F:2:`. Each one states a single expected result, for example \"expect exit=1, then 2, then 0\". The test-suite line runs `npm test` and also has the checker read the test files. Since it adds a reading step, it still has one clear answer. The CI line asks for the `test` check to be green \"on the PR head\", which happens before merge. The README line is a \"read\" at the PR head. No line depends on a release, publish or deploy, and publishing to npm is listed as a non-goal. \"A usage message\" is a little loose, but the proof checks it plainly: exit code 2 and non-empty stderr.",
+  "model": "claude-opus-5-5",
+  "ms": 7746,
+  "tokens": {
+    "input": 2,
+    "output": 629,
+    "cacheCreation": 5970,
+    "cacheRead": 783,
+    "fresh": 6601,
+    "total": 7384
+  },
+  "at": "2026-11-05T07:11:33.675Z"
+}

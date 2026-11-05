@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "2e708ce82bd732846614461f265f7bc074f52e908c4be6a66b7622688a43b8f3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines and the problem field. Each expect line describes behavior a verifier can observe: the exact stdout and exit codes for `--shout Ada`, `Ada --shout`, plain `Ada` and `--shout` with no name; that `npm test` passes with a test covering `--shout`; and that docs/index.md documents the option. None of them names a technique, an internal function or a return value. Putting the docs in docs/index.md follows from the request's demand for the published docs site, so it is not a prescribed fix. The problem field only says what is wrong: flags are thrown away by the quoted `.find(...)`, so `--shout Ada` prints `Hello, Ada!`, and the docs have no louder form. It proposes no fix. The one implementation idea (\"adding an option to `greeting` in src/greet.js or uppercasing in bin/greet.js\") appears only under assumptions and is left as the builder's choice.",
+  "model": "claude-opus-5-5",
+  "ms": 6483,
+  "tokens": {
+    "input": 2,
+    "output": 512,
+    "cacheCreation": 3373,
+    "cacheRead": 783,
+    "fresh": 3887,
+    "total": 4670
+  },
+  "at": "2026-11-05T07:07:07.950Z"
+}

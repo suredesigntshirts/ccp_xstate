@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "3571486a238da35949f77a2458358c0b5c8f492d4025627f6988ce3ba7d112bf",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I checked the problem field and all six expect lines. The problem field only says what is wrong: \"bin/greet.js has no --shout option\", unknown flags are \"silently drop[ped]\", and the docs show only `<name>`. It proposes no fix. Each expect line states observable behavior: exit codes, exact stdout/stderr, what docs/index.md contains, and that the tests pass. None names a technique, an internal function or a return value. The upper-case output and the exit-2 usage error are behaviors the verifier can see, not implementation choices. The one implementation choice, whether to change src/greet.js (new option or export) or only bin/greet.js, is left to the builder and sits under assumptions. The pages-workflow reasoning sits under assumptions and non_goals, not in expect. The test-file line asks for a test to exist but doesn't say how to fix the problem.",
+  "model": "claude-opus-5-5",
+  "ms": 10100,
+  "tokens": {
+    "input": 2,
+    "output": 558,
+    "cacheCreation": 3473,
+    "cacheRead": 783,
+    "fresh": 4033,
+    "total": 4816
+  },
+  "at": "2026-11-05T07:09:40.470Z"
+}

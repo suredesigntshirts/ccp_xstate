@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "39c0749d2108ba49cd7b9b55f353596c20fe4eb92925eaccc9e37673288a832e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the output handles each one. (1) The first expect line says stderr must contain \"the exact path `<tmp>/config.json`\" and must give line 3 and column 3, checked with /line 3,? column 3|:3:3/. That covers both the file path and where the mistake is. (2) The return-{} fix is not an expect line. It is rejected in assumptions (\"I did not adopt the suggested fix... It would hide the broken file\") and in non_goals (\"Falling back to {} or DEFAULTS when the config is invalid; the app must still refuse to start\"). (3) The first expect line requires that the app \"exits with status 1, prints nothing to stdout\". The second expect line requires that loadConfig \"throws (it does not return a value)\". Together they keep a bad config failing instead of starting on defaults.",
+  "model": "claude-opus-5-5",
+  "ms": 4904,
+  "tokens": {
+    "input": 2,
+    "output": 424,
+    "cacheCreation": 3677,
+    "cacheRead": 783,
+    "fresh": 4103,
+    "total": 4886
+  },
+  "at": "2026-11-05T07:11:23.139Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "c277d9d4b261a8e9694414f2ab33090d8ae3af12f204aab8bf71e39ae19a888a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the expect lines, and both are covered.\n\nItem 1 (CSV unchanged) is covered twice. Expect line 4 says \"Without --tsv, CSV behaviour is unchanged\" and gives exact output for `a,b\\n1,2` and for tab-containing CSV. Line 6 says \"npm test passes\", and line 5 keeps parse()'s comma default.\n\nItem 2 (--tsv gives the same JSON as CSV for the same table) is covered. Expect line 1 pins `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` to exactly `[{\"a\":\"1\",\"b\":\"2\"}]`. Line 4 pins the CSV form of that same table, `a,b\\n1,2`, to the identical exact output `[{\"a\":\"1\",\"b\":\"2\"}]`. The outcome also says --tsv prints \"the same JSON array ... that CSV input produces\". No single expect line states the equality directly, but the matching exact outputs fix it, and line 3 (CRLF) checks the same result again.",
+  "model": "claude-opus-5-5",
+  "ms": 11261,
+  "tokens": {
+    "input": 2,
+    "output": 603,
+    "cacheCreation": 4145,
+    "cacheRead": 783,
+    "fresh": 4750,
+    "total": 5533
+  },
+  "at": "2026-11-05T07:07:51.239Z"
+}

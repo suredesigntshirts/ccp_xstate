@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "f13c5e18cfa3562c0063b4dc36bff689aa2bedc554a49179805c0d4e6751e6f8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: a PASS overall. I checked the top-level field, and it reads \"result\": \"FAIL\". One expect line, the README line, is marked PASS. That is a per-line verdict, not the overall result, so it doesn't break the rule. The overall FAIL is backed by a wrong build: the program always parses with a tab, which breaks plain CSV input, yet it still meets the --tsv line. So the output doesn't do the one thing it must not do.",
+  "model": "claude-opus-5-5",
+  "ms": 5971,
+  "tokens": {
+    "input": 2,
+    "output": 236,
+    "cacheCreation": 3167,
+    "cacheRead": 783,
+    "fresh": 3405,
+    "total": 4188
+  },
+  "at": "2026-11-05T07:21:38.740Z"
+}

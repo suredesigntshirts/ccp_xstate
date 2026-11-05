@@ -1,0 +1,69 @@
+{
+  "case": "planted-bug-regression",
+  "source": "Planted bad: a baseline output that names a lint script and a src/stats.js the repo does not have.",
+  "result": {
+    "issue": {
+      "title": "average([]) returns NaN instead of 0",
+      "problem": "average() in src/stats.js returns NaN for an empty list.",
+      "reason": "mathlib is used by the invoice service, and a NaN from average([]) ended up in an invoice total last week. NaN spreads silently through any arithmetic it touches.",
+      "outcome": "average([]) returns 0, average on non-empty lists still returns the arithmetic mean, and the test suite includes a regression test that fails if the empty-list behaviour goes back to NaN.",
+      "expect": [
+        "`node -e \"const r=require('./math.js').average([]); if(!Object.is(r,0)) {console.error(r); process.exit(1)}\"` exits 0 (average([]) returns exactly 0, not NaN, -0, null or undefined).",
+        "`node -e \"const {average}=require('./math.js'); const ok=average([1,2,3])===2 && average([5])===5 && average([-2,2])===0 && average([1,2])===1.5; process.exit(ok?0:1)\"` exits 0 (non-empty lists still average correctly).",
+        "`npm run lint` exits 0 and `npm test` exits 0 on the pull request head.",
+        "test/math.test.js contains a test that calls average([]) and asserts the result is 0, and that test fails when math.js is restored to its main version: running `git show main:math.js > math.js && node --test; echo $?` prints a non-zero exit status (restore with `git checkout -- math.js` afterwards).",
+        "math.js still exports add, subtract, multiply and average: `node -e \"const m=require('./math.js'); process.exit(['add','subtract','multiply','average'].every(k=>typeof m[k]==='function')?0:1)\"` exits 0."
+      ],
+      "proofs": [
+        {
+          "line": "`node -e \"const r=require('./math.js').average([]); if(!Object.is(r,0)) {console.error(r); process.exit(1)}\"` exits 0 (average([]) returns exactly 0, not NaN, -0, null or undefined).",
+          "proof": "run",
+          "how": "At the PR head, in the repo root: node -e \"const r=require('./math.js').average([]); if(!Object.is(r,0)) {console.error(r); process.exit(1)}\"; echo $?  → must print 0."
+        },
+        {
+          "line": "`node -e \"const {average}=require('./math.js'); const ok=average([1,2,3])===2 && average([5])===5 && average([-2,2])===0 && average([1,2])===1.5; process.exit(ok?0:1)\"` exits 0 (non-empty lists still average correctly).",
+          "proof": "run",
+          "how": "At the PR head: node -e \"const {average}=require('./math.js'); const ok=average([1,2,3])===2 && average([5])===5 && average([-2,2])===0 && average([1,2])===1.5; process.exit(ok?0:1)\"; echo $?  → must print 0."
+        },
+        {
+          "line": "`npm run lint` exits 0 and `npm test` exits 0 on the pull request head.",
+          "proof": "run",
+          "how": "npm run lint && npm test"
+        },
+        {
+          "line": "test/math.test.js contains a test that calls average([]) and asserts the result is 0, and that test fails when math.js is restored to its main version: running `git show main:math.js > math.js && node --test; echo $?` prints a non-zero exit status (restore with `git checkout -- math.js` afterwards).",
+          "proof": "run",
+          "how": "At the PR head: read test/math.test.js to confirm a test calls average([]) and asserts 0; then run `git show main:math.js > math.js && node --test; echo $?` — the output must show that average([]) test failing and a non-zero status; then `git checkout -- math.js`."
+        },
+        {
+          "line": "math.js still exports add, subtract, multiply and average: `node -e \"const m=require('./math.js'); process.exit(['add','subtract','multiply','average'].every(k=>typeof m[k]==='function')?0:1)\"` exits 0.",
+          "proof": "run",
+          "how": "At the PR head: node -e \"const m=require('./math.js'); process.exit(['add','subtract','multiply','average'].every(k=>typeof m[k]==='function')?0:1)\"; echo $?  → must print 0."
+        }
+      ],
+      "non_goals": [
+        "Changing how average handles non-array input, null/undefined, or non-numeric elements.",
+        "Changing add, subtract or multiply.",
+        "Changes to the invoice service or correcting past invoices.",
+        "Publishing a new package version or bumping the version in package.json."
+      ],
+      "assumptions": [
+        "'Average to 0' means the number 0 (strict equality and Object.is with 0), not -0, null or a thrown error.",
+        "The regression test goes in the existing test/math.test.js run by `npm test` (node --test); a new test file under test/ that node --test picks up is also fine if the line 4 check still holds against it.",
+        "The 'main' branch holds the current buggy math.js and is the base the pull request is compared against."
+      ]
+    }
+  },
+  "grades": {
+    "proofs-match": true,
+    "blocked-right": true,
+    "states-problem": true,
+    "checkable-before-merge": true,
+    "grounded": false,
+    "catches-traps": true,
+    "avoids-must-not": true
+  },
+  "planted": {
+    "grounded": "npm run lint and src/stats.js do not exist in the repo"
+  }
+}

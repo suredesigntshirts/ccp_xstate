@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-bug-regression.2",
+  "case": "planted-bug-regression",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "5 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. I checked all five expect lines and the problem field. Expect 1 says average([]) returns the number 0, which the request itself requires (\"An empty list should average to 0\"). It doesn't name a technique such as a length guard or early return. Expect 2 and 3 check that existing behaviour is unchanged. Expect 4 and 5 ask for a test that catches the bug if it comes back. Expect 5 quotes the original buggy body only to undo the fix in a scratch copy, not to say how to write the fix. No expect line names an internal function or a way to implement the fix. The problem field only describes what is wrong: `0/0` for an empty array prints NaN, and \"average has no tests at all\". It doesn't suggest a fix. Choices that go beyond the request, such as where the test goes, are kept under assumptions.",
+      "cached": false
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for all five expect lines. Each one can be checked at the PR head, and each gives one clear answer. Every proof is a `run` with a concrete command and an expected exit code. Line 1 and lines 2–3 use `node -e` scripts that exit 0 or 1 against `./math.js`. Line 4 runs `npm test; echo $?` and checks the tests with `grep -rn 'average(\\[\\])' test/`. Line 5, the regression guard, restores the original body in a scratch copy, either with `git show 72ac645:math.js` or by hand, then runs `npm test` and expects a non-zero exit. That commit already exists before merge, and the scratch copy is local work. No line needs a release, a deploy, a published page or anything that only exists after merge. Publishing and version bumps are listed under non_goals.",
+      "cached": false
+    },
+    "grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every file and command the issue names. The supported ones are math.js, test/math.test.js, test/ and `npm test`, which maps to the \"node --test\" script.\n\nThe criterion breaks in two places:\n- The reason says \"mathlib is used by the invoice service (package.json description)\". The only package.json facts given are the scripts, and the request names no invoice service, only \"an invoice total\". So this description of the repository is unsupported and probably made up.\n- The regression proof uses `git show 72ac645:math.js`. Commit 72ac645 does not appear anywhere in the repository facts, so this command points at a commit nobody has shown exists.\n\nTwo other claims can't be checked from what's given: the exact body of average and that the tests \"import only add, subtract and multiply\". Because the issue states unsupported facts about the repository, the criterion is not met.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the expect list. Item 1 (a regression test that calls average([]) and expects 0) is covered by expect line 4: \"`npm test` exits 0 and its output shows at least one test under test/ that calls average([]) and asserts the result is 0\". The regression-guard line backs it up: npm test must fail if the original body of average is put back. Item 2 (a non-empty average stays correct) is covered by expect line 2: \"average of non-empty arrays is unchanged: average([2,4])===3, average([1,2,3,4])===2.5…\". Each line also has a run proof. Nothing in the output conflicts with either item.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: an issue that has no regression test line for the empty-list bug. I checked the expect list for such a line. It has two. One says \"`npm test` exits 0 and its output shows at least one test under test/ that calls average([]) and asserts the result is 0\". The other is a \"Regression guard\" line: if average's body is put back to the original, `npm test` must exit non-zero. Both lines have run proofs. One proof greps test/ for average([]) inside an assertion. The other restores the old math.js and expects a failing test. The outcome also says the suite \"has a test for average that catches this bug if it comes back.\" So the output does not do the forbidden thing.",
+      "cached": false
+    }
+  }
+}

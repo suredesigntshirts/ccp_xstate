@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "196638524f04f3e2ae6a5f32241c0172d257677ad0b785b2939e5e4cf5b43614",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I checked each expect line for a prescribed fix. The lines only check observable behaviour: average([]) returns 0, which the request asks for directly (\"An empty list should average to 0\"). The other lines check that non-empty results are unchanged from base, that the input array isn't modified, that the exports are unchanged, that a regression test exists and fails on base, and that npm test passes. None names a technique or an internal function. The regression-test line asks for a deliverable but doesn't say how to fix the bug. The technique is left open under assumptions: \"How the fix is done (an early return for empty input, a guard on length, or similar) is up to the builder.\" The problem field only describes the fault: the code computes 0 / 0, so average([]) returns NaN; there is no test for it; and the NaN reached an invoice total. It doesn't propose a fix.",
+  "model": "claude-opus-5-5",
+  "ms": 7780,
+  "tokens": {
+    "input": 2,
+    "output": 537,
+    "cacheCreation": 3610,
+    "cacheRead": 783,
+    "fresh": 4149,
+    "total": 4932
+  },
+  "at": "2026-11-05T07:09:38.172Z"
+}

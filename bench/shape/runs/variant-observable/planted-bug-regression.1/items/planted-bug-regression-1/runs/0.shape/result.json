@@ -1,0 +1,59 @@
+{
+  "result": {
+    "issue": {
+      "title": "average([]) returns NaN instead of 0",
+      "problem": "In math.js, `average(xs)` divides the sum by `xs.length`, so `require('./math.js').average([])` returns NaN (verified: `node -e 'console.log(require(\"./math\").average([]))'` prints `NaN`). test/math.test.js imports only add, subtract and multiply; average has no test at all, so `npm test` passes while this bug is present.",
+      "reason": "mathlib is used by the invoice service (README). An empty list of amounts produced NaN, which propagated into an invoice total last week. NaN silently poisons every later arithmetic step.",
+      "outcome": "average of an empty list returns the number 0, averages of non-empty lists are unchanged, the other exports behave as before, and the test suite contains a regression test for the empty-list case that fails on the current code.",
+      "expect": [
+        "`require('./math.js').average([])` returns the number 0 (`Object.is(average([]), 0)` is true; not NaN, not -0, not null/undefined/'0', and no exception is thrown).",
+        "Non-empty input is unchanged: `average([1, 2, 3])` === 2, `average([5])` === 5, `average([1, 2])` === 1.5, `average([-2, 2])` === 0, `average([0, 0])` === 0.",
+        "`add`, `subtract` and `multiply` are still exported from math.js with the same results: `add(2, 3)` === 5, `subtract(5, 3)` === 2, `multiply(-2, 3)` === -6.",
+        "`npm test` exits 0 at the PR head.",
+        "test/math.test.js contains a test asserting `average([])` equals 0, and that test fails when math.js is put back to the base-branch version: with the PR's test file and the base math.js, `npm test` exits non-zero."
+      ],
+      "proofs": [
+        {
+          "line": "`require('./math.js').average([])` returns the number 0 (`Object.is(average([]), 0)` is true; not NaN, not -0, not null/undefined/'0', and no exception is thrown).",
+          "proof": "run",
+          "how": "From the repo root at PR head: `node -e 'const r=require(\"./math.js\").average([]); console.log(Object.is(r,0)); process.exit(Object.is(r,0)?0:1)'` prints `true` and exits 0."
+        },
+        {
+          "line": "Non-empty input is unchanged: `average([1, 2, 3])` === 2, `average([5])` === 5, `average([1, 2])` === 1.5, `average([-2, 2])` === 0, `average([0, 0])` === 0.",
+          "proof": "run",
+          "how": "`node -e 'const {average:a}=require(\"./math.js\"); const ok=a([1,2,3])===2&&a([5])===5&&a([1,2])===1.5&&a([-2,2])===0&&a([0,0])===0; console.log(ok); process.exit(ok?0:1)'` prints `true` and exits 0."
+        },
+        {
+          "line": "`add`, `subtract` and `multiply` are still exported from math.js with the same results: `add(2, 3)` === 5, `subtract(5, 3)` === 2, `multiply(-2, 3)` === -6.",
+          "proof": "run",
+          "how": "`node -e 'const m=require(\"./math.js\"); const ok=m.add(2,3)===5&&m.subtract(5,3)===2&&m.multiply(-2,3)===-6; console.log(ok); process.exit(ok?0:1)'` prints `true` and exits 0."
+        },
+        {
+          "line": "`npm test` exits 0 at the PR head.",
+          "proof": "run",
+          "how": "Run `npm test` at the PR head; exit code is 0 and the output reports `# fail 0`."
+        },
+        {
+          "line": "test/math.test.js contains a test asserting `average([])` equals 0, and that test fails when math.js is put back to the base-branch version: with the PR's test file and the base math.js, `npm test` exits non-zero.",
+          "proof": "run",
+          "how": "Read test/math.test.js to confirm it imports `average` and asserts `average([])` is 0. Then in a scratch copy of the PR head, run `git show <base>:math.js > math.js` (base = the PR's merge base) and `npm test`; it must exit non-zero with the empty-list test failing."
+        }
+      ],
+      "non_goals": [
+        "Changing the behaviour of average for non-array input, non-numeric elements, or lists containing NaN/Infinity.",
+        "Changing add, subtract or multiply.",
+        "Changing the invoice service or correcting past invoices.",
+        "Publishing a new package version or bumping the version in package.json."
+      ],
+      "assumptions": [
+        "The returned value for an empty list is the number 0 (positive zero), as the request says, rather than throwing an error or returning null.",
+        "Only the empty array `[]` is in scope; inputs such as `undefined` or non-arrays keep their current behaviour.",
+        "The regression test belongs in the existing test/math.test.js run by `npm test` (node --test)."
+      ]
+    }
+  },
+  "hash": "2dc6fe7733ac7e2ba11b9987b5a80a967ff90e470dca86e1cf3112795d7d8249",
+  "caller": "bench-planted-bug-regression-1",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:19:57.856Z"
+}

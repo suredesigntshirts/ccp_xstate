@@ -1,0 +1,14 @@
+{
+  "case": "planted-not-one-change",
+  "source": "A baseline output (bench/shape/runs/baseline/planted-not-one-change.1): blocked on a question.",
+  "result": {
+    "blocked": {
+      "reason": "The request (issue #11) is a question, not a change: it asks why mathlib uses CommonJS rather than ES modules and whether that was a deliberate choice. It asks for no change to the repository, such as migrating to ESM, adding dual exports, or documenting the module format, so there is no outcome a pull request could make true and a verifier could check. Answer it as a discussion. If someone then asks for a concrete change (for example 'document the module-format decision in README' or 'publish ESM builds'), that can become an issue."
+    }
+  },
+  "grades": {
+    "blocked-right": true,
+    "catches-traps": true,
+    "avoids-must-not": true
+  }
+}

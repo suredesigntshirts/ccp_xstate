@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "377408344c2c37f25d4207518353431895ba82b0eb4c08f1c2ee6c280231d767",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Neither item on the must_not list appears. 1) The README expect line needs \"Every function index.js exports (capitalize, slugify, truncate, padLeft) has its own `## name(` section heading\". A build that adds only a padLeft section fails it, and the proof script checks slugify too. The assumptions also say the job \"includes adding the missing slugify section, not only padLeft.\" 2) No expect line dictates how padLeft is built. The lines check only behaviour: the output for '42' and 42, that wider input is not cut off, and that it is exported. padStart is mentioned only in assumptions, which say \"How padLeft is implemented (for example with String.prototype.padStart) is up to the builder.\" The default fill is also left open and not checked.",
+  "model": "claude-opus-5-5",
+  "ms": 9774,
+  "tokens": {
+    "input": 2,
+    "output": 614,
+    "cacheCreation": 550,
+    "cacheRead": 3758,
+    "fresh": 1166,
+    "total": 4924
+  },
+  "at": "2026-11-05T07:10:51.870Z"
+}

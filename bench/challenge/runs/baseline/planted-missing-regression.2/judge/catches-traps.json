@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "c166903b8c012d027a139fbee2f0b6b890c092f5cf5c81ad141a1537b4ee4653",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "There is one must_catch item: FAIL, naming the missing line that CSV stays unchanged (or npm test passes), with a wrong build that breaks CSV. The output's overall result is \"FAIL\". The first line's evidence names missing line (a): \"running node bin/csv2json.js without --tsv on comma input gives the same output as before (or `npm test` passes, existing tests unchanged)\". The wrong build breaks CSV in two ways. One is an unconditional tab split (\"always splits on tab and breaks CSV entirely\"). The other is a /[\\t,]/ default that wrongly splits comma input when fields contain tabs. The output also says no line requires running the existing test that would catch this. The item is fully handled.",
+  "model": "claude-opus-5-5",
+  "ms": 8017,
+  "tokens": {
+    "input": 2,
+    "output": 400,
+    "cacheCreation": 3451,
+    "cacheRead": 783,
+    "fresh": 3853,
+    "total": 4636
+  },
+  "at": "2026-11-05T07:21:32.604Z"
+}

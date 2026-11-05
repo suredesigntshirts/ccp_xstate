@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "e6806632be5d985af8668dcee4939445e9d5ebd56f30ba243cf915a57de4c359",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the evidence for each line against the criterion. Line 3's FAIL does name a concrete wrong build: a PR that adds only a padLeft section passes the line but leaves out slugify, which index.js really exports and README.md really lacks. Line 2's PASS names a wrong build (one that cuts a longer s down to width) and shows how \"unchanged\" catches it.\n\nLine 1's FAIL breaks the criterion. Its evidence only suggests a rewrite: the line \"should say \\\"zero-pad\\\"\" and \"should also require that fill is exactly one character\". It names no concrete wrong build that meets the line yet misses the request, gives no two concrete readings, and gives no post-merge reason.\n\nLine 4's PASS also misquotes the repository. It says npm test runs \"node --test test/\", but package.json's test script is \"node --test\".",
+  "model": "claude-opus-5-5",
+  "ms": 6320,
+  "tokens": {
+    "input": 2,
+    "output": 438,
+    "cacheCreation": 3489,
+    "cacheRead": 783,
+    "fresh": 3929,
+    "total": 4712
+  },
+  "at": "2026-11-05T07:19:07.500Z"
+}

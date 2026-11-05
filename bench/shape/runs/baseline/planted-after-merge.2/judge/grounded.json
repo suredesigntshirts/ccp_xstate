@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "2be62f7069edc4c409a953bbb992c719b6d1ef158742d87690a683ad9ffaeca2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every path and command the issue names against the 8 tracked files and the package.json scripts. bin/greet.js, src/greet.js, docs/index.md, .github/workflows/pages.yml and test/greet.test.js are all tracked. `npm test` maps to the existing `node --test` script. The `--shout` option is the thing the issue asks to create. The `greeting(name)` export is described as being in src/greet.js, which exists. I could not see file contents, so some claims are unchecked: that bin/greet.js drops '--' arguments, that pages.yml publishes docs/ on push to main, and that a call with no arguments exits 2. Still, nothing I was given contradicts them. Calling out pages.yml for docs publishing fits the workflow file being there. The issue invents no script, file or function that isn't in the repo and isn't marked as new work.",
+  "model": "claude-opus-5-5",
+  "ms": 9421,
+  "tokens": {
+    "input": 2,
+    "output": 594,
+    "cacheCreation": 3532,
+    "cacheRead": 783,
+    "fresh": 4128,
+    "total": 4911
+  },
+  "at": "2026-11-05T07:09:56.002Z"
+}

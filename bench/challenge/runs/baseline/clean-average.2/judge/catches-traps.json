@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "f84eaaa7b553efab7ad96dd5759b11128ad0a6da3d35ef82463eab4d373be28b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion is met. The single must_catch item asks that every line PASS with evidence naming the wrong build that was tried. I checked all three lines. Line 1 is PASS and names the builds it tried: \"returning the string '0' or '0.00'\", \"returning -0\" and \"catching every NaN result and turning it into 0\". Line 2 is PASS and names \"`const r = sum/len; return Number.isNaN(r) ? 0 : r`\". It also names rounding and a different summing loop. Line 3 is PASS and names \"a test that never calls average([])\", \"a fix with no test at all\" and a test.skip build. The overall result is also PASS. Every line is PASS and each one's evidence names a concrete wrong build, so the item holds across the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 5230,
+  "tokens": {
+    "input": 2,
+    "output": 417,
+    "cacheCreation": 3368,
+    "cacheRead": 783,
+    "fresh": 3787,
+    "total": 4570
+  },
+  "at": "2026-11-05T07:20:24.904Z"
+}

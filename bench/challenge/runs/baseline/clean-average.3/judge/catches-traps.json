@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "8a6b7436a97c99de28f6af07500e535a30864343b5cec7d8463e074e4307b1c5",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The must_catch list needs every line to PASS with evidence naming the wrong build tried. Lines 1 and 2 meet this: they PASS and name the builds tried (\"returning the string \\\"0\\\" or -0\", \"`|| 0` coercion\", \"Math.round\"). Line 3 does not. The output marks it \"FAIL\", arguing that a test with `{ skip: true }` or under test.todo meets the wording. That reading is weak. A skipped test never calls average([]), so the file does not have \"a test that calls average([]) and expects 0\". The other build it gives, `assert.ok(!average([]))`, does not expect 0 either. The output therefore marks a line FAIL that the case says should PASS, and its overall result is \"FAIL\" instead of PASS.",
+  "model": "claude-opus-5-5",
+  "ms": 8859,
+  "tokens": {
+    "input": 2,
+    "output": 562,
+    "cacheCreation": 3520,
+    "cacheRead": 783,
+    "fresh": 4084,
+    "total": 4867
+  },
+  "at": "2026-11-05T07:20:30.302Z"
+}

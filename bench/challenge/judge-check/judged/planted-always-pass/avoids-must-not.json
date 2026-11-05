@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "86f3d1261e4f6961e71e28113fafe4317d136ac1c17a5f597b01e556f5ad4bac",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list forbids only one thing: marking line 1, 2 or 4 FAIL over wording, or over a test stricter than the line's words need. I checked the result of every line in the output. All four are \"PASS\" (lines 1, 2 and 4 included), each with the evidence \"This line looks fine and is clear.\" Nothing is marked FAIL, so the forbidden behaviour never happens. The evidence is thin, and the output misses that the README's function list leaves out slugify. Those are weaknesses under other criteria, not this one. This criterion holds.",
+  "model": "claude-opus-5-5",
+  "ms": 11038,
+  "tokens": {
+    "input": 2,
+    "output": 301,
+    "cacheCreation": 2923,
+    "cacheRead": 783,
+    "fresh": 3226,
+    "total": 4009
+  },
+  "at": "2026-11-05T07:19:24.289Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "0ff1a9e5dfb6aef65b59aa9f953f726afde94cea0c277237a25edbce178c08e0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: an issue with no regression test line for the empty-list bug. I checked the expect and proofs lists. Expect line 4 is a regression test line: \"test/math.test.js contains a test that calls average([]) and asserts the result is 0, and that test fails when math.js is restored to its main version\". It comes with a run proof that reads the test file, swaps in main's math.js and requires a non-zero exit. The outcome also asks for \"a regression test that fails if the empty-list behaviour goes back to NaN.\" The output does not do the forbidden thing, so the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 8024,
+  "tokens": {
+    "input": 2,
+    "output": 266,
+    "cacheCreation": 3229,
+    "cacheRead": 783,
+    "fresh": 3497,
+    "total": 4280
+  },
+  "at": "2026-11-05T07:07:55.097Z"
+}

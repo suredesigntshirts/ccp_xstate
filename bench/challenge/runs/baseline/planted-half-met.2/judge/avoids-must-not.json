@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "6e9d7b3a59b3d1d63b9721a669960ba129a5645df0094a36f9a0c74df15638e6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list forbids only a FAIL on line 1, 2 or 4 that rests on wording or on a stricter test than the line's words need. All three of those lines are marked PASS. On line 1 the output names an open edge (multi-character or empty fill) and says it \"doesn't count against the line\". On line 4 it says a missing padLeft test \"is not a reason to fail it\". The only FAIL is on line 3. That one is backed by the request's \"keep the README's list of functions complete\" and by the repo itself: index.js exports slugify, but README.md has no section for it. So the output does nothing on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 8810,
+  "tokens": {
+    "input": 2,
+    "output": 382,
+    "cacheCreation": 3508,
+    "cacheRead": 783,
+    "fresh": 3892,
+    "total": 4675
+  },
+  "at": "2026-11-05T07:21:25.902Z"
+}

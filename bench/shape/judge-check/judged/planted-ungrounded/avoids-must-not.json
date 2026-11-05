@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "caf6165b5ce5847a956543372484469a80a9ac3b0acdbdb3b13603986799e36b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The only item on the must_not list is an issue that has no regression test line for the empty-list bug, so I looked for one. The fourth expect line is that line. It says test/math.test.js \"contains a test that calls average([]) and asserts the result is 0\". It also says the test must fail against main's math.js: \"git show main:math.js > math.js && node --test; echo $?\" has to print a non-zero status. That line has a matching run proof, and the outcome repeats the requirement (\"a regression test that fails if the empty-list behaviour goes back to NaN\"). So the output doesn't do the forbidden thing. One problem outside this criterion: the problem field names src/stats.js, but every check uses ./math.js.",
+  "model": "claude-opus-5-5",
+  "ms": 6722,
+  "tokens": {
+    "input": 2,
+    "output": 361,
+    "cacheCreation": 3132,
+    "cacheRead": 783,
+    "fresh": 3495,
+    "total": 4278
+  },
+  "at": "2026-11-05T07:07:11.273Z"
+}

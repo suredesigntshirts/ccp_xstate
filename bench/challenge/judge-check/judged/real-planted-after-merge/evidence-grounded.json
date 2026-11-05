@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "0bc7c53e51b2beb32f761f15901f6f9e3afddae1b9fe7b03b047e92ed78900cd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all three lines and the summary.\n\n- **Line 1 (PASS):** It names three wrong builds and says how the line catches each: hardcoding Ada, upper-casing only the name, and leaving bin/greet.js's existing `--` filter in place. That filter is real: `find((a) => !a.startsWith('--'))`.\n- **Line 2 (PASS):** It names a wrong build (\"upper-cases every output, or turns shouting on by default\") and says `node bin/greet.js Ada` catches it. The 'cli' test it cites really exists in test/greet.test.js.\n- **Line 3 (FAIL):** It gives a concrete reason the line only shows after merge. .github/workflows/pages.yml publishes docs/ only on push to main, which matches the file. It also gives two concrete readings (live URL vs docs/index.md in the diff) and names a wrong build that edits README.md instead.\n\nThe wrong_build summary describes a specific change that leaves docs/index.md unchanged and says why it misses the request. Every file it cites exists in the repository, and every behaviour it describes matches the code.",
+  "model": "claude-opus-5-5",
+  "ms": 8182,
+  "tokens": {
+    "input": 2,
+    "output": 760,
+    "cacheCreation": 3590,
+    "cacheRead": 783,
+    "fresh": 4352,
+    "total": 5135
+  },
+  "at": "2026-11-05T07:19:09.443Z"
+}

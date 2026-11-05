@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "deb0e057a274e7be7d3179be1e1090d0343dd22f79b45cdbcedd39256b41b3f7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. The output is a blocked answer and doesn't claim anything false about the repository. The only file it names is README, in the hypothetical \"document the module-format decision in README\", and README.md is tracked at this commit. It names no script, command or function that is missing from the repository. Its other references are possible future changes, not claims about existing code: \"migrating to ESM, adding dual exports\" and \"publish ESM builds\". The statement that mathlib uses CommonJS comes from the request itself. It is framed as what the question asks, not as a new claim about the code. So nothing in the output misdescribes the five tracked files or the package.json test script.",
+  "model": "claude-opus-5-5",
+  "ms": 5673,
+  "tokens": {
+    "input": 2,
+    "output": 415,
+    "cacheCreation": 548,
+    "cacheRead": 1854,
+    "fresh": 965,
+    "total": 2819
+  },
+  "at": "2026-11-05T07:10:20.933Z"
+}

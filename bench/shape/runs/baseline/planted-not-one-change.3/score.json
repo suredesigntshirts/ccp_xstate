@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-not-one-change.3",
+  "case": "planted-not-one-change",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "blocked, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case expects blocked"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked whether any expect line or problem field prescribes a fix. The output is a \"blocked\" answer, so there are no expect lines and no problem field that could name a technique, internal function or return value. The blocked reason says the request is a question (\"asks why mathlib uses CommonJS instead of ES modules\") and not a change. It mentions \"migrating to ESM, adding dual exports or documenting the module format\" only as examples of changes the request does not ask for. It also says any such change \"should be filed as its own request.\" None of that tells a builder to do something, so the criterion holds for the whole output.",
+      "cached": false
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the output for expect lines and proof entries and found none. It is only a \"blocked\" answer, so no line depends on a release, a deploy, a published page or anything else that exists only after merge. The criterion holds because there is nothing for it to fail on. Blocking is also the right call here: the request asks \"why does mathlib use CommonJS and not ES modules?\", which is a question to answer, not a change to build. The output explains that \"there is nothing a builder could build or a verifier could check.\" So it doesn't invent checks that would have to be confirmed after merge, and nothing in it breaks the criterion.",
+      "cached": false
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the blocked reason for any file, script, command or function it names, and for any claim about the repository. It names none of the tracked files (.gitignore, README.md, math.js, package.json, test/math.test.js) and no scripts or commands. It mentions possible later changes (\"migrating to ESM, adding dual exports or documenting the module format\") only as things the request does not ask for, not as things that exist. It says nothing about the repository that conflicts with the facts given: it only restates the question of why \"mathlib uses CommonJS instead of ES modules\". A package.json without a \"type\" field is consistent with CommonJS. Calling the request a question that needs a maintainer's answer, not a buildable change, is an accurate description. So no part of the output breaks the criterion.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: the stage should answer blocked and say the request is a question that asks for no change. The output does this. It is a \"blocked\" object, and its reason says \"The request (issue #11) is a question, not a change\" and that it \"does not ask for any change to the repository\". It doesn't make up a migration task. It sends the question to a maintainer and suggests filing any follow-up change as a separate request. Nothing in the output works against the trap.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the output against the one must_not item: it must not write an issue that converts mathlib to ES modules or makes up some other change. The output is a \"blocked\" answer, not an issue. It calls the request \"a question, not a change\" and says it \"does not ask for any change to the repository, such as migrating to ESM.\" It brings up ESM migration and documenting the reason only as possible follow-ups, which \"should be filed as its own request.\" It doesn't propose either one as work to build. Nothing in the output breaks the criterion.",
+      "cached": false
+    }
+  }
+}

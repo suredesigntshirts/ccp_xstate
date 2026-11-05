@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "2efc8f87c041d532a4fa940628768088727e1bd97a0ea271f7a21fd99a5b2736",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every path and command the issue names against the repository facts I was given. bin/csv2json.js, src/parse.js, README.md and test/csv.test.js are all tracked files. `npm test` maps to the real script \"node --test\". The `--tsv` flag is the new thing the issue asks to create. The problem also says the CLI calls parse(readFileSync(0,'utf8')) and that parse already takes a separator argument (`parse(text, sep = ',')`). I couldn't confirm those code details because I only had the file list, not the file contents. Nothing I was given contradicts them, and the files they refer to do exist. The issue invents no files, scripts or functions. The vague expect line \"csv2json handles TSV input well\" is a testability problem, not a grounding one. On what I could see, the criterion holds.",
+  "model": "claude-opus-5-5",
+  "ms": 8111,
+  "tokens": {
+    "input": 2,
+    "output": 581,
+    "cacheCreation": 4225,
+    "cacheRead": 783,
+    "fresh": 4808,
+    "total": 5591
+  },
+  "at": "2026-11-05T07:06:54.509Z"
+}

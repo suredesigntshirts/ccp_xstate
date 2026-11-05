@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-shout.1",
+  "case": "clean-shout",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": false,
+      "why": "FAIL, where the case expects PASS"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": false,
+      "why": "line 3 not PASS: \"The request asks for the docs 'next to the existing usage'. This line asks only that --shout be documented somewhere with an example. Wrong build: replace the c\""
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the evidence for all four lines and the summary wrong build against the repository. Every PASS names wrong builds that were tried and says how the line catches them:\n- Line 1 tries ignoring --shout, upper-casing only the name, and hard-coding Ada. The run proof catches the first two, and the line's \"<name>\" wording catches the third. Its claim that the existing parser takes the first argument not starting with \"--\" matches bin/greet.js.\n- Line 2 relies on the existing 'cli' test, which really does assert 'Hello, Ada!\\n' in test/greet.test.js.\n- Line 4 tries a test of src/greet.js only, a test with no assertion, and a skipped test. Its claim that pages.yml only publishes docs is correct.\n\nThe one FAIL (line 3) names a concrete wrong build: replace the usage block in docs/index.md, or show the wrong example output. It explains why that meets the line yet misses \"next to the existing usage.\" The summary wrong build only cites real files. Nothing is invented.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "The must_catch item says every line should PASS, with evidence naming the wrong build that was tried. The output gets this right for lines 1, 2 and 4. Each of those PASSes and names the wrong builds it tried, such as \"a build that ignores --shout\", \"a build that makes shouting the default\" and \"a skipped test\". Line 3 (the docs line) is marked \"FAIL\" instead. It argues that a build which replaces the existing usage block, or gives a wrong example, would still meet the line. Because of that, the overall result is \"FAIL\" when it should be all PASS. The output breaks the must_catch item at line 3 and in its top-level result.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The output's only FAIL is on line 3, the docs line. I checked whether that FAIL is about wording, style, or a stricter test than the request needs. It isn't. It names two concrete wrong builds that meet the line's words. One replaces the existing usage block with only a --shout example, which goes against the request's \"next to the existing usage\". The other gives an example showing the wrong output (\"Prints Hello, Ada!\"), which still counts as \"documented with an example\". Both are real gaps between the line and the request, not wording preferences. The fix it asks for (keep the existing usage, put --shout next to it, show HELLO, ADA!) comes straight from the request and the line-1 behavior. The other three lines get PASS without nitpicking. Nothing on the must_not list is done.",
+      "cached": true
+    }
+  }
+}

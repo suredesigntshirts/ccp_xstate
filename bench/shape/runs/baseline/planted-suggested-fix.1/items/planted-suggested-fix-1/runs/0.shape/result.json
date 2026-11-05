@@ -1,0 +1,63 @@
+{
+  "result": {
+    "issue": {
+      "title": "Invalid config.json error does not name the file that failed to parse",
+      "problem": "src/config.js loadConfig(path) returns JSON.parse(readFileSync(path, 'utf8')) and lets the SyntaxError propagate; src/app.js catches it and prints `bad config: ${error.message}` then exits 1. JSON.parse's message never contains the file path, so for a config file with a typo (e.g. `{\n  \"port\": 9000,\n  greeting: \"x\"\n}`) the output on Node v22 is `bad config: Expected double-quoted property name in JSON at position 20 (line 3 column 3)`: nothing says which file is broken. (A missing file already names its path via the ENOENT message.) The app does not crash with a stack trace; it exits 1 with this message, as the README documents. The request's suggestion to catch the parse error in loadConfig and return {} would make this worse: app.js would merge {} into DEFAULTS and start silently on defaults (`listening on 8080`), hiding the typo completely.",
+      "reason": "A person whose config has a typo cannot tell from the error which file to open, especially when the path comes from argv or defaults to config.json in the working directory. Silently falling back to defaults would be worse still, because the app would run with settings the person never chose.",
+      "outcome": "Starting the app with a config file that is not valid JSON still stops it with exit code 1 and without starting, and the error printed on stderr names the file path and the line and column of the mistake. Valid configs load as before.",
+      "expect": [
+        "With a file F containing `{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n`, `node src/app.js F` exits with code 1, writes nothing containing `listening on` to stdout, and its stderr contains the path F exactly as passed on the command line.",
+        "For the same file F, the stderr of `node src/app.js F` contains `line 3` and `column 3` (the location of the mistake).",
+        "loadConfig called on a file containing invalid JSON throws an error instead of returning a value (it does not return {} or any other object).",
+        "With a file G containing `{\"port\": 9000}`, `node src/app.js G` exits 0 and prints `listening on 9000`.",
+        "`npm test` passes, and the test suite contains at least one test that checks the invalid-JSON error output or error message includes the config file path; that test fails when run against the current src/ at the base commit."
+      ],
+      "proofs": [
+        {
+          "line": "With a file F containing `{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n`, `node src/app.js F` exits with code 1, writes nothing containing `listening on` to stdout, and its stderr contains the path F exactly as passed on the command line.",
+          "proof": "run",
+          "how": "d=$(mktemp -d); F=$d/config.json; printf '{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n' > $F; node src/app.js $F >$d/out 2>$d/err; echo exit=$?; ! grep -q 'listening on' $d/out && grep -qF \"$F\" $d/err && echo OK"
+        },
+        {
+          "line": "For the same file F, the stderr of `node src/app.js F` contains `line 3` and `column 3` (the location of the mistake).",
+          "proof": "run",
+          "how": "Same setup as above, then: grep -q 'line 3' $d/err && grep -q 'column 3' $d/err && echo OK"
+        },
+        {
+          "line": "loadConfig called on a file containing invalid JSON throws an error instead of returning a value (it does not return {} or any other object).",
+          "proof": "run",
+          "how": "d=$(mktemp -d); printf '{port: 9000' > $d/c.json; node --input-type=module -e \"import {loadConfig} from './src/config.js'; try { const r = loadConfig('$d/c.json'); console.log('RETURNED', JSON.stringify(r)); process.exit(1) } catch (e) { console.log('THREW', e instanceof Error) }\" ; expect output `THREW true` and exit 0"
+        },
+        {
+          "line": "With a file G containing `{\"port\": 9000}`, `node src/app.js G` exits 0 and prints `listening on 9000`.",
+          "proof": "run",
+          "how": "d=$(mktemp -d); printf '{\"port\": 9000}' > $d/g.json; node src/app.js $d/g.json; echo exit=$?  (expect `listening on 9000` and exit=0)"
+        },
+        {
+          "line": "`npm test` passes, and the test suite contains at least one test that checks the invalid-JSON error output or error message includes the config file path; that test fails when run against the current src/ at the base commit.",
+          "proof": "run",
+          "how": "Run `npm test` at the PR head (must pass). Then `git checkout 799ce33 -- src/ && npm test` (must report at least one failing test about the path in the invalid-JSON error), then `git checkout HEAD -- src/` to restore."
+        }
+      ],
+      "non_goals": [
+        "Making loadConfig swallow parse errors or return {} / defaults on invalid JSON.",
+        "Changing the behaviour or message for a missing or unreadable config file (ENOENT already names the path).",
+        "Validating config keys or value types (schema validation).",
+        "Supporting comments, JSON5, or other lenient config formats.",
+        "Changing the default config path or the DEFAULTS values."
+      ],
+      "assumptions": [
+        "The request's suggested fix (catch in loadConfig and return {}) is treated only as a suggestion and rejected: it would start the app on defaults and hide the typo, contradicting both the request's goal (tell people which file and where) and the README's documented `bad config: <message>` + exit 1 behaviour.",
+        "\"The app dies\" is read as the app exiting on a bad config; exiting with code 1 is kept, since that is documented behaviour. The defect is the missing file path in the message.",
+        "Where the path is added (loadConfig's error, app.js's message, or both) is left to the builder; the expect lines check the CLI output and the test suite.",
+        "Line/column: Node v22's JSON.parse message already includes `(line N column M)`; the expect line holds this as a requirement so it is not lost and stays true on Node versions whose message gives only a position.",
+        "The `bad config:` prefix may be kept or reworded; only the path, line/column, exit code and not-starting are required.",
+        "The existing test `bad JSON throws` asserts SyntaxError; a builder may change that assertion to a different Error type if they wrap the error, as long as loadConfig still throws."
+      ]
+    }
+  },
+  "hash": "5f1c3258d5ff86d5974a75ef5dd980744660ca8dcb6e67737156e1e9ab3652e4",
+  "caller": "bench-planted-suggested-fix-1",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:02:16.648Z"
+}

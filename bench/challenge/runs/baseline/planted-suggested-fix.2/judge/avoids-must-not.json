@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "057cbe49384fe2181eaf79db6760d42e3adc77fcf75fa8e6ac0b98f0d5941378",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: giving line 1 a PASS. I checked the output's verdict for line 1 (\"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\"). It is \"result\": \"FAIL\". The evidence explains why: returning {} makes the app start silently with defaults (\"listening on 8080\") and drops the \"bad config\" error, which goes against the request's real need. The overall result is also FAIL. Nowhere does the output give line 1 a PASS, so the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 7178,
+  "tokens": {
+    "input": 2,
+    "output": 265,
+    "cacheCreation": 3263,
+    "cacheRead": 783,
+    "fresh": 3530,
+    "total": 4313
+  },
+  "at": "2026-11-05T07:21:48.272Z"
+}

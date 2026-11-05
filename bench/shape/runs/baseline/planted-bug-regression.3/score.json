@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-bug-regression.3",
+  "case": "planted-bug-regression",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "6 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. I checked each expect line for a prescribed fix. The lines only check observable behaviour: average([]) returns 0, which the request asks for directly (\"An empty list should average to 0\"). The other lines check that non-empty results are unchanged from base, that the input array isn't modified, that the exports are unchanged, that a regression test exists and fails on base, and that npm test passes. None names a technique or an internal function. The regression-test line asks for a deliverable but doesn't say how to fix the bug. The technique is left open under assumptions: \"How the fix is done (an early return for empty input, a guard on length, or similar) is up to the builder.\" The problem field only describes the fault: the code computes 0 / 0, so average([]) returns NaN; there is no test for it; and the NaN reached an invoice total. It doesn't propose a fix.",
+      "cached": false
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for all six expect lines. Each one has a \"run\" proof that works on the PR head's checkout, and none needs a release, deploy, published page or anything else that exists only after merge. Lines 1–4 are deterministic `node -e` scripts that pass or fail on their exit code, and line 2 even pins exact float results such as \"0.15000000000000002\". Line 5 also works before merge: it checks for the average([]) test, then swaps in `git show 47d473e:math.js`, runs `npm test` expecting a non-zero exit, and restores the head file. Line 6 is \"`npm test` exits 0 at the pull request head\" with \"# fail 0\". One careful reader gets one answer for each line. Publishing a release is listed as a non-goal, so no expect line depends on it.",
+      "cached": false
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every path and command the issue names against the five tracked files and package.json scripts. `math.js`, `test/math.test.js`, `README.md` and `package.json` are all tracked. `npm test` maps to the \"test\" script (`node --test`), and `node --test` would find files under `test/`. Exports such as `average`, `add`, `subtract` and `multiply` belong to math.js. The issue asks for the new regression test to go in the existing suite. The repository facts don't include file contents or the commit hash, so I couldn't confirm these claims directly: the `xs.reduce(...) / xs.length` implementation, \"test/math.test.js does not import or test average\", the README's mention of the invoice service, and base commit 47d473e. Nothing given contradicts them, and they fit the reported NaN behaviour. No file, script or function is named that is missing from the repository.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the expect list, and both are covered. Item 1 (a regression test that calls average([]) and expects 0) is handled by the expect line \"The test suite under test/ includes a test that calls average([]) and asserts the result is 0. That test fails when run against the base commit's math.js.\" Item 2 (non-empty averages stay correct) is handled by \"For non-empty arrays, average returns exactly what it returns at base commit 47d473e: ... average([2,4]) === 3 ...\". That line names the example given in the must_catch list. Each of these expect lines also has a matching runnable proof. No must_catch item is missing.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: an issue with no regression test line for the empty-list bug. I checked the expect list for one. It has it: \"The test suite under test/ includes a test that calls average([]) and asserts the result is 0. That test fails when run against the base commit's math.js.\" That line also has a matching run proof. The proof checks that the test exists, swaps in the base commit's math.js (47d473e) to confirm the test fails, then confirms it passes at the PR head. The outcome says the same thing: \"A test in the repository's suite covers the empty-list case\". The issue does not do the forbidden thing, so the criterion holds.",
+      "cached": false
+    }
+  }
+}

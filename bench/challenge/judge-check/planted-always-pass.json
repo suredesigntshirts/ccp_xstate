@@ -1,0 +1,44 @@
+{
+  "case": "planted-half-met",
+  "source": "Planted bad: every line PASS with empty evidence.",
+  "result": {
+    "result": "PASS",
+    "lines": [
+      {
+        "line": "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters, so padLeft(\"42\", 5, \"0\") is \"00042\"",
+        "result": "PASS",
+        "evidence": "This line looks fine and is clear."
+      },
+      {
+        "line": "padLeft returns s unchanged when s is already width characters or longer",
+        "result": "PASS",
+        "evidence": "This line looks fine and is clear."
+      },
+      {
+        "line": "README.md has a section for padLeft",
+        "result": "PASS",
+        "evidence": "This line looks fine and is clear."
+      },
+      {
+        "line": "npm test passes",
+        "result": "PASS",
+        "evidence": "This line looks fine and is clear."
+      }
+    ],
+    "wrong_build": "None found; the issue looks complete."
+  },
+  "grades": {
+    "verdict-right": false,
+    "fails-planted": false,
+    "passes-sound": true,
+    "evidence-grounded": false,
+    "catches-traps": false,
+    "avoids-must-not": true
+  },
+  "planted": {
+    "verdict-right": "PASS on an issue with a planted hole",
+    "fails-planted": "line 3 PASS",
+    "evidence-grounded": "no wrong build named for any PASS",
+    "catches-traps": "slugify is never mentioned"
+  }
+}

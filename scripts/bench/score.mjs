@@ -60,6 +60,35 @@ export function repoFacts(c) {
   }
 }
 
+const contents = new Map();
+/**
+ * The repository's tracked text files with their contents, at the case's commit, for criteria that judge claims about
+ * what the code does (the intake stages' grounded criteria): files of 20,000 bytes or less, in name order, until
+ * 120,000 bytes; the rest are named only.
+ */
+export function repoContents(c, { file = 20000, total = 120000 } = {}) {
+  if (contents.has(c.id)) return contents.get(c.id);
+  const work = mkdtempSync(join(tmpdir(), 'bench-contents-'));
+  try {
+    const repo = caseRepo(c, work);
+    const files = execFileSync('git', ['-C', repo, 'ls-files'], { encoding: 'utf8' }).trim().split('\n');
+    const shown = [];
+    const named = [];
+    let used = 0;
+    for (const f of files) {
+      const buf = readFileSync(join(repo, f));
+      if (buf.length > file || used + buf.length > total || buf.includes(0)) { named.push(f); continue; }
+      used += buf.length;
+      shown.push(`--- ${f}\n${buf.toString('utf8')}`);
+    }
+    const text = `Tracked files at this commit (${files.length}), with their contents${named.length ? `; ${named.length} too large to show are only named` : ''}:\n\n${shown.join('\n')}${named.length ? `\n\nNamed only:\n${named.join('\n')}` : ''}`;
+    contents.set(c.id, text);
+    return text;
+  } finally {
+    rmSync(work, { recursive: true, force: true });
+  }
+}
+
 /** The judge prompt for one criterion and one output: everything the judge sees besides its system prompt. */
 export function judgePrompt({ criterion, c, result, stage = 'brief' }) {
   const st = stageOf(stage);
@@ -68,6 +97,7 @@ export function judgePrompt({ criterion, c, result, stage = 'brief' }) {
   if (criterion.case) parts.push(`# The case's ${criterion.case} list\n\n${list(c[criterion.case] ?? [])}`);
   parts.push(...st.judgeCase(c));
   if (st.repoFacts.includes(criterion.id)) parts.push(`# The repository\n\n${repoFacts(c)}`);
+  if (st.repoContents?.includes(criterion.id)) parts.push(`# The repository\n\n${repoContents(c)}`);
   parts.push(st.judgeOutput(result));
   parts.push('# Grading rule\n\nAnswer met: true only if the criterion holds for the whole output; otherwise met: false. Answer through the structured output.');
   return parts.join('\n\n');

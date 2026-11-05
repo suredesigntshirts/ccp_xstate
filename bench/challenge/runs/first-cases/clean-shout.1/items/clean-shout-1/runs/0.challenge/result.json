@@ -1,0 +1,32 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "Tried: hard-coding upper case for every call (line 2 catches it); treating only argv[2]==='--shout' (still meets the stated form, and that is what was asked); upper-casing just the name to give 'Hello, ADA!' (the HELLO, ADA! example catches it). bin/greet.js already skips --flags when it looks for the name, so `--shout Ada` gives the name Ada. Running `node bin/greet.js --shout Ada` checks this at the commit."
+      },
+      {
+        "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "result": "PASS",
+        "evidence": "Tried: making shout the default, or upper-casing everything. Running `node bin/greet.js Ada` must print exactly Hello, Ada!, which catches both. The existing 'cli' test in test/greet.test.js also guards this."
+      },
+      {
+        "line": "docs/index.md documents the --shout option with an example",
+        "result": "FAIL",
+        "evidence": "The request asks that --shout 'shows up on the published docs site'. .github/workflows/pages.yml uploads docs/ as-is with upload-pages-artifact and deploy-pages. It has no Jekyll or markdown build step, and docs/ has no index.html. So the site root https://o.github.io/greet-cli/ never renders docs/index.md; at best the raw file sits at /index.md. Wrong build: add a --shout section with an example to docs/index.md. That meets this line word for word, but --shout still does not show up on the docs site support would point people at. The outcome assumes 'docs/, which the pages workflow publishes on merge' without checking it, and the issue moves the only real check (the published page) to a non_goal, so it can only be verified after merge. Missing line: the pages workflow must turn docs/index.md into a page served at the site root (for example add actions/jekyll-build-pages, or ship docs/index.html), checkable at the commit by reading pages.yml or building the artifact."
+      },
+      {
+        "line": "npm test passes and includes a test that runs greet with --shout",
+        "result": "FAIL",
+        "evidence": "Wrong build: add `test('shout', () => { execFileSync('node', ['bin/greet.js', '--shout', 'Ada']); })`, or one that only checks the output is truthy or non-empty. npm test passes and a test does 'run greet with --shout', but nothing checks HELLO, ADA!, so a later regression to plain 'Hello, Ada!' still passes. Two readers would grade it differently: one reads 'runs greet with --shout' literally and passes it, the other expects the output to be checked. The line should require the test to assert the output equals 'HELLO, ADA!\\n'."
+      }
+    ],
+    "wrong_build": "Add a --shout check in bin/greet.js that upper-cases greeting(name). Add a '--shout' section with an example to docs/index.md. Add a test that runs `bin/greet.js --shout Ada` without checking its output. All four expect lines pass at the commit. But the pages workflow uploads docs/ raw, with no Jekyll build and no index.html, so --shout never appears on the published docs site the request explicitly asked for. And the 'test' would not catch a regression in the shout output."
+  },
+  "hash": "444474c00367399b0e6d0737180e278393816dc7dc947ce8cbeec9ad8472cb9f",
+  "caller": "bench-clean-shout-1",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:04:18.920Z"
+}
