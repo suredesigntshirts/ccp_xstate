@@ -4,7 +4,7 @@
   "title": "Find out whether agents shipped in the harness plugin load in real cloud threads",
   "stage": "s5-parity",
   "kind": "probe",
-  "status": "ready",
+  "status": "done",
   "outcome": "A released ccp-harness version ships one test agent in its agents/ folder, and a fresh cloud thread on that release shows whether the agent is listed and callable by its namespaced name, whether its tools, model and system prompt hold, and whether the harness's prompt swap and SubagentStart binding still work with a named agent; the report says whether stage roles can live in the plugin.",
   "why": "On 5 Nov the person asked to keep our agents in the plugin, if spike tests show plugin agents deploy. Named agents would make Claude Code enforce a stage's tools and model, where today those are only rules in the prompt text. A first headless spike on 5 Nov, with claude -p --plugin-dir and a throwaway plugin, held on every point (results in plan/decisions/2026-11-05-plugin-agents-spike.md). What it cannot show is the real install path: a marketplace-installed plugin, loaded at session start, in a Projects thread. The stage-prompt-files decision on named agents stays open until this reports.",
   "serves": [
@@ -42,8 +42,8 @@
   "expect": [
     {
       "id": "listed",
-      "check": "In a fresh cloud thread on the release that ships the agent, the Agent tool lists ccp-harness:probe-reader, and a call with that subagent_type starts it",
-      "how": "The thread's transcript and the subagent's meta.json",
+      "check": "In a cloud container, with the plugin installed by infra/cloud-environment/setup.sh from the commit that ships the agent and a claude -p session started with no --plugin-dir (so it loads ccp-harness@skills-dir at session start, as a thread does), the Agent tool lists ccp-harness:probe-reader, and a call with that subagent_type starts it. A Projects thread on a release is follow-up item probe-plugin-agents-thread, because new threads resume a cached 0.1.17 container",
+      "how": "The session's init line and the subagent's meta.json",
       "proof": "world"
     },
     {

@@ -1,0 +1,1 @@
+Run probe-agents-1:0.brief, worktree /home/user/probe-wt/probe-agents-1--0.brief of https://github.com/suredesigntshirts/ccp_xstate_scratch, branch run/probe-agents-1/0.brief.

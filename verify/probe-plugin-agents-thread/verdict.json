@@ -1,0 +1,29 @@
+{
+  "item": "probe-plugin-agents-thread",
+  "verified_sha": "98229dd53f5de64fe247e962ebad6dabcb397dce",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GUkYerz6U2CEzYneX",
+    "model": null
+  },
+  "summary": "All 3 MET at 98229dd (same tree as 3e983c6, the builder commit, after main and ready replan #114 merged in). This verifier is a separate Projects thread (session_01KfkB5GUkYerz6U2CEzYneX, local transcript 845786c5-b10e-5b52-82b7-1659f4a5b54a, Claude Code 2.1.318) whose own SessionStart line reads 'ccp-harness 0.1.24 (harness-v0.1.24): self-check passed (7 of 7 checks).' The builder's journal extract matches the shared journal byte for byte. I repeated the Agent call with subagent_type ccp-harness:probe-reader from this thread and got the same results; my extracts are in verify/probe-plugin-agents-thread/evidence/. Side finding, not bearing on any check: my agent.finish row has ms 508057022 (about 5.9 days) for an agent that ran about 5 s, while the builder's row had a sane 8200; agent.finish's ms looks unreliable.",
+  "results": [
+    {
+      "id": "thread-listed",
+      "status": "MET",
+      "command": "diff the session.fingerprint, agent.spawn and agent.finish rows of plan/research/probe-plugin-agents-thread/journal-extract.jsonl against /mnt/project-files/harness/journal/sessions/session_01KfkB5FmDxfpGGozgmjnWGN.jsonl (md5 per row id); read thread-transcript-extract.jsonl and agent-a399d257145231f6c.meta.json; Agent call with subagent_type ccp-harness:probe-reader in this thread; read ~/.claude/projects/-home-user/845786c5-.../subagents/agent-adda18087b10e0b3a.meta.json and my session's journal",
+      "excerpt": "Builder: shared-journal rows 17679d3d (session.fingerprint), 12374a8e (agent.spawn), 3377bd56 (agent.finish) are identical to the committed extract. Fingerprint: release 0.1.24, tag harness-v0.1.24, commit e9b6ae35, root /root/.claude/skills/ccp-harness, entrypoint remote_projects. agent.spawn type 'ccp-harness:probe-reader' from SubagentStart a399d257145231f6c. The transcript's agent_listing_delta lists 'ccp-harness:probe-reader ... (Tools: Read, Glob)'; meta.json agentType ccp-harness:probe-reader, isBuiltIn false, finished true. Mine: this thread's agent listing also names ccp-harness:probe-reader (Tools: Read, Glob); my call started agent adda18087b10e0b3a, meta.json agentType ccp-harness:probe-reader, isBuiltIn false; my journal has session.fingerprint release 0.1.24 / harness-v0.1.24 / same commit and root, and agent.spawn type ccp-harness:probe-reader."
+    },
+    {
+      "id": "thread-holds",
+      "status": "MET",
+      "command": "node over plan/research/probe-plugin-agents-thread/agent-a399d257145231f6c.jsonl and verify/probe-plugin-agents-thread/evidence/agent-adda18087b10e0b3a.jsonl (model per assistant row, tool_use names, first user message contains QUILLMARROW?), prefix.json state.toolNames and model, journal agent.finish rows",
+      "excerpt": "Builder: every assistant row is claude-haiku-5-5; tools used Read, Glob, SubagentHandback; prefix toolNames [Read, Glob, SubagentHandback], model claude-haiku-5-5; handback opens 'QUILLMARROW'; the first user message (the task prompt) has no QUILLMARROW; agent.finish model claude-haiku-5-5; write and whoami reported not done ('I have no Write or Edit tool', 'I have no Bash or shell tool'). Mine (asked to read CLAUDE.md, write verify-write.txt, run id -un): every assistant row claude-haiku-5-5 while this thread runs opus; tools used Read and SubagentHandback only; prefix toolNames [Read, Glob, SubagentHandback]; reply opens 'QUILLMARROW', prompt lacks it; it quoted '# ccp_xstate', and said 'no file-write tool (no Write, Edit or Bash)' and 'I have no shell tool'; verify-write.txt does not exist; agent.finish type ccp-harness:probe-reader, model claude-haiku-5-5. meta.json pickedEffortModel names the main model in both, as the report says."
+    },
+    {
+      "id": "thread-report",
+      "status": "MET",
+      "command": "read the 'In a real Projects thread (probe-plugin-agents-thread)' section of plan/research/probe-plugin-agents.md against the committed extracts, the shared journal and my rerun",
+      "excerpt": "The section names the session (cse_01KfkB5FmDxfpGGozgmjnWGN, transcript 3a5752f4), Claude Code 2.1.318, release harness-v0.1.24, the tool use id toolu_01R8dcCA6pJMxQA5VMoTsx5a and the journal path, and gives each result (release, listed and starts, model, tools, marker) with its evidence file. Every claim I checked matches: SessionStart text, fingerprint fields, listing line, meta.json fields, haiku on all turns and on agent.finish, toolNames, refusal wording, marker absent from the prompt. It states plainly that the README read failed because there is no root README.md, and what was stripped from the committed transcript."
+    }
+  ]
+}
