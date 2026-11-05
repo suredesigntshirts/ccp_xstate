@@ -60,3 +60,20 @@ tells the builder "The item then stops for the person to replan; it is not retri
   verify FAILs and red checks, which are not the person's to clear.
 - **A `prefix` guard condition on `event.error`.** It parses text the agent wrote and adds an operator for one use.
 - **Retrying a block on a rebuild.** It would be a third build. The item's limit is two builds per attempt.
+
+## After the first build round
+
+Any change to workflows/quick-fix.json changes its hash, and this item's whole change is to quick-fix. Five done
+items' verifier suites pin main's workflows as they were when those items were verified: four `main-prompts.json`
+(and one `main-scenarios.json`) snapshots of every stage's render and every workflow's hash, and
+verify/fix-waiting-wake's literal list of quick-fix's asking states. On the first build they went red (13 tests,
+every difference the new hash, build.md's blocked line, or the new `blocked` state, which has the one-hour checkBack
+those suites require). Those snapshots say "this item changed no prompt", which their own commit history still
+proves; they are not a rule that no later item may change a workflow, or no workflow could change again.
+
+9. **Snapshots are re-captured, assertions are not touched.** This item re-captures those evidence files from its own
+   head with the script each suite names (verify/fix-refusal-hints/prompts.mjs and the scenario harness), adds
+   `blocked` to load-check's quick-fix list, and changes nothing else in another item's verify/ folder. The verifier
+   checks that every changed line in them is the hash, the blocked line or the blocked state. This holds only for an
+   item whose Expect changes a workflow; any other item keeps them as they are
+   (plan/decisions/2026-11-05-waiting-lines-owner.md).
