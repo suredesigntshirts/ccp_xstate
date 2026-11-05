@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-average.3",
+  "case": "clean-average",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "PASS, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 3 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "All three lines are PASS, and each one names a concrete wrong build and says how the line catches it.\n- **Line 1:** a build that only patches the caller, or one where average returns null, fails `node -e` on average([]) returning 0.\n- **Line 2:** a `|| 0` or `Number.isNaN` guard is caught by the line's average([NaN, 1]) is NaN example. This holds: (NaN+1)/2 || 0 gives 0.\n- **Line 3:** a fix to math.js with no test fails, because test/math.test.js really does import only add, subtract and multiply. A test using loose `== 0` doesn't \"expect 0\".\n\nThe repository facts it cites are real: the file uses node:assert/strict, `npm test` runs `node --test`, and the base average is reduce sum / length. The -0 claim also holds, since strict assert.equal uses Object.is. The overall wrong_build reads the `||` precedence correctly.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The single must_catch item is that every line gets a PASS, and each PASS has evidence naming a wrong build that was tried. I checked all three lines. Line 1 is PASS and names two wrong builds: one that \"leaves average unchanged and only patches the caller\" and one that \"returns a falsy non-number such as null\". Line 2 is PASS and names the `|| 0` / `Number.isNaN(r) ? 0 : r` build, which the average([NaN, 1]) example catches. Line 3 is PASS and names \"a build that fixes math.js with no regression test\" plus tests that use loose `== 0` or only check \"not NaN\". The overall result is PASS, and the wrong_build field says none was found and gives the closest attempt. Every line meets the item.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list forbids only one thing: a FAIL given for wording, style, or a stricter test than the words need. I checked each of the three lines and the overall result. All are \"PASS\" and the overall result is \"PASS\", so the output has no FAIL of any kind. Its evidence does mention stricter-reading cases, such as \"loose `== 0`\" not meeting \"expects 0\". But it uses them only to show that wrong builds get caught, not to fail a line. So the output does nothing on the must_not list.",
+      "cached": false
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "0bc7c53e51b2beb32f761f15901f6f9e3afddae1b9fe7b03b047e92ed78900cd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each line's evidence. Line 1 (PASS) names specific wrong builds and says why the line catches each one. For example, \"upper-casing only the name ('Hello, ADA!')\" fails against the example, and leaving --shout to the existing filter that drops '--' args prints plain output. That filter really exists in bin/greet.js (`!a.startsWith('--')`). Line 2 (PASS) names a build that upper-cases every output and says `node bin/greet.js Ada` catches it. The 'cli' test it cites really exists in test/greet.test.js. Line 3 (FAIL) gives a concrete reason it shows only after merge: .github/workflows/pages.yml publishes docs/ only on push to main, which the repository confirms. It also gives two concrete readings (live URL vs docs/index.md in the diff) and a concrete wrong build that documents only in README.md. Every file, script and behaviour it cites is real in the repository. I found nothing invented.",
+  "model": "claude-opus-5-5",
+  "ms": 7235,
+  "tokens": {
+    "input": 2,
+    "output": 616,
+    "cacheCreation": 548,
+    "cacheRead": 3825,
+    "fresh": 1166,
+    "total": 4991
+  },
+  "at": "2026-11-05T07:20:37.686Z"
+}

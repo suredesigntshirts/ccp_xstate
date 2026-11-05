@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "413cb189f9851a04646ec7cfcbbbda1e4ee07f2badf5c8d71963f1c3aa2eb3f0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items. Item 1 holds. The docs ask is turned into an expect line that can be checked at the head: \"docs/index.md documents the `--shout` option, with an example command...\" and it is proved by reading the file. The published page is kept out of scope: the outcome says the site \"shows it after the next push to main publishes docs/\", and a non_goal excludes \"Publishing or deploying the docs site, or checking the live page\". Item 2 holds. One expect line says \"Running `node bin/greet.js Ada` without the flag still exits 0 and writes exactly `Hello, Ada!\\n`\", and a run proof backs it up, so the default greeting is protected.",
+  "model": "claude-opus-5-5",
+  "ms": 9954,
+  "tokens": {
+    "input": 2,
+    "output": 299,
+    "cacheCreation": 3495,
+    "cacheRead": 783,
+    "fresh": 3796,
+    "total": 4579
+  },
+  "at": "2026-11-05T07:10:05.957Z"
+}

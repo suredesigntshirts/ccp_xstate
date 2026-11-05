@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "f799f3f1636ab585cb3feaec6869e66669c7112f0596250c7b9346a4a22da135",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all eight expect lines. Each one can be checked at the PR head, and its proof works there:\n- Lines 1–5 are concrete value checks, each run with a `node --input-type=module -e` assert script against `./index.js`. Each gives one answer.\n- Line 5's \"behave as before\" is pinned to specific values such as \"truncate('abcdef', 4) === 'abc…'\", so it doesn't depend on a comparison with history.\n- The README heading line uses a script that compares the exported functions with the README headings matching `^## name(`. That is checkable and gives one answer.\n- The padLeft README section is a \"read\" proof with three concrete items: the parameters, the space default and the 42 -> 00042 example. One careful reader would reach one answer.\n- The npm test line runs `npm test; echo exit=$?; grep`, which can be done at the head.\n\nNo line needs a release, an npm publish or a deploy; publishing is explicitly a non-goal.",
+  "model": "claude-opus-5-5",
+  "ms": 7475,
+  "tokens": {
+    "input": 2,
+    "output": 554,
+    "cacheCreation": 4044,
+    "cacheRead": 783,
+    "fresh": 4600,
+    "total": 5383
+  },
+  "at": "2026-11-05T07:26:56.337Z"
+}

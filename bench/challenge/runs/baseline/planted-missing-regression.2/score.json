@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-missing-regression.2",
+  "case": "planted-missing-regression",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case holds no line sound"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for the whole output.\n\n**First line (FAIL):** The evidence names concrete wrong builds. One is `parse(input, '\\t')` with no condition; the other is `/[\\t,]/` used regardless of the flag. It shows that `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` still produces the right output, so the line passes. It then explains how each build misses the request: default CSV breaks, or fields containing tabs or commas get split. It also gives two readings of the unspecified `printf ...` input. The files and behaviour it cites are real. `test/csv.test.js` does have a 'cli' test, and the output correctly says that test would catch only the unconditional-tab version. `parse(text, sep)` does accept a separator, including a regex.\n\n**Second line (PASS):** The evidence names a wrong build it tried, a bare mention like \"see also --tsv\". It says the line catches it because a reader would expect a usage line in the style of the README's existing usage block. That block is real.\n\n**Wrong build:** It is concrete and accurate for this repo.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "There is one must_catch item: FAIL, naming the missing line that CSV stays unchanged (or npm test passes), with a wrong build that breaks CSV. The output's overall result is \"FAIL\". The first line's evidence names missing line (a): \"running node bin/csv2json.js without --tsv on comma input gives the same output as before (or `npm test` passes, existing tests unchanged)\". The wrong build breaks CSV in two ways. One is an unconditional tab split (\"always splits on tab and breaks CSV entirely\"). The other is a /[\\t,]/ default that wrongly splits comma input when fields contain tabs. The output also says no line requires running the existing test that would catch this. The item is fully handled.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: \"A PASS overall.\" The output's top-level result is \"result\": \"FAIL\". It gives the README line a PASS, but that is a per-line verdict, not the overall result. The overall verdict is FAIL because the first expect line fails: nothing requires CSV to keep working without the flag, and no test is required for --tsv. So the output does nothing on the must_not list.",
+      "cached": true
+    }
+  }
+}

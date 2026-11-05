@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "91b8438aa6775acb03eba37b592b1615188a2198acd5376158af6a2ede19831d",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most of the issue matches the repository. math.js exists and exports add, subtract, multiply and average. average's body really is `xs.reduce(...)/xs.length`. test/math.test.js really covers only add, subtract and multiply. `npm test` maps to `node --test` in package.json. The node -e commands use real exports. The break is in the regression proof, which runs `git checkout c82b37b -- math.js`. Nothing in the repository facts gives a commit hash, so `c82b37b` looks made up. If that hash isn't the real base commit, the command fails and the check can't be run. That proof relies on a repository fact that isn't shown and was probably invented, so the issue doesn't fully match the repository as it is.",
+  "model": "claude-opus-5-5",
+  "ms": 12644,
+  "tokens": {
+    "input": 2,
+    "output": 614,
+    "cacheCreation": 3511,
+    "cacheRead": 783,
+    "fresh": 4127,
+    "total": 4910
+  },
+  "at": "2026-11-05T07:29:33.994Z"
+}

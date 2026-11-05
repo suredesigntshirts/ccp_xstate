@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "a129b9502928fd38c3084dfac020a02d7b1c899df946d440c9f83f3a2a73c201",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every name the issue uses against the repository. math.js exists and exports add, subtract, multiply and average. average is exactly `xs.reduce((sum, x) => sum + x, 0) / xs.length`, so an empty list does give 0/0 = NaN. test/math.test.js exists and imports only add, subtract and multiply, so the claim that \"average has no tests at all\" is true. `npm test` maps to `node --test` in package.json. The README says the library serves the invoice service, which backs the reason given. The package.json version mentioned in the non-goals exists. One thing can't be confirmed from the listing: the 'main' branch used in `git show main:math.js`. The issue names it openly as an assumption, and a branch isn't a file, script, command or function. Everything else matches the repository, so the problem describes it as it really is.",
+  "model": "claude-opus-5-5",
+  "ms": 10601,
+  "tokens": {
+    "input": 2,
+    "output": 536,
+    "cacheCreation": 549,
+    "cacheRead": 4036,
+    "fresh": 1087,
+    "total": 5123
+  },
+  "at": "2026-11-05T07:29:31.961Z"
+}

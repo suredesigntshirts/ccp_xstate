@@ -68,7 +68,8 @@ Open `/tmp/bench-inspector/index.html`. A bench run has no live capture, so its 
 | `scripts/bench/score.mjs` | Mechanical checks, then one judge session per judge criterion per output; `--judge-check` checks the judge |
 | `scripts/bench/compare.mjs` | Two scored run sets, per case and criterion, with what changed in the stage entry; `--blind` writes a blind A/B packet |
 | `scripts/bench/return-server.mjs` | The `harness` MCP server whose `return` tool calls the engine's `accept()` |
-| `bench/<stage>/rubric.json` | The criteria, each mechanical or judged |
+| `scripts/bench/stages.mjs` | Per stage: its workflow, its mechanical criteria, and how a judge and a blind reader see a case and an output. A stage needs an entry here to be scored or compared |
+| `bench/<stage>/rubric.json` | The criteria, each mechanical or judged, and `workflow`, the workflow the stage belongs to (quick-fix when absent) |
 | `bench/<stage>/cases/<id>/case.json` | One case: its repository (`repo/` seed files, or a public git URL and commit), the stage input, `must_catch`, `must_not` |
 | `bench/<stage>/judge-check/` | Hand-graded outputs, some planted bad, and the judge's kept verdicts and agreement (`judged/`) |
 | `bench/<stage>/runs/<set>/` | Run sets; `baseline/` is today's prompt |
@@ -82,6 +83,24 @@ public repository with git; a case with a `repo/` seed folder needs no network a
 journal root holding the engine's own run folder, and also `bench.json` (model, workflow version, time, tokens,
 cost, what of this host reached the session, the return calls) and `transcript.jsonl` (the session's text and tool
 calls, cut down).
+
+## Benched stages
+
+| Stage | Workflow | Bench | What its cases plant |
+|---|---|---|---|
+| brief | quick-fix | `bench/brief/` | Half-met lines, after-merge lines, a missing line, a prescribed fix, real product-repo issues |
+| shape | intake | `bench/shape/` | Raw requests: a rule the repo half-breaks, a suggested fix that defeats the need, a shared parser with no old-path line, a bug with no regression asked for, an after-merge ask, a question that is no change, one real request |
+| challenge | intake | `bench/challenge/` | Shaped issues with one planted hole each (half-met, ambiguous, after-merge, missing regression, adopted wrong fix) and two sound issues that must PASS; per-line verdicts are scored mechanically against the case's `must_fail`, `must_pass` and `result` |
+
+The intake workflow (`workflows/intake.json`, plan item wf-intake) turns a request into a frozen issue before any
+build: shape writes it, challenge tries to break it, shape revises at most twice, and the frozen issue starts a
+quick-fix child item. Every stage runs through the real host from the item's start, so each run folder replays
+in the Workflow Inspector. A later stage (challenge) is reached by giving each earlier stage its output from the
+case: `before.<stage>` when the case has it, else the earlier stage's output fields taken by name from the case
+input (challenge's `issue` is shape's output), held to that stage's schema (`earlierOutput` in
+`scripts/bench/lib.mjs`). The challenge folders under `runs/baseline`, `runs/first-cases` and
+`runs/variant-good-faith` were written before this and do not replay; `runs/hosted` does. Use `--stage <stage>`
+with every command below; the workflow comes from the rubric.
 
 ## Commands
 

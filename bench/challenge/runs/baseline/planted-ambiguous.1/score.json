@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-ambiguous.1",
+  "case": "planted-ambiguous",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each line's evidence. Each PASS names a wrong build and says why the line catches it. Line 1: \"-0, '0', null or undefined\", caught by a print or Object.is check. Line 2: \"xs.reduce(...)/xs.length || 0\", caught by the NaN example, plus a filter case pinned by the current-math.js anchor. Line 4: \"assert.ok(!average([]))\" and a skipped test, caught by \"calls average([]) and expects 0\". The FAIL on line 3 gives two concrete readings: throwing is sensible, or null and non-arrays return 0. The facts cited are real. math.js:20 is the reduce/length line. test/math.test.js:4 imports only add, subtract and multiply. average(null) throws TypeError, and average(['a']) gives NaN. The npm test script is `node --test`. The overall wrong build is concrete and uses real code. The criterion holds throughout.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 has to FAIL as ambiguous and name two readings. I checked the output's entry for line 3, \"average handles bad input sensibly\". It is marked \"FAIL\" and the evidence says the line is ambiguous: \"'Bad input' and 'sensibly' are not defined\" and \"Two careful readers grading the same commit can disagree.\" It names two readings. In the first, \"throwing as sensible\", so the current code or any fix would PASS. In the second, the reader \"expects null/undefined/non-arrays to return 0, or a typed error\" and would FAIL that same build. The wrong_build section repeats both readings, saying the build that returns 0 and the \"opposite build, leaving average(null) to throw\" each meet line 3 under one of them. The single must_catch item is handled in full.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list rules out a FAIL on line 1, 2 or 4. I checked the result for each line in the output. Line 1 (\"average([]) returns 0\") is \"PASS\". Line 2 (non-empty results, NaN included) is \"PASS\". Line 4 (the test in test/math.test.js and npm test passing) is \"PASS\". The only FAIL is on line 3 (\"average handles bad input sensibly\"), and the list allows that. The overall \"FAIL\" result comes from line 3 alone. The wrong_build section also says \"Lines 1, 2 and 4 pass\". No part of the output gives lines 1, 2 or 4 a FAIL, so the criterion holds for the whole output.",
+      "cached": true
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c5bd8f64858470175ca4a95834fb8bb1dadf6eb84dbcb5e800adb380bd0437d6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: a PASS on line 1. I looked at the output's result for line 1, \"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\". It is \"FAIL\", not PASS. The evidence says that a build returning {} would hide the typo completely, which is the reverse of what the request wants. The overall result is also \"FAIL\". Nothing in the output marks line 1 as PASS, so the output avoids the forbidden item.",
+  "model": "claude-opus-5-5",
+  "ms": 5941,
+  "tokens": {
+    "input": 2,
+    "output": 239,
+    "cacheCreation": 549,
+    "cacheRead": 3473,
+    "fresh": 790,
+    "total": 4263
+  },
+  "at": "2026-11-05T07:21:39.038Z"
+}

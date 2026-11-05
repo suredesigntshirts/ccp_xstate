@@ -1,0 +1,70 @@
+{
+  "stage": "shape",
+  "workflow": "intake",
+  "about": "What a good shape-stage output must do: one criterion per line, scored met or not met per run. Mechanical criteria are computed by score.mjs (scripts/bench/stages.mjs) from the run's files; judge criteria are graded by one fresh judge session per criterion per output, checked against judge-check/. No criterion is weighed against another: there is no overall score. Approved for wf-intake by the building thread as the person's stand-in (plan/decisions/2026-11-05-wf-intake-ready.md).",
+  "approved": {
+    "by": "stand-in: the wf-intake building thread",
+    "at": "2026-11-05",
+    "record": "plan/decisions/2026-11-05-wf-intake-ready.md"
+  },
+  "criteria": [
+    {
+      "id": "returned",
+      "by": "mechanical",
+      "needs": "run",
+      "says": "The stage returns through the return tool, and the host accepts its first return.",
+      "from": "Rules: return once the issue is written; the host refuses a result that breaks the schema."
+    },
+    {
+      "id": "changes-nothing",
+      "by": "mechanical",
+      "needs": "run",
+      "says": "The run leaves its worktree as it found it: no file added, changed or deleted.",
+      "from": "Rules: you change nothing."
+    },
+    {
+      "id": "blocked-right",
+      "by": "mechanical",
+      "says": "The stage answers blocked exactly when the case's request is not one change to the repository.",
+      "from": "Rules: if the request is not one change to this repository, return blocked."
+    },
+    {
+      "id": "proofs-match",
+      "by": "mechanical",
+      "says": "proofs has one entry per expect line, in the same order, each quoting its line exactly.",
+      "from": "Output: proofs, one entry per expect line, in the same order, line copied exactly."
+    },
+    {
+      "id": "states-problem",
+      "by": "judge",
+      "says": "No expect line prescribes how to fix the problem (a technique, an internal function or a return value) unless the request itself makes it a requirement; a fix the request only suggests appears, if at all, under assumptions or non_goals. The problem field describes what is wrong, not a fix.",
+      "from": "Rules: state the problem, not a fix. Ledger L-issues-state-problems."
+    },
+    {
+      "id": "checkable-before-merge",
+      "by": "judge",
+      "says": "Every expect line can be checked at the pull request's head before merge, by one careful reader, with one answer, and its proof entry (run, ci or read, and how) is a way to check it there. No line needs a release, a deploy, a published page or anything else that exists only after merge.",
+      "from": "Rules: every expect line must be checkable at the head before merge. Ledger L-expect-checkable-before-accept."
+    },
+    {
+      "id": "grounded",
+      "by": "judge",
+      "says": "Every file, script, command and function the issue names exists in the repository at this commit or is one the issue asks to create, and the problem describes the repository as it really is.",
+      "from": "Task: read the repository; find what is really there."
+    },
+    {
+      "id": "catches-traps",
+      "by": "judge",
+      "case": "must_catch",
+      "says": "The output handles every item in the case's must_catch list.",
+      "from": "The traps each case plants: half-met rules, suggested fixes, missing regressions, after-merge asks."
+    },
+    {
+      "id": "avoids-must-not",
+      "by": "judge",
+      "case": "must_not",
+      "says": "The output does none of the things in the case's must_not list.",
+      "from": "The traps each case plants."
+    }
+  ]
+}

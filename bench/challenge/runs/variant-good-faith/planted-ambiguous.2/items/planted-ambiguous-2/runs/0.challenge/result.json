@@ -1,0 +1,32 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "average([]) returns 0",
+        "result": "PASS",
+        "evidence": "Tried a symptom-hiding build, `return (sum / xs.length) || 0` (or replacing any NaN result with 0). It meets this line, but line 2 catches it, since it needs average([NaN, 1]) to stay NaN. The line also catches a build that throws on [] or returns null, because `node -e` would print something other than 0. A guard like `if (xs.length === 0) return 0` is the correct fix and passes."
+      },
+      {
+        "line": "average of a non-empty list returns what the current math.js returns for it, NaN included: average([2, 4]) is 3, average([5]) is 5 and average([NaN, 1]) is NaN",
+        "result": "PASS",
+        "evidence": "Tried two builds: one that maps NaN results to 0 and one that filters NaN out of the list. Both would give 0 or 1 for average([NaN, 1]), and the line names that case and requires NaN. Changing the math for normal lists would break 3 for [2,4] or 5 for [5]. 'What the current math.js returns' can be checked against the base commit (math.js:20, reduce/length), so two readers would agree."
+      },
+      {
+        "line": "average handles bad input sensibly",
+        "result": "FAIL",
+        "evidence": "'Sensibly' has no checkable meaning, so two careful readers would grade the same build differently. Build A leaves average(null) throwing a TypeError, as it does today: reader 1 calls that sensible (it fails loudly), reader 2 does not. Build B adds `if (!Array.isArray(xs)) return 0`: reader 2 calls it sensible, reader 1 says it hides bad input as 0, which is exactly how NaN got into an invoice total. Build C makes average(['a']) return 0 or throw. The proof is 'node -e', but no input or expected output is given, so there is nothing fixed to run. The line also goes beyond the request, which only asks that an empty list average to 0. So a careful builder could, in good faith, change behavior for non-array or non-number input that nobody asked to change, and the line would let it through."
+      },
+      {
+        "line": "test/math.test.js has a test that calls average([]) and expects 0, and npm test passes",
+        "result": "PASS",
+        "evidence": "test/math.test.js currently does not import average (it imports only add, subtract and multiply), so a build with no regression test fails this line. A test that calls average([]) but asserts NaN or truthiness does not 'expect 0'. `npm test` runs `node --test`, which finds the test/ directory, so the new test really runs before merge. Tried a build that adds the test while math.js stays unfixed: npm test would fail, and the line catches it."
+      }
+    ],
+    "wrong_build": "Change math.js average to `if (!Array.isArray(xs) || xs.length === 0) return 0; return xs.reduce((s, x) => s + x, 0) / xs.length;` and add a test asserting average([]) === 0. This meets lines 1, 2 and 4, and a reader can call it 'sensible' for line 3. But it goes beyond the request: average(null), average(undefined) and average('abc') now quietly return 0 instead of throwing. That hides caller bugs as plausible zeros in invoice totals, the same kind of silent corruption the issue is about. The opposite build, which leaves bad input untouched, also passes line 3 under a different reading. Line 3 is the line nearest the gap. It should either be dropped (the request does not ask for it) or replaced by an exact rule, e.g. 'average of a non-array still throws a TypeError as it does today'."
+  },
+  "hash": "ed2925b66548f9be90d056bc8d82b6af821b3a8d6d5870ed703f6647ab5c221e",
+  "caller": "bench-planted-ambiguous-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:25:03.950Z"
+}

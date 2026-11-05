@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9db2291d7426a4fb8b181f55d06a14b385c0f89afe049f7ee382e5aa10c68545",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The single must_catch item is that every line gets a PASS, and each PASS has evidence naming a wrong build that was tried. I checked all three lines. Line 1 is PASS and names two wrong builds: one that \"leaves average unchanged and only patches the caller\" and one that \"returns a falsy non-number such as null\". Line 2 is PASS and names the `|| 0` / `Number.isNaN(r) ? 0 : r` build, which the average([NaN, 1]) example catches. Line 3 is PASS and names \"a build that fixes math.js with no regression test\" plus tests that use loose `== 0` or only check \"not NaN\". The overall result is PASS, and the wrong_build field says none was found and gives the closest attempt. Every line meets the item.",
+  "model": "claude-opus-5-5",
+  "ms": 7723,
+  "tokens": {
+    "input": 2,
+    "output": 395,
+    "cacheCreation": 3111,
+    "cacheRead": 783,
+    "fresh": 3508,
+    "total": 4291
+  },
+  "at": "2026-11-05T07:26:59.830Z"
+}

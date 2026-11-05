@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "7934f0c34ea3e2185f5777f2e00faaa0089003687ed3b9ad11d932b56a2d2822",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the problem field and all eight expect lines. The problem field only says what's wrong: the repo has no tools (\"`packages/` is empty\") and bad rows \"are only discovered when a reader breaks on them\". It proposes no fix. The expect lines describe behaviour you can see from outside: exit codes, which line numbers get reported, handling of a torn last row and of a missing file, no stack traces, and the README listing the tool. The request asks for these things or they follow directly from it. The `path:n:` report format is a choice the request left open, and it is marked as an assumption. No expect line names an internal function, a parsing technique or a return value. A few lines do carry implementation details: the `node_modules/.bin` binary, \"no runtime `dependencies`\" and \"a node:test suite\". The output ties these to repo conventions (CLAUDE.md's one-folder-per-tool rule and workspace tests run by root `npm test`), and I couldn't see the repo facts to confirm that. If those conventions hold, they're repo requirements, not fix techniques the builder is being steered toward. Suggested details, such as exit codes 1 and 2, are kept under assumptions.",
+  "model": "claude-opus-5-5",
+  "ms": 12658,
+  "tokens": {
+    "input": 2,
+    "output": 1040,
+    "cacheCreation": 5294,
+    "cacheRead": 783,
+    "fresh": 6336,
+    "total": 7119
+  },
+  "at": "2026-11-05T07:28:01.189Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "223b2397e8e4f04bb555c5f94085d92eb58a47cebde19611d46e370eaa2d6aec",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the expect list, and the output handles both.\n\nItem 1 (CSV conversion unchanged): Several expect lines cover this. One says the no-flag CLI on `a,b\\n1,2\\n` still writes exactly `[{\"a\":\"1\",\"b\":\"2\"}]` and exits 0. Another says tabs are not treated as separators without --tsv. A third says `parse()` keeps its current behaviour. A fourth says \"`npm test` exits 0\".\n\nItem 2 (--tsv gives the same JSON as the CSV path): The first expect line says `a\\tb\\n1\\t2\\n` with --tsv writes exactly `[{\"a\":\"1\",\"b\":\"2\"}]` plus a newline. The CSV expect line writes the same table, `a,b\\n1,2\\n`, to exactly the same bytes. So the two expect lines together pin TSV output to the CSV output for the same table. The outcome also says --tsv \"prints the same JSON-array-of-objects shape it prints for CSV.\"",
+  "model": "claude-opus-5-5",
+  "ms": 5887,
+  "tokens": {
+    "input": 2,
+    "output": 532,
+    "cacheCreation": 4382,
+    "cacheRead": 783,
+    "fresh": 4916,
+    "total": 5699
+  },
+  "at": "2026-11-05T07:27:56.642Z"
+}

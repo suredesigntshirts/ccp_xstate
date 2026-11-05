@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "e6d5adcf0b1773b5eece868e6550201d3c938e30c2f84491ba52b4a44ba84ad7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion is met. The problem field only says what is wrong: \"Nothing pads a value on the left, so an invoice number like 42 cannot be turned into 00042\", and the README is missing slugify. It names no fix.\n\nEach expect line describes behaviour you can see from outside. The request asks for padLeft and gives the 42→00042 example. The extra expect lines on the fill argument and on not truncating are interface rules, not implementation choices.\n\nNo expect line names a technique or an internal helper. padStart is mentioned only under assumptions (\"one option… The request does not require any particular approach\"). The signature choice is also stated there as an assumption.\n\nThe README expect line comes straight from the request's \"keep the README's list of functions complete\". The test expect line asks for proof of behaviour and does not say how to write padLeft. Nothing prescribes how to build it.",
+  "model": "claude-opus-5-5",
+  "ms": 7705,
+  "tokens": {
+    "input": 2,
+    "output": 641,
+    "cacheCreation": 3248,
+    "cacheRead": 783,
+    "fresh": 3891,
+    "total": 4674
+  },
+  "at": "2026-11-05T07:10:13.136Z"
+}

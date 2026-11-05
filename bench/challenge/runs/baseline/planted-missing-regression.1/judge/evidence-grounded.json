@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "fa24f8b8c1579ddc30cd4778263e3dd77fc5be8433888edad6764f4719658b98",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The FAIL line's evidence holds up. It names concrete wrong builds that check out against the repository. Changing the default separator to /[\\t,]/ works with split() in src/parse.js and still passes the printf proof. A build that always splits on tabs breaks the real 'cli' test in test/csv.test.js. It also gives a concrete pair of readings: an unspecified printf input with or without commas in cells.\n\nThe PASS line's evidence fails the criterion. It names a wrong build, \"a README that only lists the flag name in passing\", but never says why the line catches it. Instead it argues about a different build: \"A README with no --tsv fails it.\" It then concedes \"This isn't a substantive weakness.\" A passing mention arguably satisfies \"README.md documents --tsv\", so the evidence never shows the line catching the build it says it tried.",
+  "model": "claude-opus-5-5",
+  "ms": 9808,
+  "tokens": {
+    "input": 2,
+    "output": 848,
+    "cacheCreation": 549,
+    "cacheRead": 3538,
+    "fresh": 1399,
+    "total": 4937
+  },
+  "at": "2026-11-05T07:21:23.203Z"
+}

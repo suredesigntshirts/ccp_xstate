@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "ba7c3ec511e1d80fa6d286c0112a47336e6252202646898b9a0e94c3f39f82f1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each line's evidence against the 6 files in the repository. The evidence for line 1 cites \"src/loader.js already wraps loadConfig in readConfigSafe()\", a \"--safe flag\" and \"bin/settings.js\". None of these exist. The tracked files are only .gitignore, README.md, package.json, src/app.js, src/config.js and test/config.test.js. So that FAIL rests on code that isn't there. The evidence for line 2 and the overall wrong_build do hold up. They cite the real 'bad JSON throws' test, the real DEFAULTS in src/app.js and the real README behaviour (`bad config: <message>`, exit 1). They also describe a concrete wrong build that meets the line but misses the request. Because the criterion requires every cited file and behaviour to be real, line 1 breaks it, and the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 10320,
+  "tokens": {
+    "input": 2,
+    "output": 424,
+    "cacheCreation": 3082,
+    "cacheRead": 783,
+    "fresh": 3508,
+    "total": 4291
+  },
+  "at": "2026-11-05T07:19:11.531Z"
+}

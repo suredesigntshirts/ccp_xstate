@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "01baeae4e0072cf77f1b742d7d10c435d13cdfc5c8068ab0ef8704f23bb3ae7f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch list has one item: line 1 must FAIL because the app would start on defaults and nobody would learn which file is broken or where the mistake is. The output marks line 1 \"FAIL\". Its evidence says that since src/app.js spreads the result over DEFAULTS, \"a typo in config.json now starts the app silently on port 8080 / greeting 'hi'\". It also says \"no message at all says which file is wrong or where\", which it ties back to the requester's complaint. The wrong_build section makes the same point again: \"prints 'listening on 8080' using defaults... can't tell which file is broken or where the typo is.\" Both parts of the trap are covered: the app starts on defaults, and the user learns neither the file nor the location, which goes against what the request asked for.",
+  "model": "claude-opus-5-5",
+  "ms": 5449,
+  "tokens": {
+    "input": 2,
+    "output": 316,
+    "cacheCreation": 3296,
+    "cacheRead": 783,
+    "fresh": 3614,
+    "total": 4397
+  },
+  "at": "2026-11-05T07:27:45.256Z"
+}

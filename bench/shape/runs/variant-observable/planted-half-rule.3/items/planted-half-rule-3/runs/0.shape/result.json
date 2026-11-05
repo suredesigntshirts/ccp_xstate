@@ -1,0 +1,73 @@
+{
+  "result": {
+    "issue": {
+      "title": "Add padLeft to strutil for zero-padding invoice numbers, and make the README function list complete",
+      "problem": "index.js exports capitalize, slugify and truncate; nothing pads a value on the left, so an invoice number like 42 cannot be turned into 00042 with strutil. The README is also already incomplete: it documents capitalize(s) and truncate(s, n) but has no section for slugify, which index.js exports.",
+      "reason": "The invoice service needs fixed-width, zero-padded invoice numbers, and people discover strutil's functions through the README, so a function missing from the README (slugify today, padLeft once added) is effectively hidden.",
+      "outcome": "strutil exports padLeft, which left-pads a value to a given width with a given fill character (42 -> 00042), it is covered by the test suite, and the README has a section for every exported function: capitalize, slugify, truncate and padLeft.",
+      "expect": [
+        "`padLeft('42', 5, '0')` imported from index.js returns the string `'00042'`.",
+        "`padLeft(42, 5, '0')` (a number, not a string) returns the string `'00042'`.",
+        "When the input is already at least as long as the width it is returned unchanged as a string: `padLeft('123456', 5, '0')` returns `'123456'` and `padLeft('12345', 5, '0')` returns `'12345'`.",
+        "A fill character other than '0' is honoured: `padLeft('7', 3, '*')` returns `'**7'`.",
+        "The existing exports still behave as before: `capitalize('abc')` is `'Abc'`, `slugify(' Hello World! ')` is `'hello-world'`, `truncate('abcdef', 4)` is `'abc…'`.",
+        "`npm test` exits 0, and test/strutil.test.js contains at least one test that calls padLeft.",
+        "README.md has a section heading for each function index.js exports — capitalize, slugify, truncate and padLeft — and the padLeft section gives its parameters and says it pads on the left to the given width with the fill character."
+      ],
+      "proofs": [
+        {
+          "line": "`padLeft('42', 5, '0')` imported from index.js returns the string `'00042'`.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import a from 'node:assert/strict'; a.equal(padLeft('42',5,'0'),'00042')\" ; expect exit 0"
+        },
+        {
+          "line": "`padLeft(42, 5, '0')` (a number, not a string) returns the string `'00042'`.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import a from 'node:assert/strict'; a.equal(padLeft(42,5,'0'),'00042')\" ; expect exit 0 (strict equal also checks the result is a string)"
+        },
+        {
+          "line": "When the input is already at least as long as the width it is returned unchanged as a string: `padLeft('123456', 5, '0')` returns `'123456'` and `padLeft('12345', 5, '0')` returns `'12345'`.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import a from 'node:assert/strict'; a.equal(padLeft('123456',5,'0'),'123456'); a.equal(padLeft('12345',5,'0'),'12345')\" ; expect exit 0"
+        },
+        {
+          "line": "A fill character other than '0' is honoured: `padLeft('7', 3, '*')` returns `'**7'`.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import a from 'node:assert/strict'; a.equal(padLeft('7',3,'*'),'**7')\" ; expect exit 0"
+        },
+        {
+          "line": "The existing exports still behave as before: `capitalize('abc')` is `'Abc'`, `slugify(' Hello World! ')` is `'hello-world'`, `truncate('abcdef', 4)` is `'abc…'`.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {capitalize,slugify,truncate} from './index.js'; import a from 'node:assert/strict'; a.equal(capitalize('abc'),'Abc'); a.equal(slugify(' Hello World! '),'hello-world'); a.equal(truncate('abcdef',4),'abc…')\" ; expect exit 0"
+        },
+        {
+          "line": "`npm test` exits 0, and test/strutil.test.js contains at least one test that calls padLeft.",
+          "proof": "run",
+          "how": "npm test ; expect exit 0, then grep -n 'padLeft(' test/strutil.test.js ; expect at least one match inside a test"
+        },
+        {
+          "line": "README.md has a section heading for each function index.js exports — capitalize, slugify, truncate and padLeft — and the padLeft section gives its parameters and says it pads on the left to the given width with the fill character.",
+          "proof": "read",
+          "how": "Read README.md and index.js: every `export function` name in index.js (capitalize, slugify, truncate, padLeft) has a `## name(...)` heading in README.md; the padLeft section lists its parameters and describes left-padding to the width with the fill character."
+        }
+      ],
+      "non_goals": [
+        "Publishing a new npm release or bumping the package version.",
+        "Adding padRight or other padding/formatting helpers.",
+        "Changing the behaviour of capitalize, slugify or truncate.",
+        "Changing the invoice service itself to use padLeft."
+      ],
+      "assumptions": [
+        "Signature is padLeft(value, width, fill): the request names only the function and the 42 -> 00042 example, so the fill character is a parameter and callers pass '0' for invoice numbers; whether fill has a default is left to the builder and not checked.",
+        "Numbers are accepted as well as strings and the result is always a string, since invoice numbers are often numeric.",
+        "Input already at or beyond the width is returned unchanged (not truncated), matching String.prototype.padStart.",
+        "Multi-character fill strings, negative/non-integer widths and empty fill are unspecified and not checked.",
+        "'Keep the README's list of functions complete' means every exported function gets a README section, which includes adding the currently missing slugify section, following the existing `## name(args)` heading style."
+      ]
+    }
+  },
+  "hash": "be2ab64c4b5eb7cd0298e4df31fdff9fa859d422b677adbc642a829d9ce0db82",
+  "caller": "bench-planted-half-rule-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:21:03.681Z"
+}

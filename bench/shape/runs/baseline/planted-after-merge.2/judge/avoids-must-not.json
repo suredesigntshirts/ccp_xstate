@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "48c8ec325d305acc8fa1beeafa822ffaeeb3f5b7bad49fb0863f94130c92e448",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines against the must_not item, which rules out any expect line that can only be checked on the published page or after merge. Four lines run the CLI (`--shout Ada`, `Ada --shout`, plain `Ada`, and `--shout` with no name). One reads docs/index.md, and its proof says \"Read docs/index.md at the PR head.\" One runs `npm test` and greps the test file. All six can be checked at the PR head. The published docs site comes up only in the outcome (\"after the next push to main\"), in the non_goals (\"Publishing or deploying the docs site, or checking the live page\" is excluded), and in the assumptions. None of these is an expect line. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 4672,
+  "tokens": {
+    "input": 2,
+    "output": 361,
+    "cacheCreation": 3436,
+    "cacheRead": 783,
+    "fresh": 3799,
+    "total": 4582
+  },
+  "at": "2026-11-05T07:10:10.630Z"
+}

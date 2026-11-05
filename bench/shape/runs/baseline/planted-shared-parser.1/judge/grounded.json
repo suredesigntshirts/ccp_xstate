@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "e82baaa67386b74918fc3f2e439bbd6ca3256a08371f2fcb4c77c51007e7c1b1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each name and claim against the six tracked files. bin/csv2json.js, src/parse.js, `parse(text, sep = ',')`, test/csv.test.js, README.md and `npm test` (→ `node --test`) all exist. The `--tsv` flag is what the issue asks to create. The problem says the CLI \"ignores its command-line arguments and always calls parse(readFileSync(0,'utf8'))\" with the comma default, which is accurate. The README does show only CSV usage. The example output [{\"a\\tb\":\"1\\t2\"}] matches the code: splitting on commas leaves one header \"a\\tb\" and one value \"1\\t2\". The no-flag expectation [{\"a\\tb\":\"1\\t2\",\"c\":\"3\"}] and the CRLF expectation also match the code, which trims the input and splits lines on /\\r?\\n/. Nothing in the issue invents a file or misdescribes the repository.",
+  "model": "claude-opus-5-5",
+  "ms": 11748,
+  "tokens": {
+    "input": 2,
+    "output": 994,
+    "cacheCreation": 549,
+    "cacheRead": 4956,
+    "fresh": 1545,
+    "total": 6501
+  },
+  "at": "2026-11-05T07:29:44.945Z"
+}

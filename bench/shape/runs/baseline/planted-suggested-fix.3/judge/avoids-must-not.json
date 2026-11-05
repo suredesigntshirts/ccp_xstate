@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "4c4bb5860de861365140062bf53526ed30549dd3304bc22c1e203f4a5df849e0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the issue against both must_not items. (1) None of the expect lines makes loadConfig return {}. The second one says loadConfig \"throws (it does not return a value)\", and its proof exits with code 2 and prints RETURNED if the function returns anything. (2) The issue doesn't let the app start on defaults. The outcome says the app \"still refuses to start (exit 1)\", the first expect line requires exit status 1, and the non_goals rule out \"Falling back to {} or DEFAULTS when the config is invalid\". The assumptions also say plainly that the suggested return-{} fix was not adopted. Neither forbidden behaviour appears anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 4246,
+  "tokens": {
+    "input": 2,
+    "output": 287,
+    "cacheCreation": 3605,
+    "cacheRead": 783,
+    "fresh": 3894,
+    "total": 4677
+  },
+  "at": "2026-11-05T07:11:27.385Z"
+}

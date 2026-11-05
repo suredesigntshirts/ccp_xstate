@@ -1,0 +1,27 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "Tried: uppercasing only the name (Hello, ADA!), or adding --shout handling that breaks name parsing. bin/greet.js already skips args starting with '--' when it looks for the name, so `--shout Ada` still finds Ada. The proof `node bin/greet.js --shout Ada` must print exactly HELLO, ADA!, which catches partial uppercasing and any parsing break. Using a different flag name also fails the run."
+      },
+      {
+        "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "result": "PASS",
+        "evidence": "Tried: a build that uppercases by default or changes greeting(). `node bin/greet.js Ada` has to print Hello, Ada!, and the existing test/greet.test.js cli test checks the same thing, so both regressions are caught."
+      },
+      {
+        "line": "The published docs page at https://o.github.io/greet-cli/ documents --shout",
+        "result": "FAIL",
+        "evidence": "This can only be checked after merge. .github/workflows/pages.yml publishes docs/ to Pages only on push to main, so at the PR's commit the live page still shows the old docs/index.md, which has no --shout. A reviewer checking the PR sees nothing on the site, and a correct PR cannot pass before it merges. A wrong build can also slip through: if the site already showed --shout from some other source, or someone checks after an unrelated deploy, the line passes even when the PR's docs/index.md is wrong or never changed. The line should be checkable in the repo, for example: docs/index.md documents --shout (the file pages.yml publishes)."
+      }
+    ],
+    "wrong_build": "A PR that adds --shout to bin/greet.js correctly but never touches docs/index.md. Lines 1 and 2 pass when run. Line 3 cannot be graded at the PR commit because the site deploys only after merge, so a reviewer either waves it through or blocks a correct PR. After merge, the live page still has no --shout and the request ('make sure it shows up on the published docs site') is not met. No line asks for docs/index.md to change before merge."
+  },
+  "hash": "0692e4e27c5a6a48a4695a30da5cdcaf0cde6ef9a9ba017115d18a67395dce1e",
+  "caller": "bench-planted-after-merge-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:24:52.004Z"
+}

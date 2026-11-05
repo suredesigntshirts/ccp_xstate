@@ -1,0 +1,66 @@
+{
+  "result": {
+    "issue": {
+      "title": "csv2json: add a --tsv flag to read tab-separated input",
+      "problem": "bin/csv2json.js ignores its arguments and always calls parse(readFileSync(0,'utf8')) from src/parse.js, which splits on ',' by default. parse already accepts a separator as its second argument (parse(text, sep = ',')), but nothing in the CLI exposes it, so TSV on stdin comes out as one column per row keyed by the whole tab-joined header line. Users have to pipe their TSV exports through sed to turn tabs into commas first.",
+      "reason": "The requester's exports are now TSV. A --tsv flag lets them convert TSV directly, drops the sed step, and stops sed from corrupting fields that contain commas.",
+      "outcome": "`node bin/csv2json.js --tsv < table.tsv` prints the rows as a JSON array of objects keyed by the tab-separated header row. Running without the flag works exactly as before, for both the CLI and the shared parse() function. The flag is documented and tested.",
+      "expect": [
+        "With --tsv, tab-separated stdin is split on tabs: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline",
+        "With --tsv, commas inside a field are kept as data, not treated as separators: `printf 'name\\tcity\\nAnn\\tParis, FR\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"name\":\"Ann\",\"city\":\"Paris, FR\"}]` followed by a newline",
+        "Without --tsv the CLI still parses commas: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline, and `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` still treats the tab-joined line as one column (prints `[{\"a\\tb\":\"1\\t2\"}]`)",
+        "The shared parser's default is unchanged: with no separator argument, parse() from src/parse.js still splits on commas, so `node -e \"import('./src/parse.js').then(m=>console.log(JSON.stringify(m.parse('a,b\\n1,2\\n'))))\"` prints `[{\"a\":\"1\",\"b\":\"2\"}]`",
+        "The test suite has at least one new test that runs the CLI with --tsv on tab-separated input and checks its output, and `npm test` passes with every test green, the existing 'parse' and 'cli' tests included",
+        "README.md documents the --tsv flag with an example invocation"
+      ],
+      "proofs": [
+        {
+          "line": "With --tsv, tab-separated stdin is split on tabs: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline",
+          "proof": "run",
+          "how": "From the repo root: printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv | od -c ; expect the bytes of [{\"a\":\"1\",\"b\":\"2\"}] then \\n"
+        },
+        {
+          "line": "With --tsv, commas inside a field are kept as data, not treated as separators: `printf 'name\\tcity\\nAnn\\tParis, FR\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"name\":\"Ann\",\"city\":\"Paris, FR\"}]` followed by a newline",
+          "proof": "run",
+          "how": "From the repo root: printf 'name\\tcity\\nAnn\\tParis, FR\\n' | node bin/csv2json.js --tsv ; compare to [{\"name\":\"Ann\",\"city\":\"Paris, FR\"}]"
+        },
+        {
+          "line": "Without --tsv the CLI still parses commas: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline, and `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` still treats the tab-joined line as one column (prints `[{\"a\\tb\":\"1\\t2\"}]`)",
+          "proof": "run",
+          "how": "From the repo root, run both commands: printf 'a,b\\n1,2\\n' | node bin/csv2json.js  and  printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js ; compare the output to the two expected strings"
+        },
+        {
+          "line": "The shared parser's default is unchanged: with no separator argument, parse() from src/parse.js still splits on commas, so `node -e \"import('./src/parse.js').then(m=>console.log(JSON.stringify(m.parse('a,b\\n1,2\\n'))))\"` prints `[{\"a\":\"1\",\"b\":\"2\"}]`",
+          "proof": "run",
+          "how": "From the repo root, run the quoted node -e command; expect [{\"a\":\"1\",\"b\":\"2\"}]"
+        },
+        {
+          "line": "The test suite has at least one new test that runs the CLI with --tsv on tab-separated input and checks its output, and `npm test` passes with every test green, the existing 'parse' and 'cli' tests included",
+          "proof": "run",
+          "how": "Run npm test; expect exit 0, no failing tests, the 'parse' and 'cli' tests listed as passing, and in test/ a test that runs bin/csv2json.js with '--tsv' on tab-separated input and asserts on its output"
+        },
+        {
+          "line": "README.md documents the --tsv flag with an example invocation",
+          "proof": "read",
+          "how": "Read README.md; it shows --tsv in a usage example and says that it reads tab-separated input"
+        }
+      ],
+      "non_goals": [
+        "Quoted fields, escaped separators, or other RFC 4180 / IANA TSV escaping (the current parser has none for CSV either)",
+        "A general --sep/--delimiter option or auto-detecting the delimiter",
+        "Changing the JSON output format, or how empty or missing cells are handled",
+        "Publishing a release or changing the package version"
+      ],
+      "assumptions": [
+        "--tsv means use a single tab character as the field separator; nothing else about parsing changes",
+        "The request only suggests reusing parse()'s existing sep parameter from the CLI; the builder may implement it another way, as long as parse()'s comma default stays as it is for its other callers",
+        "Unknown arguments keep their current behaviour (ignored); this issue does not add argument validation or --help",
+        "Line splitting (\\r?\\n) and trimming of the whole input stay the same in TSV mode"
+      ]
+    }
+  },
+  "hash": "beefea5eb1626f1e001dcd768c3441219e8df26b997d50aae532cb4d6d9f085d",
+  "caller": "bench-planted-shared-parser-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:02:11.130Z"
+}

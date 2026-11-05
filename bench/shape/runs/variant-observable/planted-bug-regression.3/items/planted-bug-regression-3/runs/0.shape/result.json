@@ -1,0 +1,59 @@
+{
+  "result": {
+    "issue": {
+      "title": "average([]) returns NaN instead of 0",
+      "problem": "math.js exports average(xs), which computes xs.reduce(...)/xs.length. For an empty array this is 0/0, so `node -e 'console.log(require(\"./math\").average([]))'` prints NaN today. test/math.test.js covers add, subtract and multiply but has no test for average at all, so nothing caught this.",
+      "reason": "mathlib backs the invoice service. A NaN from average([]) was carried into an invoice total last week. NaN spreads silently through any arithmetic it touches.",
+      "outcome": "average([]) returns 0. average on non-empty arrays still returns the arithmetic mean. The test suite covers both cases, so the bug cannot come back unnoticed.",
+      "expect": [
+        "`node -e 'const r=require(\"./math\").average([]); console.log(Object.is(r,0))'` run from the repo root prints `true` (the result is the number 0, not NaN, -0, null or a string)",
+        "`node -e 'const {average}=require(\"./math\"); console.log(average([1,2,3]), average([5]), average([-2,2]), average([1,2]))'` prints `2 5 0 1.5`, so non-empty averages are unchanged",
+        "`node -e 'const m=require(\"./math\"); console.log(Object.keys(m).sort().join(\",\"))'` prints `add,average,multiply,subtract`, so the exports are unchanged",
+        "`npm test` exits 0, and the suite has a test that calls average([]) and asserts the result is 0",
+        "Regression check: with only math.js's average reverted to the current `xs.reduce((sum, x) => sum + x, 0) / xs.length` body (and the PR's tests kept), `npm test` exits non-zero"
+      ],
+      "proofs": [
+        {
+          "line": "`node -e 'const r=require(\"./math\").average([]); console.log(Object.is(r,0))'` run from the repo root prints `true` (the result is the number 0, not NaN, -0, null or a string)",
+          "proof": "run",
+          "how": "From the repo root at PR head, run: node -e 'const r=require(\"./math\").average([]); console.log(Object.is(r,0))' and check that the output is `true`."
+        },
+        {
+          "line": "`node -e 'const {average}=require(\"./math\"); console.log(average([1,2,3]), average([5]), average([-2,2]), average([1,2]))'` prints `2 5 0 1.5`, so non-empty averages are unchanged",
+          "proof": "run",
+          "how": "From the repo root at PR head, run the command and check that the output is exactly `2 5 0 1.5`."
+        },
+        {
+          "line": "`node -e 'const m=require(\"./math\"); console.log(Object.keys(m).sort().join(\",\"))'` prints `add,average,multiply,subtract`, so the exports are unchanged",
+          "proof": "run",
+          "how": "From the repo root at PR head, run the command and check that the output is exactly `add,average,multiply,subtract`."
+        },
+        {
+          "line": "`npm test` exits 0, and the suite has a test that calls average([]) and asserts the result is 0",
+          "proof": "run",
+          "how": "At PR head, run `npm test; echo $?` and check for exit 0 with `# fail 0`. Then grep test/ for `average([])` and confirm it sits inside an assertion that it equals 0."
+        },
+        {
+          "line": "Regression check: with only math.js's average reverted to the current `xs.reduce((sum, x) => sum + x, 0) / xs.length` body (and the PR's tests kept), `npm test` exits non-zero",
+          "proof": "run",
+          "how": "At PR head, run `git checkout c82b37b -- math.js && npm test; echo $?` and check that the exit status is non-zero. Then run `git checkout HEAD -- math.js` to restore."
+        }
+      ],
+      "non_goals": [
+        "Changing how average handles non-array input, non-numeric elements, or NaN/Infinity inside the list",
+        "Changing add, subtract or multiply",
+        "Changes to the invoice service or to past invoice totals",
+        "Publishing a new package release"
+      ],
+      "assumptions": [
+        "The request says an empty list should average to 0, so this issue uses the number 0 rather than throwing an error or returning null.",
+        "Only the empty array is special-cased. Other edge inputs (undefined, non-arrays) are out of scope and may behave as they do today.",
+        "A package version bump or README update is optional and not required."
+      ]
+    }
+  },
+  "hash": "35a2853f549df0f66013614a3b336ef713f0c59bba6838d1733dde8e6fe4731f",
+  "caller": "bench-planted-bug-regression-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:20:28.662Z"
+}

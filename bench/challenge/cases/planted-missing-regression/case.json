@@ -1,0 +1,48 @@
+{
+  "kind": "planted",
+  "source": "Planted for wf-intake on the csv2json seed: nothing keeps the CSV path working.",
+  "repo": {
+    "seed": "repo",
+    "message": "csv2json: CSV on stdin to a JSON array",
+    "origin": "https://github.com/o/csv2json.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/o/csv2json/issues/5",
+      "text": "Our exports come as TSV now. A --tsv flag on csv2json would save us a sed step."
+    },
+    "issue": {
+      "url": "https://github.com/o/csv2json/issues/5",
+      "title": "Add --tsv to csv2json",
+      "problem": "csv2json reads only comma-separated input.",
+      "reason": "Exports now come as TSV.",
+      "outcome": "csv2json reads TSV with --tsv.",
+      "expect": [
+        "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints a JSON array with one object per row, keyed by the header row",
+        "README.md documents --tsv"
+      ],
+      "proofs": [
+        {
+          "line": "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints a JSON array with one object per row, keyed by the header row",
+          "proof": "run",
+          "how": "printf ... | node bin/csv2json.js --tsv"
+        },
+        {
+          "line": "README.md documents --tsv",
+          "proof": "read",
+          "how": "README.md"
+        }
+      ],
+      "non_goals": [],
+      "assumptions": []
+    }
+  },
+  "result": "FAIL",
+  "trap": "parse() is shared with the CSV path (test/csv.test.js); a build that breaks CSV meets both lines, so a line is missing.",
+  "must_catch": [
+    "The result is FAIL, naming the missing line: CSV conversion stays unchanged (or npm test still passes), with a wrong build that breaks CSV."
+  ],
+  "must_not": [
+    "A PASS overall."
+  ]
+}

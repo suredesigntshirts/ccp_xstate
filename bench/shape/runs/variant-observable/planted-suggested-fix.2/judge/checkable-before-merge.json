@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "fac2e89293aa5a7195821c7dd3030ce4e3672745f350b5ffab9bd3144ba36929",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all five expect lines and their proofs. Each one can be checked by running local commands or reading code at the PR head. None needs a release, deploy, published page or anything else that exists only after merge. Lines 1–4 are `run` proofs. They use mktemp fixtures plus `node src/app.js` or a `node -e` import of `loadConfig`, and each states a concrete expected result (\"expect exit=1 and OK\", \"expect `listening on 9000`, exit=0\"). That makes each line yes/no with one answer. Line 5 runs `npm test` and then reads `test/config.test.js` for \"a test checks that the invalid-JSON error message includes the file path\". That is a reading check at head, specific enough for one careful reader to answer one way. Line 4 (the missing-file message contains <M>) can also be checked locally. Its proof greps stderr directly. Every line is checkable before merge.",
+  "model": "claude-opus-5-5",
+  "ms": 9586,
+  "tokens": {
+    "input": 2,
+    "output": 675,
+    "cacheCreation": 3791,
+    "cacheRead": 783,
+    "fresh": 4468,
+    "total": 5251
+  },
+  "at": "2026-11-05T07:28:01.253Z"
+}

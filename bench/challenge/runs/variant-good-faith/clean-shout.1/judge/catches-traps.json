@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "1ee52e44e13607d7315aaf4b53b72c4d575f623d742350828b599be77dba6519",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch item says every line passes, with evidence naming a wrong build that was tried. I checked all four lines. Line 1 is PASS and names \"a build that changes nothing\" (it prints Hello, Ada!) and builds that upper-case only the name or only the greeting. Line 2 is PASS and names \"A build that upper-cases every greeting, or turns shouting on by default\". Line 3 is PASS and names \"A build that documents --shout only in README.md, or only in the usage text on stderr\". Line 4 is PASS and names \"A build that tests only a shout() helper... or adds no test\". The overall result is PASS. The wrong_build field says no wrong build met all four lines. Every line passes with a named wrong build, so the item is handled.",
+  "model": "claude-opus-5-5",
+  "ms": 8461,
+  "tokens": {
+    "input": 2,
+    "output": 441,
+    "cacheCreation": 3655,
+    "cacheRead": 783,
+    "fresh": 4098,
+    "total": 4881
+  },
+  "at": "2026-11-05T07:27:00.648Z"
+}

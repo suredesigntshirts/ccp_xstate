@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9de4e34620fe8ff2058ed2d252bc3b9384a121e226f37cddf46ada248c37bd75",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion is met. The must_catch list has one item: the stage should answer blocked because the request is a question that asks for no change. The output is a `blocked` object. Its reason says \"The request (issue #11) is a question, not a change\" and \"It asks for no change to the repository,\" and it adds that there is no outcome a pull request could make true and a verifier could check. That matches the item. The output also doesn't invent an issue to build, such as an ESM migration. It only mentions possible follow-up changes and says a request for one of those could become a new issue.",
+  "model": "claude-opus-5-5",
+  "ms": 5296,
+  "tokens": {
+    "input": 2,
+    "output": 240,
+    "cacheCreation": 1559,
+    "cacheRead": 783,
+    "fresh": 1801,
+    "total": 2584
+  },
+  "at": "2026-11-05T07:06:57.602Z"
+}

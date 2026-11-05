@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "4b0682588b4f4f428cadbb09580d3fc0864461752f9c385880f851c51e5d60f0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the problem field and every expect line. The problem field describes the defect: the message never names the file. It mentions the suggested {} fix only to explain why it would hide the typo, and doesn't prescribe a fix. Expect lines 1, 2, 4 and 5 check what users can see: CLI exit code, stdout, stderr content, and that a test exists. Expect line 3 breaks the criterion. It says \"loadConfig called on a file containing invalid JSON throws an error instead of returning a value (it does not return {} or any other object)\". That fixes how an internal function must behave, and the request never requires it. Rejecting the suggested {} fix belongs in non_goals, where it already appears. The CLI-level lines already cover the visible outcome (exit 1, nothing printed with `listening on`). Line 3 also contradicts the output's own assumption that where the fix goes \"is left to the builder\".",
+  "model": "claude-opus-5-5",
+  "ms": 9763,
+  "tokens": {
+    "input": 2,
+    "output": 776,
+    "cacheCreation": 3712,
+    "cacheRead": 783,
+    "fresh": 4490,
+    "total": 5273
+  },
+  "at": "2026-11-05T07:10:54.947Z"
+}

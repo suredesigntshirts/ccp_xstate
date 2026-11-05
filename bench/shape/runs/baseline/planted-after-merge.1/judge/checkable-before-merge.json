@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "a0e3eb8a168b88214e0543db60d4540224da63a5bf131c67bbf7de70227830ce",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines and their proofs. Every one can be checked at the PR head. Four are CLI runs whose exit codes and exact output are confirmed with `od -c` and PIPESTATUS. One is `npm test` plus a grep and read of test/greet.test.js. The last is a read of docs/index.md \"at the PR head\". Each line has a clear pass or fail answer, such as exactly `HELLO, ADA!\\n` with exit 0, or exit 2 with `usage: greet` on stderr. The only post-merge piece is the live docs site, and it is kept out of the expect lines. The non-goals say so directly: \"Checking that the live site ... shows the change. That happens only after merge\". The docs line asks only that docs/index.md contain the usage and say the output is uppercase. The outcome mentions the next deploy, but no expect line depends on a deploy or a published page.",
+  "model": "claude-opus-5-5",
+  "ms": 6632,
+  "tokens": {
+    "input": 2,
+    "output": 496,
+    "cacheCreation": 549,
+    "cacheRead": 3609,
+    "fresh": 1047,
+    "total": 4656
+  },
+  "at": "2026-11-05T07:09:45.916Z"
+}

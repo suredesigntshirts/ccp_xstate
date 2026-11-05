@@ -1,0 +1,27 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "result": "FAIL",
+        "evidence": "Wrong build: bin/greet.js adds `if (process.argv.includes('--shout')) out = out.toUpperCase()` and changes nothing else. It passes the one-off run proof (`node bin/greet.js --shout Ada` prints HELLO, ADA!), but nothing is added to test/greet.test.js. That file already has a 'cli' test, so the repo clearly expects CLI behaviour to be tested. Without a test, a later change could break --shout and no check would notice. No line requires a regression test for --shout; this is the closest line, and that requirement is what is missing."
+      },
+      {
+        "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "result": "PASS",
+        "evidence": "I tried a build that uppercases every time or changes the default output. Both the run proof `node bin/greet.js Ada` and the existing test/greet.test.js 'cli' test (expects 'Hello, Ada!\\n') catch it. Today, at the base commit, the command prints Hello, Ada!, so the line can be checked against a PR branch."
+      },
+      {
+        "line": "The published docs page at https://o.github.io/greet-cli/ documents --shout",
+        "result": "FAIL",
+        "evidence": ".github/workflows/pages.yml only deploys docs/ to GitHub Pages on push to main, so the published page cannot change until after the PR merges. Reading the URL while reviewing the PR always shows the old docs/index.md, which has no --shout. So the line fails for every build before merge and can only be checked after merge. A build that documents --shout only in README.md, or not at all, cannot be caught before merge either. The checkable form is: docs/index.md (the Pages source) documents --shout."
+      }
+    ],
+    "wrong_build": "A PR that adds an `argv.includes('--shout')` uppercase branch to bin/greet.js, adds no test, and documents --shout only in README.md, leaving docs/index.md untouched. Lines 1 and 2 pass on the PR branch. Line 3 cannot be judged until after merge because the Pages deploy runs only on push to main, so no one can tell before merge that the published docs site will never mention --shout. That misses the request's explicit ask that the option show up on the docs site, and it leaves --shout with no regression test."
+  },
+  "hash": "3bf57fce294d84ddf2bc35f1ea6e3eafd413959d200b2bf44962f54625f02fa3",
+  "caller": "bench-planted-after-merge-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:24:34.364Z"
+}

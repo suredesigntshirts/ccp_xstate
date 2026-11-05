@@ -1,0 +1,1 @@
+Run planted-half-met-1:1.challenge, worktree /tmp/bench-planted-half-met-1-TS9Pmh/wt/planted-half-met-1--1.challenge of https://github.com/o/strutil, branch run/planted-half-met-1/1.challenge.

@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "9c863f07e0743bbb39c268625940dc5dcd347be198f93984051e36ba1137f471",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all eight expect lines and their proofs. Each one can be checked in the repo at the PR head. Five are CLI runs of `printf ... | node bin/csv2json.js [--tsv]` with an exact expected output and exit code. One is a `node -e` run that imports src/parse.js and deep-equals the result. One is `npm test` plus a grep and a read of the test file for a `--tsv` CLI test. The last is a read of README.md for a `--tsv` usage example. Every line names a specific output or artifact, so one careful reader gets one answer. Every proof is a run or read at head. No line depends on a release, a deploy or a published page. \"Publishing a release\" appears only as a non-goal. Some proofs are loose: the comma-field run doesn't check the trailing newline with od. Each one still checks its line at head.",
+  "model": "claude-opus-5-5",
+  "ms": 11292,
+  "tokens": {
+    "input": 2,
+    "output": 728,
+    "cacheCreation": 4361,
+    "cacheRead": 783,
+    "fresh": 5091,
+    "total": 5874
+  },
+  "at": "2026-11-05T07:27:41.548Z"
+}

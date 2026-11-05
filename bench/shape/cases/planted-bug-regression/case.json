@@ -1,0 +1,23 @@
+{
+  "kind": "planted",
+  "source": "Planted for wf-intake: mathlib with an average() that returns NaN for an empty list and has no test.",
+  "repo": {
+    "seed": "repo",
+    "message": "mathlib: add, subtract, multiply, average",
+    "origin": "https://github.com/o/mathlib.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/o/mathlib/issues/9",
+      "text": "average([]) gives NaN and it ended up as NaN in an invoice total last week. An empty list should average to 0."
+    }
+  },
+  "trap": "average() in math.js divides by xs.length, so [] gives NaN, and no test calls average at all. A fix with no regression test can come back unnoticed.",
+  "must_catch": [
+    "An expect line asks for a test (a regression test) that calls average([]) and expects 0.",
+    "An expect line keeps average of a non-empty list correct (for example average([2, 4]) is 3)."
+  ],
+  "must_not": [
+    "An issue with no regression test line for the empty-list bug."
+  ]
+}

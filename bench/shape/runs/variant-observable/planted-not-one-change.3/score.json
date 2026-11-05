@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-not-one-change.3",
+  "case": "planted-not-one-change",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "blocked, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case expects blocked"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked whether the output prescribes a fix anywhere. It is a \"blocked\" answer, so it has no expect lines and no problem field that could state a technique, internal function or return value. The reason only says the request is a question with nothing to build (\"doesn't ask for anything in the repository to change\"). It does mention possible future changes (\"migrating to ES modules or documenting the module-format decision\"), but only as things that \"would be a separate request\", not as expected work. Nothing in the output tells a builder how to fix anything, so the criterion holds for the whole output.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "The output is a \"blocked\" answer, not an issue, so it has no expect lines and no proof entries. Nothing in it relies on a release, a deploy, a published page or anything else that exists only after merge, so the criterion holds by default. Blocking also fits the request. Issue #11 only asks a question (\"why does mathlib use CommonJS and not ES modules?\") and asks for no repository change, so there would be nothing to check at the pull request's head anyway. The reason given (\"nothing for a builder to build or a verifier to check\") is consistent with that.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The output is a blocked answer, so I checked its claims against the repository. It names no file, script, command or function that the repository lacks. It says mathlib \"uses CommonJS rather than ES modules\", and that matches the code: math.js ends with `module.exports = { add, subtract, multiply };`, the test and README use `require(...)`, and package.json has no `\"type\": \"module\"`. It mentions \"migrating to ES modules or documenting the module-format decision\" only as possible future requests, not as things that exist now. It also correctly says the request asks for no change. Nothing in the output misdescribes the repository.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: the stage should answer blocked and say the request is a question that asks for no change. The output is a \"blocked\" object, and its reason covers both parts. It says the request \"only asks why mathlib uses CommonJS rather than ES modules\". It also says \"It doesn't ask for anything in the repository to change: no ESM migration, no doc update\", so there is nothing for a builder to build. No other part of the output goes against this, so the item is handled.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the output against the one item on the must_not list: it must not create an issue that converts mathlib to ES modules or makes up some other change. The output creates no issue at all. It answers \"blocked\" and says the request \"doesn't ask for anything in the repository to change: no ESM migration, no doc update.\" It mentions migrating or documenting only as a possible \"separate request\" later, not as work to build. Nothing in the output invents a change.",
+      "cached": true
+    }
+  }
+}

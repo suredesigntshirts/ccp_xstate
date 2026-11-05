@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-half-met.1",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "Most evidence holds. The README FAIL rests on a real gap: index.js exports slugify and README.md has no section for it. It also names a concrete wrong build: add only a padLeft section, so the list stays incomplete. Each PASS names a wrong build and the clause that catches it (for example, \"unchanged\" catches truncating a longer s). The output fails because the npm test PASS cites the script as \"node --test test/\", but package.json has \"test\": \"node --test\". The criterion requires cited scripts to be real, and this one is misquoted. Line 1 also says \"on Node v22.23.4 require(\\\"./index.js\\\") loads it\". No Node version appears in the repository, so that claim is unsupported. Because cited material is inaccurate, the criterion does not hold for the whole output.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 should FAIL because a build that only adds a padLeft section still leaves slugify undocumented, even though the request asks for a complete list. The output marks line 3 \"FAIL\". Its evidence quotes the request (\"keep the README's list of functions complete\"). It says that index.js exports slugify but README.md doesn't document it. It also says that \"A PR that adds only a '## padLeft(s, width, fill)' section meets this line, yet the README list is still incomplete (no slugify).\" The output's wrong_build describes this same build. So the output catches the trap fully and for the right reason.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not item is about failing lines 1, 2 or 4 over wording or over a stricter test than their words need. The output passes all three. Line 1: \"s.padStart(width, fill ?? ' ') meets it\". Line 2 passes. Line 4 passes, and the output says outright \"I am not failing this line for a stricter test\", even though it noticed there is no padLeft test. The only FAIL is on line 3, which the must_not list doesn't cover. That FAIL is about the request's demand that the README's list of functions be complete (slugify is missing), not about wording. So none of the must_not items happen.",
+      "cached": true
+    }
+  }
+}

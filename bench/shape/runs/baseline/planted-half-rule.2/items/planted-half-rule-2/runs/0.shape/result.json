@@ -1,0 +1,74 @@
+{
+  "result": {
+    "issue": {
+      "title": "Add padLeft to strutil for zero-padded invoice numbers, and make the README function list complete",
+      "problem": "index.js exports capitalize, slugify and truncate. None of them pads a value to a fixed width, so 42 cannot be turned into 00042. The README function list is already incomplete: it has `## capitalize(s)` and `## truncate(s, n)` sections, but slugify is exported from index.js and has no section. test/strutil.test.js covers only capitalize, slugify and truncate.",
+      "reason": "Invoice numbers have to be zero padded to a fixed width (42 -> 00042). People look for helpers in the README, so a function missing from it (slugify today, padLeft once added) is hard to find.",
+      "outcome": "strutil exports a padLeft function that left-pads a string or number to a given width with a given character, so padLeft(42, 5, '0') gives '00042'. A test covers it. The README has a section for every exported function, including slugify and padLeft.",
+      "expect": [
+        "index.js exports a function named padLeft, and `node -e \"import('./index.js').then(m=>{if(typeof m.padLeft!=='function')process.exit(1)})\"` exits 0",
+        "padLeft(42, 5, '0') returns the string '00042' (a number input is padded)",
+        "padLeft('42', 5, '0') returns '00042' and padLeft('7', 3, 'x') returns 'xx7' (a string input is padded with the given character)",
+        "padLeft('123456', 5, '0') returns '123456' and padLeft('12345', 5, '0') returns '12345' (input already at or over the width is returned unchanged, not cut)",
+        "capitalize, slugify and truncate still return what they did before: capitalize('abc') === 'Abc', slugify(' Hello World! ') === 'hello-world', truncate('abcdef', 4) === 'abc…', truncate('ab', 4) === 'ab'",
+        "test/strutil.test.js contains at least one test that calls padLeft, and `npm test` exits 0 with 0 failures",
+        "README.md has a `## name(...)` section heading for every function exported from index.js (including slugify and padLeft), and the padLeft section says what its parameters mean"
+      ],
+      "proofs": [
+        {
+          "line": "index.js exports a function named padLeft, and `node -e \"import('./index.js').then(m=>{if(typeof m.padLeft!=='function')process.exit(1)})\"` exits 0",
+          "proof": "run",
+          "how": "node -e \"import('./index.js').then(m=>{if(typeof m.padLeft!=='function')process.exit(1)})\"; echo $?"
+        },
+        {
+          "line": "padLeft(42, 5, '0') returns the string '00042' (a number input is padded)",
+          "proof": "run",
+          "how": "node -e \"import('./index.js').then(m=>{const r=m.padLeft(42,5,'0');if(r!=='00042'){console.error(r);process.exit(1)}})\""
+        },
+        {
+          "line": "padLeft('42', 5, '0') returns '00042' and padLeft('7', 3, 'x') returns 'xx7' (a string input is padded with the given character)",
+          "proof": "run",
+          "how": "node -e \"import('./index.js').then(m=>{if(m.padLeft('42',5,'0')!=='00042'||m.padLeft('7',3,'x')!=='xx7')process.exit(1)})\""
+        },
+        {
+          "line": "padLeft('123456', 5, '0') returns '123456' and padLeft('12345', 5, '0') returns '12345' (input already at or over the width is returned unchanged, not cut)",
+          "proof": "run",
+          "how": "node -e \"import('./index.js').then(m=>{if(m.padLeft('123456',5,'0')!=='123456'||m.padLeft('12345',5,'0')!=='12345')process.exit(1)})\""
+        },
+        {
+          "line": "capitalize, slugify and truncate still return what they did before: capitalize('abc') === 'Abc', slugify(' Hello World! ') === 'hello-world', truncate('abcdef', 4) === 'abc…', truncate('ab', 4) === 'ab'",
+          "proof": "run",
+          "how": "node -e \"import('./index.js').then(m=>{if(m.capitalize('abc')!=='Abc'||m.slugify(' Hello World! ')!=='hello-world'||m.truncate('abcdef',4)!=='abc…'||m.truncate('ab',4)!=='ab')process.exit(1)})\""
+        },
+        {
+          "line": "test/strutil.test.js contains at least one test that calls padLeft, and `npm test` exits 0 with 0 failures",
+          "proof": "run",
+          "how": "grep -n 'padLeft(' test/strutil.test.js && npm test"
+        },
+        {
+          "line": "README.md has a `## name(...)` section heading for every function exported from index.js (including slugify and padLeft), and the padLeft section says what its parameters mean",
+          "proof": "run",
+          "how": "node -e \"import('./index.js').then(m=>{const r=require('fs').readFileSync('README.md','utf8');const miss=Object.keys(m).filter(k=>typeof m[k]==='function'&&!new RegExp('^## '+k+'\\\\(','m').test(r));if(miss.length){console.error(miss);process.exit(1)}})\" ; then read the padLeft section of README.md to check that it describes the parameters"
+        }
+      ],
+      "non_goals": [
+        "Adding a padRight or any other new helper",
+        "Changing how capitalize, slugify or truncate behave",
+        "Publishing a release, bumping the version or deploying anything",
+        "Building invoice-number formatting into the invoice service itself"
+      ],
+      "assumptions": [
+        "Signature is padLeft(s, n, ch): s is the value, n is the target width and ch is the pad character, matching the short parameter style of truncate(s, n)",
+        "A number input is converted to its string form before padding, because the example pads the number 42",
+        "Input already at or over the width is returned unchanged and is never truncated",
+        "The default pad character when ch is left out is the builder's choice (space, like String.prototype.padStart, is reasonable). It is not checked here; tests pass '0' explicitly",
+        "Multi-character pad strings and invalid widths (negative, NaN) are not specified and not checked",
+        "'Keep the README's list of functions complete' means every exported function, so the slugify section that is missing today must be added too, in the existing `## name(args)` heading style"
+      ]
+    }
+  },
+  "hash": "51be7ecb3e83b9298312014607b7d15c34e6f302da382ac4225a6eb9f438dc35",
+  "caller": "bench-planted-half-rule-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:01:22.974Z"
+}

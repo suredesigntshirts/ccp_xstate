@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "155cc24d924ccbd4cb40643a9c21cb751aa41afcc9a75ffbdcdac7fa4baa6967",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list rules out a FAIL on line 1, 2 or 4, so I checked the result given for each line. Line 1 (\"average([]) returns 0\") is \"PASS\". Line 2 (non-empty lists, NaN included) is \"PASS\". Line 4 (the test in test/math.test.js and npm test passing) is \"PASS\". The only FAIL is on line 3 (\"average handles bad input sensibly\"), and the must_not list allows that. The overall \"result\": \"FAIL\" comes from line 3 alone, and the wrong_build text says that build meets lines 1, 2 and 4. Nothing in the output gives a FAIL to line 1, 2 or 4, so the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 6681,
+  "tokens": {
+    "input": 2,
+    "output": 332,
+    "cacheCreation": 3727,
+    "cacheRead": 783,
+    "fresh": 4061,
+    "total": 4844
+  },
+  "at": "2026-11-05T07:27:34.252Z"
+}

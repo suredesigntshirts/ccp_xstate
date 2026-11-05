@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "476050b6ec6b99cec2056efdfab669a015971931f98e4987cd266950e8af3864",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items against the expect lines.\n1. Root tests: one expect line says \"`npm ci && npm test` at the repo root runs them and exits 0\". Its proof requires \"jsonl-lint tests listed in the output\", so tests that `--if-present` skips would fail it.\n2. README: one expect line says \"README.md no longer says there are no tools\" and requires `packages/jsonl-lint` to be listed under \"What is here\".\n3. Output form and exit codes: stdout lines must begin with `2:`, `4:` and `5:` (1-based). A bad row exits 1. A missing file exits 2 with the path on stderr, and no argument exits 2 with a usage message.\nOne caveat: the pinned form is `<line>:` with no file name. The tool only takes one file per run, so the line number alone is enough to find the row. I count item 3 as handled, but a strict reading of \"file and 1-based line\" could fail it.",
+  "model": "claude-opus-5-5",
+  "ms": 11591,
+  "tokens": {
+    "input": 2,
+    "output": 976,
+    "cacheCreation": 5414,
+    "cacheRead": 783,
+    "fresh": 6392,
+    "total": 7175
+  },
+  "at": "2026-11-05T07:28:43.031Z"
+}

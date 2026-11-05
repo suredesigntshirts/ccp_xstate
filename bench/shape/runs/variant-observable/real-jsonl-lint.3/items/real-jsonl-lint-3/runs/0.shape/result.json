@@ -1,0 +1,93 @@
+{
+  "result": {
+    "issue": {
+      "title": "Add a jsonl-lint tool that reports every non-JSON row of a JSONL file by line number",
+      "problem": "The repo has no tools yet: `packages/` does not exist (README says \"No tools yet: `packages/` is empty\"), and nothing in the repo checks a JSONL file. A journal row that a crash cut off or someone edited by hand isn't valid JSON, and nobody sees it until a reader fails on it. Nothing points to the bad lines.",
+      "reason": "Journals are kept as JSONL, and one torn or hand-edited row breaks every reader. A standalone checker that lists every bad row with its line number and fails with a non-zero exit lets a person or a script find and fix the damage before a reader hits it.",
+      "outcome": "A new npm workspace `packages/jsonl-lint` (Node 22+, plain ES modules, no runtime dependencies, no build step) gives a `jsonl-lint <file>` command. It reports the line number of every row that isn't valid JSON, exits 0 when there are none, exits 1 when there are some, and treats a missing file or a missing argument as an error. Its node:test suite runs under the root `npm test` and in CI.",
+      "expect": [
+        "`node packages/jsonl-lint/bin/jsonl-lint.js <file>` on a file whose non-blank lines are all valid JSON (objects, arrays, strings, numbers, true/false/null), ending with a trailing newline, exits 0 and prints nothing on stdout.",
+        "On a file with valid rows on lines 1 and 3, invalid rows on lines 2 and 4, and a truncated row with no trailing newline on line 5 (e.g. `{\"a\":1}`, `{\"a\":`, `[1,2]`, `not json`, `{\"b\":\"x`), the command exits 1 and stdout has exactly three lines, which begin with `2:`, `4:` and `5:` in that order. No line on stdout begins with `1:` or `3:`.",
+        "Blank or whitespace-only lines anywhere in the file aren't reported: a file with lines `{\"a\":1}`, an empty line, `   `, `{\"b\":2}` exits 0 with empty stdout. An empty (0-byte) file also exits 0 with empty stdout.",
+        "A line holding two JSON values (e.g. `{\"a\":1} {\"b\":2}`) is reported as invalid. A row with CRLF line endings that is otherwise valid JSON is not reported.",
+        "Run on a path that doesn't exist, the command exits 2, prints nothing on stdout, and prints a message on stderr that contains the path given.",
+        "Run with no file argument, the command exits 2 and prints a usage message on stderr.",
+        "`packages/jsonl-lint/package.json` declares a `bin` entry named `jsonl-lint` pointing at `bin/jsonl-lint.js`, a `test` script that runs `node --test`, and no `dependencies`.",
+        "`packages/jsonl-lint` has node:test tests covering the all-valid, invalid-rows, blank-line and missing-file cases. `npm ci && npm test` at the repo root runs them and exits 0.",
+        "The `test` CI check (.github/workflows/test.yml) passes on the pull request.",
+        "README.md no longer says there are no tools. Its \"What is here\" section lists `packages/jsonl-lint` with its usage and exit codes (0 clean, 1 invalid rows, 2 missing file or usage error)."
+      ],
+      "proofs": [
+        {
+          "line": "`node packages/jsonl-lint/bin/jsonl-lint.js <file>` on a file whose non-blank lines are all valid JSON (objects, arrays, strings, numbers, true/false/null), ending with a trailing newline, exits 0 and prints nothing on stdout.",
+          "proof": "run",
+          "how": "d=$(mktemp -d); printf '{\"a\":1}\\n[1,2]\\n\"s\"\\n42\\ntrue\\nnull\\n' > $d/ok.jsonl; node packages/jsonl-lint/bin/jsonl-lint.js $d/ok.jsonl > $d/out; echo exit=$?; wc -c < $d/out   # expect exit=0 and 0"
+        },
+        {
+          "line": "On a file with valid rows on lines 1 and 3, invalid rows on lines 2 and 4, and a truncated row with no trailing newline on line 5 (e.g. `{\"a\":1}`, `{\"a\":`, `[1,2]`, `not json`, `{\"b\":\"x`), the command exits 1 and stdout has exactly three lines, which begin with `2:`, `4:` and `5:` in that order. No line on stdout begins with `1:` or `3:`.",
+          "proof": "run",
+          "how": "d=$(mktemp -d); printf '{\"a\":1}\\n{\"a\":\\n[1,2]\\nnot json\\n{\"b\":\"x' > $d/bad.jsonl; node packages/jsonl-lint/bin/jsonl-lint.js $d/bad.jsonl > $d/out; echo exit=$?; cut -d: -f1 $d/out   # expect exit=1 and exactly the lines 2, 4, 5"
+        },
+        {
+          "line": "Blank or whitespace-only lines anywhere in the file aren't reported: a file with lines `{\"a\":1}`, an empty line, `   `, `{\"b\":2}` exits 0 with empty stdout. An empty (0-byte) file also exits 0 with empty stdout.",
+          "proof": "run",
+          "how": "d=$(mktemp -d); printf '{\"a\":1}\\n\\n   \\n{\"b\":2}\\n' > $d/b.jsonl; node packages/jsonl-lint/bin/jsonl-lint.js $d/b.jsonl; echo exit=$?; : > $d/e.jsonl; node packages/jsonl-lint/bin/jsonl-lint.js $d/e.jsonl; echo exit=$?   # expect no stdout and exit=0 twice"
+        },
+        {
+          "line": "A line holding two JSON values (e.g. `{\"a\":1} {\"b\":2}`) is reported as invalid. A row with CRLF line endings that is otherwise valid JSON is not reported.",
+          "proof": "run",
+          "how": "d=$(mktemp -d); printf '{\"a\":1}\\r\\n{\"a\":1} {\"b\":2}\\r\\n{\"c\":3}\\r\\n' > $d/c.jsonl; node packages/jsonl-lint/bin/jsonl-lint.js $d/c.jsonl > $d/out; echo exit=$?; cut -d: -f1 $d/out   # expect exit=1 and only the line 2"
+        },
+        {
+          "line": "Run on a path that doesn't exist, the command exits 2, prints nothing on stdout, and prints a message on stderr that contains the path given.",
+          "proof": "run",
+          "how": "d=$(mktemp -d); node packages/jsonl-lint/bin/jsonl-lint.js $d/nope.jsonl > $d/out 2> $d/err; echo exit=$?; wc -c < $d/out; grep -c \"$d/nope.jsonl\" $d/err   # expect exit=2, 0, and >=1"
+        },
+        {
+          "line": "Run with no file argument, the command exits 2 and prints a usage message on stderr.",
+          "proof": "run",
+          "how": "node packages/jsonl-lint/bin/jsonl-lint.js 2> /tmp/u.err; echo exit=$?; cat /tmp/u.err   # expect exit=2 and a non-empty usage message"
+        },
+        {
+          "line": "`packages/jsonl-lint/package.json` declares a `bin` entry named `jsonl-lint` pointing at `bin/jsonl-lint.js`, a `test` script that runs `node --test`, and no `dependencies`.",
+          "proof": "run",
+          "how": "node -e 'const p=require(\"./packages/jsonl-lint/package.json\"); const b=typeof p.bin===\"string\"?{[p.name]:p.bin}:p.bin; console.log(b[\"jsonl-lint\"], p.scripts&&p.scripts.test, JSON.stringify(p.dependencies||{}))'   # expect bin/jsonl-lint.js (optionally ./ prefixed), a test script containing node --test, and {}"
+        },
+        {
+          "line": "`packages/jsonl-lint` has node:test tests covering the all-valid, invalid-rows, blank-line and missing-file cases. `npm ci && npm test` at the repo root runs them and exits 0.",
+          "proof": "run",
+          "how": "npm ci && npm test; echo exit=$?   # expect exit=0 and jsonl-lint tests listed in the output; read the test files under packages/jsonl-lint to confirm the four cases are covered"
+        },
+        {
+          "line": "The `test` CI check (.github/workflows/test.yml) passes on the pull request.",
+          "proof": "ci",
+          "how": "Read the `test` check on the PR head commit: it must be green."
+        },
+        {
+          "line": "README.md no longer says there are no tools. Its \"What is here\" section lists `packages/jsonl-lint` with its usage and exit codes (0 clean, 1 invalid rows, 2 missing file or usage error).",
+          "proof": "read",
+          "how": "Read README.md, the \"What is here\" section."
+        }
+      ],
+      "non_goals": [
+        "Schema validation of rows, or checking anything beyond whether each line parses as JSON.",
+        "Fixing or rewriting bad rows (no --fix mode).",
+        "Reading from stdin or linting several files or directories in one run.",
+        "Publishing the package to npm, or any change in suredesigntshirts/ccp_machine or the harness.",
+        "Specific error text for why a row failed, beyond a line that starts with its number."
+      ],
+      "assumptions": [
+        "The tool lives in a new workspace `packages/jsonl-lint`, run as `node packages/jsonl-lint/bin/jsonl-lint.js <file>` and exposed as bin `jsonl-lint`. The request names no path; this follows the repo's one-folder-per-tool layout.",
+        "Line numbers are 1-based, counted by `\\n`. A row counts as valid when the whole line (minus a trailing `\\r` and surrounding whitespace) parses with JSON.parse, so any JSON value is accepted, not only objects.",
+        "Blank or whitespace-only lines, including the empty piece after a final newline, are skipped and not reported, the way common JSONL readers treat them.",
+        "Report format: one stdout line per invalid row, starting with `<line number>:` and then free text (e.g. the parse error). The request gives no format; this one is fixed only so it can be checked.",
+        "Exit codes: 0 no invalid rows, 1 one or more invalid rows, 2 for a missing or unreadable file or a missing argument. The request only says non-zero, so 2 keeps a broken call apart from a dirty file.",
+        "Every invalid row is reported in one run. The tool doesn't stop at the first one."
+      ]
+    }
+  },
+  "hash": "c5652d2dedfaccc1bacca6a22af7846c659315c803cfbef038acb635bbb9084e",
+  "caller": "bench-real-jsonl-lint-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:23:10.224Z"
+}

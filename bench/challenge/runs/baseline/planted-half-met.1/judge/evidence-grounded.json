@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "3e5ae4c3cf8cc759ee3bfe0d55dd97618ae8adcf340ab86ab573c93802c694a3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most evidence holds. The README FAIL rests on a real gap: index.js exports slugify and README.md has no section for it. It also names a concrete wrong build: add only a padLeft section, so the list stays incomplete. Each PASS names a wrong build and the clause that catches it (for example, \"unchanged\" catches truncating a longer s). The output fails because the npm test PASS cites the script as \"node --test test/\", but package.json has \"test\": \"node --test\". The criterion requires cited scripts to be real, and this one is misquoted. Line 1 also says \"on Node v22.23.4 require(\\\"./index.js\\\") loads it\". No Node version appears in the repository, so that claim is unsupported. Because cited material is inaccurate, the criterion does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 15164,
+  "tokens": {
+    "input": 2,
+    "output": 1014,
+    "cacheCreation": 548,
+    "cacheRead": 3828,
+    "fresh": 1564,
+    "total": 5392
+  },
+  "at": "2026-11-05T07:21:06.387Z"
+}

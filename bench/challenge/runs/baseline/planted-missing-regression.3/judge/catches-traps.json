@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "62c22b8a3cb9765ee13d3715aa6f783a6f1d1f6e1963c6bc0862a2758d71904f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch list has one item, and the output covers it. Top-level \"result\" is \"FAIL\". The first line's evidence names the missing line: \"`node bin/csv2json.js` without --tsv still parses comma-separated input as before / `npm test` passes\". It pairs that with a wrong build that breaks CSV: bin/csv2json.js calls `parse(..., '\\t')` every time, whether or not --tsv is passed. The wrong_build field says the same thing: \"default CSV input is now broken\" and \"No expect line requires CSV behavior without the flag to stay the same, `npm test` to pass\". The output also lists extra gaps (no --tsv test, an unspecified printf input), but these don't conflict with the required item.",
+  "model": "claude-opus-5-5",
+  "ms": 5082,
+  "tokens": {
+    "input": 2,
+    "output": 356,
+    "cacheCreation": 3209,
+    "cacheRead": 783,
+    "fresh": 3567,
+    "total": 4350
+  },
+  "at": "2026-11-05T07:21:32.768Z"
+}

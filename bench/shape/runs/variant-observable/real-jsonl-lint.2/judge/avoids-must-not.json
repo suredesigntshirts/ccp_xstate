@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "58922cdc7536be2d2a28886c88f90a5e426940525060b945a875718902d27762",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all 11 expect lines against both must_not items. Item 1: every line can be checked at the PR head before merge. The checks are `npm ci` with the committed lock file, running `npx --no-install jsonl-lint` on temp files, root `npm test`, and reading package.json and README. The only CI mention is the PR's own `test` check, which also runs before merge. Publishing is listed as a non-goal, not as something to expect. Item 2: a tool with no tests run by npm test would not meet the issue. One expect line requires \"a `test` script running `node:test` tests that cover a clean file, a file with invalid rows ... and a missing file\", and adds that \"the root `npm test` runs them and passes\". Its proof also checks that npm test no longer prints 'no workspaces under packages/'. Neither forbidden item appears.",
+  "model": "claude-opus-5-5",
+  "ms": 5763,
+  "tokens": {
+    "input": 2,
+    "output": 439,
+    "cacheCreation": 5704,
+    "cacheRead": 783,
+    "fresh": 6145,
+    "total": 6928
+  },
+  "at": "2026-11-05T07:28:39.885Z"
+}

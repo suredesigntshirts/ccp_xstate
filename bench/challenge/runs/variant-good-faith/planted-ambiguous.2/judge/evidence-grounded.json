@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "5896df470a2be6e6353f4f055bba3e1553b3664d019a79b2954ae7b57e472252",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every line's evidence. All four meet the criterion.\n\n- **Line 1 (PASS):** names wrong builds that line 1 itself catches: one that throws on [] and one that returns null. It also notes that the `|| 0` build is caught by line 2.\n- **Line 2 (PASS):** names two wrong builds, mapping NaN to 0 and filtering NaN out. Line 2 catches both because average([NaN, 1]) has to stay NaN. It cites \"math.js:20, reduce/length\", and line 20 of math.js really is the reduce/length return.\n- **Line 3 (FAIL):** gives two concrete readings with concrete builds. Build A leaves average(null) throwing a TypeError, which it does today. Build B adds an `Array.isArray` guard that returns 0.\n- **Line 4 (PASS):** says the test file imports only add, subtract and multiply, which matches the repository. It says `npm test` runs `node --test`, which matches package.json. Its wrong build adds the test but leaves math.js unfixed, so npm test fails and the line catches it.\n\nThe overall wrong build's claims also hold up: today average('abc') throws, and with the guard it would return 0.",
+  "model": "claude-opus-5-5",
+  "ms": 13322,
+  "tokens": {
+    "input": 2,
+    "output": 999,
+    "cacheCreation": 3789,
+    "cacheRead": 783,
+    "fresh": 4790,
+    "total": 5573
+  },
+  "at": "2026-11-05T07:27:16.927Z"
+}

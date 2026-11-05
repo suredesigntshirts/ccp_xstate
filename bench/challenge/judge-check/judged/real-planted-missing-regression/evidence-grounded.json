@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "fa24f8b8c1579ddc30cd4778263e3dd77fc5be8433888edad6764f4719658b98",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Not met. The FAIL for line 1 is well grounded. It names concrete wrong builds: a default separator of `/[\\t,]/` while bin ignores --tsv, and bin always splitting on tabs. It says why each passes the line but misses the request: commas inside TSV cells get split, and plain CSV breaks. The files it cites are real, and test/csv.test.js 'cli' would really fail under the always-tab build.\n\nThe PASS for line 2 breaks the criterion. It says it \"Tried a README that only lists the flag name in passing\" but never shows that the line catches that build. Instead it says only that \"A README with no --tsv fails it\" and that this \"isn't a substantive weakness.\" A passing mention arguably does \"document --tsv\", so the evidence never says why the tried wrong build is caught. The criterion requires every PASS to give that reason.",
+  "model": "claude-opus-5-5",
+  "ms": 10487,
+  "tokens": {
+    "input": 2,
+    "output": 909,
+    "cacheCreation": 3304,
+    "cacheRead": 783,
+    "fresh": 4215,
+    "total": 4998
+  },
+  "at": "2026-11-05T07:19:31.706Z"
+}

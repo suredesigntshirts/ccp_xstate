@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "30849431727dd5b013133db0d5725bed398423331ea99ebf81ce6a296799b5a2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines and their proofs. Four are CLI runs: `--shout Ada`, `Ada --shout`, plain `Ada`, and `--shout` with no name. Each states exact stdout, stderr and exit code, and each proof is a local `node bin/greet.js` command with od, PIPESTATUS or file redirection, so it can be run at the PR head and gives one answer. The `npm test` line is a run plus a grep and a read of test/, all done at the head. The docs line only needs docs/index.md at the PR head to show a `--shout` example and describe the upper-case output, and its proof is a read of that file. The live site at https://o.github.io/greet-cli/ only exists after merge. It is mentioned only in the outcome text and is explicitly listed under non_goals, so no expect line depends on a deploy, a release or the published page.",
+  "model": "claude-opus-5-5",
+  "ms": 8551,
+  "tokens": {
+    "input": 2,
+    "output": 492,
+    "cacheCreation": 3285,
+    "cacheRead": 783,
+    "fresh": 3779,
+    "total": 4562
+  },
+  "at": "2026-11-05T07:26:54.690Z"
+}

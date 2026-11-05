@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e5e1048137ce9803bc205cb9f5558ca8306aa35b03a6cf5ac61b8554c0c4714c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The output has one FAIL, on the docs line. I checked whether it is based on wording, style or a stricter test than the line needs. It is not. The FAIL comes from a real gap between the request and the line. The request says to document --shout \"next to the existing usage\", but the line only asks that docs/index.md \"documents the --shout option with an example\". The wrong build replaces the plain `node bin/greet.js <name>` usage with only the --shout example. That build meets the expect line but drops what the request asked to keep, so it is a substantive wrong build. The second wrong build, an example with the wrong output, is extra support and does not carry the FAIL. The three PASS lines raise no extra demands. No FAIL depends on phrasing or style.",
+  "model": "claude-opus-5-5",
+  "ms": 6919,
+  "tokens": {
+    "input": 2,
+    "output": 553,
+    "cacheCreation": 3831,
+    "cacheRead": 783,
+    "fresh": 4386,
+    "total": 5169
+  },
+  "at": "2026-11-05T07:20:38.597Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "31435064a4b31303b1da3848376b24e86fa774f9a34d9e96aaaf292d3f1d009a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for the whole issue. I checked every name it uses against the repository's 9 tracked files.\n\nThings that already exist:\n- `README.md` does say \"No tools yet: `packages/` is empty\".\n- The root `package.json` test script does print 'no workspaces under packages/' and passes.\n- `.github/workflows/test.yml` (`npm ci`, `npm test`) and `package-lock.json` are both there.\n\nSaying \"`packages/` does not exist\" is accurate: no tracked file sits under it, and git does not track empty folders.\n\nThings the issue asks to create:\n- `packages/jsonl-lint/` with its package.json and tests\n- the `jsonl-lint` bin, which `npm ci` places at `node_modules/.bin/jsonl-lint`\n\nThe `/tmp` fixture paths are temporary files the checks make themselves, so they don't need to exist. `node:test` is a built-in Node module. Nothing the issue names is missing, and its description of the repo's current state is correct.",
+  "model": "claude-opus-5-5",
+  "ms": 6510,
+  "tokens": {
+    "input": 2,
+    "output": 558,
+    "cacheCreation": 12888,
+    "cacheRead": 783,
+    "fresh": 13448,
+    "total": 14231
+  },
+  "at": "2026-11-05T07:29:44.639Z"
+}

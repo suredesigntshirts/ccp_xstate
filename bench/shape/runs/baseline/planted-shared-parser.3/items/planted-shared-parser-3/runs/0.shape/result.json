@@ -1,0 +1,66 @@
+{
+  "result": {
+    "issue": {
+      "title": "csv2json: add a --tsv flag to read tab-separated input",
+      "problem": "bin/csv2json.js ignores its command-line arguments. It always calls parse(text) from src/parse.js with the default ',' separator. parse(text, sep = ',') already takes a separator argument, but the CLI has no way to pass one. TSV input such as 'a\\tb\\n1\\t2\\n' is not split on tabs, so you get [{\"a\\tb\":\"1\\t2\"}]. Users currently convert tabs to commas with sed before piping the data in. The README documents only CSV usage.",
+      "reason": "The reporter's exports now come as TSV. A built-in flag removes the sed step. It also avoids the corruption that sed causes when a TSV field contains a literal comma.",
+      "outcome": "`node bin/csv2json.js --tsv < table.tsv` prints the same JSON array of header-keyed objects that the CSV path prints for the equivalent CSV. Running without the flag behaves exactly as before, both in the CLI and in the shared parse() function.",
+      "expect": [
+        "`printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline and exits 0.",
+        "In --tsv mode a comma inside a field is kept as data: `printf 'name\\tcity\\nx\\tParis, FR\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"name\":\"x\",\"city\":\"Paris, FR\"}]` followed by a newline.",
+        "Without the flag, CSV behaviour is unchanged: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline, and `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` (no flag) prints exactly `[{\"a\\tb\":\"1\\t2\"}]` followed by a newline, so tabs are not treated as separators by default.",
+        "The shared parser's default is unchanged: `node -e \"import('./src/parse.js').then(m=>console.log(JSON.stringify([m.parse('a,b\\n1,2\\n'), m.parse('a\\tb\\n1\\t2\\n')])))\"` prints `[[{\"a\":\"1\",\"b\":\"2\"}],[{\"a\\tb\":\"1\\t2\"}]]`.",
+        "test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and asserts the JSON output, and `npm test` passes with all tests, including the existing 'parse' and 'cli' tests, unchanged and green.",
+        "README.md documents the --tsv flag with an example invocation."
+      ],
+      "proofs": [
+        {
+          "line": "`printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline and exits 0.",
+          "proof": "run",
+          "how": "From the repo root: printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \"exit=$?\" — expect the line [{\"a\":\"1\",\"b\":\"2\"}] then exit=0."
+        },
+        {
+          "line": "In --tsv mode a comma inside a field is kept as data: `printf 'name\\tcity\\nx\\tParis, FR\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"name\":\"x\",\"city\":\"Paris, FR\"}]` followed by a newline.",
+          "proof": "run",
+          "how": "printf 'name\\tcity\\nx\\tParis, FR\\n' | node bin/csv2json.js --tsv — compare the output to [{\"name\":\"x\",\"city\":\"Paris, FR\"}]."
+        },
+        {
+          "line": "Without the flag, CSV behaviour is unchanged: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline, and `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` (no flag) prints exactly `[{\"a\\tb\":\"1\\t2\"}]` followed by a newline, so tabs are not treated as separators by default.",
+          "proof": "run",
+          "how": "Run both printf pipelines without arguments and compare each output to the stated string. The second string has JSON-escaped \\t in the key and in the value."
+        },
+        {
+          "line": "The shared parser's default is unchanged: `node -e \"import('./src/parse.js').then(m=>console.log(JSON.stringify([m.parse('a,b\\n1,2\\n'), m.parse('a\\tb\\n1\\t2\\n')])))\"` prints `[[{\"a\":\"1\",\"b\":\"2\"}],[{\"a\\tb\":\"1\\t2\"}]]`.",
+          "proof": "run",
+          "how": "Run the node -e command from the repo root and compare its output to the stated string."
+        },
+        {
+          "line": "test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and asserts the JSON output, and `npm test` passes with all tests, including the existing 'parse' and 'cli' tests, unchanged and green.",
+          "proof": "run",
+          "how": "Run grep -rn -- '--tsv' test/ to find the new test. Run git diff origin/main -- test/csv.test.js to confirm the existing 'parse' and 'cli' assertions are not modified. Run npm test and expect exit 0 with no failures."
+        },
+        {
+          "line": "README.md documents the --tsv flag with an example invocation.",
+          "proof": "read",
+          "how": "Read README.md and confirm it shows a usage line such as `node bin/csv2json.js --tsv < table.tsv` and explains that the flag reads tab-separated input."
+        }
+      ],
+      "non_goals": [
+        "Quoted fields, escaped separators, or RFC 4180 / IANA TSV escaping. Neither the CSV path nor the TSV path handles these today.",
+        "An arbitrary --delimiter/--sep option, or auto-detection of the separator.",
+        "Reading from file arguments instead of stdin, or changing the JSON output format.",
+        "Publishing a release or changing package.json metadata."
+      ],
+      "assumptions": [
+        "The flag is spelled exactly `--tsv` and takes no value, as the request says. Other arguments are out of scope, and the issue does not define how they are handled.",
+        "TSV rows map to objects exactly as CSV rows do today: keyed by the header row, with missing trailing cells as ''. The only difference is that the separator is a tab.",
+        "The existing parse(text, sep) parameter in src/parse.js can be reused, but how the flag reaches the parser is up to the builder. The parser's default separator must stay ','.",
+        "The default for the flag's documentation is a short addition to README.md, since that is the only usage documentation in the repo."
+      ]
+    }
+  },
+  "hash": "6d86616b05306b40bdf38bb0f1e3382b028e420fea171e8fc65646f0e8b8d909",
+  "caller": "bench-planted-shared-parser-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:02:05.562Z"
+}

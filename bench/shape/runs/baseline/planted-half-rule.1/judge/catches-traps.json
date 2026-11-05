@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "28909ccfaef1d0fd52a0dfff4aaf346f0c59a9999d3ff6973c9fdbabc9bd2c50",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the expect lines. Item 1: one expect line requires \"Every function index.js exports (capitalize, slugify, truncate, padLeft) has its own `## name(` section heading in README.md\". It names slugify explicitly, and its proof loops over every function index.js exports, not just padLeft. Item 2: the expect lines \"padLeft('42', 5, '0') returns the string '00042'\" and \"padLeft(42, 5, '0') (a number as input) returns the string '00042'\" fix the with-fill behaviour, and each has a run proof, so 42 -> 00042 is checkable. The default when no fill is passed is left to the builder, but the item accepts either \"no fill argument or with a fill\", so pinning the fill case is enough. Both items are handled.",
+  "model": "claude-opus-5-5",
+  "ms": 12812,
+  "tokens": {
+    "input": 2,
+    "output": 712,
+    "cacheCreation": 548,
+    "cacheRead": 3776,
+    "fresh": 1262,
+    "total": 5038
+  },
+  "at": "2026-11-05T07:10:42.095Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "a3138e49c6b15a10abbec827faf067e490c77b8164b004bfac9c1ac94ae2659a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items. Item 1 holds: one expect line says \"docs/index.md documents the `--shout` option\", and it has a read proof done at the PR head. The live site is left out of the checks. The outcome says it \"will show it after the next deploy from main\", and non_goals lists \"Checking that the live site at https://o.github.io/greet-cli/ shows the change\". Item 2 holds: an expect line says \"`node bin/greet.js Ada` still exits 0 and prints exactly `Hello, Ada!`\", and it has a run proof. That protects the default greeting. The outcome also says \"Running greet without --shout works as it does now\". No part of the output breaks either item.",
+  "model": "claude-opus-5-5",
+  "ms": 6206,
+  "tokens": {
+    "input": 2,
+    "output": 329,
+    "cacheCreation": 3393,
+    "cacheRead": 783,
+    "fresh": 3724,
+    "total": 4507
+  },
+  "at": "2026-11-05T07:07:30.906Z"
+}

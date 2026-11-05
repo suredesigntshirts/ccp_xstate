@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "678b1caf8b060c4a4cd5435f04fb3a2ba0b6a92da3dda184fd20aa44cfc41a5b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most evidence fits the repository and names concrete builds. Line 3 FAIL is right: index.js exports slugify and README.md has no section for it, so adding only a padLeft section meets the line but leaves the README list incomplete. Line 2 PASS names a truncating build the line catches. Line 4 PASS names regressions the existing tests catch. But Line 1 PASS rests on \"the repo's Node v22.23.4\" to argue that require(\"./index.js\") can load the ESM module. The repository states no Node version: package.json has no engines field and there is no .nvmrc or similar file. That fact is made up, so the claim that the require-based proof can run is not grounded in the repository. The criterion requires every cited fact to be real in the repository, so it is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 13671,
+  "tokens": {
+    "input": 2,
+    "output": 998,
+    "cacheCreation": 3535,
+    "cacheRead": 783,
+    "fresh": 4535,
+    "total": 5318
+  },
+  "at": "2026-11-05T07:21:16.194Z"
+}

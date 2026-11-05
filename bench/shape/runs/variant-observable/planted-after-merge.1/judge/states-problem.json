@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "1515fac8c8c1d5a895f978315d6f80285c6d581dea72ebb5202c67bba18ec40d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every expect line and the problem field. The expect lines describe behaviour you can observe: exact stdout such as `HELLO, ANN!`, exit codes, docs/index.md content, and `npm test` passing with a --shout test. None of them names a technique, an internal function or a return value. The test-file line asks for a check to exist, not for a way of building the feature. The guesses a builder would otherwise have to make are all listed under assumptions: that upper case means \"louder\", that the flag can come before or after the name, and that docs/index.md is the published source. The output also says outright that \"The request does not say how to implement it... The builder decides.\" The problem field only describes what is wrong: greet ignores --shout and still prints `Hello, Ann!`, and the docs never mention the flag. It proposes no fix. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 11705,
+  "tokens": {
+    "input": 2,
+    "output": 497,
+    "cacheCreation": 3288,
+    "cacheRead": 783,
+    "fresh": 3787,
+    "total": 4570
+  },
+  "at": "2026-11-05T07:26:47.682Z"
+}

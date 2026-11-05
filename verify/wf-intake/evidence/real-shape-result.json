@@ -1,0 +1,78 @@
+{
+  "result": {
+    "issue": {
+      "title": "Round printed temperatures to one decimal place (thermo and thermo-table)",
+      "problem": "Both command-line tools print the raw floating-point result of conv.js, so floating-point noise shows up in the output. At the current head: `node bin/thermo.js 37` prints `98.60000000000001°F`; `node bin/thermo.js -f 98.6` prints `36.99999999999999°C`; `node bin/thermo.js -f 100` prints `37.77777777777778°C`; `node bin/thermo.js 36.6` prints `97.88000000000001°F`. `node bin/table.js` (thermo-table) has the same noise in its F column, e.g. rows `31\\t87.80000000000001` and `37\\t98.60000000000001`. The library functions cToF/fToC in conv.js return unrounded values, and test/conv.test.js only covers those functions. No test covers the CLI output.",
+      "reason": "Users read these numbers. Values like 98.60000000000001°F look like a bug and are harder to read than 98.6°F, and the -f direction prints long repeating decimals.",
+      "outcome": "Every temperature printed by `thermo`, `thermo -f` and `thermo-table` is rounded to one decimal place, with no floating-point noise. The library functions and the CLI usage/error behaviour stay the same.",
+      "expect": [
+        "`node bin/thermo.js 37` prints exactly the line `98.6°F` and exits 0.",
+        "`node bin/thermo.js 36.6` prints exactly the line `97.9°F`, and `node bin/thermo.js 100` prints a line that is either `212°F` or `212.0°F`.",
+        "`node bin/thermo.js -f 100` prints exactly the line `37.8°C`, and `node bin/thermo.js -f 98.6` prints a line that is either `37°C` or `37.0°C`.",
+        "`node bin/table.js 30 40` prints the header line `C\\tF` followed by 11 rows for C = 30 through 40. In each row the F value is the Fahrenheit equivalent rounded to one decimal place and has at most one digit after the decimal point. The row for 31 has F 87.8 and the row for 37 has F 98.6.",
+        "`node bin/table.js -5 -3` prints rows whose F values are 23, 24.8 and 26.6, each with at most one digit after the decimal point.",
+        "Error handling is unchanged: `node bin/thermo.js` with no arguments prints `usage: thermo <celsius>` to stderr and exits 2, and `node bin/thermo.js -f x` prints `usage: thermo -f <fahrenheit>` to stderr and exits 2.",
+        "The library is unchanged: `require('./conv.js').cToF(37)` still returns 98.60000000000001 and `fToC(100)` still returns 37.77777777777778, so only printed output is rounded.",
+        "`npm test` passes and includes at least one new test that runs or checks the printed CLI output for `thermo 37` (expecting `98.6°F`)."
+      ],
+      "proofs": [
+        {
+          "line": "`node bin/thermo.js 37` prints exactly the line `98.6°F` and exits 0.",
+          "proof": "run",
+          "how": "node bin/thermo.js 37; echo \"exit=$?\"  → stdout is `98.6°F`, exit=0"
+        },
+        {
+          "line": "`node bin/thermo.js 36.6` prints exactly the line `97.9°F`, and `node bin/thermo.js 100` prints a line that is either `212°F` or `212.0°F`.",
+          "proof": "run",
+          "how": "node bin/thermo.js 36.6; node bin/thermo.js 100"
+        },
+        {
+          "line": "`node bin/thermo.js -f 100` prints exactly the line `37.8°C`, and `node bin/thermo.js -f 98.6` prints a line that is either `37°C` or `37.0°C`.",
+          "proof": "run",
+          "how": "node bin/thermo.js -f 100; node bin/thermo.js -f 98.6"
+        },
+        {
+          "line": "`node bin/table.js 30 40` prints the header line `C\\tF` followed by 11 rows for C = 30 through 40. In each row the F value is the Fahrenheit equivalent rounded to one decimal place and has at most one digit after the decimal point. The row for 31 has F 87.8 and the row for 37 has F 98.6.",
+          "proof": "run",
+          "how": "node bin/table.js 30 40 | node -e \"const l=require('fs').readFileSync(0,'utf8').trim().split('\\n');if(l[0]!=='C\\tF'||l.length!==12)throw 'shape';l.slice(1).forEach((r,i)=>{const[c,f]=r.split('\\t');const C=30+i;if(Number(c)!==C||!/^-?\\d+(\\.\\d)?$/.test(f)||Number(f)!==Math.round((C*1.8+32)*10)/10)throw r});console.log('ok')\""
+        },
+        {
+          "line": "`node bin/table.js -5 -3` prints rows whose F values are 23, 24.8 and 26.6, each with at most one digit after the decimal point.",
+          "proof": "run",
+          "how": "node bin/table.js -5 -3  → after header `C\\tF`, rows -5/23 (or 23.0), -4/24.8, -3/26.6"
+        },
+        {
+          "line": "Error handling is unchanged: `node bin/thermo.js` with no arguments prints `usage: thermo <celsius>` to stderr and exits 2, and `node bin/thermo.js -f x` prints `usage: thermo -f <fahrenheit>` to stderr and exits 2.",
+          "proof": "run",
+          "how": "node bin/thermo.js; echo $?; node bin/thermo.js -f x; echo $?"
+        },
+        {
+          "line": "The library is unchanged: `require('./conv.js').cToF(37)` still returns 98.60000000000001 and `fToC(100)` still returns 37.77777777777778, so only printed output is rounded.",
+          "proof": "run",
+          "how": "node -e \"const c=require('./conv.js');console.log(c.cToF(37)===98.60000000000001, c.fToC(100)===37.77777777777778)\"  → true true"
+        },
+        {
+          "line": "`npm test` passes and includes at least one new test that runs or checks the printed CLI output for `thermo 37` (expecting `98.6°F`).",
+          "proof": "run",
+          "how": "npm test (exit 0, fail 0); then read test/ for a test asserting the `thermo 37` CLI output is `98.6°F`"
+        }
+      ],
+      "non_goals": [
+        "Changing the return values of cToF/fToC in conv.js (the library stays at full precision).",
+        "Adding flags to choose precision, or changing output units, symbols, the table layout or the defaults (30 to 40).",
+        "Changing argument parsing or the usage messages and exit codes.",
+        "Publishing a release or bumping the package version."
+      ],
+      "assumptions": [
+        "\"Temperatures we print\" covers all three printed outputs: `thermo <c>`, `thermo -f <f>` and the F column of `thermo-table`. The C column of thermo-table is made of integer inputs and is left as is.",
+        "Rounding applies only to presentation in the CLI scripts. The library API keeps full precision so that library callers see no behaviour change.",
+        "Whole-number results may print either with or without a trailing `.0` (e.g. `212°F` or `212.0°F`). The request only asks for rounding to one decimal place, so both forms are accepted, but there must never be more than one digit after the point.",
+        "Rounding is to nearest (e.g. 97.88 → 97.9, 37.777… → 37.8). Exact .x5 ties and the sign of values that round to zero are not specified and are not tested."
+      ]
+    }
+  },
+  "hash": "8d160928eee89177bb7509c0cc8fa7b454c2e813d925f73c1d6697e39c150f49",
+  "caller": "bench-verifier-thermo-table-1",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:47:30.412Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "0518e001ddcc62ebc2e2ea5a33bab9e9e739840ddd69deae949262d3e40fb94f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The output breaks the must_not item. Its line 1 FAIL rests only on wording and on a stricter test than the line needs: \"The line should say \\\"zero-pad\\\" instead of \\\"pads on the left\\\", and should also require that fill is exactly one character.\" It names no wrong build that line 1 lets through. The request doesn't call for a one-character fill, and the line's padLeft(\"42\", 5, \"0\") check with a default space already covers the behaviour asked for. The other lines are fine. Line 2 is a PASS. Line 4 is a PASS, and the output says outright that it won't fail that line for a stricter test. Line 3 is allowed to FAIL because it's a real gap: the README doesn't list slugify, which the request's \"keep the list complete\" covers. Even so, the line 1 FAIL is exactly what the must_not list forbids.",
+  "model": "claude-opus-5-5",
+  "ms": 5874,
+  "tokens": {
+    "input": 2,
+    "output": 406,
+    "cacheCreation": 3444,
+    "cacheRead": 783,
+    "fresh": 3852,
+    "total": 4635
+  },
+  "at": "2026-11-05T07:19:21.187Z"
+}

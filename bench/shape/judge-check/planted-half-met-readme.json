@@ -1,0 +1,82 @@
+{
+  "case": "planted-half-rule",
+  "source": "Planted bad: a baseline output whose README line asks only for a padLeft section.",
+  "result": {
+    "issue": {
+      "title": "Add padLeft for zero-padding invoice numbers",
+      "problem": "index.js exports capitalize, slugify and truncate, and nothing that left-pads a value to a fixed width, so turning invoice number 42 into 00042 needs code outside strutil. The README's function list is already incomplete: it has sections for capitalize(s) and truncate(s, n) but none for slugify, which index.js exports. test/strutil.test.js tests only the three existing functions. `npm test` (node --test) currently passes 3 of 3.",
+      "reason": "The invoice service needs fixed-width, zero-padded invoice numbers. People find helpers through the README, so a function the README leaves out (like slugify today, or a new padLeft) is hard to discover.",
+      "outcome": "strutil exports padLeft, which left-pads a value to a given width with a given fill character (padLeft(42, 5, '0') gives '00042'), and the README has a section for every function index.js exports, padLeft and slugify included.",
+      "expect": [
+        "index.js exports a function named padLeft.",
+        "padLeft('42', 5, '0') returns the string '00042'.",
+        "padLeft(42, 5, '0') (a number as input) returns the string '00042'.",
+        "padLeft returns its input as a string, unchanged, when that input is already at or over the width: padLeft('12345', 5, '0') returns '12345' and padLeft('123456', 5, '0') returns '123456' (nothing is cut off).",
+        "README.md has a `## padLeft(` section that says what it does.",
+        "test/strutil.test.js contains at least one test that calls padLeft.",
+        "`npm test` exits 0, the existing capitalize, slugify and truncate tests are still present and passing, and no test fails."
+      ],
+      "proofs": [
+        {
+          "line": "index.js exports a function named padLeft.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import * as m from './index.js'; if (typeof m.padLeft !== 'function') { console.error('missing'); process.exit(1) }\""
+        },
+        {
+          "line": "padLeft('42', 5, '0') returns the string '00042'.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import assert from 'node:assert/strict'; assert.equal(padLeft('42', 5, '0'), '00042')\""
+        },
+        {
+          "line": "padLeft(42, 5, '0') (a number as input) returns the string '00042'.",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import assert from 'node:assert/strict'; assert.equal(padLeft(42, 5, '0'), '00042')\""
+        },
+        {
+          "line": "padLeft returns its input as a string, unchanged, when that input is already at or over the width: padLeft('12345', 5, '0') returns '12345' and padLeft('123456', 5, '0') returns '123456' (nothing is cut off).",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; import assert from 'node:assert/strict'; assert.equal(padLeft('12345', 5, '0'), '12345'); assert.equal(padLeft('123456', 5, '0'), '123456')\""
+        },
+        {
+          "line": "README.md has a `## padLeft(` section that says what it does.",
+          "proof": "read",
+          "how": "README.md"
+        },
+        {
+          "line": "test/strutil.test.js contains at least one test that calls padLeft.",
+          "proof": "read",
+          "how": "Read test/strutil.test.js and check that padLeft is imported from ../index.js and called inside a test() with an assertion"
+        },
+        {
+          "line": "`npm test` exits 0, the existing capitalize, slugify and truncate tests are still present and passing, and no test fails.",
+          "proof": "run",
+          "how": "npm test; check the exit code is 0, the output says '# fail 0', and the output has 'ok' lines for capitalize, slugify and truncate"
+        }
+      ],
+      "non_goals": [
+        "A right-pad (padRight) or other new helpers beyond padLeft.",
+        "Changing how capitalize, slugify or truncate behave.",
+        "Publishing a new npm release or bumping the package version.",
+        "Formatting invoices beyond padding (prefixes, checksums and so on)."
+      ],
+      "assumptions": [
+        "Signature is padLeft(value, width, fill): value can be a string or a number and the result is always a string. Callers pass the fill explicitly for zero padding. Whatever default fill is chosen when it is left out (a space, like String.prototype.padStart, is a reasonable choice) is up to the builder and not checked.",
+        "When the value is already as wide as the width or wider, it comes back unchanged and is never cut off, because cutting off an invoice number would corrupt it.",
+        "How padLeft is implemented (for example with String.prototype.padStart) is up to the builder."
+      ]
+    }
+  },
+  "grades": {
+    "proofs-match": true,
+    "blocked-right": true,
+    "states-problem": true,
+    "checkable-before-merge": true,
+    "grounded": true,
+    "catches-traps": false,
+    "avoids-must-not": false
+  },
+  "planted": {
+    "catches-traps": "no line requires a section for every export or names slugify",
+    "avoids-must-not": "a padLeft-only README line lets slugify stay undocumented"
+  }
+}

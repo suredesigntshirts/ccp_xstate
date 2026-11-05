@@ -1,0 +1,79 @@
+{
+  "result": {
+    "issue": {
+      "title": "csv2json: add a --tsv flag to read tab-separated input",
+      "problem": "bin/csv2json.js ignores its command-line arguments and always calls parse(text) from src/parse.js, which defaults to a ',' separator. If you pipe TSV through it with --tsv, the flag is ignored: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints `[{\"a\\tb\":\"1\\t2\"}]` (one key holding the whole line), not one key per column. parse() already takes a separator argument (`parse(text, '\\t')` returns `[{\"a\":\"1\",\"b\":\"2\"}]`), but nothing in the CLI passes one. The README documents CSV only.",
+      "reason": "The requester's exports now arrive as TSV, so they have to run sed to turn tabs into commas before csv2json. That step is extra work, and it corrupts any field that already contains a comma.",
+      "outcome": "With `--tsv`, `node bin/csv2json.js` splits stdin on tabs and prints the same JSON-array-of-objects shape it prints for CSV. Without the flag, it behaves exactly as it does today.",
+      "expect": [
+        "`printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` writes exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline to stdout and exits 0.",
+        "In --tsv mode a comma inside a field is not a separator: `printf 'a\\tb\\nx,y\\t2\\n' | node bin/csv2json.js --tsv` writes exactly `[{\"a\":\"x,y\",\"b\":\"2\"}]` followed by a newline.",
+        "In --tsv mode CRLF line endings are handled: `printf 'a\\tb\\r\\n1\\t2\\r\\n' | node bin/csv2json.js --tsv` writes exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline.",
+        "Without --tsv the CLI still parses CSV: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` writes exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline and exits 0.",
+        "Without --tsv, tabs are not treated as separators: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` writes exactly `[{\"a\\tb\":\"1\\t2\"}]` followed by a newline.",
+        "The exported parse function in src/parse.js keeps its current behaviour: `parse('a,b\\n1,2\\n')` deep-equals `[{a:'1',b:'2'}]` and `parse('a\\tb\\n1\\t2\\n', '\\t')` deep-equals `[{a:'1',b:'2'}]`.",
+        "`npm test` exits 0, and the test files under test/ include at least one test that runs bin/csv2json.js with the --tsv argument on tab-separated input and checks the output.",
+        "README.md documents the --tsv flag with an example invocation."
+      ],
+      "proofs": [
+        {
+          "line": "`printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` writes exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline to stdout and exits 0.",
+          "proof": "run",
+          "how": "From the repo root: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv | od -c; echo \"exit ${PIPESTATUS[1]}\"`. Expect the bytes [{\"a\":\"1\",\"b\":\"2\"}] then \\n, and exit 0."
+        },
+        {
+          "line": "In --tsv mode a comma inside a field is not a separator: `printf 'a\\tb\\nx,y\\t2\\n' | node bin/csv2json.js --tsv` writes exactly `[{\"a\":\"x,y\",\"b\":\"2\"}]` followed by a newline.",
+          "proof": "run",
+          "how": "`printf 'a\\tb\\nx,y\\t2\\n' | node bin/csv2json.js --tsv`, then compare the output to [{\"a\":\"x,y\",\"b\":\"2\"}]."
+        },
+        {
+          "line": "In --tsv mode CRLF line endings are handled: `printf 'a\\tb\\r\\n1\\t2\\r\\n' | node bin/csv2json.js --tsv` writes exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline.",
+          "proof": "run",
+          "how": "`printf 'a\\tb\\r\\n1\\t2\\r\\n' | node bin/csv2json.js --tsv | od -c`. Expect no \\r in the output."
+        },
+        {
+          "line": "Without --tsv the CLI still parses CSV: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` writes exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline and exits 0.",
+          "proof": "run",
+          "how": "`printf 'a,b\\n1,2\\n' | node bin/csv2json.js; echo \"exit $?\"`"
+        },
+        {
+          "line": "Without --tsv, tabs are not treated as separators: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` writes exactly `[{\"a\\tb\":\"1\\t2\"}]` followed by a newline.",
+          "proof": "run",
+          "how": "`printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js`. Expect [{\"a\\tb\":\"1\\t2\"}]."
+        },
+        {
+          "line": "The exported parse function in src/parse.js keeps its current behaviour: `parse('a,b\\n1,2\\n')` deep-equals `[{a:'1',b:'2'}]` and `parse('a\\tb\\n1\\t2\\n', '\\t')` deep-equals `[{a:'1',b:'2'}]`.",
+          "proof": "run",
+          "how": "`node -e \"import('./src/parse.js').then(m=>{const a=require('node:assert/strict');a.deepEqual(m.parse('a,b\\n1,2\\n'),[{a:'1',b:'2'}]);a.deepEqual(m.parse('a\\tb\\n1\\tsep'.replace('sep','2'),'\\t'),[{a:'1',b:'2'}]);console.log('ok')})\"`. Expect it to print ok and exit 0."
+        },
+        {
+          "line": "`npm test` exits 0, and the test files under test/ include at least one test that runs bin/csv2json.js with the --tsv argument on tab-separated input and checks the output.",
+          "proof": "run",
+          "how": "Run `npm test` and check it exits 0. Then `grep -rn -- '--tsv' test/` and read the matching test to confirm it runs the CLI with --tsv on tab-separated input and asserts the JSON output."
+        },
+        {
+          "line": "README.md documents the --tsv flag with an example invocation.",
+          "proof": "read",
+          "how": "Read README.md. It should show a `node bin/csv2json.js --tsv` usage example and say that it reads tab-separated input."
+        }
+      ],
+      "non_goals": [
+        "Quoted-field or escape handling (RFC 4180 quoting) for either CSV or TSV.",
+        "Other separators or a general --sep/--delimiter option.",
+        "Detecting the format automatically from the input.",
+        "Changing the default (no-flag) CSV behaviour or the signature or default of parse() in src/parse.js.",
+        "Publishing a release or bumping the package version."
+      ],
+      "assumptions": [
+        "The flag is spelled exactly `--tsv` (as in the request), takes no value, and means the input is separated by tab characters.",
+        "TSV mode splits fields the same simple way CSV mode does today (split on the separator, no quote handling), and the JSON output shape is unchanged.",
+        "How unknown arguments are handled is left as it is today (they are ignored); the request does not ask for argument validation.",
+        "Reusing the existing separator parameter of parse() is a likely implementation, but the issue does not require it."
+      ]
+    }
+  },
+  "hash": "cc30cacbaf7b64f6a1f849f7773e4eada612ca8e553114a3daa423f345e83a38",
+  "caller": "bench-planted-shared-parser-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:21:42.635Z"
+}

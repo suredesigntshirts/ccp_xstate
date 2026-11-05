@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "cc59a37e6e1494738ee885388f153b9ac29e25402b9d165ee4f24ae20c0ff60d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: a FAIL on lines 1 or 2. I checked each line's result in the output. Line 1 (\"--shout <name> prints ... HELLO, ADA!\") is marked \"PASS\". Its evidence covers hardcoding for Ada, upper-casing only the name and the existing '--' filter, and it says a missing test doesn't fail the line. Line 2 (\"without --shout still prints Hello, <name>!\") is marked \"PASS\" too. Only line 3, the published-docs line, is marked \"FAIL\", and the overall result is FAIL because of it. Neither line 1 nor line 2 gets a FAIL anywhere in the output, so the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 9205,
+  "tokens": {
+    "input": 2,
+    "output": 326,
+    "cacheCreation": 3529,
+    "cacheRead": 783,
+    "fresh": 3857,
+    "total": 4640
+  },
+  "at": "2026-11-05T07:19:23.203Z"
+}

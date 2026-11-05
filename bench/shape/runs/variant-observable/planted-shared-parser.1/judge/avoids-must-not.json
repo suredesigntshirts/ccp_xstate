@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "23a5270d09964bdda39dcefd0762c396207597fe08d7da2699e8ff9dfa800b89",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I checked whether a build that breaks plain CSV input could still pass every expect line. It could not. One expect line says \"Without the flag, CSV still works as before: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]`\". It has a run proof, so any change to comma parsing without the flag fails that line. A second line fixes the current no-flag output for tab input, which also catches a build that changes the default separator. The outcome adds \"Running without the flag behaves exactly as it does today.\" Nothing else in the issue breaks the must_not item.",
+  "model": "claude-opus-5-5",
+  "ms": 8174,
+  "tokens": {
+    "input": 2,
+    "output": 339,
+    "cacheCreation": 3854,
+    "cacheRead": 783,
+    "fresh": 4195,
+    "total": 4978
+  },
+  "at": "2026-11-05T07:28:03.448Z"
+}

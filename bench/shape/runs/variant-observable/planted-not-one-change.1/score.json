@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-not-one-change.1",
+  "case": "planted-not-one-change",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "blocked, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case expects blocked"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "The output is a \"blocked\" answer, so there are no expect lines and no problem field that could prescribe a fix. The reason only says the request is a question (\"asks why mathlib uses CommonJS rather than ES modules\") and not a change. It does mention \"moving to ES modules or writing down the rationale\", but only as examples of a separate request a maintainer might file later, not as a required fix. Nothing in the output names a technique, internal function or return value as the solution, so the criterion holds for the whole output.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "The output is a \"blocked\" answer and has no expect lines or proof entries. It says the request \"is a question, not a change\" and does not ask for \"any change to the repository\". With no expect lines, none of them can rely on a release, a deploy, a published page or anything else that only exists after merge, so the criterion holds trivially for the whole output. Blocking also fits this request: it only asks why mathlib uses CommonJS, so there is nothing to build and nothing to check at the PR head.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The output is a \"blocked\" answer, and it names no files, scripts, commands or functions that don't exist. It describes the repository correctly. It says mathlib \"uses CommonJS rather than ES modules\", and that matches the repo: math.js uses `module.exports`, the tests use `require`, and package.json has no \"type\": \"module\". It also says the request doesn't ask for any change, which is true, since issue #11 is only a question. Nothing in the output misstates the repository, so the criterion holds for the whole output.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: the stage must answer blocked and say the request is a question that asks for no change. The output does exactly that. It is a \"blocked\" object, and its reason says the request \"is a question, not a change\" and \"does not ask for any change to the repository (no migration to ESM, no documentation update)\". It also explains that a builder would have nothing to build and a verifier nothing to check. No issue was drafted alongside the block, so the whole output meets the criterion.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the output against the one must_not item: no issue that converts mathlib to ES modules or invents some other change. The output answers blocked and does not shape an issue at all. Its reason calls the request \"a question, not a change\" and says there is \"no migration to ESM, no documentation update\" to build. It mentions moving to ES modules only as a possible follow-up a maintainer could \"file as a separate request\", not as work to build. No part of the output invents a change or proposes converting to ESM, so the criterion holds for the whole output.",
+      "cached": true
+    }
+  }
+}

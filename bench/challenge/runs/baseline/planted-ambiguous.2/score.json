@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-ambiguous.2",
+  "case": "planted-ambiguous",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each line's evidence and each repository claim. Line 1's PASS names wrong builds (`|| 0`, a throw, undefined/null) and says which line catches each. Line 2's PASS names builds that hide the NaN (`|| 0`, isNaN→0, filtering) and says average([NaN,1]) catches them. Line 4's PASS names wrong builds (a test that only checks for non-NaN, a test that never imports average) and says why the line rejects them. Line 3's FAIL gives concrete readings (throw TypeError, return 0, skip elements) and a concrete wrong build: an Array.isArray guard plus Number() coercion. That build changes ['1','2'] from 6 to 1.5. The repository claims hold: current code gives '012'/2 = 6, null.reduce throws a TypeError, the test file imports only add, subtract and multiply, and npm test runs `node --test`. The wrong build really does meet lines 1, 2 and 4. All evidence is concrete and grounded in the repository.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 must FAIL as ambiguous, naming two readings. The output marks \"average handles bad input sensibly\" as \"FAIL\". Its evidence says no bad inputs or expected outputs are named and that \"'sensibly' is a matter of opinion\". It then gives three separate readings: \"Reading A: average(null) should throw a TypeError\", \"Reading B: ... should return 0\" and \"Reading C: non-numeric elements should be skipped\". It also says \"One build grades PASS by one reader and FAIL by another.\" That covers the ambiguity and names more than the two readings required. So the one must_catch item is handled.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list rules out a FAIL on line 1, 2 or 4. I checked the result for each line in the output. Line 1 (\"average([]) returns 0\") is PASS. Line 2 (non-empty lists match current math.js, NaN included) is PASS. Line 4 (test in test/math.test.js and npm test passes) is PASS. The only FAIL is on line 3 (\"handles bad input sensibly\"), which the must_not list allows. The overall \"FAIL\" result and the wrong build both rest only on line 3. The output breaks nothing on the list.",
+      "cached": true
+    }
+  }
+}

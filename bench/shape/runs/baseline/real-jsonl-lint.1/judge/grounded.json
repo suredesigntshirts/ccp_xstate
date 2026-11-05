@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "0c449f1f3cefb179f25b33823806199ad72890cb6df98b79bd8daaa67e72e88a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every name in the issue against the 9 tracked files. Things it names that already exist: README.md, which does contain \"No tools yet: `packages/` is empty, and `npm test` says so and passes\", plus `.github/workflows/test.yml` with its `test` job, the root `package.json` with `workspaces: packages/*` and the `test` script, and the commands `npm ci`, `npm test` and `node:test`. Things it names that don't exist yet, `jsonl-lint` and `packages/jsonl-lint/package.json`, are what the issue asks to create. The problem statement matches the repo. No file is tracked under `packages/`, so saying it \"does not exist yet\" fits, and the README calls it empty. Nothing in the repo checks JSONL row by row. `npm query .workspace` is a real npm command. The issue makes no false claims about the repository.",
+  "model": "claude-opus-5-5",
+  "ms": 8275,
+  "tokens": {
+    "input": 2,
+    "output": 536,
+    "cacheCreation": 12095,
+    "cacheRead": 783,
+    "fresh": 12633,
+    "total": 13416
+  },
+  "at": "2026-11-05T07:29:45.595Z"
+}

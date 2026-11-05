@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-half-met.2",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "Most of the evidence is grounded. The README FAIL is correct: index.js exports slugify, and README.md has sections only for capitalize and truncate. It names a concrete wrong build (adding only a padLeft section) that meets the line but misses the request. The line-2 PASS names truncation and off-by-one builds and gives the node -e checks that catch them. The line-4 PASS says the line still catches builds that break the existing tests or the module's syntax.\n\nThe line-1 PASS breaks the rule that cited facts must be real in the repository. It says require(\"./index.js\") works \"under the repo's Node v22.23.4 (I checked it)\". Nothing in the repository pins a Node version: package.json has no engines field and there is no .nvmrc. So \"the repo's Node v22.23.4\" is not a repository fact, and the PASS rests on it to show the line can be run. That is not grounded in the repository.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 has to FAIL because a build that adds only a padLeft section leaves slugify undocumented, while the request asks for a complete list. I checked the output's line 3 (\"README.md has a section for padLeft\"). It is marked \"FAIL\", and its evidence says index.js exports capitalize, slugify and truncate, that the README is \"missing\" slugify, and that \"A PR that adds only a '## padLeft(s, width, fill)' section meets this line, yet the README still leaves out slugify\". It ties this to the request's \"keep the README's list of functions complete\" and proposes a replacement line covering every exported function. The wrong_build field describes the same build. So the one trap is fully caught.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list forbids only a FAIL on line 1, 2 or 4 that rests on wording or on a stricter test than the line's words need. All three of those lines are marked PASS. On line 1 the output names an open edge (multi-character or empty fill) and says it \"doesn't count against the line\". On line 4 it says a missing padLeft test \"is not a reason to fail it\". The only FAIL is on line 3. That one is backed by the request's \"keep the README's list of functions complete\" and by the repo itself: index.js exports slugify, but README.md has no section for it. So the output does nothing on the must_not list.",
+      "cached": true
+    }
+  }
+}

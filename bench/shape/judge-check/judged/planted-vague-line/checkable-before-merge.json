@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "cb2ed897d72818c65672e39a78b1073d632103a61e3985fadf3a3d9436d36922",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each expect line and its proof. Most lines can be checked at the PR head before merge. The run commands use stdin piped to the CLI, `node -e` and `npm test`, and the README read is concrete. Nothing needs a release or deploy.\n\nThe last line breaks the criterion: \"csv2json handles TSV input well.\" \"Well\" is vague, so two careful readers could give different answers. Its proof, \"read the code\", doesn't say what to check, so it gives no single way to settle the line.\n\nA smaller problem: the CRLF line asks for the exact output, but its proof only checks \"expect no \\r in the output\" with `od -c`. That doesn't confirm the full exact JSON.\n\nBecause one line fails, the criterion doesn't hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 5670,
+  "tokens": {
+    "input": 2,
+    "output": 372,
+    "cacheCreation": 4185,
+    "cacheRead": 783,
+    "fresh": 4559,
+    "total": 5342
+  },
+  "at": "2026-11-05T07:06:46.330Z"
+}

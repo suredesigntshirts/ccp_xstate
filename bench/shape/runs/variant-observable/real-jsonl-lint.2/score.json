@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "real-jsonl-lint.2",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "11 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": false,
+      "why": "The problem field is fine. It says what is missing (\"nothing in the repo that can check a JSONL journal\") and proposes no fix. Several expect lines, though, prescribe implementation choices the request never asks for. The request only says \"exits non-zero\" for bad rows and calls a missing file \"an error\", but the expect lines fix exact return values: \"exits 1\" for invalid rows and \"exits 2\" for missing file or usage. Expect lines also require technique: \"the workspace package declares a `jsonl-lint` bin\", \"plain ES modules with no build step\", \"no runtime `dependencies`\" and \"`node:test` tests\". The exit-code split appears as an assumption, which is the right place for it, but it is also repeated as a requirement in the expect lines. These are design decisions the request does not make requirements, so the criterion fails.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all 11 expect lines and their proofs. Each one can be checked at the PR head before merge. Nine use `run` proofs: local commands such as `npm ci`, `npx --no-install jsonl-lint` on temp files made with `printf`, `grep` counts and exit codes, all with exact expected values (e.g. \"expect exit=1 and exactly the two lines `/tmp/bad.jsonl:2:` and `/tmp/bad.jsonl:4:`\"). The test-suite line also asks for \"the CI `test` check on the PR\", and that check runs on the PR before merge. Two lines use `read` proofs on package.json and README.md \"at the PR head\", with concrete things to look for (no `dependencies`, `\"type\": \"module\"`, the 'No tools yet' bullet gone). Nothing depends on publishing, a release, a deploy or a live page; publishing to npm is listed as a non-goal. The weakest line is \"a usage message\", which still has a clear check: exit 2 and stderr that isn't empty.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every name and claim in the issue against the repository. The problem says there is no packages/ directory and quotes the README as \"No tools yet: packages/ is empty\". No file under packages/ is tracked, and README.md has that bullet in its \"What is here\" section. It says the root `npm test` prints 'no workspaces under packages/', which matches the test script in package.json. The other existing names are real: package-lock.json, README.md, the \"What is here\" section, `npm ci`, `npm test`, node:test (named in CLAUDE.md) and the CI `test` workflow. The new names are ones the issue asks to create: packages/jsonl-lint, its package.json, the `jsonl-lint` bin and the test files. Paths like /tmp/*.jsonl and /nonexistent/journal.jsonl are fixtures the proofs make themselves, or a path meant not to exist. The issue invents no other repo files or functions, and it describes the repository accurately.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items against the expect lines, and each one is handled.\n1. Tests that root `npm test` actually runs: the workspace must have a `test` script running `node:test` tests, and \"the root `npm test` runs them and passes\". Because a `test` script is required, `--if-present` can't skip it. The proof also says the run must not print 'no workspaces under packages/'.\n2. README: \"README.md's 'What is here' section no longer says there are no tools and lists jsonl-lint with how to run it.\"\n3. Output form and exit codes: bad rows must appear as lines \"starting `<file>:2:`\" and \"`<file>:4:`\", which pins the file and the 1-based line. Bad rows must exit 1, and a missing file must exit 2. With no argument, \"`jsonl-lint` exits 2 and writes a usage message to stderr\", so the two failure cases get different codes.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all 11 expect lines against both must_not items. Item 1: every line can be checked at the PR head before merge. The checks are `npm ci` with the committed lock file, running `npx --no-install jsonl-lint` on temp files, root `npm test`, and reading package.json and README. The only CI mention is the PR's own `test` check, which also runs before merge. Publishing is listed as a non-goal, not as something to expect. Item 2: a tool with no tests run by npm test would not meet the issue. One expect line requires \"a `test` script running `node:test` tests that cover a clean file, a file with invalid rows ... and a missing file\", and adds that \"the root `npm test` runs them and passes\". Its proof also checks that npm test no longer prints 'no workspaces under packages/'. Neither forbidden item appears.",
+      "cached": true
+    }
+  }
+}

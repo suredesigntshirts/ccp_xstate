@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-ambiguous.2",
+  "case": "planted-ambiguous",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every line's evidence. All four meet the criterion.\n\n- **Line 1 (PASS):** names wrong builds that line 1 itself catches: one that throws on [] and one that returns null. It also notes that the `|| 0` build is caught by line 2.\n- **Line 2 (PASS):** names two wrong builds, mapping NaN to 0 and filtering NaN out. Line 2 catches both because average([NaN, 1]) has to stay NaN. It cites \"math.js:20, reduce/length\", and line 20 of math.js really is the reduce/length return.\n- **Line 3 (FAIL):** gives two concrete readings with concrete builds. Build A leaves average(null) throwing a TypeError, which it does today. Build B adds an `Array.isArray` guard that returns 0.\n- **Line 4 (PASS):** says the test file imports only add, subtract and multiply, which matches the repository. It says `npm test` runs `node --test`, which matches package.json. Its wrong build adds the test but leaves math.js unfixed, so npm test fails and the line catches it.\n\nThe overall wrong build's claims also hold up: today average('abc') throws, and with the guard it would return 0.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 has to FAIL as ambiguous and name two readings. I checked the output's verdict on line 3, \"average handles bad input sensibly\". It gives \"result\": \"FAIL\" and says \"'Sensibly' has no checkable meaning, so two careful readers would grade the same build differently.\" It then names two readings. In the first, leaving average(null) throwing a TypeError is sensible because it \"fails loudly\". In the second, returning 0 for non-arrays is sensible, while the other reader says that \"hides bad input as 0\". The wrong_build section makes the same point again: one build passes line 3 under one reading, and \"the opposite build... also passes line 3 under a different reading.\" The item is handled.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list rules out a FAIL on line 1, 2 or 4, so I checked the result given for each line. Line 1 (\"average([]) returns 0\") is \"PASS\". Line 2 (non-empty lists, NaN included) is \"PASS\". Line 4 (the test in test/math.test.js and npm test passing) is \"PASS\". The only FAIL is on line 3 (\"average handles bad input sensibly\"), and the must_not list allows that. The overall \"result\": \"FAIL\" comes from line 3 alone, and the wrong_build text says that build meets lines 1, 2 and 4. Nothing in the output gives a FAIL to line 1, 2 or 4, so the criterion holds for the whole output.",
+      "cached": true
+    }
+  }
+}

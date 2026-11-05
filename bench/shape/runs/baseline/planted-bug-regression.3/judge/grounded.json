@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "e7cac0466775b495a3c8a9d73ccd2251bc1489402d5ce8dc8a3c390c6c1b72f4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. Every name the issue uses exists in the repository. math.js is there with average, add, subtract and multiply, and it exports exactly those four. test/math.test.js exists, and the `npm test` script runs `node --test`. The README describes the helpers as \"used by the invoice service\". The problem statement matches the code. average really is `xs.reduce((sum, x) => sum + x, 0) / xs.length`, which gives 0/0 = NaN for []. The test file does import and test only add, subtract and multiply, as the issue says. The only new thing the issue calls for is a regression test under test/, and it asks for that explicitly. One caveat: the base commit hash 47d473e doesn't appear anywhere in the material, so I couldn't confirm it. It isn't a file, script, command or function, though, so it doesn't count against this criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 11757,
+  "tokens": {
+    "input": 2,
+    "output": 546,
+    "cacheCreation": 4144,
+    "cacheRead": 783,
+    "fresh": 4692,
+    "total": 5475
+  },
+  "at": "2026-11-05T07:29:33.154Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "33011913db15c558fe989ddd447540ee17ba4eb79eaf0fa109d3aba69af9e00b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every expect line, proof, non-goal and assumption against both must_not items. No expect line requires loadConfig to return {}. The second line requires the opposite: loadConfig \"throws (it does not return a value, `{}` included)\", and its proof prints RETURNED and exits 1 if anything comes back. The issue also never lets the app start on defaults when config.json is broken. The outcome says an invalid config \"still stops the app with exit 1\", the first expect line requires exit code 1 with nothing written to stdout, and the non-goals rule out \"Returning `{}` or falling back to defaults when the config is invalid. The app must still stop.\" The assumptions explicitly reject the requester's suggestion to return {}. Neither forbidden item appears anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 4213,
+  "tokens": {
+    "input": 2,
+    "output": 319,
+    "cacheCreation": 3780,
+    "cacheRead": 783,
+    "fresh": 4101,
+    "total": 4884
+  },
+  "at": "2026-11-05T07:28:20.821Z"
+}

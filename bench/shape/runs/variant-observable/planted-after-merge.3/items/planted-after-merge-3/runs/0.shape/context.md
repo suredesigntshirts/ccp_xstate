@@ -1,0 +1,1 @@
+Run planted-after-merge-3:0.shape, worktree /tmp/bench-planted-after-merge-3-8s1Mrh/wt/planted-after-merge-3--0.shape of https://github.com/o/greet-cli, branch run/planted-after-merge-3/0.shape.

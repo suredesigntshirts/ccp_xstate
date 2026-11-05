@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "dece39b62900efe4b5922c11b5ff08d9b09078dd25e72484ca07b830b41071e2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all seven expect lines. Each one states behaviour you can observe from outside the code: the exact CLI output for given input, exit codes, `npm test` passing with a test that covers --tsv, and the README documenting the flag. None of them names an internal function, a technique or a return value. The test and README lines ask for things to exist, not for a particular fix, and the request implies the --tsv flag itself. The only implementation hint, using the existing `sep` parameter of parse(), sits under assumptions and is marked \"suggested, not required\". The problem field describes current behaviour: the CLI ignores arguments, always splits on commas, and turns TSV into one column. Saying that parse() \"already accepts a separator\" but \"nothing in the CLI exposes it\" is a fact about the repository, not an instruction. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 7802,
+  "tokens": {
+    "input": 2,
+    "output": 512,
+    "cacheCreation": 3889,
+    "cacheRead": 783,
+    "fresh": 4403,
+    "total": 5186
+  },
+  "at": "2026-11-05T07:27:25.630Z"
+}

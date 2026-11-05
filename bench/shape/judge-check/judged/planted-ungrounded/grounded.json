@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "42bf4565db51026315c316bc1a5a07a92a28072e06de6b7d95b135299586387b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared every file, script and command the issue names against the repository. It fails in two places. First, the problem says \"average() in src/stats.js returns NaN\", but there is no src/stats.js. `average` is defined in math.js at the repo root, and the issue doesn't ask anyone to create src/stats.js, so the problem misdescribes the repo. Second, the expect line and proof \"`npm run lint` exits 0\" call a script that doesn't exist: package.json has only a \"test\" script (`node --test`), so `npm run lint` would fail with a missing-script error. The rest checks out: math.js and test/math.test.js exist, and `npm test`, `node --test` and the exports add, subtract, multiply and average are all real.",
+  "model": "claude-opus-5-5",
+  "ms": 5351,
+  "tokens": {
+    "input": 2,
+    "output": 340,
+    "cacheCreation": 3705,
+    "cacheRead": 783,
+    "fresh": 4047,
+    "total": 4830
+  },
+  "at": "2026-11-05T07:29:08.237Z"
+}

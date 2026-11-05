@@ -1,0 +1,60 @@
+{
+  "result": {
+    "issue": {
+      "title": "Invalid config.json error does not say which file is broken",
+      "problem": "`src/config.js` `loadConfig(path)` is `JSON.parse(readFileSync(path, 'utf8'))`, so a typo throws a bare SyntaxError and `src/app.js` prints `bad config: <message>` and exits 1. The message gives the position but never the file. Observed on Node v22: a file whose line 3 is `  greeting: \"x\"` (unquoted key) gives `bad config: Expected double-quoted property name in JSON at position 20 (line 3 column 3)`, exit 1. No path is printed, so the user cannot tell which file is broken (the path argument is optional and defaults to `config.json` in the cwd). The request suggests catching the parse error in loadConfig and returning `{}`. That would make the app start silently on defaults, so it would hide both the file and the mistake.",
+      "reason": "When a config has a typo the user needs to know which file to fix and where the mistake is in it. Without the file name they have to guess which config was loaded.",
+      "outcome": "A config file that is not valid JSON still stops the app with exit 1. The error now names the file and the line and column of the mistake. Valid configs and missing files behave as before.",
+      "expect": [
+        "Running `node src/app.js <P>`, where <P> is an absolute path to a file containing `{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n`, exits with code 1, writes nothing to stdout, and writes to stderr a message that contains the string <P> exactly as given and the substrings `line 3` and `column 3`.",
+        "Calling `loadConfig(P)` on that same invalid file throws (it does not return a value, `{}` included). The thrown value is a SyntaxError whose `message` contains P.",
+        "Running `node src/app.js <V>`, where <V> is a file containing `{\"port\": 9000}`, exits 0 and prints `listening on 9000` to stdout. With a file containing `{}` it exits 0 and prints `listening on 8080`.",
+        "Running `node src/app.js <M>`, where <M> is a path that does not exist, still exits 1 and writes to stderr a line starting `bad config:` that contains <M>.",
+        "`npm test` exits 0, and `test/config.test.js` contains a test asserting that the error thrown for invalid JSON names the file path."
+      ],
+      "proofs": [
+        {
+          "line": "Running `node src/app.js <P>`, where <P> is an absolute path to a file containing `{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n`, exits with code 1, writes nothing to stdout, and writes to stderr a message that contains the string <P> exactly as given and the substrings `line 3` and `column 3`.",
+          "proof": "run",
+          "how": "d=$(mktemp -d); P=$d/config.json; printf '{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n' > $P; node src/app.js $P >$d/out 2>$d/err; echo exit=$?; test ! -s $d/out && grep -qF \"$P\" $d/err && grep -q 'line 3' $d/err && grep -q 'column 3' $d/err && echo OK  (expect exit=1 and OK)"
+        },
+        {
+          "line": "Calling `loadConfig(P)` on that same invalid file throws (it does not return a value, `{}` included). The thrown value is a SyntaxError whose `message` contains P.",
+          "proof": "run",
+          "how": "d=$(mktemp -d); P=$d/config.json; printf '{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n' > $P; node --input-type=module -e \"import {loadConfig} from './src/config.js'; try { const r = loadConfig(process.argv[1]); console.log('RETURNED', JSON.stringify(r)); process.exit(1) } catch (e) { console.log(e instanceof SyntaxError && e.message.includes(process.argv[1]) ? 'OK' : 'BAD ' + e.message) }\" $P  (expect OK)"
+        },
+        {
+          "line": "Running `node src/app.js <V>`, where <V> is a file containing `{\"port\": 9000}`, exits 0 and prints `listening on 9000` to stdout. With a file containing `{}` it exits 0 and prints `listening on 8080`.",
+          "proof": "run",
+          "how": "d=$(mktemp -d); echo '{\"port\": 9000}' > $d/a.json; echo '{}' > $d/b.json; node src/app.js $d/a.json; echo exit=$?; node src/app.js $d/b.json; echo exit=$?  (expect `listening on 9000`, exit=0, `listening on 8080`, exit=0)"
+        },
+        {
+          "line": "Running `node src/app.js <M>`, where <M> is a path that does not exist, still exits 1 and writes to stderr a line starting `bad config:` that contains <M>.",
+          "proof": "run",
+          "how": "M=$(mktemp -d)/nope.json; node src/app.js $M 2>err.txt; echo exit=$?; grep -F \"$M\" err.txt | grep -q '^bad config:' && echo OK; rm err.txt  (expect exit=1 and OK)"
+        },
+        {
+          "line": "`npm test` exits 0, and `test/config.test.js` contains a test asserting that the error thrown for invalid JSON names the file path.",
+          "proof": "run",
+          "how": "Run `npm test; echo exit=$?` (expect exit=0), then read test/config.test.js and confirm a test checks that the invalid-JSON error message includes the file path."
+        }
+      ],
+      "non_goals": [
+        "Returning `{}` or falling back to defaults when the config is invalid. The app must still stop.",
+        "Validating config keys or values (schema checking).",
+        "Changing how missing files are reported, beyond keeping their current behaviour.",
+        "Supporting config formats other than JSON (JSON5, comments, etc.)."
+      ],
+      "assumptions": [
+        "The suggested fix (catch the parse error in loadConfig and return `{}`) is rejected. It would hide the broken file and the location of the mistake, which is the opposite of what the request needs. The README also documents that invalid JSON stops the app with exit 1.",
+        "loadConfig keeps throwing a SyntaxError for invalid JSON, so the existing `bad JSON throws` test and the README contract stay valid. Only the message gains the file path.",
+        "The location is given as `line N` and `column N`, matching what Node v22's JSON.parse already reports. Exact wording around the path and location is otherwise left to the builder.",
+        "The path appears as the caller passed it (argv or the default `config.json`), not necessarily resolved to an absolute path."
+      ]
+    }
+  },
+  "hash": "bae60e7453baf6f70de199f470a10cfd85a716d717d9fcd88370c89b27c6d3e2",
+  "caller": "bench-planted-suggested-fix-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:22:08.423Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "796e8167181a92e5a26c916430c9de3a14b950216539b8049c5e46e300278a65",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The must_catch item says line 3 (\"README.md has a section for padLeft\") should FAIL. The request wants the README's function list to be complete, but slugify is exported in index.js and never documented in README.md, so a build that only adds a padLeft section would still leave the list incomplete. The output marks line 3 \"PASS\" with the boilerplate evidence \"This line looks fine and is clear.\" It never mentions slugify, and its wrong_build is \"None found; the issue looks complete.\" It misses the trap entirely.",
+  "model": "claude-opus-5-5",
+  "ms": 5275,
+  "tokens": {
+    "input": 2,
+    "output": 234,
+    "cacheCreation": 2932,
+    "cacheRead": 783,
+    "fresh": 3168,
+    "total": 3951
+  },
+  "at": "2026-11-05T07:19:13.250Z"
+}

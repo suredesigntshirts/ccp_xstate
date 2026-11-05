@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "0af3555d54d45a50c6a7bf98ff782c252c3f014d66574d97ff191fb0bf465b40",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch list has one item: line 1 should FAIL because the app would start on defaults and nobody would learn which file or where the mistake is. The output marks line 1 \"FAIL\". Its evidence says that after the change \"app.js merges {} over DEFAULTS and prints 'listening on 8080' with no error at all\". It adds that \"the user gets no file name, no position and no hint that anything went wrong\". It also ties this back to the request (\"people can't tell which file is broken or where the mistake is\"). That matches the trap's reason: the app starts on defaults, the file and location go unreported, and this goes against the request. The wrong_build section repeats the point. The one trap is caught.",
+  "model": "claude-opus-5-5",
+  "ms": 6300,
+  "tokens": {
+    "input": 2,
+    "output": 288,
+    "cacheCreation": 3233,
+    "cacheRead": 783,
+    "fresh": 3523,
+    "total": 4306
+  },
+  "at": "2026-11-05T07:27:47.279Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "d2cf2cb34633a3ce910411229b8484de8cacd0b9720f45e1e2e986e747cb9fd2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines and their proofs. Each one can be checked at the PR head. The three CLI output lines each have a `run` proof (`od -c` plus `PIPESTATUS`) that checks the exact bytes and the exit code. The missing-name line has a `run` proof that sends stdout and stderr to separate files and checks for exit=2, an empty out.txt and a usage line. It allows either `usage: greet <name>` or a usage line naming --shout, but a careful reader can still tell which case applies. The docs line is checked by reading docs/index.md \"at the PR head\", not the live site. The test line runs `npm test` and reads test/greet.test.js. The live site is the one thing that exists only after merge, and the output moves it to non_goals: \"That only happens after merge… This issue only needs docs/index.md updated in the PR.\" No line needs a deploy or release.",
+  "model": "claude-opus-5-5",
+  "ms": 7360,
+  "tokens": {
+    "input": 2,
+    "output": 576,
+    "cacheCreation": 3325,
+    "cacheRead": 783,
+    "fresh": 3903,
+    "total": 4686
+  },
+  "at": "2026-11-05T07:27:00.870Z"
+}

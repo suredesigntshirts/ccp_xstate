@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { render } from '../../../packages/engine/src/stages.js';
 import { loadWorkflow } from '../../../packages/engine/src/index.js';
 import { exportRun } from '../../inspector/export.mjs';
-import { REPO, ambientOf, casesOf, readJson, stageInput, specOf, workflowVersion } from '../lib.mjs';
+import { REPO, ambientOf, casesOf, earlierOutput, readJson, stageInput, specOf, workflowVersion } from '../lib.mjs';
 import { benchRun, promptOnly } from '../run.mjs';
 import { judgeCheck, noRestatedRules, oneCheckPerLine, reportOf, scoreRuns } from '../score.mjs';
 import { blindPacket, compareReport, entryDiff, scoredSet, stageEntry } from '../compare.mjs';
@@ -71,6 +71,25 @@ test('alone: the run folder is a journal root the Inspector export replays, with
   assert.equal(run.layers.l2.text, readFileSync(join(out, 'planted-missing-line.2/items/planted-missing-line-2/runs/0.brief/brief.md'), 'utf8'));
   assert.deepEqual(run.layers.l6.result, GOOD);
   assert.equal(run.layers.outcome.status, 'accepted');
+});
+
+test('alone, a later stage: a challenge run is reached through the real host from the start, so the Inspector shows it', async () => {
+  const [c] = casesOf('challenge', 'planted-half-met');
+  const verdict = { result: 'FAIL', lines: c.input.issue.expect.map((line, i) => ({ line, result: i === 2 ? 'FAIL' : 'PASS', evidence: 'x' })), wrong_build: 'a README with padLeft only' };
+  const dir = fake(verdict);
+  const out = join(dir, 'runs');
+  await benchRun({ c, k: 1, stage: 'challenge', version: workflowVersion({ name: 'intake' }), out });
+  const b = await exportRun({ engine: REPO, journal: join(out, 'planted-half-met.1') });
+  assert.equal(b.replay.ok, true);
+  assert.deepEqual(b.steps.map((s) => s.value), ['shaping', 'challenging'], 'the item started, and shape was given the case issue');
+  const run = b.steps[1].actors.find((a) => a.actor === 'challenge');
+  assert.deepEqual(run.layers.l6.result, verdict);
+  assert.equal(run.layers.outcome.status, 'accepted');
+  assert.deepEqual(run.layers.l6.result && b.steps[1].context.issue, c.input.issue, 'the challenged issue is the case issue, url and all');
+  // A case cannot hand an earlier stage what its schema refuses.
+  const spec = loadWorkflow('intake');
+  assert.throws(() => earlierOutput(spec, 'shape', { issue: { title: 'no expect' } }), /refuses/);
+  assert.deepEqual(earlierOutput(spec, 'shape', c.input), { issue: c.input.issue });
 });
 
 test('returned: a result the host refuses is handed back, and the second return is accepted', async () => {

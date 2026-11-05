@@ -4,7 +4,9 @@
 package.json        npm workspaces (packages/*, plugins/*); Node 22+; `npm test` runs everything
 packages/<name>/    a harness library: package.json, src/, test/
 plugins/<name>/     a Claude Code plugin: package.json, .claude-plugin/plugin.json, and its parts
-workflows/          workflow files: XState machine config as JSON, loaded by packages/engine
+workflows/          workflow files: XState machine config as JSON, loaded by packages/engine, each model stage's
+                    words in workflows/<workflow>/<stage>.md; intake.json shapes and challenges a request into
+                    an issue, then starts quick-fix.json as a child item
 verify/<item>/      the verifier's own tests for an item, and its verdict.json
 scripts/gates/      the PR gates verdict.yml runs, with their tests
 scripts/tournament/ the generic design-tournament kit: runner, args builder, measure, CI template (docs/tournaments.md)

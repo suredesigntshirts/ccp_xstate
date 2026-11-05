@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "b89674f1ea6880a01887c15452bf5701da2f7eb67ff5b38017a0699c6fb05f39",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch list has one item: line 3 should FAIL because a build that only adds a padLeft section leaves slugify undocumented, even though the request asks for a complete list. The output marks line 3 \"FAIL\". Its evidence says index.js exports slugify but the README lists only capitalize and truncate, so \"A PR that adds just a '## padLeft(s, width, fill)' section meets this line, but the README stays incomplete.\" It also proposes the missing line, \"README.md has a section for every function index.js exports.\" The wrong_build shows the same gap. The trap is fully caught.",
+  "model": "claude-opus-5-5",
+  "ms": 9347,
+  "tokens": {
+    "input": 2,
+    "output": 258,
+    "cacheCreation": 3513,
+    "cacheRead": 783,
+    "fresh": 3773,
+    "total": 4556
+  },
+  "at": "2026-11-05T07:27:28.228Z"
+}

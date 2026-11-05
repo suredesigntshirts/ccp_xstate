@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "7bc4520ea788af2b8900d3001c755133f62d6b5829ed9632c2591208088f49ef",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all seven expect lines and their proofs. None of them needs a release, a deploy or a published page. Six are plain `node -e` or grep/`npm test` checks that run at the head and give one answer each. The README line is the problem. Decoded from the JSON, its `how` holds `'\\\\('`. Inside bash double quotes that becomes `'\\('`, which JS reads as `'('`. So `new RegExp('^## '+k+'(','m')` throws \"Unterminated group\" and the command exits non-zero even when the README is correct. That makes this proof unusable for checking the line at the head as written. The manual follow-up (\"read the padLeft section\") still covers the parameter part, but the \"every exported function has a heading\" part has no working check. Because one proof entry breaks, the criterion doesn't hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 14970,
+  "tokens": {
+    "input": 2,
+    "output": 1262,
+    "cacheCreation": 3690,
+    "cacheRead": 783,
+    "fresh": 4954,
+    "total": 5737
+  },
+  "at": "2026-11-05T07:10:31.807Z"
+}

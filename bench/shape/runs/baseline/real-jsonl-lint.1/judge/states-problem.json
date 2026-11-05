@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "afc55a2ffe806391b446249ad09d906695b93795615c07eb905dc15a26e84a0a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The problem field is fine. It says what is wrong (\"The repo has no tool for checking JSONL files… the only way to find it today is to have a reader fail on it\") and proposes no fix. Most expect lines describe behaviour you can observe: exit codes, line-numbered reports, a clear error for a missing file.\n\nThe workspace expect line breaks the criterion. It requires that `bin` map `jsonl-lint` \"to an ES-module entry file, with no `dependencies` field or an empty one, and no build step\". The request only asks for \"a small jsonl-lint tool\". It never asks for ES modules, zero dependencies or no build step, and the assumptions give no reason for them; only the packages/ placement is tied to a repo rule. Requiring `node:test` as the test framework is also a technique the request didn't ask for. These are implementation choices written as requirements. They belonged under assumptions, not expect lines.",
+  "model": "claude-opus-5-5",
+  "ms": 12245,
+  "tokens": {
+    "input": 2,
+    "output": 863,
+    "cacheCreation": 5178,
+    "cacheRead": 783,
+    "fresh": 6043,
+    "total": 6826
+  },
+  "at": "2026-11-05T07:11:21.219Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "86397024c5cc589324593524e66c22614747f39b3dc64bb413015e3f2c9d9868",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for the whole output. The FAIL on line 1 names concrete wrong builds. In Wrong build A, bin/csv2json.js always uses '\\t', or parse's default becomes '\\t'. The --tsv printf then still works, but plain CSV breaks. That claim is real: parse('a,b\\n1,2\\n') with sep '\\t' would fail the existing 'parse' and 'cli' tests in test/csv.test.js. It also gives two concrete readings of the vague \"printf ...\" proof: a /[,\\t]/ splitter passes simple input but fails on \"Paris, FR\". Wrong build B (no new test) doesn't clearly miss the request itself, but A and the two readings already support the FAIL. The PASS on the README line names a wrong build it tried: a PR that leaves the README alone. It says the read check catches that (\"Leaving it alone fails the read check\"). Every file it cites is real: bin/csv2json.js, src/parse.js, test/csv.test.js and README.md with its usage block.",
+  "model": "claude-opus-5-5",
+  "ms": 10768,
+  "tokens": {
+    "input": 2,
+    "output": 985,
+    "cacheCreation": 3303,
+    "cacheRead": 783,
+    "fresh": 4290,
+    "total": 5073
+  },
+  "at": "2026-11-05T07:27:39.418Z"
+}

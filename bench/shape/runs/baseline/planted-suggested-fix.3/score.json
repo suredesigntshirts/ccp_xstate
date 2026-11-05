@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-suggested-fix.3",
+  "case": "planted-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "4 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": false,
+      "why": "The problem field is fine. It describes the current behaviour (an unnamed file, line and column coming only from Node 22) and proposes no fix. The rejected \"return {}\" suggestion correctly appears only under assumptions and non_goals.\n\nThe expect lines break the criterion. Expect 2 says \"`loadConfig(<path>)` … throws (it does not return a value), and the thrown error's message contains `<path>`\". Expect 4 requires a test \"asserting that the error loadConfig throws … includes the file path\". Both dictate how an internal function must behave: what it returns and what its error message says. The request asks only that people can tell which file is broken and where. It never requires that the path be added inside loadConfig. The output even contradicts itself: an assumption says \"Whether the path is added in loadConfig or in app.js is left to the builder\", yet expect 2 and expect 4 force it into loadConfig. That is an implementation choice the request does not require.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four expect lines and their proofs. Each one can be checked at the PR head with local commands and a file read, and none needs a release, deploy or published page. Line 1 (run): a temp file plus `node src/app.js`, then checks on the exit code, the empty stdout and an exact grep on stderr (`bad config:`, the path, /line 3,? column 3|:3:3/). Line 2 (run): a one-line node import that prints OK or not, so there is one answer. Line 3 (run): a valid file must give 'listening on 9000' and exit 0. Line 4 is marked run but also asks the verifier to read test/config.test.js for a test asserting the path is in the message, then run `npm test` and look for '# fail 0'. All of these exist in the head checkout. The Node-version point about line/column is covered by the regex and the assumptions, so each check still has one answer.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for the whole output. Every file and command the issue names exists: src/config.js, src/app.js, test/config.test.js, README.md and `npm test` (package.json has \"test\": \"node --test\"). The only function it names, `loadConfig`, exists. The descriptions match the code: loadConfig is `JSON.parse(readFileSync(path, 'utf8'))`, app.js prints `bad config: ${error.message}` and exits 1, DEFAULTS has port 8080, the test file only checks for a SyntaxError, and README documents the exit-1 behaviour. The Node 22 example also checks out. In the sample file, `g` sits at character 20, line 3 column 3, which fits the quoted V8 message. The issue says correctly that Node, not the code, supplies the line and column. No file or script that doesn't exist is presented as real.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the output handles each one. (1) The first expect line says stderr must contain \"the exact path `<tmp>/config.json`\" and must give line 3 and column 3, checked with /line 3,? column 3|:3:3/. That covers both the file path and where the mistake is. (2) The return-{} fix is not an expect line. It is rejected in assumptions (\"I did not adopt the suggested fix... It would hide the broken file\") and in non_goals (\"Falling back to {} or DEFAULTS when the config is invalid; the app must still refuse to start\"). (3) The first expect line requires that the app \"exits with status 1, prints nothing to stdout\". The second expect line requires that loadConfig \"throws (it does not return a value)\". Together they keep a bad config failing instead of starting on defaults.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the issue against both must_not items. (1) None of the expect lines makes loadConfig return {}. The second one says loadConfig \"throws (it does not return a value)\", and its proof exits with code 2 and prints RETURNED if the function returns anything. (2) The issue doesn't let the app start on defaults. The outcome says the app \"still refuses to start (exit 1)\", the first expect line requires exit status 1, and the non_goals rule out \"Falling back to {} or DEFAULTS when the config is invalid\". The assumptions also say plainly that the suggested return-{} fix was not adopted. Neither forbidden behaviour appears anywhere in the output.",
+      "cached": true
+    }
+  }
+}

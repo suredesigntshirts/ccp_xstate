@@ -1,0 +1,235 @@
+{
+  "run": "planted-half-met-2:0.challenge",
+  "item": "planted-half-met-2",
+  "name": "0.challenge",
+  "invoke": "challenge",
+  "actor": "challenge",
+  "workflow": "intake@ddf8f03f131ff62bc64c3f427f7f1e11158325d0242a571833c5343936a809c5",
+  "root": "/home/user/ccp_xstate/bench/challenge/runs/variant-good-faith/planted-half-met.2",
+  "session": "bench",
+  "release": "0.0.0",
+  "state": null,
+  "input": {
+    "task": "Read the request and the issue, then the repository. Write down what a correct pull request must do for the request, before you read the expect lines closely. Then, for each expect line, try to build a wrong pull request that meets it: one that satisfies its words while missing the request (a half-met rule the repository already breaks, a fix that hides the symptom, a change with no regression test), one that two readers would grade differently, or one whose proof only shows after merge. Check every assumption against the request: an assumption that changes what was asked fails the line that rests on it. Last, try for one wrong build that meets every line at once.",
+    "request": {
+      "url": "https://github.com/o/strutil/issues/7",
+      "text": "Invoice numbers need zero padding (42 -> 00042). Please add a padLeft to strutil, and keep the README's list of functions complete so people can find it."
+    },
+    "issue": {
+      "url": "https://github.com/o/strutil/issues/7",
+      "title": "Add padLeft for zero-padded invoice numbers",
+      "problem": "strutil has no way to pad a string on the left, so invoice numbers like 42 cannot be shown as 00042.",
+      "reason": "Invoices need fixed-width numbers.",
+      "outcome": "padLeft pads strings on the left and is documented.",
+      "expect": [
+        "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters, so padLeft(\"42\", 5, \"0\") is \"00042\"",
+        "padLeft returns s unchanged when s is already width characters or longer",
+        "README.md has a section for padLeft",
+        "npm test passes"
+      ],
+      "proofs": [
+        {
+          "line": "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters, so padLeft(\"42\", 5, \"0\") is \"00042\"",
+          "proof": "run",
+          "how": "node -e with require(\"./index.js\")"
+        },
+        {
+          "line": "padLeft returns s unchanged when s is already width characters or longer",
+          "proof": "run",
+          "how": "node -e"
+        },
+        {
+          "line": "README.md has a section for padLeft",
+          "proof": "read",
+          "how": "README.md"
+        },
+        {
+          "line": "npm test passes",
+          "proof": "run",
+          "how": "npm test"
+        }
+      ],
+      "non_goals": [],
+      "assumptions": []
+    }
+  },
+  "schema": {
+    "rules": [
+      "You are the challenger. Your job is to break an issue before anyone builds it: you look for a pull request that would meet every expect line and still be wrong. You did not write the issue, and the writer's reasoning is not yours to rely on.",
+      "Read the repository to find real ways a build could go wrong; change nothing. Write no code, commits, branches, pull requests or comments.",
+      "FAIL a line when a wrong build meets it, when two careful readers could check it at the same commit and disagree, or when it can only be checked after merge. PASS a line only when you tried to break it and could not.",
+      "If a wrong build meets every line, a line is missing: FAIL the line nearest to what that build gets wrong, and say in its evidence which line is missing.",
+      "Do not FAIL a line for style, wording you would prefer, a stricter test its words do not need, or a wrong build only a builder set on gaming the line would make (a skipped test, deleting what the request did not touch); FAIL for the mistakes and shortcuts a careful builder could make in good faith.",
+      "Return once every expect line has an entry."
+    ],
+    "inputs": {
+      "task": "The challenger's job, fixed in the workflow. It fills the Task part.",
+      "request": "What was asked: url is where it came from and text is its words. The issue must deliver what the text asks, no less and no more.",
+      "issue": "The issue to challenge: title, problem, reason, outcome, expect (the acceptance lines), proofs (how each line is to be checked: run, ci or read), non_goals and assumptions. The expect lines are what you judge."
+    },
+    "type": "object",
+    "required": [
+      "result",
+      "lines",
+      "wrong_build"
+    ],
+    "properties": {
+      "result": {
+        "enum": [
+          "PASS",
+          "FAIL"
+        ],
+        "description": "PASS only if every entry in lines is PASS; otherwise FAIL."
+      },
+      "lines": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "$ref": "#line"
+        },
+        "covers": "issue.expect",
+        "description": "One entry per expect line, in order: { line: the expect line copied exactly, result: PASS or FAIL, evidence: for FAIL, the wrong build that meets it, the two readings, or why it can only be checked after merge; for PASS, the strongest wrong build you tried and why the line catches it }. The host refuses a result that misses a line, adds one, puts them out of order, or whose result disagrees with these entries."
+      },
+      "wrong_build": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The strongest pull request you found that meets every expect line and is still wrong against the request, the problem or the outcome, and what it gets wrong; or, if you found none, the closest you came and which line stopped it."
+      }
+    }
+  },
+  "defs": {
+    "request": {
+      "type": "object",
+      "required": [
+        "url",
+        "text"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "shaped": {
+      "type": "object",
+      "required": [
+        "title",
+        "problem",
+        "reason",
+        "outcome",
+        "expect",
+        "proofs",
+        "non_goals",
+        "assumptions"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "problem": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expect": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "proofs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#proof"
+          }
+        },
+        "non_goals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "proof": {
+      "type": "object",
+      "required": [
+        "line",
+        "proof",
+        "how"
+      ],
+      "properties": {
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proof": {
+          "enum": [
+            "run",
+            "ci",
+            "read"
+          ]
+        },
+        "how": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "line": {
+      "type": "object",
+      "required": [
+        "line",
+        "result",
+        "evidence"
+      ],
+      "properties": {
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "repo": "/tmp/bench-planted-half-met-2-guSUnX/repo",
+  "github": "o/strutil",
+  "worktrees": "/tmp/bench-planted-half-met-2-guSUnX/wt",
+  "worktree": "/tmp/bench-planted-half-met-2-guSUnX/wt/planted-half-met-2--0.challenge",
+  "branch": "run/planted-half-met-2/0.challenge",
+  "briefHash": "29b338342b27fba1f165d1216d2bbe6ecac4e18ecc097d0c9c5f3d1413e5b7ab",
+  "context": "Run planted-half-met-2:0.challenge, worktree /tmp/bench-planted-half-met-2-guSUnX/wt/planted-half-met-2--0.challenge of https://github.com/o/strutil, branch run/planted-half-met-2/0.challenge."
+}

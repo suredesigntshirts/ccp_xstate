@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "73696bd9e28770faf6a8ee80ac68b10d6156c9bb0accc0fde74e56431c5cdfb4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I read all five expect lines and the problem field. None of them prescribes a technique, an internal function or how the code should be written. Each expect line checks behaviour you can observe: `Object.is(r,0)` prints true, non-empty averages print `2 5 0 1.5`, the export list is unchanged, `npm test` passes with a test on average([]), and the suite fails if the old `xs.reduce(...)/xs.length` body comes back. That last line names the current code only to check for a regression; it doesn't say how to write the fix. The return value 0 is something the request itself requires (\"An empty list should average to 0\"), so it's allowed. The problem field only says what is wrong: average([]) computes 0/0, prints NaN, and has no test. It doesn't suggest a fix. Choices the request leaves open, like returning 0 instead of throwing, are listed under assumptions.",
+  "model": "claude-opus-5-5",
+  "ms": 14264,
+  "tokens": {
+    "input": 2,
+    "output": 506,
+    "cacheCreation": 2977,
+    "cacheRead": 783,
+    "fresh": 3485,
+    "total": 4268
+  },
+  "at": "2026-11-05T07:26:50.263Z"
+}

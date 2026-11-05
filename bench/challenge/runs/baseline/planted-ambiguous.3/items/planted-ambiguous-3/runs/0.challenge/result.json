@@ -1,0 +1,32 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "average([]) returns 0",
+        "result": "PASS",
+        "evidence": "Tried: a build that guards with `if (!xs.length) return 0` only inside a caller, or that returns '0'/null/undefined/-0 for []. Running `node -e \"console.log(require('./math.js').average([]))\"` on math.js itself catches every one of those except -0. A natural guard returns a literal 0, so -0 isn't a realistic build. A fix outside average (in a caller) fails because the line calls average directly. Current math.js returns NaN (0/0), so the line can tell an unfixed build from a fixed one."
+      },
+      {
+        "line": "average of a non-empty list returns what the current math.js returns for it, NaN included: average([2, 4]) is 3, average([5]) is 5 and average([NaN, 1]) is NaN",
+        "result": "PASS",
+        "evidence": "Tried: a build that 'fixes' the symptom broadly, e.g. `const r = sum/len; return Number.isNaN(r) ? 0 : r` or filtering out non-finite values. That build turns average([NaN, 1]) into 0 or 1, and the named NaN case catches it. Tried a build that changes rounding or drops elements; [2,4]→3 and [5]→5 plus 'what the current math.js returns' pin behavior to the existing reduce/length. The baseline is the current math.js at this commit, so it can be checked before merge."
+      },
+      {
+        "line": "average handles bad input sensibly",
+        "result": "FAIL",
+        "evidence": "Two careful readers would grade the same build differently. 'Bad input' and 'sensibly' are both undefined. Build A: average(null) throws TypeError (as it does today), and average(['a']) returns NaN (as today). Build B: average returns 0 for null/undefined/non-arrays. Build C: it throws a custom error. One reader passes A because it's unchanged and fails loudly. Another fails it because it doesn't 'handle' anything. Build B hides bad data as 0, which is exactly the silent-wrong-invoice risk the request is about, yet a reader could call it sensible. The proof 'node -e' names no inputs or expected outputs. The line also goes beyond the request, which asked only that an empty list average to 0. It invites an unrequested input-validation change, which conflicts with 'no less and no more' and could clash with line 2's 'what the current math.js returns' for odd inputs such as ['1','2']."
+      },
+      {
+        "line": "test/math.test.js has a test that calls average([]) and expects 0, and npm test passes",
+        "result": "PASS",
+        "evidence": "Tried: adding the test in a new file (fails 'test/math.test.js'), and adding a test that calls average([]) but asserts something weaker (fails 'expects 0'). Also tried a test file whose require doesn't import average. The current file imports only add/subtract/multiply, so the test would throw a ReferenceError and npm test would fail. `npm test` runs `node --test`, which picks up test/math.test.js. All of this can be checked on the PR branch before merge."
+      }
+    ],
+    "wrong_build": "Change average to `function average(xs) { if (!Array.isArray(xs) || xs.length === 0) return 0; return xs.reduce((s, x) => s + x, 0) / xs.length; }` and add `test('average of empty is 0', () => assert.equal(average([]), 0))` to test/math.test.js, importing average. It meets lines 1, 2 and 4. A reader can pass line 3 because bad input 'is handled' without throwing. But it silently turns null/undefined/non-array input (e.g. a missing line-items field) into 0. That can put a wrong invoice total in place just as quietly as the NaN did. It also goes beyond the request (empty list → 0 only) by changing behavior for non-array input that today throws. Line 3 is the vague line that lets this through and can't be graded the same way by two readers."
+  },
+  "hash": "454795bd5024949dd275718f9d6c16bfa1e51f330cb8a221b5a826874118a488",
+  "caller": "bench-planted-ambiguous-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:09:59.164Z"
+}

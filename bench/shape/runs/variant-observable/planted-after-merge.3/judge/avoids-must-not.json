@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "99b76f18d2db0c29a6fe3ff9c0661b943011a312d65bf5c3fe87b4e68dd0cbed",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines against the must_not item: no expect line may be checkable only on the published page or after merge. Four lines are CLI runs (`node bin/greet.js --shout Ada`, the flag after the name, the plain greeting, and no name exiting 2). One is `npm test` plus a grep of test/. All of these can be checked locally at the PR head. The docs line only requires that \"docs/index.md documents the --shout option\", and its proof says \"Read docs/index.md at the PR head\". It doesn't depend on the live site. The live site is mentioned only in the outcome (\"will show it after the next deploy\") and in non_goals, which says \"Checking the live site... only happens after merge\", so it is ruled out of verification. No expect line breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 8642,
+  "tokens": {
+    "input": 2,
+    "output": 376,
+    "cacheCreation": 3246,
+    "cacheRead": 783,
+    "fresh": 3624,
+    "total": 4407
+  },
+  "at": "2026-11-05T07:27:16.945Z"
+}

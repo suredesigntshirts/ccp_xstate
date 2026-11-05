@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-shout.2",
+  "case": "clean-shout",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": false,
+      "why": "FAIL, where the case expects PASS"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": false,
+      "why": "line 3 not PASS: \"The request says to document --shout 'next to the existing usage'. This line does not ask for the existing usage to stay. Wrong build: replace the current block\""
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for every line. Each PASS names concrete wrong builds and says why the line catches them. Line 1 names a build hardcoded for Ada and one with partial upper-casing: the general <name> catches the first and the HELLO, ADA! example catches the second. Line 2 names a build that upper-cases every greeting and one that deletes the 'cli' test, and running the command catches both. Line 4 names a test that only calls a helper and one that asserts only the substring; the line's wording and the read proof catch both. The one FAIL, line 3, names a concrete wrong build that replaces the existing usage block with only --shout, and gives two readings. Every repository claim checks out: bin/greet.js skips `--` arguments, the 'cli' test exists in test/greet.test.js, package.json's test script is `node --test`, docs/index.md has the content quoted, and the docs are published from docs/.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "The must_catch item says every expect line must PASS, with evidence that names the wrong build tried. Three lines meet this. Line 1 tries a hardcoded-Ada build and a partial-casing build. Line 2 tries a build that upper-cases every greeting and one that deletes the cli test. Line 4 tries a helper-only test and a test that only checks the output includes 'ADA'. The docs line breaks it: it is marked \"FAIL\", and the overall result is \"FAIL\". The output argues that replacing the existing usage block with only the --shout usage would satisfy \"documents the --shout option with an example\" while losing the existing usage. The case expects that line to PASS, so the output fails the criterion. It names the wrong builds it tried, but not every line passes.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The output has one FAIL, on the docs line. I checked whether it is based on wording, style or a stricter test than the line needs. It is not. The FAIL comes from a real gap between the request and the line. The request says to document --shout \"next to the existing usage\", but the line only asks that docs/index.md \"documents the --shout option with an example\". The wrong build replaces the plain `node bin/greet.js <name>` usage with only the --shout example. That build meets the expect line but drops what the request asked to keep, so it is a substantive wrong build. The second wrong build, an example with the wrong output, is extra support and does not carry the FAIL. The three PASS lines raise no extra demands. No FAIL depends on phrasing or style.",
+      "cached": true
+    }
+  }
+}

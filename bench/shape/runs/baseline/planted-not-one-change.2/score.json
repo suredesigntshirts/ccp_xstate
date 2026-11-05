@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-not-one-change.2",
+  "case": "planted-not-one-change",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "blocked, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case expects blocked"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "The output is a \"blocked\" answer, so it has no expect lines that could prescribe a fix and no problem field that could describe one. The blocked reason states the actual situation: the request \"is a question\", it \"does not ask for any change\", and it \"needs an answer from a maintainer\". It names possible changes (\"migrate mathlib to ES modules\", \"document why we use CommonJS\") only as separate requests the asker could file later. It doesn't present either as the fix this issue requires. Nothing in the output sets a technique, internal function or return value as a requirement, so the criterion holds for the whole output.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the output for expect lines and proof entries. It has none, because it answers \"blocked\": it says issue #11 \"is a question\" and \"does not ask for any change to the repository.\" Since there are no expect lines, none of them can depend on a release, a deploy, a published page or anything else that exists only after merge. None can be ambiguous to check at the PR head either. Blocking is also the right call: the request only asks why mathlib uses CommonJS, so there is nothing to build or verify. The criterion therefore holds for the whole output, although only because there is nothing in it to fail.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The output is a \"blocked\" answer, so it names no files, scripts or functions that might be missing. Its only claim about the repository is that mathlib uses CommonJS rather than ES modules, and the code confirms that: math.js uses `module.exports = { add, subtract, multiply }`, the test file uses `require`, and package.json has no `\"type\": \"module\"`. Its mentions of \"migrate mathlib to ES modules\" and \"document why we use CommonJS\" are only examples of possible future requests, not claims that anything exists. Nothing in the output gets the repository wrong, so the criterion holds.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: the stage has to answer blocked and say the request is a question that asks for no change. The output is a \"blocked\" object. Its reason says \"The request (issue #11) is a question\" and \"It does not ask for any change to the repository\", and it names possible changes it doesn't ask for (migrating to ESM, dual-package output, documentation). It also says there is nothing for a builder to build or a verifier to check. So the one trap is caught, and nothing else in the output works against it.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. The case's only must_not item is an issue that converts mathlib to ES modules or makes up some other change. The output files no issue at all. It answers \"blocked\" and explains that the request \"is a question\" and \"does not ask for any change to the repository.\" It brings up \"migrate mathlib to ES modules\" only as an example of something that \"should be filed as its own request,\" not as work to do. Nowhere does it turn the question into a migration or invent a change.",
+      "cached": true
+    }
+  }
+}

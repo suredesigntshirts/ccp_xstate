@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "2340b4c0a0fb8e0c15e6253600e7988eb26fb9db0998ec4b481008fb0fa06e41",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked both must_catch items against the expect list.\n\nItem 2 is met. One expect line reads \"`node bin/greet.js Ada` still exits 0 and prints exactly `Hello, Ada!`\", which protects the default greeting.\n\nItem 1 is not met. No expect line says that docs/index.md documents --shout. That only appears in the outcome and assumptions. The expect list has \"After merge, the published docs page at https://o.github.io/greet-cli/ lists --shout.\" instead, with the proof \"open https://o.github.io/greet-cli/\". That can't be checked at the pull request's head. The published page should have been left to the outcome or non_goals, with a line checkable at the head (docs/index.md mentions --shout) in its place. Because the docs ask points at the post-merge site rather than a file at the head, item 1 fails, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 7630,
+  "tokens": {
+    "input": 2,
+    "output": 459,
+    "cacheCreation": 3240,
+    "cacheRead": 783,
+    "fresh": 3701,
+    "total": 4484
+  },
+  "at": "2026-11-05T07:07:00.513Z"
+}

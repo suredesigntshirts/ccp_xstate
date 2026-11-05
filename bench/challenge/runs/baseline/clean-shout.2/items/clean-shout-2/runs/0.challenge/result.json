@@ -1,0 +1,32 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "Tried a build that hardcodes the output for Ada, and one that upper-cases only part of the output. The line says <name> in general, so a reader running it with another name catches the hardcoded build, and the HELLO, ADA! example catches partial casing. bin/greet.js already skips any argument starting with -- when it looks for the name, so a correct build only has to detect the flag; the order of flag and name is not a trap."
+      },
+      {
+        "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "result": "PASS",
+        "evidence": "Tried a build that upper-cases every greeting, and one that deletes the existing 'cli' test in test/greet.test.js. Running node bin/greet.js Ada shows the first one is wrong, and this line checks behaviour by running the command, so deleting the test does not hide a regression."
+      },
+      {
+        "line": "docs/index.md documents the --shout option with an example",
+        "result": "FAIL",
+        "evidence": "The request says to document --shout 'next to the existing usage'. This line does not ask for the existing usage to stay. Wrong build: replace the current block in docs/index.md (`node bin/greet.js <name>` / Prints `Hello, <name>!`) with only `node bin/greet.js --shout <name>` and its output. That documents --shout with an example and meets the line, but the plain usage is gone. A second wrong build adds a --shout example that shows the wrong output, such as `Hello, ADA!`, or puts it somewhere unrelated in the file. One reader would pass these because an example exists; another would fail them because they don't match the request. The missing requirement: the existing usage must stay, the --shout usage must sit next to it, and the example must show HELLO, <NAME>!."
+      },
+      {
+        "line": "npm test passes and includes a test that runs node bin/greet.js --shout Ada and asserts it prints HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "Tried a test that only calls a src helper such as shout('Ada') without running the CLI, and one that asserts only that the output includes 'ADA'. The line requires the test to run node bin/greet.js --shout Ada and to assert HELLO, ADA!, and the proof says to read the test, so both are caught. npm test runs `node --test`, which finds test/*.test.js on its own, so it works before merge."
+      }
+    ],
+    "wrong_build": "Add --shout to bin/greet.js correctly (upper-case greeting(name) when process.argv includes '--shout'). Add a test in test/greet.test.js that runs node bin/greet.js --shout Ada and expects 'HELLO, ADA!\\n'. In docs/index.md, replace the existing usage block with only the --shout usage and its example, so the plain `node bin/greet.js <name>` usage is removed. All four expect lines pass, but the request asked for the docs to sit next to the existing usage, and that usage is now gone from the published docs page."
+  },
+  "hash": "11a3ad70d3839d8e0254279bffeb2c9b553eea761fc4de4361d3363a887ffcb2",
+  "caller": "bench-clean-shout-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:09:12.283Z"
+}

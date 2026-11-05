@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "a1295a8ac97ca9525bd50acb8ac09b9bfd73bd563e3c4df1e543da5c682821b4",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Lines 2–4 meet the criterion. Line 2 names a `Number.isNaN(r) ? 0 : r` build that the [NaN, 1] case catches. Line 3's FAIL gives concrete competing builds A/B/C and readings of the line. Line 4 names a test in a new file, a weaker assert and a missing import, which correctly gives a ReferenceError. The files and `node --test` are real. Line 1's PASS evidence states behaviour that is wrong. It says running `node -e \"console.log(require('./math.js').average([]))\"` \"catches every one of those except -0\". In Node, `console.log('0')` prints `0`, the same as the number 0, so that command would not catch the string '0' build. `console.log(-0)` prints `-0`, so it would catch -0. The reason given for why the line catches the tried wrong builds is wrong, so the evidence is not fully grounded.",
+  "model": "claude-opus-5-5",
+  "ms": 13041,
+  "tokens": {
+    "input": 2,
+    "output": 945,
+    "cacheCreation": 3895,
+    "cacheRead": 783,
+    "fresh": 4842,
+    "total": 5625
+  },
+  "at": "2026-11-05T07:20:57.276Z"
+}

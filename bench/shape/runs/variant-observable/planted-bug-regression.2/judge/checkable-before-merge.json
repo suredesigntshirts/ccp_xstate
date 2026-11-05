@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "bd56aca402376ac03d17a49af1c1c21b8dfbf9c94a5eee10aae899394f3a0196",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all five expect lines and their proofs. Each one can be checked at the PR head before merge. Lines 1–3 are concrete `node -e` commands against `./math.js` that pass or fail by exit code, so they have one answer. Line 4 runs `npm test` at the head, expects exit 0, then uses grep plus a reading to confirm a test calls `average([])` and asserts 0. That is a clear check one reader can do. Line 5 swaps in `git show 088f4f4:math.js` at the head and expects `npm test` to fail. The base commit is already in the repo's history, so this needs nothing that only exists after merge. No line depends on a release, deploy, published page or package version, and \"Publishing a new package version\" is listed as a non-goal. Every proof is a run done at the head, so the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 9465,
+  "tokens": {
+    "input": 2,
+    "output": 519,
+    "cacheCreation": 3048,
+    "cacheRead": 783,
+    "fresh": 3569,
+    "total": 4352
+  },
+  "at": "2026-11-05T07:27:21.063Z"
+}

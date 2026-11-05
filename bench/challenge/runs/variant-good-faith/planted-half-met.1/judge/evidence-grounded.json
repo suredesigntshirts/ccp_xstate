@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "9fb963f43201a724f1f73b98e72d67b291d7f52eca858712d2e964f004ef8581",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Not met, because the 'npm test passes' FAIL is not grounded. Its wrong build \"adds padLeft and no test\", and the evidence says this \"proves nothing about padLeft\". It never shows how that build misses the request, which asks only for padLeft and a complete README, not for tests. The \"two readers could also disagree\" claim gives no real second reading of \"npm test passes\", since that line is unambiguous.\n\nThe other lines hold up:\n- The README FAIL is grounded. slugify really is exported but has no README section, and a build that only adds a padLeft section meets the line but misses the request.\n- The PASS for line 2 names a truncating build that the check would catch.\n- The PASS for line 1 names builds with a hard-coded fill or a '0' default, and how running without a fill catches them. It also relies on \"Node v22.23.4 supports require(esm)\", a runtime claim that is not a repository fact.",
+  "model": "claude-opus-5-5",
+  "ms": 12729,
+  "tokens": {
+    "input": 2,
+    "output": 914,
+    "cacheCreation": 3609,
+    "cacheRead": 783,
+    "fresh": 4525,
+    "total": 5308
+  },
+  "at": "2026-11-05T07:27:18.611Z"
+}

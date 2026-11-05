@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "8b5be78e4dd8fa67122f6fc73210384e4bf6f6ae4ef081f56d156bd25f3aad7f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the expect lines.\n\nItem 1 (CSV unchanged) is met. One expect line says \"Without the flag, CSV still works as before: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]`\". Another keeps the current tab output when the flag is absent. A third requires \"`npm test` exits 0\".\n\nItem 2 (--tsv output matches the CSV output for the same table) is met. The first --tsv line pins the table a/b, 1/2 to exactly `[{\"a\":\"1\",\"b\":\"2\"}]`. The CSV line pins that same table to the identical string. No line says \"same as CSV\" outright, but both outputs are fixed to the same exact JSON for the same table, so the match is enforced. The multi-row and comma-in-field lines add more cases on top of that.\n\nBoth items hold.",
+  "model": "claude-opus-5-5",
+  "ms": 6709,
+  "tokens": {
+    "input": 2,
+    "output": 586,
+    "cacheCreation": 3909,
+    "cacheRead": 783,
+    "fresh": 4497,
+    "total": 5280
+  },
+  "at": "2026-11-05T07:27:55.272Z"
+}

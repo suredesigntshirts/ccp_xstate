@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "6e857e4c252d5080780b62cd9b0664acd4206ab47d2b66d5b0c8089c0a16a053",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the issue against the 9 tracked files. Its claims about the repo all hold. No tracked file sits under `packages/`. README.md says \"No tools yet: `packages/` is empty\". The root `test` script in package.json echoes 'no workspaces under packages/' when nothing is under `packages/`. The issue's other references are real (README.md, CLAUDE.md's one-folder-per-tool rule, package-lock.json, `npm ci`, `npm test`) or things the issue asks to create: `packages/jsonl-lint`, its package.json and the `jsonl-lint` bin. `node_modules/.bin/jsonl-lint` comes from installing the new workspace. The issue names no invented scripts, functions or paths, and the problem describes the repo as it is.",
+  "model": "claude-opus-5-5",
+  "ms": 13695,
+  "tokens": {
+    "input": 2,
+    "output": 808,
+    "cacheCreation": 12212,
+    "cacheRead": 783,
+    "fresh": 13022,
+    "total": 13805
+  },
+  "at": "2026-11-05T07:29:52.453Z"
+}

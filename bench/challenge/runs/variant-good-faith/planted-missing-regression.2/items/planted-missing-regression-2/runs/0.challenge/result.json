@@ -1,0 +1,22 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints a JSON array with one object per row, keyed by the header row",
+        "result": "FAIL",
+        "evidence": "The repo has test/csv.test.js with 'parse' and 'cli' tests run by `npm test`, but no expect line requires a test for --tsv. A careful builder could add `parse(input, process.argv.includes('--tsv') ? '\\t' : ',')` in bin/csv2json.js, check it once by hand and add no test. That passes this line's one-off `printf ... | node bin/csv2json.js --tsv` proof, and nothing stops the flag from regressing later. A missing line is needed, for example: test/csv.test.js has a test that runs bin/csv2json.js --tsv on tab-separated input and checks the JSON, and `npm test` passes, so existing CSV behaviour stays covered. The proof `how` is also just `printf ...`, with no input or expected output. So a build that splits on /[\\t,]/ under --tsv, which breaks TSV fields containing commas, meets the line if the grader's sample has no commas. Two graders using different samples could grade the same commit differently."
+      },
+      {
+        "line": "README.md documents --tsv",
+        "result": "PASS",
+        "evidence": "I tried a README that only says the flag exists without showing how to use it. Any wording that names --tsv and says it reads tab-separated input meets the request's need for documentation, and a reader can check it at the PR commit. A README with no --tsv mention fails. I found no good-faith wrong build that this line lets through."
+      }
+    ],
+    "wrong_build": "In bin/csv2json.js, pass '\\t' to the existing parse(text, sep) when process.argv includes '--tsv', and add one README line showing `node bin/csv2json.js --tsv < table.tsv`. Add no test to test/csv.test.js. Every expect line is met: the printf run prints the right JSON and the README documents the flag. But the new behaviour has no regression test in the repo's existing node --test suite, so a later change, such as argument parsing that drops the flag or a parse change, could silently break --tsv. A variant splits on /[\\t,]/ under --tsv and is wrong for TSV fields containing commas; it gets past the unspecified printf sample."
+  },
+  "hash": "5f7f04685a2efa3c4275edf1ddb3521f12ffe5fc6ae2fc46bc6897f33b66b850",
+  "caller": "bench-planted-missing-regression-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:25:41.507Z"
+}

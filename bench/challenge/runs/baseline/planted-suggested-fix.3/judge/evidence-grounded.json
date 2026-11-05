@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "085011bd5166850ed09b46cbb3df01e3e48ac30927dea819b07ea149b7fbfdba",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds: the output has two FAIL lines and no PASS lines, and each FAIL names a concrete wrong build. Line 1: wrapping JSON.parse in try/catch and returning {} meets the line. But app.js then merges {} into DEFAULTS and prints \"listening on 8080\" with no error, so the typo is hidden. That misses the request's \"can't tell which file is broken or where.\" Line 2: deleting the \"bad JSON throws\" test lets npm test pass with nothing checking that the file path or error position is reported. I checked every citation against the repository and all are real: test/config.test.js:15 is the SyntaxError test, the README promises \"bad config: <message>\" and exit 1, app.js's DEFAULTS sets port 8080, and the spread merge behaves as described.",
+  "model": "claude-opus-5-5",
+  "ms": 6541,
+  "tokens": {
+    "input": 2,
+    "output": 587,
+    "cacheCreation": 3278,
+    "cacheRead": 783,
+    "fresh": 3867,
+    "total": 4650
+  },
+  "at": "2026-11-05T07:21:35.134Z"
+}

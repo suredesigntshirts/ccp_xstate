@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "377408344c2c37f25d4207518353431895ba82b0eb4c08f1c2ee6c280231d767",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against every expect line. Item 1: the README line says \"Every function index.js exports (capitalize, slugify, truncate, padLeft) has its own `## name(` section heading\". It names slugify outright, and its proof checks every function index.js exports. A build that only adds a padLeft section fails it. Item 2: no expect line says how padLeft must work. The lines only check exports, return values ('00042' for string and number input, no cutting when the input is already at or over the width), README sections, tests and `npm test`. padStart only comes up in the assumptions, which say \"How padLeft is implemented (for example with String.prototype.padStart) is up to the builder\". The default fill is also left to the builder and \"not checked\". Neither forbidden thing appears anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 6221,
+  "tokens": {
+    "input": 2,
+    "output": 368,
+    "cacheCreation": 3525,
+    "cacheRead": 783,
+    "fresh": 3895,
+    "total": 4678
+  },
+  "at": "2026-11-05T07:07:52.884Z"
+}

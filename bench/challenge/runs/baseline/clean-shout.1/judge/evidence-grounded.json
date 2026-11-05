@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "5e049239a5cf72ac33a43aab353e43e752516f5cad0f925eff578832200b8e8a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the evidence for all four lines and the summary wrong build against the repository. Every PASS names wrong builds that were tried and says how the line catches them:\n- Line 1 tries ignoring --shout, upper-casing only the name, and hard-coding Ada. The run proof catches the first two, and the line's \"<name>\" wording catches the third. Its claim that the existing parser takes the first argument not starting with \"--\" matches bin/greet.js.\n- Line 2 relies on the existing 'cli' test, which really does assert 'Hello, Ada!\\n' in test/greet.test.js.\n- Line 4 tries a test of src/greet.js only, a test with no assertion, and a skipped test. Its claim that pages.yml only publishes docs is correct.\n\nThe one FAIL (line 3) names a concrete wrong build: replace the usage block in docs/index.md, or show the wrong example output. It explains why that meets the line yet misses \"next to the existing usage.\" The summary wrong build only cites real files. Nothing is invented.",
+  "model": "claude-opus-5-5",
+  "ms": 17013,
+  "tokens": {
+    "input": 2,
+    "output": 831,
+    "cacheCreation": 3968,
+    "cacheRead": 783,
+    "fresh": 4801,
+    "total": 5584
+  },
+  "at": "2026-11-05T07:20:27.472Z"
+}

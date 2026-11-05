@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-average.2",
+  "case": "clean-average",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "PASS, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 3 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds: all three lines are PASS, and each one names a wrong build that was tried and says why the line catches it.\n- Line 1: tries returning the string '0' or '0.00' (rejected if \"returns 0\" means the number 0), -0 (judged not wrong) and turning every NaN into 0 (stopped by line 2).\n- Line 2: tries `Number.isNaN(r) ? 0 : r`, which the \"average([NaN, 1]) is NaN\" example catches, plus rounding builds that break the \"current math.js\" rule.\n- Line 3: tries a test that never calls average([]), a fix with no test and test.skip, and says the line's wording rejects each.\n\nThe repository facts it cites are real. math.js computes reduce/xs.length, so [] gives NaN. test/math.test.js imports only add, subtract and multiply, and uses node:assert/strict. package.json runs `node --test`. There are no FAIL lines to check.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion is met. The single must_catch item asks that every line PASS with evidence naming the wrong build that was tried. I checked all three lines. Line 1 is PASS and names the builds it tried: \"returning the string '0' or '0.00'\", \"returning -0\" and \"catching every NaN result and turning it into 0\". Line 2 is PASS and names \"`const r = sum/len; return Number.isNaN(r) ? 0 : r`\". It also names rounding and a different summing loop. Line 3 is PASS and names \"a test that never calls average([])\", \"a fix with no test at all\" and a test.skip build. The overall result is also PASS. Every line is PASS and each one's evidence names a concrete wrong build, so the item holds across the whole output.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list bans one thing: a FAIL given for wording, for style, or for a stricter test than the words need. I checked every result in the output. All three lines are marked PASS, and so is the overall result. Because there is no FAIL anywhere, the output cannot have given a FAIL for wording or style. The output does point out ambiguities, such as \"If 'returns 0' is read as the number 0\" and test.skip being arguable. In each case it settles on the natural reading and still marks the line PASS, so it never asks for a stricter test than the words need. The criterion holds across the whole output.",
+      "cached": true
+    }
+  }
+}

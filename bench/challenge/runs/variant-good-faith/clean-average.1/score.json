@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-average.1",
+  "case": "clean-average",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "PASS, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 3 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three PASS verdicts, and each names a concrete wrong build and the check that catches it. Line 1 tried returning `undefined`, `null` or `'0'`, and \"returns 0\" shown by `node -e` catches them. Its NaN-to-0 masking build is correctly handed to line 2. Line 2 names `/xs.length || 0`, filtering non-finite entries, and dropping the reduce initial value. `average([NaN, 1])` is NaN, `[2,4]`→3 and `[5]`→5 catch them. Line 3 names a test added without the fix, which makes npm test fail. It also names a test that only checks `!isNaN`, which does not \"expect 0\". The repository facts it cites are real: test/math.test.js does not import average, package.json runs `node --test`, which finds `*.test.js`, and strict `equal` uses Object.is. No line is FAIL, so the FAIL-evidence rule does not apply.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch item says every line must PASS, and each line's evidence must name a wrong build that was tried. I checked all three lines and each one meets it. Line 1 is \"PASS\". It names the NaN-masking build (\"`|| 0` or `Number.isNaN(r) ? 0 : r`\") and builds that return undefined, null or '0'. Line 2 is \"PASS\". It names three wrong builds: the NaN-masking fallback, filtering out non-finite entries, and dropping the reduce initial value. Line 3 is \"PASS\". It names \"a build that adds the test but not the fix\" and a test that only checks `!isNaN`. The overall result is also PASS, and the wrong_build field explains why no wrong build got through. No line fails, and none is missing evidence about a wrong build.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I looked through every line in the output for a FAIL result. All three expect lines are marked PASS, and the overall result is PASS. Since nothing is marked FAIL, there can't be a FAIL for wording, style, or a stricter test than the words need. The evidence also stays within what each line says. Line 1 rejects undefined/null/'0' only because the line says \"returns 0\". Line 3 relies on assert/strict's Object.is, which matches \"expects 0\". The wrong_build section is \"None found\" and lists close candidates without turning them into FAILs. So the only item on the must_not list is not broken anywhere in the output.",
+      "cached": false
+    }
+  }
+}

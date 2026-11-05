@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "e3a9ac5c3d563c5c5dbb1eb3fbcef4c55cff2743427a403677efc8fea8970c09",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every name in the issue against the 9 tracked files. These exist: `.github/workflows/test.yml` (its workflow and job are both called `test`), `README.md` with a \"What is here\" section, the root `npm test` script and `npm ci` with the lockfile. Everything under `packages/jsonl-lint` (the package.json, `bin/jsonl-lint.js`, the tests) is new, and the request asks for it. The problem's facts hold: `packages/` doesn't exist because no tracked file sits under it, and the README quote \"No tools yet: `packages/` is empty\" matches the file word for word. Nothing in the repo checks JSONL. The `node --test` and node:test claims match CLAUDE.md. No part of the issue names a missing file or command, or describes the repo wrongly.",
+  "model": "claude-opus-5-5",
+  "ms": 11433,
+  "tokens": {
+    "input": 2,
+    "output": 505,
+    "cacheCreation": 12267,
+    "cacheRead": 783,
+    "fresh": 12774,
+    "total": 13557
+  },
+  "at": "2026-11-05T07:29:55.499Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "61143be60756b689b01ed7f40a3b230dfb7934fad1e4fbd8fc52b8546100eeaf",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each line's evidence against the repo. Line 3's FAIL holds up: pages.yml really does deploy docs/ only on push to main, so the line can only be checked after merge. Line 2's PASS holds up too: it names a build that always uppercases, and both the run proof and the existing 'cli' test in test/greet.test.js would catch it. Line 1's FAIL breaks the criterion. Its wrong build (`argv.includes('--shout')` then toUpperCase) prints \"HELLO, ADA!\", so it does what the request asks. The only gap it names is a missing regression test: \"No line requires a regression test for --shout\". The request never asked for a test, so this is a new requirement, not a build that meets the line yet misses the request. The evidence also offers no two readings and no after-merge reason for this line.",
+  "model": "claude-opus-5-5",
+  "ms": 9323,
+  "tokens": {
+    "input": 2,
+    "output": 506,
+    "cacheCreation": 3537,
+    "cacheRead": 783,
+    "fresh": 4045,
+    "total": 4828
+  },
+  "at": "2026-11-05T07:26:45.617Z"
+}

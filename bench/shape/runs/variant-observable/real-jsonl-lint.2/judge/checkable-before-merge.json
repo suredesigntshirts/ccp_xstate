@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "3a895cfdbf6e242227a774bb95b4a83ed6dd6b5754d6f7ea75dd2181510e60b9",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all 11 expect lines and their proofs. Each one can be checked at the PR head before merge. Nine use `run` proofs: local commands such as `npm ci`, `npx --no-install jsonl-lint` on temp files made with `printf`, `grep` counts and exit codes, all with exact expected values (e.g. \"expect exit=1 and exactly the two lines `/tmp/bad.jsonl:2:` and `/tmp/bad.jsonl:4:`\"). The test-suite line also asks for \"the CI `test` check on the PR\", and that check runs on the PR before merge. Two lines use `read` proofs on package.json and README.md \"at the PR head\", with concrete things to look for (no `dependencies`, `\"type\": \"module\"`, the 'No tools yet' bullet gone). Nothing depends on publishing, a release, a deploy or a live page; publishing to npm is listed as a non-goal. The weakest line is \"a usage message\", which still has a clear check: exit 2 and stderr that isn't empty.",
+  "model": "claude-opus-5-5",
+  "ms": 7103,
+  "tokens": {
+    "input": 2,
+    "output": 544,
+    "cacheCreation": 5712,
+    "cacheRead": 783,
+    "fresh": 6258,
+    "total": 7041
+  },
+  "at": "2026-11-05T07:28:17.654Z"
+}

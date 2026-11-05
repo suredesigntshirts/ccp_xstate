@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-after-merge.2",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for all three lines. Line 1 (PASS) names two concrete wrong builds, a hardcoded \"HELLO, ADA!\" and a version that upper-cases only the name (\"Hello, ADA!\"), and explains why the line catches each. Its claim that bin/greet.js skips args starting with '--' matches the code. Line 2 (PASS) names a build that makes shouting the default and shows that running Ada would catch it. It also cites the 'cli' test in test/greet.test.js, which exists and checks 'Hello, Ada!\\n'. Line 3 (FAIL) gives a concrete reason the line shows only after merge: pages.yml publishes docs/ only on push to main, and the README says so too. Both files are real, and the quoted README text is accurate. Its statement that docs/index.md doesn't mention --shout is also true. Every file and behaviour the output cites exists in the repository as described.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 has to FAIL because it can only be checked after merge, and the output has to point at pages.yml or the publish-on-push. The output gives line 3 \"FAIL\" and says \"This line can only be checked after merge.\" It cites \".github/workflows/pages.yml publishes docs/ to GitHub Pages only on push to main\" and quotes the README's \"published from `docs/` on every push to main\". It also explains that during review the live page still shows the old docs, and it suggests a checkable replacement: docs/index.md documents --shout. The wrong_build section repeats the point. The one required item is handled in full.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list forbids only one thing: a FAIL on lines 1 or 2. I checked each line's result in the output. Line 1 (\"--shout <name> prints ... in upper case\") is \"PASS\". Line 2 (\"without --shout still prints Hello, <name>!\") is \"PASS\". The only FAIL is on line 3, the published docs page line, which the must_not list does not forbid. The overall \"result\": \"FAIL\" comes from line 3 and is not a FAIL on lines 1 or 2. The output does nothing on the must_not list.",
+      "cached": true
+    }
+  }
+}

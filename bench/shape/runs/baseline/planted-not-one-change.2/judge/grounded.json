@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "f9fb590496c6f2141c3724c3d5efe8f8513bbfa7bb664e9ae43aed3d1d522549",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The output is a \"blocked\" answer, so it names no files, scripts or functions that might be missing. Its only claim about the repository is that mathlib uses CommonJS rather than ES modules, and the code confirms that: math.js uses `module.exports = { add, subtract, multiply }`, the test file uses `require`, and package.json has no `\"type\": \"module\"`. Its mentions of \"migrate mathlib to ES modules\" and \"document why we use CommonJS\" are only examples of possible future requests, not claims that anything exists. Nothing in the output gets the repository wrong, so the criterion holds.",
+  "model": "claude-opus-5-5",
+  "ms": 5295,
+  "tokens": {
+    "input": 2,
+    "output": 318,
+    "cacheCreation": 2173,
+    "cacheRead": 783,
+    "fresh": 2493,
+    "total": 3276
+  },
+  "at": "2026-11-05T07:29:37.259Z"
+}

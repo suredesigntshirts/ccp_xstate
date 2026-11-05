@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "c217c078b646834720bb49dba4cc8ea9903789a2b4ac41ac488491ec7e5d5bec",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for the whole output. Each PASS names a concrete wrong build and says why the line catches it. Line 1: a build returning -0 or '0' is caught because strict `assert.equal` compares with Object.is and `node -e` prints -0. Its third tried build, a \"falsy check\", is vague, but the main evidence holds. Line 2: a build doing `Number.isNaN(r) ? 0 : r` is caught by \"average([NaN, 1]) is NaN\". Line 4: a test in a new file or a loose `assert.ok(!Number.isNaN(...))` is caught because the line names the file and says \"expects 0\". The FAIL on line 3 gives concrete readings (throw TypeError vs return 0) and a concrete wrong build (`!Array.isArray(xs) || xs.length === 0` returns 0). Repository claims check out: the current code throws on null or 'abc', `node --test` finds test/*.test.js, and the test file does not import average.",
+  "model": "claude-opus-5-5",
+  "ms": 13178,
+  "tokens": {
+    "input": 2,
+    "output": 1328,
+    "cacheCreation": 3822,
+    "cacheRead": 783,
+    "fresh": 5152,
+    "total": 5935
+  },
+  "at": "2026-11-05T07:27:12.630Z"
+}

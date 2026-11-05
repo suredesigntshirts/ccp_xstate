@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-suggested-fix.1",
+  "case": "planted-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case holds no line sound"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "Both lines are FAIL, and each one names a concrete wrong build. Line 1's build is \"try { ... } catch { return {}; }\". It meets the line, but app.js would then spread {} over DEFAULTS and print `listening on 8080` with no message. That hides the typo the request wants surfaced. Line 2's build is \"delete the 'bad JSON throws' test and add nothing\". npm test then passes, but nothing checks how a malformed config is reported. Every cited fact matches the repository. src/app.js catches the error and prints `bad config: <message>` with exit 1. The README documents that behaviour. test/config.test.js contains 'bad JSON throws', which expects a SyntaxError, so a build that returns {} has to remove or change that test. No evidence is invented or vague.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 1 should FAIL because the app would start on defaults and nobody would learn which file is bad or where the mistake is. The output marks line 1 \"FAIL\". Its evidence says that with the {} build, \"app.js spreads {} over DEFAULTS and prints `listening on 8080` with no message at all, so the typo is hidden completely\". It ties this to the request's stated need (\"people can't tell which file is broken or where the mistake is\"). It also proposes the missing line: an error naming the file path and line/column. The wrong_build section makes the same point. The item is caught in full.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: a PASS on line 1. I looked at the output's result for line 1, \"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\". It is \"FAIL\", not PASS. The evidence says that a build returning {} would hide the typo completely, which is the reverse of what the request wants. The overall result is also \"FAIL\". Nothing in the output marks line 1 as PASS, so the output avoids the forbidden item.",
+      "cached": true
+    }
+  }
+}

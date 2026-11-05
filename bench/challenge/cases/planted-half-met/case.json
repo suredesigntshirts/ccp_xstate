@@ -1,0 +1,68 @@
+{
+  "kind": "planted",
+  "source": "Planted for wf-intake on the strutil seed: the README line names only padLeft, while the request asks for a complete list and slugify is already missing.",
+  "repo": {
+    "seed": "repo",
+    "message": "strutil: capitalize, slugify, truncate",
+    "origin": "https://github.com/o/strutil.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/o/strutil/issues/7",
+      "text": "Invoice numbers need zero padding (42 -> 00042). Please add a padLeft to strutil, and keep the README's list of functions complete so people can find it."
+    },
+    "issue": {
+      "url": "https://github.com/o/strutil/issues/7",
+      "title": "Add padLeft for zero-padded invoice numbers",
+      "problem": "strutil has no way to pad a string on the left, so invoice numbers like 42 cannot be shown as 00042.",
+      "reason": "Invoices need fixed-width numbers.",
+      "outcome": "padLeft pads strings on the left and is documented.",
+      "expect": [
+        "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters, so padLeft(\"42\", 5, \"0\") is \"00042\"",
+        "padLeft returns s unchanged when s is already width characters or longer",
+        "README.md has a section for padLeft",
+        "npm test passes"
+      ],
+      "proofs": [
+        {
+          "line": "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters, so padLeft(\"42\", 5, \"0\") is \"00042\"",
+          "proof": "run",
+          "how": "node -e with require(\"./index.js\")"
+        },
+        {
+          "line": "padLeft returns s unchanged when s is already width characters or longer",
+          "proof": "run",
+          "how": "node -e"
+        },
+        {
+          "line": "README.md has a section for padLeft",
+          "proof": "read",
+          "how": "README.md"
+        },
+        {
+          "line": "npm test passes",
+          "proof": "run",
+          "how": "npm test"
+        }
+      ],
+      "non_goals": [],
+      "assumptions": []
+    }
+  },
+  "result": "FAIL",
+  "must_fail": [
+    3
+  ],
+  "must_pass": [
+    1,
+    2,
+    4
+  ],
+  "trap": "README.md lacks a slugify section although index.js exports slugify; line 3 is met by a build that leaves the list incomplete, against the request.",
+  "must_catch": [
+    "Line 3 FAILs because a build adding only a padLeft section leaves slugify undocumented, while the request asks for a complete list."
+  ],
+  "must_not": [
+    "A FAIL on line 1, 2 or 4 for wording or a stricter test their words do not need."
+  ]
+}

@@ -1,0 +1,1 @@
+Run planted-half-rule-2:0.shape, worktree /tmp/bench-planted-half-rule-2-NNyJVg/wt/planted-half-rule-2--0.shape of https://github.com/o/strutil, branch run/planted-half-rule-2/0.shape.

@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-missing-regression.1",
+  "case": "planted-missing-regression",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case holds no line sound"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "The criterion is not met. The PASS evidence for line 2 falls short, though the FAIL evidence for line 1 is sound.\n\nThe FAIL evidence names concrete wrong builds that meet the line yet miss the request:\n- always calling `parse(input, '\\t')`, which breaks plain CSV;\n- splitting on `/[,\\t]/`, which splits TSV fields that contain commas.\n\nBoth are real. `parse(text, sep)` in src/parse.js accepts any separator, and the cited 'cli' test in test/csv.test.js exists.\n\nThe PASS evidence says it \"Tried a README that only names the flag or describes it wrongly.\" It never explains why \"README.md documents --tsv\" would catch that build. It only says that \"A README that leaves the flag out fails the line\", which is a different wrong build. A README that names `--tsv` or describes it wrongly arguably still \"documents --tsv\", so the PASS does not show the line catching the wrong build it tried.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The case's must_catch list has one item. It needs a FAIL result that names the missing line about CSV staying unchanged (or npm test still passing), backed by a wrong build that breaks CSV. The output's overall result is \"FAIL\", and the first line is marked FAIL. Its wrong build calls \"parse(input, '\\t') whether or not --tsv is given\", which \"breaks default CSV mode\". It also notes that \"no line requires `npm test` to pass\". It names the missing line: \"plain CSV without --tsv still gives the same output and npm test passes\". The wrong_build field repeats this as \"CSV without --tsv keeps its current output (npm test passes)\". So the one required item is fully covered.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: an overall PASS. I checked the output's top-level result, and it is \"FAIL\", not PASS. The second line did get a PASS (\"README.md documents --tsv\"), but that is a per-line verdict, and the item forbids only a PASS overall. The first line is FAIL, which fits: the output shows a wrong build that still meets the line, such as always splitting on '\\t' or splitting on /[,\\t]/, while CSV without the flag breaks. So the output does nothing on the must_not list.",
+      "cached": false
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "4a7146402a23e760010348642ecba03e56d4e8fa5387d88ee017038bc2ecf69c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Item 1: one expect line requires \"a `## name(...)` section heading for every function exported from index.js (including slugify and padLeft)\". It names slugify outright and goes beyond padLeft. Its proof checks every function export against the README. Item 2: expect lines pin the with-fill case: \"padLeft(42, 5, '0') returns the string '00042'\" and \"padLeft('7', 3, 'x') returns 'xx7'\". That makes the 42 -> 00042 zero padding checkable. The no-fill default is left to the builder in the assumptions, but the criterion accepts either the no-fill or the with-fill case. Both items are handled.",
+  "model": "claude-opus-5-5",
+  "ms": 10277,
+  "tokens": {
+    "input": 2,
+    "output": 643,
+    "cacheCreation": 3717,
+    "cacheRead": 783,
+    "fresh": 4362,
+    "total": 5145
+  },
+  "at": "2026-11-05T07:10:50.445Z"
+}

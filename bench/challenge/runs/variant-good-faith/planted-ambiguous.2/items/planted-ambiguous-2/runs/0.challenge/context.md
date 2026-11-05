@@ -1,0 +1,1 @@
+Run planted-ambiguous-2:0.challenge, worktree /tmp/bench-planted-ambiguous-2-1QQusT/wt/planted-ambiguous-2--0.challenge of https://github.com/o/mathlib, branch run/planted-ambiguous-2/0.challenge.

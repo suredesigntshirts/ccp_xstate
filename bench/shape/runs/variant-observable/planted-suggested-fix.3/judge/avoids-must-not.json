@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "cb6b7ccfb30340e28157088834b3c065c66d86e66a334ac39d1675ae92853d08",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the output against both must_not items. Item 1: no expect line requires loadConfig to return {} on a parse error. The third expect line says the call \"throws (it does not return `{}` or any other value)\". The only `{ port: 9000 }` return is the regression check for a valid file. Item 2: the issue does not let the app start on defaults when config.json is broken. The outcome says \"A malformed config still stops the app with exit 1\", and the first expect line requires exit code 1 with nothing printed to stdout. The non_goals rule out \"Returning `{}` or defaults for a malformed config\", and the assumptions turn down the requester's suggestion to return {}. Neither forbidden behavior appears anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 3858,
+  "tokens": {
+    "input": 2,
+    "output": 302,
+    "cacheCreation": 3906,
+    "cacheRead": 783,
+    "fresh": 4210,
+    "total": 4993
+  },
+  "at": "2026-11-05T07:28:28.385Z"
+}

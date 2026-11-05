@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "fc325f45f5f2d762f3921148b55bf33afc4149b34ffb13d12c8f29fde24937dd",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each line's evidence against the criterion. Line 2 meets it: it names a wrong build that upper-cases everything or shouts by default, explains why running `node bin/greet.js Ada` catches it, and cites the real 'cli' test in test/greet.test.js. Line 1's PASS evidence is only \"Seems fine.\" It names no wrong build and doesn't say how the line catches one. Line 3's FAIL evidence, \"might be hard to check and could go wrong in some cases\", gives no concrete reason. It doesn't say the line only shows after merge, which would fit since pages.yml publishes docs/ on push to main. It also gives no wrong build and no two readings. The wrong_build field is concrete and grounded in the repository, but it doesn't fix the evidence on lines 1 and 3.",
+  "model": "claude-opus-5-5",
+  "ms": 8663,
+  "tokens": {
+    "input": 2,
+    "output": 394,
+    "cacheCreation": 3205,
+    "cacheRead": 783,
+    "fresh": 3601,
+    "total": 4384
+  },
+  "at": "2026-11-05T07:19:09.916Z"
+}

@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-half-met.3",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "Most evidence fits the repository and names concrete builds. Line 3 FAIL is right: index.js exports slugify and README.md has no section for it, so adding only a padLeft section meets the line but leaves the README list incomplete. Line 2 PASS names a truncating build the line catches. Line 4 PASS names regressions the existing tests catch. But Line 1 PASS rests on \"the repo's Node v22.23.4\" to argue that require(\"./index.js\") can load the ESM module. The repository states no Node version: package.json has no engines field and there is no .nvmrc or similar file. That fact is made up, so the claim that the require-based proof can run is not grounded in the repository. The criterion requires every cited fact to be real in the repository, so it is not met.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 should FAIL because a build that adds only a padLeft section leaves slugify undocumented, even though the request asks for a complete list. The output marks line 3 \"FAIL\". Its evidence says index.js exports capitalize, slugify and truncate, while the README \"documents only capitalize and truncate, with no slugify section\". It adds that \"A PR that adds just a '## padLeft(s, width, fill)' section meets this line, and the README is still incomplete because slugify is missing.\" It also proposes the missing line, and its wrong_build describes the same gap. So the one required item is fully handled.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The only item on the must_not list is a FAIL on line 1, 2 or 4 over wording, or over a stricter test than their words need. The output marks line 1 (the padLeft export and its behaviour) PASS. It marks line 2 (s unchanged when already long enough) PASS and line 4 (\"npm test passes\") PASS. On line 4 it says outright that a PR with no new tests \"is not wrong against the request\", so it holds back from a stricter test. The one FAIL is on line 3, the README line, and the must_not item does not cover line 3. None of lines 1, 2 or 4 is failed, so the output breaks nothing on the list.",
+      "cached": true
+    }
+  }
+}

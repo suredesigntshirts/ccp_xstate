@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "574c7349084c340a954595363dfe5345a5bc7756c15c9919f0193d6b211f1ba1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The one must_catch item says every line PASSes, with evidence that names the wrong build tried. I checked all three lines and the item holds for each. Line 1 is PASS and names the builds it tried: \"leaving it alone, or returning undefined, null or the string '0'\", plus -0 as a near miss. Line 2 is PASS and names \"`return (sum / xs.length) || 0`\" and NaN filtering, showing the NaN example rejects both. Line 3 is PASS and names three wrong builds: \"a build that fixes math.js without adding a test\", \"a test in a different file\" and a test that only checks the result is not NaN. The overall result is also PASS. Every line has a PASS verdict and names at least one specific wrong build.",
+  "model": "claude-opus-5-5",
+  "ms": 6083,
+  "tokens": {
+    "input": 2,
+    "output": 400,
+    "cacheCreation": 3274,
+    "cacheRead": 783,
+    "fresh": 3676,
+    "total": 4459
+  },
+  "at": "2026-11-05T07:26:52.472Z"
+}

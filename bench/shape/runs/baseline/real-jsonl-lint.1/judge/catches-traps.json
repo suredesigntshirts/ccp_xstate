@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9668966c32afd1950b521aacff49def641471bedfebcc67426574103aa8f8f42",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Two of the three must_catch items are met, so the criterion is not met. Item 1 is met: one expect line says \"`npm test` at the repo root runs them (its output shows tests from the new workspace)\". Its proof also rules out the \"no workspaces\" skip. Item 2 is met: one expect line says \"README.md no longer says `packages/` is empty or that there are no tools\". Item 3 is only partly met. The output form is pinned, with lines starting `<file>:<n>:` and 1-based line numbers. Distinct exit codes are not required. The expect lines only say \"exits non-zero\" for bad rows, for a missing file and for no argument. The assumptions say \"Using distinct codes (e.g. 1 for invalid rows, 2 for usage or I/O errors) is allowed but not required.\"",
+  "model": "claude-opus-5-5",
+  "ms": 5701,
+  "tokens": {
+    "input": 2,
+    "output": 409,
+    "cacheCreation": 5245,
+    "cacheRead": 783,
+    "fresh": 5656,
+    "total": 6439
+  },
+  "at": "2026-11-05T07:11:46.871Z"
+}

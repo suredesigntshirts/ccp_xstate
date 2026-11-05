@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "012730da7554c6622369aedb245663fe5b1dd34f8ea0aa8e8182040bfa58a1e6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the output handles each one. (1) The expect lines require the path and the location. One says stderr \"contains the path F exactly as passed on the command line\". The next says stderr \"contains `line 3` and `column 3`\". (2) The return-{} fix is not an expect line. Non_goals rejects it: \"Making loadConfig swallow parse errors or return {}\". The assumptions also reject it, saying it would \"start the app on defaults and hide the typo\". An expect line even requires that loadConfig throws and \"does not return {}\". (3) A bad config must keep failing. The first expect line requires that the app \"exits with code 1, writes nothing containing `listening on` to stdout\". The outcome adds that the app stops \"without starting\".",
+  "model": "claude-opus-5-5",
+  "ms": 4891,
+  "tokens": {
+    "input": 2,
+    "output": 385,
+    "cacheCreation": 3774,
+    "cacheRead": 783,
+    "fresh": 4161,
+    "total": 4944
+  },
+  "at": "2026-11-05T07:11:17.476Z"
+}

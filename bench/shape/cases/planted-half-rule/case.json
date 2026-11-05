@@ -1,0 +1,24 @@
+{
+  "kind": "planted",
+  "source": "Planted for wf-intake on bench/brief's strutil seed: the request asks to keep the README's function list complete, which the repo already breaks.",
+  "repo": {
+    "seed": "repo",
+    "message": "strutil: capitalize, slugify, truncate",
+    "origin": "https://github.com/o/strutil.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/o/strutil/issues/7",
+      "text": "Invoice numbers need zero padding (42 -> 00042). Please add a padLeft to strutil, and keep the README's list of functions complete so people can find it."
+    }
+  },
+  "trap": "Half-met rule: index.js exports slugify, and README.md has sections only for capitalize and truncate. A complete README needs a slugify section too, so an issue whose README line names only padLeft lets a half-done build pass.",
+  "must_catch": [
+    "An expect line requires a README.md section for every function index.js exports (or names slugify explicitly), not only padLeft.",
+    "An expect line pins what padLeft does with no fill argument or with a fill, so the zero padding of 42 -> 00042 is checkable."
+  ],
+  "must_not": [
+    "A README expect line that a build adding only a padLeft section meets while slugify stays undocumented.",
+    "An expect line that dictates padLeft's implementation (for example that it must use String.prototype.padStart)."
+  ]
+}

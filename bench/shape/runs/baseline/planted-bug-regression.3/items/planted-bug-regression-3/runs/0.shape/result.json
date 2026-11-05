@@ -1,0 +1,66 @@
+{
+  "result": {
+    "issue": {
+      "title": "average([]) returns NaN instead of 0",
+      "problem": "In math.js, average(xs) is `xs.reduce((sum, x) => sum + x, 0) / xs.length`. For an empty array this computes 0 / 0, so `average([])` returns NaN. test/math.test.js does not import or test average at all (it covers only add, subtract and multiply), so nothing catches this. The README says these helpers are used by the invoice service, and a NaN from average([]) ended up in an invoice total.",
+      "reason": "NaN spreads through every calculation it touches. One empty list turned an invoice total into NaN. Money totals must stay finite numbers, and the requester says an empty list should average to 0.",
+      "outcome": "average([]) returns 0. Averages of non-empty lists come out exactly as before. A test in the repository's suite covers the empty-list case, so the bug cannot come back unnoticed.",
+      "expect": [
+        "`node -e \"const {average}=require('./math.js'); const r=average([]); if(!(r===0 && !Number.isNaN(r))) {console.error(r); process.exit(1)}\"` exits 0 (average([]) returns the number 0, not NaN).",
+        "For non-empty arrays, average returns exactly what it returns at base commit 47d473e: average([1,2,3]) === 2, average([2,4]) === 3, average([-1,1]) === 0, average([5]) === 5, and average([0.1,0.2]) === 0.15000000000000002.",
+        "average does not modify the array it is given: after `const a=[1,2,3]; average(a)`, a still deep-equals [1,2,3], and after `const e=[]; average(e)`, e.length is still 0.",
+        "math.js still exports exactly add, subtract, multiply and average, and add(2,3) === 5, subtract(5,3) === 2 and multiply(2,3) === 6 still hold.",
+        "The test suite under test/ includes a test that calls average([]) and asserts the result is 0. That test fails when run against the base commit's math.js.",
+        "`npm test` exits 0 at the pull request head, with 0 failing tests."
+      ],
+      "proofs": [
+        {
+          "line": "`node -e \"const {average}=require('./math.js'); const r=average([]); if(!(r===0 && !Number.isNaN(r))) {console.error(r); process.exit(1)}\"` exits 0 (average([]) returns the number 0, not NaN).",
+          "proof": "run",
+          "how": "From the repo root at the PR head, run: node -e \"const {average}=require('./math.js'); const r=average([]); if(!(r===0 && !Number.isNaN(r))) {console.error(r); process.exit(1)}\"; echo $?  — expect 0."
+        },
+        {
+          "line": "For non-empty arrays, average returns exactly what it returns at base commit 47d473e: average([1,2,3]) === 2, average([2,4]) === 3, average([-1,1]) === 0, average([5]) === 5, and average([0.1,0.2]) === 0.15000000000000002.",
+          "proof": "run",
+          "how": "node -e \"const {average:f}=require('./math.js'); const c=[[[1,2,3],2],[[2,4],3],[[-1,1],0],[[5],5],[[0.1,0.2],0.15000000000000002]]; for (const [i,o] of c) if (f(i)!==o) {console.error(i,f(i)); process.exit(1)}\"; echo $?  — expect 0."
+        },
+        {
+          "line": "average does not modify the array it is given: after `const a=[1,2,3]; average(a)`, a still deep-equals [1,2,3], and after `const e=[]; average(e)`, e.length is still 0.",
+          "proof": "run",
+          "how": "node -e \"const {average}=require('./math.js'); const a=[1,2,3]; average(a); const e=[]; average(e); require('assert').deepStrictEqual(a,[1,2,3]); require('assert').strictEqual(e.length,0)\"; echo $?  — expect 0."
+        },
+        {
+          "line": "math.js still exports exactly add, subtract, multiply and average, and add(2,3) === 5, subtract(5,3) === 2 and multiply(2,3) === 6 still hold.",
+          "proof": "run",
+          "how": "node -e \"const m=require('./math.js'); const k=Object.keys(m).sort().join(','); if(k!=='add,average,multiply,subtract'||m.add(2,3)!==5||m.subtract(5,3)!==2||m.multiply(2,3)!==6){console.error(k);process.exit(1)}\"; echo $?  — expect 0."
+        },
+        {
+          "line": "The test suite under test/ includes a test that calls average([]) and asserts the result is 0. That test fails when run against the base commit's math.js.",
+          "proof": "run",
+          "how": "At the PR head, read test/ and confirm a test calls average([]) and asserts 0. Then run: cp math.js /tmp/math.head.js && git show 47d473e:math.js > math.js && npm test; echo $? ; cp /tmp/math.head.js math.js  — the npm test exit code must be non-zero, and the failing test must be the empty-list average test. Then run npm test again on the restored head math.js to confirm it passes."
+        },
+        {
+          "line": "`npm test` exits 0 at the pull request head, with 0 failing tests.",
+          "proof": "run",
+          "how": "npm test; echo $?  — expect 0, and the output shows '# fail 0'."
+        }
+      ],
+      "non_goals": [
+        "Changing how average handles input that is not an array, or that is null/undefined, or arrays with non-numeric entries.",
+        "Changing add, subtract or multiply.",
+        "Changing the invoice service itself, or repairing invoice totals that were already affected.",
+        "Publishing a release or bumping the package version."
+      ],
+      "assumptions": [
+        "\"0\" means the JavaScript number 0, compared with ===. It is not null, not a string, and not an exception.",
+        "How the fix is done (an early return for empty input, a guard on length, or similar) is up to the builder.",
+        "The regression test belongs in the existing node:test suite run by `npm test` (test/math.test.js or another file under test/).",
+        "Base commit 47d473e is the current behaviour for non-empty lists, and that behaviour must not change, including floating-point results."
+      ]
+    }
+  },
+  "hash": "1e33b5bf31e284ba1dd15b82e186019c2e5aaa71431d9143c88f7f8e2c2d7b5c",
+  "caller": "bench-planted-bug-regression-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:01:07.575Z"
+}

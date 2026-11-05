@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "c6d16644669d27de2f5137afc870bc9c34ba2f9aa22f1c5b806f64d299961ec3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion is not met. The PASS evidence for line 2 falls short, though the FAIL evidence for line 1 is sound.\n\nThe FAIL evidence names concrete wrong builds that meet the line yet miss the request:\n- always calling `parse(input, '\\t')`, which breaks plain CSV;\n- splitting on `/[,\\t]/`, which splits TSV fields that contain commas.\n\nBoth are real. `parse(text, sep)` in src/parse.js accepts any separator, and the cited 'cli' test in test/csv.test.js exists.\n\nThe PASS evidence says it \"Tried a README that only names the flag or describes it wrongly.\" It never explains why \"README.md documents --tsv\" would catch that build. It only says that \"A README that leaves the flag out fails the line\", which is a different wrong build. A README that names `--tsv` or describes it wrongly arguably still \"documents --tsv\", so the PASS does not show the line catching the wrong build it tried.",
+  "model": "claude-opus-5-5",
+  "ms": 11580,
+  "tokens": {
+    "input": 2,
+    "output": 827,
+    "cacheCreation": 3354,
+    "cacheRead": 783,
+    "fresh": 4183,
+    "total": 4966
+  },
+  "at": "2026-11-05T07:27:20.112Z"
+}

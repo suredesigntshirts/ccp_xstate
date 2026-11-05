@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "8af01918abe941049f2f9c90d1420f3f4efd7327fb8e6ac6ed2fda89263bf7c6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: an issue that has no regression test line for the empty-list bug. I checked the expect list for such a line. It has two. One says \"`npm test` exits 0 and its output shows at least one test under test/ that calls average([]) and asserts the result is 0\". The other is a \"Regression guard\" line: if average's body is put back to the original, `npm test` must exit non-zero. Both lines have run proofs. One proof greps test/ for average([]) inside an assertion. The other restores the old math.js and expects a failing test. The outcome also says the suite \"has a test for average that catches this bug if it comes back.\" So the output does not do the forbidden thing.",
+  "model": "claude-opus-5-5",
+  "ms": 4252,
+  "tokens": {
+    "input": 2,
+    "output": 283,
+    "cacheCreation": 3269,
+    "cacheRead": 783,
+    "fresh": 3554,
+    "total": 4337
+  },
+  "at": "2026-11-05T07:10:04.798Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "5b10e03564ed6b139a71a19eb3e6b8562981e2a7b80c0da40600f896ef5d5a50",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each expect line against the must_not item, which forbids an expect line that can only be checked on the published page or after merge. The first five lines (the --shout runs, the plain greeting, the no-name usage case and npm test) can all be checked at the pull request's head. The sixth line breaks the rule: \"After merge, the published docs page at https://o.github.io/greet-cli/ lists --shout.\" Its proof is \"open https://o.github.io/greet-cli/\", so it can only be checked on the live site after merge. The output's own assumptions say so: \"The live site can only be checked after merge.\" A line that checks docs/index.md at the PR head would have worked instead.",
+  "model": "claude-opus-5-5",
+  "ms": 9701,
+  "tokens": {
+    "input": 2,
+    "output": 331,
+    "cacheCreation": 3181,
+    "cacheRead": 783,
+    "fresh": 3514,
+    "total": 4297
+  },
+  "at": "2026-11-05T07:07:10.216Z"
+}

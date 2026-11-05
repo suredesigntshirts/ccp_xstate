@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "23d520260271b5b4f385d7861002f4e41fc581e79ee993e2fd58f24e5a0f9f4d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every name the issue uses against the repository. math.js exists, and `average(xs)` is exactly `xs.reduce((sum, x) => sum + x, 0) / xs.length`, so an empty list gives 0/0, which is NaN. test/math.test.js exists and imports only add, subtract and multiply, so the claim that \"average has no tests at all\" is correct. package.json has the description \"Small math helpers used by the invoice service\" and a `test` script set to `node --test`, so `npm test` is real. The exports add, subtract, multiply and average all exist. The problem text describes the repository accurately. One thing I couldn't confirm is the commit hash `72ac645` in the regression-guard proof, because the repository facts don't list it. That proof also says the original line can be put back by hand, and the line it quotes matches the current code. So that check is still grounded, and nothing in the output conflicts with the repository.",
+  "model": "claude-opus-5-5",
+  "ms": 12871,
+  "tokens": {
+    "input": 2,
+    "output": 862,
+    "cacheCreation": 3840,
+    "cacheRead": 783,
+    "fresh": 4704,
+    "total": 5487
+  },
+  "at": "2026-11-05T07:29:34.243Z"
+}

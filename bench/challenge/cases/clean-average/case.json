@@ -1,0 +1,61 @@
+{
+  "kind": "planted",
+  "source": "A sound issue for the average request: a challenger that fails it is too strict. Revised after the first baseline: its non-empty line said \"unchanged\" without pinning NaN inputs, so a build returning `|| 0` met it (the challenger was right).",
+  "repo": {
+    "seed": "repo",
+    "message": "mathlib: add, subtract, multiply, average",
+    "origin": "https://github.com/o/mathlib.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/o/mathlib/issues/9",
+      "text": "average([]) gives NaN and it ended up as NaN in an invoice total last week. An empty list should average to 0."
+    },
+    "issue": {
+      "url": "https://github.com/o/mathlib/issues/9",
+      "title": "average([]) should be 0",
+      "problem": "average([]) returns NaN, because it divides by the length 0.",
+      "reason": "NaN reached an invoice total.",
+      "outcome": "average of an empty list is 0, and the fix is covered by a test.",
+      "expect": [
+        "average([]) returns 0",
+        "average of a non-empty list returns what the current math.js returns for it, NaN included: average([2, 4]) is 3, average([5]) is 5 and average([NaN, 1]) is NaN",
+        "test/math.test.js has a test that calls average([]) and expects 0, and npm test passes"
+      ],
+      "proofs": [
+        {
+          "line": "average([]) returns 0",
+          "proof": "run",
+          "how": "node -e"
+        },
+        {
+          "line": "average of a non-empty list returns what the current math.js returns for it, NaN included: average([2, 4]) is 3, average([5]) is 5 and average([NaN, 1]) is NaN",
+          "proof": "run",
+          "how": "node -e"
+        },
+        {
+          "line": "test/math.test.js has a test that calls average([]) and expects 0, and npm test passes",
+          "proof": "run",
+          "how": "npm test"
+        }
+      ],
+      "non_goals": [
+        "Validating non-numeric entries."
+      ],
+      "assumptions": []
+    }
+  },
+  "result": "PASS",
+  "must_pass": [
+    1,
+    2,
+    3
+  ],
+  "trap": "None: a sound issue.",
+  "must_catch": [
+    "Every line PASSes with evidence naming the wrong build tried."
+  ],
+  "must_not": [
+    "A FAIL for wording, style, or a stricter test the words do not need."
+  ]
+}

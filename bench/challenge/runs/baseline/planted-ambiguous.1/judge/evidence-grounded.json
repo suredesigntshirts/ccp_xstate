@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "fd417c36e75e631b0e67e1c3868f8fa1ae2ce3b68a17c36961c073dfbc428cc9",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each line's evidence. Each PASS names a wrong build and says why the line catches it. Line 1: \"-0, '0', null or undefined\", caught by a print or Object.is check. Line 2: \"xs.reduce(...)/xs.length || 0\", caught by the NaN example, plus a filter case pinned by the current-math.js anchor. Line 4: \"assert.ok(!average([]))\" and a skipped test, caught by \"calls average([]) and expects 0\". The FAIL on line 3 gives two concrete readings: throwing is sensible, or null and non-arrays return 0. The facts cited are real. math.js:20 is the reduce/length line. test/math.test.js:4 imports only add, subtract and multiply. average(null) throws TypeError, and average(['a']) gives NaN. The npm test script is `node --test`. The overall wrong build is concrete and uses real code. The criterion holds throughout.",
+  "model": "claude-opus-5-5",
+  "ms": 19606,
+  "tokens": {
+    "input": 2,
+    "output": 1412,
+    "cacheCreation": 3694,
+    "cacheRead": 783,
+    "fresh": 5108,
+    "total": 5891
+  },
+  "at": "2026-11-05T07:21:01.383Z"
+}

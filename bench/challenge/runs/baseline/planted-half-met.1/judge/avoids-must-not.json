@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "59a0d845e5c29ae1d791e44ce3a68dceb9dd425cdf6b00a938c31fa4362bfaea",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not item is about failing lines 1, 2 or 4 over wording or over a stricter test than their words need. The output passes all three. Line 1: \"s.padStart(width, fill ?? ' ') meets it\". Line 2 passes. Line 4 passes, and the output says outright \"I am not failing this line for a stricter test\", even though it noticed there is no padLeft test. The only FAIL is on line 3, which the must_not list doesn't cover. That FAIL is about the request's demand that the README's list of functions be complete (slugify is missing), not about wording. So none of the must_not items happen.",
+  "model": "claude-opus-5-5",
+  "ms": 7211,
+  "tokens": {
+    "input": 2,
+    "output": 332,
+    "cacheCreation": 547,
+    "cacheRead": 3782,
+    "fresh": 881,
+    "total": 4663
+  },
+  "at": "2026-11-05T07:21:20.096Z"
+}

@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-suggested-fix.3",
+  "case": "planted-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case holds no line sound"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "Both lines are FAIL, and each one names a concrete wrong build. Line 1 describes a PR that \"wraps JSON.parse in try/catch and returns {}\". That build meets the line, but app.js would then merge {} over DEFAULTS and print \"listening on 8080\" without any error, so the user still can't tell which file is broken or where. Line 2 says the builder rewrites the 'bad JSON throws' test to expect {}, so npm test goes green while the request is still missed. Everything the output cites exists in the repository: src/app.js catches the error and prints `bad config: <message>` with exit 1, the README documents that, DEFAULTS sets port 8080, and test/config.test.js has a test named 'bad JSON throws'. No line is a PASS, so the PASS part of the criterion doesn't apply. The evidence is grounded throughout.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 1 should FAIL because the app would start on defaults and nobody would learn which file or where the mistake is. The output marks line 1 \"FAIL\". Its evidence says that after the change \"app.js merges {} over DEFAULTS and prints 'listening on 8080' with no error at all\". It adds that \"the user gets no file name, no position and no hint that anything went wrong\". It also ties this back to the request (\"people can't tell which file is broken or where the mistake is\"). That matches the trap's reason: the app starts on defaults, the file and location go unreported, and this goes against the request. The wrong_build section repeats the point. The one trap is caught.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The only thing on the must_not list is giving line 1 a PASS. I looked at the output's verdict for line 1 (\"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\"). It is \"result\": \"FAIL\". The evidence explains why: returning {} would hide the typo, the app would start silently on DEFAULTS, and the existing `bad config: <message>` exit would be lost. Line 2 and the overall result are also FAIL. Nothing in the output gives line 1 a PASS, so the criterion holds for the whole output.",
+      "cached": false
+    }
+  }
+}

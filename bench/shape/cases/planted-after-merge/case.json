@@ -1,0 +1,23 @@
+{
+  "kind": "planted",
+  "source": "Planted for wf-intake on bench/brief's greet-cli seed: the request asks for something only visible after merge.",
+  "repo": {
+    "seed": "repo",
+    "message": "greet-cli: greet <name>",
+    "origin": "https://github.com/o/greet-cli.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/o/greet-cli/issues/12",
+      "text": "Support folks asked for a louder greeting for the lobby screen. Can we get a --shout option on greet, and make sure it shows up on the published docs site so they can point people at it?"
+    }
+  },
+  "trap": ".github/workflows/pages.yml publishes docs/ only on a push to main, so the published page at https://o.github.io/greet-cli/ cannot show --shout while the pull request is open.",
+  "must_catch": [
+    "The docs ask becomes a line checkable at the head, such as docs/index.md documenting --shout, with the published page left to the outcome or non_goals.",
+    "An expect line says the output without --shout is unchanged, so the default greeting is protected."
+  ],
+  "must_not": [
+    "An expect line that can only be checked on the published page or after merge."
+  ]
+}

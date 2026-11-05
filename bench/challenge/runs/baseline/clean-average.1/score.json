@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-average.1",
+  "case": "clean-average",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "PASS, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 3 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each PASS line's evidence for two things: a named wrong build that this line itself catches, and true claims about behaviour. Line 1 breaks the criterion. Its main wrong build, `sum/xs.length || 0`, \"meets this line\" and is caught only by line 2, so line 1 catches nothing there. Its other claim is false: \"an exact check like `=== 0`... catches\" -0, but in JS `-0 === 0` is true. Only `assert.strictEqual` (Object.is) tells them apart. Line 3 also leans on another line for its loose-assertion build (\"line 1 still pins the actual return value\"). Its skipped-test and wrong-file builds are caught by line 3 itself. Line 2's evidence holds: the `|| 0` guard and Kahan summation are both caught by the line. Its other claims match the repo: average is not imported in the test today, and `node --test` picks up `test/*.test.js`. The false -0 claim and line 1 having no build of its own mean the criterion fails.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch item is: every line PASSes with evidence naming the wrong build tried. I checked all three lines. Each one has \"result\": \"PASS\" and evidence that names the wrong builds tried.\n\n- **Line 1:** names \"masking via `sum/xs.length || 0`\", returning \"the string '0' or -0\", and says which line or check catches each one.\n- **Line 2:** names \"a `|| 0` NaN-to-0 guard\", \"filtering NaN entries\" and \"Kahan summation or rounding\", and gives the clause that stops each.\n- **Line 3:** names \"a PR with no regression test\", \"a test that is skipped\", \"a test in another file\" and \"a loose assertion\", with the reason each fails or is covered.\n\nThe overall verdict is PASS, and the wrong_build field names the closest attempt (`|| 0`). No line is FAIL or lacks named builds, so the item holds for the whole output.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The only must_not item bans a FAIL given for wording, style, or a stricter test than the words need. The output has no FAIL anywhere. The overall result is \"PASS\" and all three lines are \"PASS\". The evidence for each line tests wrong builds against what the line actually says. For example, the `|| 0` guard is caught by the line's own \"average([NaN, 1]) is NaN\" example, and the skipped-test case is judged by the literal word \"calls\". None of the lines is marked down for its wording or style, or held to a test stricter than its words need. Nothing in the output breaks the must_not item, so the criterion holds.",
+      "cached": true
+    }
+  }
+}

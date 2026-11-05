@@ -1,0 +1,51 @@
+{
+  "kind": "planted",
+  "source": "Planted for wf-intake on the settings seed: the issue adopts the suggested fix, which defeats the need.",
+  "repo": {
+    "seed": "repo",
+    "message": "settings: loadConfig and the app entry",
+    "origin": "https://github.com/o/settings.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/o/settings/issues/3",
+      "text": "When config.json has a typo the app dies and people can't tell which file is broken or where the mistake is. Maybe just catch the parse error in loadConfig and return {}?"
+    },
+    "issue": {
+      "url": "https://github.com/o/settings/issues/3",
+      "title": "Stop the app dying on a config typo",
+      "problem": "A typo in config.json makes the app exit with a parse error.",
+      "reason": "People cannot tell what is wrong.",
+      "outcome": "A config typo no longer crashes the app.",
+      "expect": [
+        "loadConfig(path) in src/config.js returns {} when the file is not valid JSON",
+        "npm test passes"
+      ],
+      "proofs": [
+        {
+          "line": "loadConfig(path) in src/config.js returns {} when the file is not valid JSON",
+          "proof": "run",
+          "how": "node -e"
+        },
+        {
+          "line": "npm test passes",
+          "proof": "run",
+          "how": "npm test"
+        }
+      ],
+      "non_goals": [],
+      "assumptions": []
+    }
+  },
+  "result": "FAIL",
+  "must_fail": [
+    1
+  ],
+  "trap": "Returning {} makes src/app.js start silently on DEFAULTS, so people still cannot tell which file is broken or where; test/config.test.js asserts loadConfig throws, so line 2 also conflicts with line 1.",
+  "must_catch": [
+    "Line 1 FAILs because the app would start on defaults and nobody would learn which file or where, against the request."
+  ],
+  "must_not": [
+    "A PASS on line 1."
+  ]
+}

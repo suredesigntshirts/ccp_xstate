@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "98436a51a3634532cb545c49095f043e7a55a8a030f67888f962de50a1e40af8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The only must_not item bans a FAIL given for wording, style, or a stricter test than the words need. The output has no FAIL anywhere. The overall result is \"PASS\" and all three lines are \"PASS\". The evidence for each line tests wrong builds against what the line actually says. For example, the `|| 0` guard is caught by the line's own \"average([NaN, 1]) is NaN\" example, and the skipped-test case is judged by the literal word \"calls\". None of the lines is marked down for its wording or style, or held to a test stricter than its words need. Nothing in the output breaks the must_not item, so the criterion holds.",
+  "model": "claude-opus-5-5",
+  "ms": 4968,
+  "tokens": {
+    "input": 2,
+    "output": 335,
+    "cacheCreation": 3203,
+    "cacheRead": 783,
+    "fresh": 3540,
+    "total": 4323
+  },
+  "at": "2026-11-05T07:20:41.741Z"
+}

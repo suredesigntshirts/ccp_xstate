@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "a18546bdd2f0fed1b736d6b5a2e35742067e174ac34c5916972b8fed8b1ab3e8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every expect line and the problem field. The expect lines only describe behavior you can observe: that padLeft is exported (the request asks for that name), what it returns ('42'/42 → '00042', which comes from the request's example, and longer input coming back untouched), that README has a `## padLeft(` section (the request asks for a complete README), that a test exists, and that `npm test` passes. None of them names an implementation technique or an internal helper. The one possible technique, String.prototype.padStart, appears only under assumptions (\"How padLeft is implemented... is up to the builder\"), and the default fill is also left to the builder there. The problem field describes what is missing (\"nothing that left-pads a value\", README missing slugify, the current test state) and doesn't propose a fix. The rule that over-width input is never cut off is a behavior requirement, and its reasoning is in the assumptions. It isn't a fix technique.",
+  "model": "claude-opus-5-5",
+  "ms": 16689,
+  "tokens": {
+    "input": 2,
+    "output": 724,
+    "cacheCreation": 3936,
+    "cacheRead": 0,
+    "fresh": 4662,
+    "total": 4662
+  },
+  "at": "2026-11-05T07:06:49.057Z"
+}

@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-half-met.1",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": false,
+      "why": "line 4 not PASS: \"npm test (node --test) already passes at this commit (fail 0). A build that adds padLeft and no test meets this line, so it proves nothing about padLeft. Two re\""
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "Not met, because the 'npm test passes' FAIL is not grounded. Its wrong build \"adds padLeft and no test\", and the evidence says this \"proves nothing about padLeft\". It never shows how that build misses the request, which asks only for padLeft and a complete README, not for tests. The \"two readers could also disagree\" claim gives no real second reading of \"npm test passes\", since that line is unambiguous.\n\nThe other lines hold up:\n- The README FAIL is grounded. slugify really is exported but has no README section, and a build that only adds a padLeft section meets the line but misses the request.\n- The PASS for line 2 names a truncating build that the check would catch.\n- The PASS for line 1 names builds with a hard-coded fill or a '0' default, and how running without a fill catches them. It also relies on \"Node v22.23.4 supports require(esm)\", a runtime claim that is not a repository fact.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 (\"README.md has a section for padLeft\") should FAIL because a build that adds only a padLeft section leaves slugify undocumented, while the request asks for a complete list. The output marks line 3 \"FAIL\". Its evidence says index.js exports capitalize, slugify and truncate, but the README \"has sections only for capitalize and truncate, so slugify is missing\". It adds that a build adding only a '## padLeft' section \"meets this line, and the README still does not list every function\". It proposes a missing line covering every exported function. The wrong_build makes the same point about slugify. So the only must_catch item is handled.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked the result given for lines 1, 2 and 4. Lines 1 and 2 are PASS, so they don't break the rule. Line 4 (\"npm test passes\") is marked FAIL, and the reasons are the ones the must_not list bans. The output says a build \"that adds padLeft and no test meets this line, so it proves nothing about padLeft\". It also says \"two readers could also disagree on whether this line requires a padLeft test\". It then proposes a stricter missing line that requires a padLeft test covering zero padding, the default fill and long input. The line's words only require the suite to pass, and the request never asks for tests. So this FAIL is based on wording and on a stricter test the words don't need. That is item 1 of the must_not list.",
+      "cached": false
+    }
+  }
+}

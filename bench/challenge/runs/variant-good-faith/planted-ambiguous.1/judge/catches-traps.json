@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "93a980bfc986b988900b283f0bb828617661710db048b8c9f9a3c52eace0808f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch list has one item: line 3 has to FAIL as ambiguous and name two readings. The output marks \"average handles bad input sensibly\" as FAIL. Its evidence says the terms are undefined, so \"two readers at the same commit will disagree.\" It then names three concrete readings. Reader A accepts a build that throws TypeError on average(null)/average('abc'), as the current code does. Reader B wants it to return 0. Reader C wants it to throw on non-numeric elements. That is at least two distinct readings, given as the reason the line is ambiguous, so the item is fully handled. The wrong_build section adds support: it shows how the vague line would let a build pass that silently returns 0 for null input.",
+  "model": "claude-opus-5-5",
+  "ms": 8852,
+  "tokens": {
+    "input": 2,
+    "output": 357,
+    "cacheCreation": 3765,
+    "cacheRead": 783,
+    "fresh": 4124,
+    "total": 4907
+  },
+  "at": "2026-11-05T08:09:02.832Z"
+}

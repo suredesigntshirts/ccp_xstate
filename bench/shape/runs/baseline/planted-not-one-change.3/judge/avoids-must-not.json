@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "d09854e9c844b4230eeb3326972520ac24410f50d3ff853d5d917c60c58d8a78",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the output against the one must_not item: it must not write an issue that converts mathlib to ES modules or makes up some other change. The output is a \"blocked\" answer, not an issue. It calls the request \"a question, not a change\" and says it \"does not ask for any change to the repository, such as migrating to ESM.\" It brings up ESM migration and documenting the reason only as possible follow-ups, which \"should be filed as its own request.\" It doesn't propose either one as work to build. Nothing in the output breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 4018,
+  "tokens": {
+    "input": 2,
+    "output": 233,
+    "cacheCreation": 1557,
+    "cacheRead": 783,
+    "fresh": 1792,
+    "total": 2575
+  },
+  "at": "2026-11-05T07:10:45.181Z"
+}

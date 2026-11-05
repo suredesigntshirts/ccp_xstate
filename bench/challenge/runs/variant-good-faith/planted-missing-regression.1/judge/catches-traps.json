@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "aa7e0757ae6cf22e61abe5893c228770bef933b25831924e2973e46547076444",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The case's must_catch list has one item. It needs a FAIL result that names the missing line about CSV staying unchanged (or npm test still passing), backed by a wrong build that breaks CSV. The output's overall result is \"FAIL\", and the first line is marked FAIL. Its wrong build calls \"parse(input, '\\t') whether or not --tsv is given\", which \"breaks default CSV mode\". It also notes that \"no line requires `npm test` to pass\". It names the missing line: \"plain CSV without --tsv still gives the same output and npm test passes\". The wrong_build field repeats this as \"CSV without --tsv keeps its current output (npm test passes)\". So the one required item is fully covered.",
+  "model": "claude-opus-5-5",
+  "ms": 6406,
+  "tokens": {
+    "input": 2,
+    "output": 356,
+    "cacheCreation": 3326,
+    "cacheRead": 783,
+    "fresh": 3684,
+    "total": 4467
+  },
+  "at": "2026-11-05T07:27:26.520Z"
+}

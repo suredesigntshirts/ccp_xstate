@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "7673d294a468104dde5869a767f22d40932d12452ac5b909d8994613f7c46129",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each PASS line's evidence for two things: a named wrong build that this line itself catches, and true claims about behaviour. Line 1 breaks the criterion. Its main wrong build, `sum/xs.length || 0`, \"meets this line\" and is caught only by line 2, so line 1 catches nothing there. Its other claim is false: \"an exact check like `=== 0`... catches\" -0, but in JS `-0 === 0` is true. Only `assert.strictEqual` (Object.is) tells them apart. Line 3 also leans on another line for its loose-assertion build (\"line 1 still pins the actual return value\"). Its skipped-test and wrong-file builds are caught by line 3 itself. Line 2's evidence holds: the `|| 0` guard and Kahan summation are both caught by the line. Its other claims match the repo: average is not imported in the test today, and `node --test` picks up `test/*.test.js`. The false -0 claim and line 1 having no build of its own mean the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 16780,
+  "tokens": {
+    "input": 2,
+    "output": 910,
+    "cacheCreation": 3257,
+    "cacheRead": 783,
+    "fresh": 4169,
+    "total": 4952
+  },
+  "at": "2026-11-05T07:20:27.145Z"
+}

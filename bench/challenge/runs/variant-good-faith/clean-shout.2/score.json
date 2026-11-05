@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-shout.2",
+  "case": "clean-shout",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": false,
+      "why": "FAIL, where the case expects PASS"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": false,
+      "why": "line 3 not PASS: \"The request asks for --shout to be documented 'next to the existing usage'. The line requires neither that the existing usage stay nor that the example be corre\""
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the evidence for each line against the repository, and the criterion holds throughout. Line 1 (PASS) tries two concrete wrong builds: upper-casing only the name (\"Hello, ADA!\") and changing nothing. Its claim that bin/greet.js already skips unknown '--' args is true, since the name is found with `!a.startsWith('--')`. Line 2 (PASS) tries making shout the default and breaking name parsing. It cites the 'cli' test, which really is in test/greet.test.js. Line 3 (FAIL) names concrete wrong builds: one replaces the plain usage block, which meets the line but not \"next to the existing usage\". The other shows a mismatched output such as 'HELLO, Ada!', and the evidence gives two concrete readings of \"with an example\". Line 4 (PASS) tries a helper-only unit test and a test that only checks includes('HELLO'). It correctly says npm test is \"node --test\" and that pages.yml runs no tests. Every file and behaviour cited is real.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "The must_catch item says every line should PASS, with evidence naming the wrong build that was tried. I checked each of the four lines. Lines 1, 2 and 4 are marked PASS and each names a wrong build, such as \"upper-casing only the name\", \"making shout the default\" and \"adding only a unit test of a shout() helper\". Line 3 is marked \"FAIL\", though. The output argues that the docs line doesn't require keeping the existing usage or a correct example, and the overall result is \"FAIL\". The case expects every line to pass, so marking line 3 as failing breaks the must_catch item.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the output's one FAIL, on line 3, to see whether it rests on wording, style, or a stricter test than the request needs. It doesn't. The request says to document --shout \"next to the existing usage\", and line 3 dropped that. Wrong build A, which replaces the code block with only \"node bin/greet.js --shout <name>\", meets \"documents the --shout option with an example\" but removes the plain usage the request asked to keep. That is a real gap the request's own words call for, so the FAIL is backed. Wrong build B, an example that contradicts line 1, adds weight but the FAIL doesn't depend on it. The three PASS lines only test realistic wrong builds against what each line says. None adds a stricter demand: for example, it accepts the argv[2]-only flag parsing because the line names the \"--shout <name>\" form. No part of the output does anything on the must_not list.",
+      "cached": false
+    }
+  }
+}

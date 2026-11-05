@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "3acef4f6d915a250bbcc7187cca84ed958860d792a9fa207906332877dcedae7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: an issue with no regression test line for the empty-list bug. I checked the output's expect list and found such a line. The fifth expect item reads: \"test/math.test.js contains a test asserting `average([])` equals 0, and that test fails when math.js is put back to the base-branch version\". It also has a matching run proof that puts the base math.js back and requires `npm test` to exit non-zero. The outcome field repeats the requirement too (\"the test suite contains a regression test for the empty-list case that fails on the current code\"). Nothing in the output does what the must_not list forbids.",
+  "model": "claude-opus-5-5",
+  "ms": 5833,
+  "tokens": {
+    "input": 2,
+    "output": 261,
+    "cacheCreation": 3127,
+    "cacheRead": 783,
+    "fresh": 3390,
+    "total": 4173
+  },
+  "at": "2026-11-05T07:27:15.002Z"
+}

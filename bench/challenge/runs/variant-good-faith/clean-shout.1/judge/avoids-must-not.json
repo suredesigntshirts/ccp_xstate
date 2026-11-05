@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "2ebd4e57e41e1cd7fb85874a0260ef69179ad1733b31d8d03e34ef67ec0e4fda",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: a FAIL given for wording, style, or a stricter test than the words require. I checked all four line verdicts and the overall result. Every one is \"PASS\", so the output contains no FAIL at all. The output also avoids reading the lines more strictly than written. It does not count argument position against a build (\"The request does not say where the flag must go... so I did not count this as wrong\"). It treats the trailing newline as not mattering (\"does not change the grading\"). It reads \"next to the existing usage\" in a way that matches the docs file. Nothing in the output breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 7829,
+  "tokens": {
+    "input": 2,
+    "output": 296,
+    "cacheCreation": 3658,
+    "cacheRead": 783,
+    "fresh": 3956,
+    "total": 4739
+  },
+  "at": "2026-11-05T07:27:08.479Z"
+}

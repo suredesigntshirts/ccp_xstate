@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "a044cb5b6e4c0b04e00800098fef93d6ef31594431493bd418a93edba068eef3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the problem field and each expect line for a prescribed fix. The problem field only says what is wrong: index.js \"exports capitalize, slugify and truncate, and nothing that left-pads\", and the README \"has sections for capitalize(s) and truncate(s, n) but none for slugify\". It proposes no fix. The expect lines describe behavior a caller can observe. The name padLeft comes from the request itself. '00042' matches the request's 42 -> 00042. The other lines cover over-width input, one README section per export (the request asks for a complete list), and a passing test suite. None of them names a technique or an internal function. The two implementation suggestions sit under assumptions: \"How padLeft is implemented (for example with String.prototype.padStart) is up to the builder\", and the default fill character is also left there. The over-width behavior is the one borderline case. It is a design choice the request does not state, but it is outward behavior with a stated reason (\"cutting off an invoice number would corrupt it\"), not a way of building the fix.",
+  "model": "claude-opus-5-5",
+  "ms": 12409,
+  "tokens": {
+    "input": 2,
+    "output": 957,
+    "cacheCreation": 548,
+    "cacheRead": 3748,
+    "fresh": 1507,
+    "total": 5255
+  },
+  "at": "2026-11-05T07:10:14.869Z"
+}

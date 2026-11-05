@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "a53c5783ee3641b9c5ffbed2e1009a7666c100bc467bed10e1a426ad525f3f46",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines. Each states behaviour you can observe: CLI output with and without --tsv, parse()'s comma default when called with no separator, a new test plus `npm test` passing, and README documentation. The parse() line checks that existing behaviour doesn't regress. It doesn't say how to build the flag. No line names a technique, an internal change or a return value. The problem field says what is wrong: the CLI \"ignores its arguments\", splits on ',' and users must run sed. It mentions the existing sep parameter only as a fact about the code (\"nothing in the CLI exposes it\"). Reusing parse()'s sep appears only under assumptions, with \"the builder may implement it another way\".",
+  "model": "claude-opus-5-5",
+  "ms": 11473,
+  "tokens": {
+    "input": 2,
+    "output": 849,
+    "cacheCreation": 3851,
+    "cacheRead": 783,
+    "fresh": 4702,
+    "total": 5485
+  },
+  "at": "2026-11-05T07:10:44.576Z"
+}

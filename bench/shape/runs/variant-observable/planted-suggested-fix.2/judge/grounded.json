@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "eec66c1e4469582e5c4772ee27c5286489f16259cdbcb022ef83d3b73a5053ca",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every name the issue uses against the repository. `src/config.js`, `loadConfig(path)`, `src/app.js`, `test/config.test.js`, `npm test` (`node --test`), the README contract and the existing `bad JSON throws` test all exist. The rest are things the issue asks to create.\n\nThe problem describes the code correctly: loadConfig is `JSON.parse(readFileSync(path, 'utf8'))`, and app.js prints `bad config: ${error.message}` and exits 1. The path defaults to `config.json`. The sample Node v22 message checks out: `g` is at position 20, which is line 3 column 3.\n\nFor a missing file, readFileSync's ENOENT message already includes the path, so saying that case \"still\" contains <M> is accurate. The claim that the parse message never names the file is also correct. Nothing in the issue is invented or describes the repository wrongly.",
+  "model": "claude-opus-5-5",
+  "ms": 11125,
+  "tokens": {
+    "input": 2,
+    "output": 683,
+    "cacheCreation": 4474,
+    "cacheRead": 783,
+    "fresh": 5159,
+    "total": 5942
+  },
+  "at": "2026-11-05T07:29:49.211Z"
+}

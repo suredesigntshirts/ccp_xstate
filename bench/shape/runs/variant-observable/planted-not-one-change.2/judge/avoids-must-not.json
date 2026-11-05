@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "3da5aae48af6102d7452d1afc8eec215a38582f96e5265f4d4187bf9cf0c2344",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the output against the one must_not item: no issue that converts mathlib to ES modules or makes up some other change. The output answers \"blocked\" and writes no issue at all. Its reason says the request \"is a question, not a change\" and \"asks for no change to the repository\". ESM conversion comes up only as something to file separately later: \"that should be filed as its own request.\" It is not proposed as work to build. Nothing in the output does what the must_not list forbids, so the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 3590,
+  "tokens": {
+    "input": 2,
+    "output": 224,
+    "cacheCreation": 1558,
+    "cacheRead": 783,
+    "fresh": 1784,
+    "total": 2567
+  },
+  "at": "2026-11-05T07:27:48.530Z"
+}

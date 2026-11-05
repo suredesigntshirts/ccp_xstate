@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-after-merge.3",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "6 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I read every expect line and the problem field. The expect lines describe behaviour you can observe: exact stdout such as `HELLO, ADA!`, exit codes, usage text on stderr with no name, `npm test` passing with a --shout test, and docs/index.md describing --shout. None of them names a technique, an internal function or a return value. The request requires the docs change, and docs/index.md is simply where the published site comes from. The upper-case reading of \"louder\" is stated under assumptions, which fits the rule. The only internal detail, that `greeting(name)` keeps returning `Hello, <name>!`, is under assumptions too, and it says \"How shouting is implemented is up to the builder.\" The problem field only says what is wrong: \"--shout ... is silently dropped\" and the docs don't mention it. It proposes no fix.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all six expect lines and their proofs. Four are CLI runs: `--shout Ada`, `Ada --shout`, plain `Ada`, and `--shout` with no name. Each states exact stdout, stderr and exit code, and each proof is a local `node bin/greet.js` command with od, PIPESTATUS or file redirection, so it can be run at the PR head and gives one answer. The `npm test` line is a run plus a grep and a read of test/, all done at the head. The docs line only needs docs/index.md at the PR head to show a `--shout` example and describe the upper-case output, and its proof is a read of that file. The live site at https://o.github.io/greet-cli/ only exists after merge. It is mentioned only in the outcome text and is explicitly listed under non_goals, so no expect line depends on a deploy, a release or the published page.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every claim against the repository files and they all hold. bin/greet.js picks the first argument that doesn't start with `--`, so \"Any argument starting with `--` is silently dropped\" is true, and `--shout Bob` prints `Hello, Bob!` and exits 0. The usage message goes to stderr with exit 2, as the no-name case says. docs/index.md documents only `node bin/greet.js <name>`. pages.yml publishes `docs` on every push to main, and the README gives the URL https://o.github.io/greet-cli/. src/greet.js exports `greeting(name)`, test/ exists and package.json defines `npm test`. The --shout option is new, which is what the issue asks for. The outcome writes \"greet --shout <name>\" even though package.json has no bin entry. That is just shorthand: the CLI's own usage text says `greet <name>`, and every testable line uses `node bin/greet.js`. Nothing in the issue invents a file, function or behavior.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items and both are met. Item 1: the docs request is turned into a line that can be checked at the PR head: \"docs/index.md documents the --shout option: it shows a command using --shout and says the greeting is printed in upper case\". Its proof is to read the file at the PR head. The published site is left out of the expect lines. The outcome says \"the site will show it after the next deploy from main\", and the non_goals exclude \"Checking the live site at https://o.github.io/greet-cli/\". Item 2: an expect line protects the default greeting: \"`node bin/greet.js Ada` still prints exactly `Hello, Ada!` followed by a newline and exits 0\". It comes with a run proof using od -c.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all six expect lines against the must_not item: no expect line may be checkable only on the published page or after merge. Four lines are CLI runs (`node bin/greet.js --shout Ada`, the flag after the name, the plain greeting, and no name exiting 2). One is `npm test` plus a grep of test/. All of these can be checked locally at the PR head. The docs line only requires that \"docs/index.md documents the --shout option\", and its proof says \"Read docs/index.md at the PR head\". It doesn't depend on the live site. The live site is mentioned only in the outcome (\"will show it after the next deploy\") and in non_goals, which says \"Checking the live site... only happens after merge\", so it is ruled out of verification. No expect line breaks the criterion.",
+      "cached": true
+    }
+  }
+}

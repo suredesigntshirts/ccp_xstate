@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "88274766f5b2b50792e9b3ba63d60cb35fb1fbdfd682a7e24ffbcb364921c674",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Items 1 and 2 are covered. Item 1: one expect line requires root `npm test` to run \"a node:test suite for the jsonl-lint workspace that reports at least one passing test\". Its proof greps for the workspace test script line and a `# pass N` line, so tests skipped by --if-present would not count. Item 2: one expect line says the README \"no longer says there are no tools … and lists `jsonl-lint`\". Item 3 is only partly covered. The expect lines do pin the output form: `bad.jsonl:2:` and `bad.jsonl:4:`, with 1-based line numbers. But they do not pin distinct exit codes. Every case only requires \"exits non-zero\", and the assumptions say \"Suggested: 1 for invalid rows, 2 for usage errors…, but only 'non-zero' is required.\" The case needs separate exit codes for bad rows and for a missing file or no argument, so this item is missed.",
+  "model": "claude-opus-5-5",
+  "ms": 6252,
+  "tokens": {
+    "input": 2,
+    "output": 510,
+    "cacheCreation": 5362,
+    "cacheRead": 783,
+    "fresh": 5874,
+    "total": 6657
+  },
+  "at": "2026-11-05T07:28:26.786Z"
+}

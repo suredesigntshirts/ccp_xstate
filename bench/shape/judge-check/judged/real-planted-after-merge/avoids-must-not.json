@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "9e16c25a0d365138981b98bb8e43ebf9fab6fbee813d373cb6b6f6fa78aac040",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines against the must_not item. Each one can be checked at the PR head. Five are CLI or `npm test` runs on the branch, such as \"`node bin/greet.js --shout Ada` exits 0 and prints exactly `HELLO, ADA!`\". The docs line is checked by reading \"docs/index.md at the PR head\", not the live site. The published site comes up only in the outcome (\"will show it after the next deploy\"), in a non_goal that says checking the live site is out of scope until after merge, and in an assumption. None of these is an expect line. No expect line depends on the published page or on a merge, so the output breaks nothing on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 4641,
+  "tokens": {
+    "input": 2,
+    "output": 348,
+    "cacheCreation": 3337,
+    "cacheRead": 783,
+    "fresh": 3687,
+    "total": 4470
+  },
+  "at": "2026-11-05T07:07:35.548Z"
+}

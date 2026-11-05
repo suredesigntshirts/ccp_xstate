@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "real-jsonl-lint.3",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "10 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the problem field and all ten expect lines. The problem field says what is wrong: the repo has no tools and \"nothing in the repo checks a JSONL file\", so a torn or edited row goes unnoticed until a reader fails. It proposes no fix. The expect lines describe what the tool visibly does: exit codes, stdout lines that start with the line number, stderr messages, how blank and CRLF lines are handled. They name no parsing technique and no internal function or its return value. The method (JSON.parse on each trimmed line), the report format and the choice of exit code 2 appear only under assumptions, each with a reason. The package.json line (bin entry, a `node --test` script, no dependencies) and the node:test line come closest to dictating implementation. I counted them as packaging and checkability rules that follow the repo's conventions rather than a prescribed fix, though a stricter reading could fault them.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for all ten expect lines. Each one can be checked at the PR head before merge, and none needs a release, deploy, publish or anything else that only exists after merge. Eight lines have \"run\" proofs that run `node packages/jsonl-lint/bin/jsonl-lint.js` on temporary files, read `package.json` with `node -e`, or run `npm ci && npm test`. Each states a clear expected result, such as \"expect exit=1 and exactly the lines 2, 4, 5\", so one reader gets one answer. The CI line says to \"Read the `test` check on the PR head commit\", which exists before merge. The README line is a \"read\" of the \"What is here\" section at the head. The test-coverage line adds reading the test files for the four named cases, which is still one reader's job at the head. Publishing to npm is listed as a non-goal, so no line depends on it.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every name in the issue against the 9 tracked files. These exist: `.github/workflows/test.yml` (its workflow and job are both called `test`), `README.md` with a \"What is here\" section, the root `npm test` script and `npm ci` with the lockfile. Everything under `packages/jsonl-lint` (the package.json, `bin/jsonl-lint.js`, the tests) is new, and the request asks for it. The problem's facts hold: `packages/` doesn't exist because no tracked file sits under it, and the README quote \"No tools yet: `packages/` is empty\" matches the file word for word. Nothing in the repo checks JSONL. The `node --test` and node:test claims match CLAUDE.md. No part of the issue names a missing file or command, or describes the repo wrongly.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items against the expect lines.\n1. Root tests: one expect line says \"`npm ci && npm test` at the repo root runs them and exits 0\". Its proof requires \"jsonl-lint tests listed in the output\", so tests that `--if-present` skips would fail it.\n2. README: one expect line says \"README.md no longer says there are no tools\" and requires `packages/jsonl-lint` to be listed under \"What is here\".\n3. Output form and exit codes: stdout lines must begin with `2:`, `4:` and `5:` (1-based). A bad row exits 1. A missing file exits 2 with the path on stderr, and no argument exits 2 with a usage message.\nOne caveat: the pinned form is `<line>:` with no file name. The tool only takes one file per run, so the line number alone is enough to find the row. I count item 3 as handled, but a strict reading of \"file and 1-based line\" could fail it.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against all 10 expect lines. Item 1: every line can be checked at the pull request's head. Most use local `run` proofs. One reads README.md. The CI line asks for the `test` check \"on the pull request\", which runs before merge. Publishing to npm is listed as a non-goal, not an expect line. Item 2: a tool with no tests would fail the expect line saying \"`packages/jsonl-lint` has node:test tests covering the all-valid, invalid-rows, blank-line and missing-file cases. `npm ci && npm test` at the repo root runs them and exits 0.\" Its proof asks the verifier to see jsonl-lint tests in the npm test output and to read the test files. The package.json line also requires a `test` script that runs `node --test`. So a tool without tests run by npm test can't meet these lines. Neither forbidden thing appears.",
+      "cached": true
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "64b3f21ba922fda583ac649b3aabb52f0837ea0322ae09240562d7572875f882",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. The only item on the must_not list is a PASS on line 1. The output marks line 1 (\"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\") as \"result\": \"FAIL\", and the overall result is also \"FAIL\", so line 1 gets no PASS anywhere. A separate problem, which this criterion doesn't cover: the line 1 evidence cites files that aren't in the repository. \"src/loader.js\", \"readConfigSafe()\" and \"bin/settings.js\" don't appear among the six tracked files, so that evidence is made up. It still doesn't break this criterion, which only asks that the output avoid the items on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 6604,
+  "tokens": {
+    "input": 2,
+    "output": 369,
+    "cacheCreation": 3013,
+    "cacheRead": 783,
+    "fresh": 3384,
+    "total": 4167
+  },
+  "at": "2026-11-05T07:19:28.119Z"
+}

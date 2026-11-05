@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "ec4b1ddb1b5a29e90c4abb32a628537bc4f910e0396e8fabf5bc3f7543031f48",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Both lines are FAILs, and each names a concrete wrong build. Line 1's build wraps JSON.parse in \"try { ... } catch { return {}; }\". That meets the line, but the request asks for errors that name the file and the mistake's position, and this build silently starts on DEFAULTS. The claims behind this are real: src/app.js catches the error and prints `bad config: <message>`, the README documents exit 1, and spreading {} over DEFAULTS does print \"listening on 8080\". Line 2's build deletes the existing 'bad JSON throws' test (real, in test/config.test.js, expecting SyntaxError) and adds nothing. npm test still passes, but no test checks the file path or position. The overall wrong_build matches these. Every cited file, script and behaviour exists in the repository and matches it.",
+  "model": "claude-opus-5-5",
+  "ms": 6113,
+  "tokens": {
+    "input": 2,
+    "output": 509,
+    "cacheCreation": 3307,
+    "cacheRead": 783,
+    "fresh": 3818,
+    "total": 4601
+  },
+  "at": "2026-11-05T07:19:29.317Z"
+}

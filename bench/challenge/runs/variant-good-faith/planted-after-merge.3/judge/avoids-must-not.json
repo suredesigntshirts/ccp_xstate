@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "8043df39543e4bd3a4cc8ea7465f43ae9705c0c056499225e09b2627db2e7233",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: a FAIL on line 1 or line 2. I checked the result for each line in the output. Line 1 (--shout prints HELLO, ADA!) is \"PASS\". Line 2 (without --shout it still prints Hello, Ada!) is \"PASS\". Only line 3, the published docs page, is \"FAIL\". That FAIL and the overall \"FAIL\" result are not in the must_not list. So the output does nothing the must_not list forbids.",
+  "model": "claude-opus-5-5",
+  "ms": 8308,
+  "tokens": {
+    "input": 2,
+    "output": 249,
+    "cacheCreation": 3416,
+    "cacheRead": 783,
+    "fresh": 3667,
+    "total": 4450
+  },
+  "at": "2026-11-05T07:27:20.497Z"
+}

@@ -1,0 +1,22 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "loadConfig(path) in src/config.js returns {} when the file is not valid JSON",
+        "result": "FAIL",
+        "evidence": "This line writes the requester's tentative suggestion ('Maybe just catch the parse error ... and return {}?') into the spec. It drops the need the request actually states: people can't tell which file is broken or where the mistake is. Wrong build: wrap JSON.parse in try { ... } catch { return {}; }. That meets the line exactly, and it makes the problem worse. Today src/app.js catches the error and prints `bad config: <message>` before exit 1, so the user at least gets some message. With this build, app.js spreads {} over DEFAULTS and prints `listening on 8080` with no message at all, so the typo is hidden completely. The build also contradicts the README, which documents `bad config: <message>` and exit 1. A line is missing: when config.json is not valid JSON, the user must get an error that names the file path and the position (line/column) of the mistake, for example 'bad config: config.json:3:5: Unexpected token'."
+      },
+      {
+        "line": "npm test passes",
+        "result": "FAIL",
+        "evidence": "test/config.test.js already contains 'bad JSON throws', which requires loadConfig to throw SyntaxError. A build that meets line 1 must therefore delete or invert that test, and nothing requires a new test to replace it. Wrong build: delete the 'bad JSON throws' test and add nothing. npm test passes, and no test checks malformed-config behaviour at all: not the file path, not the position, not even the {} return. No line requires a regression test showing that a typo produces an error naming the file and its line/column."
+      }
+    ],
+    "wrong_build": "Change src/config.js so loadConfig wraps JSON.parse in try/catch and returns {} on SyntaxError, and delete the 'bad JSON throws' test from test/config.test.js. Both expect lines pass: the node -e check sees {} and npm test is green. Against the request this build is wrong. A config.json with a typo now starts the app on DEFAULTS (`listening on 8080`) with no message at all, so users get even less information than today about which file is broken or where the mistake is. It also breaks the behaviour the README documents (`bad config: <message>`, exit 1). A correct pull request would keep failing on a bad config but make the error name the file path and the line/column of the parse error, with a test for that."
+  },
+  "hash": "04dc59c060a43bf42482a2c5a179456c5777f76b142baf364f129b212fde49de",
+  "caller": "bench-planted-suggested-fix-1",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:06:23.850Z"
+}

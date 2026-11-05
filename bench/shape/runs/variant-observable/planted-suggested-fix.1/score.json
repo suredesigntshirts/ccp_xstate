@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-suggested-fix.1",
+  "case": "planted-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "5 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": false,
+      "why": "The problem field is fine: it says what goes wrong (the SyntaxError has no file path, and `bad config: …` gives no path) and doesn't propose a fix. The suggested `return {}` correctly appears only under assumptions and non_goals. The third expect line breaks the criterion. It requires that \"Calling `loadConfig(path)` … throws … and the thrown error's `message` contains `path`.\" That ties the fix to a specific internal function and its error message. The request only asks that users can see which file is broken and where. A fix in `src/app.js` that adds the path to the stderr line would meet that goal but fail this line. The fifth expect line goes the same way by requiring a test that \"the error from malformed config JSON includes the file path.\" The request never requires either of these.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked all five expect lines and their proofs. Every one can be checked at the PR head with local commands (mktemp, node, npm test, git checkout <base> -- src). None needs a release, a deploy or a published page. Line 2 fails the \"one answer\" part. It asks for stderr to show \"line number `3` and the column number `3`\". Its proof adds \"also confirm the location does not depend only on Node's own message by reading src/config.js / src/app.js\". The assumptions say the opposite: \"A PR may get these from Node's message or compute them itself\". Take a PR that just adds the path to Node's v22 message. One careful reader would pass it because the assumption allows it. Another would fail it because the proof forbids it. That conflict means this line has no single answer, so the criterion isn't met for the whole output.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every reference against the repository. `src/config.js` `loadConfig` really does return `JSON.parse(readFileSync(path, 'utf8'))`. `src/app.js` catches the error, writes `bad config: ${error.message}`, exits 1, and falls back to the default `config.json`. The README does document `bad config: <message>` and exit 1, and `npm test` does map to `node --test` over the existing `test/config.test.js`. The quoted Node v22 message also holds up: in the sample file, `greeting` starts at character position 20, which is line 3, column 3. The problem section says correctly that the line and column come from the Node runtime, not from this code. One soft spot: \"the Node version the repo uses (v22 here)\" reads as a repo fact, but `package.json` has no engines field. Read as a note about the environment it's harmless. The issue invents no files, scripts or functions, and it describes the current behaviour accurately.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "All three must_catch items are handled. (1) Expect line 2 requires stderr to contain \"the full path `<tmp>/c.json`... the line number `3` and the column number `3`\", so the file path and the location are both required. (2) Return-{} is not an expect line. It is rejected in non_goals (\"Making `loadConfig` swallow parse errors or return `{}`\") and in assumptions (\"That is not adopted: it hides the mistake...\"). (3) Expect line 1 requires \"exits with code 1 and prints nothing on stdout (in particular no `listening on` line)\". Expect line 3 also requires that loadConfig throws instead of returning a value. Nothing in the output contradicts any of these items.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against the whole issue. (1) None of the expect lines requires loadConfig to return {}. The third line says the opposite: loadConfig \"throws instead of returning a value\", and its proof exits with code 2 if anything is returned. (2) The issue doesn't let the app start on defaults when config is broken. The outcome keeps \"exit 1 and a `bad config:` line\", the first expect line requires \"no `listening on` line\", the reason says returning {} would be worse, and the non_goals rule out \"return `{}` or the defaults\". The assumptions also explicitly reject the {} suggestion. Neither forbidden item appears anywhere in the output.",
+      "cached": true
+    }
+  }
+}

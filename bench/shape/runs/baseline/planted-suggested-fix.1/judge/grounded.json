@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "232ccb45b2572d289d6054ead1dfc7a1649a5a46904c30c72d9abf65e1fff724",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every name the issue uses against the repository: src/config.js, loadConfig(path), src/app.js, DEFAULTS, the `bad config: ${error.message}` catch with exit 1, the README's documented behaviour, `npm test` (node --test), and the existing test `bad JSON throws` asserting SyntaxError. All of them exist as described. The problem describes the code accurately. It notes the app exits 1 with a message rather than crashing with a stack trace, and that JSON.parse messages do not include the path. Its example also holds up: in that sample file, `greeting` starts at position 20, which is line 3, column 3. The claim that the ENOENT message names the missing path is correct for Node. The issue also checks out at the base commit `799ce33`. The repository listing doesn't show this hash, but it isn't a file, script, command or function, so it doesn't break the criterion. No invented artifacts were found.",
+  "model": "claude-opus-5-5",
+  "ms": 10726,
+  "tokens": {
+    "input": 2,
+    "output": 803,
+    "cacheCreation": 4398,
+    "cacheRead": 783,
+    "fresh": 5203,
+    "total": 5986
+  },
+  "at": "2026-11-05T07:29:46.421Z"
+}

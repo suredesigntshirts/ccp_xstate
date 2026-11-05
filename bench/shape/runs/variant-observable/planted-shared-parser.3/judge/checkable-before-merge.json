@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "bc82b83deef4ab3d3aeee0dce04174f1bb46b12b37e8aa1b6fb782fbe3dd7a97",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines and their proofs. Each one can be checked at the PR head with local tools. Lines 1–4 are exact-output `run` commands: `printf ... | node bin/csv2json.js [--tsv]` and an inline `node --input-type=module` import of src/parse.js. Each gives one precise answer, and the stated default-mode outputs match the current behaviour described in the problem. Line 5 needs `npm test` to exit 0 plus `grep -- '--tsv' test/*.js` and a read of the matching test. That is all in the repo, though \"asserts its JSON output\" needs a little judgement when reading it. Line 6 is a `read` of README.md for a --tsv usage example, which a reader can confirm in the branch. No line depends on a release, deploy, published page or npm publish, and publishing is listed as a non-goal.",
+  "model": "claude-opus-5-5",
+  "ms": 10720,
+  "tokens": {
+    "input": 2,
+    "output": 624,
+    "cacheCreation": 3786,
+    "cacheRead": 783,
+    "fresh": 4412,
+    "total": 5195
+  },
+  "at": "2026-11-05T07:27:46.270Z"
+}

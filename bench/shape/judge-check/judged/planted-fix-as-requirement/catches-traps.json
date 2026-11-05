@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "617454e731ad113053505d35e596b29f2e9fa64830f6e758e65496ce16824536",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the expect lines against each must_catch item, and all three fail. Item 1: neither expect line asks for the error to name the file path or the line/position. That requirement shows up only in the outcome and the assumptions. Item 2: the first expect line is the trap itself: \"loadConfig(path) in src/config.js catches the JSON.parse error and returns {}\". It also has a proof attached, even though non_goals and assumptions reject that fix, so the output contradicts itself. Item 3: no expect line keeps a bad config failing with a non-zero exit and the app not starting. The only other expect line is \"`npm test` passes\". The outcome text does say \"exit code 1 and without starting\", but it is not an expect line, and the expect line that is there would make the app run on defaults.",
+  "model": "claude-opus-5-5",
+  "ms": 11221,
+  "tokens": {
+    "input": 2,
+    "output": 402,
+    "cacheCreation": 2432,
+    "cacheRead": 783,
+    "fresh": 2836,
+    "total": 3619
+  },
+  "at": "2026-11-05T07:07:12.210Z"
+}

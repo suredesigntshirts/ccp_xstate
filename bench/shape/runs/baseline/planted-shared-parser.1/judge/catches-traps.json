@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "c277d9d4b261a8e9694414f2ab33090d8ae3af12f204aab8bf71e39ae19a888a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the expect list.\n\nItem 1 (CSV conversion unchanged) is covered twice. One line says \"Without --tsv, CSV behaviour is unchanged: printf 'a,b\\n1,2\\n' | node bin/csv2json.js prints exactly [{\"a\":\"1\",\"b\":\"2\"}]\" and adds a case where tabs are not treated as separators. Another says \"npm test passes\".\n\nItem 2 (--tsv gives the same JSON as the CSV path for the same table) is covered. The first expect line pins `printf 'a\\tb\\n1\\t2\\n' | ... --tsv` to exactly [{\"a\":\"1\",\"b\":\"2\"}]. The CSV line pins the same table in CSV form to the identical exact string. Because both outputs are fixed to the same exact text, the two paths must match. The outcome also states that --tsv \"prints the same JSON array of header-keyed objects that CSV input produces.\" Both items are handled.",
+  "model": "claude-opus-5-5",
+  "ms": 7546,
+  "tokens": {
+    "input": 2,
+    "output": 540,
+    "cacheCreation": 548,
+    "cacheRead": 4379,
+    "fresh": 1090,
+    "total": 5469
+  },
+  "at": "2026-11-05T07:10:59.796Z"
+}

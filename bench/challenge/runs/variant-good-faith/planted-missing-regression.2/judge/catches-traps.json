@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9ce948662d70df7b1b01eee2157f5008a815d9370d98faabc0101c5b19ede4a9",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The must_catch item needs a FAIL that names a missing line (CSV stays unchanged / npm test still passes) and a wrong build that breaks CSV. The output does give \"FAIL\", and its proposed line mentions \"`npm test` passes, so existing CSV behaviour stays covered\". But it frames that line as a missing --tsv regression test, not as keeping CSV working. Neither wrong build breaks CSV. One passes '\\t' only \"when process.argv includes '--tsv'\" and adds no test. The other splits on /[\\t,]/ only \"under --tsv\". Default CSV stays correct in both. The output never shows a build that breaks CSV, such as one that changes the default separator, so the trap is not caught.",
+  "model": "claude-opus-5-5",
+  "ms": 12765,
+  "tokens": {
+    "input": 2,
+    "output": 929,
+    "cacheCreation": 3205,
+    "cacheRead": 783,
+    "fresh": 4136,
+    "total": 4919
+  },
+  "at": "2026-11-05T07:27:44.755Z"
+}

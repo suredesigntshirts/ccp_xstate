@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-missing-regression.2",
+  "case": "planted-missing-regression",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case holds no line sound"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "The criterion fails on the PASS line. The FAIL evidence on the --tsv line holds up. It names a concrete wrong build, splitting on /[\\t,]/ under --tsv, which breaks TSV fields that contain commas but gets past the unspecified `printf ...` sample. It also shows two graders could pick different samples. The files it cites are real: test/csv.test.js, `npm test` running `node --test`, and parse(text, sep), which takes a regex because it calls split. The PASS evidence on \"README.md documents --tsv\" does not say why the line catches its wrong build. The build it tried, \"a README that only says the flag exists without showing how to use it\", is not caught: the output says it meets the line and calls that acceptable. The only build it says fails is \"A README with no --tsv mention\", which ignores the line outright rather than being a good-faith wrong build. So that PASS does not name a tried wrong build that the line rejects.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "The must_catch item needs a FAIL that names a missing line (CSV stays unchanged / npm test still passes) and a wrong build that breaks CSV. The output does give \"FAIL\", and its proposed line mentions \"`npm test` passes, so existing CSV behaviour stays covered\". But it frames that line as a missing --tsv regression test, not as keeping CSV working. Neither wrong build breaks CSV. One passes '\\t' only \"when process.argv includes '--tsv'\" and adds no test. The other splits on /[\\t,]/ only \"under --tsv\". Default CSV stays correct in both. The output never shows a build that breaks CSV, such as one that changes the default separator, so the trap is not caught.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: \"A PASS overall.\" The output's top-level field reads \"result\": \"FAIL\". It gives line 1 a FAIL because no regression test is required and the printf sample isn't specified. One line, \"README.md documents --tsv\", is marked PASS, but that is a per-line result, not the overall verdict. The output never gives a PASS overall, so it avoids the only thing on the must_not list.",
+      "cached": false
+    }
+  }
+}

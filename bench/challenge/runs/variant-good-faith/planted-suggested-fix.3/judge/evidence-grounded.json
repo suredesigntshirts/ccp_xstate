@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "0b833fe9101c028353ff9f67af3b91019d3c88da3a27043e9f65b988d926f911",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Both lines are FAIL, and each one names a concrete wrong build. Line 1 describes a PR that \"wraps JSON.parse in try/catch and returns {}\". That build meets the line, but app.js would then merge {} over DEFAULTS and print \"listening on 8080\" without any error, so the user still can't tell which file is broken or where. Line 2 says the builder rewrites the 'bad JSON throws' test to expect {}, so npm test goes green while the request is still missed. Everything the output cites exists in the repository: src/app.js catches the error and prints `bad config: <message>` with exit 1, the README documents that, DEFAULTS sets port 8080, and test/config.test.js has a test named 'bad JSON throws'. No line is a PASS, so the PASS part of the criterion doesn't apply. The evidence is grounded throughout.",
+  "model": "claude-opus-5-5",
+  "ms": 6847,
+  "tokens": {
+    "input": 2,
+    "output": 578,
+    "cacheCreation": 3279,
+    "cacheRead": 783,
+    "fresh": 3859,
+    "total": 4642
+  },
+  "at": "2026-11-05T07:27:40.978Z"
+}

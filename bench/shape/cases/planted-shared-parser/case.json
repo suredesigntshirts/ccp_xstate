@@ -1,0 +1,23 @@
+{
+  "kind": "planted",
+  "source": "Planted for wf-intake on bench/brief's csv2json seed: a new flag on a shared parser, with nothing said about the old path.",
+  "repo": {
+    "seed": "repo",
+    "message": "csv2json: CSV on stdin to a JSON array",
+    "origin": "https://github.com/o/csv2json.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/o/csv2json/issues/5",
+      "text": "Our exports come as TSV now. A --tsv flag on csv2json would save us a sed step."
+    }
+  },
+  "trap": "parse() in src/parse.js is shared by the CSV path, which has tests in test/csv.test.js. A build that breaks CSV while adding --tsv meets any issue that speaks only of --tsv.",
+  "must_catch": [
+    "An expect line keeps CSV conversion unchanged (the existing CSV tests or npm test still pass, or CSV output is the same as before).",
+    "An expect line pins --tsv output to the same JSON as the CSV path gives for the same table."
+  ],
+  "must_not": [
+    "An issue whose lines a build that breaks plain CSV input would still meet."
+  ]
+}

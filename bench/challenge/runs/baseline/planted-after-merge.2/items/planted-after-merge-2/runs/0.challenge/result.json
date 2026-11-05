@@ -1,0 +1,27 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "Today bin/greet.js skips --shout because it ignores every argument starting with '--', so `node bin/greet.js --shout Ada` prints 'Hello, Ada!'. A build that leaves this unchanged, or only adds docs, fails the line. I tried a hardcoded build that prints 'HELLO, ADA!' only for Ada. The line covers any <name>, so a reader can try another name and catch it. I also tried a build that upper-cases only the name ('Hello, ADA!'). The line requires the whole greeting in upper case, so it catches that too."
+      },
+      {
+        "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "result": "PASS",
+        "evidence": "I tried a build that makes shouting the default, or that changes the plain output. Running `node bin/greet.js Ada` would print something other than 'Hello, Ada!', so the line catches it. The existing test/greet.test.js 'cli' test also checks this exact output."
+      },
+      {
+        "line": "The published docs page at https://o.github.io/greet-cli/ documents --shout",
+        "result": "FAIL",
+        "evidence": "This line can only be checked after merge. .github/workflows/pages.yml publishes docs/ to GitHub Pages only on push to main, and README.md says the site is 'published from `docs/` on every push to main'. When the pull request is reviewed, the live page still shows the old docs/index.md, which does not mention --shout. So the line cannot pass before merge, and checking the live URL says nothing about the pull request. A checkable line would be that docs/index.md (the source published to the site) documents --shout."
+      }
+    ],
+    "wrong_build": "A pull request that adds --shout handling to bin/greet.js but leaves docs/index.md unchanged. At review time it meets lines 1 and 2, and no reviewer can grade line 3 against the pull request: the live Pages site reflects main, not the branch. Line 3 might happen to pass from another merge, or fail even for a correct pull request. After merge the published docs still would not mention --shout, which misses the request's ask that support can point people at the docs. The missing check is a pre-merge line that docs/index.md documents --shout."
+  },
+  "hash": "a5da4e83fdf1823f7513fc438cfcd7ec88946e707b42d9659a5053ec76961f90",
+  "caller": "bench-planted-after-merge-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:04:47.604Z"
+}

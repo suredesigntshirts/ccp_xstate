@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c8a1228ddfc787692f3a231766a0e54ff9000e73a23181e4d1f29bc000ab169a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines against the must_not item: no expect line should be checkable only on the published page or after merge. Five lines are CLI runs or `npm test` at the PR head. The docs line says \"docs/index.md documents the --shout option\", and its proof is \"Read docs/index.md at the PR head\", so it can be checked before merge too. Checking the live site (https://o.github.io/greet-cli/) is listed under non_goals: \"That only happens after merge\". The outcome mentions publishing after merge, but that sentence is not an expect line. The one assumption about publishing also limits the check to docs/index.md. No expect line breaks the rule.",
+  "model": "claude-opus-5-5",
+  "ms": 4362,
+  "tokens": {
+    "input": 2,
+    "output": 327,
+    "cacheCreation": 3225,
+    "cacheRead": 783,
+    "fresh": 3554,
+    "total": 4337
+  },
+  "at": "2026-11-05T07:10:05.430Z"
+}

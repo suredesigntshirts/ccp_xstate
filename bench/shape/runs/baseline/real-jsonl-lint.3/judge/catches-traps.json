@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "bc0bd362764c389f01817eab65f00f6a09725e4c326084e1907e1369e29772d9",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Items 1 and 2 are met. Item 1: one expect line says \"`npm ci && npm test` at the repo root runs them and exits 0\", and its proof requires the jsonl-lint tests to appear in the output. Item 2: one expect line says README's \"What is here\" section \"no longer says there are no tools and lists jsonl-lint\". Item 3 is not met. The expect lines ask only for a \"non-zero status\" for bad rows and the same \"non-zero status\" for a missing file, so they don't require distinct exit codes. No expect line covers calling the tool with no argument; that case appears only under assumptions. No expect line fixes the output form as file plus 1-based line per bad row. The assumptions say \"The exact output format is left to the builder\", and the expect lines only require that lines 2 and 4 be reported.",
+  "model": "claude-opus-5-5",
+  "ms": 8197,
+  "tokens": {
+    "input": 2,
+    "output": 514,
+    "cacheCreation": 4217,
+    "cacheRead": 783,
+    "fresh": 4733,
+    "total": 5516
+  },
+  "at": "2026-11-05T07:11:48.562Z"
+}

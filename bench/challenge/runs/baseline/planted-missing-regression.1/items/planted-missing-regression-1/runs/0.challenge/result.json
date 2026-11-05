@@ -1,0 +1,22 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints a JSON array with one object per row, keyed by the header row",
+        "result": "FAIL",
+        "evidence": "Wrong build: change src/parse.js so the default separator is /[\\t,]/ (or have bin always split on tabs and commas) and leave bin ignoring the flag. `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints [{\"a\":\"1\",\"b\":\"2\"}], so the line passes. But a TSV cell that holds a comma (e.g. 'x, y') gets split wrongly, and --tsv isn't a real flag. Another wrong build: bin splits on tab no matter what. --tsv works, but plain CSV with no flag breaks (test/csv.test.js 'cli' would fail), and no expect line requires that CSV without the flag still works or that `npm test` passes. The proof says 'printf ...' and leaves the input unspecified, so one reader might test with comma-free cells and another with comma-containing cells, and they would grade differently. Missing lines: (a) without --tsv, CSV output stays unchanged and `npm test` passes; (b) a regression test in test/ covers --tsv, including a cell that contains a comma."
+      },
+      {
+        "line": "README.md documents --tsv",
+        "result": "PASS",
+        "evidence": "Tried a README that only lists the flag name in passing. A reader can check at the same commit that README.md shows --tsv usage for tab-separated input, like the existing `node bin/csv2json.js < table.csv` example. A README with no --tsv fails it. This isn't a substantive weakness compared with the request."
+      }
+    ],
+    "wrong_build": "In src/parse.js, change the default separator to /[\\t,]/ and leave bin/csv2json.js accepting (or ignoring) --tsv. Add a README line: 'Use --tsv for tab-separated input: node bin/csv2json.js --tsv < table.tsv'. `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` gives the right JSON and the README documents --tsv, so every expect line passes. Yet TSV cells that contain commas are split apart, the flag does nothing, and no test is added. A variant that always splits on tabs also passes both lines while breaking default CSV parsing and the existing npm test. Nothing requires the CSV path to keep working or a --tsv regression test."
+  },
+  "hash": "304510df9de76d161c5f03eba92ae8335a7abe0063f58e18155fadc1e37f2d66",
+  "caller": "bench-planted-missing-regression-1",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:06:05.477Z"
+}

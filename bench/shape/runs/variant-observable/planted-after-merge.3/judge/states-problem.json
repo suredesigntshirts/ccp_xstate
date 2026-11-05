@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "36921283b1c009363bf1ff9a76320fbb9075093dfc97f70df306e35f362287c3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I read every expect line and the problem field. The expect lines describe behaviour you can observe: exact stdout such as `HELLO, ADA!`, exit codes, usage text on stderr with no name, `npm test` passing with a --shout test, and docs/index.md describing --shout. None of them names a technique, an internal function or a return value. The request requires the docs change, and docs/index.md is simply where the published site comes from. The upper-case reading of \"louder\" is stated under assumptions, which fits the rule. The only internal detail, that `greeting(name)` keeps returning `Hello, <name>!`, is under assumptions too, and it says \"How shouting is implemented is up to the builder.\" The problem field only says what is wrong: \"--shout ... is silently dropped\" and the docs don't mention it. It proposes no fix.",
+  "model": "claude-opus-5-5",
+  "ms": 10152,
+  "tokens": {
+    "input": 2,
+    "output": 525,
+    "cacheCreation": 3285,
+    "cacheRead": 783,
+    "fresh": 3812,
+    "total": 4595
+  },
+  "at": "2026-11-05T07:26:46.137Z"
+}

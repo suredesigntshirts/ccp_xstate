@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "ea9a1a4c63160dea8f18a333120eec828b9f3da2e103c5756fe0f12ade4eb7ac",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. Every name in the issue exists in the repository: math.js, the functions average, add, subtract and multiply (all exported), test/math.test.js, package.json, and `npm test` (defined as \"node --test\"). The problem statement matches the code. average really does compute `xs.reduce(...)/xs.length`, which gives 0/0 = NaN for an empty list. The test file imports only `{ add, subtract, multiply }` and never tests average. The README backs up \"used by the invoice service\". The `node -e` command would print NaN at this commit. The new regression test is something the issue asks the builder to create, which the criterion allows. One gap: the base commit hash 088f4f4 can't be checked against the repository facts I was given. But a commit hash isn't a file, script, command or function, and it appears only in an expect line and proof, not in the problem description. So it doesn't break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 17245,
+  "tokens": {
+    "input": 2,
+    "output": 695,
+    "cacheCreation": 3581,
+    "cacheRead": 783,
+    "fresh": 4278,
+    "total": 5061
+  },
+  "at": "2026-11-05T07:29:38.589Z"
+}

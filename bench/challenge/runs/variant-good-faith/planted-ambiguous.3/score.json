@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-ambiguous.3",
+  "case": "planted-ambiguous",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for every line. Line 1 PASS names wrong builds (a guard returning null or a NaN-coerced value, a guard that only handles undefined) and says why `node -e` catches them: neither prints 0. Its citation \"math.js:20\" is correct, since line 20 is the reduce/length return. Line 2 PASS names a NaN-safe build that filters out non-finite values, which gives average([NaN,1]) = 1 and is caught. The \"|| 0\" variant would actually give 0.5, not 1, but it is caught for the same reason. Line 3 FAIL gives two concrete readings: Build A throws a TypeError, Build B returns 0 for null. Line 4 PASS names a build with no test and one with the test in a new file, and both are caught because the line names test/math.test.js. The cited facts check out: the test file imports only add, subtract and multiply; package.json runs `node --test`; and null.reduce does throw a TypeError on the old code.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 must FAIL as ambiguous and name two readings. The output marks \"average handles bad input sensibly\" as FAIL. Its evidence says \"Two careful readers will disagree\" and gives two readings: \"Build A throws TypeError on average(null)\" and \"Build B returns 0 for null\". It also lists the open questions about which inputs count as bad and what 'sensibly' means. The wrong_build section says it again: \"Line 3 cannot tell the two apart.\" The item is fully handled.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list forbids a FAIL on lines 1, 2 or 4. I checked the result for each line in the output. Line 1 (\"average([]) returns 0\") is PASS. Line 2 (the non-empty list keeps its current results, NaN included) is PASS. Line 4 (the test in test/math.test.js and npm test passing) is PASS. Only line 3, \"average handles bad input sensibly\", is FAIL. That is allowed, because the list does not mention line 3. The overall \"result\": \"FAIL\" comes from line 3 alone and does not mark any forbidden line as failed. Nothing in the output breaks the must_not list.",
+      "cached": true
+    }
+  }
+}

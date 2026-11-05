@@ -1,0 +1,27 @@
+{
+  "result": {
+    "result": "PASS",
+    "lines": [
+      {
+        "line": "average([]) returns 0",
+        "result": "PASS",
+        "evidence": "Tried a build that leaves average unchanged and only patches the caller, and one that returns a falsy non-number such as null. Both fail `node -e` because the line names average([]) and the value 0. A -0 result would also be caught by the strict-equal test in line 3."
+      },
+      {
+        "line": "average of a non-empty list returns what the current math.js returns for it, NaN included: average([2, 4]) is 3, average([5]) is 5 and average([NaN, 1]) is NaN",
+        "result": "PASS",
+        "evidence": "The strongest wrong build hides the symptom with `|| 0` or `Number.isNaN(r) ? 0 : r`. That turns every NaN into 0, which the request does not ask for. The line's average([NaN, 1]) is NaN example catches it. 'Current math.js' means the base commit (reduce sum / length), which can be compared with node -e before merge. Filtering or validating entries is a non-goal and would also break the NaN example."
+      },
+      {
+        "line": "test/math.test.js has a test that calls average([]) and expects 0, and npm test passes",
+        "result": "PASS",
+        "evidence": "The existing test file doesn't import average, so a build that fixes math.js with no regression test fails this line. A test that uses loose `== 0` or checks only for 'not NaN' doesn't 'expect 0' in the plain reading. The file uses node:assert/strict, so assert.equal is Object.is-strict. `npm test` (node --test) can be run on the PR branch before merge."
+      }
+    ],
+    "wrong_build": "None found. The closest was `return xs.reduce(...) / xs.length || 0;` with a test asserting average([]) === 0. It meets lines 1 and 3 but changes average([NaN, 1]) to 0, and line 2's explicit NaN example stops it."
+  },
+  "hash": "877919413ad4f9f9370378e02b6c67f7ec3212d57609c29b85231a5713bad276",
+  "caller": "bench-clean-average-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:23:59.925Z"
+}

@@ -1,0 +1,32 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "Strongest wrong build tried: hardcoding 'HELLO, ADA!' when --shout is present, or only working when --shout is argv[2]. The line is written for any <name>, so a careful reader running a second name (e.g. --shout Bob) catches the hardcode. Argument order is not part of the request. Today bin/greet.js silently drops any --flag (find(a => !a.startsWith('--'))), so a build with no change prints 'Hello, Ada!' and fails this line."
+      },
+      {
+        "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "result": "PASS",
+        "evidence": "Tried a build that uppercases every time or changes the default output. The run proof (node bin/greet.js Ada) catches it, and so does the existing test/greet.test.js 'cli' test, which asserts the exact output 'Hello, Ada!\\n'."
+      },
+      {
+        "line": "docs/index.md documents the --shout option with an example",
+        "result": "FAIL",
+        "evidence": "Wrong build that meets the words: add a separate '## Options' section at the bottom of docs/index.md that says '--shout: louder greeting' with the example `node bin/greet.js --shout Ada` → `Hello, Ada!` (wrong output), or with no output shown. The request asks for the docs 'next to the existing usage' (the ```node bin/greet.js <name>``` block followed by 'Prints `Hello, <name>!`.'). The line asks for neither placement next to that usage nor an example whose output is correct (HELLO, ADA!). One reader passes any mention of --shout with an example; another fails it for placement or accuracy. The line should require the --shout usage and its correct upper-case output next to the existing usage block."
+      },
+      {
+        "line": "npm test passes and includes a test that runs node bin/greet.js --shout Ada and asserts it prints HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "Tried a test that only calls a helper (e.g. greeting('Ada').toUpperCase()) and never runs the CLI. The line requires running node bin/greet.js --shout Ada, so that test fails it. npm test runs 'node --test', which finds test/greet.test.js, and it can be run locally at the PR commit. No CI runs on PRs (pages.yml runs only on push to main), but the run proof doesn't need CI."
+      }
+    ],
+    "wrong_build": "A PR that adds --shout to bin/greet.js (uppercases the greeting when --shout is present), adds a CLI test asserting 'HELLO, ADA!\\n', and appends a disconnected '## Extras' section to the end of docs/index.md showing `node bin/greet.js --shout Ada` with the wrong output 'Hello, Ada!', or with no output. It meets all four lines as worded. It still misses the request: the docs are not 'next to the existing usage', and their example misstates what --shout prints, so the published docs page would mislead the support folks who asked for it."
+  },
+  "hash": "d3b1aa2cba40aa698ea932e65dd7f09aaeeec08ae2edc32c7ca76d3b885283a0",
+  "caller": "bench-clean-shout-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:09:17.731Z"
+}

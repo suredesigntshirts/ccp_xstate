@@ -1,0 +1,27 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "At the base commit, bin/greet.js drops every --flag, so `node bin/greet.js --shout Ada` prints `Hello, Ada!`. Running it catches any build that only documents the flag or doesn't wire it in. I tried a build that uppercases only the name (`Hello, ADA!`): it fails the example HELLO, ADA!. I tried a build that uppercases the greeting before it is formatted: it gives the same output, which is fine. The line can be checked by running it at the PR commit, and two readers would get the same result."
+      },
+      {
+        "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "result": "PASS",
+        "evidence": "The strongest wrong build I tried makes shouting the default or always uppercases. Running `node bin/greet.js Ada` and expecting `Hello, Ada!` catches it. The existing `cli` test in test/greet.test.js also guards this. The check is clear and can be run at the PR commit."
+      },
+      {
+        "line": "The published docs page at https://o.github.io/greet-cli/ documents --shout",
+        "result": "FAIL",
+        "evidence": "This can only be checked after merge. .github/workflows/pages.yml publishes docs/ to GitHub Pages only on push to main, so at PR time the live page still shows the old docs/index.md, which has no --shout. Reviewed before merge, every correct PR fails this line. Also, a PR that leaves docs/ alone can't be judged against this line until after merge, and it only fails then. The missing PR-time line is something like: docs/index.md documents --shout (usage `node bin/greet.js --shout <name>` and its upper-case output), since docs/ is what Pages publishes."
+      }
+    ],
+    "wrong_build": "Add --shout handling to bin/greet.js (and possibly src/greet.js) and leave docs/index.md unchanged. Lines 1 and 2 pass at the PR commit. Line 3 can't be judged before merge: the live Pages site isn't updated until after merge, so a reviewer can't tell this PR from a correct one. After merge the published docs still won't mention --shout, so support can't point people at it, which the request explicitly asked for. A line requiring docs/index.md to document --shout is missing."
+  },
+  "hash": "dde0847848c256979c9bf2f968c3ffec0d53bb1ae9e27427da10f26687789e1a",
+  "caller": "bench-planted-after-merge-1",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:24:33.486Z"
+}

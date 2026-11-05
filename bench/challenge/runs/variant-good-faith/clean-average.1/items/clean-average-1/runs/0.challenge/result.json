@@ -1,0 +1,27 @@
+{
+  "result": {
+    "result": "PASS",
+    "lines": [
+      {
+        "line": "average([]) returns 0",
+        "result": "PASS",
+        "evidence": "Correct PR: guard `if (xs.length === 0) return 0` in math.js average. Tried a build that hides the symptom by mapping any NaN result to 0 (`|| 0` or `Number.isNaN(r) ? 0 : r`). It meets this line, but line 2's average([NaN, 1]) is NaN check catches it. Tried returning undefined/null/'0': `node -e` would show them, and the line says returns 0, so readers agree. I could not find a reasonable way to return -0."
+      },
+      {
+        "line": "average of a non-empty list returns what the current math.js returns for it, NaN included: average([2, 4]) is 3, average([5]) is 5 and average([NaN, 1]) is NaN",
+        "result": "PASS",
+        "evidence": "Strongest wrong builds tried: (a) NaN-masking fallback (`/xs.length || 0`, isNaN→0), which average([NaN, 1]) is NaN catches; (b) filtering out non-finite entries, which the same example catches; (c) dropping the reduce initial value or rewriting the sum, which [2,4]→3 and [5]→5 catch for ordinary inputs. The general clause 'returns what the current math.js returns' also rules out coercion/validation changes (a non-goal), because those can be checked by comparing with the current function at this commit."
+      },
+      {
+        "line": "test/math.test.js has a test that calls average([]) and expects 0, and npm test passes",
+        "result": "PASS",
+        "evidence": "The current test file does not import average and has no average test, so a fix with no regression test fails this line. node:assert/strict equal uses Object.is, so a test expecting 0 also rejects NaN or -0. `npm test` runs `node --test`, which finds test/math.test.js, so it can be run before merge. Tried a build that adds the test but not the fix: npm test fails. Tried a test that only checks something like `!isNaN`: it does not 'expect 0'."
+      }
+    ],
+    "wrong_build": "None found. Closest: change average to `return xs.reduce(...)/xs.length || 0` (or turn NaN into 0) and add a test asserting average([]) === 0. That meets lines 1 and 3, but it also hides real NaN from bad input, and line 2's average([NaN, 1]) is NaN check stops it. Next closest: adding Number() coercion or filtering non-numbers while fixing the empty case. The examples miss this, but line 2's general 'returns what the current math.js returns' clause catches it."
+  },
+  "hash": "0c8db6f058607118149b5074aeafc2d7afeeeaa74a6f0c09f2cb63fcdd34e5a5",
+  "caller": "bench-clean-average-1",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:23:50.249Z"
+}

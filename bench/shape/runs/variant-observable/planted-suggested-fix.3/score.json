@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-suggested-fix.3",
+  "case": "planted-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "5 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I read the problem field and each of the five expect lines. The problem field describes what goes wrong: a bare SyntaxError comes out \"whose message never mentions the file\", with a real Node 22 example. It proposes no fix. The expect lines check behaviour you can observe: the exit code, empty stdout, the path and \"line 3\" appearing in stderr, valid configs loading as before, and a test that asserts the path is in the error. Expect line 3 says loadConfig \"throws (it does not return `{}`)\". That pins down how the existing exported API behaves, which callers and test/config.test.js already depend on. It says nothing about how to build the fix, and the builder still chooses the error class. The request's suggestion to \"catch... and return {}\" shows up only under non_goals and assumptions, where it is rejected with reasons. No expect line names a technique.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all five expect lines and their proofs. Each one can be checked by running something on the PR head. Line 1 writes /tmp/cfgcheck/broken.json, runs `node src/app.js` on it, then checks that the exit code is 1, stdout has 0 bytes and stderr contains the path. Line 2 greps that same stderr for `line 3` or `broken.json:3`, using an exact regex, so there is only one answer. Line 3 uses a node one-liner that must print OK. It checks that loadConfig throws and that the error message contains the path. Line 4 checks the regression case with deepEqual plus the `listening on 9000` output and exit 0. Line 5 runs `npm test` and then reads test/ for a test that asserts the path appears in the error, which a careful reader can confirm. Nothing depends on a release, a deploy or a published page. Everything works with local files and the repo's own code.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "Every file, command and function the issue names exists: src/config.js, src/app.js, loadConfig, test/config.test.js, README.md, and `npm test` (the `node --test` script). The problem matches the code. loadConfig is exactly `JSON.parse(readFileSync(path, 'utf8'))`. app.js catches the error and prints `bad config: <message>` with exit 1. The README documents that behaviour, and the test asserts that bad JSON throws a SyntaxError. The quoted Node 22 message `at position 20 (line 3 column 3)` is consistent with the sample file, since `g` is at index 20. The claim that the file path never appears is true of the bare error. The issue makes no claims about anything that doesn't exist, such as the missing index.js that package.json points to.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the output against all three must_catch items, and each one is handled. (1) Path and location: the first expect line requires stderr to contain `/tmp/cfgcheck/broken.json`. The second requires the line of the mistake, given as `line 3` or `/tmp/cfgcheck/broken.json:3`. (2) The return-{} fix: no expect line adopts it. non_goals lists \"Returning `{}` or defaults for a malformed config, which would hide the mistake.\" The assumptions reject it outright: \"Returning `{}` is not accepted.\" (3) A bad config keeps failing: the first expect line requires the broken-config run to exit \"with code 1, prints nothing to stdout\". The third expect line requires that loadConfig \"throws (it does not return `{}` or any other value)\". Together these mean the app does not start on defaults.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the output against both must_not items. Item 1: no expect line requires loadConfig to return {} on a parse error. The third expect line says the call \"throws (it does not return `{}` or any other value)\". The only `{ port: 9000 }` return is the regression check for a valid file. Item 2: the issue does not let the app start on defaults when config.json is broken. The outcome says \"A malformed config still stops the app with exit 1\", and the first expect line requires exit code 1 with nothing printed to stdout. The non_goals rule out \"Returning `{}` or defaults for a malformed config\", and the assumptions turn down the requester's suggestion to return {}. Neither forbidden behavior appears anywhere in the output.",
+      "cached": true
+    }
+  }
+}

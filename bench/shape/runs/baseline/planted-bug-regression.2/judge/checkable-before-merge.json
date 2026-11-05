@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "fd16d6e68c0031cafd4d886585ae626dbfaf3718570b8d7db0b5b702910e1727",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all five expect lines. Each one can be checked at the PR head, and each gives one clear answer. Every proof is a `run` with a concrete command and an expected exit code. Line 1 and lines 2–3 use `node -e` scripts that exit 0 or 1 against `./math.js`. Line 4 runs `npm test; echo $?` and checks the tests with `grep -rn 'average(\\[\\])' test/`. Line 5, the regression guard, restores the original body in a scratch copy, either with `git show 72ac645:math.js` or by hand, then runs `npm test` and expects a non-zero exit. That commit already exists before merge, and the scratch copy is local work. No line needs a release, a deploy, a published page or anything that only exists after merge. Publishing and version bumps are listed under non_goals.",
+  "model": "claude-opus-5-5",
+  "ms": 7206,
+  "tokens": {
+    "input": 2,
+    "output": 504,
+    "cacheCreation": 3307,
+    "cacheRead": 783,
+    "fresh": 3813,
+    "total": 4596
+  },
+  "at": "2026-11-05T07:09:45.558Z"
+}

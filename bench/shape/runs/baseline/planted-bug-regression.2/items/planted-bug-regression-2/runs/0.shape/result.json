@@ -1,0 +1,60 @@
+{
+  "result": {
+    "issue": {
+      "title": "average([]) returns NaN instead of 0",
+      "problem": "In math.js, average(xs) is `xs.reduce((sum, x) => sum + x, 0) / xs.length`. For an empty array that is 0/0, so `node -e 'console.log(require(\"./math\").average([]))'` prints NaN. test/math.test.js imports only add, subtract and multiply; average has no tests at all, so nothing caught this.",
+      "reason": "mathlib is used by the invoice service (package.json description). A NaN from average([]) spread into an invoice total last week (issue #9). An empty list should give 0, a usable number.",
+      "outcome": "average([]) returns the number 0. average of a non-empty list still returns the arithmetic mean. The test suite has a test for average that catches this bug if it comes back.",
+      "expect": [
+        "`node -e 'const {average}=require(\"./math.js\"); const r=average([]); if(!(typeof r===\"number\" && r===0)) {console.error(r); process.exit(1)}'` exits 0, so average([]) returns the number 0, not NaN, undefined, null, a string or a thrown error",
+        "average of non-empty arrays is unchanged: average([2,4])===3, average([1,2,3,4])===2.5, average([5])===5, average([-1,1])===0 and average([-2,-4])===-3",
+        "math.js still exports add, subtract, multiply and average, and add(2,3)===5, subtract(5,3)===2 and multiply(2,3)===6 still hold",
+        "`npm test` exits 0 and its output shows at least one test under test/ that calls average([]) and asserts the result is 0",
+        "Regression guard: if the body of average in math.js is put back to the original `return xs.reduce((sum, x) => sum + x, 0) / xs.length;` while the PR's test files stay as they are, `npm test` exits non-zero"
+      ],
+      "proofs": [
+        {
+          "line": "`node -e 'const {average}=require(\"./math.js\"); const r=average([]); if(!(typeof r===\"number\" && r===0)) {console.error(r); process.exit(1)}'` exits 0, so average([]) returns the number 0, not NaN, undefined, null, a string or a thrown error",
+          "proof": "run",
+          "how": "At the repo root of the PR head, run: node -e 'const {average}=require(\"./math.js\"); const r=average([]); if(!(typeof r===\"number\" && r===0)) {console.error(r); process.exit(1)}'; echo $?  It should print 0."
+        },
+        {
+          "line": "average of non-empty arrays is unchanged: average([2,4])===3, average([1,2,3,4])===2.5, average([5])===5, average([-1,1])===0 and average([-2,-4])===-3",
+          "proof": "run",
+          "how": "node -e 'const {average:a}=require(\"./math.js\"); const ok=a([2,4])===3&&a([1,2,3,4])===2.5&&a([5])===5&&a([-1,1])===0&&a([-2,-4])===-3; process.exit(ok?0:1)'; echo $?  It should print 0."
+        },
+        {
+          "line": "math.js still exports add, subtract, multiply and average, and add(2,3)===5, subtract(5,3)===2 and multiply(2,3)===6 still hold",
+          "proof": "run",
+          "how": "node -e 'const m=require(\"./math.js\"); const ok=[\"add\",\"subtract\",\"multiply\",\"average\"].every(k=>typeof m[k]===\"function\")&&m.add(2,3)===5&&m.subtract(5,3)===2&&m.multiply(2,3)===6; process.exit(ok?0:1)'; echo $?  It should print 0."
+        },
+        {
+          "line": "`npm test` exits 0 and its output shows at least one test under test/ that calls average([]) and asserts the result is 0",
+          "proof": "run",
+          "how": "Run `npm test; echo $?` and check it prints 0 with `# fail 0`. Then run `grep -rn 'average(\\[\\])' test/` and confirm a match inside an assertion that expects 0."
+        },
+        {
+          "line": "Regression guard: if the body of average in math.js is put back to the original `return xs.reduce((sum, x) => sum + x, 0) / xs.length;` while the PR's test files stay as they are, `npm test` exits non-zero",
+          "proof": "run",
+          "how": "In a scratch copy of the PR head, run `git show 72ac645:math.js > math.js` (or edit average's body back to the original line by hand), then run `npm test; echo $?`. It should print a non-zero exit code with an average test failing. Throw the scratch copy away afterwards."
+        }
+      ],
+      "non_goals": [
+        "Changing the behaviour of add, subtract or multiply",
+        "Validating non-array input, or arrays with non-numeric or NaN items",
+        "Changing how the invoice service computes totals, or fixing invoices already affected",
+        "Publishing a release or bumping the package version"
+      ],
+      "assumptions": [
+        "Only an empty array (length 0) is in scope. null, undefined and non-array arguments keep their current behaviour.",
+        "average([]) must return the number 0 and must not throw, because the request says an empty list should average to 0.",
+        "The regression test goes under test/ (for example test/math.test.js) so that the existing `node --test` script runs it.",
+        "A README mention of the empty-list behaviour is welcome but not required."
+      ]
+    }
+  },
+  "hash": "e6f1bf2684a4a90aaa0b0d58c0f0938314b03ced30d1b265e047b8fb6cc12f57",
+  "caller": "bench-planted-bug-regression-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:00:55.110Z"
+}

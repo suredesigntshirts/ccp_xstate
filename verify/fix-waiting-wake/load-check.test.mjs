@@ -12,7 +12,10 @@ const ASKING = { 'quick-fix': ['awaitingGates', 'awaitingMerge', 'replanning'], 
 
 test('load-check: the three workflows in workflows/ load', () => {
   for (const name of Object.keys(ASKING)) assert.ok(loadWorkflow(name).id.startsWith(`${name}@`));
-  assert.deepEqual(readdirSync(REPO).filter((f) => f.endsWith('.json')).sort(), ['feature.json', 'quick-fix.json', 'research.json']);
+  // wf-intake added workflows/intake.json: the three are still there, and every workflow in the folder loads.
+  const files = readdirSync(REPO).filter((f) => f.endsWith('.json')).sort();
+  for (const f of ['feature.json', 'quick-fix.json', 'research.json']) assert.ok(files.includes(f), f);
+  for (const f of files) assert.ok(loadWorkflow(f.slice(0, -5)).id.startsWith(`${f.slice(0, -5)}@`), f);
 });
 
 test('load-check: every asking state has after.checkBack of one hour, and nothing else asks', () => {

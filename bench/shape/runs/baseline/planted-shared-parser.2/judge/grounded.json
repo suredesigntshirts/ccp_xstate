@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "08f61a3279bca8f6d61480ddf734fbf8d3a1d93bdd9e0e7a0556542b427fd305",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every name the issue mentions against the repo. bin/csv2json.js, src/parse.js, README.md, test/ and `npm test` (the script is \"node --test\") all exist. `parse(text, sep = ',')` matches src/parse.js exactly, and the 'parse' and 'cli' tests are in test/csv.test.js. The problem statement matches the code. The CLI really does ignore its arguments and calls `parse(readFileSync(0, 'utf8'))`, so it splits on commas only. A tab-separated line really would become one column keyed by the tab-joined header. The expected no-flag output `[{\"a\\tb\":\"1\\tb\"}]` is correct, because JSON.stringify writes a tab as \\t. The `--tsv` flag and the new test are things the issue asks the builder to create. One small slip: an assumption says the request \"suggests reusing parse()'s existing sep parameter\", which the request never says. But that sep parameter does exist, so nothing named is missing and nothing about the repo is misdescribed.",
+  "model": "claude-opus-5-5",
+  "ms": 10457,
+  "tokens": {
+    "input": 2,
+    "output": 719,
+    "cacheCreation": 4448,
+    "cacheRead": 783,
+    "fresh": 5169,
+    "total": 5952
+  },
+  "at": "2026-11-05T07:29:44.703Z"
+}

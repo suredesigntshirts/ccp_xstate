@@ -1,0 +1,32 @@
+{
+  "result": {
+    "result": "PASS",
+    "lines": [
+      {
+        "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "Right now bin/greet.js skips any argument that starts with '--', so a build that changes nothing prints 'Hello, Ada!' for --shout Ada and fails the run proof. Upper-casing only the name ('Hello, ADA!') or only the greeting fails the HELLO, ADA! example. To pass, a build would have to hardcode the output for Ada, which is gaming the line, not a good-faith mistake."
+      },
+      {
+        "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "result": "PASS",
+        "evidence": "A build that upper-cases every greeting, or turns shouting on by default (for example by changing greeting() in src/greet.js), prints HELLO, ADA! here and fails. The existing 'greeting' and 'cli' tests in test/greet.test.js also catch it."
+      },
+      {
+        "line": "docs/index.md documents the --shout option with an example",
+        "result": "PASS",
+        "evidence": "A build that documents --shout only in README.md, or only in the usage text on stderr, leaves docs/index.md unchanged and fails the read proof. That file holds only the usage block and one 'Prints' line, so wherever --shout is added it sits next to the existing usage, and two readers would grade it the same. pages.yml publishes docs/ but is a non-goal, and checking the line does not depend on deployment."
+      },
+      {
+        "line": "npm test passes and includes a test that runs node bin/greet.js --shout Ada and asserts it prints HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "A build that tests only a shout() helper in src/greet.js, or adds no test, fails because the line asks for a test that runs the CLI. npm test is 'node --test', which finds test/*.test.js, and the existing cli test already uses execFileSync from the repo root, so the result is the same before and after merge. Whether the assertion includes the trailing newline does not change the grading."
+      }
+    ],
+    "wrong_build": "No wrong build met all four lines. The closest is a build that only works when --shout comes first (for example it checks process.argv[2] === '--shout'), so 'node bin/greet.js Ada --shout' prints a normal greeting. The request does not say where the flag must go, and the current parser accepts flags anywhere, so I did not count this as wrong. A build that hardcodes the Ada output would also pass, but that is gaming, which the rules exclude."
+  },
+  "hash": "26154e8636ae92e39f1884901fbf859ce83135ef6ff92648fb7b3b7c42cb1ba2",
+  "caller": "bench-clean-shout-1",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:23:44.834Z"
+}

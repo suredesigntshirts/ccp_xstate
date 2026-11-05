@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "a29948747a13089d9a708a43cc6ec9979a45564dda7dab08dafcfff8e892522d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list forbids only a FAIL on lines 1 or 2. I checked the result on each line. Line 1 (\"--shout <name> prints ... upper case\") is \"PASS\". The missing test is noted but \"not counted against this line.\" Line 2 (\"without --shout still prints\") is \"PASS\" with \"I could not break this line.\" Only line 3, the published docs page, is \"FAIL\". The output's overall \"FAIL\" comes from line 3, not from lines 1 or 2. The wrong_build section says a line requiring a CLI test is missing, but it does not mark line 1 or 2 as FAIL. So the output does nothing on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 6201,
+  "tokens": {
+    "input": 2,
+    "output": 308,
+    "cacheCreation": 3458,
+    "cacheRead": 783,
+    "fresh": 3768,
+    "total": 4551
+  },
+  "at": "2026-11-05T07:21:02.521Z"
+}

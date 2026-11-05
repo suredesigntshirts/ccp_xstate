@@ -1,0 +1,81 @@
+{
+  "result": {
+    "issue": {
+      "title": "Add a jsonl-lint tool that reports every non-JSON row of a JSONL file by line number",
+      "problem": "The repo has no tool for checking JSONL journals. `packages/` does not exist yet (README: \"No tools yet: `packages/` is empty, and `npm test` says so and passes\"), so there is nothing that finds a torn or hand-edited row in a JSONL file before a reader trips over it.",
+      "reason": "Journals are kept as JSONL, and one row that is not valid JSON breaks the readers. A linter that names every bad row with its line number, and fails when there is one, lets a person or a CI step catch the damage and fix exactly those rows.",
+      "outcome": "A standalone `jsonl-lint` workspace exists under `packages/`. Given a file path it reports every row that is not valid JSON with its 1-based line number and exits non-zero if any exist, exits 0 on a clean file, and treats a missing file as an error. It has node:test tests run by the root `npm test`, and CI is green.",
+      "expect": [
+        "After `npm ci` at the repo root, `npx --no-install jsonl-lint <file>` runs the tool (a workspace under `packages/` declares a `bin` named `jsonl-lint`).",
+        "On a file whose 5 lines are `{\"a\":1}`, `{\"a\":`, `[1,2]`, `not json`, `\"ok\"` (newline-terminated), the tool exits with a non-zero status and its output (stdout+stderr) reports line 2 and line 4 as invalid and reports no other line number as invalid.",
+        "On a file of valid JSON rows that ends with a trailing newline and contains one empty line between rows (`{\"a\":1}\\n\\n{\"b\":2}\\n`), the tool exits 0 and reports no row as invalid.",
+        "Given a path to a file that does not exist, the tool exits with a non-zero status and prints an error message that names that path; it does not exit 0.",
+        "The new workspace has `node:test` tests covering an invalid-row file, a valid file and a missing file, and `npm ci && npm test` at the repo root runs them and exits 0.",
+        "The new workspace's package.json declares no `dependencies` (zero runtime dependencies) and the tool is plain ES modules with no build step.",
+        "The `test` GitHub Actions check passes on the pull request.",
+        "README.md's \"What is here\" section no longer says there are no tools and lists jsonl-lint with how to run it."
+      ],
+      "proofs": [
+        {
+          "line": "After `npm ci` at the repo root, `npx --no-install jsonl-lint <file>` runs the tool (a workspace under `packages/` declares a `bin` named `jsonl-lint`).",
+          "proof": "run",
+          "how": "npm ci && printf '{\"a\":1}\\n' > /tmp/ok1.jsonl && npx --no-install jsonl-lint /tmp/ok1.jsonl; echo \"exit=$?\"  — expect the tool to run (no 'command not found'/npx install prompt) and exit=0; also `grep -l '\"jsonl-lint\"' packages/*/package.json` shows a bin entry."
+        },
+        {
+          "line": "On a file whose 5 lines are `{\"a\":1}`, `{\"a\":`, `[1,2]`, `not json`, `\"ok\"` (newline-terminated), the tool exits with a non-zero status and its output (stdout+stderr) reports line 2 and line 4 as invalid and reports no other line number as invalid.",
+          "proof": "run",
+          "how": "printf '{\"a\":1}\\n{\"a\":\\n[1,2]\\nnot json\\n\"ok\"\\n' > /tmp/mixed.jsonl && npx --no-install jsonl-lint /tmp/mixed.jsonl 2>&1; echo \"exit=$?\"  — expect exit≠0, output naming lines 2 and 4, and no mention of lines 1, 3 or 5 as invalid."
+        },
+        {
+          "line": "On a file of valid JSON rows that ends with a trailing newline and contains one empty line between rows (`{\"a\":1}\\n\\n{\"b\":2}\\n`), the tool exits 0 and reports no row as invalid.",
+          "proof": "run",
+          "how": "printf '{\"a\":1}\\n\\n{\"b\":2}\\n' > /tmp/valid.jsonl && npx --no-install jsonl-lint /tmp/valid.jsonl 2>&1; echo \"exit=$?\"  — expect exit=0 and no row reported as invalid."
+        },
+        {
+          "line": "Given a path to a file that does not exist, the tool exits with a non-zero status and prints an error message that names that path; it does not exit 0.",
+          "proof": "run",
+          "how": "rm -f /tmp/no-such-journal.jsonl; npx --no-install jsonl-lint /tmp/no-such-journal.jsonl 2>&1; echo \"exit=$?\"  — expect exit≠0 and output containing /tmp/no-such-journal.jsonl."
+        },
+        {
+          "line": "The new workspace has `node:test` tests covering an invalid-row file, a valid file and a missing file, and `npm ci && npm test` at the repo root runs them and exits 0.",
+          "proof": "run",
+          "how": "npm ci && npm test; echo \"exit=$?\"  — expect exit=0 and the jsonl-lint workspace's tests listed in the output; read its test file(s) to confirm they import node:test and cover the three cases."
+        },
+        {
+          "line": "The new workspace's package.json declares no `dependencies` (zero runtime dependencies) and the tool is plain ES modules with no build step.",
+          "proof": "read",
+          "how": "Read the jsonl-lint workspace's package.json: no `dependencies` key (or an empty one), `\"type\": \"module\"` or .mjs sources, and no build script required before the bin runs."
+        },
+        {
+          "line": "The `test` GitHub Actions check passes on the pull request.",
+          "proof": "ci",
+          "how": "Read the `test` workflow check (.github/workflows/test.yml: npm ci + npm test) on the PR head; it must be green."
+        },
+        {
+          "line": "README.md's \"What is here\" section no longer says there are no tools and lists jsonl-lint with how to run it.",
+          "proof": "read",
+          "how": "Read README.md at the PR head, section \"What is here\"."
+        }
+      ],
+      "non_goals": [
+        "Validating rows against a schema or checking anything beyond whether each row parses as JSON.",
+        "Repairing or rewriting bad rows.",
+        "Linting several files or directories in one call, or reading from stdin.",
+        "Changing the harness in suredesigntshirts/ccp_machine or wiring the tool into it.",
+        "Publishing the package to npm."
+      ],
+      "assumptions": [
+        "The tool lives in its own workspace under `packages/` (e.g. `packages/jsonl-lint`) per CLAUDE.md, and the command is named `jsonl-lint` as in the request.",
+        "Line numbers are 1-based, counted by newline-separated physical lines of the file.",
+        "Empty (or whitespace-only) lines, including the one after a trailing final newline, are not rows and are not reported; every other line must parse with JSON.parse, so any JSON value (object, array, string, number) counts as valid.",
+        "The exact output format is left to the builder as long as each invalid row is identifiable by its line number; listing a short reason per row is welcome but not required.",
+        "Calling the tool with no file argument is a usage error with a non-zero exit.",
+        "The workspace is added to package-lock.json so `npm ci` still succeeds."
+      ]
+    }
+  },
+  "hash": "c3eca0cdda18bfae47121bcdfef64dc49b3a7a93a9115791dd8eca2725e21846",
+  "caller": "bench-real-jsonl-lint-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:03:35.857Z"
+}

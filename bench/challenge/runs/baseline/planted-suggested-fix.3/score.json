@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-suggested-fix.3",
+  "case": "planted-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case holds no line sound"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds: the output has two FAIL lines and no PASS lines, and each FAIL names a concrete wrong build. Line 1: wrapping JSON.parse in try/catch and returning {} meets the line. But app.js then merges {} into DEFAULTS and prints \"listening on 8080\" with no error, so the typo is hidden. That misses the request's \"can't tell which file is broken or where.\" Line 2: deleting the \"bad JSON throws\" test lets npm test pass with nothing checking that the file path or error position is reported. I checked every citation against the repository and all are real: test/config.test.js:15 is the SyntaxError test, the README promises \"bad config: <message>\" and exit 1, app.js's DEFAULTS sets port 8080, and the spread merge behaves as described.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 1 has to FAIL because the app would start on defaults and nobody would learn which file is broken or where the mistake is. I checked the output's verdict for line 1. It is \"FAIL\". The evidence says that if loadConfig returns {}, app.js \"prints 'listening on 8080' with no message at all, so the typo is hidden completely\". It ties this back to the request: people \"can't tell which file is broken or where the mistake is\". It also says a correct fix should report the file path and the line/column of the error. The wrong_build section makes the same point: the app \"silently starts on the default port 8080 with no error\". Every part of the trap is covered, so the criterion holds.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: a PASS on line 1. Line 1 is \"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\". The output marks it \"result\": \"FAIL\". It explains that returning {} would hide the typo, since app.js would start on port 8080 with no message, and that it would break the README's \"bad config: <message>\" / exit 1 behavior. Nothing in the output gives line 1 a PASS. The overall result and line 2 are also FAIL. So the output does nothing on the must_not list.",
+      "cached": true
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "f2d6698766b7539624428a190b9911f92b4987bfb9ae0f976c1667140b5f9102",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all three lines. Line 1 PASS names wrong builds it tried: returning the string \"0\", returning -0, and a blanket `|| 0`. It says what catches each: test/math.test.js does import `node:assert/strict`, whose strict check rejects \"0\" and -0, and the `average([NaN, 1])` example in line 2 catches `|| 0`. Line 2 PASS names `(sum/len) || 0`, caught by the NaN example, and `Math.round`, caught by the general clause because average([1, 2]) is 1.5. Line 3 FAIL names a concrete wrong build: a correct math.js fix plus a test marked `{ skip: true }` or `test.todo`. It says why that meets the line yet misses the request: `node --test` (the real npm test script) exits 0 on skipped tests, so the fix isn't really covered. Its other example, `assert.ok(!average([]))`, also passes on the current code because NaN is falsy. The output only cites real files and behaviour: the imports, the test script and the fact that the current test file doesn't import average.",
+  "model": "claude-opus-5-5",
+  "ms": 11070,
+  "tokens": {
+    "input": 2,
+    "output": 919,
+    "cacheCreation": 3576,
+    "cacheRead": 783,
+    "fresh": 4497,
+    "total": 5280
+  },
+  "at": "2026-11-05T07:20:21.441Z"
+}

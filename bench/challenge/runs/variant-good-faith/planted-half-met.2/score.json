@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-half-met.2",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each line's evidence against the repository. Line 1 PASS names wrong builds (a hard-coded '0' fill, ignoring width) and says why they fail: padLeft('42',5,'0') and the default-space call padLeft('42',5) catch them. Line 2 PASS names a build that cuts to width \"like truncate does\", which padLeft('123456',5,'0') catches. Line 3 FAIL names a concrete wrong build: it adds only a padLeft section, so it meets the line, but the README stays incomplete. That is real: index.js exports slugify and README.md has only capitalize and truncate sections. Line 4 PASS names a build that rewrites truncate, which test/strutil.test.js catches. That suite really does cover capitalize, slugify and truncate under \"node --test\". The cited files, functions and scripts all exist. The only claim I couldn't check is \"Node v22.23 here can require() ESM\", which is about the environment, not the repository.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 should FAIL because a build that only adds a padLeft section leaves slugify undocumented, even though the request asks for a complete list. The output marks line 3 \"FAIL\". Its evidence says index.js exports slugify but the README lists only capitalize and truncate, so \"A PR that adds just a '## padLeft(s, width, fill)' section meets this line, but the README stays incomplete.\" It also proposes the missing line, \"README.md has a section for every function index.js exports.\" The wrong_build shows the same gap. The trap is fully caught.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not item rules out a FAIL on line 1, 2 or 4 given for wording or for a stricter test than the line's words need. I checked each line's result. Line 1 (padLeft export/example) is PASS. Line 2 (returns s unchanged) is PASS. Line 4 (npm test passes) is PASS: the output even says that a missing padLeft test is fine because \"the request does not ask for tests\". The one FAIL is on line 3 (the README section), which the must_not item doesn't cover. That FAIL rests on the request's \"keep the README's list of functions complete\" and on slugify being undocumented. So nothing on the must_not list is broken.",
+      "cached": false
+    }
+  }
+}

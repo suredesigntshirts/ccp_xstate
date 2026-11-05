@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "90e3f519a82f88b40076a501b8b29153ee6b9392b6a0357349f7ebea9f1510fc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion is met. I checked every file, command and function the issue names against the repository. math.js exists, and its `average` really returns `xs.reduce(...)/xs.length`, so `average([])` gives 0/0 = NaN, as the problem says. The claim that test/math.test.js \"imports only add, subtract and multiply\" is accurate, and no test covers average. `npm test` maps to `node --test` in package.json, and node --test finds test/math.test.js. The invoice-service claim matches the README (\"Small math helpers used by the invoice service\"). The functions add, subtract, multiply and average are all exported from math.js. The regression test the issue asks for is new work it explicitly requests, so it doesn't count against the criterion. The proof commands (`node -e`, `git show <base>:math.js`) only use files that exist. I found no invented files, scripts or functions, and no wrong description of the repository.",
+  "model": "claude-opus-5-5",
+  "ms": 8084,
+  "tokens": {
+    "input": 2,
+    "output": 484,
+    "cacheCreation": 3699,
+    "cacheRead": 783,
+    "fresh": 4185,
+    "total": 4968
+  },
+  "at": "2026-11-05T07:29:29.420Z"
+}

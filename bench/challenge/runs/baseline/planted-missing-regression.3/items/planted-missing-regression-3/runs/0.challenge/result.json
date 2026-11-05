@@ -1,0 +1,22 @@
+{
+  "result": {
+    "result": "FAIL",
+    "lines": [
+      {
+        "line": "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints a JSON array with one object per row, keyed by the header row",
+        "result": "FAIL",
+        "evidence": "Wrong build: change bin/csv2json.js to `parse(readFileSync(0,'utf8'), '\\t')` unconditionally (or split on /[\\t,]/), add nothing to test/csv.test.js. `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints [{\"a\":\"1\",\"b\":\"2\"}], so the line is met, yet plain CSV without the flag is broken (existing 'cli' test in test/csv.test.js would catch it, but no line requires `npm test` to pass), and comma-containing TSV cells get split under the /[\\t,]/ variant. Missing lines: (1) `node bin/csv2json.js` without --tsv still parses comma-separated input as before / `npm test` passes; (2) test/csv.test.js gains a test running the CLI with --tsv (no regression test is required for the new flag). Also the proof `printf ...` leaves the input unspecified, so a reader can pick an input with no commas in cells and miss the over-splitting bug."
+      },
+      {
+        "line": "README.md documents --tsv",
+        "result": "PASS",
+        "evidence": "Tried a README that only mentions the string '--tsv' without saying what it does; a reader checking that README 'documents' --tsv would reasonably require a usage line such as `node bin/csv2json.js --tsv < table.tsv`, and the current README already follows that usage-example pattern, so a bare mention is a weak build rather than a clear disagreement. Could not find a wrong build that this line alone should catch beyond that."
+      }
+    ],
+    "wrong_build": "bin/csv2json.js always calls parse(input, '\\t') (ignoring whether --tsv was passed), README gains `node bin/csv2json.js --tsv < table.tsv`, and no test is added. The --tsv printf proof passes and the README documents the flag, but default CSV input is now broken (each CSV line becomes one key) and nothing tests --tsv. No expect line requires CSV behavior without the flag to stay the same, `npm test` to pass, or a --tsv test to be added."
+  },
+  "hash": "801204753f83abb26c87baefbc045d202ec25cf3b126e032ec8673529c1d8386",
+  "caller": "bench-planted-missing-regression-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:06:20.421Z"
+}

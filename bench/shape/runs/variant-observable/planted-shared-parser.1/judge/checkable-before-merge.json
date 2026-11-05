@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "32d9dcb28c9bf32ebd4bbc1376e4c411a0d91b3c1d880ea92aa17ad64fed47a1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all seven expect lines. Lines 1–5 are fixed `printf … | node bin/csv2json.js [--tsv]` commands with exact expected outputs. Their \"run\" proofs are run from the repo root, so they are local and deterministic. Line 5 is clear about the JSON `\\t` escape, so it has one answer. Line 6 (\"`npm test` exits 0\" plus a --tsv test in test/) is checked by running npm test and using grep to read the test, which works on the branch. Line 7 (README documents --tsv with an example) has a \"read\" proof against the repo's README.md, not a published page, and the proof says what form the example should take. No line depends on a release, a deploy, the npm registry or anything else that exists only after merge.",
+  "model": "claude-opus-5-5",
+  "ms": 12821,
+  "tokens": {
+    "input": 2,
+    "output": 760,
+    "cacheCreation": 3888,
+    "cacheRead": 783,
+    "fresh": 4650,
+    "total": 5433
+  },
+  "at": "2026-11-05T07:27:38.452Z"
+}

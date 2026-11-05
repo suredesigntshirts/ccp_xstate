@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "f048e341998a29efb4f4b88b86b30eeceb618f7a05045c3b5b0d0b1795a73329",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for the whole output. Every file and command the issue names exists: src/config.js, src/app.js, test/config.test.js, README.md and `npm test` (package.json has \"test\": \"node --test\"). The only function it names, `loadConfig`, exists. The descriptions match the code: loadConfig is `JSON.parse(readFileSync(path, 'utf8'))`, app.js prints `bad config: ${error.message}` and exits 1, DEFAULTS has port 8080, the test file only checks for a SyntaxError, and README documents the exit-1 behaviour. The Node 22 example also checks out. In the sample file, `g` sits at character 20, line 3 column 3, which fits the quoted V8 message. The issue says correctly that Node, not the code, supplies the line and column. No file or script that doesn't exist is presented as real.",
+  "model": "claude-opus-5-5",
+  "ms": 7657,
+  "tokens": {
+    "input": 2,
+    "output": 683,
+    "cacheCreation": 4300,
+    "cacheRead": 783,
+    "fresh": 4985,
+    "total": 5768
+  },
+  "at": "2026-11-05T07:29:44.833Z"
+}

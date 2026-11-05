@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "1542369d6c58f1162ac97c2942ac604f0d67ef2beffe40efbd357b8c6a0be292",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "All four lines are PASS. Each one names a concrete wrong build and explains how the line catches it:\n- Line 1: a build that only edits the docs, or one that prints \"HELLO, ADA!!!\" or \"HELLO ADA\". Running `--shout Ada` catches both because the line gives the exact output.\n- Line 2: a build that \"upper-cases every greeting\". `node bin/greet.js Ada` would then print the wrong text.\n- Line 3: a build that documents the flag \"only in README.md, or only in the usage string\". Reading docs/index.md catches it.\n- Line 4: a build that \"tests only a shout() helper\" and never runs the CLI. The line requires a test that runs the CLI.\n\nEverything the output cites matches the repository. bin/greet.js does skip arguments that start with `--`. test/greet.test.js has a cli test that checks 'Hello, Ada!'. package.json runs `node --test`, which picks up *.test.js files. pages.yml and the stderr usage text 'usage: greet <name>' are both real. No FAIL entries exist, so the FAIL part of the criterion doesn't apply.",
+  "model": "claude-opus-5-5",
+  "ms": 12858,
+  "tokens": {
+    "input": 2,
+    "output": 741,
+    "cacheCreation": 3869,
+    "cacheRead": 783,
+    "fresh": 4612,
+    "total": 5395
+  },
+  "at": "2026-11-05T07:26:49.037Z"
+}

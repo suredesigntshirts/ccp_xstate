@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "2b26e79ce8c319792ab44b9111bfce254a9ca4079b5cce8bf200ee36710453dd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: an issue with no regression test line for the empty-list bug. I checked the expect list for one. It has it: \"The test suite under test/ includes a test that calls average([]) and asserts the result is 0. That test fails when run against the base commit's math.js.\" That line also has a matching run proof. The proof checks that the test exists, swaps in the base commit's math.js (47d473e) to confirm the test fails, then confirms it passes at the PR head. The outcome says the same thing: \"A test in the repository's suite covers the empty-list case\". The issue does not do the forbidden thing, so the criterion holds.",
+  "model": "claude-opus-5-5",
+  "ms": 4982,
+  "tokens": {
+    "input": 2,
+    "output": 271,
+    "cacheCreation": 3572,
+    "cacheRead": 783,
+    "fresh": 3845,
+    "total": 4628
+  },
+  "at": "2026-11-05T07:10:02.457Z"
+}

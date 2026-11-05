@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "355fc785f7413cfb29be28e9697bc02b970d27ba8300bbf9fe70f5cc9ad792d4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every name in the issue against the 8 tracked files, and they all exist: bin/greet.js, src/greet.js and its `greeting` function, test/greet.test.js, docs/index.md, .github/workflows/pages.yml, the `npm test` script, and the docs URL given in README.md. The problem quotes the real argument-handling line exactly: `process.argv.slice(2).find((a) => !a.startsWith('--'))`. Its claims hold: `--shout Ada` would print `Hello, Ada!` because the flag is skipped, and docs/index.md only shows `node bin/greet.js <name>`. pages.yml does publish docs/ when main is pushed. The usage text `usage: greet` and exit status 2 match the code. One small gap: package.json has no bin field, so `greet` is not an installed command. Still, the request and the usage message both call the tool `greet`, and every check runs `node bin/greet.js`, so the issue still matches the repository.",
+  "model": "claude-opus-5-5",
+  "ms": 10092,
+  "tokens": {
+    "input": 2,
+    "output": 665,
+    "cacheCreation": 3913,
+    "cacheRead": 783,
+    "fresh": 4580,
+    "total": 5363
+  },
+  "at": "2026-11-05T07:29:12.855Z"
+}

@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-after-merge.1",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each line's evidence. Line 1 (PASS) names specific wrong builds and says why the line catches each one. For example, \"upper-casing only the name ('Hello, ADA!')\" fails against the example, and leaving --shout to the existing filter that drops '--' args prints plain output. That filter really exists in bin/greet.js (`!a.startsWith('--')`). Line 2 (PASS) names a build that upper-cases every output and says `node bin/greet.js Ada` catches it. The 'cli' test it cites really exists in test/greet.test.js. Line 3 (FAIL) gives a concrete reason it shows only after merge: .github/workflows/pages.yml publishes docs/ only on push to main, which the repository confirms. It also gives two concrete readings (live URL vs docs/index.md in the diff) and a concrete wrong build that documents only in README.md. Every file, script and behaviour it cites is real in the repository. I found nothing invented.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 has to FAIL because it can only be checked after merge, and the output has to point at pages.yml or the publish-on-push. The output marks line 3 \"FAIL\". Its evidence says \"This can only be checked after merge. .github/workflows/pages.yml publishes docs/ to GitHub Pages only on push to main, so at the PR commit the live site still shows the old docs/index.md\". That names pages.yml and the publish-on-push trigger. It also suggests a line that can be checked in the PR instead (docs/index.md documents --shout). The wrong_build section makes the same point again. So the trap is caught in full.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: a FAIL on lines 1 or 2. I checked the result for each line in the output. Line 1 (the --shout upper-case line) is \"PASS\". Line 2 (the line saying that without --shout it still prints Hello, <name>!) is \"PASS\". Only line 3, about the published docs site, is \"FAIL\", and that is allowed. Nothing on the must_not list happens, so the criterion holds for the whole output.",
+      "cached": true
+    }
+  }
+}

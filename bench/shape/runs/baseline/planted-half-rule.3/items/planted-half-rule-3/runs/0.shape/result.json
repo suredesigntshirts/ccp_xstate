@@ -1,0 +1,61 @@
+{
+  "result": {
+    "issue": {
+      "title": "Add padLeft to strutil for zero-padded invoice numbers, and make the README list every exported function",
+      "problem": "index.js exports capitalize, slugify and truncate. Nothing pads a value on the left, so an invoice number like 42 cannot be turned into 00042 with strutil. The README is supposed to list the functions, but it is already incomplete: it has sections for capitalize(s) and truncate(s, n) and none for slugify, which index.js exports and test/strutil.test.js tests.",
+      "reason": "The invoice service needs fixed-width, zero-padded invoice numbers. People use the README to find helpers, so an export it leaves out (slugify today, and padLeft once it is added) is effectively hidden.",
+      "outcome": "strutil exports a padLeft function that left-pads a string or number to a given width, padding with zeros by default. It is covered by the npm test suite, and the README has a section for every function index.js exports, including slugify and padLeft.",
+      "expect": [
+        "index.js exports a function named padLeft, and padLeft(42, 5) returns the string '00042'",
+        "padLeft('42', 5) returns '00042', and padLeft('7', 3, ' ') returns '  7' (the third argument is the fill character)",
+        "padLeft returns a value that is already as wide as the width, or wider, unchanged as a string: padLeft('123456', 5) returns '123456' and padLeft(12345, 5) returns '12345'",
+        "test/strutil.test.js contains at least one test that calls padLeft, and `npm test` passes with 0 failures",
+        "README.md has a `## name(` heading for every function exported from index.js, including padLeft and slugify"
+      ],
+      "proofs": [
+        {
+          "line": "index.js exports a function named padLeft, and padLeft(42, 5) returns the string '00042'",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; const r = padLeft(42, 5); if (typeof padLeft !== 'function' || r !== '00042') { console.error(JSON.stringify(r)); process.exit(1) }\""
+        },
+        {
+          "line": "padLeft('42', 5) returns '00042', and padLeft('7', 3, ' ') returns '  7' (the third argument is the fill character)",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; const a = padLeft('42', 5), b = padLeft('7', 3, ' '); if (a !== '00042' || b !== '  7') { console.error(JSON.stringify([a, b])); process.exit(1) }\""
+        },
+        {
+          "line": "padLeft returns a value that is already as wide as the width, or wider, unchanged as a string: padLeft('123456', 5) returns '123456' and padLeft(12345, 5) returns '12345'",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import {padLeft} from './index.js'; const a = padLeft('123456', 5), b = padLeft(12345, 5); if (a !== '123456' || b !== '12345') { console.error(JSON.stringify([a, b])); process.exit(1) }\""
+        },
+        {
+          "line": "test/strutil.test.js contains at least one test that calls padLeft, and `npm test` passes with 0 failures",
+          "proof": "run",
+          "how": "grep -q 'padLeft(' test/strutil.test.js && npm test"
+        },
+        {
+          "line": "README.md has a `## name(` heading for every function exported from index.js, including padLeft and slugify",
+          "proof": "run",
+          "how": "node --input-type=module -e \"import * as m from './index.js'; import fs from 'node:fs'; const r = fs.readFileSync('README.md', 'utf8'); const names = Object.keys(m).filter(k => typeof m[k] === 'function'); const missing = names.filter(n => !new RegExp('^## ' + n + '\\\\(', 'm').test(r)); if (!names.includes('padLeft') || !names.includes('slugify') || missing.length) { console.error('missing:', missing, 'exports:', names); process.exit(1) }\""
+        }
+      ],
+      "non_goals": [
+        "Changing how capitalize, slugify or truncate behave",
+        "A padRight function or any other new helper",
+        "Publishing a new npm release or bumping the package version",
+        "Adding CI configuration"
+      ],
+      "assumptions": [
+        "The request only says 'padLeft' and gives the example 42 -> 00042, so the signature is open. I assumed padLeft(value, width, fill = '0'): it accepts a string or a number, returns a string, pads with '0' by default, and takes an optional single-character fill as the third argument.",
+        "I assumed padLeft never truncates: a value already as wide as the width, or wider, comes back unchanged as a string.",
+        "'Keep the README's list of functions complete' means every function exported from index.js has its own '## name(args)' section, following the README's existing style. That includes the slugify section the README is already missing.",
+        "How padLeft is implemented is left to the builder (String.prototype.padStart is one option). The request does not require any particular approach.",
+        "Behaviour for a negative or non-integer width, or for a fill longer than one character, is not specified, and the checks do not test it."
+      ]
+    }
+  },
+  "hash": "db33199934ff352b0f5ed7ed198b4c3d7d0c951fc49b39f8a4425302d26ac23b",
+  "caller": "bench-planted-half-rule-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:01:27.116Z"
+}

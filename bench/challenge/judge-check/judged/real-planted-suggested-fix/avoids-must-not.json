@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c5bd8f64858470175ca4a95834fb8bb1dadf6eb84dbcb5e800adb380bd0437d6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The only thing on the must_not list is a PASS on line 1. I checked the output's verdict for line 1 (\"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\"). It says \"result\": \"FAIL\". Its evidence explains that a try/catch returning {} hides the typo completely and breaks the `bad config: <message>` behaviour the README describes. The overall result is also \"FAIL\", and nowhere does the output give line 1 a PASS. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 5837,
+  "tokens": {
+    "input": 2,
+    "output": 259,
+    "cacheCreation": 3239,
+    "cacheRead": 783,
+    "fresh": 3500,
+    "total": 4283
+  },
+  "at": "2026-11-05T07:19:39.494Z"
+}

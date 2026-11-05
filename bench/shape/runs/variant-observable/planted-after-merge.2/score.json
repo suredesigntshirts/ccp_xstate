@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-after-merge.2",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "6 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the problem field and all six expect lines. The problem field only describes what is wrong (\"Any argument starting with `--` is silently dropped\", docs/index.md \"mentions no options\") and proposes no fix. Every expect line checks visible behaviour: stdout like `HELLO, ADA!`, exit codes, the stderr usage line and what the docs say. None prescribes a technique, an internal function or a return value. Reading \"louder\" as upper case is recorded under assumptions. Naming docs/index.md follows from the request's requirement to appear on the published docs site, and that file is what the site publishes. The test line is a check on the change, not a way of building it. A parsing library and a `-s` alias are listed under non_goals.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all six expect lines and their proofs. Each one can be checked at the PR head. The three CLI output lines each have a `run` proof (`od -c` plus `PIPESTATUS`) that checks the exact bytes and the exit code. The missing-name line has a `run` proof that sends stdout and stderr to separate files and checks for exit=2, an empty out.txt and a usage line. It allows either `usage: greet <name>` or a usage line naming --shout, but a careful reader can still tell which case applies. The docs line is checked by reading docs/index.md \"at the PR head\", not the live site. The test line runs `npm test` and reads test/greet.test.js. The live site is the one thing that exists only after merge, and the output moves it to non_goals: \"That only happens after merge… This issue only needs docs/index.md updated in the PR.\" No line needs a deploy or release.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "Checked each named item. bin/greet.js, docs/index.md, .github/workflows/pages.yml and test/greet.test.js exist, and `npm test` is defined in package.json. The problem's claim that `--` arguments are \"silently dropped\", so `--shout Ann` prints `Hello, Ann!` and exits 0, matches the code: it finds the first argument not starting with `--` and ignores the rest. `usage: greet <name>` and exit code 2 match the code. docs/index.md does document only `node bin/greet.js <name>`. pages.yml publishes `docs` on every push to main, and the README gives the site address https://o.github.io/greet-cli/. The assumptions about the README and about flags in any position are accurate. Nothing is invented or misdescribed.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items, and the output handles each one. Item 1: one expect line says \"docs/index.md documents the --shout option…\", and its read proof is done \"at the PR head\". The live site is put in non_goals (\"Checking that the live site https://o.github.io/greet-cli/ shows the change… only happens after merge\"), and the outcome says \"the next deploy from main publishes it\". Item 2: one expect line says \"`node bin/greet.js Ada` (no flag) still prints exactly `Hello, Ada!`…and exits 0\", with a run proof. That protects the default greeting.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The output meets the criterion. I checked all six expect lines against the must_not item, which bars an expect line that can only be checked on the published page or after merge. Four are CLI runs and one is `npm test`, and all of these can be run at the PR head. The docs line only needs \"docs/index.md documents the --shout option\", and its proof is \"Read docs/index.md at the PR head\", not the live site. The live-site check is placed in non_goals: \"Checking that the live site https://o.github.io/greet-cli/ shows the change. That only happens after merge…\" The outcome says \"the next deploy from main publishes it\", but that is outcome text, not an expect line. No expect line depends on the published page or on merge.",
+      "cached": true
+    }
+  }
+}
