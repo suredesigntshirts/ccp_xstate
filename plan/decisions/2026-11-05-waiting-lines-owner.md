@@ -47,3 +47,14 @@ real run shows a copied id being started.
 One plugin test asserts the bug itself: plugins/harness/test/actors.test.mjs drives PostToolUse as `sess` and
 expects the next run of an item `s` owns. The `unchanged` line names that one assertion as the exception; the builder
 changes it to expect no line for `sess` and main's line for `s`.
+
+## After the build
+
+Build PR #134 merged at b757f27 with the verifier's verdict, all 5 Expect lines MET at 0d52d7a (verdict commit
+81285e8), and was released as harness-v0.1.28. Through the real hook, each session is named only its own items'
+waiting runs, a session owning nothing gets no line, and the cloud URL form owns its runs; main names every run to
+every session. stall(), cannotStart(), spawn() and every prompt are main's. In a real headless `claude -p` session
+with one run of its own and one of another session's, it was told and started only its own runs, and the other run
+stayed waiting with no spawn.json. The verifier noted one aside, not this item's: two full suites run in parallel in
+one container flaked verify/fix-return-tool-answer/unchanged.test.mjs, which passes alone and in CI. Nothing new was
+drafted.
