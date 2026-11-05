@@ -37,3 +37,10 @@ other branch name. In trial-fail-path the agent reset its worktree to the old br
    engine-stage-contract verifier's stage-record checker, which recomputes each prompt input with its own list of
    hidden fields. Showing it costs nothing (it is GitHub's own name for the PR's branch, and on a rebuild it tells the
    builder where it is), so the item's head now says branch is shown; the agent still may not set it.
+
+## Done (2026-11-05)
+
+Built in PR #95, merged b62d5b3, released as harness-v0.1.22. A separate verifier session marked all six Expect lines
+MET at fc33523 (verdict commit 2d3b648). For real-pr it used suredesigntshirts/ccp_xstate_scratch and closed the
+PRs it opened there (#45, #46). Replan #96 changed branch-stamped while the item was building: branch is reserved but
+shown in prompts (decision 7).
