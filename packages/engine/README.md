@@ -102,6 +102,10 @@ no stamped branch, or the head nowhere, the run fails and its item steps back. T
 3. The agent calls the return tool (`mcp__plugin_ccp-harness_harness__return`, `{ run, result }`). Its PreToolUse hook
    refuses it unless the caller is the run's agent, the result matches the actor's schema and any claimed PR is on
    GitHub at the claimed head (`accept`), then hands the result to the item (`deliver`), which prepares the next runs.
+   A refusal of the result (rules `schema`, `reserved`, `restated`, `covers`, `ref`) says how to fix it: each output
+   field its reason names comes with that field's own Output line, a `restated` reason names every differing key with
+   both values, and the text ends `Refusal <n> of 8.` (`refusalText`). The eighth fails the run (`failed.json`, a
+   `refusal-cap` row), and the item gets the actor's error event (plan item fix-refusal-hints).
 4. If the agent ends without its result accepted, by SubagentHandback (PreToolUse, `handback`) or a plain stop
    (SubagentStop, `stopped`), it is sent back once to call the return tool. The next time it ends, the run fails
    (`failed.json`, a `no-return` refusal row) and the item gets the actor's error event, so it steps back instead of

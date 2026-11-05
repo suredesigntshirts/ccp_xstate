@@ -88,7 +88,8 @@ test('the hooks start, bind, confine and check an actor, and the return tool acc
   assert.match(wrong.permissionDecisionReason, /^wrong-caller: agent other is not run it-1:0\.brief's actor \(ag1\)$/);
   assert.equal((await callServer(env, { run, result })).isError, true, 'the server refuses a result no check passed');
   const bad = hook(env, { hook_event_name: 'PreToolUse', agent_id: 'ag1', tool_name: tool, tool_use_id: 't7', tool_input: { run, result: { builder: 'b' } } });
-  assert.equal(bad.permissionDecisionReason, 'schema: brief result: result.verifier is missing');
+  // fix-refusal-hints: the reason, then the field's own Output line and the run's refusal count.
+  assert.match(bad.permissionDecisionReason, /^schema: brief result: result\.verifier is missing\nHow to fix it, from your Output:\n- verifier: .+\nRefusal 1 of 8\.$/);
 
   assert.equal(hook(env, { hook_event_name: 'PreToolUse', agent_id: 'ag1', tool_name: tool, tool_use_id: 't8', tool_input: { run, result } }), null);
   const answer = await callServer(env, { run, result });
