@@ -39,7 +39,7 @@
   "outputs": [
     {
       "ref": "packages/engine/src/actors.js accept",
-      "what": "accept() still returns refused { rule, reason }; for a result rule (schema, reserved, restated, covers, ref) it also returns fix { hint, count, cap }: hint holds, once per top-level output field the reason names, `<field>: <that field's description>` verbatim from the run's schema; a restated reason names every key path that differs, each with the returned value and the input's value (JSON, each cut to 200 characters); the refusal row's payload carries hint, count and cap. The refusal that makes the count reach REFUSAL_CAP (8) also fails the run: failed.json holds why, `refused <cap> times`, with each refusal's rule and reason, a no-return-style refusal row with rule refusal-cap is journalled, and accept also returns failed: the run. refusalText() gives the text the agent sees"
+      "what": "accept() still returns refused { rule, reason }; for a result rule (schema, reserved, restated, covers, ref) it also returns fix { hint, count, cap }: hint holds, once per top-level output field the reason names, `<field>: <that field's description>` verbatim from the run's schema; a restated reason names every key path that differs, each with the returned value and the input's value (JSON, each cut to 200 characters); the refusal row's payload carries hint, count and cap. The refusal that makes the count reach REFUSAL_CAP (10) also fails the run: failed.json holds why, `refused <cap> times`, with each refusal's rule and reason, a no-return-style refusal row with rule refusal-cap is journalled, and accept also returns failed: the run. refusalText() gives the text the agent sees"
     },
     {
       "ref": "plugins/harness/scripts/actors.mjs",
@@ -69,7 +69,7 @@
     },
     {
       "id": "cap",
-      "check": "The same bad result returned 7 times is refused 7 times with count 1 to 7 and cap 8 and the run stays open; the 8th is refused with count 8 and fails the run: failed.json's why starts `refused 8 times` and lists every refusal's rule and reason, a refusal-cap row is journalled, a 9th return is refused already-failed, and the item, offered resultsOf, takes the invoke's error (quick-fix verifying goes to its onError target); wrong-caller, unknown-run and already-returned refusals do not count; a run refused 7 times then accepted is accepted",
+      "check": "The same bad result returned 9 times is refused 9 times with count 1 to 9 and cap 10 and the run stays open; the 10th is refused with count 10 and fails the run: failed.json's why starts `refused 10 times` and lists every refusal's rule and reason, a refusal-cap row is journalled, an 11th return is refused already-failed, and the item, offered resultsOf, takes the invoke's error (quick-fix verifying goes to its onError target); wrong-caller, unknown-run and already-returned refusals do not count; a run refused 9 times then accepted is accepted",
       "how": "The verifier's own test on the real engine",
       "proof": "verifier"
     },
@@ -81,7 +81,7 @@
     },
     {
       "id": "real-agent",
-      "check": "In a real Claude Code session with the PR's harness plugin loaded (a thread, or claude -p with --plugin-dir), a real model agent started for a prepared run, told by its task to first return a result with pr.at shortened to 7 characters and then fix it from the refusal alone, gets a deny whose text has the pr hint and `Refusal 1 of 8.`, and its next return is accepted; a second run whose agent is told to return the same bad result until told to stop ends with the run failed at the 8th refusal, the deny saying so, and the item past its onError",
+      "check": "In a real Claude Code session with the PR's harness plugin loaded (a thread, or claude -p with --plugin-dir), a real model agent started for a prepared run, told by its task to first return a result with pr.at shortened to 7 characters and then fix it from the refusal alone, gets a deny whose text has the pr hint and `Refusal 1 of 10.`, and its next return is accepted; a second run whose agent is told to return the same bad result until told to stop ends with the run failed at the 10th refusal, the deny saying so, and the item past its onError",
       "how": "The verifier's own run, with the item's journal rows and the agent's transcript read after",
       "proof": "world"
     },
@@ -114,9 +114,9 @@
   },
   "verifier": "A separate session, not the builder's and not a subagent of it, using the Verifier brief below.",
   "risks": [
-    "A cap too low fails a run that would have succeeded; 8 is above the most sequential fixes a result can need (decision), and the count is in every row so a real run near the cap shows",
+    "A cap too low fails a run that would have succeeded; 10 is above the most sequential fixes a result can need (decision), and the count is in every row so a real run near the cap shows",
     "A long description makes a long deny; descriptions are one line each and only the named fields are given",
-    "Done verifier tests that make many refusals on one run would hit the cap; fix-verify-issue-echo's tamper test makes 7 on one run, under the cap"
+    "Done verifier tests that make many refusals on one run would hit the cap; verify/wf-intake/independent.test.mjs makes 8 on one challenge run and then expects an accept, and fix-verify-issue-echo's tamper test makes 7, both under 10"
   ]
 }
 ```
@@ -125,7 +125,7 @@
 
 Today a refused return says what rule broke and where, and the agent has to go back to its prompt for how to fix it.
 This item puts the fix next to the fault: each field the refusal names comes with that field's own Output line, a
-restated refusal says which key differs and how, and a run refused eight times fails instead of looping, so the item
+restated refusal says which key differs and how, and a run refused ten times fails instead of looping, so the item
 takes its error path and steps back.
 
 ## Verifier brief

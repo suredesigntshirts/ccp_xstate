@@ -1,4 +1,4 @@
-# Refusal hints: the field's own Output line, a key diff, and a cap of 8 (2026-11-05)
+# Refusal hints: the field's own Output line, a key diff, and a cap of 10 (2026-11-05)
 
 Item: fix-refusal-hints. Two-way doors, decided by the building thread as the person's stand-in, when the item went
 ready.
@@ -22,14 +22,22 @@ ready.
    input lacks is named as not in the input; arrays of different length are named whole. All of them at once,
    because the checks stop at the first rule that fails and one refusal per key would spend the cap on one field.
    Values are JSON cut to 200 characters, enough to see a changed word in an expect line.
-3. **8, counting only refusals of the result** (schema, reserved, restated, covers, ref). The checks run in order and
-   stop at the first that fails, so a result wrong under every rule needs at most five rounds to clear them; 8 leaves
-   three spare, and the only real-run refusal so far was cleared on the second try. Refusals that are not about the
+3. **10 (first set at 8; see below), counting only refusals of the result** (schema, reserved, restated, covers, ref). The checks run in order and
+   stop at the first that fails, so a result wrong under every rule needs at most five rounds to clear them; 10 leaves
+   five spare, and the only real-run refusal so far was cleared on the second try. Refusals that are not about the
    result (wrong-caller, unknown-run, already-returned, already-failed) do not count, so another agent cannot use up
-   a run. The refusal that reaches 8 fails the run the way a stop without a return does (failed.json, then the
+   a run. The refusal that reaches the cap fails the run the way a stop without a return does (failed.json, then the
    invoke's error event), with every refusal's rule and reason as the why, so the item steps back with the evidence
-   instead of the agent looping until it gives up. Each refusal says `Refusal <n> of 8.`, so the agent knows its
+   instead of the agent looping until it gives up. Each refusal says `Refusal <n> of 10.`, so the agent knows its
    budget. The count is read from the item's journal (the refusal rows for the run), not kept in a second file.
 
 No prompt changes: returnLine already says "If the tool refuses, fix what it names and call it again", and changing
 any prompt text would move every run's brief hash and need a bench report. The cap is a new concept (budget 1).
+
+## Raised from 8 to 10 during the build
+
+The build's CI showed a done verifier test, verify/wf-intake/independent.test.mjs, making 8 refusals on one
+challenge run (8 different bad results) and then expecting the good one accepted. With a cap of 8 that run failed.
+That test is a fair picture of a careful agent's worst case, and the replan's count of existing tests had missed it,
+so the cap is 10, not the test changed: still a bound on a looping agent, with room above every refusal sequence the
+repo's own tests make.
