@@ -54,3 +54,14 @@ revisited when the bench measures a criterion that improves with the Rules part 
 that passes it through `--append-system-prompt`), or a stage needs a tool limit the hooks cannot enforce. Adopting it
 then means the PreToolUse hook sets `subagent_type` from the stage, and the agent file's hash joins the pin; whether
 plugin agents load in cloud threads is checked then, not now.
+
+## After the build (5 Nov)
+
+Built in PR #107 and verified by a separate session (all 6 Expect lines MET at 4acdb33), then released as
+harness-v0.1.23. The person then asked for spike tests on shipping agents inside the plugin, and the thread
+"Refine stage prompts" owns that question. Its probe (`plan/research/probe-plugin-agents.md`, PR #109) found that plugin agents load on
+the real install path, and that their tools, model and system prompt are enforced. Two conditions apply: a role's tools
+must list the harness return tool, and the role file sits outside the workflow pin, so a stage file would name its
+role and that file's sha256, and the PreToolUse swap would refuse on a mismatch. So the "not used" decision above
+stands for this item only, and adopting roles is a separate item for that thread. The split stays as it is: the
+stage's words in the stage file, and only tools and model in the agent file.
