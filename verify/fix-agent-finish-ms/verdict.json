@@ -1,0 +1,42 @@
+{
+  "item": "fix-agent-finish-ms",
+  "verified_sha": "85a68abd32c5d22c602e8cba2c511865f2df600e",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5Ff7r5kBYQQeSNA136",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "old-entry",
+      "status": "MET",
+      "command": "clean worktrees at the head 85a68ab and main 55309fa, npm ci each; node --test verify/fix-agent-finish-ms/old-entry.test.mjs (lib.mjs: the real 8-row transcript of probe-plugin-agents-thread's verifier agent plus an attachment row and a user row stamped 2026-10-30T10:13:50.430Z after the brief, an attachment at the run and one a minute after the last message; SubagentStart then SubagentStop piped into the checkout's plugins/harness/scripts/capture.mjs, CCP_HARNESS_DIR at a folder made by its install.mjs); node scenarios.mjs <main worktree> gave evidence/main-scenarios.json",
+      "excerpt": "Head: agent.finish ms 4944, the brief (07:21:22.508Z) to the last message (07:21:27.452Z), exact. Main through its own hook on the same inputs: ms 508117022 (5.88 days).",
+      "mutation": "plugins/harness/scripts/capture-rows.mjs finish(): `ms: runMs(path, entries, read)` replaced by main's max minus min over every row's timestamp",
+      "red_test": "plugins/harness/test/finish-ms.test.mjs: 6 of 8 red ('old-entry: an attachment and a user row stamped days before the brief do not count', 'non-message rows after the last message do not count', 'long-transcript: past the read cap the start is still the brief', 'no brief first: the earliest message read is the start', 'no message, an empty file, or no file: ms is null', 'through the hook: the journal row carries the real ms'); verify old-entry, long-transcript (3 of 5) and unchanged's ms test also red"
+    },
+    {
+      "id": "long-transcript",
+      "status": "MET",
+      "command": "node --test verify/fix-agent-finish-ms/long-transcript.test.mjs, through the real hook",
+      "excerpt": "A 9.6 MiB transcript (over READ_CAP 8 MiB) with the brief first and the last message 30 s later: ms 30000 (main 28977, from the tail). First line an attachment, messages at +2 s..+9 s: 7000 (earliest message start). Empty file: null. Only attachment rows: null (main 5000). Missing transcript file: null. Every case wrote agent.finish, exit 0, no output, no hook.run timeout or error."
+    },
+    {
+      "id": "unchanged",
+      "status": "MET",
+      "command": "node --test verify/fix-agent-finish-ms/unchanged.test.mjs (scenarios.mjs at the head vs evidence/main-scenarios.json from main: the 6 agent scenarios above, main's recorded capture fixture events.jsonl (UserPromptSubmit, PreToolUse, PostToolUse, SubagentStart/Stop, Stop, SessionStart/End) and the hook-and-permission refusal transcript at a Stop and a SubagentStop plus a classifier denial, retried, then run; ids, at, release, hook.run ms and temp paths normalised); full suite (npm test's globs) at the head and at main; git diff 55309fa 85a68ab",
+      "excerpt": "Every row, payload (agent.finish ms aside) and blob equals main's in all 8 scenarios: agent.spawn, agent.finish's agentId/type/model/tokens/resultHash, result.stored, refusal (with retryOf links), tool.call, brief.stored, wake, turn.usage, hook.run. agent.finish ms equals main's for the fixture (5673), refusal transcript (280692), empty and unreadable. Full suite head: 1542 tests, 1529 pass, 1 fail; main: 1514, 1501 pass, 1 fail; the one failure on both is test/setup.test.mjs copy-not-link (the clone holds real release tags, so the newest is harness-v0.1.27), and CI's test check is green. The diff touches only docs/journal.md, plugins/harness/scripts/capture-rows.mjs and the new plugins/harness/test/finish-ms.test.mjs: no prompt, workflow or existing test file."
+    },
+    {
+      "id": "real-agents",
+      "status": "MET",
+      "command": "fresh HOME, CCP_HARNESS_DIR made by the head's install.mjs; HOME=<fresh> claude -p --plugin-dir <head>/plugins/harness --output-format stream-json --verbose < evidence/real/prompt.txt (Claude Code 2.1.318; it inherits CLAUDE_CODE_REMOTE_SESSION_ID, so rows land in session_01KfkB5Ff7r5kBYQQeSNA136.jsonl); run 1 from another cwd (the agents' reads were denied, they finished anyway), run 2 from the head checkout; node --test verify/fix-agent-finish-ms/real-agents.test.mjs over evidence/real/",
+      "excerpt": "Run 2: probe-reader (foreground, haiku) ms 4011, finish.at - spawn.at 4235, Agent call 4188; general-purpose foreground ms 10512, at-diff 10692, Agent call 10619; general-purpose background ms 5487, at-diff 5701, Agent call 7 ms. Run 1: 3695/3938/3861, 8745/8939/8840, 6607/6799/8. Every gap under 250 ms. Their transcripts hold 11-14 attachment rows each, the brief first; the head's hook over their type+timestamp timelines gives the journalled ms."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 137 at 85a68ab",
+      "excerpt": "Check run 'test' (id 127287796554) completed success at head 85a68ab; clean-room success. 'gates' failed only because no verdict at that sha existed yet."
+    }
+  ]
+}
