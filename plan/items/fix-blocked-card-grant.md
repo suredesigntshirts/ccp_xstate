@@ -4,7 +4,7 @@
   "title": "Let a stand-in's grant answer the blocked build card",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A stand-in session answers quick-fix's blocked card (retry, replan with a why, or drop) through bin/host.js answer under a grant, as it answers the merge cards: a card with no PR takes its repository from the item's GitHub issue, so a person away for hours can leave the clear-and-retry to a stand-in.",
   "why": "fix-blocked-retry's real run and its verifier (plan/decisions/2026-11-05-blocked-retry.md, After the build): standinInput checks a grant's repos against repoOf(run.input.pr.url), and the blocked card has no pr because no PR was opened, so every grant is refused with 'repo (none) not granted'. Only a tap answers it today. bin/host.js answer also has no way to give a why, so even a covered replan answer would fail quick-fix's replan guard.",
   "serves": [

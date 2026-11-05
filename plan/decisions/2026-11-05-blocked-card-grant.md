@@ -33,3 +33,17 @@ opened. So every grant is refused `repo (none) not granted`, and only a tap answ
    chart's own guard refuses a replan with no why, and the host refuses an event the chart does not take.
 5. **The done suite's gap test is changed, not deleted.** verify/fix-blocked-retry's note test asserted the gap this
    item closes; it now asserts the same grant is taken. That is the only change to a done suite.
+
+## After the build
+
+Build PR #144 merged at 2a024de. The verifier thread (session_01KfkB5GR9FLaAKoj1hQt7ZX) found all 4 Expect lines MET
+at d4bf39e (verdict commit 813c05c), driving the blocked card through `bin/host.js answer` with its own grants files.
+Released as harness-v0.1.31 (Actions tagged it on merge).
+
+- **Found while building:** a stand-in answer the chart turned away (a replan with no why) was journalled and refused,
+  and the same grant's next answer on that card came back `duplicate`, because the answer's source ref is the grant
+  and the card. `standinInput` now asks the chart (`snapshot.can`) first and refuses before anything is written.
+- **Verifier note, left as is:** a grant whose `repos` holds JSON `null` covers every card with no repository,
+  because `repos.includes(null)` is true. Main behaves the same way. Grants are written by the person, a null is not
+  a repository anyone would list, and the first grant names repos as strings; if a grant is ever written by a tool,
+  that tool should refuse non-string repos.
