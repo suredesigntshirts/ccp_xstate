@@ -1,0 +1,1 @@
+Run trial:5.verify, worktree /home/user/trial-blocked-retry/world/wt/trial--5.verify of https://github.com/o/r, branch run/trial/5.verify.

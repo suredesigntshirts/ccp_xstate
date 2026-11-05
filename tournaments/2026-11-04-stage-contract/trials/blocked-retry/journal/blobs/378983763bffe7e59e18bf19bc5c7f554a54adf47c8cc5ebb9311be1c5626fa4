@@ -1,0 +1,5 @@
+The harness accepted the result for run trial:5.verify: PASS, both expect lines held at d2aadd7fd73db03ad7b16a598c5b31dcfa6d071c.
+
+- **Workflow line:** .github/workflows/test.yml parses, and the `test` job has a node-version matrix of [20, 22]. The setup-node step takes its version from `matrix.node-version`, and a later step runs `npm test`.
+- **npm test line:** There is no lockfile and no dependencies, so I ran `npm test` directly under Node v22.23.4. All 3 tests passed with exit status 0.
+- **Not checked:** I did not run the tests under Node 20, and I could not read the PR's CI results from GitHub.

@@ -4,7 +4,8 @@
 // (1) The build prompt says how a PR is opened (the GitHub tools) and what its url looks like; the run line names
 //     the GitHub repository when the clone's origin is on GitHub.
 // (2) Build can say "could not": blocked { reason }, exactly one of it and pr. A blocked result becomes the stage's
-//     error, so quick-fix's building onError takes it to replanning, as it takes a stop without a return.
+//     error, carrying the reason as event.blocked; quick-fix's building onError takes a first build's block to its
+//     blocked card (fix-blocked-retry) and any other error to replanning, as it takes a stop without a return.
 // (3) A PR ref's url must be a GitHub PR url: a prose url fails the schema, not the web-quote check.
 // (4) Build's notes (trial 2, N1): an optional caveat for the person, written to context and shown on the merge
 //     cards (awaitingMerge, awaitingGates), never given to the verifier.
@@ -73,7 +74,7 @@ test('S5 (1): the build prompt names the GitHub tools, the PR url shape and the 
   }
 });
 
-test('S5 (2): build returns exactly one of pr and blocked; a blocked build goes where a stage error goes, replanning', async () => {
+test('S5 (2): build returns exactly one of pr and blocked; a blocked first build goes to the blocked card', async () => {
   // The schema: exactly one alternative.
   const defs = QF.meta.schemas;
   const pr = { url: prUrl(1), at: 'a'.repeat(40) };
@@ -82,9 +83,11 @@ test('S5 (2): build returns exactly one of pr and blocked; a blocked build goes 
   assert.deepEqual(check(build, { pr, blocked: { reason: 'x' } }, defs), ['$ must have exactly one of: pr; or blocked, not several']);
   assert.deepEqual(check(build, {}, defs), ['$ must have exactly one of: pr; or blocked']);
   assert.deepEqual(check(build, { blocked: {} }, defs), ['$.blocked.reason is missing']);
-  // The route is the stage error's: building has one onError, to replanning, and no onDone reads blocked.
-  assert.deepEqual(QF.states.building.invoke.onError, { target: 'replanning', actions: [{ type: 'set', params: { failure: 'event.error' } }] });
-  assert.ok(!JSON.stringify(QF.states).includes(BLOCKED), 'the chart never reads blocked');
+  // The route is the stage error's: building's onError goes to blocked under blockedBuild (event.blocked, the first
+  // build), else to replanning; no onDone reads blocked.
+  assert.deepEqual(QF.states.building.invoke.onError.map((t) => [t.target, t.guard ?? null]), [['blocked', 'blockedBuild'], ['replanning', null]]);
+  assert.deepEqual(QF.meta.guards.blockedBuild, ['event.blocked', { path: 'context.built', in: [null] }]);
+  assert.ok(!JSON.stringify(QF.states.building.invoke.onDone).includes(BLOCKED), 'no onDone reads blocked');
   // Only quick-fix's build declares it: research's stages answer in text, feature has no build stage of its own.
   const declaring = Object.entries(WORKFLOWS).flatMap(([n, wf]) => Object.entries(wf.meta.actors).filter(([, a]) => a?.properties?.[BLOCKED]).map(([a]) => `${n}.${a}`));
   assert.deepEqual(declaring, ['quick-fix.build']);
@@ -100,7 +103,7 @@ test('S5 (2): build returns exactly one of pr and blocked; a blocked build goes 
     assert.ok(got.accepted, JSON.stringify(got));
     await w.drive('b');
     const host = w.host('b');
-    assert.equal(host.snapshot.value, 'replanning');
+    assert.equal(host.snapshot.value, 'blocked');
     assert.equal(host.snapshot.context.failure, 'build blocked: gh pr create: HTTP 403');
     assert.equal(host.snapshot.context.pr, null);
     const rec = JSON.parse(readRun(w, runId, 'stage.json'));

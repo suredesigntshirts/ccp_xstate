@@ -8,7 +8,7 @@ import { loadWorkflow } from '../../packages/engine/src/index.js';
 import { fresh } from './lib.mjs';
 
 const REPO = new URL('../../workflows/', import.meta.url).pathname;
-const ASKING = { 'quick-fix': ['awaitingGates', 'awaitingMerge', 'replanning'], feature: ['replanning'], research: ['awaitingPublish', 'replanning'] };
+const ASKING = { 'quick-fix': ['awaitingGates', 'awaitingMerge', 'blocked', 'replanning'], feature: ['replanning'], research: ['awaitingPublish', 'replanning'] };
 
 test('load-check: the three workflows in workflows/ load', () => {
   for (const name of Object.keys(ASKING)) assert.ok(loadWorkflow(name).id.startsWith(`${name}@`));

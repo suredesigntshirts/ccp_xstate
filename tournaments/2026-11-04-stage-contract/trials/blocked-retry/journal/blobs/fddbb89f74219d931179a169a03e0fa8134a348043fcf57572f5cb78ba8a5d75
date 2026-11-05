@@ -1,0 +1,6 @@
+1. Open .github/workflows/test.yml and find the job that runs npm test. Read how it sets up Node today (it uses Node 20 only).
+2. Change that job to use a matrix: `strategy: matrix: node-version: [20, 22]`. Make the actions/setup-node step use `node-version: ${{ matrix.node-version }}`. Keep every other step, including the `npm test` step, running in each matrix leg. Keep the YAML valid and the existing triggers unchanged.
+3. Do not edit tests or source to get green unless a failure is caused by Node 22 itself; if one is, fix its root cause and say so in the PR body.
+4. Run `npm ci` (or the install step the workflow uses) and `npm test` locally and confirm they pass. If Node 22 is available locally (for example via `npx -p node@22 node -v`, nvm or similar), also run `npm test` under it.
+5. Check the workflow file parses as YAML.
+6. Open one pull request containing only this change, with a short description of what changed and why (the invoice service is moving to Node 22).

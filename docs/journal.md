@@ -387,6 +387,9 @@ with `stopped: true`, no output and an empty `wrote`.
 | A return passed every check | `result.stored` | `run`, `actor`, `agentId`, `hash`, `bytes`, `toolUseId` |
 
 The completion an accepted result makes is an `engine.transition` whose source is `harness` and `return <tool use id>`.
+A stage's blocked result (`{ blocked: { reason } }`, quick-fix's build) makes the actor's error event instead:
+`error` is `<actor> blocked: <reason>`, and the event also carries `blocked`, the reason alone, so a workflow routes
+a block apart from other errors by a guard on `event.blocked` (quick-fix's `blockedBuild`, plan item fix-blocked-retry).
 An invoked actor's `tool.call` rows (capture, session file) also carry `paths`: the file a file tool named, the
 folder a search ran in, or the folder a shell command ran from. They are the one piece of a tool's input a row keeps,
 and only for an agent bound to a run, so the journal shows where each actor worked.

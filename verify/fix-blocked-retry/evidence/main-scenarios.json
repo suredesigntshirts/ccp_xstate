@@ -1,0 +1,123 @@
+{
+ "verify-fail": {
+  "states": [
+   "briefing",
+   "building",
+   "verifying",
+   "building",
+   "verifying",
+   "replanning"
+  ],
+  "cards": [
+   {
+    "question": "This item stalled. Replan it with a written five whys, or drop it?",
+    "choices": [
+     "replan",
+     "drop"
+    ],
+    "inputs": [
+     "verdict"
+    ]
+   }
+  ],
+  "errors": [],
+  "final": null
+ },
+ "red-check": {
+  "states": [
+   "briefing",
+   "building",
+   "checking",
+   "building",
+   "checking",
+   "replanning"
+  ],
+  "cards": [
+   {
+    "question": "This item stalled. Replan it with a written five whys, or drop it?",
+    "choices": [
+     "replan",
+     "drop"
+    ],
+    "inputs": [
+     "failure"
+    ]
+   }
+  ],
+  "errors": [],
+  "final": {
+   "check": "test",
+   "conclusion": "failure",
+   "sha": "<sha>",
+   "url": "https://ci/test/<sha>"
+  }
+ },
+ "build-stopped": {
+  "states": [
+   "briefing",
+   "building",
+   "replanning"
+  ],
+  "cards": [
+   {
+    "question": "This item stalled. Replan it with a written five whys, or drop it?",
+    "choices": [
+     "replan",
+     "drop"
+    ],
+    "inputs": [
+     "failure"
+    ]
+   }
+  ],
+  "errors": [
+   "the actor ended (SubagentStop) without returning its result, after being sent back once"
+  ],
+  "final": "the actor ended (SubagentStop) without returning its result, after being sent back once"
+ },
+ "brief-error": {
+  "states": [
+   "briefing",
+   "replanning"
+  ],
+  "cards": [
+   {
+    "question": "This item stalled. Replan it with a written five whys, or drop it?",
+    "choices": [
+     "replan",
+     "drop"
+    ],
+    "inputs": [
+     "failure"
+    ]
+   }
+  ],
+  "errors": [
+   "the actor ended (SubagentStop) without returning its result, after being sent back once"
+  ],
+  "final": "the actor ended (SubagentStop) without returning its result, after being sent back once"
+ },
+ "blocked-text": {
+  "states": [
+   "briefing",
+   "building",
+   "replanning"
+  ],
+  "cards": [
+   {
+    "question": "This item stalled. Replan it with a written five whys, or drop it?",
+    "choices": [
+     "replan",
+     "drop"
+    ],
+    "inputs": [
+     "failure"
+    ]
+   }
+  ],
+  "errors": [
+   "build blocked: push refused: refusing to allow a token without workflow scope to update .github/workflows/ci.yml; grant the workflow scope, then retry"
+  ],
+  "final": "build blocked: push refused: refusing to allow a token without workflow scope to update .github/workflows/ci.yml; grant the workflow scope, then retry"
+ }
+}

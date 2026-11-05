@@ -1,0 +1,17 @@
+Run every check at the pull request head.
+
+Check 1: ".github/workflows/test.yml runs npm test on Node 20 and on Node 22 (a matrix over node-version)"
+Run: parse .github/workflows/test.yml as YAML (for example `ruby -ryaml -e 'p YAML.load_file(".github/workflows/test.yml")'` or `python3 -I -c` with yaml, or `node` with a YAML parser if present). Inspect the parsed structure, and also read the CI check results for the head if available.
+PASS: the file parses, a job that runs `npm test` has strategy.matrix.node-version containing both 20 and 22 (any notation, such as 20, "20", 20.x), and the job's setup-node step takes its node version from matrix.node-version.
+FAIL: the file does not parse, the matrix is missing, either 20 or 22 is absent, the setup-node step does not use the matrix value, or no step runs `npm test`.
+
+Check 2: "npm test passes"
+Run: `npm ci` (if the repo has a lockfile, else `npm install`) then `npm test` at the head.
+PASS: `npm test` finishes successfully.
+FAIL: `npm test` fails or cannot run.
+
+Advisory (not part of PASS or FAIL):
+- If Node 22 is available, also run `npm test` under it and report the result.
+- Check that the PR's CI shows both a Node 20 and a Node 22 leg of the test job, and that both are green.
+- Check that the exact `npm test` exit status is 0, that triggers in the workflow are unchanged, and that the diff touches nothing unrelated.
+- The live Actions run on the matrix can only be fully seen after merge; do not read it as a requirement.

@@ -1,0 +1,4 @@
+Blocked. The workflow change is committed locally (4601e0583c5a6ad7e0705ffcd8356b793aa726ed on run/trial/1.build), but the push was rejected, so no PR was opened. The remote said: "refusing to allow an OAuth App to create or update workflow `.github/workflows/test.yml` without `workflow` scope". Pushing needs a credential with the `workflow` scope, or the person pushing the change. The harness return tool accepted the blocked result.
+
+- **Change:** `.github/workflows/test.yml` now has `strategy.matrix.node-version: [20, 22]`. `actions/setup-node` uses `${{ matrix.node-version }}`. The checkout step, the `npm test` step and the triggers are unchanged.
+- **Checks:** The file parses as valid YAML. `npm test` passes 3/3 on local Node 22.23.4. There are no dependencies, so `npm ci` had nothing to install. Node 20 was not available locally, so I did not run it there.
