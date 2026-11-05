@@ -4,7 +4,7 @@
   "title": "Make the Inspector's step labels read plainly when a guard has a verb-like name",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A step label the Inspector writes from a guarded transition names the guard as a quoted name, so a guard called failed reads as \"the guard \\\"failed\\\" held\" and never as \"its guard failed held\".",
   "why": "Reviewing the fail trial in the Workflow Inspector on 5 Nov, the step where verify FAILed was labelled \"The verify actor finished, and its guard failed held\", which reads as nonsense: failed is the guard's name, not a verb. labelOf in scripts/inspector/export.mjs drops the bare guard name into the sentence.",
   "serves": [
