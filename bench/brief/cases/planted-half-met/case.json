@@ -1,0 +1,32 @@
+{
+  "kind": "planted",
+  "source": "Planted for stage-bench: a small string library whose README already misses one export.",
+  "repo": {
+    "seed": "repo",
+    "message": "strutil: capitalize, slugify, truncate",
+    "origin": "https://github.com/o/strutil.git"
+  },
+  "input": {
+    "issue": {
+      "url": "https://github.com/o/strutil/issues/7",
+      "title": "padLeft() for invoice numbers",
+      "body": "Invoice numbers need zero padding (42 -> 00042). Please add padLeft to strutil and document it in the README.\n\nExpect:\n- index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters\n- padLeft returns s unchanged when s is already width characters or longer\n- README.md has a section for every function index.js exports\n- npm test passes",
+      "expect": [
+        "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters",
+        "padLeft returns s unchanged when s is already width characters or longer",
+        "README.md has a section for every function index.js exports",
+        "npm test passes"
+      ]
+    }
+  },
+  "trap": "Half-met line (planted): index.js exports slugify, and README.md has sections only for capitalize and truncate. The body asks only for padLeft's docs; expect line 3 asks for every export, so a build that documents only padLeft half-meets it.",
+  "must_catch": [
+    "The builder brief has the builder add a README.md section for slugify as well as padLeft, because slugify is exported and has no section.",
+    "The verifier check for line 3 lists what index.js exports at the PR head (capitalize, slugify, truncate, padLeft) and FAILs if any of them, slugify included, has no README.md section.",
+    "The verifier check for line 1 calls padLeft without a fill argument and checks that it pads with spaces."
+  ],
+  "must_not": [
+    "A verifier check that passes line 3 when README.md has a padLeft section but none for slugify.",
+    "A PASS or FAIL condition stricter than its line, such as a required README layout, a parameter count, or a check that fill must be one character."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "15da874a97587541e71f69e2e7c20376f505a0c628d8c5b859e162b0abcde947",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check against the must_not list. Check 3 is fine. Its command fails any exported function whose name doesn't appear in README.md, and it adds a manual read of what README.md says about each one. The Note also states that a build documenting only clamp FAILs, so must_not item 1 is avoided. Check 2 breaks must_not item 2. Its PASS condition says the thrown error must be a RangeError \"and its message is exactly 'lo must not be greater than hi'\". That exact-message requirement is stricter than expect line 2, which only asks for a RangeError. It also conflicts with the builder brief, which allows any clear message. The command never checks the message, but the written PASS condition still requires it. Because this one part of the output breaks the criterion, the whole output fails.",
+  "model": "claude-opus-5-5",
+  "ms": 7580,
+  "tokens": {
+    "input": 2,
+    "output": 408,
+    "cacheCreation": 3766,
+    "cacheRead": 783,
+    "fresh": 4176,
+    "total": 4959
+  },
+  "at": "2026-11-05T05:00:04.143Z"
+}

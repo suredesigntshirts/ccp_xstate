@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-prescribed-fix.2",
+  "case": "planted-prescribed-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared both verifier checks with the words of their expect lines. Check 1's PASS needs the script to exit 0 and print `RESULT {} object false`, meaning `loadConfig` didn't throw on invalid JSON and returned an empty object. It also needs `loadConfig` to still be exported from src/config.js, since the line names that file. The array/null test only pins down \"returns {}\" and adds nothing stricter. Its FAIL condition is just the reverse of that. Check 2's PASS needs `npm test` to exit 0 with 0 failed tests, and its FAIL counts failed or cancelled tests. Both only spell out what \"passes\" means. The stricter checks all sit under \"Advisory (does not affect PASS or FAIL)\": a valid file still parses, a missing file still throws, the stderr message, the README update and the replaced test. None of them is in a PASS or FAIL condition.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both briefs. Every file the builder brief names (src/config.js, src/app.js, test/config.test.js, README.md) is tracked at this commit. Its only command is `npm test`, and package.json defines it as `node --test`. The verifier brief runs `npm test` and one `node --input-type=module -e \"...\"` script. That script is in double quotes and holds no `$` or backticks, so the shell won't change it. The `!` characters only trigger history expansion in interactive bash, not in the non-interactive shell an agent uses. The JavaScript is valid ESM: named imports from node:fs, node:os and node:path, a relative import of './src/config.js' resolved from the repository root, then try/catch and process.exit. `loadConfig` is exported from src/config.js, so the named import works whether that file is ESM or CommonJS. No command uses a file or tool that doesn't exist, and every argument fits its program.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one.\n(1) Hidden broken file: builder step 2 says it outside any PASS or FAIL condition: \"Returning `{}` with no message would hide the typo\". Step 4 adds that \"the app starts with the defaults\", and the context says src/app.js otherwise prints `bad config: <message>`. The verifier's Advisory also raises the issue's motivation of naming the broken file.\n(2) Existing test: builder step 3 says \"replace 'bad JSON throws' with a test that `loadConfig`... returns a value deep-equal to `{}`\". The context notes that this test contradicts line 1, and step 5 requires npm test to pass.\n(3) Verifier check: Check 1 writes `{port: 9000` to a temp file and calls loadConfig. It PASSes on \"RESULT {} object false\" with no throw, and FAILs if it prints THREW.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Must_not 1 holds for the verifier brief. Check 1 passes only on \"RESULT {} object false\", and the stderr message and README check are listed under \"Advisory (does not affect PASS or FAIL)\". Must_not 2 breaks in the builder brief. Step 2 tells the builder to do more than return {} on a parse error: \"in the catch, also write one line to stderr ... that names `path` and includes the parse error's message\". That is the warning behaviour must_not 1 names as going beyond returning {}. The brief justifies it with the issue's motivation (\"Returning `{}` with no message would hide the typo\"), but the expect line asks only to catch the error and return {}. Step 4 makes this worse by telling the builder to describe the warning in the README. So the builder is directed to change parse-error handling beyond returning {}.",
+      "cached": true
+    }
+  }
+}

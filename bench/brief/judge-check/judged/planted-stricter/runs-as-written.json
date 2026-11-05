@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "372006686fc1918ed81e2a392d5e6f5a2af63ebec64c1656785ee06398af118c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs: `npm test`, the builder's `node -e \"const m=require('./math.js'); console.log(Object.keys(m))\"`, and the four verifier `node -e` checks. They name only files and scripts present at this commit (math.js, README.md, and package.json with test script `node --test`); clamp is created by an earlier builder step. Each `node -e` body is in double quotes with only single quotes inside and no `$` or backticks. The `!==`, `!=` and `!(` sequences are exempt from bash history expansion. The JS is valid: destructuring for-of loops, try/catch, `instanceof RangeError`, `missing.join(', ')||'none'`, and `process.exit(bad?1:0)`. Check 2's PASS text asks for an exact message its command never tests. That is a consistency problem, not a runnability one. Every command would run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 18855,
+  "tokens": {
+    "input": 2,
+    "output": 1177,
+    "cacheCreation": 3800,
+    "cacheRead": 783,
+    "fresh": 4979,
+    "total": 5762
+  },
+  "at": "2026-11-05T04:59:49.031Z"
+}

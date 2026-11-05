@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "cddc06a6711d3291e37adcfc42791abb2f2a4156cf5a8dc8b830ccc276e24ccc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one. Item 1: the builder brief says \"leave the default CSV behaviour unchanged\" and \"Run `npm test` and make sure every test passes\", even though no expect line asks for either. Item 2: the verifier brief has a section marked \"Advisory (not a PASS or FAIL condition)\" that asks the verifier to check that the default CSV behaviour is unchanged and that npm test passes. It also says npm test \"does not decide either check by itself\". It never says in so many words that no expect line covers these. Keeping them outside every PASS/FAIL condition makes the point, so I count it, though this is the borderline item. Item 3: Check 1 feeds the same table as TSV with --tsv and as CSV without the flag, using both a multi-row and a single-row table, and compares the outputs with [ \"$a\" = \"$b\" ].",
+  "model": "claude-opus-5-5",
+  "ms": 9164,
+  "tokens": {
+    "input": 2,
+    "output": 843,
+    "cacheCreation": 2758,
+    "cacheRead": 783,
+    "fresh": 3603,
+    "total": 4386
+  },
+  "at": "2026-11-05T05:06:00.325Z"
+}

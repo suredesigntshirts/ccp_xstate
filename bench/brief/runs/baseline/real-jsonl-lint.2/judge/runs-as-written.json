@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "279dcc5dc7e82a141b3bac8b366ca13bb8ff7274b6403dd2f9c46dd9e18adb07",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds: every command in both briefs would run as written. Builder brief: `chmod +x`, `npm install`, `npm ci && npm test` and `node --test` all work. The files they act on are created in earlier steps, and the root package.json and package-lock.json are tracked. The root test script uses `--workspaces`, which fits the brief's claim that root workspaces exist. Verifier brief: `node packages/jsonl-lint/bin/jsonl-lint.js <fixture>; echo $?` runs against the file the builder makes. The `node --input-type=module -e \"import {lint} from './packages/...'; ...\"` line is valid shell and valid JS: bash leaves `\\n` alone inside double quotes, JS turns it into a newline in the single-quoted strings, and in eval mode the relative import is resolved from the current directory. `npm test -w jsonl-lint`, `test -s`, `grep -n`, `mktemp -d`, `gh pr view --json body,headRefOid,state` and `gh pr checks --repo` all use valid arguments. Placeholders like `<pr>` are clearly meant to be filled in. I found no command with broken syntax or a missing file.",
+  "model": "claude-opus-5-5",
+  "ms": 13268,
+  "tokens": {
+    "input": 2,
+    "output": 1009,
+    "cacheCreation": 5243,
+    "cacheRead": 783,
+    "fresh": 6254,
+    "total": 7037
+  },
+  "at": "2026-11-05T05:07:20.616Z"
+}

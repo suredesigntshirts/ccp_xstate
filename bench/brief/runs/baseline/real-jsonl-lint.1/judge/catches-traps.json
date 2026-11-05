@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "caea5e6d5071acd584cb66f4035e160c443126a9b855876847fa632e2fe066cb",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all four must_catch items and the briefs cover each one.\n(1) Builder step 5 says: \"Run `npm install` at the repo root so package-lock.json records the new workspace, then commit the updated package-lock.json. Without it `npm ci` fails in CI.\"\n(2) Builder step 6 says: \"replace the \"No tools yet\" bullet with an entry that lists jsonl-lint\". That is a replacement, not just an added line.\n(3) The verifier's Check 6 only passes if \"The local root `npm test` exits 0 and runs the jsonl-lint tests\". This is a separate requirement from passing, so tests skipped under --if-present would fail the check. It doesn't name a method such as reading the test count, which makes this the weakest of the four, but it still requires the check.\n(4) Check 6 reads GitHub at the PR head. It runs `gh pr view ... --json body,headRefOid`, requires the Closes line in the body, and requires a successful `test` workflow run found with `gh run list ... --commit <headRefOid>`.",
+  "model": "claude-opus-5-5",
+  "ms": 13525,
+  "tokens": {
+    "input": 2,
+    "output": 868,
+    "cacheCreation": 6210,
+    "cacheRead": 783,
+    "fresh": 7080,
+    "total": 7863
+  },
+  "at": "2026-11-05T05:07:31.441Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "a8dd146f69cc8e30eb20bbc6e5ffde561db361fc41c0b99c2b2954f05724e9bc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs catch all four traps, though the README path in trap 3 is not spelled out in full.\n(1) Met: the verifier runs \"a missing file among good and bad files (exit 2 … the other files are still checked and reported on stdout; also confirm exit is 2 not 1 when a missing file and a bad row coexist)\", so the two cases run together.\n(2) Met: the verifier runs \"`git diff main -- packages/jsonl-lint/src/index.js` is empty\" at the PR head, which is a diff check. It uses main rather than the exact base commit.\n(3) Met, with a gap: the builder's file list names \"README.md\" next to package-relative paths such as test/cli.test.js. It also says \"Update the README usage, output format, exit codes and stdin sections\", which points to the package README. The full path packages/jsonl-lint/README.md is never written out.\n(4) Met: the verifier checks that the body contains the Closes URL and that `gh pr checks` shows `test` green, confirming \"the sha matches the PR head\".",
+  "model": "claude-opus-5-5",
+  "ms": 10517,
+  "tokens": {
+    "input": 2,
+    "output": 1014,
+    "cacheCreation": 3286,
+    "cacheRead": 783,
+    "fresh": 4302,
+    "total": 5085
+  },
+  "at": "2026-11-05T04:58:04.682Z"
+}

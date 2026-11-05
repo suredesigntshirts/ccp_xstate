@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "c954f7a5ef9940484f926da42c38f31c96332056d121eff3270979ce31a12f1a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. `npm test` maps to the real script `node --test`, which picks up test/strutil.test.js. All the node one-liners use `--input-type=module -e` with double-quoted bash and JS strings in single quotes, and none of them contain `$` or backticks. In the README check, bash turns `\\\\\\\\b` inside double quotes into `\\\\b`, which the JS string turns into a regex `\\b`, so the word-boundary test is valid. The imports from './index.js', 'node:fs' and 'node:assert/strict' are valid when run from the repo root. `echo exit=$?` sits outside the quotes, so it runs correctly. The only hazard is `!new` inside double quotes, which would trigger history expansion in an interactive bash, but agents run non-interactive shells where that is off. Every file named (index.js, README.md, test/strutil.test.js) exists at this commit, and the arguments fit each program.",
+  "model": "claude-opus-5-5",
+  "ms": 14080,
+  "tokens": {
+    "input": 2,
+    "output": 924,
+    "cacheCreation": 3530,
+    "cacheRead": 783,
+    "fresh": 4456,
+    "total": 5239
+  },
+  "at": "2026-11-05T05:12:58.686Z"
+}

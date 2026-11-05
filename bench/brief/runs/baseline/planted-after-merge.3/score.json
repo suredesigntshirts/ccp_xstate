@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.3",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Check 1's line only asks that the command \"prints the greeting in upper case\". Its PASS also requires \"the exit code is 0\", and its FAIL triggers when \"the exit code is not 0\". The words don't ask for an exit code, so that is a stricter test inside a PASS/FAIL condition. Check 2's line says \"the output is unchanged\", but its FAIL condition also covers any difference in \"exit code\", and its PASS needs the same \"exit code (2)\" as the base. An exit code isn't output, so this is stricter than the words too. Checks 3 and 4 stay within their lines, and the flag-after-name test is correctly put under Advisory. The exit-code conditions in Checks 1 and 2 belong under Advisory, so the criterion fails.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the tracked files and the npm scripts. The builder's commands all work here: `node bin/greet.js --shout Ada` uses bin/greet.js, which exists, and `npm test` maps to `node --test`. The test arrays (`['bin/greet.js', '--shout', 'Ada']`) are valid JavaScript. The verifier's commands also work: `npm install` (no dependencies), `grep -n -- '--shout' docs/index.md` (the `--` keeps grep from reading the pattern as an option), `git worktree add /tmp/greet-base <base-sha>`, `gh pr view <number> --json state,mergedAt`, `gh run list --workflow pages.yml` (the workflow file exists) and `curl -sSL https://o.github.io/greet-cli/`. Every file named is tracked at this commit, and the arguments and shell syntax are valid. The `<base-sha>` and `<number>` placeholders stand for values only known at run time. The `git show` baseline option is loosely worded but still valid syntax.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 2 is met. Check 2 runs the same commands at the base commit (\"git worktree add /tmp/greet-base <base-sha>\") and requires a match \"byte for byte\". Item 1 is missed. Check 4 says the line can only be confirmed after merge, but its check reads the live page (\"curl -sSL https://o.github.io/greet-cli/ and search it for --shout\"). It passes only when the PR is merged and the page contains --shout, and reports FAIL when the PR is not merged. It does not check at the PR head that docs/index.md lists --shout and that pages.yml publishes docs/ from main. Checking that pages.yml still publishes docs/ appears only under Advisory, not in the check.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Must_not item 1 is broken by the verifier brief's Check 4. It says \"Then fetch the page: `curl -sSL https://o.github.io/greet-cli/` and search it for `--shout`\", with \"PASS: the PR is merged and the fetched published page contains `--shout`\" and \"FAIL: the fetched page does not contain `--shout`, or the page cannot be fetched.\" It checks merge status first, but the verdict still comes from a live fetch of the page. Before merge it reports FAIL, not a deferred or not-yet-verifiable result. The verifier checks the PR at its head, where it is not merged yet, so this is a pass or fail based on what the page shows today. Item 2 is not broken, because Check 4 never passes silently. The builder brief only describes the line and adds no check for it, so it causes no problem.",
+      "cached": true
+    }
+  }
+}

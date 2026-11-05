@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "6058bad4338121b45127b7351fed5b0abc34d50019e32667ed4a3a745255085d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each PASS and FAIL condition in the verifier brief against the words of its expect line. Check 1's clamp cases (below, above, inside, equal to a bound, lo equal to hi, negatives, a float) are all forced by \"returns x limited to the range lo to hi\". Its throw cases all have lo greater than hi and only require a RangeError. Check 2 requires each exported function to be named in README.md and for README.md to \"say what it does\". That matches \"documents every function\", and it adds no rule about headings or exact wording. Check 3 requires exit 0 and no failing or cancelled tests, which is what \"npm test passes\" means. The stricter items are all under \"Advisory (not part of any PASS or FAIL condition)\": tests for clamp, file scope, add/subtract/multiply behaviour unchanged, and NaN handling. No PASS or FAIL condition goes beyond what its expect line's words require.",
+  "model": "claude-opus-5-5",
+  "ms": 9732,
+  "tokens": {
+    "input": 2,
+    "output": 856,
+    "cacheCreation": 3658,
+    "cacheRead": 783,
+    "fresh": 4516,
+    "total": 5299
+  },
+  "at": "2026-11-05T04:58:55.473Z"
+}

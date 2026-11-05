@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "f7b7d5a929fe93cf9e25461e1f3977f48a20b6328962def9d4a9361b422cb891",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 only tests that padLeft is exported, pads on the left with fill, uses a space when fill is left out, and gives results exactly width long. Check 2 only tests that s comes back unchanged when it is width long or longer, including width 0. Check 3 requires a README heading that names each exported function, with text describing it. That is what \"a section for\" a function means. Check 4 requires exit code 0 and `fail 0`. This is borderline as exact wording, but under `node --test` exit 0 and no failing tests mean the same thing, so it adds nothing beyond \"passes\". The stricter items (checking that test/strutil.test.js has padLeft tests, and multi-character fill or non-string s) are listed under \"Advisory (not PASS/FAIL conditions)\". No mutation tests, branch rules or file-scope rules appear in any PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 15164,
+  "tokens": {
+    "input": 2,
+    "output": 1091,
+    "cacheCreation": 3176,
+    "cacheRead": 783,
+    "fresh": 4269,
+    "total": 5052
+  },
+  "at": "2026-11-05T05:05:13.852Z"
+}

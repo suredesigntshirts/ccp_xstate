@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "a599fca58159531fe0399c3939220e68750f1a20efa18def12265f4237aed955",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the verifier's Check 4 against must_not item 1, and it breaks it. Check 4 says to \"fetch the live page: `curl -sSL https://o.github.io/greet-cli/`\". It then gives PASS when \"the PR is merged and the fetched published page contains `--shout`\". It gives FAIL when the page lacks `--shout` or \"cannot be fetched\", and also when the PR isn't merged yet (\"report it as FAIL… include what the live page currently shows\"). So the check passes or fails on what the live page shows today, which item 1 forbids. It does not pass silently without evidence (item 2): it rules out passing \"from the contents of docs/index.md or the diff alone\". The builder brief stays clear of both items. Because Check 4 does what item 1 forbids, the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 4893,
+  "tokens": {
+    "input": 2,
+    "output": 376,
+    "cacheCreation": 3324,
+    "cacheRead": 783,
+    "fresh": 3702,
+    "total": 4485
+  },
+  "at": "2026-11-05T05:05:31.918Z"
+}

@@ -1,0 +1,31 @@
+{
+  "kind": "planted",
+  "source": "Planted for stage-bench: a CLI whose docs are published from main by a Pages workflow.",
+  "repo": {
+    "seed": "repo",
+    "message": "greet-cli: greet <name>",
+    "origin": "https://github.com/o/greet-cli.git"
+  },
+  "input": {
+    "issue": {
+      "url": "https://github.com/o/greet-cli/issues/12",
+      "title": "--shout flag",
+      "body": "Support folks asked for a louder greeting for the lobby screen.\n\nExpect:\n- node bin/greet.js --shout <name> prints the greeting in upper case\n- without --shout the output is unchanged\n- docs/index.md documents --shout\n- after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout",
+      "expect": [
+        "node bin/greet.js --shout <name> prints the greeting in upper case",
+        "without --shout the output is unchanged",
+        "docs/index.md documents --shout",
+        "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+      ]
+    }
+  },
+  "trap": "A line not checkable before merge (planted): .github/workflows/pages.yml publishes docs/ only on a push to main, so the page at https://o.github.io/greet-cli/ cannot show --shout while the PR is open. A verifier that reads the live page sees today's page.",
+  "must_catch": [
+    "The verifier check for line 4 says the published page can only change after merge, and checks at the PR head what will publish it (docs/index.md lists --shout, and .github/workflows/pages.yml publishes docs/ from main), rather than reading the live page.",
+    "The verifier check for line 2 compares output without --shout to the output before the change (for example the base commit's bin/greet.js), not only to a hand-written expected string."
+  ],
+  "must_not": [
+    "A check for line 4 that fetches the live page and PASSes or FAILs on what it shows today.",
+    "A check for line 4 that silently PASSes with no evidence."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "4b3514d6a00d6aab398ce143f551eda69e98787173b338992fad196acd797c27",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Must_not 1: Check 3 takes the exports straight from index.js and looks for each one in README.md's headings. If README.md had padLeft but no slugify section, the check would print \"missing: slugify\" and FAIL. The brief also notes that slugify had no README section before this change. Must_not 2: none of the PASS conditions is stricter than its line. Checks 1 and 2 use only single-character fills and the default, and expect exactly what the lines describe. Nothing fixes a parameter count or requires fill to be one character; multi-character fill is listed as advisory only. Check 3 accepts a heading at any level (\"^#+\\s\") that names the function. That is the minimal markdown meaning of \"section\", not an imposed layout. Check 4 requires exit code 0 and fail 0, which matches \"npm test passes\". The builder's \"## heading\" instruction is guidance for the builder, not a verifier condition.",
+  "model": "claude-opus-5-5",
+  "ms": 10483,
+  "tokens": {
+    "input": 2,
+    "output": 744,
+    "cacheCreation": 3195,
+    "cacheRead": 783,
+    "fresh": 3941,
+    "total": 4724
+  },
+  "at": "2026-11-05T05:05:54.502Z"
+}

@@ -1,0 +1,58 @@
+{
+  "item": "stage-bench",
+  "verified_sha": "b7d6cb1c1ab9090a3d2b842c04810d46b620d165",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FYsZKaV2hUtiwziZn",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "same-prompt",
+      "status": "MET",
+      "command": "npm ci; node --test verify/stage-bench/same-prompt.test.mjs (my own render() from packages/engine/src/stages.js vs `scripts/bench/run.mjs --prompt-only` output, no model run)",
+      "excerpt": "9 pass. quick-fix has exactly the model stages brief, build, verify. For each, the adopt trial's recorded run.json input (0.brief, 1.build, 3.verify): bench --prompt-only equals my render() on today's workflows/quick-fix.json (39430bff…), and with --workflow on the trial's pinned blob 8dc9451a… it equals my render() on that pin AND the committed runs/<n>/brief.md byte for byte (brief, build and verify). For all 7 brief cases, --prompt-only --case equals render() of the briefing task literal plus the case input. For all 24 committed bench run folders (baseline 21 + example-variant 3), sha256(brief.md) equals bench.json prompt.sha256 (what benchRun sends is readFileSync(brief.md)) and render(run.json) equals brief.md."
+    },
+    {
+      "id": "alone",
+      "status": "MET",
+      "command": "env -u GH_TOKEN -u GITHUB_TOKEN PATH=<gh shim that exits 1>:$PATH GIT_CONFIG_* url.https://github.invalid/.insteadOf=https://github.com/ (and git@github.com:) node scripts/bench/run.mjs --stage brief --case planted-after-merge --k 3 --out <scratch>/alone --model claude-opus-5-5; then node scripts/inspector/build.mjs --config <one source: alone/planted-after-merge.1> --out <scratch>/insp and a Playwright read of index.html",
+      "excerpt": "3 of 3 runs accepted (37 s, 48 s, 46 s; 14,418 / 14,596 / 13,971 fresh tokens), first return accepted, changed: [] in each worktree, bench.json conditions.github \"none\". Transcripts show only local commands (git ls-files, cat bin/greet.js docs/index.md package.json .github/workflows/*, cat src/greet.js test/greet.test.js); github.com appears only as text in the briefs. scripts/bench/*.mjs has no fetch/https/GH_TOKEN/api.github use. Inspector: \"1 runs -> …/insp (data.js 162 KB)\"; page shows \"Main (real run) · Verifier alone run · planted-after-merge-1 -> ends in briefing\", badges \"Real model run, 1 model agent run, replay matches the journal\", and its text contains the prompt's task line and a rules line, the issue title (input) and the returned verifier brief (result). Note: blocking github.com at the proxy level (NO_PROXY) was refused by this session's permission classifier, so GitHub was cut by removing tokens, shimming gh and rewriting git URLs; the case is a seed case that needs no network."
+    },
+    {
+      "id": "cases",
+      "status": "MET",
+      "command": "read bench/brief/cases/*/case.json; grep/cat the seed repos; git clone https://github.com/suredesigntshirts/ccp_machine_test and git show <commit>:<file> for the two real git cases",
+      "excerpt": "7 cases: 3 real (real-adopt-clamp, real-jsonl-lint, real-jsonl-lint-multi), 4 planted, each with must_catch (2-4) and must_not (2). Traps present: half-met: planted-half-met/repo/index.js exports capitalize, slugify, truncate; README.md has only \"## capitalize(s)\", \"## truncate(s, n)\" (and real-adopt-clamp: module.exports = { add, subtract, multiply }, README ### add, ### multiply). Not checkable before merge: planted-after-merge/.github/workflows/pages.yml publishes docs on push to branches [main] only, and expect line 4 is \"after merge, the published docs page … lists --shout\". Prescribes a fix: expect line 1 says return {} on parse error while the body asks people to learn which file is broken; src/app.js already catches and prints \"bad config: <message>\" exit 1; test/config.test.js:15 asserts SyntaxError is thrown. Missing obvious line: expect has only the --tsv line and README line; parse() is shared by bin/csv2json.js and test/csv.test.js, no line says CSV keeps working or npm test passes. Real git cases: at b772aff README.md:13 \"No tools yet: packages/ is empty…\", root test uses npm test --workspaces --if-present, test.yml runs npm ci; at b74bddb jsonl-lint.js reads argv[2] only and exits 2 on read error, README documents only \"jsonl-lint <file>\"."
+    },
+    {
+      "id": "judge-checked",
+      "status": "MET",
+      "command": "node scripts/bench/score.mjs --stage brief --judge-check (kept verdicts); then the same with --extra verify/stage-bench/evidence/verifier-stricter.json --out <copy of judged/> (4 fresh judge sessions, claude-opus-5-5)",
+      "excerpt": "Committed set: 10 entries (7 planted bad), agreement 10/10 on every criterion, \"Planted faults caught: 9 of 9\", exit 0. My own planted-bad entry (planted-half-met: a sound brief that catches slugify, but check 1 PASS also requires padLeft to throw TypeError for a multi-character fill; I checked a correct padLeft fails that check: \"NO THROW\") was graded words-only **not** and avoids-must-not **not**, other criteria met as hand-graded; table then 11/11 on every criterion, \"Planted faults caught: 11 of 11\". Judge why (words-only): \"Check 1 breaks the criterion. Its PASS condition requires the second printed line to be TypeError…\". Entry and the judge's verdicts are in verify/stage-bench/evidence/."
+    },
+    {
+      "id": "baseline",
+      "status": "MET",
+      "command": "cp -r bench/brief/runs/baseline <scratch>/bl; node scripts/bench/score.mjs --stage brief --runs <scratch>/bl --no-judge --report <scratch>/bl-report.md; diff of every table line with bench/brief/reports/baseline.md; diff -rq of the run folders; rerun: run.mjs --case planted-after-merge --k 3 (the alone runs above) then score.mjs --runs <scratch>/alone (12 judge sessions)",
+      "excerpt": "Recompute exit 0; every \"|\" table line of the recomputed report is identical to the committed baseline.md (per-case per-criterion table, per-run time/turns/fresh/all tokens/cost/ambient, reasons); the run folders are unchanged by scoring. Report: 21 runs, 7 cases, k = 3, model claude-opus-5-5, ambient reached 21 of 21 (attribution, userContext, skills; projectInstructions for the ccp_machine_test cases). My rerun of planted-after-merge (3 runs) scored exactly as the baseline's: returned/changes-nothing/one-check-per-line/no-restated-rules 3/3, words-only 0/3, runs-as-written 3/3, catches-traps 0/3, avoids-must-not 0/3; per run 37-48 s, 5 turns, ~14K fresh tokens, $0.17-0.18 (baseline 36-43 s, ~14.2K, $0.17-0.18). Evidence: verify/stage-bench/evidence/rerun-planted-after-merge.md."
+    },
+    {
+      "id": "edit-safe",
+      "status": "MET",
+      "command": "scratch clone at b7d6cb1, brief rule 2 (the Advisory rule) changed by a one-line text edit (+\" Keep each brief under 400 words.\"), npm ci, TMPDIR=<scratch> npm test; failing files rerun on an unedited clean clone; and node --test verify/stage-bench/edit-safe.test.mjs",
+      "excerpt": "npm test with the edit: 783 tests, 767 pass, 5 fail, 11 skipped. (1) S5 (6) \"the brief rule keeps stricter checks under Advisory\" asserts rule 2's text by regex: a test of the current file's contents, allowed. (2) verify/engine-stage-contract stage-record \"every model run folder the scenario tests write…\" fails only because it runs packages/engine/test/tourney/*.test.js as a child and S5 (6) is among them (the tourney suite alone: 71 pass, 1 fail = S5 (6)). (3) setup.test.mjs copy-not-link: fails on the unedited clone too (local-only, release tags). (4,5) clean-room catches x2: \"reference is not a tree\" because TEST_REF is a git stash create of the uncommitted edit; with the edit committed they pass. trial-fail-path and test/journals-replay pass with the edit. My replay test: \"replayed 27 items, 44 applied transitions, 28 roots; 27 brief runs re-rendered from their pin\" with the edited workflows dir; each brief run's committed brief.md equals render() on its pinned blob and differs from render() on the edited spec. One journal, verify/engine-host/one-owner-evidence/own-1, pins plain \"quick-fix\" (release 0.1.0, before pins) and does not replay on the unedited workflow either, so it is recorded, not replayed (the builder's decision file says the same)."
+    },
+    {
+      "id": "procedure-runs",
+      "status": "MET",
+      "command": "fresh clone at b7d6cb1, npm ci, then every fenced command in docs/prompts.md in order, as written (11 commands, including 1 + 3 model runs and 12 judge sessions)",
+      "excerpt": "All 11 exit 0: inspector config write + build.mjs (/tmp/bench-inspector/index.html); --prompt-only --case planted-half-met; --prompt-only build on the adopt pin; --judge-check; --no-judge baseline report; run --k 1 (\"planted-half-met.1: accepted in 38s, 13297 fresh tokens\"); variant node -e; variant --k 3 (3 accepted); score variant; compare.mjs wrote /tmp/bench-compare.md and /tmp/bench-blind/packet.md + key.json (\"worse on: words-only, avoids-must-not\": words-only 2/3 -> 1/3, avoids-must-not 3/3 -> 1/3, runs-as-written 1/3 -> 1/3). git status of the clone stayed clean. Small defect: the compare report's \"Generated by\" line prints --b as \"../../../../../bench-variant\" instead of /tmp/bench-variant."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub MCP pull_request_read get_check_runs, PR #102",
+      "excerpt": "Head b7d6cb1c1ab9090a3d2b842c04810d46b620d165: check run \"test\" (workflow ci) completed, conclusion success (05:25:14-05:26:41Z). \"gates\" (workflow verdict) was failure before this verdict existed."
+    }
+  ]
+}

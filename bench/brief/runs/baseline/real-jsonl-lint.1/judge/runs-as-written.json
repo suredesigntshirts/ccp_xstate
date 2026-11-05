@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "0850a0903befaa89da0314a0fa92d257c4009fd17d175874ecb8e3b0eab4efbe",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder's commands are sound: `npm install`, `chmod +x`, `npm ci && npm test` and the gh steps all fit this repo. In the verifier brief, Check 3's `node --input-type=module -e \"...\"` quoting and parentheses are valid, and Check 4's `require` one-liner works. Check 1 breaks the criterion. Its Run block puts prose on the same lines as commands, for example `printf '{\"a\":1}\\n\\n   \\n{bad\\n{\"c\":3}\\n{\"d\":' > $T/mixed.jsonl   (line 4 is bad, lines 2 and 3 are blank, ...)` and `printf '{\"a\":1}\\n{\"b\":2}' > $T/noeol-ok.jsonl   (a valid last line with no newline)`. Run as written, bash stops with \"syntax error near unexpected token `('\", so those fixtures are never created. The shell syntax is not valid as written.",
+  "model": "claude-opus-5-5",
+  "ms": 14297,
+  "tokens": {
+    "input": 2,
+    "output": 1178,
+    "cacheCreation": 6198,
+    "cacheRead": 783,
+    "fresh": 7378,
+    "total": 8161
+  },
+  "at": "2026-11-05T05:07:17.915Z"
+}

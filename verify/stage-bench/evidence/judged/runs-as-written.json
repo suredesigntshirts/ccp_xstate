@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "90d515d9aef4b85688a7cd22ceff0d667d6e59873c9a730cbbde5eaff1857732",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. The builder brief only names files that are tracked: index.js, README.md, test/strutil.test.js and package.json. It runs `npm test`, which exists as `node --test`. All four verifier commands are `node --input-type=module -e \"...\"` or `npm test`. They import './index.js' from the repo root, and the shell quoting holds up: double quotes wrap the script and single quotes sit inside it, with no stray `$` or backticks. The JavaScript is valid. Check 3 uses top-level await, which is allowed in module input, and its `new RegExp('^#+ ' + k + '[(]', 'm')` is well-formed. `!new` inside double quotes would only trigger bash history expansion in an interactive shell, not in non-interactive runs. Check 1 requires a TypeError, which is a problem with the spec, not with whether the command runs. Every command would run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 11500,
+  "tokens": {
+    "input": 2,
+    "output": 852,
+    "cacheCreation": 2703,
+    "cacheRead": 783,
+    "fresh": 3557,
+    "total": 4340
+  },
+  "at": "2026-11-05T05:29:42.090Z"
+}

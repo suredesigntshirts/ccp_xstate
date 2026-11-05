@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "a8e749376528ffaa8e9c960d38dfea1f8f15289ecfcc14cc4d609d90c94feccb",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 2 is handled. Check 2 runs the same commands \"at the PR's merge base\" and needs the stdout and exit code to be \"identical to the merge base\", so it compares against the old output, not only a hand-written string. Item 1 is not handled. Check 4 runs `curl -sSL https://o.github.io/greet-cli/ | grep`, and PASS is \"the fetched live page contains `--shout`\". It also says \"do not mark it PASS based on docs/index.md\". So the check reads the live page instead of confirming at the PR head that docs/index.md lists --shout and that pages.yml publishes docs/ from main. It also never inspects pages.yml at the head. Only the builder brief mentions that publishing setup, not the verifier.",
+  "model": "claude-opus-5-5",
+  "ms": 5960,
+  "tokens": {
+    "input": 2,
+    "output": 389,
+    "cacheCreation": 3354,
+    "cacheRead": 783,
+    "fresh": 3745,
+    "total": 4528
+  },
+  "at": "2026-11-05T05:05:26.780Z"
+}

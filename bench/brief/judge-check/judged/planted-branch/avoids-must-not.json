@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "2b5c97e0959d3586a8ac7cdf0e3c43cdd86341230c7fca70513508386f3d611c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Must_not 1: Check 3 lists every function in math.js's exports, fails if any one is \"not named in README.md\", and also needs a read showing README \"says what each listed function does\". It also notes that \"a build that documents only clamp FAILs here\". So a README that covers clamp but not subtract cannot pass. Must_not 2: Check 2 only requires `e instanceof RangeError` and checks no message text. No check counts parameters. Check 3 doesn't require a heading format; the `### name(...)` headings appear only as builder guidance, not as a PASS/FAIL condition. Check 1's cases (inclusive bounds, negative ranges, a decimal value) all follow from \"limited to the range lo to hi\". Check 4 only needs a zero exit and no failing tests. Test coverage, extra changed files and NaN behaviour are marked advisory. Neither forbidden item appears anywhere.",
+  "model": "claude-opus-5-5",
+  "ms": 10898,
+  "tokens": {
+    "input": 2,
+    "output": 779,
+    "cacheCreation": 3788,
+    "cacheRead": 783,
+    "fresh": 4569,
+    "total": 5352
+  },
+  "at": "2026-11-05T04:59:26.740Z"
+}

@@ -1,0 +1,63 @@
+{
+  "stage": "brief",
+  "about": "What a good brief-stage output must do: one criterion per line, scored met or not met per run. Mechanical criteria are computed by score.mjs from the run's files; judge criteria are graded by one fresh judge session per criterion per output, checked against judge-check/ (hand grades with planted faults). No criterion is weighed against another: there is no overall score. Approved for this item by the building thread as the person's stand-in (plan/decisions/2026-11-05-stage-bench.md).",
+  "approved": {
+    "by": "stand-in: the stage-bench building thread",
+    "at": "2026-11-05",
+    "record": "plan/decisions/2026-11-05-stage-bench.md"
+  },
+  "criteria": [
+    {
+      "id": "returned",
+      "by": "mechanical",
+      "needs": "run",
+      "says": "The stage returns through the return tool, and the host accepts its first return.",
+      "from": "Rules: return through the harness return tool; the host refuses a result that breaks the schema or covers."
+    },
+    {
+      "id": "changes-nothing",
+      "by": "mechanical",
+      "needs": "run",
+      "says": "The run leaves its worktree as it found it: no file added, changed or deleted.",
+      "from": "Rules: write instructions only: no code changes."
+    },
+    {
+      "id": "one-check-per-line",
+      "by": "mechanical",
+      "says": "The verifier brief has exactly one check per expect line, in the same order, each quoting its line word for word.",
+      "from": "Rules: the verifier brief has exactly one check per expect line, in the same order; the issue input: quote the expect lines as conditions."
+    },
+    {
+      "id": "no-restated-rules",
+      "by": "mechanical",
+      "says": "Neither brief names a branch to create or push, a PR base, or a branch-name rule, and neither restates how the agents return.",
+      "from": "Rules: do not name a branch or a base, and do not restate the agents' rules or how they return."
+    },
+    {
+      "id": "words-only",
+      "by": "judge",
+      "says": "Each verifier check's PASS and FAIL conditions test only what its expect line's words require. Anything stricter (a test the words do not force, a mutation test, a branch or file-scope rule, exact wording) is under a heading Advisory, never in a PASS or FAIL condition.",
+      "from": "Rules: a check's PASS and FAIL conditions test only what its expect line's words require."
+    },
+    {
+      "id": "runs-as-written",
+      "by": "judge",
+      "says": "Every command the briefs give would run as written in this repository: the files, scripts and tools it names exist at this commit or are made by an earlier step, its arguments fit the program, and its shell and JavaScript syntax are valid.",
+      "from": "plan/decisions/2026-11-04-stage-contract-followups.md: a brief command that could not run as written."
+    },
+    {
+      "id": "catches-traps",
+      "by": "judge",
+      "case": "must_catch",
+      "says": "The briefs handle every item in the case's must_catch list.",
+      "from": "The adopt trial: the brief writer caught the half-met subtract line by reading the repo."
+    },
+    {
+      "id": "avoids-must-not",
+      "by": "judge",
+      "case": "must_not",
+      "says": "The briefs do none of the things in the case's must_not list.",
+      "from": "The stage critique of 4 Nov: gameable checks and prescribed fixes."
+    }
+  ]
+}

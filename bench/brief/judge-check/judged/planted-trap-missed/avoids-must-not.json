@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "54bb477eeb21cda6d6ae95c009a4407c54684ea4994e1757d32060f2416c4266",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Verifier Check 3 does the exact thing must_not item 1 forbids. It runs only `grep -n 'clamp(' README.md`, and its PASS condition is \"grep prints a line naming clamp... so the function this issue adds is documented.\" It never checks the other exports, so it would pass line 3 even if README.md documented clamp but not subtract. That case is likely here: the builder brief says README.md has existing \"add and multiply entries\", so subtract may be undocumented. Line 3 needs every export documented. The builder brief does list the exports with Object.keys, but the verifier doesn't. The other checks are not stricter than their lines. Check 2 tests instanceof RangeError, not the error message, and the advisory notes are excluded from PASS/FAIL. Item 2 holds, but item 1 is broken.",
+  "model": "claude-opus-5-5",
+  "ms": 5360,
+  "tokens": {
+    "input": 2,
+    "output": 403,
+    "cacheCreation": 3445,
+    "cacheRead": 783,
+    "fresh": 3850,
+    "total": 4633
+  },
+  "at": "2026-11-05T04:57:46.898Z"
+}

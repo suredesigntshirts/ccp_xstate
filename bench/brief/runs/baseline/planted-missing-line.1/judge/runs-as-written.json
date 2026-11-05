@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "f65365341f836eb12394161ca12959baace860880c0a627754b52ca87c15a10b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files. The builder brief names bin/csv2json.js, src/parse.js, test/csv.test.js and README.md, and all four exist. Its `npm test` maps to the \"node --test\" script, which picks up test/csv.test.js. The `execFileSync('node', ['bin/csv2json.js', '--tsv'])` call is valid JavaScript when the input is passed in the options. The verifier brief's `a=$(printf 'name\\tage...' | node bin/csv2json.js --tsv)`, `[ \"$a\" = \"$b\" ] && echo SAME` and `grep -n -- '--tsv' README.md` are all valid shell. The `--` correctly stops grep from reading '--tsv' as an option. Before the PR adds it, the --tsv flag would just be an unused extra argument, and the PR is meant to add it. One thing I couldn't confirm is the claim that parse already takes a separator argument. That is a statement about the code, not a command, so it doesn't affect this criterion. I found no command that breaks it.",
+  "model": "claude-opus-5-5",
+  "ms": 7351,
+  "tokens": {
+    "input": 2,
+    "output": 667,
+    "cacheCreation": 2736,
+    "cacheRead": 783,
+    "fresh": 3405,
+    "total": 4188
+  },
+  "at": "2026-11-05T05:05:51.159Z"
+}

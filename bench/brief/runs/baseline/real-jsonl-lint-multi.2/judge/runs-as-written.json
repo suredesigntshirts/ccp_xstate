@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "a0d411c8b25ee5888f944d1313157877f10ce5fc71074bcb237ca37e36bbd530",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief's commands are fine: `npm test` at the root and the files it names all exist. The verifier brief has commands that won't run as written. Every Check uses `$D` (e.g. `node $CLI $D/bad.jsonl`), but `D` is never set. The brief only says \"Make a scratch directory outside the repo (mktemp -d)\", while `CLI=` is set explicitly. bad2.jsonl is used in Check 1 but missing from the list of files to create. The step \"git show <merge-base>:... > /tmp/old.js, copy it next to the src folder\" is vague, and `/tmp/old.js` can't import `../src/index.js` from where it is. Check 5 runs `node --test packages/jsonl-lint/test/`. On Node 22+, positional arguments are glob patterns, and a bare directory likely won't find the test files. So some commands in the output don't run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 12926,
+  "tokens": {
+    "input": 2,
+    "output": 1101,
+    "cacheCreation": 5734,
+    "cacheRead": 783,
+    "fresh": 6837,
+    "total": 7620
+  },
+  "at": "2026-11-05T05:06:50.115Z"
+}

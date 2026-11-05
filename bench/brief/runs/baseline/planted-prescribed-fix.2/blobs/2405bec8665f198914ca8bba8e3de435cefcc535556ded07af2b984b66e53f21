@@ -1,0 +1,20 @@
+Check the pull request head against the two acceptance lines of issue https://github.com/o/settings/issues/31, in this order. Run everything from the repository root at the PR head. Install nothing beyond what the repository needs (it has no dependencies; `npm test` runs `node --test`).
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run this script with Node from the repository root. It writes invalid JSON to a temp file and calls the exported loadConfig:
+```
+node --input-type=module -e "import {mkdtempSync,writeFileSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import {loadConfig} from './src/config.js';const f=join(mkdtempSync(join(tmpdir(),'cfg-')),'config.json');writeFileSync(f,'{port: 9000');let r;try{r=loadConfig(f);}catch(e){console.log('THREW',e&&e.name);process.exit(2);}console.log('RESULT',JSON.stringify(r),typeof r,Array.isArray(r));process.exit(JSON.stringify(r)==='{}'&&typeof r==='object'&&r!==null&&!Array.isArray(r)?0:3);"
+```
+PASS: the script exits 0 and prints `RESULT {} object false`. That means `loadConfig` did not throw on invalid JSON and returned an empty plain object. Also, `loadConfig` is still defined in and exported from src/config.js (the script imports it from there).
+FAIL: the script prints THREW, returns anything other than an empty plain object, exits non-zero, or src/config.js no longer exports `loadConfig`.
+
+Check 2. Expect line: "npm test passes"
+Run `npm test` at the PR head.
+PASS: the command exits 0 and the node test runner reports 0 failed tests.
+FAIL: the command exits non-zero, or any test fails or is cancelled.
+
+Advisory (does not affect PASS or FAIL):
+- Check that `loadConfig` on a valid file such as `{"port": 9000}` still returns `{ port: 9000 }`.
+- Check that a missing file still throws instead of returning `{}`, because only the parse error should be caught.
+- The issue's motivation is that people can't tell which file is broken or where. Note whether a parse failure writes a stderr message naming the path and the error's position, and whether README.md was updated to match the new behaviour.
+- Note whether the old 'bad JSON throws' test was replaced by one asserting `{}`, and not just deleted.

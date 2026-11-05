@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "8e7ba0c1c39fd84673b45f73c8bc354ffb6a1518124068b93f95e3a4d4269bd4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the package.json scripts. The builder's `npm test` maps to the existing \"node --test\" script. `node bin/csv2json.js --tsv < table.tsv` is a usage line to write into the README, not a command the builder runs. In the verifier brief, the `printf ... | node bin/csv2json.js` pipelines have valid shell syntax and point at bin/csv2json.js, which exists. The `--tsv` flag gets added in the builder's step 2. The /tmp redirects and `diff ... && echo SAME` are well-formed. `grep -n -- '--tsv' README.md` uses `--` correctly, so grep doesn't read the pattern as an option, and README.md exists. `npm test` is valid. One caveat: the builder's claim that parse already takes a separator isn't confirmed by the repository facts, but it describes the code rather than a command. No command names a missing file or script or has invalid syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 9599,
+  "tokens": {
+    "input": 2,
+    "output": 547,
+    "cacheCreation": 549,
+    "cacheRead": 2465,
+    "fresh": 1098,
+    "total": 3563
+  },
+  "at": "2026-11-05T04:56:33.946Z"
+}

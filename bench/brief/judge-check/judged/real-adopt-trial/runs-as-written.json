@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "81a91fa586a17cbbb92b1dcaf3b63a0b75e3d058180ce399c160ac36755b3e1d",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. `npm test` matches the package.json script `node --test`. The builder's `node -e \"...Object.keys(m)...\"`, and verifier Checks 1, 2 and 4, are valid as quoted. Bash does not expand `!` when it is followed by `=` or `(`. Verifier Check 3 breaks. It wraps the code in double quotes, so bash turns `'^#+\\\\s*'+f+'\\\\s*\\\\('` into the JS source `'^#+\\s*'+f+'\\s*\\('`. In a JS string, `\\s` becomes `s` and `\\(` becomes `(`. That leaves `new RegExp('^#+s*adds*(','m')`, whose group is never closed, so it throws \"SyntaxError: Invalid regular expression: Unterminated group\". Check 3 therefore crashes on every PR, not just bad ones. Because of this one command, the briefs' commands do not all run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 12810,
+  "tokens": {
+    "input": 2,
+    "output": 1055,
+    "cacheCreation": 548,
+    "cacheRead": 4063,
+    "fresh": 1605,
+    "total": 5668
+  },
+  "at": "2026-11-05T04:57:35.355Z"
+}

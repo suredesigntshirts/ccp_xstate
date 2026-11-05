@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "56863983d5c718c364dc30d7b9190b7e8efef54cba056a92f1aa091108a60220",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Some conditions ask for more than the words do.\n\nCheck 1 requires each `<msg>` to be \"that row's JSON.parse message with newlines turned into spaces\". Line 1 only says `<error>` must match the single-file behaviour before the change, so the test should compare against lint's output. The check's own run step even says to do that, but the PASS condition pins a specific message source instead.\n\nCheck 5 requires the README to show the exact `<file> [<file> ...]` string and to describe `-` as stdin. Line 5 only says the README \"documents the usage\", so this is an exact-wording rule.\n\nCheck 4 also adds \"the existing lint tests pass\", which \"lint(text) … is unchanged\" does not require.\n\nThese stricter tests belong under Advisory, not in PASS/FAIL conditions, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 11635,
+  "tokens": {
+    "input": 2,
+    "output": 1103,
+    "cacheCreation": 5113,
+    "cacheRead": 783,
+    "fresh": 6218,
+    "total": 7001
+  },
+  "at": "2026-11-05T05:06:40.061Z"
+}

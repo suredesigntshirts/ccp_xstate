@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "690c2f45a83554c712caad5b5994e9991c99acf7162d9143a4cf7106f5613f1f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs. Every file the commands name is in the repository: index.js, README.md, package.json and test/strutil.test.js. `npm test` maps to the existing script `node --test`, and node's default test search picks up test/strutil.test.js. The verifier's checks use `node --input-type=module -e '...'`, which is a valid flag pairing. Each JavaScript snippet sits in single quotes and contains no single quotes of its own, so the shell quoting holds. In Check 3, `\"\\\\b\"+f+\"\\\\b\"` passes through the single quotes unchanged and becomes the regex `\\b` in JavaScript. `/^#{1,6}\\s/` and the default import from \"node:fs\" are valid. `npm test; echo exit=$?` is valid shell. The expected outputs also match the snippets, for example `padLeft(\"7\",3,\"0\").length` gives 3. The claim that package.json sets \"type\": \"module\" can't be checked from the facts given. Either way, the dynamic-import commands would still run.",
+  "model": "claude-opus-5-5",
+  "ms": 8885,
+  "tokens": {
+    "input": 2,
+    "output": 822,
+    "cacheCreation": 3382,
+    "cacheRead": 783,
+    "fresh": 4206,
+    "total": 4989
+  },
+  "at": "2026-11-05T05:05:23.607Z"
+}

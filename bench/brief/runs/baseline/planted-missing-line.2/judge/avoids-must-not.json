@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "2e5c00cd40b9d4be402aeca78646de2e70be596e4ebc030252e4a5729705e28a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds, though the advisory at the end of the verifier brief is a borderline case. The verifier brief has exactly two checks, Check 1 and Check 2, one for each expect line and in order. Neither PASS nor FAIL condition requires npm test or the CSV tests. Check 1 compares the CSV and --tsv output byte for byte. Check 2 greps README.md for --tsv. The brief does ask the verifier to run npm test, but it labels that item \"Advisory (not a PASS/FAIL condition)\". It only asks for a note and gives no verdict, and the brief says \"Give one verdict per check\", so it is not a third check. The builder brief asks for npm test and a new test, but must_not only covers the verifier's checks and the PASS/FAIL conditions, so that is allowed.",
+  "model": "claude-opus-5-5",
+  "ms": 12249,
+  "tokens": {
+    "input": 2,
+    "output": 577,
+    "cacheCreation": 2611,
+    "cacheRead": 783,
+    "fresh": 3190,
+    "total": 3973
+  },
+  "at": "2026-11-05T05:06:28.424Z"
+}

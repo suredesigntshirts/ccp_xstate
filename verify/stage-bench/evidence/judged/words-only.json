@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "ddb816c8d72303744d5e1e87c16aa6620df68c9277fafd5b68aa0d0920c33036",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Check 1 breaks the criterion. Its PASS condition requires the second printed line to be \"TypeError, because fill must be a single character\", and its FAIL condition includes the case where \"the second line is NO THROW\". Expect line 1 only says padLeft pads on the left with fill, using a space when no fill is given. It says nothing about rejecting a multi-character fill or throwing a TypeError. That stricter test belongs under an Advisory heading, not in the PASS/FAIL conditions. Checks 2, 3 and 4 test only what their lines require: s comes back unchanged when it is already long enough, every exported function has a README section, and npm test exits 0. Naming slugify in Check 3 is fine, because the line covers every export.",
+  "model": "claude-opus-5-5",
+  "ms": 4935,
+  "tokens": {
+    "input": 2,
+    "output": 366,
+    "cacheCreation": 2651,
+    "cacheRead": 783,
+    "fresh": 3019,
+    "total": 3802
+  },
+  "at": "2026-11-05T05:29:30.553Z"
+}

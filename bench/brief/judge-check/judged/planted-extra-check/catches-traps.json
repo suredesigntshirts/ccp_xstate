@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "b8980dd772f04fc2d0b56cd60cbe33e62784050a8da2b12d6170383339f9c615",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all three must_catch items. Item 1 holds: the builder brief says \"otherwise keep calling it exactly as today, so CSV output does not change\" and \"Run `npm test` and keep every existing test passing\". Item 3 holds: Check 1 pipes the same table as CSV and as TSV, then runs diff on the two outputs. Item 2 fails. The verifier brief never says, outside a PASS or FAIL condition, that no expect line covers CSV behaviour or npm test. Instead it adds \"Check 3. Existing behaviour: npm test passes\" with \"PASS: exit 0... FAIL: any failure.\" That makes npm test a pass/fail check instead of advice, and there is no Advisory note.",
+  "model": "claude-opus-5-5",
+  "ms": 10075,
+  "tokens": {
+    "input": 2,
+    "output": 387,
+    "cacheCreation": 549,
+    "cacheRead": 2487,
+    "fresh": 938,
+    "total": 3425
+  },
+  "at": "2026-11-05T04:56:44.022Z"
+}

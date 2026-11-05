@@ -1,0 +1,18 @@
+Check the PR head for the two acceptance lines of issue https://github.com/o/settings/issues/31, one check per line, in this order. Run every command from the repository root at the PR head.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run: write a file containing invalid JSON, e.g. `d=$(mktemp -d); printf '{port: 9000' > "$d/config.json"`, then run `node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r), Object.getPrototypeOf(r) === Object.prototype);" "$d/config.json"`. Also read src/config.js to confirm loadConfig is the function that catches the JSON.parse error.
+PASS: the command exits 0 with no thrown error and prints `{} true`, and the catch is inside loadConfig in src/config.js.
+FAIL: the command throws (e.g. SyntaxError) or exits non-zero, prints anything other than `{} true`, or the catching happens somewhere other than loadConfig in src/config.js.
+
+Check 2. Expect line: "npm test passes"
+Run: `npm test` and note its exit code.
+PASS: exit code 0 and no test reported as failing.
+FAIL: non-zero exit code or any failing test.
+
+Advisory (not a PASS/FAIL condition):
+- Valid JSON should still load: loadConfig on a file containing `{"port": 9000}` should return {port: 9000}.
+- A missing file should probably still throw (only the parse error should be caught); check whether it does.
+- Check that test/config.test.js no longer asserts a SyntaxError is thrown for bad JSON and now asserts {} is returned.
+- `node src/app.js <bad file>` will now start with the defaults instead of exiting 1. Check that README.md was updated to match.
+- Returning {} hides which file is broken and where, which goes against the need stated in the issue body. Mention this in your report if the PR does not.

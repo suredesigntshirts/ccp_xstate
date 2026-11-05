@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "57188726411b8f55656f3b7e305fcc07a1ab6fc3e4a6be734fe253e634990825",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 3, 5 and 6 stay within their words. Check 1 requires \"exactly two error lines\" with non-empty error text, which follows from \"prints <file>:<line>: <error> for every row\". Check 6 rejects a pending workflow, which follows from \"green\". Check 4 breaks the criterion. Expect line 4 only asks for the package.json fields, no runtime dependencies, and node:test tests covering the listed cases. Check 4's PASS list adds \"`npm test -w jsonl-lint` passes\", and its FAIL rule (\"FAIL if any of these is missing\") applies to that item too. The words of line 4 don't require the tests to pass; that belongs to line 6, which covers root `npm test` and the workflow. This extra condition sits in PASS/FAIL instead of under Advisory, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 13070,
+  "tokens": {
+    "input": 2,
+    "output": 890,
+    "cacheCreation": 4787,
+    "cacheRead": 783,
+    "fresh": 5679,
+    "total": 6462
+  },
+  "at": "2026-11-05T05:07:08.098Z"
+}

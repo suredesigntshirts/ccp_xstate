@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "762327bac231f73517c2fbe56d40c64d9700668ae209fb4a51c398d53f841af3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is met: builder step 7 says \"Run `npm install` at the repo root... commit the updated lockfile\". Item 2 is met: step 6 says to \"replace the 'No tools yet' bullet\". Item 4 is met: Check 6 uses gh pr view with body,headRefOid and gh pr checks, and requires the PR body to contain the Closes line and the test workflow run for the head SHA to have concluded success. Item 3 is not met. Check 4 runs `npm test -w jsonl-lint`, which runs the workspace directly, and Check 6 only checks that root `npm test; echo $?` exits 0. The verifier never reads the root run's test count and never breaks lint() to see a test fail, so it would not notice --if-present skipping the jsonl-lint tests under root npm test.",
+  "model": "claude-opus-5-5",
+  "ms": 15903,
+  "tokens": {
+    "input": 2,
+    "output": 1246,
+    "cacheCreation": 5256,
+    "cacheRead": 783,
+    "fresh": 6504,
+    "total": 7287
+  },
+  "at": "2026-11-05T05:07:36.521Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "2dae2bf23a1870dab65f169bc0455e2c465647887686effdaee94c0692760bfc",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each command in both briefs. Builder step 5's dynamic-import one-liner, verifier Checks 1, 2 and 4, and `npm test` look valid. Verifier Check 3 breaks. Its script is wrapped in bash double quotes and contains `new RegExp('\\\\b'+f+'\\\\b')`. Bash turns `\\\\` into `\\`, so JavaScript gets `'\\b'`, which is a backspace character, not a regex word boundary. The pattern then looks for literal backspaces, never matches a README heading, and lists every export as missing, so the check fails whatever the PR does. Also, `!heads` inside double quotes can trigger history expansion in an interactive bash. So at least one command does not run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 17397,
+  "tokens": {
+    "input": 2,
+    "output": 1126,
+    "cacheCreation": 3227,
+    "cacheRead": 783,
+    "fresh": 4355,
+    "total": 5138
+  },
+  "at": "2026-11-05T05:05:31.251Z"
+}

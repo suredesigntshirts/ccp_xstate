@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.1",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 5 and 6 stay within their words. Two checks ask for more than their expect lines do:\n- **Check 3:** PASS requires \"stderr mentions missing.jsonl\". The expect line only asks for an \"error on stderr\" and does not say the message must name the file. The `node $B` run also expects \"non-empty stderr\", though for the no-file case the line only asks for exit 2.\n- **Check 4:** The expect line says only that \"lint(text) in src/index.js is unchanged\". PASS instead requires \"the diff is empty\" for the whole file, and FAIL triggers on \"any change to packages/jsonl-lint/src/index.js\". That is a file-scope rule. PASS also requires \"lint.test.js passes\", a test the words do not force.\n\nThese stricter tests belong under the Advisory heading, not in the PASS or FAIL conditions, so the criterion is not met.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the 15 tracked files and the package scripts. The criterion holds throughout.\n\n- **Paths exist:** the bin, src/index.js, test/cli.test.js, test/lint.test.js, the README and .github/workflows/test.yml are all tracked.\n- **Root commands:** `npm ci` has package-lock.json to work from, and `npm test` is a defined script at the root.\n- **Package commands:** `cd packages/jsonl-lint && node --test` matches the package's `node --test` script, and `node --test packages/jsonl-lint/test/lint.test.js` works from the root.\n- **Shell syntax:** `T=$(mktemp -d)`, `node $B - - < $T/a.jsonl` and the `$(gh pr view --json baseRefOid -q .baseRefOid)` substitution are all valid.\n- **Tool flags:** the `gh pr list --search`, `gh pr checks` and `gh run list --workflow test.yml --commit` flags are real. The baseRefOid lookup also comes with a `git merge-base` fallback.\n- **Node calls:** `readFileSync(0,'utf8')` and the spawnSync `input` option are valid Node APIs.\n\nThe `node -e` lint computation is only described, not given as a literal command, so it can't break as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items, and the briefs handle each one.\n1. Verifier Check 3 runs `node $B $T/a.jsonl $T/missing.jsonl $T/bad.jsonl`, which mixes a missing file with a bad one. It requires exit 2 and says stdout must \"still hold the `$T/bad.jsonl:2:` and `$T/bad.jsonl:4:` lines\".\n2. Verifier Check 4 runs `git diff $(gh pr view --json baseRefOid ...)...HEAD -- packages/jsonl-lint/src/index.js`. It passes only if that diff is empty, so it compares the PR head with the base.\n3. Builder step 5 says \"Update packages/jsonl-lint/README.md\". It covers the multi-file usage, `-` for stdin and the exit codes.\n4. Verifier Check 6 reads GitHub with `gh pr view ... --json body,headRefOid`. It requires the body to contain the Closes line for issue 104 and the `test` workflow run for the head commit to have succeeded, checked with `gh run list --workflow test.yml --commit <headRefOid>` or `gh pr checks`.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every PASS/FAIL condition in both briefs against the must_not list.\n\nItem 2 holds. Checks 1–3 all run the program (`node $B ...`) and compare the real stdout, stderr and exit code, not the diff.\n\nItem 1 breaks in Check 3. Line 3 only asks for an \"error on stderr\" when a file can't be read. Check 3's PASS condition goes further: \"For the runs with missing.jsonl, stderr mentions missing.jsonl\". That is a rule about what stderr must say, which line 3 never sets, so the condition is stricter than its line.\n\nThe other conditions match their lines:\n- Check 1 compares output to lint() output.\n- Check 4 fails only on a diff to src/index.js.\n- Check 6 adds no branch rule or limit on which files the PR may touch.\n- The builder's exact stderr wording (`jsonl-lint: cannot read ...`) is guidance in its steps, not a pass/fail condition.",
+      "cached": true
+    }
+  }
+}

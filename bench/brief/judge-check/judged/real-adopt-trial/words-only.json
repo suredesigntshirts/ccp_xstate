@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "fb8f83b970c724710fbfa13b90c12d303931ad49bd940c7ddf4990f22290dc54",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each of the four PASS/FAIL conditions against the words of its expect line. Checks 1, 2 and 4 test only what their lines require: clamp is exported and returns the clamped value (the test cases follow from \"limited to the range lo to hi\"), every lo>hi call throws an instance of RangeError, and npm test exits 0. Check 3 breaks the criterion. The expect line only says README.md \"documents every function math.js exports\". Its PASS condition, though, needs each function to have \"its own heading of the form name(\", checked with the regex `^#+\\s*name\\s*\\(`. Its FAIL condition is \"any exported function has no heading in README.md\". The words don't force that format. A README that documents subtract in a bullet list, a table or plain prose would meet the line but fail this check. That heading rule belongs under Advisory, not in the PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 12552,
+  "tokens": {
+    "input": 2,
+    "output": 685,
+    "cacheCreation": 549,
+    "cacheRead": 4013,
+    "fresh": 1236,
+    "total": 5249
+  },
+  "at": "2026-11-05T04:57:22.543Z"
+}

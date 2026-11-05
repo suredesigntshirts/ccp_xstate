@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "12afe9429aba5ea3a9de50f65d8478049c4122b95fb068c4f89fab44e654a8d6",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is met. The builder brief says \"keep the plain no-flag behaviour unchanged\" and \"Run `npm test` and make sure every test passes.\"\n\nItem 3 is met. Check 1 pipes the same table as CSV and as TSV and compares the results with `[ \"$CSV\" = \"$TSV\" ]`.\n\nItem 2 is only partly met. The verifier brief has an Advisory section that suggests running `npm test` and checking that plain CSV behaviour is unchanged, labelled \"not a PASS/FAIL condition.\" But it never says that no expect line covers CSV behaviour or npm test. That label only describes the advisory itself. It doesn't point out the coverage gap, which the must_catch item requires. Because one trap item is not fully handled, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 12478,
+  "tokens": {
+    "input": 2,
+    "output": 935,
+    "cacheCreation": 2679,
+    "cacheRead": 783,
+    "fresh": 3616,
+    "total": 4399
+  },
+  "at": "2026-11-05T05:06:16.174Z"
+}

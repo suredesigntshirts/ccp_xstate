@@ -1,0 +1,14 @@
+Goal: one pull request that meets every acceptance line of issue https://github.com/o/strutil/issues/7:
+- index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+- padLeft returns s unchanged when s is already width characters or longer
+- README.md has a section for every function index.js exports
+- npm test passes
+
+Context: the repository is an ES module (package.json "type": "module"). index.js currently exports capitalize, slugify and truncate. README.md has `## capitalize(s)` and `## truncate(s, n)` sections, but no section for slugify. The tests live in test/strutil.test.js and run with `npm test` (`node --test`).
+
+Steps:
+1. In index.js, add `export function padLeft(s, width, fill = ' ')` with a one-line doc comment like the other functions. It returns s padded on the left with fill until it is width characters long, and returns s unchanged when s.length >= width. `s.padStart(width, fill)` does this.
+2. In README.md, add a `## padLeft(s, width, fill)` section that says what it does, that fill defaults to a space, that s comes back unchanged when it is already width characters or longer, and gives the example padLeft('42', 5, '0') -> '00042'.
+3. In README.md, also add the missing `## slugify(s)` section (lower case, words joined by dashes, leading and trailing dashes removed). Every function index.js exports must have its own `## name(...)` heading. Keep the existing sections and the Tests section.
+4. In test/strutil.test.js, import padLeft and add tests for: '42', 5, '0' -> '00042'; '42', 5 -> '   42' (default space); 'abc', 3, '0' -> 'abc'; '12345', 3, '0' -> '12345'.
+5. Run `npm test` and make sure it reports `# fail 0`. Then open the PR.

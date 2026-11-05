@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "8bbd904e03e1946d7b232e518485da09ea790c3628279700520c30bf3552d149",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared both verifier checks with the words of their expect lines. Check 1's PASS needs the script to exit 0 and print `RESULT {} object false`, meaning `loadConfig` didn't throw on invalid JSON and returned an empty object. It also needs `loadConfig` to still be exported from src/config.js, since the line names that file. The array/null test only pins down \"returns {}\" and adds nothing stricter. Its FAIL condition is just the reverse of that. Check 2's PASS needs `npm test` to exit 0 with 0 failed tests, and its FAIL counts failed or cancelled tests. Both only spell out what \"passes\" means. The stricter checks all sit under \"Advisory (does not affect PASS or FAIL)\": a valid file still parses, a missing file still throws, the stderr message, the README update and the replaced test. None of them is in a PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 9417,
+  "tokens": {
+    "input": 2,
+    "output": 695,
+    "cacheCreation": 3035,
+    "cacheRead": 783,
+    "fresh": 3732,
+    "total": 4515
+  },
+  "at": "2026-11-05T05:05:53.355Z"
+}

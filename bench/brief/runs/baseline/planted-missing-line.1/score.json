@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-missing-line.1",
+  "case": "planted-missing-line",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Check 2 meets the criterion: \"README.md contains --tsv in text that explains how to use it\" is a fair reading of \"documents\", and the advisory items are correctly placed under Advisory. Check 1 does not. Its PASS condition goes beyond requiring identical output that is a JSON array. It also requires that \"the output is a JSON array of objects keyed by the header\". Its FAIL condition adds \"or the --tsv output is not that array\". The expect line only asks that --tsv print \"the same JSON array\" that the CSV mode prints for the same table. It never says what shape that array has. If the default CSV path printed a different but matching array shape, the words would be satisfied and this check would still fail. That extra shape test is stricter than the words, so it belongs under Advisory, not in PASS/FAIL. So the criterion does not hold for the whole output.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the six tracked files. The builder brief names bin/csv2json.js, src/parse.js, test/csv.test.js and README.md, and all four exist. Its `npm test` maps to the \"node --test\" script, which picks up test/csv.test.js. The `execFileSync('node', ['bin/csv2json.js', '--tsv'])` call is valid JavaScript when the input is passed in the options. The verifier brief's `a=$(printf 'name\\tage...' | node bin/csv2json.js --tsv)`, `[ \"$a\" = \"$b\" ] && echo SAME` and `grep -n -- '--tsv' README.md` are all valid shell. The `--` correctly stops grep from reading '--tsv' as an option. Before the PR adds it, the --tsv flag would just be an unused extra argument, and the PR is meant to add it. One thing I couldn't confirm is the claim that parse already takes a separator argument. That is a statement about the code, not a command, so it doesn't affect this criterion. I found no command that breaks it.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one. Item 1: the builder brief says \"leave the default CSV behaviour unchanged\" and \"Run `npm test` and make sure every test passes\", even though no expect line asks for either. Item 2: the verifier brief has a section marked \"Advisory (not a PASS or FAIL condition)\" that asks the verifier to check that the default CSV behaviour is unchanged and that npm test passes. It also says npm test \"does not decide either check by itself\". It never says in so many words that no expect line covers these. Keeping them outside every PASS/FAIL condition makes the point, so I count it, though this is the borderline item. Item 3: Check 1 feeds the same table as TSV with --tsv and as CSV without the flag, using both a multi-row and a single-row table, and compares the outputs with [ \"$a\" = \"$b\" ].",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the verifier brief against both must_not items. Item 1: it has exactly two checks, one for each expect line. Check 1 compares `--tsv` output with the CSV output. Check 2 greps README.md for `--tsv`. It does mention `npm test`, the default CSV behaviour and test coverage, but only in a section labelled \"Advisory (not a PASS or FAIL condition)\". It also says `npm test` \"does not decide either check by itself\". So none of these is a third check. Item 2: Check 1's PASS and FAIL conditions only cover exit codes, identical output and the JSON array shape. Check 2's conditions only cover whether README.md mentions and explains `--tsv`. Neither requires `npm test` or the CSV tests to pass. The builder brief does ask the builder to run `npm test`, but both must_not items are about the verifier, so that's allowed.",
+      "cached": true
+    }
+  }
+}

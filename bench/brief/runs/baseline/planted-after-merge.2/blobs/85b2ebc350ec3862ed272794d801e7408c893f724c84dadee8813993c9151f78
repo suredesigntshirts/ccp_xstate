@@ -1,0 +1,13 @@
+Goal: one pull request adding a --shout flag to greet-cli that meets these acceptance lines:
+1. "node bin/greet.js --shout <name> prints the greeting in upper case"
+2. "without --shout the output is unchanged"
+3. "docs/index.md documents --shout"
+4. "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+
+Steps:
+1. Read bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml. Today bin/greet.js takes the first argument not starting with `--` as the name and prints `greeting(name)` (`Hello, <name>!`) plus a newline.
+2. In bin/greet.js, detect `--shout` anywhere in process.argv.slice(2). When present, print the whole greeting line upper-cased (e.g. `node bin/greet.js --shout Ada` prints `HELLO, ADA!\n`); the flag must work whether it comes before or after the name. When absent, the output must stay byte-for-byte what it is now (`Hello, Ada!\n`), and the usage message / exit code 2 for a missing name stays as is. Keep src/greet.js's `greeting` behaviour unchanged (you may add a separate helper if you like).
+3. Add tests to test/greet.test.js: `--shout Ada` gives `HELLO, ADA!\n`; `Ada --shout` gives the same; plain `Ada` still gives `Hello, Ada!\n`. Keep the existing tests. Run `npm test` and make sure all pass.
+4. Update docs/index.md to document the `--shout` flag: show the usage `node bin/greet.js --shout <name>` and say it prints the greeting in upper case (e.g. `HELLO, <NAME>!`). The literal text `--shout` must appear in the file. Optionally mirror this in README.md.
+5. Line 4 is met by publishing: .github/workflows/pages.yml deploys the docs/ directory to GitHub Pages on push to main, so the docs/index.md change is what will appear on https://o.github.io/greet-cli/ once merged. Do not change the workflow, do not try to publish or deploy anything yourself, and do not create a separate docs site. In the PR description, state plainly that line 4 can only be confirmed after merge, once the pages workflow has run.
+6. Open one pull request with these changes, listing each acceptance line and how it is met.

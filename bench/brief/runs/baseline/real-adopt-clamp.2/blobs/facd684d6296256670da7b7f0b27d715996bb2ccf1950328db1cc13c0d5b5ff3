@@ -1,0 +1,22 @@
+Check the PR head. Run every command from the repository root. There is exactly one check per acceptance line, in order. Each check gets PASS or FAIL.
+
+Check 1. Expect: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi"
+Run: node -e "const m=require('./math.js'); const c=m.clamp; if(typeof c!=='function') throw new Error('clamp not exported'); const cases=[[-5,0,100,0],[140,0,100,100],[42,0,100,42],[0,0,100,0],[100,0,100,100],[7,3,3,3],[-1.5,-2,2,-1.5],[-10,-2,-1,-2]]; for(const [x,lo,hi,want] of cases){const got=c(x,lo,hi); if(got!==want) throw new Error('clamp('+x+','+lo+','+hi+')='+got+' want '+want);} console.log('ok')"
+PASS: it prints ok and exits 0. FAIL: it throws, exits non-zero, or clamp is not exported from math.js.
+
+Check 2. Expect: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi"
+Run: node -e "const {clamp}=require('./math.js'); for(const a of [[5,10,0],[0,1,0.5],[-3,-1,-2]]){let e=null; try{clamp(...a)}catch(err){e=err} if(!(e instanceof RangeError)) throw new Error('no RangeError for '+a+': '+e);} console.log('ok')"
+PASS: it prints ok and exits 0, meaning each call with lo > hi threw a RangeError. FAIL: any of those calls returned normally or threw something that is not a RangeError.
+
+Check 3. Expect: "README.md documents every function math.js exports"
+Run: node -e "const m=require('./math.js'); const r=require('fs').readFileSync('README.md','utf8'); const fns=Object.keys(m).filter(k=>typeof m[k]==='function'); const miss=fns.filter(f=>!new RegExp('^#+\\s*'+f+'\\s*\\(','m').test(r)); console.log('exports:',fns.join(','),'missing:',miss.join(',')); if(miss.length) process.exit(1)"
+Then open README.md and confirm that each exported function (this must include add, subtract, multiply and clamp) has an entry describing what it does.
+PASS: the script exits 0 with nothing missing, and every exported function has a real description in README.md. FAIL: any exported function has no heading or no description. Note that subtract was undocumented before this PR, so it must be documented now.
+
+Check 4. Expect: "npm test passes"
+Run: npm test
+PASS: exit code 0 and the summary shows fail 0. FAIL: non-zero exit or any failing test.
+
+Advisory (does not affect PASS/FAIL):
+- Check that test/math.test.js now has clamp tests, including one for the RangeError.
+- Check that add, subtract and multiply behave the same as before.

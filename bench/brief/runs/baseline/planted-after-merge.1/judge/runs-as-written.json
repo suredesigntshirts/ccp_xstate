@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "6a30f26d290b73627f8ab38bdaa24bd6d4fba454fbac635a8fa92a6776aabdc7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. `npm test` maps to `node --test`, which finds test/greet.test.js. bin/greet.js and docs/index.md exist. The `node bin/greet.js --shout Ada` / `'Grace Hopper'` runs only depend on the flag the builder adds in step 1. `grep -n -- '--shout' docs/index.md` uses `--` correctly so the pattern isn't read as an option. `gh run list --workflow pages.yml --branch main` names the existing .github/workflows/pages.yml and uses valid flags. `curl -sSL ... | grep -n -- '--shout'` is valid shell. `git worktree add` of the base commit is described in prose, not as a broken literal command. `gh pr view <pr> --json state,mergedAt,mergeCommit` uses fields gh accepts. `<pr>` is a placeholder for a PR number that can't be known when the brief is written, not a syntax error. I found no missing files, wrong arguments or invalid syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 10738,
+  "tokens": {
+    "input": 2,
+    "output": 1026,
+    "cacheCreation": 3360,
+    "cacheRead": 783,
+    "fresh": 4388,
+    "total": 5171
+  },
+  "at": "2026-11-05T05:05:20.818Z"
+}

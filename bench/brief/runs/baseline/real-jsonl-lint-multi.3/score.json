@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.3",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Some conditions ask for more than the words do.\n\nCheck 1 requires each `<msg>` to be \"that row's JSON.parse message with newlines turned into spaces\". Line 1 only says `<error>` must match the single-file behaviour before the change, so the test should compare against lint's output. The check's own run step even says to do that, but the PASS condition pins a specific message source instead.\n\nCheck 5 requires the README to show the exact `<file> [<file> ...]` string and to describe `-` as stdin. Line 5 only says the README \"documents the usage\", so this is an exact-wording rule.\n\nCheck 4 also adds \"the existing lint tests pass\", which \"lint(text) … is unchanged\" does not require.\n\nThese stricter tests belong under Advisory, not in PASS/FAIL conditions, so the criterion fails.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the tracked files and scripts. Every path they name exists at this commit: packages/jsonl-lint/bin/jsonl-lint.js, src/index.js, test/cli.test.js, README.md and .github/workflows/test.yml. Both `npm test` and `npm ci && npm test` fit the root package.json and package-lock.json. `npm test --workspace packages/jsonl-lint` is valid because the root script already runs `--workspaces` and the package defines `node --test`. The shell syntax is valid: `printf '...' | node $BIN T/a.jsonl -`, `cp T/bad.jsonl T/bad2.jsonl; node ...`, and the git diff command with its merge-base placeholder. The `gh pr list/view/checks` commands use valid flags (`--repo`, `--search`, `--state all`, `--json body,headRefOid`). `readFileSync(0, 'utf8')` and spawnSync's `input` option are valid Node. The fixtures and the temp dir T are made earlier in the verifier brief. The `node -e` lint comparison is only described, not written out as a command, so there is nothing in it that could fail as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items, and the briefs handle each one.\n1. Verifier Check 3, fourth run: `node $BIN T/a.jsonl T/missing.jsonl T/bad.jsonl` must exit 2, name the missing file on stderr, and still print the `T/bad.jsonl:2:`/`:4:` lines. This covers the missing file and the bad rows in one run.\n2. Check 4 runs `git diff --exit-code <merge-base with main>..HEAD -- packages/jsonl-lint/src/index.js`, which compares the head with the base. It also accepts an identical lint body as a fallback, but the check is still about the diff.\n3. Builder step 4: \"Update packages/jsonl-lint/README.md. Document the usage ... <file> [<file> ...]\", with stdin and exit codes.\n4. Check 6 uses `gh pr view ... --json body,headRefOid`. It requires the body to contain the Closes line and \"The test workflow run for the head SHA concluded success\" via `gh pr checks`.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Both must_not items hold for the verifier's checks. Item 1: none of the PASS/FAIL conditions requires exact stderr wording, a branch-name rule, a mutation test or a limit on which files the PR may touch. Stderr is only checked for being non-empty or for naming the missing file. Check 1 asks for the `<file>:<line>: <error>` format, which its line already requires. Byte-identity with the base commit is in the Advisory section, not a condition. The builder's exact message text (`jsonl-lint: cannot read <file>`) is an instruction to the builder, not a verifier condition. Item 2: Checks 1–3 (the behaviour lines) all run `node $BIN` on fixtures or stdin and record exit status, stdout and stderr. None passes by reading code. Check 4 does use git diff, but line 4 is not a behaviour line. Check 5 reads test files but also runs npm test. Check 6 runs gh and npm test.",
+      "cached": true
+    }
+  }
+}

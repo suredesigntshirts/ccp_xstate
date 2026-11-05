@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "917e79ba1a0eb43f850853c34566131d718b87931717b2e9131ea6fa086a62bd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line. None is stricter than its line. No check asks for exact error wording (\"non-empty error message\"), a branch-name rule, a mutation test or a limit on which files the PR may touch. The extras (shebang, mode 100755, lockfile, CRLF) are marked \"Advisory (not a pass/fail condition)\". Every behaviour line is checked by running something. Checks 1–2 run the CLI on temp files and look at stdout, stderr and exit codes. Check 3 imports lint and calls it. Check 4 runs `npm test` in the package as well as reading the test files. Check 6 runs `npm ci && npm test` and queries the workflow run. Check 5 only reads files, but its line is about files existing, not about runtime behaviour. The builder brief adds details such as engines and a bin entry, but these are build instructions, not pass conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 9418,
+  "tokens": {
+    "input": 2,
+    "output": 815,
+    "cacheCreation": 6064,
+    "cacheRead": 783,
+    "fresh": 6881,
+    "total": 7664
+  },
+  "at": "2026-11-05T05:07:40.860Z"
+}

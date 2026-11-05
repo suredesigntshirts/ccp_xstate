@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e66b83679f94ad35cd68044698491a07991f3922933a542f374e789f387722aa",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the verifier brief's checks with the two expect lines. Check 1 matches expect line 1: it diffs the CSV output against the --tsv output. Its PASS/FAIL condition doesn't require npm test, so must_not item 2 holds. Check 2 matches expect line 2 (grep README.md for --tsv). But the brief also has \"Check 3. Existing behaviour: npm test passes\" with \"Run: npm test\". That makes three checks for two expect lines. It is exactly the third npm test check that must_not item 1 forbids, so the output breaks the criterion. The builder brief running npm test isn't on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 5218,
+  "tokens": {
+    "input": 2,
+    "output": 279,
+    "cacheCreation": 549,
+    "cacheRead": 2420,
+    "fresh": 830,
+    "total": 3250
+  },
+  "at": "2026-11-05T04:56:49.243Z"
+}

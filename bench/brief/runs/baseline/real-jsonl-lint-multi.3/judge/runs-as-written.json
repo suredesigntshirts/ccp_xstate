@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "3d43239d8a82adccf8358b4b412cb51b58aaa993d446f16ab0d2d5ff77a5c623",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the tracked files and scripts. Every path they name exists at this commit: packages/jsonl-lint/bin/jsonl-lint.js, src/index.js, test/cli.test.js, README.md and .github/workflows/test.yml. Both `npm test` and `npm ci && npm test` fit the root package.json and package-lock.json. `npm test --workspace packages/jsonl-lint` is valid because the root script already runs `--workspaces` and the package defines `node --test`. The shell syntax is valid: `printf '...' | node $BIN T/a.jsonl -`, `cp T/bad.jsonl T/bad2.jsonl; node ...`, and the git diff command with its merge-base placeholder. The `gh pr list/view/checks` commands use valid flags (`--repo`, `--search`, `--state all`, `--json body,headRefOid`). `readFileSync(0, 'utf8')` and spawnSync's `input` option are valid Node. The fixtures and the temp dir T are made earlier in the verifier brief. The `node -e` lint comparison is only described, not written out as a command, so there is nothing in it that could fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 11545,
+  "tokens": {
+    "input": 2,
+    "output": 935,
+    "cacheCreation": 5420,
+    "cacheRead": 783,
+    "fresh": 6357,
+    "total": 7140
+  },
+  "at": "2026-11-05T05:06:51.608Z"
+}

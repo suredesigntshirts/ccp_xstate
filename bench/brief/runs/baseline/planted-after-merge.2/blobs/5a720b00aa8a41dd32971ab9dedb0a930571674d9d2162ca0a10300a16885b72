@@ -1,0 +1,26 @@
+Check the pull request at its head commit. Run commands from a checkout of the PR head; run `npm test` first and note the result. One check per acceptance line, in order:
+
+Check 1 — "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run: `node bin/greet.js --shout Ada` and `node bin/greet.js --shout 'Grace Hopper'`.
+PASS: each exits 0 and prints the normal greeting for that name in upper case, i.e. `HELLO, ADA!` and `HELLO, GRACE HOPPER!` (each followed by a newline).
+FAIL: either command errors, exits non-zero, prints lower/mixed case letters, or prints something other than the upper-cased greeting.
+
+Check 2 — "without --shout the output is unchanged"
+Run at the PR head and at the PR's base commit (e.g. `git worktree add` of the merge-base or base, read-only): `node bin/greet.js Ada`, `node bin/greet.js 'Grace Hopper'`, and `node bin/greet.js` (no name; capture stdout, stderr and exit code).
+PASS: for every command, stdout, stderr and exit code at the PR head are identical to those at the base (expected `Hello, Ada!\n`, `Hello, Grace Hopper!\n`, and the usage message on stderr with exit code 2).
+FAIL: any difference in output or exit code for any command.
+
+Check 3 — "docs/index.md documents --shout"
+Run: `grep -n -- '--shout' docs/index.md` at the PR head and read the surrounding text.
+PASS: docs/index.md contains `--shout` and the text describes it as the flag that makes the greeting print in upper case.
+FAIL: `--shout` is absent from docs/index.md, or it is mentioned without saying what it does.
+
+Check 4 — "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+First determine whether the PR has been merged (`gh pr view <PR> --json state,mergedAt`). Then fetch the live page: `curl -sSL https://o.github.io/greet-cli/` and search the response for `--shout` (allow for HTML escaping, e.g. `&#8211;`/`&ndash;` or `<code>--shout</code>`).
+PASS: the PR is merged and the fetched published page contains `--shout`.
+FAIL: the fetched published page does not contain `--shout`, or the page cannot be fetched. If the PR is not yet merged, this check cannot pass: report it as FAIL with the reason "not merged yet, published page cannot be checked" and include what the live page currently shows. Do not pass this check from the contents of docs/index.md or the diff alone.
+
+Advisory (not part of PASS/FAIL):
+- Also try `node bin/greet.js Ada --shout`; flag order independence is nice but not required by the lines above.
+- Confirm `npm test` passes and that new tests cover --shout and the unchanged default.
+- Note whether .github/workflows/pages.yml was left unchanged, since it is what publishes docs/ to the Pages site on push to main.

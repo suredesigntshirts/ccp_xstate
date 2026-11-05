@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "ee8c9dda85a1c07d9bf07f2434eacb0b84a6b268ff215a6afc322088ad43b5e9",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Must_not 1: Check 3 builds the list of exported functions from index.js and looks for a README heading for each one with `\\bname\\b`. It says \"a PR that only adds padLeft's section FAILS this check\", so a README with padLeft but no slugify fails. Not violated.\n\nMust_not 2: Checks 1 and 2 compare outputs to exact values that follow from the expect lines. Check 1 uses a multi-character-safe fill (\"x\") and has no one-character fill check. Neither check counts parameters. Check 3 takes a heading at any level (1–6) naming the function as a section, with no required layout or order. Check 4 asks for exit 0 and `# fail 0`. That only restates that tests pass, though the summary wording depends on which reporter Node uses (a small edge case). The builder's \"before `## Tests`\" placement is a build instruction, not a PASS/FAIL condition, and the verifier doesn't check it. Not violated.",
+  "model": "claude-opus-5-5",
+  "ms": 13606,
+  "tokens": {
+    "input": 2,
+    "output": 971,
+    "cacheCreation": 3350,
+    "cacheRead": 783,
+    "fresh": 4323,
+    "total": 5106
+  },
+  "at": "2026-11-05T05:05:43.317Z"
+}

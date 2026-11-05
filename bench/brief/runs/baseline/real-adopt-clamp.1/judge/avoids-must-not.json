@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "04c7af80593959315dd8123e3d7acdd42c57dea40e98bef296a91c4b22457c82",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is avoided. Check 3 lists every exported function, subtract included, so a README that documents clamp but not subtract fails. Item 2 is broken by Check 3. Its script passes a function only if a Markdown heading matches `'^#+\\\\s*'+n+'\\\\s*\\\\('`. Its FAIL condition is \"any exported function has no heading\". So the README must use one layout: a heading per function, written as `name(`. The expect line only asks that README.md \"documents every function math.js exports\". A README that documents subtract in a table, a bullet list or prose would meet that line but fail this check. That is a PASS/FAIL condition stricter than its line. Checks 1, 2 and 4 match their lines: Check 2 asks only for a RangeError instance, with no exact message.",
+  "model": "claude-opus-5-5",
+  "ms": 6984,
+  "tokens": {
+    "input": 2,
+    "output": 578,
+    "cacheCreation": 3297,
+    "cacheRead": 783,
+    "fresh": 3877,
+    "total": 4660
+  },
+  "at": "2026-11-05T05:06:55.026Z"
+}

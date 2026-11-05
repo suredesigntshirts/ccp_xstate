@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "25aba30ecdbfba36d8187b0117fc598c474d2ba798984345a33be862e9775676",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "All three must_catch items are handled.\n1. The builder brief says README.md has \"NO section for slugify… so you must also add a slugify section.\" Its step 3 lists `## slugify(s)` as \"currently missing\".\n2. Verifier Check 3 runs over every export at the PR head. It prints `Object.keys(m)` and reports `MISSING: <names>` for any exported function without a heading. It also notes that \"slugify must now be covered too\", and a missing heading means FAIL.\n3. Verifier Check 1 asserts `padLeft('42', 5) === '   42'`, so it calls padLeft without a fill argument and checks for space padding.\n\nOne problem outside this criterion: the shell will likely turn `\\\\b` into a JS `'\\b'`, which is a backspace character, not a word boundary. That would make the Check 3 regex fail even when every section exists. It does not change whether the traps are covered.",
+  "model": "claude-opus-5-5",
+  "ms": 14933,
+  "tokens": {
+    "input": 2,
+    "output": 1249,
+    "cacheCreation": 3649,
+    "cacheRead": 783,
+    "fresh": 4900,
+    "total": 5683
+  },
+  "at": "2026-11-05T05:13:15.306Z"
+}

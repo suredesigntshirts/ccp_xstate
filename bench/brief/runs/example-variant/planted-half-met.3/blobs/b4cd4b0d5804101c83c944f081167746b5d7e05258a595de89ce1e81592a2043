@@ -1,0 +1,24 @@
+Check out the PR head and run every command from the repository root. There is one check per acceptance line, in order. Report each as PASS or FAIL with the output you saw.
+
+Check 1. Expect: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+  node --input-type=module -e "import { padLeft } from './index.js'; import assert from 'node:assert/strict'; assert.equal(typeof padLeft,'function'); assert.equal(padLeft('42',5,'0'),'00042'); assert.equal(padLeft('ab',4),'  ab'); assert.equal(padLeft('7',3,'x'),'xx7'); assert.equal(padLeft('',2,'0'),'00'); console.log('OK')"; echo exit=$?
+Also open index.js and confirm padLeft is a named export whose parameters are, in order, s, width, fill.
+PASS: the command prints OK and exit=0, and the export is padLeft(s, width, fill). FAIL: any import error or assertion error, a nonzero exit, or padLeft is missing or not exported with that parameter order.
+
+Check 2. Expect: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+  node --input-type=module -e "import { padLeft } from './index.js'; import assert from 'node:assert/strict'; assert.equal(padLeft('00042',5,'0'),'00042'); assert.equal(padLeft('123456',5,'0'),'123456'); assert.equal(padLeft('abc',3),'abc'); assert.equal(padLeft('abcd',2),'abcd'); console.log('OK')"; echo exit=$?
+PASS: prints OK and exit=0. FAIL: any assertion error or nonzero exit, e.g. the input was truncated or padded.
+
+Check 3. Expect: "README.md has a section for every function index.js exports"
+Run:
+  node --input-type=module -e "import * as m from './index.js'; import fs from 'node:fs'; const r=fs.readFileSync('README.md','utf8'); const miss=Object.keys(m).filter(k=>typeof m[k]==='function' && !new RegExp('^#+ .*\\\\b'+k+'\\\\b','m').test(r)); console.log(miss.length?'MISSING '+miss.join(','):'OK')"
+This lists each exported function that has no Markdown heading naming it. On the base, before this change, it prints MISSING slugify. Then read README.md and confirm that each such heading starts a real section about that function, not an empty heading.
+PASS: prints OK, and every exported function (at least capitalize, slugify, truncate and padLeft) has its own README section. FAIL: prints MISSING with any names (slugify especially), or a heading has no section content for its function.
+
+Check 4. Expect: "npm test passes"
+Run: npm test; echo exit=$?
+PASS: exit=0 and the summary shows fail 0. FAIL: nonzero exit or any failing or cancelled test.
+
+Advisory (does not affect PASS/FAIL): it is good if test/strutil.test.js includes padLeft tests for zero padding, the default space and the unchanged case, and if README sections follow the export order. Note any that are missing, but do not fail a check because of them.

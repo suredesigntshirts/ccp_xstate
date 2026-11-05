@@ -1,0 +1,14 @@
+Goal: one pull request that meets every one of these acceptance lines from issue https://github.com/o/r/issues/23:
+- math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+- clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+- README.md documents every function math.js exports
+- npm test passes
+
+Current state: math.js is CommonJS and exports { add, subtract, multiply } via module.exports. README.md has an "## API" section with "### add(a, b)" and "### multiply(a, b)" entries, but subtract is NOT documented yet. Tests are in test/math.test.js and use node:test with node:assert/strict; `npm test` runs `node --test`.
+
+Steps:
+1. In math.js, add a function clamp(x, lo, hi) with a short doc comment, in the same style as the other functions. If lo > hi, throw a RangeError with a clear message, and do this check before anything else. Otherwise return lo when x < lo, hi when x > hi, and x when it is inside the range (lo and hi count as inside). Add clamp to module.exports and keep add, subtract and multiply exported.
+2. In README.md, under "## API", add a "### subtract(a, b)" entry (returns `a` minus `b`, with a short example) and a "### clamp(x, lo, hi)" entry. The clamp entry says it returns x limited to the range lo to hi, says it throws a RangeError when lo is greater than hi, and shows examples such as clamp(-5, 0, 100) // 0, clamp(140, 0, 100) // 100, clamp(42, 0, 100) // 42. Every name in math.js's module.exports must have its own ### heading in the API section.
+3. In test/math.test.js, import clamp and add tests: a value below the range returns lo, a value above returns hi, a value inside returns itself, the boundary values lo and hi return themselves, lo === hi returns that value, and assert.throws(() => clamp(5, 10, 0), RangeError).
+4. Run `npm test` and make sure every test passes. Then run `node -e "const m=require('./math.js'); console.log(Object.keys(m))"` and check that each listed name has a ### heading in README.md.
+5. Commit these changes and open the pull request, with a link to the issue in its description.

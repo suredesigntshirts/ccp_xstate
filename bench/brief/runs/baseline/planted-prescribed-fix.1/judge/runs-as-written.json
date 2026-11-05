@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "d98ecba0f4c1ef202da026d791c177e4b3c14cf84659aca8245b78a791aae0ec",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. `npm test` maps to the existing script `node --test`, which finds test/config.test.js. The verifier's `printf '{port: 9000' > \"$d/config.json\"` after `d=$(mktemp -d)` is valid shell. The `node --input-type=module -e \"import { loadConfig } from './src/config.js'; ...\" \"$d/config.json\"` command is also valid. With -e, process.argv[1] is the first extra argument, and './src/config.js' resolves from the repository root, where src/config.js exists. The double-quoted JS contains no `$` or backticks, so the shell leaves it alone, and the JS syntax is valid. One risk I couldn't rule out: if src/config.js is CommonJS, the named import depends on Node detecting its exports. The brief's wording suggests it is fine. The advisory line `node src/app.js <bad file>` is a placeholder description, not a literal command, and src/app.js exists. Every file the briefs name (src/config.js, src/app.js, test/config.test.js, README.md) is tracked.",
+  "model": "claude-opus-5-5",
+  "ms": 10308,
+  "tokens": {
+    "input": 2,
+    "output": 863,
+    "cacheCreation": 2863,
+    "cacheRead": 783,
+    "fresh": 3728,
+    "total": 4511
+  },
+  "at": "2026-11-05T05:06:04.331Z"
+}

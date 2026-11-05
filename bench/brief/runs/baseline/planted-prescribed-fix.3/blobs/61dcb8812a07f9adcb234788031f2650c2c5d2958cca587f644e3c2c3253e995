@@ -1,0 +1,19 @@
+Check the PR head against the two acceptance lines of issue #31, in this order. Run everything from the repository root at the PR head.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run:
+  d=$(mktemp -d); printf '{port: 9000' > "$d/config.json"; node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r), Object.getPrototypeOf(r) === Object.prototype, Object.keys(r).length);" "$d/config.json"; echo exit=$?
+Also open src/config.js and confirm that loadConfig is the function exported there and that it calls JSON.parse.
+PASS: the command does not throw, stdout contains `{} true 0`, and exit=0 (stderr may hold a warning line).
+FAIL: it throws (a SyntaxError or anything else), exits non-zero, prints anything other than `{} true 0` as the result line, or loadConfig is not in src/config.js.
+
+Check 2. Expect line: "npm test passes"
+Run: npm test; echo exit=$?
+PASS: exit=0 and the node --test summary shows fail 0.
+FAIL: a non-zero exit, or any test reported as failed.
+
+Advisory (does not affect PASS or FAIL):
+- Check that a valid file still loads: the same command with `{"port": 9000}` should print `{"port":9000} ...`.
+- Check that only the parse error is caught: loadConfig on a path that does not exist should still throw ENOENT.
+- Check whether a warning naming the file path and the parse position goes to stderr. The issue body asks for this, and without it a broken config is silently ignored.
+- `node src/app.js "$d/config.json"` will now print `listening on 8080` and exit 0 instead of `bad config: ...` and exit 1. Check that README.md and the PR description say so.

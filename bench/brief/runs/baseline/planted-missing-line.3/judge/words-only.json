@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "c9093b2bd49cecad35390f42f0e79c53b62c1a6e829177869be7019eb34cc04e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked both verifier checks against their expect lines. Check 2 is fine: requiring that README.md mention --tsv and say what it does is a fair reading of \"documents --tsv\". Check 1 asks for more than its line does. The line only requires that --tsv prints the same JSON array the CSV run prints for the same table. But its PASS condition also fixes the CSV output to an exact value: \"the CSV output is a JSON array of row objects (for the first table, [{\"name\":\"ann\",\"age\":\"30\",\"city\":\"paris\"},...])\". It also requires that \"both commands exit 0\", which covers the CSV-only run. The words don't force either of these. They test the existing CSV baseline and its exact output, not whether --tsv matches it. Those stricter tests belong under Advisory, not in the PASS condition.",
+  "model": "claude-opus-5-5",
+  "ms": 7821,
+  "tokens": {
+    "input": 2,
+    "output": 701,
+    "cacheCreation": 2684,
+    "cacheRead": 783,
+    "fresh": 3387,
+    "total": 4170
+  },
+  "at": "2026-11-05T05:05:50.914Z"
+}

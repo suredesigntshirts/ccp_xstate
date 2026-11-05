@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "676316a503f6ee32b46baf4207ebf36325f0c151a1b39bf61a8921d3eb2a9a5e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one. (1) Builder step 3 adds a clamp entry and also says: \"Also add a `### subtract(a, b)` entry (it is exported but currently undocumented)\". (2) Verifier Check 3 gets the exports from Object.keys(math.js) at the PR head. Its PASS condition says the list \"must include add, subtract, multiply and clamp\". It FAILs if any exported function has no heading, and adds: \"note subtract was undocumented before this change, so its absence is a FAIL\". (3) Verifier Check 2 calls clamp with lo greater than hi in four cases. It FAILs a case when `!(e instanceof RangeError)`, and also when the call returns a value instead of throwing. It names a plain Error or TypeError as FAIL examples. Nothing in either brief contradicts these items.",
+  "model": "claude-opus-5-5",
+  "ms": 5569,
+  "tokens": {
+    "input": 2,
+    "output": 444,
+    "cacheCreation": 549,
+    "cacheRead": 4142,
+    "fresh": 995,
+    "total": 5137
+  },
+  "at": "2026-11-05T04:57:40.926Z"
+}

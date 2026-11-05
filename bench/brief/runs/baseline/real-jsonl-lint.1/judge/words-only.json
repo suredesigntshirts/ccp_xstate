@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "bc2af33adfc65bffe65ea16d615863f00dbeadd2fdbb5dd4f9ebd3794d888cf0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier PASS/FAIL condition with the words of its expect line. Several conditions ask for more than the words say, and none of them sits under Advisory. Check 3's line says only \"exports lint(text) returning [{ line, error }]\", but PASS also requires \"an `error` property that is a non-empty string\", specific line values (3 and 4), and [] for a clean input. Check 4's line asks for \"node:test tests for\" the five cases, but PASS also requires \"npm test in the package runs node:test tests that pass\". Passing tests is not in line 4's words. Check 6's line asks that npm test is \"green\", but PASS also requires that the root npm test \"runs the jsonl-lint tests\". Checks 1, 2 and 5 stay within their words. Because of these extra conditions, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 13121,
+  "tokens": {
+    "input": 2,
+    "output": 1028,
+    "cacheCreation": 6027,
+    "cacheRead": 783,
+    "fresh": 7057,
+    "total": 7840
+  },
+  "at": "2026-11-05T05:07:03.578Z"
+}

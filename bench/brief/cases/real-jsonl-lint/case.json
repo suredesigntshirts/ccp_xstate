@@ -1,0 +1,33 @@
+{
+  "kind": "real",
+  "source": "The first real issue (31 Oct): ccp_machine_test issue #102, item fri-jsonl-lint, brief run 0.brief in /mnt/project-files/first-real-issue/harness/journal (pre-contract prompt). The input is that run's input; the repo is ccp_machine_test at b772aff, main when the item started.",
+  "repo": {
+    "git": "https://github.com/suredesigntshirts/ccp_machine_test",
+    "commit": "b772affa43bc0bbdf580648684e42b1a4f838471",
+    "origin": "https://github.com/suredesigntshirts/ccp_machine_test.git"
+  },
+  "input": {
+    "issue": {
+      "url": "https://github.com/suredesigntshirts/ccp_machine_test/issues/102",
+      "expect": [
+        "packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for every row that is not valid JSON (1-based lines, blank lines skipped, an unterminated last line checked) and exits 1 if any, 0 if none",
+        "A missing file or no argument prints to stderr and exits 2",
+        "packages/jsonl-lint/src/index.js exports lint(text) returning [{ line, error }]",
+        "The workspace has its own package.json (jsonl-lint, type module, test script node --test), no runtime dependencies, and node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes",
+        "packages/jsonl-lint/README.md exists and the root README lists the tool",
+        "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, and npm test and the test workflow are green at its head"
+      ]
+    }
+  },
+  "trap": "Real repo facts: README.md says 'No tools yet: packages/ is empty, and npm test says so and passes', which the new tool makes false; the root npm test runs workspaces with --if-present, so a workspace without a test script passes silently; and the test workflow runs npm ci, which fails unless package-lock.json gains the new workspace (the merged PR #103 changed package-lock.json).",
+  "must_catch": [
+    "The builder brief has the builder update package-lock.json for the new workspace (for example with npm install) so that npm ci, which the test workflow runs, still works.",
+    "The builder brief has the builder replace the root README's 'No tools yet' statement, not just add a line.",
+    "The verifier brief makes sure the jsonl-lint tests really run under the root npm test, so it would notice them being skipped (the root script uses --if-present): for example by reading the test count, or by breaking lint() and seeing a test fail.",
+    "The verifier check for line 6 reads GitHub at the PR head: the PR body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, and the test workflow's run is green at that sha."
+  ],
+  "must_not": [
+    "A PASS or FAIL condition stricter than its line, such as exact error message wording, a branch-name rule, a mutation test, or a limit on which files the PR may touch.",
+    "A check that passes a line by reading the diff or file names only, where the line asks for behaviour the program shows when run."
+  ]
+}

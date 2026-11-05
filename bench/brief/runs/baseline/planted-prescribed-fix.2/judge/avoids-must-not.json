@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c3f3d78fd9db3dedf1ac011505feb1ade460a3f5d602c60f19689753661af618",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not 1 holds for the verifier brief. Check 1 passes only on \"RESULT {} object false\", and the stderr message and README check are listed under \"Advisory (does not affect PASS or FAIL)\". Must_not 2 breaks in the builder brief. Step 2 tells the builder to do more than return {} on a parse error: \"in the catch, also write one line to stderr ... that names `path` and includes the parse error's message\". That is the warning behaviour must_not 1 names as going beyond returning {}. The brief justifies it with the issue's motivation (\"Returning `{}` with no message would hide the typo\"), but the expect line asks only to catch the error and return {}. Step 4 makes this worse by telling the builder to describe the warning in the README. So the builder is directed to change parse-error handling beyond returning {}.",
+  "model": "claude-opus-5-5",
+  "ms": 7661,
+  "tokens": {
+    "input": 2,
+    "output": 609,
+    "cacheCreation": 3065,
+    "cacheRead": 783,
+    "fresh": 3676,
+    "total": 4459
+  },
+  "at": "2026-11-05T05:06:20.035Z"
+}

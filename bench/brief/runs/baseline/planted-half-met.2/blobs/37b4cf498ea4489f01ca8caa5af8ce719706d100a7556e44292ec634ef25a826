@@ -1,0 +1,28 @@
+Check out the PR head and run every check from the repository root. Use Node to run the code itself; do not judge from reading the diff alone. Report one result per check, in this order.
+
+Check 1 — expect line: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+node --input-type=module -e "import * as m from './index.js'; const p=m.padLeft; console.log(typeof p); console.log(JSON.stringify([p('42',5,'0'), p('42',5), p('a',3,'*'), p('',4,'0')]));"
+PASS: first line prints `function`, and the second prints `["00042","   42","**a","0000"]` (every result is exactly width characters, padded on the left with fill, using a space when fill is omitted).
+FAIL: padLeft is not exported, the command throws, or any value differs.
+
+Check 2 — expect line: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+node --input-type=module -e "import {padLeft as p} from './index.js'; console.log(JSON.stringify([p('12345',5,'0'), p('123456',5,'0'), p('abc',2), p('abc',0,'x')]));"
+PASS: prints `["12345","123456","abc","abc"]`.
+FAIL: any value differs from its input s, or the command throws.
+
+Check 3 — expect line: "README.md has a section for every function index.js exports"
+Run:
+node --input-type=module -e "import * as m from './index.js'; import fs from 'node:fs'; const heads=fs.readFileSync('README.md','utf8').split('\n').filter(l=>/^#+\s/.test(l)); const fns=Object.keys(m).filter(k=>typeof m[k]==='function'); const missing=fns.filter(f=>!heads.some(h=>new RegExp('\\b'+f+'\\b').test(h))); console.log('exports:',fns.join(',')); console.log('missing:',missing.join(',')||'none');"
+PASS: prints `missing: none`: every exported function (this should include capitalize, slugify, truncate and padLeft) has a markdown heading in README.md that names it. Read each such section to confirm it actually describes that function.
+FAIL: any exported function is listed as missing (note that slugify had no README section before this change), or a heading has no text describing its function.
+
+Check 4 — expect line: "npm test passes"
+Run: `npm test` and record the exit code.
+PASS: exit code 0 and the output reports `fail 0`.
+FAIL: non-zero exit code or any failing test.
+
+Advisory (not PASS/FAIL conditions):
+- Check that test/strutil.test.js includes padLeft tests for the default fill and the unchanged case.
+- Note any behaviour with multi-character fill, or with a non-string s, if the PR mentions it.

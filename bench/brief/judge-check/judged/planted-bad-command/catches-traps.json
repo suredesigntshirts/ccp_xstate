@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "f04de0669353370146d2fd36ec095e4a68b414f25c559d22ed966ea8156c73a3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and each one is met.\n1. Builder step 3 says to \"Also add a `### subtract(a, b)` entry (it is exported but currently undocumented)\", and also to add the clamp entry.\n2. Verifier Check 3 reads the exports from math.js at the PR head (`Object.keys(m)` filtered to functions), prints them, and fails if any is missing from README.md. Its note adds that \"a build that documents only clamp FAILs here\", so subtract is covered.\n3. Verifier Check 2 calls clamp with lo greater than hi in four cases. It fails if a call returns a value or throws an error that fails `e instanceof RangeError`, and it gives \"plain Error or TypeError\" as fail examples.\nOne flaw falls outside this criterion: builder step 5 runs `npm run lint && npm run test:unit` instead of `npm test`.",
+  "model": "claude-opus-5-5",
+  "ms": 9680,
+  "tokens": {
+    "input": 2,
+    "output": 779,
+    "cacheCreation": 3867,
+    "cacheRead": 783,
+    "fresh": 4648,
+    "total": 5431
+  },
+  "at": "2026-11-05T04:59:18.293Z"
+}

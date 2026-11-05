@@ -1,0 +1,17 @@
+Run every check at the PR head, from the repository root. Start with `npm test` and note the result, but it does not decide either check by itself.
+
+Check 1. Expect line: "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+Run:
+  a=$(printf 'name\tage\tcity\nAnn\t30\tOslo\nBob\t41\tRome\n' | node bin/csv2json.js --tsv)
+  b=$(printf 'name,age,city\nAnn,30,Oslo\nBob,41,Rome\n' | node bin/csv2json.js)
+  echo "$a"; echo "$b"; [ "$a" = "$b" ] && echo SAME
+Also run the same pair with a single-row table: printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv, compared with printf 'a,b\n1,2\n' | node bin/csv2json.js.
+PASS: both commands in each pair exit 0, the outputs are identical, and the output is a JSON array of objects keyed by the header (for example [{"name":"Ann","age":"30","city":"Oslo"},{"name":"Bob","age":"41","city":"Rome"}]).
+FAIL: either command in a pair errors, the outputs differ, or the --tsv output is not that array (for example, keys that still contain tab characters).
+
+Check 2. Expect line: "README.md documents --tsv"
+Run: grep -n -- '--tsv' README.md, and read the lines around each match.
+PASS: README.md contains --tsv in text that explains how to use it for tab-separated input.
+FAIL: --tsv is missing from README.md, or it appears without any explanation of what it does.
+
+Advisory (not a PASS or FAIL condition): check that the default CSV behaviour is unchanged (printf 'a,b\n1,2\n' | node bin/csv2json.js prints [{"a":"1","b":"2"}]), that npm test passes, and that a test covers --tsv.

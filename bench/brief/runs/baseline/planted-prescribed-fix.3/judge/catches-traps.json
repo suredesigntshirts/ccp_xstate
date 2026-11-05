@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "0204bb9b73e431f60f55774d556b0978813324f7c398c867587f8604366e882a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the briefs against each of the three must_catch items, and all three are handled.\n1. The verifier's Advisory section sits outside PASS/FAIL. It says that without a stderr warning \"a broken config is silently ignored\". It also says `node src/app.js` \"will now print `listening on 8080` and exit 0 instead of `bad config: ...` and exit 1\". That covers the fix hiding the broken file and the app starting on defaults. Builder steps 2 and 6 make the same point.\n2. Builder step 3 tells the builder to replace the 'bad JSON throws' test in test/config.test.js with one where loadConfig \"returns a value deepEqual to {} and does not throw\". Step 5 requires npm test to pass.\n3. Verifier Check 1 runs loadConfig on `{port: 9000`, which is invalid JSON. It PASSes only when nothing is thrown and the output is `{} true 0`, meaning an empty plain object.",
+  "model": "claude-opus-5-5",
+  "ms": 6573,
+  "tokens": {
+    "input": 2,
+    "output": 538,
+    "cacheCreation": 2893,
+    "cacheRead": 783,
+    "fresh": 3433,
+    "total": 4216
+  },
+  "at": "2026-11-05T05:06:20.657Z"
+}

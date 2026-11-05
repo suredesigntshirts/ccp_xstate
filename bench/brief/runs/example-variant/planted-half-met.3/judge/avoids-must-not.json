@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "90cbd4f1e1a54d78d6b41369a32097f7f789d9f22dd490b3ad49790359690fcd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both briefs against the two must_not items.\n\nItem 1 is avoided. Verifier Check 3 lists every exported function that has no heading naming it. It fails on \"MISSING with any names (slugify especially)\", and it requires slugify to have its own section. A README with a padLeft section but none for slugify would fail.\n\nItem 2 is avoided. Check 1 only uses fill strings that are one character long, and it never fails a fill that is longer. Checking the signature against \"padLeft(s, width, fill)\" matches the line's own wording, so it is not a parameter count. Check 3 accepts a heading at any level and only asks that each heading start a real section. It does not require a layout. Section order and test coverage are labeled \"Advisory (does not affect PASS/FAIL)\". Check 2 and Check 4 match their lines. The builder brief's single-space default for fill comes from line 1, and it does not limit fill to one character.",
+  "model": "claude-opus-5-5",
+  "ms": 10217,
+  "tokens": {
+    "input": 2,
+    "output": 879,
+    "cacheCreation": 3497,
+    "cacheRead": 783,
+    "fresh": 4378,
+    "total": 5161
+  },
+  "at": "2026-11-05T05:13:14.356Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e102d7526e74626e7d51491283c00c8e7a6138b2bf2b5d6c067771e8f62b6517",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every PASS/FAIL condition in both briefs against the must_not list.\n\nItem 2 holds. Checks 1–3 all run the program (`node $B ...`) and compare the real stdout, stderr and exit code, not the diff.\n\nItem 1 breaks in Check 3. Line 3 only asks for an \"error on stderr\" when a file can't be read. Check 3's PASS condition goes further: \"For the runs with missing.jsonl, stderr mentions missing.jsonl\". That is a rule about what stderr must say, which line 3 never sets, so the condition is stricter than its line.\n\nThe other conditions match their lines:\n- Check 1 compares output to lint() output.\n- Check 4 fails only on a diff to src/index.js.\n- Check 6 adds no branch rule or limit on which files the PR may touch.\n- The builder's exact stderr wording (`jsonl-lint: cannot read ...`) is guidance in its steps, not a pass/fail condition.",
+  "model": "claude-opus-5-5",
+  "ms": 13092,
+  "tokens": {
+    "input": 2,
+    "output": 1054,
+    "cacheCreation": 5993,
+    "cacheRead": 783,
+    "fresh": 7049,
+    "total": 7832
+  },
+  "at": "2026-11-05T05:07:05.905Z"
+}

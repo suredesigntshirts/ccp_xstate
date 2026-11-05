@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "350fc2ea7ecb9559c78ad7b1cd3c5db190ae3eb218e9e35e310b7bcf35eeec47",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. `npm test` maps to `node --test`, which exists in package.json, and the commands for Checks 1, 2 and 4 are valid. Check 3 breaks the criterion. It is wrapped in double quotes in bash, where `\\\\` becomes a single `\\`. So the JavaScript receives `new RegExp('\\b'+f+'\\b')`, and in a JS string `'\\b'` is a backspace character (U+0008), not a regex word boundary. No README heading contains a backspace, so the check prints every export under \"missing:\" no matter what README.md says. Run as written, it fails even a correct PR. A minor extra issue: `!heads` inside double quotes can trigger bash history expansion in an interactive shell. The builder brief's claim that the package is `\"type\": \"module\"` also can't be confirmed from the package.json facts given. Because Check 3 doesn't work as written, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 13389,
+  "tokens": {
+    "input": 2,
+    "output": 952,
+    "cacheCreation": 3329,
+    "cacheRead": 783,
+    "fresh": 4283,
+    "total": 5066
+  },
+  "at": "2026-11-05T05:05:24.446Z"
+}

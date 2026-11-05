@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "98cd198295928daa67d151453a4cde2ce7157985982e543ad6d600423917ca72",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. `npm test`, the builder's `node -e` line that lists exports, and verifier Checks 1, 2 and 4 are valid as written. Check 3 breaks. Its `node -e` argument is in double quotes and contains `new RegExp('^#+\\\\s*'+n+'\\\\s*\\\\(','m')`. Bash turns each `\\\\` into `\\`, so Node gets `'\\s*\\('`. In a JavaScript string literal, `\\s` becomes `s` and `\\(` becomes `(`. The pattern becomes `^#+s*adds*(`, which has an unclosed `(`, so `new RegExp` throws a SyntaxError on every run. The check can never report \"missing: none\", and even with that fixed, `#+s*` would not match a heading like \"### add(a, b)\". So one of the briefs' commands does not run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 20457,
+  "tokens": {
+    "input": 2,
+    "output": 1445,
+    "cacheCreation": 3330,
+    "cacheRead": 783,
+    "fresh": 4777,
+    "total": 5560
+  },
+  "at": "2026-11-05T05:06:34.975Z"
+}

@@ -1,0 +1,22 @@
+Goal: one pull request that meets every line of issue https://github.com/o/strutil/issues/7. The acceptance conditions are exactly these lines:
+1. "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+2. "padLeft returns s unchanged when s is already width characters or longer"
+3. "README.md has a section for every function index.js exports"
+4. "npm test passes"
+
+Current state of the repository (ESM package, "type": "module", tests run by `node --test` via `npm test`):
+- index.js exports capitalize, slugify and truncate.
+- README.md has sections `## capitalize(s)` and `## truncate(s, n)`, but NO section for slugify. Line 3 is about every exported function, not only padLeft, so you must also add a slugify section.
+- test/strutil.test.js has tests for the three existing functions.
+
+Steps:
+1. In index.js add and export `padLeft(s, width, fill = ' ')` with a short doc comment in the same style as the other functions. It returns s padded on the left with fill until it is width characters long (e.g. `s.padStart(width, fill)`), so padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42'. When s.length >= width it returns s unchanged (never truncates): padLeft('123456', 5, '0') === '123456'.
+2. In test/strutil.test.js import padLeft and add tests covering: zero padding ('42', 5, '0' -> '00042'), default space fill ('42', 5 -> '   42'), s exactly width long returned unchanged, s longer than width returned unchanged.
+3. In README.md add a section for every function index.js exports, using the existing heading style `## name(args)` followed by a one-sentence description:
+   - `## slugify(s)` (lower case, words joined by dashes) — currently missing.
+   - `## padLeft(s, width, fill)` describing left padding with fill (a space by default) to width characters, and that s is returned unchanged when already width characters or longer.
+   Keep the existing sections and the Tests section.
+4. Run `npm test` from the repository root and make sure every test passes.
+5. Self-check line 3 by running this from the repository root; it must print ALL DOCUMENTED:
+   node --input-type=module -e "import * as m from './index.js'; import { readFileSync } from 'node:fs'; const readme = readFileSync('README.md','utf8'); const missing = Object.keys(m).filter(k => typeof m[k]==='function' && !new RegExp('^#{1,6}\\s+\`?'+k+'\\b','m').test(readme)); console.log(missing.length ? 'MISSING: '+missing.join(', ') : 'ALL DOCUMENTED');"
+6. Open one pull request containing these changes; reference issue #7 in its description.

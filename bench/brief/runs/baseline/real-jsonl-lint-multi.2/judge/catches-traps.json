@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9ab6441b4486a55eb39fd2dfcb6e608e54198868a8f352f86f3385a78a6ce480",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all four must_catch items against the two briefs, and the briefs cover each one.\n1. Verifier Check 3 runs `node $CLI $D/clean1.jsonl $D/missing.jsonl $D/bad.jsonl`. It expects exit 2 and also requires \"stdout still contains `$D/bad.jsonl:2: ...`\", so the missing file and the bad row are tested in the same run.\n2. Verifier Check 4 runs `git diff <merge-base>..HEAD -- packages/jsonl-lint/src/index.js`, which compares the file at the PR head with the base commit. The pass test reads \"no change to the lint function\" rather than \"the diff is empty\", which is a bit loose, but the comparison is against the diff.\n3. Builder step 4 says \"Update packages/jsonl-lint/README.md\" and spells out the new usage, stdin and exit codes.\n4. Verifier Check 6 uses `gh pr view` to read the body and headRefOid, requires the Closes line, and runs `gh run list --commit <headRefOid>`, which must show the workflow \"finished with conclusion success\".",
+  "model": "claude-opus-5-5",
+  "ms": 10465,
+  "tokens": {
+    "input": 2,
+    "output": 818,
+    "cacheCreation": 5606,
+    "cacheRead": 783,
+    "fresh": 6426,
+    "total": 7209
+  },
+  "at": "2026-11-05T05:07:00.581Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e782a583705db6af044198ea0ecf0fe951bd445975afdb890f7c5dcdfdeabb5a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all three must_catch items, and two are missed. Item 1 is missed: builder step 3 asks only for a `### clamp(x, lo, hi)` entry and says \"Do not remove the existing add and multiply entries\". It never says that subtract is exported but undocumented, or that it needs a README entry. Step 5 has the builder check that every exported name has a heading, but that is an indirect check, not an instruction to document subtract. Item 2 is missed: verifier Check 3 runs only `grep -n 'clamp(' README.md` and passes if clamp is documented. It never lists add, subtract, multiply and clamp, and it would not fail when subtract has no entry. Item 3 is met: Check 2 calls clamp with lo greater than hi and fails unless `e instanceof RangeError`.",
+  "model": "claude-opus-5-5",
+  "ms": 5371,
+  "tokens": {
+    "input": 2,
+    "output": 459,
+    "cacheCreation": 3557,
+    "cacheRead": 783,
+    "fresh": 4018,
+    "total": 4801
+  },
+  "at": "2026-11-05T04:57:41.537Z"
+}
