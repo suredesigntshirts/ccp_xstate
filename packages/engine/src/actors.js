@@ -17,7 +17,7 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { append, readFile } from '../../journal/src/index.js';
 import { check } from './schema.js';
 import { prRef } from './effects/merge.js';
-import { assemble, blockedOf, contextOf, isStage, returnLine, sections, stagesOf, STAMPED, uncovered } from './stages.js';
+import { assemble, BLOCKED, blockedOf, contextOf, isStage, returnLine, sections, stagesOf, STAMPED, uncovered } from './stages.js';
 import { endRecord, stageRecord } from './trace.js';
 
 // The actors that are agents are the workflow's model stages (stages.js isStage). Others (merge, ask, post) are host
@@ -715,9 +715,11 @@ export function resultsOf(host) {
     }
     if (!got) continue;
     // The stage's "could not" (stages.js BLOCKED): the actor's error, so the invoke's onError takes it like a stop.
+    // The event also carries the reason as `blocked`, so a chart can route a block apart from other errors by a guard
+    // on event.blocked (plan item fix-blocked-retry); `error` keeps the same text for every other onError.
     const blocked = blockedOf(host.spec.meta.actors[run.actor], got.result);
     if (blocked != null) {
-      inputs.push({ event: { type: `xstate.error.actor.${run.invoke}`, error: `${run.actor} blocked: ${blocked}` }, run: run.id, source: { system: 'harness', ref: `return ${got.toolUseId ?? got.hash}` } });
+      inputs.push({ event: { type: `xstate.error.actor.${run.invoke}`, error: `${run.actor} blocked: ${blocked}`, [BLOCKED]: blocked }, run: run.id, source: { system: 'harness', ref: `return ${got.toolUseId ?? got.hash}` } });
       continue;
     }
     inputs.push({

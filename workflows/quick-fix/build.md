@@ -23,5 +23,5 @@
 ## Output
 
 - pr: Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees.
-- blocked: Instead of pr, only when you could not push or open the PR: { reason: what stopped you }. The item then stops for the person to replan; it is not retried.
+- blocked: Instead of pr, only when you could not push or open the PR: { reason: what stopped you, and what would clear it }. The item then stops for the person, who may clear the block and retry this build, replan, or drop it; nothing retries it on its own.
 - notes: Optional, beside pr: a caveat the person should read before approving the merge, such as something you could not set on the PR. It goes on the merge card; the verifier never sees it. A reason you could not open the PR is blocked, not a note.

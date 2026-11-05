@@ -29,7 +29,10 @@
           { "target": "verifying", "description": "the host saw CI green on the claimed head at accept time", "actions": [{ "type": "set", "params": { "pr": "event.output.pr", "notes": "event.output.notes", "verdict": { "value": null }, "failure": { "value": null } } }, { "type": "set", "params": { "rebuilt": "context.built", "built": { "value": true } } }] },
           { "target": "checking", "actions": [{ "type": "set", "params": { "pr": "event.output.pr", "notes": "event.output.notes", "verdict": { "value": null }, "failure": { "value": null } } }, { "type": "set", "params": { "rebuilt": "context.built", "built": { "value": true } } }] }
         ],
-        "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
+        "onError": [
+          { "target": "blocked", "guard": "blockedBuild", "description": "the first build returned blocked: the person may clear it and retry", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] },
+          { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
+        ]
       }
     },
     "checking": {
@@ -152,6 +155,19 @@
         "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error", "decision": "context.grant" } }] }
       }
     },
+    "blocked": {
+      "after": { "checkBack": { "description": "no answer an hour after the ask: nothing moves; the wake brings the thread back to the waiting item (fix-waiting-wake)" } },
+      "invoke": {
+        "id": "ask", "src": "ask",
+        "input": { "question": { "value": "The build is blocked; what stopped it is below. Clear the block, then retry the build with the same briefs; or replan it with a written five whys; or drop it?" }, "choices": { "value": ["retry", "replan", "drop"] }, "failure": "context.failure" },
+        "onDone": [
+          { "target": "building", "guard": "retry", "description": "the same briefs again, with the block as failure; the retried build counts as the second", "actions": [{ "type": "set", "params": { "built": { "value": true } } }] },
+          { "target": "briefing", "guard": "replan", "actions": [{ "type": "set", "params": { "why": "event.output.why", "built": { "value": null }, "rebuilt": { "value": null }, "pr": { "value": null }, "notes": { "value": null }, "verdict": { "value": null }, "failure": { "value": null }, "decision": "context.grant" } }] },
+          { "target": "dropped", "guard": "drop", "actions": [{ "type": "set", "params": { "decision": "event.output" } }] }
+        ],
+        "onError": "dropped"
+      }
+    },
     "replanning": {
       "after": { "checkBack": { "description": "no answer an hour after the ask: nothing moves; the wake brings the thread back to the waiting item (fix-waiting-wake)" } },
       "invoke": {
@@ -181,6 +197,8 @@
       "gatesTouched": ["context.verdict.pr.gates"],
       "gatesApproved": [{ "path": "event.output.choice", "in": ["approve CI change"] }],
       "approved": [{ "path": "context.decision.choice", "in": ["approve"] }],
+      "blockedBuild": ["event.blocked", { "path": "context.built", "in": [null] }],
+      "retry": [{ "path": "event.output.choice", "in": ["retry"] }],
       "replan": [{ "path": "event.output.choice", "in": ["replan"] }, "event.output.why"],
       "drop": [{ "path": "event.output.choice", "in": ["drop"] }],
       "isMerged": ["context.merge.sha"],

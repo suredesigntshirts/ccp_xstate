@@ -50,7 +50,7 @@ export async function fakeGitHub(prs = {}) {
   await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
   const api = `http://127.0.0.1:${server.address().port}`;
   return {
-    state, suites, merges,
+    state, suites, merges, api,
     open: (n, head, extra = {}) => { state[n] = { merged: false, mergeSha: null, base: 'main', files: [], ...extra, head }; },
     push: (n, head) => { state[n].head = head; },
     green: (sha) => { suites[sha] = [{ status: 'completed', conclusion: 'success' }]; },
