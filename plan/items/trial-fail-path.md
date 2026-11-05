@@ -4,7 +4,7 @@
   "title": "Drive the FAIL and blocked paths with real agents",
   "stage": "s5-parity",
   "kind": "probe",
-  "status": "ready",
+  "status": "done",
   "outcome": "Two real-model trials on main's engine are committed under tournaments/2026-11-04-stage-contract/trials/: in fail/, one quick-fix item goes through verify FAIL, a rebuild whose input carries that verdict, verify PASS at the new head and merged; in blocked/, a build that the world refuses returns blocked and the item stops at replanning with the build's reason on the card. Each report counts refusals by rule and says whether the stage prompts carried the agents through without coaching.",
   "why": "Three real-model trials of the stage contract (trial 1, trial 2 and the engine-stage-contract adopt trial) all merged on the first build, so the FAIL to rebuild loop and the blocked route have only ever been taken by scenario tests and offline probes. In the adopt trial the brief writer read the repo and defused the planted half-met line before the builder saw it, so a trap the brief writer can see does not reach verify; the issue must fail for a reason only running the code reveals, or the first build must be made to miss a line.",
   "serves": [
@@ -135,3 +135,12 @@ brief.md and context.md and name every extra line. For refusals-counted, count r
 journal and driver log and compare with the tables. For stage-record, reassemble every stage.json with assemble(). You
 may rerun a driver in a temp TRIAL_DIR up to its first hand-off to see it start. Read the ci check at the head sha.
 Commit `verify/trial-fail-path/verdict.json` with a verdict per Expect id.
+
+## Result
+
+Done 2026-11-05: build PR #92, verdict all 6 MET at d05e687 (verify/trial-fail-path/verdict.json, 5711756). Reports:
+tournaments/2026-11-04-stage-contract/trials/fail/report.md and blocked/report.md. Both routes held with real agents and
+0 refusals. Found: a rebuild's worktree starts on a fresh branch at the clone's HEAD, not on the previous PR's branch
+(draft fix-rebuild-worktree). Known blemishes left as they are: the agent transcripts were not committed, so
+real-agents rests on the prompts and answers in run/; run/injected.diff lacks its final newline (git apply needs one
+added), not worth a re-stamp.
