@@ -39,7 +39,7 @@
   "outputs": [
     {
       "ref": "packages/engine/src/actors.js accept",
-      "what": "A refusal for a result rule (schema, reserved, restated, covers, ref) is { rule, reason, hint, count, cap }: hint holds, once per top-level output field the reason names, `<field>: <that field's description>` verbatim from the run's schema; a restated reason names every key path that differs, each with the returned value and the input's value (JSON, each cut to 200 characters); the refusal row's payload carries hint, count and cap. The refusal that makes the count reach REFUSAL_CAP (8) also fails the run: failed.json holds why, `refused <cap> times`, with each refusal's rule and reason, a no-return-style refusal row with rule refusal-cap is journalled, and accept returns { refused, failed: run }"
+      "what": "accept() still returns refused { rule, reason }; for a result rule (schema, reserved, restated, covers, ref) it also returns fix { hint, count, cap }: hint holds, once per top-level output field the reason names, `<field>: <that field's description>` verbatim from the run's schema; a restated reason names every key path that differs, each with the returned value and the input's value (JSON, each cut to 200 characters); the refusal row's payload carries hint, count and cap. The refusal that makes the count reach REFUSAL_CAP (8) also fails the run: failed.json holds why, `refused <cap> times`, with each refusal's rule and reason, a no-return-style refusal row with rule refusal-cap is journalled, and accept also returns failed: the run. refusalText() gives the text the agent sees"
     },
     {
       "ref": "plugins/harness/scripts/actors.mjs",
@@ -57,7 +57,7 @@
   "expect": [
     {
       "id": "hint",
-      "check": "Through the real accept() on a run prepared from workflows/quick-fix.json, a verify result with pr.at a short sha is refused with rule schema, its reason unchanged from main's (`verify result: result.pr.at does not match ^[0-9a-f]{40}$`), and its hint is `pr: ` followed by the pr line of workflows/quick-fix/verify.md's ## Output word for word; a result wrong in two fields (pr.at and a missing lines) has one hint line for each of pr and lines and none for others; a build result with pr.url prose gets the build stage's pr line; a covers refusal (an expect line left out of lines) has the lines hint",
+      "check": "Through the real accept() on a run prepared from workflows/quick-fix.json, a verify result with pr.at a short sha is refused with rule schema, its refused value { rule, reason } exactly main's (the reason names result.pr.at), and its fix.hint is `pr: ` followed by the pr line of workflows/quick-fix/verify.md's ## Output word for word; a result wrong in two fields (pr.at and a missing lines) has one hint line for each of pr and lines and none for others; a build result with pr.url prose gets the build stage's pr line; a covers refusal (an expect line left out of lines) has the lines hint",
       "how": "The verifier's own test, comparing the hint with the stage file's text",
       "proof": "verifier"
     },
