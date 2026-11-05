@@ -42,7 +42,7 @@ export const contextOf = ({ run, worktree, repo, github = null, branch }) =>
 export const BLOCKED = 'blocked';
 
 /** The fields the host stamps on a ref { url, at }: an agent may not set them, and is not shown them. */
-export const STAMPED = Object.freeze(['key', 'gates', 'green', 'checkout']);
+export const STAMPED = Object.freeze(['key', 'gates', 'green', 'checkout', 'branch']);
 
 const text = (v) => typeof v === 'string' && v.trim() !== '';
 const isObject = (v) => v != null && typeof v === 'object' && !Array.isArray(v);

@@ -154,6 +154,54 @@ const outcomeOf = (run) => ({
   spawn: { tool: 'Agent', prompt: spawnPrompt(run.run) }
 });
 
+// git in a folder, its output trimmed, or null when it fails.
+const git = (dir, args) => {
+  try {
+    return execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return null;
+  }
+};
+const hasCommit = (repo, sha) => git(repo, ['cat-file', '-e', `${sha}^{commit}`]) != null;
+
+/**
+ * Where a rebuild's worktree starts: the previous PR's branch (stamped by accept from GitHub's head.ref) at previous.at,
+ * the head the host last saw. A missing commit is fetched from origin (the PR's head and its branch) first. Throws,
+ * so the run fails and its item steps back, when the branch is unknown or the commit cannot be found.
+ */
+export function rebuildStart({ repo, worktrees, previous }) {
+  const clone = resolve(repo);
+  const { branch, at, url } = previous;
+  if (typeof branch !== 'string' || !branch || git(clone, ['check-ref-format', '--branch', branch]) == null) {
+    throw new Error(`rebuild-branch: previous PR ${url} has no branch the host saw on GitHub (a fork PR, or not read at accept)`);
+  }
+  const pr = prRef(url);
+  const tracking = `refs/remotes/origin/${branch}`;
+  if (!hasCommit(clone, at) || git(clone, ['rev-parse', '--verify', '-q', tracking]) == null) {
+    git(clone, ['fetch', '-q', 'origin', `+refs/heads/${branch}:${tracking}`]);
+    if (!hasCommit(clone, at)) git(clone, ['fetch', '-q', 'origin', `pull/${pr.pullNumber}/head`]);
+  }
+  if (!hasCommit(clone, at)) throw new Error(`rebuild-head: previous PR ${url} head ${at} is in neither the clone nor origin`);
+  const upstream = git(clone, ['rev-parse', '--verify', '-q', tracking]) != null ? `origin/${branch}` : null;
+  return { branch, at, upstream };
+}
+
+/**
+ * git refuses a branch checked out in another worktree. A finished run's worktree (one in the host's worktrees folder)
+ * that holds the branch is detached, its files and commits kept; a branch held anywhere else is not touched: throws.
+ */
+function freeBranch({ repo, worktrees, branch }) {
+  const list = git(resolve(repo), ['worktree', 'list', '--porcelain']) ?? '';
+  for (const block of list.split(/\n\n+/)) {
+    const path = block.match(/^worktree (.+)$/m)?.[1];
+    if (!path || !block.split('\n').includes(`branch refs/heads/${branch}`)) continue;
+    if (!inside(resolve(worktrees), path) || resolve(path) === resolve(worktrees)) {
+      throw new Error(`rebuild-branch: branch ${branch} is checked out at ${path}, outside the host's worktrees; it is left alone`);
+    }
+    if (git(path, ['checkout', '-q', '--detach']) == null) throw new Error(`rebuild-branch: could not detach ${path} from ${branch}`);
+  }
+}
+
 /** Write the run's folder, brief and worktree, and journal the brief. Returns the run effect's outcome. */
 export function prepare({ host, effect, repo, worktrees }) {
   const { root, item, spec } = host;
@@ -165,11 +213,17 @@ export function prepare({ host, effect, repo, worktrees }) {
 
   const stage = spec.meta.actors?.[effect.actor];
   if (!isStage(stage)) throw new Error(`${effect.actor} is no stage`);
-  const branch = `run/${safe(item)}/${safe(r.name)}`;
+  // A rebuild (input.previous is a PR ref) works on that PR's branch at its head (fix-rebuild-worktree); any other run
+  // gets a fresh branch named by its run, at the clone's HEAD.
+  const previous = prRef(effect.input?.previous?.url) ? effect.input.previous : null;
+  const start = previous ? rebuildStart({ repo, worktrees, previous }) : { branch: `run/${safe(item)}/${safe(r.name)}`, at: 'HEAD' };
+  const { branch } = start;
   const worktree = join(resolve(worktrees), `${safe(item)}--${safe(r.name)}`);
   if (!existsSync(worktree)) {
     mkdirSync(dirname(worktree), { recursive: true });
-    execFileSync('git', ['-C', resolve(repo), 'worktree', 'add', '-q', '-B', branch, worktree, 'HEAD'], { stdio: ['ignore', 'ignore', 'pipe'] });
+    if (previous) freeBranch({ repo, worktrees, branch });
+    execFileSync('git', ['-C', resolve(repo), 'worktree', 'add', '-q', '-B', branch, worktree, start.at], { stdio: ['ignore', 'ignore', 'pipe'] });
+    if (start.upstream) git(worktree, ['branch', '-q', '--set-upstream-to', start.upstream]);
   }
   const run = {
     run: effect.id,
@@ -413,6 +467,11 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
       }
       if (head !== ref.at) return refuse('ref', `${path}: your worktree is at ${head}, not ${ref.at}`);
       ref.key = `${pr.owner}/${pr.repo}#${pr.pullNumber}`;
+      // The PR's branch, for a rebuild's worktree (fix-rebuild-worktree): only when the head is in the PR's own
+      // repository, since a fork's branch is not on origin. GitHub gives head.repo null when the fork is gone.
+      const from = now?.head?.repo;
+      const own = from === undefined || (typeof from?.full_name === 'string' && from.full_name.toLowerCase() === `${pr.owner}/${pr.repo}`.toLowerCase());
+      if (own && typeof now?.head?.ref === 'string' && now.head.ref) ref.branch = now.head.ref;
       // The exact commands that put this head in a worktree (judge's round-1 graft from lane A): host-filled data.
       ref.checkout = `git fetch origin pull/${pr.pullNumber}/head && git checkout --detach ${ref.at}`;
       // Fails closed (round 2, graft from lane B): when the files cannot all be listed, the gates are unknown, and an
