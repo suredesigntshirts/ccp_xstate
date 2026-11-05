@@ -1,0 +1,47 @@
+{
+  "item": "fix-refusal-hints",
+  "verified_sha": "2b0df321bd3ae4665a33c48cb4e1e3a634796be7",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5F3u2WUXd1Pxr9Nr1H", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "hint",
+      "status": "MET",
+      "command": "npm ci; node --test verify/fix-refusal-hints/hint.test.mjs (real engine via the tourney world, workflows/quick-fix.json; accept() through w.agent); evidence/main-refusals.json = lib.mjs hintScenarios() run on a checkout of main bbcdadc; mutation of hintOf to return no lines",
+      "excerpt": "verify with pr.at 7 chars: refused {rule schema, reason 'verify result: result.pr.at is shorter than 40'} deep-equal to main's, fix.hint = ['pr: ' + the pr line of workflows/quick-fix/verify.md ## Output, word for word, read from the file]. pr.at short and lines missing: reason 'result.lines is missing; result.pr.at is shorter than 40' (main's), exactly two hint lines, pr and lines, none for issue or result. build with pr.url prose: build.md's own pr line (differs from verify's). covers (an expect line left out of lines): rule covers, reason main's, hint = the lines line. With hintOf mutated to give no lines, builder tests go red.",
+      "mutation": "packages/engine/src/actors.js hintOf: `.map(([k, s]) => `${k}: ${s.description}`)` replaced by `.map(() => null).filter(Boolean)` (empty hint)",
+      "red_test": "packages/engine/test/refusals.test.js 'hint: each field the reason names gets its Output line once; the reason is unchanged', 'hint: a build result with a prose url gets the build stage's pr line', 'restated: names every differing key...'; plugins/harness/test/actors.test.mjs 'the hooks start, bind, confine and check an actor...'; verify hint.test.mjs"
+    },
+    {
+      "id": "restated",
+      "status": "MET",
+      "command": "node --test verify/fix-refusal-hints/restated.test.mjs (one verifying item, tampered issue returned repeatedly, then the exact echo)",
+      "excerpt": "expect[1] changed: rule restated, reason names `result.issue.expect[1] is \"clamp throws a TypeError when lo > hi\", the input's issue.expect[1] is \"clamp throws a RangeError when lo > hi\"` and no other index; issue hint included. Added labels: `result.issue.labels is not in the input's issue`. url and a line changed: both result.issue.url and result.issue.expect[1] named. A 500-char line is shown as 200 chars + an ellipsis. Then the exact echo is accepted (5 refusals, under the cap)."
+    },
+    {
+      "id": "cap",
+      "status": "MET",
+      "command": "node --test verify/fix-refusal-hints/cap.test.mjs; mutation of the cap check to never fail",
+      "excerpt": "Short pr.at returned 9 times: refused schema with fix.count 1..9, cap 10, no failed, item stays verifying after each drive; between each, a wrong-caller (caller 'intruder') and an unknown-run refusal, neither with fix nor counted (9 wrong-caller rows journalled). 10th: count 10, failed = the run; refusalText ends 'Refusal 10 of 10.' and says the run has failed and not to call the return tool again. One refusal-cap row (outcome failed); counted rows carry count 1..10, cap 10, one hint line each. failed.json why starts 'refused 10 times' and lists all 10 'schema: ...' reasons. 11th return and a then-good result: already-failed, no fix. resultsOf gives xstate.error.actor.verify with that why; offered, the item goes to replanning with context.failure 'refused 10 times...'. Second item: 9 refusals then a good result is accepted, 3 already-returned refusals carry no fix, item reaches awaitingMerge, no refusal-cap row.",
+      "mutation": "packages/engine/src/actors.js accept refuse(): `if (!counted || extra.count < REFUSAL_CAP) return` replaced by `if (true) return` (never fail)",
+      "red_test": "packages/engine/test/refusals.test.js 'cap: the refusal that reaches the cap fails the run, and the item takes the invoke's error'; verify cap.test.mjs"
+    },
+    {
+      "id": "unchanged",
+      "status": "MET",
+      "command": "node --test verify/fix-refusal-hints/unchanged.test.mjs (prompts.mjs: every stage of every workflow in workflows/ rendered by each checkout's own engine with the same made-up inputs, sha256, plus loadWorkflow ids; main's in evidence/main-prompts.json from bbcdadc); npm test at 2b0df32 and at main bbcdadc; git diff origin/main...HEAD -- '*test*'",
+      "excerpt": "All 10 stages of feature, intake, quick-fix and research render byte for byte main's; the four workflow hashes equal main's (quick-fix@cb8645f4...). The PR touches no file under workflows/, stages.js or prompts.js. npm test at 2b0df32: 1458 tests, 1446 pass, 1 fail: test/setup.test.mjs copy-not-link, which also fails on main in this container (local release tags) and is not under packages/, plugins/ or verify/; ci's test job is green at the head. At the first head 9c83692 (cap 8) verify/wf-intake/independent.test.mjs went red (8 refusals then an accept); at 2b0df32 (cap 10) it passes. The only changed assertion in an existing test is plugins/harness/test/actors.test.mjs: the exact `schema: brief result: result.verifier is missing` became a match of that same reason followed by the hint lines and 'Refusal 1 of 10.'; packages/engine/test/refusals.test.js is new."
+    },
+    {
+      "id": "real-agent",
+      "status": "MET",
+      "command": "HOME=<fresh> CCP_HARNESS_DIR=<dir with install.json> CCP_GITHUB_API=<evidence/real-agent/gh.mjs> claude -p (2.1.318) --plugin-dir plugins/harness --allowedTools Agent,ToolSearch,mcp__plugin_ccp-harness_harness__return,Read; items ra3/ra4 started by bin/host.js start quick-fix, brief accepted by evidence/real-agent/brief.mjs with the builder task; node --test verify/fix-refusal-hints/real-agent.test.mjs over the committed transcripts and journals",
+      "excerpt": "Only the PR's ccp-harness (inline) loaded. ra3: the real build agent returned pr.at '0743afc', got the deny 'schema: build result: result.pr.at is shorter than 40 / How to fix it, from your Output: / - pr: <build.md pr line> / Refusal 1 of 10.', returned the full 40-char sha, and the hook accepted it (result.stored row; item moved on to verifying). ra4: the agent returned the same bad result 10 times, denies 'Refusal 1 of 10.' .. 'Refusal 10 of 10.' and then 'Run ra4:1.build has failed after 10 refusals: do not call the return tool again; end your turn.'; journal has 10 schema refusals and a refusal-cap row, failed.json why 'refused 10 times: ...', and the item applied xstate.error.actor.build through building's onError (host.js show: state replanning). Advisory, not this item's: after the hook accepted ra3's return, the return-tool server answered 'not accepted: no harness check passed this result', because result.json's hash is of the stamped result (key, branch, checkout, green added) while return-tool.mjs hashes what the agent sent; this is the same on main (neither file's hashing changed here), so any accepted PR-ref return gets that misleading answer and the agent retries into already-returned."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 123; git rev-parse origin/build/fix-refusal-hints",
+      "excerpt": "Check run 'test' (ci.yml, id 127193449096) completed success at head 2b0df321bd3ae4665a33c48cb4e1e3a634796be7; clean-room success. 'gates' failed only because no verdict existed yet. At the first head 9c83692 'test' had failed (wf-intake independent test at cap 8), fixed by replan #124."
+    }
+  ]
+}
