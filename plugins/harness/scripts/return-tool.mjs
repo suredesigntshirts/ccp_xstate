@@ -3,7 +3,10 @@
 // actor hands back its result with it: { run, result }. The checks are not here. The PreToolUse hook (actors.mjs)
 // runs them before the call reaches this server, refuses a call that fails one, and stores the result of one that
 // passes. So this server only answers whether that happened: it says accepted when the run's stored result is this
-// result, and refuses anything else, such as a call made while the hook was not running.
+// result, and refuses anything else, such as a call made while the hook was not running. The host stamps PR refs
+// before storing (key, branch, checkout, gates, green), so the match is against `sent`, the hash of the result as the
+// agent sent it; only a result.json stored before sent existed is matched by `hash`, the stamped result's
+// (fix-return-tool-answer).
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -24,6 +27,9 @@ const TOOL = {
 };
 
 const sha256 = (text) => createHash('sha256').update(text).digest('hex');
+// As the engine's sentHash (packages/engine/src/actors.js): object keys sorted at every depth.
+const sorted = (v) => (Array.isArray(v) ? v.map(sorted) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sorted(v[k])])) : v);
+const sentHash = (result) => sha256(JSON.stringify(sorted(result ?? null)));
 const safe = (s) => String(s).replace(/[^A-Za-z0-9._-]/g, '_');
 
 // Whether the hook stored exactly this result for this run.
@@ -35,7 +41,8 @@ function answer({ run, result } = {}) {
       stored = JSON.parse(readFileSync(join(journalDir(), 'items', safe(m[1]), 'runs', safe(m[2]), 'result.json'), 'utf8'));
     } catch {}
   }
-  if (stored && stored.hash === sha256(JSON.stringify(result))) {
+  const same = stored && (typeof stored.sent === 'string' ? stored.sent === sentHash(result) : stored.hash === sha256(JSON.stringify(result)));
+  if (same) {
     return { content: [{ type: 'text', text: `accepted: run ${run}'s result is stored (${stored.hash.slice(0, 12)}). You are done.` }] };
   }
   return { isError: true, content: [{ type: 'text', text: `not accepted: no harness check passed this result for run ${run}. The harness hook checks every return; without it nothing is accepted.` }] };

@@ -105,4 +105,6 @@ session, at most twice per run, while a run of an item that session owns waits f
 (plan item fix-waiting-run-stall); the logic is `packages/engine/src/actors.js`
 (`packages/engine/README.md`, "Actors"). `.mcp.json` registers one MCP server, `harness`
 (`scripts/return-tool.mjs`), with one tool, `return`. The hook checks every call before it reaches the server; the
-server only answers whether the hook stored that result, so a return with the hook absent is never accepted.
+server only answers whether the hook stored that result, so a return with the hook absent is never accepted. It
+matches the call by result.json's `sent`, the hash of the result as the agent sent it, because the stored result has
+the host's stamps on its PR refs (fix-return-tool-answer).
