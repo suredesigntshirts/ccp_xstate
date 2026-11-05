@@ -1,0 +1,33 @@
+{
+  "item": "fix-grant-null-repo",
+  "verified_sha": "880612654976bf729b4dd5d362363af21893fa0b",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5JHer8pjQ1QEofMrJv",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "null-repo-refused",
+      "status": "MET",
+      "command": "npm ci; node --test verify/fix-grant-null-repo/nullrepo.test.mjs (world from verify/fix-blocked-card-grant/lib.mjs: real restore/offer/pump and handlers, the CLI's relay as the thread, stub agents, stub GitHub; quick-fix driven to blocked, card put up with `bin/host.js card`, answered with `bin/host.js answer --grants <file>` as a separate process). The same file in a worktree of main 8fd2875: the 4 null-repo-refused tests red there (exit 0, the answer taken)",
+      "excerpt": "Issue urls https://gitlab.com/o/r/issues/7, https://github.com/o/r/pull/7 and 'o/r#7'; grants { id vg, workflow quick-fix, ask ask, choices [retry, replan, drop] } with repos [null] and with repos [null, \"o/r\"]; choices retry, replan (with --why) and drop: every answer exit 2, stderr 'refused ... vg: repo (none) not granted (the card has no pr, and the item's issue is not a GitHub issue URL)'; item file byte-identical, state blocked, context unchanged, no standin row. Two null-listing grants g1, g2 in one file: exit 2, both named.",
+      "mutation": "main's standin.js (repos.includes(repo) with repo null), via the main worktree",
+      "red_test": "all 4 null-repo-refused tests red on main: 'repos [null] retry: exit 2' failed with exit 0"
+    },
+    {
+      "id": "named-repos-unchanged",
+      "status": "MET",
+      "command": "node --test verify/fix-grant-null-repo/nullrepo.test.mjs named-repos-unchanged tests at head and main; npm test at head 8806126 (with verify/fix-grant-null-repo/) and at main 8fd2875 (without), run one after the other; passing test names compared with comm",
+      "excerpt": "Grant repos [null, \"o/r\"]: blocked card of issue https://github.com/o/r/issues/12, retry -> exit 0, state building, failure 'build blocked: <reason>', one applied standin row output { choice: retry, by: standin-session, grant: vg }. Merge card of PR https://github.com/o/r/pull/1 (issue on gitlab) approve -> exit 0, state done, stub merged o/r#1 once. Both pass on main too. npm test head: 1582 tests, 1568 pass, 12 skipped, 2 fail; main: 1575, 1562 pass, 12 skipped, 1 fail. copy-not-link fails on both (this container's clone). The only test passing on main and not on head is verify/obs-live-capture's timing test 'cheap' (53 ms vs a 50 ms bound under load); rerun alone at head it passes (8/8). Head adds 7 passing tests (6 here, 1 builder's)."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 147 at 8806126",
+      "excerpt": "Check run 'test' (id 127384101653) completed success at 8806126. 'gates' (127384102428) failed only because no verdict existed yet at that sha."
+    }
+  ],
+  "notes": [
+    "Test hygiene, not an Expect line: packages/engine/test/standin.test.js runs bin/host.js with no --repo and no cwd, so its build runs add worktrees and run/it-1/* branches to whatever repo the test's cwd is in, under /tmp/ccp-actors. Running npm test in a checkout and a git worktree of it at the same time left run/it-1/3.build behind and made 'bin/host.js answer on the blocked card' red (state replanning) in the other; after removing those worktrees and branches it passed 10/10 three times."
+  ]
+}
