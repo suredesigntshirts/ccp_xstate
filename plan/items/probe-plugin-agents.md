@@ -42,8 +42,8 @@
   "expect": [
     {
       "id": "listed",
-      "check": "In a fresh cloud thread on the release that ships the agent, the Agent tool lists ccp-harness:probe-reader, and a call with that subagent_type starts it",
-      "how": "The thread's transcript and the subagent's meta.json",
+      "check": "In a cloud container, with the plugin installed by infra/cloud-environment/setup.sh from the commit that ships the agent and a claude -p session started with no --plugin-dir (so it loads ccp-harness@skills-dir at session start, as a thread does), the Agent tool lists ccp-harness:probe-reader, and a call with that subagent_type starts it. A Projects thread on a release is follow-up item probe-plugin-agents-thread, because new threads resume a cached 0.1.17 container",
+      "how": "The session's init line and the subagent's meta.json",
       "proof": "world"
     },
     {
