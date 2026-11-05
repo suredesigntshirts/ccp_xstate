@@ -94,9 +94,13 @@ calls, cut down).
 
 The intake workflow (`workflows/intake.json`, plan item wf-intake) turns a request into a frozen issue before any
 build: shape writes it, challenge tries to break it, shape revises at most twice, and the frozen issue starts a
-quick-fix child item. A stage invoked in the initial state (brief, shape) is started through the real host from
-the case's item input; any other (challenge) is prepared from the case's stage input. Use `--stage <stage>` with
-every command below; the workflow comes from the rubric.
+quick-fix child item. Every stage runs through the real host from the item's start, so each run folder replays
+in the Workflow Inspector. A later stage (challenge) is reached by giving each earlier stage its output from the
+case: `before.<stage>` when the case has it, else the earlier stage's output fields taken by name from the case
+input (challenge's `issue` is shape's output), held to that stage's schema (`earlierOutput` in
+`scripts/bench/lib.mjs`). The challenge folders under `runs/baseline`, `runs/first-cases` and
+`runs/variant-good-faith` were written before this and do not replay; `runs/hosted` does. Use `--stage <stage>`
+with every command below; the workflow comes from the rubric.
 
 ## Commands
 

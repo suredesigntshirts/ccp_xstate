@@ -14,6 +14,7 @@ import { accept, actors, bind, loadRun, prepare, runDir, spawn } from '../../pac
 import { handlers } from '../../packages/engine/src/effects/index.js';
 import { loadWorkflow, readWorkflow } from '../../packages/engine/src/index.js';
 import { chart, isStage } from '../../packages/engine/src/stages.js';
+import { check } from '../../packages/engine/src/schema.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(HERE, '../..');
@@ -112,6 +113,23 @@ export function stageInput(spec, actor, given = {}) {
   ]));
 }
 
+/**
+ * What an earlier stage returns, for a case of a later stage: the case's `before.<actor>` when it gives one, else the
+ * stage's output fields taken by name from the case input (challenge's case holds `issue`, which is shape's output).
+ * Held to the stage's schema as accept() holds a model's result, so a case cannot feed the chart what no stage could.
+ */
+export function earlierOutput(spec, actor, caseInput = {}) {
+  const schema = spec.meta.actors[actor];
+  let output = caseInput.before?.[actor];
+  if (output === undefined) {
+    const names = [schema, ...(schema.oneOf ?? []), ...(schema.anyOf ?? [])].flatMap((s) => Object.keys(s.properties ?? {}));
+    output = Object.fromEntries([...new Set(names)].filter((n) => Object.hasOwn(caseInput, n)).map((n) => [n, caseInput[n]]));
+  }
+  const problems = check(schema, output, spec.meta.schemas ?? {});
+  if (problems.length) throw new Error(`the case gives ${actor} an output its schema refuses: ${problems.join('; ')}`);
+  return output;
+}
+
 // ---- Cases
 
 /** The cases of a stage's bench: bench/<stage>/cases/<id>/case.json, in name order. */
@@ -170,13 +188,22 @@ export function caseRepo(c, work) {
 export async function prepareRun({ spec, actor, item, root, repo, worktrees, caseInput = {}, input = null }) {
   mkdirSync(root, { recursive: true });
   let runId;
-  if (input == null && atStart(spec, actor)) {
-    const host = restore({ root, item, spec, session: SESSION, release: RELEASE });
-    const hs = handlers({ github: null, actors: actors({ host, repo, worktrees }) });
-    await offer(host, [{ event: { type: 'xstate.init', input: caseInput }, source: { system: 'bench', ref: `start ${item}` } }], hs);
-    const open = [...host.runs.values()].filter((e) => e.actor === actor);
-    if (open.length !== 1) throw new Error(`${item}: starting the item opened ${open.length} ${actor} runs`);
-    runId = open[0].id;
+  if (input == null) {
+    // Every stage runs through the real host from the item's start, so its run folder replays (the Inspector shows it).
+    // A stage after the first is reached by giving each earlier stage its output from the case (earlierOutput).
+    let host = restore({ root, item, spec, session: SESSION, release: RELEASE });
+    const hs = () => handlers({ github: null, actors: actors({ host, repo, worktrees }) });
+    await offer(host, [{ event: { type: 'xstate.init', input: caseInput }, source: { system: 'bench', ref: `start ${item}` } }], hs());
+    for (let step = 0; ; step++) {
+      const open = [...host.runs.values()];
+      const mine = open.filter((e) => e.actor === actor);
+      if (mine.length === 1) { runId = mine[0].id; break; }
+      const before = open.find((e) => isStage(spec.meta.actors[e.actor]));
+      if (mine.length > 1 || !before || step >= 10) throw new Error(`${item}: the item reached ${JSON.stringify(host.snapshot.value)} with ${mine.length} ${actor} runs open and no earlier stage to give an output to`);
+      const output = earlierOutput(spec, before.actor, caseInput);
+      await offer(host, [{ event: { type: `xstate.done.actor.${before.invoke}`, output }, run: before.id, source: { system: 'bench', ref: `case output for ${before.actor}` } }], hs());
+      host = restore({ root, item, spec, session: SESSION, release: RELEASE });
+    }
   } else {
     const inv = invokeOf(spec, actor);
     runId = `${item}:0.${inv.id}`;

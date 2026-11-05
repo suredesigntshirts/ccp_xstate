@@ -118,6 +118,8 @@ Decisions made while building, as the person's stand-in:
   It loses one grounded run, on a seed-repo commit hash the judge cannot see. The kept challenge variant (good-faith
   wrong builds) is better on verdict-right, passes-sound, evidence-grounded and catches-traps, and holds every
   planted hole. It loses two avoids-must-not runs, each a sound line failed for a test its words do not ask for. Both
-  trades are accepted here. The procedure allows a worse criterion only with a written acceptance. Both blind reads
-  preferred the variant. Next to target: challenge's over-strict lines (avoids-must-not), and fixed committer dates
+  trades are accepted here. The procedure allows a worse criterion only with a written acceptance. The blind reads
+  lean to the variants only narrowly, case by case (X and Y are shuffled per case, so an overall "X" names no
+  version): shape 3 cases to 3 with 1 even, challenge 3 to 2 with 2 even. They are no reason to keep a variant; the
+  scores are. Next to target: challenge's over-strict lines (avoids-must-not), and fixed committer dates
   for seed repos so their hashes are stable.
