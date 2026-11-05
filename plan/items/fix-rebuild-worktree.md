@@ -50,7 +50,7 @@
     },
     {
       "ref": "packages/engine/src/stages.js STAMPED",
-      "what": "branch added, so an agent may not set it and is not shown it"
+      "what": "branch added, so an agent may not set it; it stays shown in prompts, while key, gates, green and checkout stay hidden"
     },
     {
       "ref": "packages/engine/src/actors.js prepare",
@@ -58,7 +58,7 @@
     },
     {
       "ref": "workflows/quick-fix.json build",
-      "what": "The rule and the previous input say the worktree is already on the PR's branch at its head when previous is set; pr's description lists branch among the fields the agent never sets"
+      "what": "Unchanged: its rule already agrees once the worktree is on the PR's branch, and the trial-fail-path verifier pins its hash (decision 6)"
     },
     {
       "ref": "packages/engine/test/actors.test.js",
@@ -78,7 +78,7 @@
     },
     {
       "id": "branch-stamped",
-      "check": "accept stamps pr.branch from GitHub's head.ref when head.repo.full_name is the PR's repository and leaves it unset for a fork PR; a build result that sets pr.branch itself is refused with rule reserved; the build prompt's previous input does not show branch",
+      "check": "accept stamps pr.branch from GitHub's head.ref when head.repo.full_name is the PR's repository and leaves it unset for a fork PR; a build result that sets pr.branch itself is refused with rule reserved; unlike key, gates, green and checkout, branch is shown in prompts (the rebuild's previous input names it), so earlier stage records and their checkers stay true",
       "how": "The verifier's own test",
       "proof": "verifier"
     },
