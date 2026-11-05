@@ -1,0 +1,56 @@
+diff --git a/README.md b/README.md
+index e9133b6..a19590a 100644
+--- a/README.md
++++ b/README.md
+@@ -29,6 +29,14 @@ Returns the product of `a` and `b`.
+ multiply(-2, 3); // -6
+ ```
+ 
++### percent(part, whole)
++
++Returns `part` as a percentage of `whole`, rounded to two decimal places.
++
++```js
++percent(1, 3); // 33.33
++```
++
+ ## Tests
+ 
+ Run the tests with `npm test`.
+diff --git a/math.js b/math.js
+index 586dfcb..9e81d58 100644
+--- a/math.js
++++ b/math.js
+@@ -15,4 +15,9 @@ function multiply(a, b) {
+   return a * b;
+ }
+ 
+-module.exports = { add, subtract, multiply };
++/** Share of part in whole, as a percentage rounded to two decimal places. */
++function percent(part, whole) {
++  return Math.round((part / whole) * 100 * 100) / 100;
++}
++
++module.exports = { add, subtract, multiply, percent };
+diff --git a/test/math.test.js b/test/math.test.js
+index ad6a3c3..0877263 100644
+--- a/test/math.test.js
++++ b/test/math.test.js
+@@ -1,7 +1,7 @@
+ 'use strict';
+ const test = require('node:test');
+ const assert = require('node:assert/strict');
+-const { add, subtract, multiply } = require('../math.js');
++const { add, subtract, multiply, percent } = require('../math.js');
+ 
+ test('add sums two numbers', () => {
+   assert.equal(add(2, 3), 5);
+@@ -16,3 +16,8 @@ test('multiply returns the product', () => {
+   assert.equal(multiply(2, 3), 6);
+   assert.equal(multiply(-2, 3), -6);
+ });
++
++test('percent rounds to two decimal places', () => {
++  assert.equal(percent(1, 3), 33.33);
++  assert.equal(percent(50, 200), 25);
++});

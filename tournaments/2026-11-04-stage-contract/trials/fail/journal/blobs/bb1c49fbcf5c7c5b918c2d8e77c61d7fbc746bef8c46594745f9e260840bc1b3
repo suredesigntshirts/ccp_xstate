@@ -1,0 +1,14 @@
+Make one pull request in the mathlib repository (files at the repository root: math.js, README.md, package.json, test/math.test.js) that meets each of these expect lines:
+1. math.js exports percent(part, whole), which returns part / whole * 100 rounded to two decimal places
+2. percent(part, whole) throws a RangeError when whole is 0
+3. README.md has a ### percent(part, whole) entry in its API section
+4. npm test passes
+
+Steps:
+1. Read math.js, README.md, package.json and test/math.test.js. The tests run with `npm test` (`node --test`) using node:test and node:assert/strict.
+2. In math.js, add a function `percent(part, whole)` in the same style as add, subtract and multiply (a one-line doc comment above it). If `whole === 0`, throw a `RangeError` with a short message (for example 'percent: whole must not be 0'). Otherwise compute `part / whole * 100` and round it to two decimal places, for example `Math.round(part / whole * 100 * 100) / 100`. Add `percent` to the `module.exports` object alongside add, subtract and multiply, keeping the existing exports.
+3. In README.md, inside the `## API` section (after `### multiply(a, b)` and before `## Tests`), add an entry whose heading line is exactly `### percent(part, whole)`. Below it, one sentence saying it returns `part` as a percentage of `whole`, rounded to two decimal places, and that it throws a `RangeError` when `whole` is 0; then a short js example such as `percent(1, 3); // 33.33` and `percent(1, 4); // 25`.
+4. In test/math.test.js, import `percent` too and add tests: percent(1, 4) is 25; percent(1, 3) is 33.33; percent(2, 3) is 66.67; percent(50, 200) is 25; percent(0, 5) is 0; and `assert.throws(() => percent(5, 0), RangeError)` plus `assert.throws(() => percent(0, 0), RangeError)`.
+5. Run `npm test` and make sure it exits 0 with every test passing, including the existing ones. Also run `node -e "const m=require('./math.js'); console.log(m.percent(1,3), m.percent(2,3))"` and confirm it prints `33.33 66.67`.
+6. Keep the change to math.js, README.md and test/math.test.js; do not add dependencies or change package.json.
+7. Open the pull request with a title naming percent(), and a body that lists the four expect lines and links https://github.com/o/r/issues/31.

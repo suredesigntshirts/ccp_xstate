@@ -1,0 +1,211 @@
+{
+  "run": "trial:4.build",
+  "item": "trial",
+  "name": "4.build",
+  "invoke": "build",
+  "actor": "build",
+  "workflow": "quick-fix@39430bff16ef92ce75ad733ddc774fa43cee17461876897dad3067583191fafb",
+  "root": "/home/user/ccp_xstate/tournaments/2026-11-04-stage-contract/trials/fail/journal",
+  "session": "owner",
+  "release": "0.2.0",
+  "state": "\"building\"",
+  "input": {
+    "issue": {
+      "url": "https://github.com/o/r/issues/31",
+      "title": "percent() for mathlib, so the invoice summary stops showing Infinity%",
+      "body": "The invoice summary shows each line's share of the total as a percentage. When a draft invoice has a total of 0 it prints Infinity% or NaN%. We'd like a percent(part, whole) in mathlib that gives the share rounded to two decimal places, and refuses a whole of 0 with a RangeError so the summary can catch it and print a dash.\n\nPlease add it to the README's API section too.\n\nExpect:\n- math.js exports percent(part, whole), which returns part / whole * 100 rounded to two decimal places\n- percent(part, whole) throws a RangeError when whole is 0\n- README.md has a ### percent(part, whole) entry in its API section\n- npm test passes",
+      "expect": [
+        "math.js exports percent(part, whole), which returns part / whole * 100 rounded to two decimal places",
+        "percent(part, whole) throws a RangeError when whole is 0",
+        "README.md has a ### percent(part, whole) entry in its API section",
+        "npm test passes"
+      ]
+    },
+    "task": "Make one pull request in the mathlib repository (files at the repository root: math.js, README.md, package.json, test/math.test.js) that meets each of these expect lines:\n1. math.js exports percent(part, whole), which returns part / whole * 100 rounded to two decimal places\n2. percent(part, whole) throws a RangeError when whole is 0\n3. README.md has a ### percent(part, whole) entry in its API section\n4. npm test passes\n\nSteps:\n1. Read math.js, README.md, package.json and test/math.test.js. The tests run with `npm test` (`node --test`) using node:test and node:assert/strict.\n2. In math.js, add a function `percent(part, whole)` in the same style as add, subtract and multiply (a one-line doc comment above it). If `whole === 0`, throw a `RangeError` with a short message (for example 'percent: whole must not be 0'). Otherwise compute `part / whole * 100` and round it to two decimal places, for example `Math.round(part / whole * 100 * 100) / 100`. Add `percent` to the `module.exports` object alongside add, subtract and multiply, keeping the existing exports.\n3. In README.md, inside the `## API` section (after `### multiply(a, b)` and before `## Tests`), add an entry whose heading line is exactly `### percent(part, whole)`. Below it, one sentence saying it returns `part` as a percentage of `whole`, rounded to two decimal places, and that it throws a `RangeError` when `whole` is 0; then a short js example such as `percent(1, 3); // 33.33` and `percent(1, 4); // 25`.\n4. In test/math.test.js, import `percent` too and add tests: percent(1, 4) is 25; percent(1, 3) is 33.33; percent(2, 3) is 66.67; percent(50, 200) is 25; percent(0, 5) is 0; and `assert.throws(() => percent(5, 0), RangeError)` plus `assert.throws(() => percent(0, 0), RangeError)`.\n5. Run `npm test` and make sure it exits 0 with every test passing, including the existing ones. Also run `node -e \"const m=require('./math.js'); console.log(m.percent(1,3), m.percent(2,3))\"` and confirm it prints `33.33 66.67`.\n6. Keep the change to math.js, README.md and test/math.test.js; do not add dependencies or change package.json.\n7. Open the pull request with a title naming percent(), and a body that lists the four expect lines and links https://github.com/o/r/issues/31.",
+    "base": null,
+    "branch": null,
+    "previous": {
+      "url": "https://github.com/o/r/pull/1",
+      "at": "8b25414f65c91c4ee83398a177633c571e0daa6e",
+      "key": "o/r#1",
+      "checkout": "git fetch origin pull/1/head && git checkout --detach 8b25414f65c91c4ee83398a177633c571e0daa6e",
+      "green": true
+    },
+    "verdict": {
+      "result": "FAIL",
+      "pr": {
+        "url": "https://github.com/o/r/pull/1",
+        "at": "8b25414f65c91c4ee83398a177633c571e0daa6e",
+        "key": "o/r#1",
+        "checkout": "git fetch origin pull/1/head && git checkout --detach 8b25414f65c91c4ee83398a177633c571e0daa6e",
+        "green": true
+      },
+      "issue": {
+        "url": "https://github.com/o/r/issues/31",
+        "expect": [
+          "math.js exports percent(part, whole), which returns part / whole * 100 rounded to two decimal places",
+          "percent(part, whole) throws a RangeError when whole is 0",
+          "README.md has a ### percent(part, whole) entry in its API section",
+          "npm test passes"
+        ]
+      },
+      "lines": [
+        {
+          "line": "math.js exports percent(part, whole), which returns part / whole * 100 rounded to two decimal places",
+          "result": "PASS",
+          "evidence": "At HEAD 8b25414f65c91c4ee83398a177633c571e0daa6e I ran Check 1's node command. math.js exports percent. All 9 cases printed ok: (1,4)->25, (1,3)->33.33, (2,3)->66.67, (50,200)->25, (1,7)->14.29, (0,5)->0, (-1,3)->-33.33, (3,2)->150, (7,9)->77.78. Exit 0. The implementation is Math.round((part/whole)*100*100)/100."
+        },
+        {
+          "line": "percent(part, whole) throws a RangeError when whole is 0",
+          "result": "FAIL",
+          "evidence": "I ran Check 2's node command. percent(5,0) returned Infinity, percent(0,0) returned NaN and percent(-3,0) returned -Infinity. None of them threw. Exit 1. math.js has no check for whole === 0, so the issue's Infinity%/NaN% bug remains."
+        },
+        {
+          "line": "README.md has a ### percent(part, whole) entry in its API section",
+          "result": "PASS",
+          "evidence": "I ran Check 3's node command. It printed 'found at line 32' and exited 0, so the heading is inside the ## API section, before ## Tests. Advisory: the entry describes the two-decimal rounding and has the example percent(1, 3); // 33.33. It does not mention the RangeError."
+        },
+        {
+          "line": "npm test passes",
+          "result": "PASS",
+          "evidence": "I ran npm test. It exited 0 with tests 4, pass 4, fail 0. Advisory: test/math.test.js gained one test, 'percent rounds to two decimal places' (percent(1,3) and percent(50,200)). It would fail if percent were removed. It has no test for the RangeError on whole 0. The commit changes only README.md, math.js and test/math.test.js, with no new dependency. No local changes were made; the worktree is clean."
+        }
+      ]
+    },
+    "failure": null
+  },
+  "schema": {
+    "rules": [
+      "You are the builder. Your job is one pull request that meets every line of issue.expect, and it ends when that PR is pushed and returned. A separate verifier then tests each expect line at the commit you return.",
+      "Open exactly one pull request, from branch (your worktree's branch when branch is null) against base (the default branch when base is null), on the repository your run line names (Run <run>, worktree <path> of <repository>, branch <branch>); when previous is set, push to that PR instead of opening one. Use no other branch name.",
+      "Open the PR with the GitHub tools you have: the gh CLI or the GitHub MCP tools, giving it a title and a body that say how each expect line is met. GitHub's answer gives its url, https://github.com/<owner>/<repo>/pull/<number>.",
+      "Do not merge, push to base, or change files under .github/ unless an expect line asks for it; a PR that changes CI needs the person's approval before it can merge.",
+      "Push before you return, and do not push again after: the commit you return is the one verified.",
+      "Return as soon as the PR is pushed; you do not wait for CI, the harness watches it. If the tool refuses a reference, fix that reference and return again.",
+      "If you cannot push or open the PR (no GitHub tools, access refused, or your run line names no github.com repository), return blocked with what stopped you instead of pr. Never put anything but the PR's url in pr."
+    ],
+    "inputs": {
+      "task": "The brief agent's steps for this build. It fills the Task part.",
+      "issue": "The issue: url, and expect, the acceptance lines your PR must meet. Build against these lines, never against the issue's current text on GitHub.",
+      "base": "The branch your PR targets. null means the repository's default branch.",
+      "branch": "The branch your PR comes from. null means your worktree's branch, named in your run line.",
+      "previous": "The PR an earlier build of this attempt opened, as { url, at }. null on a first build. When set, push your fixes to that PR's branch and do not open a new PR.",
+      "verdict": "The verifier's result on the previous build: result, and lines with the evidence for each expect line. null unless the last verify failed. When set, fix every line marked FAIL.",
+      "failure": "What stopped the previous build: a red CI check as { check, conclusion, sha, url }, or an error text. null unless something did. When set, fix its cause first."
+    },
+    "type": "object",
+    "oneOf": [
+      {
+        "required": [
+          "pr"
+        ]
+      },
+      {
+        "required": [
+          "blocked"
+        ]
+      }
+    ],
+    "properties": {
+      "pr": {
+        "$ref": "#prRef",
+        "description": "Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees."
+      },
+      "blocked": {
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "description": "Instead of pr, only when you could not push or open the PR: { reason: what stopped you }. The item then stops for the person to replan; it is not retried."
+      },
+      "notes": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Optional, beside pr: a caveat the person should read before approving the merge, such as something you could not set on the PR. It goes on the merge card; the verifier never sees it. A reason you could not open the PR is blocked, not a note."
+      }
+    }
+  },
+  "defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "prRef": {
+      "type": "object",
+      "required": [
+        "url",
+        "at"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^https://github\\.com/[\\w.-]+/[\\w.-]+/pull/[0-9]+/?$"
+        },
+        "at": {
+          "type": "string",
+          "minLength": 40,
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "required": [
+        "url",
+        "expect"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expect": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "line": {
+      "type": "object",
+      "required": [
+        "line",
+        "result",
+        "evidence"
+      ],
+      "properties": {
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "repo": "/home/user/trial-fail/world/repo",
+  "github": "o/r",
+  "worktrees": "/home/user/trial-fail/world/wt",
+  "worktree": "/home/user/trial-fail/world/wt/trial--4.build",
+  "branch": "run/trial/4.build",
+  "briefHash": "6d8d6d0bd4f240c77822e9ff4d98781fac0862814ab0de6aa6366dfaaba36370",
+  "context": "Run trial:4.build, worktree /home/user/trial-fail/world/wt/trial--4.build of https://github.com/o/r, branch run/trial/4.build."
+}

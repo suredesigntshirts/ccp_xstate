@@ -1,0 +1,43 @@
+{
+  "item": "trial-fail-path",
+  "verified_sha": "d05e687125c217186193df38d4e4435e95463d02",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5FMqJ38e7uGSL1qetK", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "fail-loop",
+      "status": "MET",
+      "command": "npm ci; TMPDIR=<scratch> node --test verify/trial-fail-path/trials.test.mjs (tests 1 and 2: engine restore() of fail/journal on workflows/quick-fix.json, then the applied rows, runs/*/result.json, runs/4.build/stage.json and brief.md, run/driver-log.jsonl and run/gh-state.json); mutation check: 3.verify result.json FAIL->PASS turns tests 2 and 4 red",
+      "excerpt": "restore() replays all 10 applied transitions with matching hashes, every row pins quick-fix@39430bff… = sha256 of workflows/quick-fix.json at this head (unchanged from main). States: briefing > building > checking > verifying > building > checking > verifying > awaitingMerge > merging > done. Build 1 = driver-log 'inject' row for trial:1.build, PR #1 at 8b25414 (the only inject row). trial#4 takes verify FAIL at 8b25414, the one FAIL line being 'percent(part, whole) throws a RangeError when whole is 0', deep-equal to runs/3.verify/result.json. runs/4.build/stage.json: input verdict from context.verdict, producer trial:3.verify / trial#4, value deep-equal to that FAIL result; input previous from trial:1.build = PR #1 at 8b25414; brief.md shows both under ## Inputs. (context.md holds only the run line, as the stage contract puts it, so the verdict is in stage.json and brief.md, not in context.md.) Build 2 returns PR #1 at 06d7cc8; trial#7 verify PASS at 06d7cc8, key o/r#1, 4/4 PASS; 6.verify's target input is 06d7cc8. trial#8 ask output choice approve; trial:8.merge effect head 06d7cc8; gh-state: one PR (#1), merged, head 06d7cc8, merges [{number 1, sha 06d7cc8}], both pushes to run/trial/1.build, both suites success. Item done."
+    },
+    {
+      "id": "blocked-route",
+      "status": "MET",
+      "command": "node --test verify/trial-fail-path/trials.test.mjs (test 3: restore() of blocked/journal, runs/1.build/result.json, the trial#2 event, snapshot.context.failure, quick-fix replanning.invoke.input, driver-log item.asks, run/refused-pushes.jsonl, run/builder-push.txt, run/gh-state.json)",
+      "excerpt": "States briefing > building > replanning; restored snapshot value 'replanning'. 1.build's accepted result is exactly { blocked: { reason } }, reason starting 'The push was refused, so no PR could be opened' and quoting 'refusing to allow an OAuth App to create or update workflow `.github/workflows/test.yml` without `workflow` scope' and commit c7908f4. trial#2 is xstate.error.actor.build with error 'build blocked: ' + reason; context.failure equals it; replanning's ask input wires failure: context.failure, and the one item.asks row (state replanning, cmsg_card1) has that failure and verdict null. run/refused-pushes.jsonl: one row, sha c7908f4, file .github/workflows/test.yml; builder-push.txt (copied from the agent's transcript) shows 'remote: <that same message>' and '! [remote rejected] run/trial/1.build -> run/trial/1.build (pre-receive hook declined)' and the same sha. gh-state empty: no push landed, no PR."
+    },
+    {
+      "id": "real-agents",
+      "status": "MET",
+      "command": "node --test verify/trial-fail-path/trials.test.mjs (test 4: LCS line diff of every run/pending/*.prompt.md against brief.md + context.md, answers vs accepted results; test 5: re-runs fail/driver/drive.mjs init in a mkdtemp copy up to the first hand-off, then git apply run/injected.diff to the driver's seed origin and runs each expect line); read the drivers' answer/inject code",
+      "excerpt": "All 7 pending prompts (fail 0,1,3,4,6; blocked 0,1) = brief.md + '\\n\\n' + context.md: nothing missing, and the only extra line in each is one blank separator line (fail lines 31, 50, 59, 50, 59; blocked lines 31, 41). The one-line trial note is not in the pending files; it was the spawn message, quoted word for word in both reports. Every raw answer in run/answers equals its accepted result minus host-stamped key/checkout/green, no unwrap, one accept per run. The drivers answer a run only from an answer file (answer) or, in fail only, inject, which refuses anything but :1.build; the log has exactly one inject row. Re-run: the first prompt is byte-identical to the committed one (paths aside). Injected diff on the seed: percent exported, 25 33.33 66.67 25 14.29 -33.33 (line 1 met); percent(5,0), (0,0), (-3,0) give Infinity NaN -Infinity with no throw (line 2 missed, which is the line the report names); '### percent(part, whole)' inside ## API (line 3 met); npm test exit 0 (line 4 met). Limits: the agents' transcripts are not in this container, so 'real model' rests on the records: answer text, shim calls from the agents' worktrees (4.build: gh auth status, gh pr view; blocked 1.build: gh auth status), and the blocked builder's commit carrying a Claude-Session trailer. Small defect: injected.diff was saved with its final newline trimmed, so git apply needs one added back."
+    },
+    {
+      "id": "refusals-counted",
+      "status": "MET",
+      "command": "node --test verify/trial-fail-path/trials.test.mjs (test 6: count kind 'refusal' rows by rule in each journal, and accept rows with got.refused plus answer.unparsable in each driver log; parse each report's Rule|Count table; negative control on trials/adopt/journal)",
+      "excerpt": "fail: 0 refusal rows, 0 refused accepts, 0 unparsable, 5 accepts for 5 model runs. blocked: 0, 0, 0, 2 accepts for 2 runs. Both tables list schema, restated, covers, ref, reserved, unknown-run, wrong-caller, already-returned, already-failed, all 0, so the tables match. Negative control: the same counter finds adopt's one 'restated' refusal. Each report answers 'Did the prompts carry the agents without coaching?' with 'Yes.' and has a section per agent run (fail 0.brief, 3.verify, 4.build, 6.verify; blocked 0.brief, 1.build); fail's injected 1.build is marked 'injected' in the run table."
+    },
+    {
+      "id": "stage-record",
+      "status": "MET",
+      "command": "node --test verify/trial-fail-path/trials.test.mjs (test 7: assemble(stage.prompt.parts) from packages/engine/src/stages.js vs brief.md, sha256(brief.md) vs prompt.hash, context.text vs context.md; negative control: one changed byte in brief.md)",
+      "excerpt": "7 of 7 model runs (every brief/build/verify run effect the journals started) have stage.json; for each, assemble(parts) === brief.md byte for byte, prompt.hash = sha256(brief.md), context.text = context.md. The negative control (brief.md 'verdict' -> 'verdicT') is caught."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs, PR 92 (head d05e687)",
+      "excerpt": "Check 'test' (ci.yml) completed success at d05e687 (run 41944756587). 'gates' failed only because no verdict existed yet. This commit adds files under verify/ only."
+    }
+  ]
+}
