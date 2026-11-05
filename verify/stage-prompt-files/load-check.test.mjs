@@ -3,8 +3,7 @@
 // missing file is refused at load with an error naming the file and line. My own malformed files, each in a scratch
 // copy of workflows/, loaded with loadWorkflow (what the host and the bench call).
 //
-// A case the head does not meet is a todo test (it runs and reports, but does not turn npm test red); the verdict
-// marks the Expect NOT MET and names those cases.
+// At 40ae1b6 the missing-Output and wrong-input-name cases failed (verdict 873ca5b); they are plain tests from 4acdb33 on.
 import assert from 'node:assert/strict';
 import { readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -40,14 +39,15 @@ function refused(r, rel, line) {
   else assert.ok(r.message.includes(`workflows/${rel}:${line}:`), `want workflows/${rel}:${line}: in: ${r.message}`);
 }
 
-const NOT_MET = {
-  missingOutput: 'head loads a brief.md with no ## Output section: the output descriptions drop out of the prompt silently',
-  inputName: 'head refuses an Inputs name that is not an input, but the error ("quick-fix@<sha>: stage build invoke build inputs differ") names neither the file nor the line'
-};
 
 test('unknown section: ## Notes in build.md is refused at its line', () => {
   const r = tryLoad('quick-fix/build.md', (t) => t.replace('## Inputs', '## Notes\n\n- a note\n\n## Inputs'));
   refused(r, 'quick-fix/build.md', lineOf(r.text, /^## Notes$/));
+});
+
+test('input name in research researcher that is not its input is refused at its line', () => {
+  const r = tryLoad('research/researcher.md', (t) => t.replace(/^- question:/m, '- query:'), 'research');
+  refused(r, 'research/researcher.md', lineOf(r.text, /^- query:/));
 });
 
 test('unknown section: a ### sub-heading under Rules is refused at its line', () => {
@@ -67,14 +67,22 @@ test('missing section: brief.md without ## Inputs', () => {
 
 test('missing section: brief.md without ## Task, which its invoke wires', () => {
   const r = tryLoad('quick-fix/brief.md', (t) => t.replace(/## Task\n[\s\S]*$/, ''));
-  refused(r, 'quick-fix/brief.md'); // the head names the file; no line (the section is absent)
-  console.log(`missing ## Task: ${r.message}`);
+  refused(r, 'quick-fix/brief.md', r.text.split('\n').length);
 });
 
-test('missing section: brief.md without ## Output', { todo: NOT_MET.missingOutput }, () => {
+test('missing section: brief.md without ## Output', () => {
   const r = tryLoad('quick-fix/brief.md', (t) => t.replace(/## Output\n[\s\S]*?(?=## Task)/, ''));
-  console.log(`missing ## Output: ${r.loaded ? 'LOADED' : r.message}`);
-  refused(r, 'quick-fix/brief.md');
+  refused(r, 'quick-fix/brief.md', r.text.split('\n').length);
+});
+
+test('missing Output line: verify.md without its - pr: line is refused at the ## Output heading', () => {
+  const r = tryLoad('quick-fix/verify.md', (t) => t.replace(/^- pr:.*\n/m, ''));
+  refused(r, 'quick-fix/verify.md', lineOf(r.text, /^## Output$/));
+});
+
+test('missing Inputs line: build.md without its - previous: line is refused at the ## Inputs heading', () => {
+  const r = tryLoad('quick-fix/build.md', (t) => t.replace(/^- previous:.*\n/m, ''));
+  refused(r, 'quick-fix/build.md', lineOf(r.text, /^## Inputs$/));
 });
 
 test('output name that is not an output property is refused at its line', () => {
@@ -82,15 +90,13 @@ test('output name that is not an output property is refused at its line', () => 
   refused(r, 'quick-fix/verify.md', lineOf(r.text, /^- pull:/));
 });
 
-test('input name that is not one of the stage\'s inputs (an extra one) is refused at its line', { todo: NOT_MET.inputName }, () => {
+test('input name that is not one of the stage\'s inputs (an extra one) is refused at its line', () => {
   const r = tryLoad('quick-fix/build.md', (t) => t.replace(/^- previous:/m, '- earlier: the earlier PR\n- previous:'));
-  console.log(`extra input: ${r.loaded ? 'LOADED' : r.message}`);
   refused(r, 'quick-fix/build.md', lineOf(r.text, /^- earlier:/));
 });
 
-test('input name that is not one of the stage\'s inputs (a misspelt one) is refused at its line', { todo: NOT_MET.inputName }, () => {
+test('input name that is not one of the stage\'s inputs (a misspelt one) is refused at its line', () => {
   const r = tryLoad('quick-fix/build.md', (t) => t.replace(/^- previous:/m, '- previus:'));
-  console.log(`misspelt input: ${r.loaded ? 'LOADED' : r.message}`);
   refused(r, 'quick-fix/build.md', lineOf(r.text, /^- previus:/));
 });
 

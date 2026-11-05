@@ -20,12 +20,16 @@ export const STAGES = {
 };
 export const readJson = (f) => JSON.parse(readFileSync(f, 'utf8'));
 
-/** The base commit's workflows/ extracted to a temp folder (git archive, so no checkout is touched). */
+/**
+ * The base commit's workflows/, copied to a temp folder. CI's checkout is shallow (depth 1), so the base's three
+ * workflow files are committed beside these tests (base-workflows/, `git show <BASE>:workflows/<name>.json` bytes);
+ * base-fixture.test.mjs checks them against git where the base commit is present.
+ */
+export const BASE_FIXTURES = new URL('./base-workflows/', import.meta.url).pathname;
 export function baseWorkflows() {
   const out = mkdtempSync(join(tmpdir(), 'v-spf-base-'));
-  const tar = execFileSync('git', ['-C', REPO, 'archive', '--format=tar', BASE, 'workflows']);
-  execFileSync('tar', ['-x', '-C', out], { input: tar });
-  return join(out, 'workflows');
+  cpSync(BASE_FIXTURES, out, { recursive: true });
+  return out;
 }
 
 /** A scratch copy of this checkout's workflows/ (with the stage folders). */
@@ -35,8 +39,12 @@ export function scratchWorkflows() {
   return dir;
 }
 
-/** The base raw JSON of a workflow, straight from git. */
-export const baseRaw = (name) => JSON.parse(execFileSync('git', ['-C', REPO, 'show', `${BASE}:workflows/${name}.json`], { encoding: 'utf8' }));
+/** The base raw JSON of a workflow, from the committed fixture. */
+export const baseRaw = (name) => readJson(join(BASE_FIXTURES, `${name}.json`));
+/** True when this clone has the base commit (a full clone; CI's shallow one does not). */
+export const hasBase = () => {
+  try { execFileSync('git', ['-C', REPO, 'cat-file', '-e', `${BASE}^{commit}`], { stdio: 'ignore' }); return true; } catch { return false; }
+};
 
 export const load = (name, dir) => loadWorkflow(name, { dir });
 
