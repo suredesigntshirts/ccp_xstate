@@ -1,0 +1,48 @@
+{
+  "item": "fix-return-tool-answer",
+  "verified_sha": "2c2e31e8f23c3776a16a062e24ec794827f39aac",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5Jp7vAX2J6KC22XrEL",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "stamped-accepted",
+      "status": "MET",
+      "command": "npm ci; node --test verify/fix-return-tool-answer/stamped.test.mjs (lib.mjs: item it-1 of workflows/quick-fix.json on the real engine, brief and build runs started, bound and returned through the real plugins/harness/scripts/actors.mjs with hook input on stdin, stub GitHub via CCP_GITHUB_API showing PR o/r#1 at the build worktree's HEAD; then the real return-tool.mjs over stdio, initialize + tools/call with the same arguments); VERIFY_MAIN=<worktree of main 762e2c1> runs the same steps live at main; evidence/main-scenarios.json = scenarios.mjs run at main",
+      "excerpt": "Head: the hook let the build return { pr: { url, at: HEAD }, notes } through (no deny), result.json's result.pr has key 'o/r#1', branch 'fix-1', checkout 'git fetch origin pull/1/head && git checkout --detach <at>', green true; the server answered \"accepted: run it-1:1.build's result is stored (<hash12>). You are done.\" One result.stored row, no refusal. Same for the verify run's result (lines, issue, pr). Main 762e2c1, live and in evidence: hook accepted the same return, same stamped result.json (no sent), server answered 'not accepted: no harness check passed this result for run it-1:1.build...' (and for the verify run)."
+    },
+    {
+      "id": "still-refuses",
+      "status": "MET",
+      "command": "node --test verify/fix-return-tool-answer/still-refuses.test.mjs",
+      "excerpt": "After the accepted build return, not accepted for: pr.at another sha, pr.at in capitals, pr.url #2, notes changed, notes left out, the stamped key added by the agent, the stamped result itself (result.json's result), another run name. Verify run: not accepted before any return (no result.json); after its accept, not accepted for a lines entry's evidence changed, a lines entry's result FAIL, lines reversed, pr.at changed, issue.title added, the verify result under the build run. A hand-written result.json { result, hash } (no sent) is accepted for exactly that result, not for one changed value nor for its keys reordered (plain hash, as before); with a sent present that does not match, the same result is not accepted (hash fallback unused)."
+    },
+    {
+      "id": "key-order",
+      "status": "MET",
+      "command": "node --test verify/fix-return-tool-answer/key-order.test.mjs",
+      "excerpt": "Build result with keys reversed at every depth (top and pr), and top level only: accepted. Verify result with keys reversed at every depth (pr, issue, each lines entry) and with only the lines entries reordered: accepted. Reverse direction too: hook accepted the reversed order, server answered accepted for the first order."
+    },
+    {
+      "id": "unchanged",
+      "status": "MET",
+      "command": "node --test verify/fix-return-tool-answer/unchanged.test.mjs (prompts: verify/fix-refusal-hints/prompts.mjs, main's in evidence/main-prompts.json from 762e2c1; scenarios.mjs: same returns in a fixed folder with fixed commit dates at head and main); node --test over the package.json test globs at 2c2e31e and at main 762e2c1; git diff origin/main...HEAD",
+      "excerpt": "All 10 stages of feature, intake, quick-fix and research render byte for byte main's; all 4 workflow hashes equal main's. Same returns (wrong-caller, schema short pr.at, reserved key, ref mismatch, accept, already-returned, verify accept): hook answers deep-equal main's, refusal and result.stored rows (minus id and at) deep-equal main's, result.json minus sent and at deep-equal main's; only the server's answers to the two accepted results moved from 'not accepted' to 'accepted'. Full suite at head: 1490 tests, 1476 pass, 1 fail test/setup.test.mjs copy-not-link and 1 cancelled verify/self-update-by-version/no-self-edit.test.mjs (hangs); main has exactly the same two (1481 tests, 1468 pass), both container-local, and ci's test job is green. The diff touches docs/journal.md, packages/engine/src/actors.js (sentHash, sent in result.json), plugins/harness/README.md, plugins/harness/scripts/return-tool.mjs and adds one test to plugins/harness/test/actors.test.mjs; no existing assertion changed, no workflow file, stages.js or prompts.js touched. verify/fix-refusal-hints/real-agent.test.mjs passes unchanged (reads committed evidence). Round 2: lib.mjs commits now ignore user and system git config (GIT_CONFIG_GLOBAL=/dev/null, commit.gpgsign=false), since this container signs commits and CI does not, and evidence/main-scenarios.json was regenerated at main 762e2c1 (build head 4848bfe..., the sha CI computes).",
+      "mutation": "packages/engine/src/actors.js accept: `{ result: stamped, hash, sent: sentHash(result), caller` replaced by `{ result: stamped, hash, caller` (no sent in result.json)",
+      "red_test": "plugins/harness/test/actors.test.mjs 'a build result with a PR ref, stamped by the host, is answered accepted by the return tool; a changed one is not'; verify stamped, key-order, still-refuses and unchanged (server answer) tests"
+    },
+    {
+      "id": "real-agent",
+      "status": "MET",
+      "command": "env -u CLAUDE_CODE_REMOTE_SESSION_ID HOME=<fresh> CCP_HARNESS_DIR=<dir with install.json> CCP_GITHUB_API=<evidence/real-agent/gh.mjs, PR head = build worktree HEAD> claude -p (2.1.318) --plugin-dir plugins/harness --output-format stream-json --allowedTools Agent,ToolSearch,mcp__plugin_ccp-harness_harness__return,Read,Bash,Edit,Write; item rta1 started by bin/host.js start quick-fix, brief accepted by evidence/real-agent/brief.mjs with the builder task; node --test verify/fix-return-tool-answer/real-agent.test.mjs over the committed transcript and journal",
+      "excerpt": "Main session made one call: Agent 'ccp-run rta1:1.build'. The real build agent (claude-sonnet-5-5) added clamp, committed a8a8a80 in its worktree and made one return call { run: 'rta1:1.build', result: { pr: { url: 'https://github.com/o/r/pull/1', at: 'a8a8a8091aa5f6d9cf7af0082fc596235bf9d74a' } } }; the tool result was \"accepted: run rta1:1.build's result is stored (e83a9e62d3f3). You are done.\" It made no further return call. result.json (same toolUseId) holds the stamped pr (key o/r#1, branch fix-1, checkout, green) and sent; the item journal has one result.stored for rta1:1.build and no refusal (no already-returned)."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 130; git rev-parse origin/build/fix-return-tool-answer",
+      "excerpt": "Check run 'test' (id 127231502693) completed success at head 2c2e31e8f23c3776a16a062e24ec794827f39aac; clean-room success. 'gates' failed only because no verdict existed yet."
+    }
+  ]
+}

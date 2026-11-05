@@ -1,0 +1,294 @@
+{
+ "hook": {
+  "wrongCaller": {
+   "hookEventName": "PreToolUse",
+   "permissionDecision": "deny",
+   "permissionDecisionReason": "wrong-caller: agent intruder is not run it-1:1.build's actor (ag-b)"
+  },
+  "schema": {
+   "hookEventName": "PreToolUse",
+   "permissionDecision": "deny",
+   "permissionDecisionReason": "schema: build result: result.pr.at is shorter than 40\nHow to fix it, from your Output:\n- pr: Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees.\nRefusal 1 of 10."
+  },
+  "reserved": {
+   "hookEventName": "PreToolUse",
+   "permissionDecision": "deny",
+   "permissionDecisionReason": "reserved: result.pr sets key: the host sets these from what it sees\nHow to fix it, from your Output:\n- pr: Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees.\nRefusal 2 of 10."
+  },
+  "refMismatch": {
+   "hookEventName": "PreToolUse",
+   "permissionDecision": "deny",
+   "permissionDecisionReason": "ref: result.pr: GitHub shows https://github.com/o/r/pull/1 at 4848bfe357753e57f9908e836dfd70b1fc93b933, not ffffffffffffffffffffffffffffffffffffffff\nHow to fix it, from your Output:\n- pr: Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees.\nRefusal 3 of 10."
+  },
+  "accepted": null,
+  "alreadyReturned": {
+   "hookEventName": "PreToolUse",
+   "permissionDecision": "deny",
+   "permissionDecisionReason": "already-returned: run it-1:1.build already returned its result"
+  },
+  "verifyAccepted": null
+ },
+ "server": {
+  "beforeAccept": "not accepted: no harness check passed this result for run it-1:1.build. The harness hook checks every return; without it nothing is accepted.",
+  "accepted": "not accepted: no harness check passed this result for run it-1:1.build. The harness hook checks every return; without it nothing is accepted.",
+  "verifyAccepted": "not accepted: no harness check passed this result for run it-1:2.verify. The harness hook checks every return; without it nothing is accepted."
+ },
+ "rows": [
+  {
+   "v": 1,
+   "session": "sess",
+   "release": "0.2.0",
+   "item": "it-1",
+   "state": "\"briefing\"",
+   "agent": "ag-brief",
+   "kind": "result.stored",
+   "source": {
+    "system": "journal",
+    "ref": "blobs/65f1a6a57cad107574be22da0105d3936a59965e92ed957462ec17f76e32a33d"
+   },
+   "payload": {
+    "run": "it-1:0.brief",
+    "actor": "brief",
+    "agentId": "ag-brief",
+    "hash": "65f1a6a57cad107574be22da0105d3936a59965e92ed957462ec17f76e32a33d",
+    "bytes": 75,
+    "toolUseId": "tu-brief-ret"
+   }
+  },
+  {
+   "v": 1,
+   "session": "sess",
+   "release": "0.2.0",
+   "item": "it-1",
+   "state": "\"building\"",
+   "agent": "intruder",
+   "kind": "refusal",
+   "source": {
+    "system": "hook",
+    "ref": "tu-1"
+   },
+   "payload": {
+    "source": "hook",
+    "rule": "wrong-caller",
+    "reason": "agent intruder is not run it-1:1.build's actor (ag-b)",
+    "run": "it-1:1.build",
+    "actor": "build",
+    "caller": "intruder",
+    "tool": "harness return",
+    "textHash": "74602e85ec001e8715ef8b35c3555b890781d35233cb5d49b1cb46317a3fd6fc",
+    "outcome": "denied",
+    "hookSession": "sess"
+   }
+  },
+  {
+   "v": 1,
+   "session": "sess",
+   "release": "0.2.0",
+   "item": "it-1",
+   "state": "\"building\"",
+   "agent": "ag-b",
+   "kind": "refusal",
+   "source": {
+    "system": "hook",
+    "ref": "tu-2"
+   },
+   "payload": {
+    "source": "hook",
+    "rule": "schema",
+    "reason": "build result: result.pr.at is shorter than 40",
+    "hint": [
+     "pr: Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees."
+    ],
+    "count": 1,
+    "cap": 10,
+    "run": "it-1:1.build",
+    "actor": "build",
+    "caller": "ag-b",
+    "tool": "harness return",
+    "textHash": "e3887334b1cf017468c729c9913472526a00e6e9dacd8ee7721c78b025d85959",
+    "outcome": "denied",
+    "hookSession": "sess"
+   }
+  },
+  {
+   "v": 1,
+   "session": "sess",
+   "release": "0.2.0",
+   "item": "it-1",
+   "state": "\"building\"",
+   "agent": "ag-b",
+   "kind": "refusal",
+   "source": {
+    "system": "hook",
+    "ref": "tu-3"
+   },
+   "payload": {
+    "source": "hook",
+    "rule": "reserved",
+    "reason": "result.pr sets key: the host sets these from what it sees",
+    "hint": [
+     "pr: Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees."
+    ],
+    "count": 2,
+    "cap": 10,
+    "run": "it-1:1.build",
+    "actor": "build",
+    "caller": "ag-b",
+    "tool": "harness return",
+    "textHash": "db49528fc3b07d9372201c34734fb20a203444bb7456ae7f7681a0c65f048c81",
+    "outcome": "denied",
+    "hookSession": "sess"
+   }
+  },
+  {
+   "v": 1,
+   "session": "sess",
+   "release": "0.2.0",
+   "item": "it-1",
+   "state": "\"building\"",
+   "agent": "ag-b",
+   "kind": "refusal",
+   "source": {
+    "system": "hook",
+    "ref": "tu-4"
+   },
+   "payload": {
+    "source": "hook",
+    "rule": "ref",
+    "reason": "result.pr: GitHub shows https://github.com/o/r/pull/1 at 4848bfe357753e57f9908e836dfd70b1fc93b933, not ffffffffffffffffffffffffffffffffffffffff",
+    "hint": [
+     "pr: Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees."
+    ],
+    "count": 3,
+    "cap": 10,
+    "run": "it-1:1.build",
+    "actor": "build",
+    "caller": "ag-b",
+    "tool": "harness return",
+    "textHash": "4444b37b57df5c1781e6535091b38ae2a18ea6699ae324370b0ddd4fa337e625",
+    "outcome": "denied",
+    "hookSession": "sess"
+   }
+  },
+  {
+   "v": 1,
+   "session": "sess",
+   "release": "0.2.0",
+   "item": "it-1",
+   "state": "\"building\"",
+   "agent": "ag-b",
+   "kind": "result.stored",
+   "source": {
+    "system": "journal",
+    "ref": "blobs/967ffcc4c72f08dabdd511e7c473f290404a304c4cb76d9531a14c0c04f657a5"
+   },
+   "payload": {
+    "run": "it-1:1.build",
+    "actor": "build",
+    "agentId": "ag-b",
+    "hash": "967ffcc4c72f08dabdd511e7c473f290404a304c4cb76d9531a14c0c04f657a5",
+    "bytes": 268,
+    "toolUseId": "tu-5"
+   }
+  },
+  {
+   "v": 1,
+   "session": "sess",
+   "release": "0.2.0",
+   "item": "it-1",
+   "state": "\"building\"",
+   "agent": "ag-b",
+   "kind": "refusal",
+   "source": {
+    "system": "hook",
+    "ref": "tu-6"
+   },
+   "payload": {
+    "source": "hook",
+    "rule": "already-returned",
+    "reason": "run it-1:1.build already returned its result",
+    "run": "it-1:1.build",
+    "actor": "build",
+    "caller": "ag-b",
+    "tool": "harness return",
+    "textHash": "7129e633897546ba05001ff4e50a263d1a87b7e3a980aac3f9dcad30bfbcd445",
+    "outcome": "denied",
+    "hookSession": "sess"
+   }
+  },
+  {
+   "v": 1,
+   "session": "sess",
+   "release": "0.2.0",
+   "item": "it-1",
+   "state": "\"verifying\"",
+   "agent": "ag-v",
+   "kind": "result.stored",
+   "source": {
+    "system": "journal",
+    "ref": "blobs/e2586eb65c6d7b5f9e790174a771f195fdc74c2add5fc0c6a4052dd1c4782636"
+   },
+   "payload": {
+    "run": "it-1:2.verify",
+    "actor": "verify",
+    "agentId": "ag-v",
+    "hash": "e2586eb65c6d7b5f9e790174a771f195fdc74c2add5fc0c6a4052dd1c4782636",
+    "bytes": 679,
+    "toolUseId": "tu-verify-ret"
+   }
+  }
+ ],
+ "results": {
+  "build": {
+   "result": {
+    "pr": {
+     "url": "https://github.com/o/r/pull/1",
+     "at": "4848bfe357753e57f9908e836dfd70b1fc93b933",
+     "key": "o/r#1",
+     "branch": "fix-1",
+     "checkout": "git fetch origin pull/1/head && git checkout --detach 4848bfe357753e57f9908e836dfd70b1fc93b933",
+     "green": true
+    },
+    "notes": "clamp added"
+   },
+   "hash": "967ffcc4c72f08dabdd511e7c473f290404a304c4cb76d9531a14c0c04f657a5",
+   "caller": "ag-b",
+   "toolUseId": "tu-5"
+  },
+  "verify": {
+   "result": {
+    "result": "PASS",
+    "pr": {
+     "url": "https://github.com/o/r/pull/1",
+     "at": "4848bfe357753e57f9908e836dfd70b1fc93b933",
+     "key": "o/r#1",
+     "branch": "fix-1",
+     "checkout": "git fetch origin pull/1/head && git checkout --detach 4848bfe357753e57f9908e836dfd70b1fc93b933",
+     "green": true
+    },
+    "issue": {
+     "url": "https://github.com/o/r/issues/9",
+     "expect": [
+      "clamp is exported from math.js",
+      "clamp throws a RangeError when lo > hi"
+     ]
+    },
+    "lines": [
+     {
+      "line": "clamp is exported from math.js",
+      "result": "PASS",
+      "evidence": "ran node -e at target.at: clamp is exported from math.js"
+     },
+     {
+      "line": "clamp throws a RangeError when lo > hi",
+      "result": "PASS",
+      "evidence": "ran node -e at target.at: clamp throws a RangeError when lo > hi"
+     }
+    ]
+   },
+   "hash": "e2586eb65c6d7b5f9e790174a771f195fdc74c2add5fc0c6a4052dd1c4782636",
+   "caller": "ag-v",
+   "toolUseId": "tu-verify-ret"
+  }
+ }
+}

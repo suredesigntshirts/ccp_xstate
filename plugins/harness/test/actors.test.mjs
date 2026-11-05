@@ -169,3 +169,69 @@ test('SubagentStop after a handback the hook let through (its transcript ends in
   assert.equal(stop(env, { agent_id: 'ag1', stop_hook_active: false, agent_transcript_path: tx }), null, 'no block: it would not bring the agent back');
   assert.equal(restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' }).snapshot.value, 'replanning');
 });
+
+// Plan item fix-return-tool-answer: the host stamps a PR ref before storing it, and the return tool still answers
+// accepted for the result the hook let through, matched by the hash of the result as sent.
+import { createServer } from 'node:http';
+import { readFileSync } from 'node:fs';
+
+const hookAsync = (env, input) => new Promise((ok, fail) => {
+  const child = spawn(process.execPath, [HOOK], { env });
+  let out = '';
+  child.stdout.on('data', (d) => (out += d));
+  child.on('error', fail);
+  child.on('close', () => ok(out.trim() ? JSON.parse(out.trim()).hookSpecificOutput : null));
+  child.stdin.end(JSON.stringify({ session_id: 'sess', ...input }));
+});
+
+async function fakeGitHub(head) {
+  const server = createServer((req, res) => {
+    const json = req.url.includes('/files') ? [] : req.url.includes('/check-suites') ? { check_suites: [] } : { number: 1, head: { sha: head, ref: 'fix', repo: { full_name: 'o/r' } } };
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify(json));
+  });
+  await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
+  return { api: `http://127.0.0.1:${server.address().port}`, close: () => new Promise((ok) => { server.closeAllConnections(); server.close(ok); }) };
+}
+
+test('a build result with a PR ref, stamped by the host, is answered accepted by the return tool; a changed one is not', async () => {
+  const { dir, root, env } = await project();
+  const tool = 'mcp__plugin_ccp-harness_harness__return';
+  mkdirSync(join(dir, 'tx', 'sess', 'subagents'), { recursive: true });
+  const transcript = join(dir, 'tx', 'sess.jsonl');
+  const startRun = (run, use, agent) => {
+    hook(env, { hook_event_name: 'PreToolUse', tool_name: 'Agent', tool_use_id: use, tool_input: { prompt: `ccp-run ${run}`, description: run } });
+    writeFileSync(join(dir, 'tx', 'sess', 'subagents', `agent-${agent}.meta.json`), JSON.stringify({ toolUseId: use }));
+    return hook(env, { hook_event_name: 'SubagentStart', agent_id: agent, agent_type: 'general-purpose', transcript_path: transcript }).additionalContext;
+  };
+  startRun('it-1:0.brief', 'u1', 'ag1');
+  assert.equal(hook(env, { hook_event_name: 'PreToolUse', agent_id: 'ag1', tool_name: tool, tool_use_id: 'u2', tool_input: { run: 'it-1:0.brief', result: { builder: 'b', verifier: 'v' } } }), null);
+
+  const run = 'it-1:1.build';
+  const worktree = startRun(run, 'u3', 'ag2').match(/worktree (\S+?)[.,]?(\s|$)/)[1];
+  const head = execFileSync('git', ['-C', worktree, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  const gh = await fakeGitHub(head);
+  try {
+    const result = { pr: { url: 'https://github.com/o/r/pull/1', at: head }, notes: 'n' };
+    const ghEnv = { ...env, CCP_GITHUB_API: gh.api };
+    assert.equal(await hookAsync(ghEnv, { hook_event_name: 'PreToolUse', agent_id: 'ag2', tool_name: tool, tool_use_id: 'u4', tool_input: { run, result } }), null, 'the hook accepts');
+    const stored = JSON.parse(readFileSync(join(root, 'items', 'it-1', 'runs', '1.build', 'result.json'), 'utf8'));
+    assert.equal(stored.result.pr.key, 'o/r#1', 'the host stamped the PR ref');
+    assert.equal(stored.result.pr.branch, 'fix');
+    assert.notDeepEqual(stored.result, result);
+
+    const answer = await callServer(env, { run, result });
+    assert.equal(answer.isError, undefined, answer.content[0].text);
+    assert.match(answer.content[0].text, /^accepted: /);
+    const reordered = await callServer(env, { run, result: { notes: 'n', pr: { at: head, url: 'https://github.com/o/r/pull/1' } } });
+    assert.match(reordered.content[0].text, /^accepted: /, 'key order does not matter');
+
+    for (const other of [{ ...result, pr: { ...result.pr, at: 'f'.repeat(40) } }, { ...result, notes: 'm' }, stored.result, { ...result, pr: { ...result.pr, key: 'o/r#1' } }]) {
+      const no = await callServer(env, { run, result: other });
+      assert.equal(no.isError, true);
+      assert.match(no.content[0].text, /^not accepted: /);
+    }
+  } finally {
+    await gh.close();
+  }
+});

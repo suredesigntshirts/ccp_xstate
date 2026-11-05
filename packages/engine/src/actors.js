@@ -31,6 +31,11 @@ export const spawnPrompt = (run) => `ccp-run ${run}`;
 export const isReturnTool = (name) => /^mcp__(?:plugin_[\w.-]+_)?harness__return$/.test(String(name));
 
 const sha256 = (text) => createHash('sha256').update(text).digest('hex');
+// A value serialised with its object keys sorted at every depth, so the return tool's server and accept() hash the
+// same result alike whatever order its keys came in (fix-return-tool-answer). return-tool.mjs repeats these lines,
+// since it may not import the engine.
+const sorted = (v) => (Array.isArray(v) ? v.map(sorted) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sorted(v[k])])) : v);
+export const sentHash = (result) => sha256(JSON.stringify(sorted(result ?? null)));
 
 /** A run's id is its effect id, `<item>:<seq>.<invoke>`; its name inside the item is `<seq>.<invoke>`. */
 export function runOf(run) {
@@ -578,7 +583,8 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
 
   const text = JSON.stringify(stamped);
   const { hash, bytes } = storeBlob(root, text);
-  if (!writeOnce(join(dir, 'result.json'), { result: stamped, hash, caller, toolUseId, at: new Date().toISOString() })) {
+  // sent is the result as the agent sent it, before the stamp: the return tool's server matches its call by it.
+  if (!writeOnce(join(dir, 'result.json'), { result: stamped, hash, sent: sentHash(result), caller, toolUseId, at: new Date().toISOString() })) {
     return refuse('already-returned', `run ${run.run} already returned its result`);
   }
   journal(root, run, {

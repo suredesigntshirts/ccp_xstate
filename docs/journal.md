@@ -343,7 +343,9 @@ The engine's actor runs (plan item engine-actors, `packages/engine/src/actors.js
 beside its engine rows, with `item` and the `state` the run was started in. A run's folder is
 `<journal root>/items/<item>/runs/<seq>.<invoke>/`: `brief.md`, `context.md`, `run.json`, `stage.json` (the stage
 record), `spawn.json` (the Agent call that started it), `agent.json` (the agent bound to it) and `result.json` (its
-accepted result). Brief and result texts are blobs, `<journal root>/blobs/<sha256>`, as capture stores them.
+accepted result: `result` as stamped, `hash` of it, `sent`, the hash of the result as the agent sent it with object keys
+sorted at every depth, which the return tool's server matches its call by, `caller`, `toolUseId` and `at`). Brief and
+result texts are blobs, `<journal root>/blobs/<sha256>`, as capture stores them.
 
 `stage.json` (`packages/engine/src/trace.js`) is what the person reads to see one stage run end to end. Written when the
 run is prepared: `stage`, `workflow` (`id`, `name`, `hash`), the `invoke`, `state` and `invokeAt` (JSON pointer) that
