@@ -15,7 +15,8 @@
     "L-never-idle-on-person"
   ],
   "depends_on": [
-    "stage-bench"
+    "stage-bench",
+    "stage-prompt-files"
   ]
 }
 ```

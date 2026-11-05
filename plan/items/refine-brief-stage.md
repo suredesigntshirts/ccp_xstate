@@ -14,6 +14,7 @@
   ],
   "depends_on": [
     "stage-bench",
+    "stage-prompt-files",
     "wf-intake"
   ]
 }
