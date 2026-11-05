@@ -9,7 +9,8 @@ const runOf = (r) => r.payload?.run ?? null;
  * The stalls view over `rows` (any order, any mix). Returns { prepared, blocked, blocks, startedAfterBlock,
  * failedAtCap, cannotStart, rate, runs }: prepared counts runs with a brief.stored row; blocked counts runs blocked
  * at least once, blocks every block; startedAfterBlock counts blocked runs whose agent.spawn row is later than their
- * first block; rate is blocked / prepared (0 with none prepared). runs lists every run the guard touched.
+ * first block; rate is blocked / prepared (0 with none prepared). runs lists every prepared run and every run the
+ * guard touched.
  * A row read twice (the same id) counts once.
  */
 export function stalls(rows) {
@@ -22,6 +23,8 @@ export function stalls(rows) {
     if (!runs.has(run)) runs.set(run, { run, item: r.item ?? null, actor: r.payload?.actor ?? null, blocks: 0, firstBlockAt: null, startedAfterBlock: false, failed: null });
     return runs.get(run);
   };
+  // Every prepared run gets an entry, blocked or not, so the view lists each run it counted.
+  for (const r of unique.filter((r) => r.kind === 'brief.stored' && runOf(r))) entry(r);
   for (const r of unique.filter((r) => r.kind === 'refusal' && runOf(r))) {
     const rule = r.payload.rule;
     if (rule === 'stall') {

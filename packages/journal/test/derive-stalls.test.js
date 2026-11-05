@@ -30,11 +30,12 @@ const rows = [
   row('refusal', 'a:0.brief', 5, { rule: 'schema', outcome: 'denied' }) // another rule counts for nothing here
 ];
 
-test('stalls: counts, the rate and a line per run the guard touched', () => {
+test('stalls: counts, the rate and a line per run', () => {
   const view = stalls(rows);
   const { runs, ...totals } = view;
   assert.deepEqual(totals, { prepared: 4, blocked: 2, blocks: 3, startedAfterBlock: 1, failedAtCap: 1, cannotStart: 1, rate: 0.5 });
   assert.deepEqual(runs.map((r) => [r.run, r.blocks, r.startedAfterBlock, r.failed]), [
+    ['a:0.brief', 0, false, null],
     ['b:0.brief', 1, true, null],
     ['c:0.brief', 2, false, 'stall-cap'],
     ['d:0.brief', 0, false, 'cannot-start']

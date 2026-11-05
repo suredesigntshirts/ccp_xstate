@@ -245,7 +245,7 @@ counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
 - **`stalls.js`** (plan item fix-waiting-run-stall): how often a session ended a turn with one of its runs prepared
   and no agent. `prepared` (runs with a `brief.stored` row), `blocked` (runs with a `stall` row), `blocks`,
   `startedAfterBlock` (blocked runs whose `agent.spawn` row is at or after their first block), `failedAtCap`
-  (`stall-cap`), `cannotStart` and `rate` (blocked over prepared), with one entry per run the guard touched.
+  (`stall-cap`), `cannotStart` and `rate` (blocked over prepared), with one entry per prepared run (and any other run the guard touched).
 
 ### PR check rows
 
