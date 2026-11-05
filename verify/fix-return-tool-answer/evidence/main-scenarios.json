@@ -18,7 +18,7 @@
   "refMismatch": {
    "hookEventName": "PreToolUse",
    "permissionDecision": "deny",
-   "permissionDecisionReason": "ref: result.pr: GitHub shows https://github.com/o/r/pull/1 at 59aa9d09a83e2cec5d2e51dbeda0b52998ca3952, not ffffffffffffffffffffffffffffffffffffffff\nHow to fix it, from your Output:\n- pr: Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees.\nRefusal 3 of 10."
+   "permissionDecisionReason": "ref: result.pr: GitHub shows https://github.com/o/r/pull/1 at 4848bfe357753e57f9908e836dfd70b1fc93b933, not ffffffffffffffffffffffffffffffffffffffff\nHow to fix it, from your Output:\n- pr: Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees.\nRefusal 3 of 10."
   },
   "accepted": null,
   "alreadyReturned": {
@@ -155,7 +155,7 @@
    "payload": {
     "source": "hook",
     "rule": "ref",
-    "reason": "result.pr: GitHub shows https://github.com/o/r/pull/1 at 59aa9d09a83e2cec5d2e51dbeda0b52998ca3952, not ffffffffffffffffffffffffffffffffffffffff",
+    "reason": "result.pr: GitHub shows https://github.com/o/r/pull/1 at 4848bfe357753e57f9908e836dfd70b1fc93b933, not ffffffffffffffffffffffffffffffffffffffff",
     "hint": [
      "pr: Your PR as { url, at }: url is its page, https://github.com/<owner>/<repo>/pull/<number>, and at the full 40-character sha of the head commit you pushed. Your worktree's HEAD must equal at when you return, and GitHub must show the PR at at. Never set key, gates, green or checkout: the host sets them from what it sees."
     ],
@@ -165,7 +165,7 @@
     "actor": "build",
     "caller": "ag-b",
     "tool": "harness return",
-    "textHash": "3a6e3415f21bdee09030fd444ee10e7e634e158e2b0ed06ba93cc971fad0e20c",
+    "textHash": "4444b37b57df5c1781e6535091b38ae2a18ea6699ae324370b0ddd4fa337e625",
     "outcome": "denied",
     "hookSession": "sess"
    }
@@ -180,13 +180,13 @@
    "kind": "result.stored",
    "source": {
     "system": "journal",
-    "ref": "blobs/95b908d6779b79e4c224a1e06a2ad39c60674bcdc7f6fd99596411416c74ef8f"
+    "ref": "blobs/967ffcc4c72f08dabdd511e7c473f290404a304c4cb76d9531a14c0c04f657a5"
    },
    "payload": {
     "run": "it-1:1.build",
     "actor": "build",
     "agentId": "ag-b",
-    "hash": "95b908d6779b79e4c224a1e06a2ad39c60674bcdc7f6fd99596411416c74ef8f",
+    "hash": "967ffcc4c72f08dabdd511e7c473f290404a304c4cb76d9531a14c0c04f657a5",
     "bytes": 268,
     "toolUseId": "tu-5"
    }
@@ -226,13 +226,13 @@
    "kind": "result.stored",
    "source": {
     "system": "journal",
-    "ref": "blobs/2dd0c589fc9fc9aff38340ced64c0563c57fee6f11d186e7b16752a3b3ded325"
+    "ref": "blobs/e2586eb65c6d7b5f9e790174a771f195fdc74c2add5fc0c6a4052dd1c4782636"
    },
    "payload": {
     "run": "it-1:2.verify",
     "actor": "verify",
     "agentId": "ag-v",
-    "hash": "2dd0c589fc9fc9aff38340ced64c0563c57fee6f11d186e7b16752a3b3ded325",
+    "hash": "e2586eb65c6d7b5f9e790174a771f195fdc74c2add5fc0c6a4052dd1c4782636",
     "bytes": 679,
     "toolUseId": "tu-verify-ret"
    }
@@ -243,15 +243,15 @@
    "result": {
     "pr": {
      "url": "https://github.com/o/r/pull/1",
-     "at": "59aa9d09a83e2cec5d2e51dbeda0b52998ca3952",
+     "at": "4848bfe357753e57f9908e836dfd70b1fc93b933",
      "key": "o/r#1",
      "branch": "fix-1",
-     "checkout": "git fetch origin pull/1/head && git checkout --detach 59aa9d09a83e2cec5d2e51dbeda0b52998ca3952",
+     "checkout": "git fetch origin pull/1/head && git checkout --detach 4848bfe357753e57f9908e836dfd70b1fc93b933",
      "green": true
     },
     "notes": "clamp added"
    },
-   "hash": "95b908d6779b79e4c224a1e06a2ad39c60674bcdc7f6fd99596411416c74ef8f",
+   "hash": "967ffcc4c72f08dabdd511e7c473f290404a304c4cb76d9531a14c0c04f657a5",
    "caller": "ag-b",
    "toolUseId": "tu-5"
   },
@@ -260,10 +260,10 @@
     "result": "PASS",
     "pr": {
      "url": "https://github.com/o/r/pull/1",
-     "at": "59aa9d09a83e2cec5d2e51dbeda0b52998ca3952",
+     "at": "4848bfe357753e57f9908e836dfd70b1fc93b933",
      "key": "o/r#1",
      "branch": "fix-1",
-     "checkout": "git fetch origin pull/1/head && git checkout --detach 59aa9d09a83e2cec5d2e51dbeda0b52998ca3952",
+     "checkout": "git fetch origin pull/1/head && git checkout --detach 4848bfe357753e57f9908e836dfd70b1fc93b933",
      "green": true
     },
     "issue": {
@@ -286,7 +286,7 @@
      }
     ]
    },
-   "hash": "2dd0c589fc9fc9aff38340ced64c0563c57fee6f11d186e7b16752a3b3ded325",
+   "hash": "e2586eb65c6d7b5f9e790174a771f195fdc74c2add5fc0c6a4052dd1c4782636",
    "caller": "ag-v",
    "toolUseId": "tu-verify-ret"
   }

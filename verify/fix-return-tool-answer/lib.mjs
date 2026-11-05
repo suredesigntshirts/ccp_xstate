@@ -68,9 +68,10 @@ export function callServer(repo, env, args) {
 }
 export const textOf = (answer) => answer.content.map((c) => c.text).join('');
 
-// Fixed commit dates, so the same steps give the same shas at head and at main (unchanged compares their rows).
-const DATED = { ...process.env, GIT_AUTHOR_DATE: '2026-11-05T12:00:00Z', GIT_COMMITTER_DATE: '2026-11-05T12:00:00Z' };
-const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', env: DATED, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+// Fixed commit dates and no user or system git config (a container may sign commits), so the same steps give the
+// same shas at head and at main, here and in CI (unchanged compares their rows).
+const DATED = { ...process.env, GIT_AUTHOR_DATE: '2026-11-05T12:00:00Z', GIT_COMMITTER_DATE: '2026-11-05T12:00:00Z', GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' };
+const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, '-c', 'commit.gpgsign=false', ...args], { encoding: 'utf8', env: DATED, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 
 /**
  * A harness folder (install.json, journal) with item `it-1` of workflows/quick-fix.json started by `repo`'s engine,
@@ -89,7 +90,7 @@ export async function atBuild(repo, gh, { at } = {}) {
   mkdirSync(root, { recursive: true });
   writeFileSync(join(dir, 'install.json'), '{}');
   const clone = join(dir, 'clone');
-  execFileSync('git', ['init', '-q', '-b', 'main', clone]);
+  execFileSync('git', ['init', '-q', '-b', 'main', clone], { env: DATED });
   writeFileSync(join(clone, 'math.js'), 'export const add = (a, b) => a + b;\n');
   git(clone, 'add', '-A');
   git(clone, '-c', 'user.email=v@v', '-c', 'user.name=v', 'commit', '-qm', 'one');
