@@ -26,7 +26,7 @@ The bench runs the same `brief.md` through `claude -p`.
   stage is the default agent with rules and task in one prompt. The stage-prompt-files replan decides whether the
   plugin ships a few roles (builder, verifier, writer) for tools and model, with stage files holding the
   task-specific rules. It must check that plugin agents load in cloud threads and how a role's version is tied to
-  the workflow pin.
+  the workflow pin. Settled: not used, in `plan/decisions/2026-11-05-stage-prompt-files-ready.md`.
 - **Stalled runs.** A prepared run waits on the thread's Claude calling the Agent tool. Draft item
   `fix-waiting-run-stall` blocks a Stop while a run waits. Headless stage processes (`claude -p`, as the bench runs
   them) would remove that dependence entirely; they are weighed once the bench has measured their cost.
