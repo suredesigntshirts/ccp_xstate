@@ -61,7 +61,8 @@ export function standinInput(host, { effect, choice, by, why: reason, grants, at
     if (g.workflow !== name && g.workflow !== host.spec.id) return why.push(`${g.id}: workflow ${g.workflow}, not ${name}`), false;
     if (g.ask !== run.invoke) return why.push(`${g.id}: ask ${g.ask}, not ${run.invoke}`), false;
     if (!Array.isArray(g.choices) || !g.choices.includes(choice)) return why.push(`${g.id}: does not grant "${choice}"`), false;
-    if (!Array.isArray(g.repos) || !g.repos.includes(repo)) return why.push(`${g.id}: repo ${named}`), false;
+    // A card with no repository is covered by no grant, even one listing null (plan item fix-grant-null-repo).
+    if (repo === null || !Array.isArray(g.repos) || !g.repos.includes(repo)) return why.push(`${g.id}: repo ${named}`), false;
     if (!(Date.parse(g.until) > now)) return why.push(`${g.id}: expired ${g.until}`), false;
     return true;
   });

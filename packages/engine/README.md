@@ -81,7 +81,8 @@ run. The grants file defaults to `grants.json` beside the journal folder (`<harn
 An entry covers an answer when its workflow and ask (the invoke id) match, it lists the choice and the card's repo, and
 `until` is still ahead. The card's repo is its PR's when the card has a `pr` input; a card asked before any PR (quick-fix's
 `blocked` card) takes the repo of the item's issue when that is a `https://github.com/<owner>/<repo>/issues/<n>` URL,
-and otherwise has none, so no grant covers it (plan item fix-blocked-card-grant). `--why <text>` adds a `why` to the
+and otherwise has none, so no grant covers it, not even one listing `null` in `repos` (plan items fix-blocked-card-grant,
+fix-grant-null-repo). `--why <text>` adds a `why` to the
 answer's output, which quick-fix's replan needs. An answer the chart would not take as given (a replan with no why) is
 refused before anything is written, so the same grant can answer the card again. The person sets the file; the first one is `plan/decisions/2026-10-31-first-grant.md`.
 
