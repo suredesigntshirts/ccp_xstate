@@ -34,7 +34,7 @@
     },
     {
       "ref": "plugins/harness/scripts/return-tool.mjs answer",
-      "what": "Answers accepted when the arguments' sorted-key hash equals result.json's sent, or their plain hash equals its hash (results stored before this change); not accepted otherwise, with the same texts as today"
+      "what": "Answers accepted when the arguments' sorted-key hash equals result.json's sent, or, when result.json has no sent (results stored before this change), their plain hash equals its hash; not accepted otherwise, with the same texts as today"
     },
     {
       "ref": "plugins/harness/test/actors.test.mjs (or a new test beside it)",
