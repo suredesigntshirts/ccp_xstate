@@ -4,8 +4,9 @@
 // calls it and answers Claude Code. In a project that hasn't installed the harness it does nothing.
 //
 //   PreToolUse of Agent with the prompt `ccp-run <run>`: swap in the run's brief, or refuse an unknown or started run.
-//   PreToolUse of the return tool: refuse unless the caller, the schema and GitHub check out; then hand the result to
-//     the item, which prepares the runs its next state invokes.
+//   PreToolUse of the return tool: refuse unless the caller, the schema and GitHub check out, saying how to fix it and
+//     which refusal of the run's cap this is; then hand the result to the item, which prepares the runs its next state
+//     invokes. The refusal that reaches the cap fails the run, and its error goes to the item (fix-refusal-hints).
 //   PreToolUse of any other tool a bound agent calls: run shell commands from its worktree, refuse file tools outside.
 //   SubagentStart: bind the agent to its run and give it its run, worktree and return instructions. When the session
 //     has several runs starting at once, the agent is bound at its first tool call instead, from its meta.json.
@@ -72,7 +73,11 @@ async function main() {
     const { github } = await engine('effects/github.js');
     const gh = github({ ...(process.env.CCP_GITHUB_API ? { api: process.env.CCP_GITHUB_API } : {}) });
     const got = await A.accept({ root, caller: input.agent_id ?? null, run: input.tool_input?.run, result: input.tool_input?.result, toolUseId: input.tool_use_id, github: gh, session });
-    if (got.refused) return deny(`${got.refused.rule}: ${got.refused.reason}`);
+    if (got.refused) {
+      deny(A.refusalText(got));
+      if (got.failed) await A.deliver({ root, run: got.failed, github: gh });
+      return;
+    }
     await A.deliver({ root, run: got.accepted.run, github: gh });
     return;
   }

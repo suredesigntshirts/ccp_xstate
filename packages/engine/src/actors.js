@@ -403,23 +403,89 @@ export function agrees(given, input) {
   return JSON.stringify(given) === JSON.stringify(input);
 }
 
+// A value as a refusal shows it: JSON, cut to CUT characters (fix-refusal-hints).
+const CUT = 200;
+const brief = (v) => {
+  const t = JSON.stringify(v) ?? 'undefined';
+  return t.length > CUT ? `${t.slice(0, CUT)}…` : t;
+};
+
+/**
+ * Where a restated value disagrees with its input, as agrees() decides it: every differing path, with the returned
+ * value and the input's (fix-refusal-hints). A key the input lacks is named as not in the input; arrays of different
+ * length are named whole.
+ */
+export function differences(given, input, path, inPath) {
+  if (plain(given) && plain(input)) {
+    return Object.keys(given).flatMap((k) =>
+      Object.hasOwn(input, k) ? differences(given[k], input[k], `${path}.${k}`, `${inPath}.${k}`) : [`${path}.${k} is not in the input's ${inPath}`]
+    );
+  }
+  if (Array.isArray(given) && Array.isArray(input) && given.length === input.length) {
+    return given.flatMap((v, i) => differences(v, input[i], `${path}[${i}]`, `${inPath}[${i}]`));
+  }
+  if (agrees(given, input)) return [];
+  return [`${path} is ${brief(given)}, the input's ${inPath} is ${brief(input)}`];
+}
+
+/** The refusals of a result that count toward a run's cap, and the cap (fix-refusal-hints). */
+export const RESULT_RULES = Object.freeze(['schema', 'reserved', 'restated', 'covers', 'ref']);
+export const REFUSAL_CAP = 10;
+
+// How to fix a refusal: `<field>: <description>` for each top-level output field the reason names, once each, in the
+// schema's order. Only top-level fields carry descriptions (prompts.js puts each ## Output line there).
+function hintOf(schema, reason) {
+  const named = new Set([...String(reason).matchAll(/\bresult\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]));
+  return Object.entries(schema?.properties ?? {})
+    .filter(([k, s]) => named.has(k) && typeof s?.description === 'string' && s.description.trim())
+    .map(([k, s]) => `${k}: ${s.description}`);
+}
+
+// The result refusals already journalled for a run, oldest first.
+function resultRefusals(root, run) {
+  let rows = [];
+  try {
+    rows = readFile(itemFile(root, run.item)).rows;
+  } catch {
+    return [];
+  }
+  return rows.filter((r) => r.kind === 'refusal' && r.payload?.run === run.run && r.payload?.outcome === 'denied' && RESULT_RULES.includes(r.payload?.rule));
+}
+
 /**
  * The checks a result passes before it counts, in order: the run exists, the caller is the agent the run started,
  * the run hasn't returned yet, the result matches the actor's schema, and every PR it claims is on GitHub at the
  * claimed head. `github` is a client from effects/github.js ({ pull }). Returns { accepted: { run, hash } } or
- * { refused: { rule, reason } }; both are journalled in the item's file.
+ * { refused: { rule, reason } }; both are journalled in the item's file. A refusal of the result (RESULT_RULES) also
+ * has fix: { hint, count, cap }, and the one that reaches REFUSAL_CAP has failed: the run, which has then failed.
  */
 export async function accept({ root, caller, run: runId, result, toolUseId, github, web = null, session = null }) {
   const run = loadRun(root, runId);
   if (!run) return { refused: { rule: 'unknown-run', reason: `no prepared run ${JSON.stringify(runId ?? null)}` } };
+  // A refusal of the result (RESULT_RULES) carries how to fix it and counts toward the run's cap; the one that reaches
+  // the cap fails the run, so its item takes the invoke's error instead of the agent looping (fix-refusal-hints).
   const refuse = (rule, reason) => {
+    const counted = RESULT_RULES.includes(rule);
+    const before = counted ? resultRefusals(root, run) : [];
+    const extra = counted ? { hint: hintOf(run.schema, reason), count: before.length + 1, cap: REFUSAL_CAP } : {};
     journal(root, run, {
       kind: 'refusal',
       source: { system: 'hook', ref: toolUseId ?? `return ${run.run}` },
       agent: caller ?? null,
-      payload: { source: 'hook', rule, reason, run: run.run, actor: run.actor, caller: caller ?? null, tool: 'harness return', textHash: sha256(`${rule}: ${reason}`), outcome: 'denied', hookSession: session }
+      payload: { source: 'hook', rule, reason, ...extra, run: run.run, actor: run.actor, caller: caller ?? null, tool: 'harness return', textHash: sha256(`${rule}: ${reason}`), outcome: 'denied', hookSession: session }
     });
-    return { refused: { rule, reason } };
+    const fix = counted ? { fix: extra } : {};
+    if (!counted || extra.count < REFUSAL_CAP) return { refused: { rule, reason }, ...fix };
+    const list = [...before.map((r) => r.payload), { rule, reason }].map((r, i) => `${i + 1}. ${r.rule}: ${r.reason}`);
+    const why = `refused ${REFUSAL_CAP} times: ${list.join(' ')}`;
+    if (!writeOnce(join(runDir(root, run.run), 'failed.json'), { agentId: caller ?? null, why, at: new Date().toISOString() })) return { refused: { rule, reason }, ...fix };
+    journal(root, run, {
+      kind: 'refusal',
+      source: { system: 'hook', ref: toolUseId ?? `return ${run.run}` },
+      agent: caller ?? null,
+      payload: { source: 'hook', rule: 'refusal-cap', reason: why, run: run.run, actor: run.actor, caller: caller ?? null, tool: 'harness return', textHash: sha256(`refusal-cap: ${why}`), outcome: 'failed', hookSession: session }
+    });
+    return { refused: { rule, reason }, ...fix, failed: run.run };
   };
 
   const dir = runDir(root, run.run);
@@ -428,7 +494,10 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   if (!caller) return refuse('wrong-caller', `the main session is not run ${run.run}'s actor (${bound.agentId})`);
   if (caller !== bound.agentId) return refuse('wrong-caller', `agent ${caller} is not run ${run.run}'s actor (${bound.agentId})`);
   if (existsSync(join(dir, 'result.json'))) return refuse('already-returned', `run ${run.run} already returned its result`);
-  if (existsSync(join(dir, 'failed.json'))) return refuse('already-failed', `run ${run.run} failed: its actor stopped without returning`);
+  if (existsSync(join(dir, 'failed.json'))) {
+    const why = readJson(join(dir, 'failed.json'))?.why ?? '';
+    return refuse('already-failed', `run ${run.run} failed: ${why.startsWith('refused') ? `its result was refused ${REFUSAL_CAP} times` : 'its actor stopped without returning'}`);
+  }
 
   const problems = check(run.schema, result, run.defs);
   if (problems.length) return refuse('schema', `${run.actor} result: ${problems.join('; ').replaceAll('$', 'result')}`);
@@ -441,7 +510,8 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   }
   for (const k of Object.keys(result ?? {})) {
     if (run.input && Object.hasOwn(run.input, k) && !agrees(result[k], run.input[k])) {
-      return refuse('restated', `result.${k} is not the input's ${k}: whatever it carries must repeat the input exactly (it may leave out keys its schema does not require)`);
+      const where = differences(result[k], run.input[k], `result.${k}`, k).join('; ');
+      return refuse('restated', `result.${k} is not the input's ${k}: whatever it carries must repeat the input exactly (it may leave out keys its schema does not require): ${where}`);
     }
   }
   // A blocked result (the stage's "could not") covers nothing: it becomes the stage's error (resultsOf).
@@ -525,6 +595,18 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
     }
   }
   return { accepted: { run: run.run, hash } };
+}
+
+/**
+ * The text an agent sees for a refused return (fix-refusal-hints): `<rule>: <reason>`, then for a result refusal how
+ * to fix it, from the run's Output, and which refusal of the cap this is; at the cap, that the run has failed.
+ */
+export function refusalText({ refused, fix = null, failed = null }) {
+  const lines = [`${refused.rule}: ${refused.reason}`];
+  if (fix?.hint?.length) lines.push('How to fix it, from your Output:', ...fix.hint.map((h) => `- ${h}`));
+  if (fix) lines.push(`Refusal ${fix.count} of ${fix.cap}.`);
+  if (failed) lines.push(`Run ${failed} has failed after ${fix?.cap ?? REFUSAL_CAP} refusals: do not call the return tool again; end your turn.`);
+  return lines.join('\n');
 }
 
 // Every ref { url, at } in a value, depth-first, with its path (design A, 4.1). STAMPED (stages.js): the fields the
