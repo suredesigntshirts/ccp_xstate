@@ -99,3 +99,8 @@
 **Lesson:** An invoked actor can finish its work and hand back without calling the return tool, and nothing then moves its run.
 **Evidence:** first-real-issue run 2 (31 Oct): the verify agent for fri-jsonl-lint-2 checked all six lines, then ended with SubagentHandback only; the item sat in verifying with nothing waiting until the thread nudged the agent (`plan/decisions/2026-10-31-first-real-issue-run-2.md`).
 **Fate:** test. engine-actor-returns blocks the stop once, then fails the run.
+
+### L-stage-needs-bench
+**Lesson:** A stage's prompt that can only be tried in a full item run, with nothing to score it against, stays a first draft.
+**Evidence:** By 5 Nov the quick-fix stage rules had changed twice since they were written on 4 Nov, both times to fit a host check, never to improve output. Until 4 Nov the brief stage's whole prompt was one generic line. Each trial was a full item, about an hour, and it counted refusals, not quality. The best catch on record, the brief writer defusing the half-met `subtract` line in the adopt trial, came from no rule, and nothing would show if it stopped happening. The adopt trial's brief also wrote a check command that could not run as written (`plan/decisions/2026-11-04-stage-contract-followups.md`).
+**Fate:** design. Every model stage gets a bench: fixed cases, a rubric, a runner that sends the engine's own rendered prompt to that stage alone, and a scorer whose judge is checked against hand grades (stage-bench). A prompt change lands with a bench report.
