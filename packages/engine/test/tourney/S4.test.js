@@ -9,14 +9,15 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { runDir } from '../../src/actors.js';
+import { readWorkflow } from '../../src/prompts.js';
 import { assemble, DATA_RULE, WORKTREE_RULE, returnLine, runLine } from '../../src/stages.js';
 import { makeWorld, ISSUE, BRIEFS, prUrl, builds, verifies, tapWake, suiteWake, offer, pending } from './world.js';
 
 const sha256 = (t) => createHash('sha256').update(t).digest('hex');
 const FILE = new URL('../../../../workflows/quick-fix.json', import.meta.url);
-const BYTES = readFileSync(FILE);
-const WF = JSON.parse(BYTES.toString('utf8'));
-/** The value at a JSON pointer in the workflow file. */
+// The workflow as pinned: its JSON with its stage files filled in (prompts.js).
+const { bytes: BYTES, spec: WF } = readWorkflow('quick-fix', { dir: new URL('.', FILE).pathname });
+/** The value at a JSON pointer in the workflow as pinned. */
 const at = (ptr) => ptr.split('/').slice(1).map((t) => t.replaceAll('~1', '/').replaceAll('~0', '~')).reduce((v, k) => v?.[k], WF);
 const FRAME = { DATA_RULE, WORKTREE_RULE, none: '(none)' };
 

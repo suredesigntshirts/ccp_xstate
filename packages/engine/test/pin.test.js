@@ -7,9 +7,10 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { loadWorkflow } from '../src/index.js';
+import { loadWorkflow, readWorkflow } from '../src/index.js';
 
-const QF = readFileSync(new URL('../../../workflows/quick-fix.json', import.meta.url));
+// The bytes quick-fix is pinned as (its JSON with its stage files filled in): written as one file, they pin the same.
+const QF = readWorkflow('quick-fix', { dir: new URL('../../../workflows/', import.meta.url).pathname }).bytes;
 const hash = (b) => createHash('sha256').update(b).digest('hex');
 
 test('a pinned id loads from the stored blob, and a missing blob is stored from a file with exactly the pinned bytes', () => {

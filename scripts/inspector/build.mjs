@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
-import { exportRoot, graphOf } from './export.mjs';
+import { composedIn, exportRoot, graphOf } from './export.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -148,7 +148,12 @@ export async function build({ config, out, captureDir }) {
       const path = join(engine, 'workflows', file);
       const text = readFileSync(path, 'utf8');
       let spec; try { spec = JSON.parse(text); } catch { skipped.push(`${path}: not JSON`); continue; }
-      const key = createHash('sha256').update(text).digest('hex');
+      let key = createHash('sha256').update(text).digest('hex');
+      // A workflow with stage files is keyed and shown as its engine pins it: filled in from them (stage-prompt-files).
+      try {
+        const read = await composedIn(engine, basename(file, '.json'));
+        if (read && read.spec !== read.raw) { spec = read.spec; key = createHash('sha256').update(read.bytes).digest('hex'); }
+      } catch (error) { skipped.push(`${path}: ${error.message}`); continue; }
       const used = runs.filter((r) => r.workflow.key === key);
       workflows[key] ??= { name: basename(file, '.json'), spec, graph: graphOf(spec) };
       shelf.push({ id: slug(`wf-${owner}-${file}`), key, file: path, engine, label: `${owner} · ${file}`, runs: used.map((r) => r.id) });

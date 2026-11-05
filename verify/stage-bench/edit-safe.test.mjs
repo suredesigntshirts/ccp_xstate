@@ -15,12 +15,13 @@ import { REPO } from './lib.mjs';
 /** workflows/ copied to a temp folder with brief rule 2 changed by text replacement (a one-line diff). */
 function editedWorkflows() {
   const dir = mkdtempSync(join(tmpdir(), 'v-sb-wf-'));
-  for (const f of readdirSync(join(REPO, 'workflows'))) cpSync(join(REPO, 'workflows', f), join(dir, f));
-  const p = join(dir, 'quick-fix.json');
+  // The rule's words live in the brief's stage file since stage-prompt-files: the one-line diff is made there.
+  cpSync(join(REPO, 'workflows'), dir, { recursive: true });
+  const p = join(dir, 'quick-fix/brief.md');
   const t = readFileSync(p, 'utf8');
-  const old = JSON.stringify(JSON.parse(t).meta.actors.brief.rules[2]);
+  const old = `- ${loadWorkflow('quick-fix').meta.actors.brief.rules[2]}\n`;
   assert.equal(t.split(old).length, 2, 'rule 2 text is unique in the file');
-  writeFileSync(p, t.replace(old, JSON.stringify(JSON.parse(old) + ' Keep each brief under 400 words.')));
+  writeFileSync(p, t.replace(old, `${old.trimEnd()} Keep each brief under 400 words.\n`));
   assert.notEqual(readFileSync(p, 'utf8'), t);
   return dir;
 }

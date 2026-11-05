@@ -3,7 +3,8 @@
 //
 //   started:  the stage, its workflow (id, name and hash), the invoke and state that started it, the prompt as its
 //             parts (stages.js sections: every piece with its source; a frame piece says fixed: true, or filled: the
-//             run facts it was filled from; an input piece names its meaningAt and producer) and every input with its
+//             run facts it was filled from; an input piece names its meaningAt and producer; a piece whose words come
+//             from a stage file names its file and line, and an input's meaning its meaningFile and meaningLine) and every input with its
 //             meaning, meaningAt, value, the context path the invoke read it from and its producer;
 //   finished: the transition, event and state (a list of active states, each a dotted path) that took the result,
 //             then the output (or error) with stamped (the dotted paths in it the host wrote, not the agent), each
@@ -26,13 +27,22 @@
 // output. Every write is in the journal: the host puts each applied transition's writes in its engine.transition row
 // (host.js writesOf), so the record is derived from the journal and the workflow JSON alone. Nothing here imports
 // XState.
-import { chart, esc, isStage, EFFECTS, readers, STAMPED } from './stages.js';
+import { chart, esc, isStage, EFFECTS, readers, STAMPED, TASK } from './stages.js';
 
 const isObject = (v) => v != null && typeof v === 'object' && !Array.isArray(v);
 const kindOf = (spec, actor) => (isStage(spec.meta?.actors?.[actor]) ? 'stage' : EFFECTS.includes(actor) ? 'effect' : 'workflow');
 const paramAt = (w) => (w.set ? `${w.set}/params/${esc(w.path)}` : null);
 /** The value at a JSON pointer in the workflow. */
 const pointer = (spec, ptr) => String(ptr ?? '').split('/').slice(1).map((t) => t.replaceAll('~1', '/').replaceAll('~0', '~')).reduce((v, k) => v?.[k], spec);
+/**
+ * Where a workflow pointer's text came from, when a stage file gave it (prompts.js compose: meta.prompts): { file, line },
+ * or with a prefix { meaningFile, meaningLine }; {} when the text is in the workflow JSON itself.
+ */
+const lineOf = (spec, ptr, prefix = null) => {
+  const loc = ptr == null ? null : spec?.meta?.prompts?.[ptr];
+  if (!loc) return {};
+  return prefix ? { [`${prefix}File`]: loc.file, [`${prefix}Line`]: loc.line } : { file: loc.file, line: loc.line };
+};
 const join = (a, b) => [a, b].filter((x) => x != null && x !== '').join('.') || null;
 
 /** Who last wrote `path` in a context log ([{ path, by }], oldest first): { producer, amended? }. */
@@ -129,11 +139,20 @@ export function stageRecord({ spec, run, parts, context = null, promptHash, valu
     const source = isObject(from)
       ? { producer: { kind: 'literal', at: `${wiredAt}/value` } }
       : typeof from === 'string' && from.startsWith('context.') ? producerOf(log, from.slice(8), spec) : { producer: { kind: 'none' } };
-    return { name: k, meaning, meaningAt: `/meta/actors/${esc(run.actor)}/inputs/${esc(k)}`, value: run.input?.[k] ?? null, from: from ?? null, wiredAt, ...source };
+    const meaningAt = `/meta/actors/${esc(run.actor)}/inputs/${esc(k)}`;
+    return { name: k, meaning, meaningAt, ...lineOf(spec, meaningAt, 'meaning'), value: run.input?.[k] ?? null, from: from ?? null, wiredAt, ...source };
   });
   const byName = Object.fromEntries(inputs.map((i) => [i.name, i]));
-  const tagged = Object.fromEntries(Object.entries(parts).map(([part, pieces]) => [part, pieces.map((p) =>
-    p.source.input ? { ...p, source: { ...p.source, from: byName[p.source.input]?.from ?? null, producer: byName[p.source.input]?.producer ?? null } } : p)]));
+  const tagged = Object.fromEntries(Object.entries(parts).map(([part, pieces]) => [part, pieces.map((p) => {
+    if (p.source.workflow != null) return { ...p, source: { ...p.source, ...lineOf(spec, p.source.workflow) } };
+    if (!p.source.input) return p;
+    const i = byName[p.source.input];
+    // An input piece's text is its value (a literal from a stage file, as the brief's task, names that file's line)
+    // and, under Inputs, its meaning (named as meaningFile and meaningLine).
+    const literal = i?.producer?.kind === 'literal' ? lineOf(spec, i.producer.at) : {};
+    const meaning = p.source.input === TASK ? {} : lineOf(spec, p.source.meaningAt, 'meaning');
+    return { ...p, source: { ...p.source, ...literal, ...meaning, from: i?.from ?? null, producer: i?.producer ?? null } };
+  })]));
   return {
     run: run.run,
     stage: run.actor,

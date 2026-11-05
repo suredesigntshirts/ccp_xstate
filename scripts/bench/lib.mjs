@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { offer, restore } from '../../packages/engine/src/host.js';
 import { accept, actors, bind, loadRun, prepare, runDir, spawn } from '../../packages/engine/src/actors.js';
 import { handlers } from '../../packages/engine/src/effects/index.js';
-import { loadWorkflow } from '../../packages/engine/src/index.js';
+import { loadWorkflow, readWorkflow } from '../../packages/engine/src/index.js';
 import { chart, isStage } from '../../packages/engine/src/stages.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -31,31 +31,49 @@ const git = (dir, ...args) => execFileSync('git', ['-C', dir, '-c', 'user.email=
 // ---- Workflow versions
 
 /**
- * A workflow version: the bytes of <name>.json from a file (`workflow`), from this repo at a git revision (`rev`), or
- * this checkout's workflows/<name>.json. Returns { name, bytes, sha256, source, dir }: dir is a temp copy of this
- * repo's workflows/ with <name>.json replaced by those bytes, so the engine's loadWorkflow checks and pins exactly
- * them (its spec id is <name>@<sha256>).
+ * A workflow version: <name>.json and its stage files (workflows/<name>/*.md) from a file (`workflow`, with the stage
+ * files beside it, or a journal's blob, which holds them filled in), from this repo at a git revision (`rev`), or
+ * this checkout's workflows/. Returns { name, bytes, sha256, source, dir }: dir is a temp copy of this repo's
+ * workflows/ with the version's files in place of <name>'s, and bytes are what the engine pins for it (prompts.js
+ * readWorkflow), so loadWorkflow checks and pins exactly them (its spec id is <name>@<sha256>).
  */
 export function workflowVersion({ name = 'quick-fix', workflow = null, rev = null, pinned = null } = {}) {
-  let bytes;
   let source;
-  if (workflow) {
-    bytes = readFileSync(resolve(workflow));
-    source = `file ${resolve(workflow)}`;
-  } else if (rev) {
-    bytes = execFileSync('git', ['-C', REPO, 'show', `${rev}:workflows/${name}.json`]);
-    source = `git ${rev}:workflows/${name}.json`;
-  } else {
-    bytes = readFileSync(join(REPO, 'workflows', `${name}.json`));
-    source = `workflows/${name}.json`;
-  }
   const dir = mkdtempSync(join(tmpdir(), 'bench-wf-'));
-  for (const f of readdirSync(join(REPO, 'workflows')).filter((f) => f.endsWith('.json'))) cpSync(join(REPO, 'workflows', f), join(dir, f));
-  writeFileSync(join(dir, `${name}.json`), bytes);
+  cpSync(join(REPO, 'workflows'), dir, { recursive: true });
+  rmSync(join(dir, name), { recursive: true, force: true });
+  if (workflow) {
+    const file = resolve(workflow);
+    // A stage file is named relative to the workflow's folder: bring the folder of this version's stage files along.
+    if (existsSync(join(dirname(file), name))) cpSync(join(dirname(file), name), join(dir, name), { recursive: true });
+    writeFileSync(join(dir, `${name}.json`), readFileSync(file));
+    source = `file ${file}`;
+  } else if (rev) {
+    const tar = execFileSync('git', ['-C', REPO, 'archive', '--format=tar', rev, `workflows/${name}.json`, ...(gitHas(rev, `workflows/${name}`) ? [`workflows/${name}`] : [])]);
+    const out = mkdtempSync(join(tmpdir(), 'bench-rev-'));
+    execFileSync('tar', ['-x', '-C', out], { input: tar });
+    cpSync(join(out, 'workflows'), dir, { recursive: true });
+    rmSync(out, { recursive: true, force: true });
+    source = `git ${rev}:workflows/${name}.json${gitHas(rev, `workflows/${name}`) ? ` and workflows/${name}/` : ''}`;
+  } else {
+    source = `workflows/${name}.json${existsSync(join(REPO, 'workflows', name)) ? ` and workflows/${name}/` : ''}`;
+    if (existsSync(join(REPO, 'workflows', name))) cpSync(join(REPO, 'workflows', name), join(dir, name), { recursive: true });
+  }
+  const { bytes } = readWorkflow(name, { dir });
   // A journal's blob (a file named by its hash) is loaded as the pin it is: with the checks an item started on it keeps.
   pinned ??= Boolean(workflow && /^[0-9a-f]{64}$/.test(basename(workflow)));
   return { name, bytes, sha256: sha256(bytes), source, dir, pinned };
 }
+
+// True when `path` exists in this repo at revision `rev`.
+const gitHas = (rev, path) => {
+  try {
+    execFileSync('git', ['-C', REPO, 'cat-file', '-e', `${rev}:${path}`], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 /**
  * The version's spec, checked and pinned by the engine; with root, its blob is stored there. A pinned version is read

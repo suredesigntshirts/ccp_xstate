@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { join } from 'node:path';
 import { readFile } from '../../journal/src/index.js';
 import { checkStages } from './stages.js';
+import { readWorkflow } from './prompts.js';
 
 export { machineOf, failing, get, mapPaths, startRefusal, hashOf, replay } from './spec.js';
 export { check } from './schema.js';
@@ -12,6 +13,7 @@ export { wakesIn, inputsOfWake, dueTimers } from './wake.js';
 export { actors, accept, deliver, resultsOf, waiting } from './actors.js';
 export { stageRecord, producerOf } from './trace.js';
 export { tripwiresOf } from './tripwire.js';
+export { compose, readWorkflow, parseStageFile, pinBytes, locationOf, hasStageFiles } from './prompts.js';
 
 const REPO_WORKFLOWS = new URL('../../../workflows/', import.meta.url).pathname;
 const PINNED = /^(.+)@([0-9a-f]{64})$/;
@@ -38,8 +40,11 @@ const workflowNames = (dir) => {
 
 /**
  * A workflow by name (design A, 4.3: the pin). `name@<sha256>` reads the pinned bytes from <root>/blobs and checks
- * their hash; when the blob is missing and <dir>/<name>.json has exactly those bytes, they are stored from it. A plain name reads <dir ?? repo workflows>/<name>.json, stores its bytes as a blob under root (when
- * given), and returns the spec with id `<name>@<sha256>`, so every row the item writes names the bytes it runs on.
+ * their hash; when the blob is missing and <dir>/<name>.json (with its stage files) gives exactly those bytes, they are
+ * stored from it. A plain name reads <dir ?? repo workflows>/<name>.json and its stage files (prompts.js), stores the
+ * bytes it is pinned as under root (when given), and returns the spec with id `<name>@<sha256>`, so every row the item
+ * writes names the bytes it runs on. A workflow with stage files is pinned as its composed spec, so its blob alone
+ * replays an item; one without is pinned as its file bytes, as before stage-prompt-files.
  */
 export const loadWorkflow = (name, { root = null, dir = null } = {}) => {
   const pinned = String(name).match(PINNED);
@@ -51,7 +56,7 @@ export const loadWorkflow = (name, { root = null, dir = null } = {}) => {
     if (!existsSync(blob)) {
       let file = null;
       try {
-        file = readFileSync(join(dir ?? REPO_WORKFLOWS, `${pinned[1]}.json`));
+        file = readWorkflow(pinned[1], { dir: dir ?? REPO_WORKFLOWS }).bytes;
       } catch {
         file = null;
       }
@@ -66,10 +71,10 @@ export const loadWorkflow = (name, { root = null, dir = null } = {}) => {
     // An item pinned before fix-waiting-wake keeps its asking states with no timer until it finishes.
     return checkStages({ ...JSON.parse(bytes.toString('utf8')), id: name }, { workflows: workflowNames(dir ?? REPO_WORKFLOWS), pinned: true });
   }
-  const bytes = readFileSync(join(dir ?? REPO_WORKFLOWS, `${name}.json`));
+  const { spec: composed, bytes } = readWorkflow(name, { dir: dir ?? REPO_WORKFLOWS });
   const hash = createHash('sha256').update(bytes).digest('hex');
   // Checked before it is stored: a workflow that would be refused is never pinned.
-  const spec = checkStages({ ...JSON.parse(bytes.toString('utf8')), id: `${name}@${hash}` }, { workflows: workflowNames(dir ?? REPO_WORKFLOWS) });
+  const spec = checkStages({ ...composed, id: `${name}@${hash}` }, { workflows: workflowNames(dir ?? REPO_WORKFLOWS) });
   if (root) {
     const path = join(root, 'blobs', hash);
     if (!existsSync(path)) {
