@@ -122,7 +122,7 @@ test('S4: the quick-fix happy path leaves a complete stage record per run, each 
         delete holder[segs.at(-1)];
       }
       assert.deepEqual(own, results[actor] ?? own, `${actor}: the output less stamped is what the agent returned`);
-      assert.ok(!JSON.stringify(own).match(/"(key|checkout|gates|green)":/), `${actor}: no stamped field left unmarked`);
+      assert.ok(!JSON.stringify(own).match(/"(key|checkout|gates|green|branch)":/), `${actor}: no stamped field left unmarked`);
       assert.ok(rec.wrote.length > 0, `${actor}: wrote something`);
       for (const wr of rec.wrote) {
         assert.deepEqual(at(wr.at), wr.from, `${actor}: write at ${wr.at}`);
@@ -177,7 +177,7 @@ test('S4: the quick-fix happy path leaves a complete stage record per run, each 
     const selfReads = build.wrote[0].readBy.filter((r) => r.self).map((r) => `${r.state}:${r.actor}.${r.input}`);
     assert.deepEqual(selfReads, ['building:build.previous'], 'the build reading its own pr as previous is marked self, and only it');
     assert.ok(brief.wrote[0].readBy.every((r) => !r.self) && verify.wrote[0].readBy.every((r) => !r.self), 'brief and verify read none of their own writes');
-    assert.deepEqual(build.stamped, ['pr.key', 'pr.checkout'], 'build: the host stamped key and checkout on its pr (not green: the suite came later)');
+    assert.deepEqual(build.stamped, ['pr.key', 'pr.branch', 'pr.checkout'], 'build: the host stamped key, branch and checkout on its pr (not green: the suite came later)');
     assert.deepEqual(brief.stamped, [], 'brief: nothing stamped');
     assert.ok(build.wrote[0].readBy.some((r) => r.kind === 'effect' && r.actor === 'merge' && r.input === 'pr'));
     assert.deepEqual(verify.wrote.map((x) => [x.path, x.from]), [['verdict', 'event.output']]);

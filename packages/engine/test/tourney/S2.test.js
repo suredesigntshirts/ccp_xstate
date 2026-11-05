@@ -36,7 +36,8 @@ test('S2: the verify prompt carries the exact checkout commands; target shows on
     assert.equal(run.input.checkout, checkout);
     const prompt = readFileSync(join(runDir(w.root, run.run), 'brief.md'), 'utf8');
     const inputs = part(prompt, 'Inputs');
-    assert.ok(inputs.includes(`  = ${JSON.stringify({ url, at })}\n`), 'target shown as { url, at } only');
+    // fix-rebuild-worktree: branch (GitHub's head.ref) is stamped but shown; key, gates, green and checkout stay hidden.
+    assert.ok(inputs.includes(`  = ${JSON.stringify({ url, at, branch: 'b' })}\n`), 'target shown as { url, at, branch } only');
     assert.ok(inputs.includes(`  = ${JSON.stringify(checkout)}`), 'checkout shown as data');
     assert.ok(!/"key"|"green"|"gates"|"checkout":/.test(inputs), 'no stamped field shown');
     const got = await w.agent('c', 'verify', ({ input, worktree }) => {

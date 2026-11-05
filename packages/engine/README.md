@@ -88,8 +88,11 @@ effect didn't make, and with `--host` fails on one.
 
 A state that invokes `brief`, `build` or `verify` starts an agent (`src/actors.js`, plan item engine-actors). The run
 handler writes the run's folder under `<root>/items/<item>/runs/<seq>.<invoke>/`, adds a git worktree named
-`<item>--<seq>.<invoke>` on branch `run/<item>/<seq>.<invoke>` (from `--repo`, under `--worktrees`), and journals the
-brief's hash. The run stays open until its agent returns:
+`<item>--<seq>.<invoke>` on branch `run/<item>/<seq>.<invoke>` (from `--repo`'s HEAD, under `--worktrees`), and journals the
+brief's hash. A rebuild, a run whose input `previous` is a PR ref, instead gets its worktree on that PR's branch at
+`previous.at` (plan item fix-rebuild-worktree): `accept` stamps the branch from GitHub's `head.ref` (not for a fork
+PR), a missing commit is fetched from origin, and a finished run's worktree holding the branch is detached first. With
+no stamped branch, or the head nowhere, the run fails and its item steps back. The run stays open until its agent returns:
 
 1. The session calls the Agent tool with the prompt `ccp-run <run>` (bin/host.js prints it under `waiting`, and the
    harness hook names waiting runs after each Agent call and wake). The harness's PreToolUse hook swaps in the brief,

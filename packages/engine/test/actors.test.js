@@ -299,3 +299,88 @@ test('handback: an agent sent back that then returns hands back freely', async (
   await accept({ root, caller: 'ag1', run: BRIEF_RUN, result: BRIEFS });
   assert.equal(handback({ root, agentId: 'ag1' }), null);
 });
+
+// fix-rebuild-worktree: a rebuild's worktree is on the previous PR's branch at its head, not a fresh branch at HEAD.
+// The clone's origin is a local bare repo; GitHub shows the PR on the branch the first build pushed.
+const gitIn = (dir, ...args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+async function rebuilt({ repo: from = { full_name: 'o/r' }, push = true } = {}) {
+  const ctx = await building();
+  const origin = mkdtempSync(join(tmpdir(), 'actors-origin-'));
+  execFileSync('git', ['init', '-q', '--bare', origin]);
+  gitIn(ctx.clone, 'remote', 'add', 'origin', origin);
+  gitIn(ctx.clone, 'push', '-q', 'origin', 'HEAD:refs/heads/main');
+  const build1 = loadRun(ctx.root, 'it-1:1.build');
+  assert.equal(build1.branch, 'run/it-1/1.build', 'a first build gets a fresh branch named by its run');
+  assert.equal(gitIn(build1.worktree, 'rev-parse', 'HEAD'), gitIn(ctx.clone, 'rev-parse', 'HEAD'), 'at the clone\'s HEAD');
+  const head = commitIn(build1.worktree);
+  if (push) gitIn(build1.worktree, 'push', '-q', 'origin', `HEAD:refs/heads/${build1.branch}`);
+  const gh = await fakeGitHubWithFiles({ 1: { head } });
+  const pull = gh.client.pull;
+  gh.client.pull = async (pr) => { const p = await pull(pr); return { ...p, head: { ...p.head, ref: build1.branch, repo: from } }; };
+  gh.green(head);
+  assert.ok((await accept({ root: ctx.root, caller: 'ag2', run: 'it-1:1.build', result: claim(head), github: gh.client })).accepted);
+  assert.equal((await deliver({ root: ctx.root, run: 'it-1:1.build' })).state, 'verifying');
+  const verify = loadRun(ctx.root, 'it-1:2.verify');
+  gitIn(verify.worktree, 'checkout', '-q', '--detach', head);
+  startAgent(ctx.root, 'it-1:2.verify', 'ag3');
+  const lines = ISSUE.expect.map((line) => ({ line, result: 'FAIL', evidence: 'ran it: it does not hold' }));
+  const fail = { result: 'FAIL', pr: { url: URL_, at: head }, issue: ISSUE, lines };
+  assert.ok((await accept({ root: ctx.root, caller: 'ag3', run: 'it-1:2.verify', result: fail, github: gh.client })).accepted);
+  const d = await deliver({ root: ctx.root, run: 'it-1:2.verify' });
+  return { ...ctx, gh, head, origin, build1, d };
+}
+
+test('rebuild: after a FAIL the build run\'s worktree is on the PR\'s branch at its head, and a plain push lands on it', async () => {
+  const { root, gh, head, origin, build1, d } = await rebuilt();
+  try {
+    assert.equal(d.state, 'building');
+    const stamped = JSON.parse(readFileSync(join(runDir(root, 'it-1:1.build'), 'result.json'), 'utf8')).result.pr;
+    assert.equal(stamped.branch, build1.branch, 'accept stamped the branch GitHub showed');
+    const run = loadRun(root, 'it-1:3.build');
+    assert.equal(run.branch, build1.branch);
+    assert.equal(gitIn(run.worktree, 'rev-parse', 'HEAD'), head);
+    assert.equal(gitIn(run.worktree, 'rev-parse', '--abbrev-ref', 'HEAD'), build1.branch);
+    assert.match(readFileSync(join(runDir(root, 'it-1:3.build'), 'context.md'), 'utf8'), new RegExp(`branch ${build1.branch}\\.`));
+    assert.equal(gitIn(build1.worktree, 'rev-parse', '--abbrev-ref', 'HEAD'), 'HEAD', 'the finished build\'s worktree was detached, not removed');
+    assert.ok(readFileSync(join(runDir(root, 'it-1:3.build'), 'brief.md'), 'utf8').includes(`"branch":"${build1.branch}"`), 'the stamped branch is shown in previous');
+    const fix = commitIn(run.worktree);
+    gitIn(run.worktree, 'push', '-q');
+    assert.equal(gitIn(origin, 'rev-parse', `refs/heads/${build1.branch}`), fix, 'a plain git push updates the PR\'s branch');
+  } finally {
+    await gh.close();
+  }
+});
+
+test('rebuild: a commit only on origin is fetched; a fork PR, or a head nowhere, fails the run and the item steps back', async () => {
+  const fetched = await rebuilt();
+  try {
+    // A fresh clone of origin has the PR's commit only after a fetch.
+    const other = mkdtempSync(join(tmpdir(), 'actors-clone-'));
+    execFileSync('git', ['clone', '-q', fetched.origin, other]);
+    const { rebuildStart } = await import('../src/actors.js');
+    const prev = { url: URL_, at: fetched.head, branch: fetched.build1.branch };
+    assert.deepEqual(rebuildStart({ repo: other, worktrees: join(other, '..', 'wt'), previous: prev }), { branch: prev.branch, at: prev.at, upstream: `origin/${prev.branch}` });
+    assert.throws(() => rebuildStart({ repo: other, worktrees: join(other, '..', 'wt'), previous: { ...prev, at: OTHER } }), /^Error: rebuild-head: /);
+    assert.throws(() => rebuildStart({ repo: other, worktrees: join(other, '..', 'wt'), previous: { url: URL_, at: fetched.head } }), /^Error: rebuild-branch: /);
+  } finally {
+    await fetched.gh.close();
+  }
+  const fork = await rebuilt({ repo: { full_name: 'someone/r' } });
+  try {
+    const stamped = JSON.parse(readFileSync(join(runDir(fork.root, 'it-1:1.build'), 'result.json'), 'utf8')).result.pr;
+    assert.equal(stamped.branch, undefined, 'a fork PR gets no branch');
+    assert.equal(fork.d.state, 'replanning', 'the rebuild run failed, so the item stepped back');
+    assert.equal(loadRun(fork.root, 'it-1:3.build'), null, 'no run on a fresh branch was made');
+    const failed = rows(fork.root).find((r) => r.payload?.reason?.startsWith?.('rebuild-branch: '));
+    assert.ok(failed, 'the failure is journalled with its reason');
+  } finally {
+    await fork.gh.close();
+  }
+});
+
+test('rebuild: a build result that sets pr.branch itself is refused as reserved', async () => {
+  const { root } = await building();
+  const head = commitIn(loadRun(root, 'it-1:1.build').worktree);
+  const got = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: { pr: { url: URL_, at: head, branch: 'main' } } });
+  assert.equal(got.refused.rule, 'reserved');
+});
