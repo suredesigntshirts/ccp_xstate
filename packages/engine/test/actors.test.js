@@ -342,7 +342,7 @@ test('rebuild: after a FAIL the build run\'s worktree is on the PR\'s branch at 
     assert.equal(gitIn(run.worktree, 'rev-parse', '--abbrev-ref', 'HEAD'), build1.branch);
     assert.match(readFileSync(join(runDir(root, 'it-1:3.build'), 'context.md'), 'utf8'), new RegExp(`branch ${build1.branch}\\.`));
     assert.equal(gitIn(build1.worktree, 'rev-parse', '--abbrev-ref', 'HEAD'), 'HEAD', 'the finished build\'s worktree was detached, not removed');
-    assert.ok(!readFileSync(join(runDir(root, 'it-1:3.build'), 'brief.md'), 'utf8').includes('"branch":"run/'), 'the stamped branch is not shown in the prompt');
+    assert.ok(readFileSync(join(runDir(root, 'it-1:3.build'), 'brief.md'), 'utf8').includes(`"branch":"${build1.branch}"`), 'the stamped branch is shown in previous');
     const fix = commitIn(run.worktree);
     gitIn(run.worktree, 'push', '-q');
     assert.equal(gitIn(origin, 'rev-parse', `refs/heads/${build1.branch}`), fix, 'a plain git push updates the PR\'s branch');

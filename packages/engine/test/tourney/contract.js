@@ -20,7 +20,7 @@ export const stageOf = (workflow, actor) => WORKFLOWS[workflow].meta.actors[acto
 export const taskInput = (stage) => (Object.hasOwn(stage.inputs, 'task') ? 'task' : null);
 // The test's own formatting, not the renderer's: a value as shown (refs without the host's stamped fields), an
 // input line, and the output schema as printed ($refs inlined, no description or covers, no stage parts).
-const HIDDEN = ['key', 'gates', 'green', 'checkout', 'branch'];
+const HIDDEN = ['key', 'gates', 'green', 'checkout'];
 export const shownJson = (v) => JSON.stringify(v ?? null, function (k, x) {
   return HIDDEN.includes(k) && typeof this.url === 'string' && typeof this.at === 'string' ? undefined : x;
 });

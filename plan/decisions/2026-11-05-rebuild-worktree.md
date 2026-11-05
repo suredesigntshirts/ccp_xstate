@@ -28,9 +28,3 @@ other branch name. In trial-fail-path the agent reset its worktree to the old br
 5. **Fails closed.** With `previous` set but no stamped branch, or `previous.at` not found after the fetch, the run
    fails with a reason, and the item steps back as any failed run does. A fresh-branch fallback was set aside: it is
    the bug this item fixes, and a fork PR cannot be pushed to anyway.
-6. **Built without changing `workflows/quick-fix.json`** (decided while building). Its rule already reads right once
-   the worktree is on the PR's branch: the run line names that branch, and "push to that PR" and "use no other branch
-   name" now agree. The trial-fail-path verifier's test replays the trial journals on this head's quick-fix and pins
-   its hash, so a wording change would break committed evidence for no change in behaviour. A builder that sets
-   `pr.branch` is refused with rule `reserved`, which names the field. The item's output line for the workflow text is
-   not built for this reason.

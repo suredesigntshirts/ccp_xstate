@@ -41,8 +41,10 @@ export const contextOf = ({ run, worktree, repo, github = null, branch }) =>
 /** The output field that is a stage's "could not": { reason }, a oneOf alternative to the rest of its output. */
 export const BLOCKED = 'blocked';
 
-/** The fields the host stamps on a ref { url, at }: an agent may not set them, and is not shown them. */
+/** The fields the host stamps on a ref { url, at }: an agent may not set them. */
 export const STAMPED = Object.freeze(['key', 'gates', 'green', 'checkout', 'branch']);
+/** The stamped fields an agent is not shown. branch, the PR's branch on GitHub, is shown (fix-rebuild-worktree). */
+export const HIDDEN = Object.freeze(['key', 'gates', 'green', 'checkout']);
 
 const text = (v) => typeof v === 'string' && v.trim() !== '';
 const isObject = (v) => v != null && typeof v === 'object' && !Array.isArray(v);
@@ -56,7 +58,7 @@ export const stagesOf = (spec) => Object.keys(spec.meta?.actors ?? {}).filter((n
 
 // A value as an agent sees it: refs without the fields the host stamps on them.
 const shown = (value) => JSON.stringify(value ?? null, function hide(key, v) {
-  return STAMPED.includes(key) && typeof this?.url === 'string' && typeof this?.at === 'string' ? undefined : v;
+  return HIDDEN.includes(key) && typeof this?.url === 'string' && typeof this?.at === 'string' ? undefined : v;
 });
 
 // A schema node as printed under Output: $refs inlined, without the per-field description and covers (the
