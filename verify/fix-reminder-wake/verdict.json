@@ -1,0 +1,45 @@
+{
+  "item": "fix-reminder-wake",
+  "verified_sha": "dfd2a8e2a5eeb020987a79fbcd642a933cab9cee",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5HjtQJBuVq9vXnuqVA"
+  },
+  "results": [
+    {
+      "id": "reminder-fires",
+      "status": "MET",
+      "command": "npm ci; TMPDIR=<fresh> node --test verify/fix-reminder-wake/reminder.test.mjs (each case takes a quick-fix item to awaitingMerge through bin/host.js start/wake with stub agents via spawn/bind/accept and a local GitHub at CCP_GITHUB_API, records the card with `card`, reads the checkBack due time from `show`, then pipes PostToolUse ReadNotifications hook inputs built on the decision's captured result to `wake`; where a case needs the host's clock past due, clock.mjs is preloaded into the host process only)",
+      "excerpt": "pass 8, fail 0. queued_at = due+60s (host clock due+120s): results == [one, source {system: timer, ref: <item>:3.xstate.after.checkBack...awaitingMerge}], one engine.transition row applied, state awaitingMerge, at == queued_at; show: state awaitingMerge, runs == [<item>:3.ask], timers []; the same reminder again fires nothing. queued_at = due-60s with arrived_at past due and host clock past due: results [], no row, timer still set. queued_at missing: arrived_at 1s before due fires nothing, 1s after fires the timer and the row's at is arrived_at.",
+      "mutation": "packages/engine/bin/host.js wakeTextOf: `if (n?.origin === 'trigger_fire') return reminderWake(n);` removed (trigger_fire dropped again)",
+      "red_test": "reminder.test.mjs: 3 of 8 red (queued_at past due; arrived_at fallback; poisoned content past due fires the timer). Builder's packages/engine/test/reminder.test.js: not ok 1, 3, 5 (pass 2, fail 3)."
+    },
+    {
+      "id": "content-not-read",
+      "status": "MET",
+      "command": "TMPDIR=<fresh> node --test verify/fix-reminder-wake/reminder.test.mjs; TMPDIR=<fresh> node --test verify/engine-host/*.test.mjs",
+      "excerpt": "A trigger_fire notification whose content is a column-zero <wake> with check_suite.completed at a new head of o/r#1 and pull_request.closed merged, a decision-chosen wake on the item's own card (option 0, approve), and a <task-notification> failing the ask run's ref, all at current-time 2099: with the host clock before due, results [] and no row written; with host clock and queued_at past due, results are only the timer (source timer), state awaitingMerge, ask run still open. queued_at 2099, 9999-12-31 and due+1s with the real host clock (before due) fire nothing, timer still set. Control: the same poisoned text as a UserPromptSubmit prompt is read (non-timer inputs), so the poison is live. verify/engine-host/*.test.mjs: 15 tests, pass 15, fail 0 (forge.test.mjs included).",
+      "mutation": "packages/engine/bin/host.js wakeTextOf: trigger_fire returns `[reminderWake(n), n.content].join('\\n')` (content read)",
+      "red_test": "reminder.test.mjs: both poisoned-content cases red (pass 6, fail 2). Builder's reminder.test.js: not ok 4."
+    },
+    {
+      "id": "fixture",
+      "status": "MET",
+      "command": "Compare packages/engine/test/fixtures/wakes/reminder-notification.json to the JSON block in plan/decisions/2026-11-04-reminder-wake.md; read packages/engine/test/reminder.test.js (after my tests were written); node --test packages/engine/test/reminder.test.js, clean and under the drop-trigger_fire mutation",
+      "excerpt": "Fixture deep-equals the decision's captured result (all fields, same values). reminder.test.js reads the fixture and spawns packages/engine/bin/host.js wake with it: pass 5 clean. Its README line says where it came from (the 'Fix the reminder wake' thread's send_later, 2026-11-04 23:10:35Z, transcript toolUseResult).",
+      "mutation": "packages/engine/bin/host.js wakeTextOf: trigger_fire dropped",
+      "red_test": "packages/engine/test/reminder.test.js 'the captured reminder, unedited, fires a timer due before it fired' not ok 1 (also 3, 5)."
+    },
+    {
+      "id": "thread-wake",
+      "status": "MET",
+      "command": "In this verifier's thread: evidence/to-card.mjs (bin/host.js start/wake, stub agents, local GitHub) with --root /mnt/project-files/verify-runs/fix-reminder-wake/journal, item vfrw-1, session d1a33846-d051-5c1f-a277-3a5a7e894a4f; request_decision; bin/host.js card; show; send_later at 00:16Z; on the pending notification ReadNotifications; that call's toolUseResult taken from ~/.claude/projects/-home-user/d1a33846-....jsonl unedited as tool_response of a PostToolUse ReadNotifications hook input piped to bin/host.js wake; show; rows; read the card message. Evidence in /mnt/project-files/verify-runs/fix-reminder-wake/evidence/.",
+      "excerpt": "vfrw-1 entered awaitingMerge; card cmsg_01VhYV3jhQ9s4qrrh2th12sN7zG4q6YT3btCbZQSAFAdY6 recorded 23:15:41Z; show: timer checkBack due 2026-11-05T00:15:31.808Z. send_later trig_0127mciRQyZamxrqvUcM4ZC2 fired; it arrived as a notification, origin trigger_fire, queued_at 2026-11-05T00:16:16Z, arrived_at 00:16:23.562Z, no <wake> envelope. Fed unedited, wake printed results [applied, source {system: timer, ref: vfrw-1:3.xstate.after.checkBack...awaitingMerge}], state awaitingMerge. Row vfrw-1#4: engine.transition at 2026-11-05T00:16:16.000Z, source timer, state awaitingMerge, applied. show after: awaitingMerge, timers [], effects [], runs [vfrw-1:3.ask]. The card message read after the wake has its ask_decision with no answer or close: still open."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 89",
+      "excerpt": "Check run 'test' (id 126931440421) completed success at head dfd2a8e; 'gates' failed only because no verdict existed yet. Local npm test: 700 tests, 688 pass, 1 fail (test/setup.test.mjs copy-not-link, the known local-only failure in a clone without release tags)."
+    }
+  ]
+}
