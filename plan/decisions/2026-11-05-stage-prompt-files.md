@@ -18,3 +18,15 @@ The bench runs the same `brief.md` through `claude -p`.
 - Claude Code's `.claude/agents` definitions are not used for stages. They load only at session start, they are not
   covered by the workflow pin, and each run's inputs must be filled in at run time anyway.
 - It lands before `wf-intake` and `refine-brief-stage`, so their prompt work is done in the files.
+
+## Follow-ups (5 Nov, later)
+
+- **Named agents.** Claude Code agent definitions (`~/.claude/agents`, `.claude/agents`, a plugin's `agents/`) put
+  a role's standing rules in the system prompt and enforce its tools and model. Stages do not use them today: every
+  stage is the default agent with rules and task in one prompt. The stage-prompt-files replan decides whether the
+  plugin ships a few roles (builder, verifier, writer) for tools and model, with stage files holding the
+  task-specific rules. It must check that plugin agents load in cloud threads and how a role's version is tied to
+  the workflow pin.
+- **Stalled runs.** A prepared run waits on the thread's Claude calling the Agent tool. Draft item
+  `fix-waiting-run-stall` blocks a Stop while a run waits. Headless stage processes (`claude -p`, as the bench runs
+  them) would remove that dependence entirely; they are weighed once the bench has measured their cost.
