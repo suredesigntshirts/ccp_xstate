@@ -85,7 +85,7 @@
     },
     {
       "ref": "verify/",
-      "what": "Frozen suites that pin quick-fix.json's hash or bytes keep passing: they read the pinned blob or the trial journals, never workflows/quick-fix.json at HEAD; if one reads HEAD, the build stops for a replan rather than editing it"
+      "what": "Done items' suites that snapshot main's workflows (evidence/main-prompts.json and main-scenarios.json in verify/fix-refusal-hints, fix-waiting-run-stall, fix-return-tool-answer and fix-waiting-lines-owner, holding renders and the quick-fix hash, and verify/fix-waiting-wake/load-check.test.mjs's list of asking states) are re-captured from this PR's head by the scripts that wrote them, and blocked is added to quick-fix's asking states; no assertion and no other evidence changes (plan/decisions/2026-11-05-blocked-retry.md, After the first build round)"
     }
   ],
   "expect": [
@@ -103,7 +103,7 @@
     },
     {
       "id": "not-blocked-unchanged",
-      "check": "A verify FAIL, a red check, an agent that stopped without returning (failed.json) and a briefing error reach the same states with the same cards as on main; the error event's error text for a block is main's; every engine, plugin and verify test that passes on main passes",
+      "check": "A verify FAIL, a red check, an agent that stopped without returning (failed.json) and a briefing error reach the same states with the same cards as on main; the error event's error text for a block is main's; every engine, plugin and verify test that passes on main passes, where a done suite's main snapshot differs from main only by quick-fix's new hash, build.md's blocked line and the blocked state, re-captured as the outputs line says",
       "how": "The verifier's own test, run at the head and at main, and npm test",
       "proof": "verifier"
     },
