@@ -1,0 +1,49 @@
+{
+  "item": "fix-rebuild-worktree",
+  "verified_sha": "fc33523bad2a5ff8b938cadb1a2e23ab1945da9e",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FnuQniQjjxN6sWQrQ"
+  },
+  "results": [
+    {
+      "id": "rebuild-on-branch",
+      "status": "MET",
+      "command": "npm ci; TMPDIR=<fresh> node --test verify/fix-rebuild-worktree/rebuild.test.mjs (real engine: restore/offer/pump, real handlers and agent run handler, spawn/bind/accept; origin a local bare repo, the host's --repo a clone of it; stub GitHub REST whose PR head.ref is the branch the first build pushed and head.repo o/r; stub agents commit in their worktrees and push)",
+      "excerpt": "pass 8, fail 0. FAIL path: first build run/a/1.build at clone HEAD (its HEAD^ is main); after the FAIL verdict the item is in building and the rebuild's worktree HEAD == previous.at, rev-parse --abbrev-ref HEAD == run/a/1.build, @{u} == origin/run/a/1.build, run.json branch and the context.md run line ('..., branch run/a/1.build.') name it, the brief.stored row's contextHash is that context's sha256; a plain `git push` moved origin's branch to the new commit whose parent is previous.at, the PR (still the only one) is at it; the finished first worktree is detached at its commit; a second FAIL goes to replanning with no third build (C-second-fail-replans). Red check_run path (C-red-ci-back-to-building): from checking, a failure check_run at pr.at goes back to building with failure.sha == pr.at and the same worktree checks hold. head.ref 'fix/multiply' (not the run's name) is the branch used. A host on a fresh clone without the head fetches it from origin and the same checks hold.",
+      "mutation": "packages/engine/src/actors.js prepare: `const start = { branch: run/<item>/<run>, at: 'HEAD' }` always (rebuildStart and freeBranch dropped)",
+      "red_test": "rebuild.test.mjs: 8 of 8 red."
+    },
+    {
+      "id": "branch-stamped",
+      "status": "MET",
+      "command": "TMPDIR=<fresh> node --test verify/fix-rebuild-worktree/rebuild.test.mjs (test 5), Expect line as changed by replan #96 (branch reserved but shown); node --test verify/engine-stage-contract/*.test.mjs",
+      "excerpt": "head.repo 'o/r' and 'O/R' stamp pr.branch == head.ref ('b1'); head.repo 'fork/r' and head.repo null leave it unset (key still o/r#1). A build result { pr: { url, at, branch: 'elsewhere' } } is refused, rule reserved, reason names branch. The rebuild's brief.md previous input shows exactly { url, at, branch } with branch the stamped one; key, checkout, green and gates are not shown. verify/engine-stage-contract: pass 4, fail 0 (stage-record checker true again). Real GitHub (scratch PR #46): result.json pr.branch run/vfrw-2/1.build from GitHub's head.ref."
+    },
+    {
+      "id": "fails-closed",
+      "status": "MET",
+      "command": "TMPDIR=<fresh> node --test verify/fix-rebuild-worktree/rebuild.test.mjs (tests 6-8)",
+      "excerpt": "Fork PR (head.repo fork/r, and null): after FAIL one engine.effect row for the build run with phase failed, reason 'rebuild-branch: previous PR ... has no branch the host saw on GitHub (a fork PR, or not read at accept)'; state replanning with context.failure set; no worktree folder and no run/<item>/3.build branch made. Head nowhere (branch deleted from origin and gc-pruned, host on a fresh clone): failed reason 'rebuild-head: previous PR ... head <sha> is in neither the clone nor origin', replanning, no worktree or branch. Clone's own checkout on branch feat == the PR's head.ref: failed reason 'rebuild-branch: branch feat is checked out at <clone>, outside the host's worktrees; it is left alone', replanning, the clone still on feat at the same commit."
+    },
+    {
+      "id": "builder-tests",
+      "status": "MET",
+      "command": "node --test packages/engine/test/actors.test.js, clean and with prepare reverted to always branch from HEAD (read after my tests were written)",
+      "excerpt": "Clean: pass 20. Reverted: not ok 18 'rebuild: after a FAIL the build run's worktree is on the PR's branch at its head, and a plain push lands on it', not ok 19 'rebuild: a commit only on origin is fetched; a fork PR, or a head nowhere, fails the run and the item steps back' (pass 18, fail 2). Test 20 (pr.branch refused as reserved) stays green, as it tests accept, not prepare.",
+      "mutation": "packages/engine/src/actors.js prepare: always `-B run/<item>/<run> HEAD`, no freeBranch",
+      "red_test": "packages/engine/test/actors.test.js tests 18 and 19 red"
+    },
+    {
+      "id": "real-pr",
+      "status": "MET",
+      "command": "In this verifier's thread, /mnt/project-files/verify-runs/fix-rebuild-worktree/evidence/drive.mjs: bin/host.js start/wake against real GitHub (suredesigntshirts/ccp_xstate_scratch clone), stub agents through spawn/bind/accept; the stub builder pushed run/vfrw-2/1.build and opened PR #46 with the GitHub MCP; a check_suite.completed wake; verify FAIL; in the rebuild worktree commit + plain `git push`; rebuild returned; PR commits and open PRs read with the GitHub MCP; PR closed. Engine at fc33523 (a first run, vfrw-1/PR #45 at d1ca9cb, gave the same result).",
+      "excerpt": "Rebuild run vfrw-2:4.build: worktree HEAD 19b362be (the PR head), branch run/vfrw-2/1.build, upstream origin/run/vfrw-2/1.build; context 'Run vfrw-2:4.build, worktree ... of https://github.com/suredesigntshirts/ccp_xstate_scratch, branch run/vfrw-2/1.build.'; `git push` -> '19b362b..fb3d6cb run/vfrw-2/1.build -> run/vfrw-2/1.build'; the rebuild's return was accepted (state checking). GitHub: PR #46 commits 19b362be, fb3d6cb1; #46 the only PR opened since the run started (next newest #43, 2026-11-04). #45 and #46 closed."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 95",
+      "excerpt": "At d1ca9cb 'test' was red: verify/engine-stage-contract stage-record checker (its own hidden-field list) disagreed with prompts that hid branch; the builder's fc33523 shows branch (replan #96). At fc33523 'test' (run 41950164835) completed success; 'gates' red only because no verdict existed yet. Local npm test at d1ca9cb: 2 fails, that stage-record one and test/setup.test.mjs copy-not-link (known local-only, no release tags in clone)."
+    }
+  ]
+}
