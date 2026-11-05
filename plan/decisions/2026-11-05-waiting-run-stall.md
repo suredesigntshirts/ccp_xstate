@@ -47,3 +47,16 @@ measures how often stalls happen.
 
 The block reason names the item, its state, the run, its actor, the exact Agent prompt, which block of the cap this
 is, and the cannot-start exit. No stage prompt changes. The guard is one new concept (budget 1).
+
+## After the build
+
+Build PR #127 merged at 3258451 with the verifier's verdict. Round 1, at 5fa8ddc (verdict bd2fed0), found 6 of the 7
+Expect lines MET. measure was NOT MET because the stalls view listed only runs that had guard rows, not the
+never-blocked one. The fix seeds a per-run entry from each brief.stored row (06c5868). The verifier then re-stamped all
+7 MET at 06c5868 (b789584). The merge was released as harness-v0.1.26. In the real `claude -p` sessions, a blocked
+stop was followed by the Agent call `ccp-run <run>` and the run's agent.spawn row. With the Agent tool disallowed, a
+session got two blocks, then stall-cap, and the item went to replanning.
+
+The verifier also found something outside this item. The waiting-run lines that UserPromptSubmit and PostToolUse of
+Agent add list every session's prepared runs, so a model in one session started a run whose item another session
+owns. The Stop guard filters by owner, but those lines don't. This is drafted as fix-waiting-lines-owner.
