@@ -1,0 +1,35 @@
+{
+  "item": "probe-plugin-agents",
+  "verified_sha": "52036075ec9081c126681f03b3e4c9ffc18824c4",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GMk6rgZDYCKTbzLXY",
+    "model": null
+  },
+  "summary": "All 4 MET at 5203607 (after replan #111 reworded listed to the path that ran). I reran every check at this head, because the merge of main brought engine and workflow changes (#107) into the installed plugin: setup.sh installed 5203607 into a fresh HOME (/home/user/v2home), and three claude -p sessions with no --plugin-dir (24aeea9d, e88b02ea, 256d5976) in this cloud container, on Claude Code 2.1.318, reproduced the builder's results. verify/probe-plugin-agents/evidence.test.mjs checks the builder's evidence set and mine: 9 pass. The first round, at 4d11a54 (commit cd5007d), judged listed NOT MET under its old wording, which asked for a fresh cloud thread on a release. That check is now follow-up item probe-plugin-agents-thread.",
+  "results": [
+    {
+      "id": "listed",
+      "status": "MET",
+      "command": "HOME=/home/user/v2home CCP_SETUP_FETCH=0 CCP_SETUP_REF=52036075 bash infra/cloud-environment/setup.sh; cd /home/user/v2probe && HOME=/home/user/v2home CCP_HARNESS_DIR=/home/user/v2harness claude -p \"$(cat evidence/run1/prompt.txt)\" --output-format stream-json --verbose --permission-mode auto; node --test verify/probe-plugin-agents/evidence.test.mjs",
+      "excerpt": "installed-release.json: commit 52036075ec90, files include agents/probe-reader.md (60 files). Session 24aeea9d init.agents includes 'ccp-harness:probe-reader'. init.plugins has ccp-harness with source 'ccp-harness@skills-dir' and path /home/user/v2home/.claude/skills/ccp-harness. No --plugin-dir was passed. The subagent's meta.json has agentType 'ccp-harness:probe-reader' and isBuiltIn false. The same holds in the builder's run1 (session 5d344287)."
+    },
+    {
+      "id": "holds",
+      "status": "MET",
+      "command": "same run1 session (24aeea9d); python over evidence/run1/agent-*.jsonl and session.jsonl modelUsage; node --test verify/probe-plugin-agents/evidence.test.mjs",
+      "excerpt": "Subagent tool calls: Read and SubagentHandback only. Asked to write /home/user/v2probe/written.txt and run echo hi, it said 'I have no file-write tool. My tools are Read, Glob, and SubagentHandback' and 'I have no shell or Bash tool'. The folder holds only README.md. Every assistant message is claude-haiku-5-5, and the session's modelUsage has claude-haiku-5-5 beside claude-sonnet-5-5. The reply opens with 'QUILLMARROW', which prompt.txt never gives. meta.json's pickedEffortModel names the main model, which is wrong for a named agent, as the report says."
+    },
+    {
+      "id": "harness-works",
+      "status": "MET",
+      "command": "node packages/engine/bin/host.js start --item verify2-agents-1 --workflow quick-fix --input '{...}' --root /home/user/v2harness/journal; claude -p 'Call the Agent tool once with subagent_type \"ccp-harness:probe-reader\" ... prompt exactly: ccp-run verify2-agents-1:0.brief' (session e88b02ea); compare the subagent's first user message with run-folder/brief.md",
+      "excerpt": "The first user message equals brief.md byte for byte. Its sha256 a4803151eca9caa2... equals the agent.spawn payload.briefHash. spawn.json names session e88b02ea, which is the session's init id. The agent.spawn row has type 'ccp-harness:probe-reader' and via 'start', and its agentId equals agent.json's. Then the sent-back and no-return refusals fire, as expected for an agent with no return tool. Beyond Expect, probe-returner (tools Read, Glob, mcp__plugin_ccp-harness_harness__return) in session 256d5976 was bound as ccp-harness:probe-returner and returned: there is a result.stored row and a result.json, and no refusal."
+    },
+    {
+      "id": "report",
+      "status": "MET",
+      "command": "read plan/research/probe-plugin-agents.md against plan/research/probe-plugin-agents/run1-3 (session.json, agent transcripts, meta.json, item.jsonl, run-folder) and my rerun",
+      "excerpt": "Each row of 'The checks' names its session (5d344287, 27f57a32, 55fad843) and files; every claim I checked matches the committed copies and my rerun (agent listing and source, haiku turns, marker, Write absent, brief equality and hash, agent.spawn type/via, sent-back then no-return, returner result.stored). It states the verdict (stage roles can live in the plugin), the condition that a role's tools name the return tool and every stage tool, and how a role's version ties to the pin (stage file names role + sha256 of the agent file, pin covers it, PreToolUse refuses role-mismatch). It states the gap plainly: no fresh thread, build commit not a release. Rechecked after replan #111: the report's account of the path that ran matches listed's new wording."
+    }
+  ]
+}
