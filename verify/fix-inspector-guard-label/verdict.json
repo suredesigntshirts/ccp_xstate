@@ -1,0 +1,24 @@
+{
+  "item": "fix-inspector-guard-label",
+  "verified_sha": "d3bb9a40236d7c26ec230c4f6a59c21a0129d037",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FsNZ8wmHJgFAZBAKX#agent=verifier-guard-label",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "label-quoted",
+      "status": "MET",
+      "command": "node scripts/inspector/export.mjs --engine . --journal tournaments/2026-11-04-stage-contract/trials/fail/journal --out /tmp/gl-bundle.json, at d3bb9a4 and at origin/main 9a959a4 (worktree), then compared every 'label' string in both bundles by JSON path",
+      "excerpt": "Head step seq 4: 'The verify actor finished, and the guard \"failed\" held; the item moves to building' (main: 'The verify actor finished, and its guard failed held; the item moves to building'). 'its guard' occurs 0 times in the head bundle. 173 labels in each bundle; only 2 differ, both this same guarded label without description (.steps.4 and .steps.3.actors.0.layers.after). Described transitions unchanged, e.g. seq 7 'PASS at the head' in both."
+    },
+    {
+      "id": "builder-test",
+      "status": "MET",
+      "command": "node --test scripts/inspector/test/label.test.mjs, before and after reverting labelOf in scripts/inspector/export.mjs, then git checkout scripts/inspector/export.mjs",
+      "excerpt": "Unchanged: 'ok 1 - a guarded transition without a description names its guard in quotes', pass 1 fail 0. Reverted: 'not ok 1 ...' expected 'The verify actor finished, and the guard \"failed\" held; the item moves to building', actual 'The verify actor finished, and its guard failed held; the item moves to building', pass 0 fail 1.",
+      "mutation": "const why = edge?.guard ? `, and its guard ${edge.guard} held` : '';",
+      "red_test": "scripts/inspector/test/label.test.mjs: a guarded transition without a description names its guard in quotes"
+    }
+  ]
+}
