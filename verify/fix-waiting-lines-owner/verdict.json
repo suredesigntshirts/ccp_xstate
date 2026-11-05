@@ -1,0 +1,42 @@
+{
+  "item": "fix-waiting-lines-owner",
+  "verified_sha": "0d52d7a275430738990e3fa266f92c3faf6fadc8",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GYXzjNLAQWsFcthXr",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "lines-owned",
+      "status": "MET",
+      "command": "clean clones at the head 0d52d7a and main 3be0740, npm ci each; node --test verify/fix-waiting-lines-owner/lines.test.mjs (scenarios.mjs lines(): quick-fix a-1 started by bin/host.js start --session sess-A, b-1 by sess-B, u-1 by https://claude.ai/code/session_verifyU; the checkout's plugins/harness/scripts/actors.mjs as a child process, CCP_HARNESS_DIR at a temp folder with install.json and journal/); node scenarios.mjs <main clone> gave evidence/main-scenarios.json",
+      "excerpt": "Head: UserPromptSubmit and PostToolUse of Agent from sess-A: 'ccp-harness: actor runs prepared and waiting for their agent:\\n- brief for a-1:0.brief: Agent tool with prompt exactly \"ccp-run a-1:0.brief\"' only; sess-B: b-1 only; sess-C (owns nothing): no output for either event; session_id local-U with CLAUDE_CODE_REMOTE_SESSION_ID=cse_verifyU: u-1 only; sess-A with that variable set: a-1 and u-1. Main, same inputs: every asker, sess-C included, is named a-1, b-1 and u-1. Line text is main's. The same test run in the main clone: all six lines-owned tests red.",
+      "mutation": "plugins/harness/scripts/actors.mjs: `const runs = A.ownedWaiting(root, owners);` replaced by listing every item's A.waiting(root, item) again (main's waitingRuns)",
+      "red_test": "plugins/harness/test/actors.test.mjs 'the hooks start, bind, confine and check an actor, and the return tool accepts only what the hook stored'; plugins/harness/test/stall.test.mjs 'waiting lines: each session is named only its own runs, after a wake and after an Agent call', 'waiting lines: the cloud form of the session name owns its runs'; verify lines.test.mjs (all 6)"
+    },
+    {
+      "id": "stall-unchanged",
+      "status": "MET",
+      "command": "node --test verify/fix-waiting-lines-owner/stall.test.mjs (scenarios.mjs stalls(), compared to the same run at main in evidence/main-scenarios.json; paths, clock fields, ids and hashes normalised)",
+      "excerpt": "Engine direct: stall() for C null; for A Block 1, Block 2, then {block:null, failed:['a-1:0.brief']}; for B Block 1; for [A,B] b-1's block; cannotStart() no-prompt null, no-reason, unknown-run, wrong-session ('run b-1:0.brief's item is owned by sess-B'), owner fails it, again already-failed, B's stall after null: every answer, row and run file equal main's. Stop hook: C nothing, A block twice then nothing (run failed), B block, U (cloud form) block, cannot-start from A wrong-session and from B cannot-start, all equal main's outputs, item rows and run files."
+    },
+    {
+      "id": "unchanged",
+      "status": "MET",
+      "command": "node --test verify/fix-waiting-lines-owner/unchanged.test.mjs (verify/fix-refusal-hints/prompts.mjs on each clone, evidence/main-prompts.json from main 3be0740; scenarios.mjs spawns() direct and through the hook vs main); full suite (npm test's globs, --test-timeout=240000) at the head and at main in parallel in this container; git diff 3be0740 0d52d7a",
+      "excerpt": "Every stage of feature, intake, quick-fix and research renders byte for byte main's and every workflow hash is main's. spawn(): not-a-run null, unknown-run, own run allowed with the brief, again already-started, another session's run allowed, spawn.json the same; through the hook a ccp-run from sess-A of sess-B's run is rewritten to the brief as on main; all equal main's. Full suite head: 1505 tests, 1486 pass, 3 fail, 1 cancelled; main: 1491, 1473 pass, 2 fail, 1 cancelled. Both: copy-not-link (local release tags) and cheap hook timing (load), and no-self-edit cancelled (hangs in this container). Head only: verify/fix-return-tool-answer/unchanged.test.mjs ('the hook swapped in it-1:0.brief's brief') under the parallel load; it passes alone 3 of 3 at the head and at main, and CI's test check ran it green. The diff touches no workflow, stages.js or prompts.js and no verify/ file; of existing tests only plugins/harness/test/actors.test.mjs changes, the named exception: PostToolUse as a session that doesn't own the item now gets null and the owner s gets main's build line; packages/engine/test/actors.test.js only adds an ownedWaiting test."
+    },
+    {
+      "id": "real-session",
+      "status": "MET",
+      "command": "fresh HOME, CCP_HARNESS_DIR with install.json and journal/sessions/, CLAUDE_CODE_REMOTE_SESSION_ID unset; host.js start quick-fix r1 --session <s1 uuid>, r2 --session <other uuid>; claude -p --plugin-dir <head clone>/plugins/harness --session-id <s1> --output-format stream-json --verbose --allowedTools Agent,ToolSearch,Read,Bash,Write,Edit,mcp__plugin_ccp-harness_harness__return, prompt on stdin ('start each listed run ... Do not start any run it does not list'); node --test verify/fix-waiting-lines-owner/real-session.test.mjs over evidence/real-session/",
+      "excerpt": "Claude Code 2.1.318, ccp-harness@inline. UserPromptSubmit context: only '- brief for r1:0.brief ... \"ccp-run r1:0.brief\"'; the model called Agent ccp-run r1:0.brief; the brief agent returned; PostToolUse:Agent context: only '- build for r1:1.build'; the model called Agent ccp-run r1:1.build; the build agent returned blocked (no remote); 'ok'. No hook line ever named r2. r1.jsonl: agent.spawn r1:0.brief and r1:1.build, both session s1. r2.jsonl: no agent.spawn, every row the other session's; r2/runs/0.brief holds brief.md, context.md, run.json, stage.json and no spawn.json."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 134 at 0d52d7a",
+      "excerpt": "Check run 'test' (id 127260402125) completed success at head 0d52d7a; clean-room success. 'gates' failed only because no verdict at that sha existed yet."
+    }
+  ]
+}

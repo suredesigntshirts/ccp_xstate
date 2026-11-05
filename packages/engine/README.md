@@ -95,8 +95,9 @@ PR), a missing commit is fetched from origin, and a finished run's worktree hold
 no stamped branch, or the head nowhere, the run fails and its item steps back. The run stays open until its agent returns:
 
 1. The session calls the Agent tool with the prompt `ccp-run <run>` (bin/host.js prints it under `waiting`, and the
-   harness hook names waiting runs after each Agent call and wake). The harness's PreToolUse hook swaps in the brief,
-   so the agent's prompt is the brief exactly; a second start of a run is refused.
+   harness hook names the waiting runs of the session's own items after each Agent call and wake, `ownedWaiting`).
+   The harness's PreToolUse hook swaps in the brief, so the agent's prompt is the brief exactly; a second start of a
+   run is refused (plan item fix-waiting-lines-owner filters the hook's list to the session's own items).
 2. SubagentStart binds the agent to the run and tells it its run, worktree and result schema. Its shell commands run
    from the worktree, and file tools outside it are refused.
 3. The agent calls the return tool (`mcp__plugin_ccp-harness_harness__return`, `{ run, result }`). Its PreToolUse hook

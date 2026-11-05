@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { restore, offer } from '../src/index.js';
 import { handlers, github } from '../src/effects/index.js';
-import { actors, accept, bind, bindLate, boundRun, confine, deliver, isReturnTool, loadRun, resultsOf, runDir, spawn, startedRun, stopped, handback, waiting } from '../src/actors.js';
+import { actors, accept, bind, bindLate, boundRun, confine, deliver, isReturnTool, loadRun, resultsOf, runDir, spawn, startedRun, stopped, handback, ownedWaiting, waiting } from '../src/actors.js';
 import { readFile } from '../../journal/src/index.js';
 import { workflow, ISSUE, BRIEFS } from './flow.js';
 import { loadWorkflow } from '../src/index.js';
@@ -383,4 +383,13 @@ test('rebuild: a build result that sets pr.branch itself is refused as reserved'
   const head = commitIn(loadRun(root, 'it-1:1.build').worktree);
   const got = await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: { pr: { url: URL_, at: head, branch: 'main' } } });
   assert.equal(got.refused.rule, 'reserved');
+});
+
+test('ownedWaiting lists the waiting runs of the items the given sessions own, and none once started', async () => {
+  const { root } = await started();
+  assert.equal(loadRun(root, BRIEF_RUN).session, 's');
+  assert.deepEqual(ownedWaiting(root, ['s', null]).map((r) => [r.run, r.item, r.actor, r.prompt]), [[BRIEF_RUN, 'it-1', 'brief', `ccp-run ${BRIEF_RUN}`]]);
+  assert.deepEqual(ownedWaiting(root, ['other']), []);
+  assert.ok(spawn({ root, prompt: `ccp-run ${BRIEF_RUN}`, toolUseId: 'n1', session: 'other' }).allow, 'spawn checks no owner');
+  assert.deepEqual(ownedWaiting(root, ['s']), []);
 });

@@ -1,0 +1,14 @@
+{"type":"init","session_id":"d9032d2f-e67b-48b3-927d-b919674d40ae","claude_code_version":"2.1.318","plugins":[{"name":"ccp-harness","source":"ccp-harness@inline"}],"agent_tool_listed_as":"Task"}
+{"type":"hook_response","hook_name":"UserPromptSubmit","output":""}
+{"type":"hook_response","hook_name":"UserPromptSubmit","output":"{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"ccp-harness: actor runs prepared and waiting for their agent:\\n- brief for r1:0.brief: Agent tool with prompt exactly \\\"ccp-run r1:0.brief\\\"\"}}\n"}
+{"type":"hook_response","hook_name":"UserPromptSubmit","output":"{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"ccp-harness: this session runs release 0.1.0, but 0.1.27 (harness-v0.1.27) is out. Plugins load only when a session starts, so this session keeps 0.1.0; finish or hand off the current step, then a new thread runs 0.1.27.\"}}\n"}
+{"type":"tool_use","name":"Agent","input":{"prompt":"ccp-run r1:0.brief"}}
+{"type":"hook_response","hook_name":"PostToolUse:Agent","output":""}
+{"type":"hook_response","hook_name":"PostToolUse:Agent","output":"{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"ccp-harness: actor runs prepared and waiting for their agent:\\n- build for r1:1.build: Agent tool with prompt exactly \\\"ccp-run r1:1.build\\\"\"}}\n"}
+{"type":"tool_use","name":"Agent","input":{"prompt":"ccp-run r1:1.build"}}
+{"type":"hook_response","hook_name":"PostToolUse:Agent","output":""}
+{"type":"hook_response","hook_name":"PostToolUse:Agent","output":""}
+{"type":"text","text":"ok"}
+{"type":"hook_response","hook_name":"Stop","output":""}
+{"type":"hook_response","hook_name":"Stop","output":""}
+{"type":"result","subtype":"success","result":"ok"}

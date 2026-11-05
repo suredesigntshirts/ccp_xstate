@@ -18,12 +18,11 @@
 //   Stop of the main session with a run of an item it owns prepared and no agent: block with the exact Agent call,
 //     at most twice per run by the stall rows in the journal; the stop after that fails the run.
 //   PostToolUse of Agent in the main session, and UserPromptSubmit (a wake, such as a background agent finishing):
-//     say which runs are prepared and waiting for their agent.
+//     say which runs of this session's own items are prepared and waiting for their agent.
 //
 // A refusal is a PreToolUse deny whose reason starts with its rule (`wrong-caller: ...`), journalled in the item's
 // file. A call it adds nothing to gets no output, so the normal permission flow still decides it.
-import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { engine, gate, journalDir, sessionName, stdin } from './host.mjs';
 import { handedBack, read } from './capture-rows.mjs';
 
@@ -40,15 +39,6 @@ function spawningToolUse(input) {
   } catch {
     return null;
   }
-}
-
-// Runs prepared in any item and not yet started, for the main session's next Agent call.
-function waitingRuns(A, root) {
-  let items = [];
-  try {
-    items = readdirSync(join(root, 'items'), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
-  } catch {}
-  return items.flatMap((item) => A.waiting(root, item));
 }
 
 // Hands a failed run's error to its item, which steps back.
@@ -133,9 +123,10 @@ async function main() {
     if (r) out({ hookEventName: 'SubagentStart', additionalContext: r.context });
     return;
   }
-  // After an Agent call, or a wake such as a background agent's task notification: name the runs waiting.
+  // After an Agent call, or a wake such as a background agent's task notification: name the runs of this session's
+  // own items waiting, the ones the Stop guard checks (plan item fix-waiting-lines-owner).
   if ((event === 'PostToolUse' && tool === 'Agent' && !input.agent_id) || event === 'UserPromptSubmit') {
-    const runs = waitingRuns(A, root);
+    const runs = A.ownedWaiting(root, owners);
     if (!runs.length) return;
     const lines = runs.map((r) => `- ${r.actor} for ${r.run}: Agent tool with prompt exactly "${r.prompt}"`);
     out({ hookEventName: event, additionalContext: `ccp-harness: actor runs prepared and waiting for their agent:\n${lines.join('\n')}` });

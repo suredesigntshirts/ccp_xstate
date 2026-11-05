@@ -126,3 +126,38 @@ test('cannot-start: a started run is refused', async () => {
   assert.match(agent(env, `ccp-cannot-start ${RUN}: changed my mind`, 's', 't2').permissionDecisionReason, /^already-started: /);
   assert.equal(existsSync(join(runDir(root, RUN), 'failed.json')), false);
 });
+
+// ---- The waiting lines and spawn name only the session's own runs (plan item fix-waiting-lines-owner)
+
+// Two harness roots can't share items, so one root holds it-1 owned by `s` and it-2 owned by `T`.
+async function twoOwners() {
+  const p = await project({ items: ['it-1'], owner: 's' });
+  const { root } = p;
+  const dir = join(p.dir, 'clone');
+  const host = restore({ root, item: 'it-2', spec: loadWorkflow('quick-fix', { root }), session: 'T', release: '0.2.0' });
+  await offer(host, [{ event: { type: 'xstate.init', input: { issue: ISSUE } }, source: { system: 'claude-code', ref: 'T' } }],
+    handlers({ actors: actors({ host, repo: dir, worktrees: join(p.dir, 'wt') }) }));
+  return p;
+}
+const lines = (env, session, event = 'UserPromptSubmit') => {
+  const extra = event === 'PostToolUse' ? { tool_name: 'Agent', tool_input: { prompt: 'x' } } : { prompt: 'wake' };
+  const out = call(env, { session_id: session, hook_event_name: event, ...extra });
+  return out ? JSON.parse(out).hookSpecificOutput.additionalContext : null;
+};
+
+test('waiting lines: each session is named only its own runs, after a wake and after an Agent call', async () => {
+  const { env } = await twoOwners();
+  for (const event of ['UserPromptSubmit', 'PostToolUse']) {
+    const s = lines(env, 's', event);
+    assert.ok(s.includes('"ccp-run it-1:0.brief"') && !s.includes('it-2:'), `${event}: s sees it-1 only`);
+    const t = lines(env, 'T', event);
+    assert.ok(t.includes('"ccp-run it-2:0.brief"') && !t.includes('it-1:'), `${event}: T sees it-2 only`);
+    assert.equal(lines(env, 'nobody', event), null, `${event}: a session owning nothing gets no line`);
+  }
+});
+
+test('waiting lines: the cloud form of the session name owns its runs', async () => {
+  const { env } = await project({ owner: URL_S });
+  assert.match(lines({ ...env, CLAUDE_CODE_REMOTE_SESSION_ID: 'cse_owner' }, 'local-id'), /ccp-run it-1:0\.brief/);
+  assert.equal(lines(env, 'local-id'), null);
+});
