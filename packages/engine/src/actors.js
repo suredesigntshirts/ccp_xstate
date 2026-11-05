@@ -784,8 +784,8 @@ export const STALL_CAP = 2;
 export const CANNOT_START = /^\s*ccp-cannot-start\s+(\S+:\d+\.[\w-]+):\s*(\S[\s\S]*?)\s*$/;
 export const cannotStartPrompt = (run, why = '<why>') => `ccp-cannot-start ${run}: ${why}`;
 
-// The runs, across all items, prepared, not started and not failed, whose owner is one of `sessions`.
-function ownedWaiting(root, sessions) {
+// The run records, across all items, prepared, not started and not failed, whose owner is one of `sessions`.
+function ownedRecords(root, sessions) {
   const owners = new Set(sessions.filter(Boolean));
   let items = [];
   try {
@@ -794,6 +794,15 @@ function ownedWaiting(root, sessions) {
     return [];
   }
   return items.flatMap((item) => waitingRecords(root, item)).filter((run) => owners.has(run.session));
+}
+
+/**
+ * The runs, across all items, prepared, not started and not failed, whose item is owned by one of `sessions` (the
+ * session's id and its sessionName): { run, actor, prompt, item }, by item then run. The runs the Stop guard checks,
+ * and the ones the hook names after a wake or an Agent call (plan item fix-waiting-lines-owner).
+ */
+export function ownedWaiting(root, sessions) {
+  return ownedRecords(root, sessions).map((run) => ({ run: run.run, actor: run.actor, prompt: spawnPrompt(run.run), item: run.item }));
 }
 
 const stallRows = (root, run) => itemRows(root, run.item).filter((r) => r.kind === 'refusal' && r.payload?.run === run.run && r.payload?.rule === 'stall');
@@ -832,7 +841,7 @@ export function stallText(run, count) {
  * fail now (failed), and the first run blocked fewer times is blocked (block, its reason; null when none is left).
  */
 export function stall({ root, sessions, session = null }) {
-  const runs = ownedWaiting(root, sessions);
+  const runs = ownedRecords(root, sessions);
   if (!runs.length) return null;
   const failed = [];
   let block = null;

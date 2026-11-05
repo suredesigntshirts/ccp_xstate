@@ -98,7 +98,9 @@ test('the hooks start, bind, confine and check an actor, and the return tool acc
   const host = restore({ root, item: 'it-1', spec: workflow, session: 's', release: '0.2.0' });
   assert.equal(host.snapshot.value, 'building', 'the hook handed the result to the item');
 
-  const next = hook(env, { hook_event_name: 'PostToolUse', tool_name: 'Agent', tool_use_id: 't1', tool_input: {}, tool_response: {} });
+  // The item's owner (s) is named its next run; a session that doesn't own it is not (plan item fix-waiting-lines-owner).
+  assert.equal(hook(env, { hook_event_name: 'PostToolUse', tool_name: 'Agent', tool_use_id: 't1', tool_input: {}, tool_response: {} }), null);
+  const next = hook(env, { session_id: 's', hook_event_name: 'PostToolUse', tool_name: 'Agent', tool_use_id: 't1', tool_input: {}, tool_response: {} });
   assert.match(next.additionalContext, /build for it-1:1\.build: Agent tool with prompt exactly "ccp-run it-1:1\.build"/);
 });
 
