@@ -125,6 +125,7 @@ returned and changes-nothing are 27 of 27 in every set.
   on runs-as-written without either rule, and fixes real-adopt-clamp in 3 of 3.
 - **criteria-not-methods dropped.** It gets builder-criteria to 27 of 27, but its target methods-private does not
   move (11), and one-check-per-line, runs-as-written, catches-traps and avoids-must-not all get worse.
+- **traps-named not run.** It was the conditional fifth candidate. The sets that were run, about 2.86M fresh stage tokens plus about 4.75M in judge sessions, left too little of the 9M step-back budget for another 27-run set and its judging. Its target, catches-traps on planted-missing-line, stays a next target (below).
 - **combined (words-test + proof-at-head) kept** as the new `workflows/quick-fix/brief.md`. Against the baseline it is
   better on words-only (10 to 20), runs-as-written (19 to 23) and avoids-must-not (18 to 24). catches-traps is level
   at 20: it gains the after-merge case and loses one run each on missing-line, prescribed-fix and jsonl-lint.
