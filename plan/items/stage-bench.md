@@ -4,7 +4,7 @@
   "title": "Bench a stage's prompt alone on fixed cases, starting with the brief stage",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Any quick-fix model stage can be run alone on committed cases with the exact prompt the engine renders, scored per rubric criterion by mechanical checks and a judge checked against hand grades, and compared across two workflow versions in a committed report. The brief stage has its first bench and a baseline from real model runs, and docs/prompts.md gives the refinement procedure a thread follows.",
   "why": "On 5 Nov the person asked how prompts are audited, changed and improved. Reading is solved: every run stores its exact prompt and the Inspector traces each line. Improving is not. A stage can only be tried in a full item run (about an hour), nothing scores whether its output is good, and editing quick-fix.json breaks a done item's replay test. So the stage rules have changed only to fit host checks since they were written on 4 Nov (L-stage-needs-bench). The five whys put this first, before an intake stage, so that intake is designed on a bench rather than shipped as another first draft (plan/decisions/2026-11-05-prompt-refinement.md).",
   "serves": [
