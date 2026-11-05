@@ -74,3 +74,11 @@ builder and verifier `brief.stored` rows.
   parent thread's session, not the child's. Read the child's own `session_id` from the hook input or the transcript.
 - In `-p` mode the named agent can run in the background: in `run3` the parent's first result said it was still
   running, and the final result came after it finished.
+
+## The release
+
+PR #109 merged as `e9b6ae3` and was released as `harness-v0.1.24` (a release branch; the only changed released file
+was `plugins/harness/agents/probe-reader.md`). `setup.sh` installed that release into a fresh `HOME`, and a `claude -p`
+session there with no `--plugin-dir` (session `3119065a-c41b-41bb-bf06-6ed3a1786c82`) loaded `ccp-harness@skills-dir`
+version 0.1.24 and listed `ccp-harness:probe-reader`. The verifier's evidence is in `verify/probe-plugin-agents/`. The
+Projects-thread step waits for a setup-script re-save, as draft item `probe-plugin-agents-thread`.
