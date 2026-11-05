@@ -13,7 +13,9 @@
     "L-measure-then-park"
   ],
   "depends_on": [
-    "retro-first-item"
+    "retro-first-item",
+    "wf-intake",
+    "refine-brief-stage"
   ],
   "inputs": [
     {
