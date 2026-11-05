@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "b81ff999bcc35dad37335d7a12c9de049efd37d332b74a032ddb92d4a4eb9577",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items. It has exactly two checks, \"Check 1\" and \"Check 2\", one for each expect line, in order. Neither check's PASS or FAIL condition mentions npm test or the CSV tests. Check 1 compares the --tsv output with the plain CSV output as JSON. Check 2 reads README.md. The `npm test` and CSV-behaviour items sit under \"Advisory (not pass/fail conditions)\", so they are notes only, not a third gating check. This is the closest call: they could be read as extra checks, but they are marked as non-gating. The builder brief does tell the builder to run npm test, but no must_not item covers the builder. Neither prohibited pattern appears.",
+  "model": "claude-opus-5-5",
+  "ms": 5876,
+  "tokens": {
+    "input": 2,
+    "output": 472,
+    "cacheCreation": 2782,
+    "cacheRead": 783,
+    "fresh": 3256,
+    "total": 4039
+  },
+  "at": "2026-11-05T08:57:13.895Z"
+}

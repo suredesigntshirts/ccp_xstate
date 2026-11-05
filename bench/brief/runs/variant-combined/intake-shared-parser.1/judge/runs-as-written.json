@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "345d85e5ae0e8e02063d7f8a5029ee51626cb039582ec57b4c1ea0e818e71686",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the single `test` script. The briefs only name files that exist: bin/csv2json.js, src/parse.js, test/csv.test.js and README.md. The builder's `npm test` maps to the existing script. The builder's suggested `execFileSync('node', ['bin/csv2json.js', '--tsv'], { input, encoding: 'utf8' })` is valid JavaScript. All the `printf ... | node bin/csv2json.js [--tsv]` pipelines are valid shell, and so are `; echo \"exit=$?\"`, `| od -c` and `grep -n -- '--tsv' test/*.js`. The issue's proof uses `npm run test:cli`, which doesn't exist at base. The verifier brief catches this: it judges check 6 on `npm test` and only asks for test:cli if the PR adds it. No command depends on a missing script or tool, and none has a bad argument or broken syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 8574,
+  "tokens": {
+    "input": 2,
+    "output": 599,
+    "cacheCreation": 5406,
+    "cacheRead": 783,
+    "fresh": 6007,
+    "total": 6790
+  },
+  "at": "2026-11-05T08:54:34.028Z"
+}

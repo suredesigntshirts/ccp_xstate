@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "4aa089696204fa96cb7e8c458b35e8504819d04e4fabe2e2dc6960997c7afab1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Not met: the builder brief includes one of the verifier's probes. Builder step 2 says to test that \"loadConfig on a file containing `{port: 9000` returns a value deepEqual to {}\". Verifier Check 1 uses that same input (`printf '{port: 9000'`) and passes only if the result is `{}`. That is a set of inputs with expected outputs shared by both briefs, which the criterion forbids. Asking the builder to write its own tests is allowed, but handing it the checker's exact case is not. The rest holds: running `npm test` is allowed because an expect line names it, and the builder brief has no PASS or FAIL wording and no grep.",
+  "model": "claude-opus-5-5",
+  "ms": 12416,
+  "tokens": {
+    "input": 2,
+    "output": 892,
+    "cacheCreation": 2824,
+    "cacheRead": 783,
+    "fresh": 3718,
+    "total": 4501
+  },
+  "at": "2026-11-05T08:58:02.383Z"
+}

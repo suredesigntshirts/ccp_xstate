@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.3",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each check's PASS/FAIL conditions with the words of its expect line. Check 1 asks for reports on lines 3 and 6, nothing for blank or valid lines, the `<file>:<line>: <error>` form and exits 1/0. The words \"blank lines skipped\" and \"an unterminated last line checked\" require all of this. Check 2 asks only for exit 2 and non-empty stderr. Empty stdout is left to Advisory. Check 3's second call returning `[]` for a trailing newline is also forced, because the empty trailing row is a blank line and must be skipped. Check 4 allows extra flags after `node --test`. It asks for passing tests, which line 6's green npm test already forces. Check 6 runs `npm ci && npm test`, and the workflow itself runs `npm ci`, so a green workflow already requires it. Shebang, file mode, CRLF, lockfile and mutation checks all sit under Advisory.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Most commands work as written. The builder steps are fine: npm install, npm ci && npm test, chmod. The Check 3 `node --input-type=module -e \"…\"` quoting and escapes come out as valid JS. The Check 4 `node -e \"const p=require(...)\"` is valid. The gh commands (`pr view --json body,headRefOid,files`, `pr list --search`, `pr checks`) take valid arguments. The problem is that every verifier command in Checks 1 and 2 uses `$T`, as in `printf ... > $T/clean.jsonl` and `node ... $T/does-not-exist.jsonl >$T/o1`, but no step ever sets it. The brief only says to use a scratch directory \"e.g. `mktemp -d`\" and never gives `T=$(mktemp -d)`. Run as written, `$T` is empty, so the files go to `/clean.jsonl`, `/o1` and so on at the filesystem root. Those writes may fail, or may clobber files, and the PASS lines that expect `$T/bad.jsonl:3:` don't line up with the intended scratch path. Because these commands depend on a variable no earlier step creates, the brief breaks the criterion.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Items 1, 2 and 4 are handled. 1: builder step 7, \"Run `npm install` at the root so `package-lock.json` includes the new workspace\". 2: builder step 6, \"replace the \"No tools yet\" bullet\". 4: Check 6 reads the PR body and headRefOid with gh and checks the test workflow run at the head commit. Item 3 is not handled. Check 4 runs `cd packages/jsonl-lint && node --test`, which tests the workspace on its own, not under the root script. Check 6 runs the root `npm ci && npm test` but only checks the exit status, so it would not notice the jsonl-lint tests being skipped. No check reads the test count from the root run. The mutation test appears only under \"Advisory (not pass/fail conditions)\" and isn't tied to the root npm test.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I went through every PASS and FAIL condition in the verifier brief. None is stricter than its line. Check 1 asks only for the `<file>:<line>: ` prefix followed by \"a non-empty error text\", with no exact wording. Check 2 needs only exit 2 and non-empty stderr; an empty stdout is listed as advisory. Check 4 lets the test script add flags after `node --test`. Check 6 counts PRs but sets no rule on branch names or which files the PR touches. The mutation test, shebang/mode and lockfile checks are all placed under \"Advisory (not pass/fail conditions)\". Every behaviour line is checked by running the program: checks 1 and 2 run the CLI, check 3 imports `lint`, check 4 runs `node --test`, and check 6 runs `npm ci && npm test` and reads the workflow result. Only the checks for test coverage (4) and the READMEs (5) read files, and those lines are about what exists in the repo, not runtime behaviour. The builder brief's extra steps (such as mode 100755) are build instructions, not pass/fail conditions.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with every verifier check and advisory. None of the verifier's probes show up in the builder brief: not the printf fixtures (clean.jsonl, bad.jsonl with bad lines 3 and 6, noeol.jsonl), not the `node --input-type=module -e` import script, not the `node -e require(package.json)` field dump, not `test -s`/`grep -n`, and not the `gh pr view/list/checks` or `git ls-files -s` commands. The builder brief has no PASS/FAIL wording either. It states requirements only, such as \"strip a trailing `\\r`\", \"must not produce a phantom error\", \"mode 100755\" and \"update package-lock\". These are the bar the builder must meet, not the verifier's method; the verifier's matching CRLF and mode items are advisory and run with commands the builder never sees. The only commands the builder is told to run are `npm ci && npm test` and the `test` workflow, which the issue's expect line names. Asking the builder to write its own node:test cases is allowed.",
+      "cached": false
+    }
+  }
+}

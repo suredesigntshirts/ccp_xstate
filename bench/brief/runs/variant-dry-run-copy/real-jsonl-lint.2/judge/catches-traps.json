@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "06f1c697126056192c29c5d9b2b3dce527e1db9b96731e59530e22b4108ba6f2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs cover all four must_catch items.\n1. Builder step 7 says to \"Run `npm install` at the repo root so `package-lock.json` picks up the new workspace, and commit the updated lockfile\". It also explains that `npm ci` fails when the lockfile is out of sync.\n2. Builder step 6 says to \"Replace that with a bullet that lists `packages/jsonl-lint`\". That replaces the \"no tools yet\" statement rather than adding a line.\n3. Verifier check 6 runs the root `npm ci && npm test` and passes only if \"its output shows the jsonl-lint tests ran\". Check 4 also fails if \"none run\". Together these would catch tests being skipped silently.\n4. Verifier check 6 uses gh api to find the PR whose body contains the exact Closes line. It requires `head_sha` to equal the checked-out commit and the `test` check run at that sha to be completed with success.",
+  "model": "claude-opus-5-5",
+  "ms": 7775,
+  "tokens": {
+    "input": 2,
+    "output": 652,
+    "cacheCreation": 6898,
+    "cacheRead": 783,
+    "fresh": 7552,
+    "total": 8335
+  },
+  "at": "2026-11-05T08:59:59.974Z"
+}

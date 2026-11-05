@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "71a6d79769cf1065286d50ada94062b28c5dc8917984967b4b38adf2a6bdf11b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not item 2 holds: Checks 1–3 all run the bin with real files and stdin, so no behaviour line is passed just by reading the code. Item 1 fails. Line 4 only says \"lint(text) in src/index.js is unchanged\", but Check 4 asks for the whole file to match a fixed sha256 hash and to show no `git diff` at all. So any edit elsewhere in src/index.js fails the check even if lint stays the same, which in effect limits which files the PR may touch. The builder brief says the same thing: \"do not touch ... src/index.js at all (not even whitespace)\". Check 6 is also stricter than line 6: it requires \"exactly one open PR\", so a merged PR would fail, and the line asks only for one PR. Check 3 also requires that stderr names missing.jsonl, which the line does not ask for.",
+  "model": "claude-opus-5-5",
+  "ms": 16954,
+  "tokens": {
+    "input": 2,
+    "output": 984,
+    "cacheCreation": 6259,
+    "cacheRead": 783,
+    "fresh": 7245,
+    "total": 8028
+  },
+  "at": "2026-11-05T08:59:31.328Z"
+}

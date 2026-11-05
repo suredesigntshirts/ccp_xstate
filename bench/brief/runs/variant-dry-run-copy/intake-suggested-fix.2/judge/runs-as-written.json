@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "f16783754788805f60301ce9830c08a612e74d352319b7e5d75dc60d0a339b83",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands hold up. Checks 1–4 use valid bash with quoted `$d` paths. `node --input-type=module -e` with `import {loadConfig} from './src/config.js'` matches the issue's own proofs. `npm test` maps to `node --test`. Piping it to grep produces TAP output, so the grep for `^(not ok|ok|# (pass|fail))` works. The builder brief names only files that exist (src/config.js, src/app.js, test/config.test.js, README.md).\n\nCheck 5 Step B breaks the criterion. It hard-codes `BASE=3a99df7; ... git worktree add --detach \"$t\" \"$BASE\"`, but the repository facts give no commit SHA, so this value appears to be made up. If that commit doesn't exist, `git worktree add` fails and the `&&` chain stops silently. No `not ok` line is printed, so the check would wrongly FAIL the PR. The fallback \"if the PR's base commit differs, set BASE\" doesn't make the command run as written. So the brief doesn't show this command works at this commit.",
+  "model": "claude-opus-5-5",
+  "ms": 14610,
+  "tokens": {
+    "input": 2,
+    "output": 1140,
+    "cacheCreation": 5676,
+    "cacheRead": 783,
+    "fresh": 6818,
+    "total": 7601
+  },
+  "at": "2026-11-05T08:55:26.428Z"
+}

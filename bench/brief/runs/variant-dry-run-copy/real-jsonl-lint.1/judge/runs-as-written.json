@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "9a6f74ba8c0acac194365f63b52c778d6d626a877c8799d35286156ff1b367c6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs and found no breakage. Check 1: the `printf` strings contain no `%` and give rows 1–5 as intended. The `$(mktemp -d)` / `echo \"exit=$?\"` chains are valid shell. Check 3: inside bash double quotes, `\\\"` becomes `\"` and `\\n` reaches JS as an escape, so `node --input-type=module -e \"import { lint } from './packages/...'\"` parses, and the relative import resolves from the cwd. Check 4: `node -e \"...require('./packages/jsonl-lint/package.json')...\"` is valid CommonJS, and `npm test -w packages/jsonl-lint` is valid npm syntax. Check 6: the `gh api` jq filters (`select((.body // \"\") | contains(...))`, `\"\\(.number) ...\"`) and the `commits/$sha/check-runs` endpoint are valid, and so is `git rev-parse HEAD; npm ci && npm test`. Builder steps: `node --test` discovers `test/*.test.js` on Node 22, and `spawnSync(process.execPath, [binPath, file])` and `fs.mkdtempSync` are valid. Every file the commands name is created by an earlier builder step. One assumption I couldn't confirm: only the root `test` script was shown, so `npm test -w` relies on the brief's claim that the root `package.json` declares `workspaces: [\"packages/*\"]`.",
+  "model": "claude-opus-5-5",
+  "ms": 20610,
+  "tokens": {
+    "input": 2,
+    "output": 1236,
+    "cacheCreation": 6763,
+    "cacheRead": 783,
+    "fresh": 8001,
+    "total": 8784
+  },
+  "at": "2026-11-05T08:59:32.904Z"
+}

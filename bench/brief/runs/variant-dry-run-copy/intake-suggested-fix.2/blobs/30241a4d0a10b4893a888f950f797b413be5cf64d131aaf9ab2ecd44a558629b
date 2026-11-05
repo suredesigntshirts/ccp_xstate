@@ -1,0 +1,21 @@
+Goal: when a config file has malformed JSON, the app's `bad config:` error must name the file path and the line and column of the mistake. `loadConfig` must still throw, and valid configs must load exactly as they do now.
+
+The current code:
+- `src/config.js`: `loadConfig(path)` returns `JSON.parse(readFileSync(path, 'utf8'))`.
+- `src/app.js`: wraps the call in try/catch, writes `bad config: ${error.message}\n` to stderr and exits 1. Otherwise it writes `listening on <port>` to stdout.
+- `test/config.test.js`: two `node:test` tests, run by `npm test` (`node --test`).
+
+Steps:
+1. In `src/config.js`, keep reading the file as now. Wrap only the `JSON.parse` call in try/catch. On a SyntaxError, throw a new error whose `message` contains:
+   - the `path` argument exactly as given (do not resolve it to an absolute path)
+   - the line and column of the mistake, e.g. `<path>: line 3 column 3: <original message>` or `<path>:3:3: ...`
+   Compute line and column yourself from the source text so the result does not rely on the Node version. Take the character position from Node's message (`at position N`), or use Node's own `(line L column C)` when it is there. Line and column are 1-based: count the newlines before position N, and the column is N minus the index just after the last of those newlines, plus 1. Check that the issue's example gives line 3 column 3: the file is the lines `{`, `  "port": 9000,`, `  greeting: "x"`, `}`, and Node reports position 20. If no position can be found, still include the path. Throwing a `SyntaxError` with the new message, or setting `cause` to the original, keeps the existing `bad JSON throws` test (which asserts `SyntaxError`) valid. Do not catch read errors such as ENOENT any differently than now, and never return `{}` or defaults for a malformed file.
+2. Leave `src/app.js` printing `bad config: ${error.message}` and exiting 1. Nothing may be written to stdout on failure. Valid files must behave as before: `{"port": 9000}` must print `listening on 9000` and exit 0.
+3. Add tests to `test/config.test.js`:
+   - `loadConfig` on a file containing `{port: 9000` throws, and the error message includes the file path. This test must fail against the current unchanged `src/config.js`.
+   - The four-line example file above gives a message containing the path and line 3 column 3.
+   - Keep the existing valid-config test, which checks the result deep-equals `{ port: 9000 }`.
+4. Optionally update `README.md` to say the message names the file and location. Keep `bad config: <message>` and exit 1 documented.
+5. Run `npm test` and make sure it passes. Then try both app runs by hand: the malformed four-line file must exit 1 with an empty stdout and a stderr containing the path and line 3 / column 3; the `{"port": 9000}` file must print `listening on 9000` and exit 0.
+
+Out of scope: JSON5 or comments, validating the schema or values, and changing how a missing file is reported.

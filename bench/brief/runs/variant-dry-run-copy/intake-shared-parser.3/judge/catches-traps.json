@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "fd70a1a029edde06e100dce139244e5ec72aca423212275cc08f36206cad4180",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The output handles both must_catch items.\n\nItem 1 is handled in the builder brief. It names test/csv.test.js and its CLI test. It says \"Keep the existing tests.\" It says that if src/parse.js changes, \"its behaviour without the flag must stay the same\", which treats parse() as shared with the CSV path. It also requires running npm test, and the acceptance lines include \"npm test exits 0\" and \"Without the flag, CSV still works as before\". Together these mean the existing CSV tests must keep passing.\n\nItem 2 is handled in the verifier brief. Check 6 runs \"npm test; echo \"exit=$?\"\", as expect line 6 says. It does not use proof 6's undefined `npm run test:cli`.",
+  "model": "claude-opus-5-5",
+  "ms": 7199,
+  "tokens": {
+    "input": 2,
+    "output": 691,
+    "cacheCreation": 5804,
+    "cacheRead": 783,
+    "fresh": 6497,
+    "total": 7280
+  },
+  "at": "2026-11-05T08:54:44.611Z"
+}

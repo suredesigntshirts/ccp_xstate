@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "e9c4ceb16fc6c7bc7e229df6081a1f0ce51938292cdc630eb0ef647987e79970",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for every command in both briefs. `npm test` runs because package.json defines the \"test\" script as `node --test`, and test/strutil.test.js exists. Each `node --input-type=module -e \"...\"` command imports './index.js', which is tracked, and resolves it from the repository root. The JavaScript is valid in all of them: the array literals, JSON.stringify, `Object.keys(m).filter(k=>typeof m[k]==='function').join(' ')` and the named import `{padLeft}`. The shell quoting also holds: single quotes sit inside double quotes, and there is no `$`, backtick or `!` to be expanded. padLeft is a valid import in the verifier commands because the builder's step 1 adds that export earlier. Steps that edit files or open the pull request are actions, not shell commands. I couldn't confirm the \"type\": \"module\" claim, because only the scripts field of package.json is shown. Even so, the import commands would run whether index.js is ESM or CommonJS.",
+  "model": "claude-opus-5-5",
+  "ms": 8355,
+  "tokens": {
+    "input": 2,
+    "output": 710,
+    "cacheCreation": 3107,
+    "cacheRead": 783,
+    "fresh": 3819,
+    "total": 4602
+  },
+  "at": "2026-11-05T08:56:08.815Z"
+}

@@ -135,7 +135,7 @@ test("a run's stage.json names the stage file and line of every rule, output des
       assert.equal(p.source.file, 'workflows/quick-fix/brief.md');
       assert.equal(lineAt(p.source.line), p.text, 'a rule is its file line');
     }
-    assert.equal(rules.filter((x) => x.source.file).length, 6);
+    assert.equal(rules.filter((x) => x.source.file).length, readFileSync(join(WORKFLOWS, 'quick-fix/brief.md'), 'utf8').split('## Inputs')[0].split('\n').filter((l) => l.startsWith('- ')).length);
     for (const p of output.filter((x) => x.source.workflow?.endsWith('/description'))) assert.equal(lineAt(p.source.line), p.text);
     assert.equal(output.filter((x) => x.source.file).length, 2);
     assert.equal(task[0].source.file, 'workflows/quick-fix/brief.md');

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "ba733028acf058d5e507d6ca7547be7f85f7aaf4ab779613b7b5d69067886516",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Both must_catch items are handled. Item 1: the builder brief names test/csv.test.js under \"Current state\" and tells the builder to \"Keep the existing CSV tests\". Step 5 requires `npm test` to exit 0, which means those tests must keep passing. It also asks for a by-hand run of the CSV command `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` with its expected output. The goal says \"behaviour without the flag stays exactly the same\", and step 2 says not to change src/parse.js unless needed. The brief never says parse() is shared with the CSV path, but naming the CSV tests and behaviour that must keep passing is enough. Item 2: verifier Check 6 runs \"npm test; echo \"exit=$?\"\". Its advisory notes that \"package.json at base defines only a `test` script\" and says to judge check 6 \"on `npm test` only\".",
+  "model": "claude-opus-5-5",
+  "ms": 7207,
+  "tokens": {
+    "input": 2,
+    "output": 679,
+    "cacheCreation": 5431,
+    "cacheRead": 783,
+    "fresh": 6112,
+    "total": 6895
+  },
+  "at": "2026-11-05T08:54:41.237Z"
+}

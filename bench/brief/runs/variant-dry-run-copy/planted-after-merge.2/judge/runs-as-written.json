@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "23caf2cd3afd15816b976f12f0476e8e1da0726e99f5c2a40e1c6aa75f22bbe6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Builder: `node bin/greet.js --shout <name>` and `node bin/greet.js Ada` run the tracked bin/greet.js. `npm test` maps to the existing \"test\":\"node --test\" script. The files it says to edit (test/greet.test.js, docs/index.md) exist. Verifier: `test \"$(node bin/greet.js --shout Ada)\" = \"HELLO, ADA!\" && echo PASS || echo FAIL` has valid quoting and command substitution, and the plain-output check has the same form. `grep -n -- '--shout' docs/index.md` uses `--` correctly, so grep doesn't read the flag as an option. In `curl -sS -w '\\nHTTP %{http_code}\\n' URL | grep -E -- '--shout|^HTTP '`, curl turns the `\\n` in -w into newlines, and the flags and pipe are valid. The advisory commands are plain node calls on an existing file. No command names a missing file or script, passes bad arguments, or has a syntax error.",
+  "model": "claude-opus-5-5",
+  "ms": 11074,
+  "tokens": {
+    "input": 2,
+    "output": 998,
+    "cacheCreation": 3183,
+    "cacheRead": 783,
+    "fresh": 4183,
+    "total": 4966
+  },
+  "at": "2026-11-05T08:55:29.981Z"
+}

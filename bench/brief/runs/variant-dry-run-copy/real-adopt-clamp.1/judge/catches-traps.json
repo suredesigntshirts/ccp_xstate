@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "ddf87b0b786fbdea683f80a2e915bf2fb338eda81523910e8b41f1099a35cd62",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one.\n1. The builder brief says \"subtract is NOT documented\". Step 2 adds both \"'### subtract(a, b)'\" and \"'### clamp(x, lo, hi)'\" entries to README.md.\n2. Verifier Check 3 lists the functions math.js exports at the PR head from Object.keys(require(\"./math.js\")). It FAILs if any name is missing from README.md. It also names the expected list \"add, subtract, multiply, clamp\" and notes that \"subtract is missing from README.md at the base commit\".\n3. Verifier Check 2 calls clamp three times with lo greater than hi. It FAILs if a call doesn't throw, or if it throws something that isn't \"e instanceof RangeError\".\nNo part of the output breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 5062,
+  "tokens": {
+    "input": 2,
+    "output": 429,
+    "cacheCreation": 3693,
+    "cacheRead": 783,
+    "fresh": 4124,
+    "total": 4907
+  },
+  "at": "2026-11-05T08:58:16.217Z"
+}

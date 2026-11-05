@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "9c94240c661a89475c55ffdbeca94de11241109cecbaa8bbf67ed7dc319443bf",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1–3 hold: exit 1 with empty stdout; `bad config:`, the exact path and line 3 / column 3; loadConfig throws with the path in the message. Check 4 is stricter than its line: \"PASS: the output is exactly `listening on 9000`, `exit 0`, `{\"port\":9000}` on three lines.\" The expect line only requires exit 0, `listening on 9000` on stdout and a return value of `{ port: 9000 }`. Any extra stdout or stderr line would fail the check, and the words don't force that. Check 5's PASS also requires \"`git status --short` is empty afterwards\". That is a tree-cleanliness rule the expect line doesn't ask for, and it belongs under Advisory, not in a PASS condition.",
+  "model": "claude-opus-5-5",
+  "ms": 16863,
+  "tokens": {
+    "input": 2,
+    "output": 839,
+    "cacheCreation": 5967,
+    "cacheRead": 783,
+    "fresh": 6808,
+    "total": 7591
+  },
+  "at": "2026-11-05T08:55:17.748Z"
+}

@@ -1,0 +1,17 @@
+Check the pull request's head. Do one check per acceptance line, in this order.
+
+Check 1: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Read src/config.js at the head to confirm that loadConfig catches the error thrown by JSON.parse. Then run it from the repository root against a file with invalid JSON:
+`d=$(mktemp -d); printf '{port: 9000' > "$d/config.json"; node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r));" "$d/config.json"`
+PASS: the call doesn't throw and the printed result is `{}` (an empty object).
+FAIL: the call throws (a SyntaxError or anything else), or it returns something other than an empty object. Also FAIL if loadConfig isn't exported from src/config.js.
+
+Check 2: "npm test passes"
+Run `npm test` from the repository root at the head. If the repository has CI checks at the head, you may also read them.
+PASS: `npm test` finishes and reports no failing tests.
+FAIL: any test fails, or `npm test` can't run.
+
+Advisory (none of this affects PASS or FAIL):
+- The issue says people need to know which file is broken and where. Note whether the catch writes a stderr line that names the path and includes the parse error message, and whether `node src/app.js "$d/config.json"` prints that line and then starts with the defaults (`listening on 8080`). If it swallows the error silently, report that as a concern.
+- Note whether a nonexistent path still throws instead of returning {}. Only JSON.parse errors should be caught.
+- Note whether the old 'bad JSON throws' test was replaced by one that asserts {}, rather than just deleted, and whether README.md was updated to match the new behaviour.

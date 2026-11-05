@@ -1,0 +1,13 @@
+Goal: make one pull request that meets both acceptance lines of issue "Read TSV too":
+1. `node bin/csv2json.js --tsv` reads tab-separated input on stdin and prints the same JSON array that `node bin/csv2json.js` prints for the same table as CSV.
+2. README.md documents --tsv.
+
+Context: src/parse.js already exports `parse(text, sep = ',')`, which splits each line on `sep`. bin/csv2json.js currently ignores its arguments and calls `parse(readFileSync(0, 'utf8'))`.
+
+Steps:
+1. In bin/csv2json.js, check whether `process.argv.slice(2)` includes `--tsv`. If it does, call `parse(input, '\t')`; if not, call `parse(input)` exactly as before. Keep the output format the same: `JSON.stringify(...)` followed by a newline. Running without the flag must behave exactly as it does now.
+2. In README.md, add a usage line such as `node bin/csv2json.js --tsv < table.tsv` with a short sentence saying that --tsv reads tab-separated input instead of CSV. The literal text `--tsv` must appear in README.md.
+3. In test/csv.test.js, add a test that runs `node bin/csv2json.js --tsv` with tab-separated input such as `'a\tb\n1\t2\n'` and asserts the output equals `'[{"a":"1","b":"2"}]\n'`, the same output the existing CSV cli test expects. Keep the existing tests.
+4. Run `npm test` and make sure every test passes. Also run this and confirm it prints SAME:
+   diff <(printf 'name\tage\tcity\nAda\t36\tLondon\nBob\t41\tParis\n' | node bin/csv2json.js --tsv) <(printf 'name,age,city\nAda,36,London\nBob,41,Paris\n' | node bin/csv2json.js) && echo SAME
+5. Commit the changes and open the pull request.

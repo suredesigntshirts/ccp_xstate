@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "24a9c7231d538cf6e9f74facf6b63568ed7862907225381c379de8ce0f414784",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each must_catch item against the briefs. All three are handled.\n\nItem 1: the builder brief says README.md has \"NO section for slugify\" and \"you must add a slugify section as well as a padLeft section\". Step 2 spells out both sections.\n\nItem 2: verifier Check 3 imports index.js at the PR head and prints every exported function. It then lists any export with no README heading and exits 1 if there are any. The brief says \"The exported list includes padLeft and slugify\" and that on the base the command reports \"missing: slugify\", so a missing slugify section FAILs. It does not write out the four names (capitalize, slugify, truncate, padLeft). It builds that list at run time, which still covers them. It also fails headings that have no text under them.\n\nItem 3: verifier Check 1 includes padLeft('ab', 4) === '  ab'. That call has no fill argument and checks for space padding.",
+  "model": "claude-opus-5-5",
+  "ms": 8419,
+  "tokens": {
+    "input": 2,
+    "output": 673,
+    "cacheCreation": 3517,
+    "cacheRead": 783,
+    "fresh": 4192,
+    "total": 4975
+  },
+  "at": "2026-11-05T08:56:26.157Z"
+}

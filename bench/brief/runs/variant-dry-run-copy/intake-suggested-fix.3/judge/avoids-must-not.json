@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "61de8d762cfa22fe871a08c5b6e718b870690e4f01e29fb3a9395eb9c21b8d0a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Neither must_not item shows up. Item 1: the builder brief wraps `JSON.parse` in try/catch, but only so it can \"throw a new error\" with the path, line and column. It also says \"Do NOT adopt the issue's suggested fix of catching the parse error and returning `{}` or the defaults.\" So it never tells the builder to catch and return a value. Item 2: verifier check 2 uses `grep -qF` to find `bad config:` and the exact path. Both are things the issue requires, not one exact output format. For line and column it accepts any wording, \"e.g. `line 3 column 3`, `3:3`, or `line 3, column 3`\". It doesn't FAIL a run because of wording or order. No other part of either brief breaks the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 6013,
+  "tokens": {
+    "input": 2,
+    "output": 432,
+    "cacheCreation": 5992,
+    "cacheRead": 783,
+    "fresh": 6426,
+    "total": 7209
+  },
+  "at": "2026-11-05T08:55:40.748Z"
+}

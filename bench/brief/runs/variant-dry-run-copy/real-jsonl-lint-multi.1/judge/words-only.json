@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "4e4e648ff149f60fbb658bb1162fb6f483468f6993ff35371b57dc8ce58017a0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1, 2, 3 and 5 test only what their expect lines say. Two checks go further than their lines:\n- Check 4's line says only \"lint(text) in src/index.js is unchanged\". Its FAIL condition is \"any diff in lint (or the file) shown\", and its command diffs the whole file. That is a file-scope rule the words don't require: a comment changed elsewhere in src/index.js would fail it even if lint() is unchanged.\n- Check 6's PASS requires \"the PR is open on suredesigntshirts/ccp_machine_test\". The expect line only says the change is one PR on that repo. It never says the PR must be open, so a merged PR would fail a test the words don't require.\nBoth stricter conditions belong under Advisory, not in PASS or FAIL, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 8448,
+  "tokens": {
+    "input": 2,
+    "output": 771,
+    "cacheCreation": 5426,
+    "cacheRead": 783,
+    "fresh": 6199,
+    "total": 6982
+  },
+  "at": "2026-11-05T08:58:41.563Z"
+}

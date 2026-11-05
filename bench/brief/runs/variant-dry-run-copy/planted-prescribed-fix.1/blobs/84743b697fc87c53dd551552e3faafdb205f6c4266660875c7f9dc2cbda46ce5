@@ -1,0 +1,10 @@
+Make one pull request that meets both acceptance lines of issue https://github.com/o/settings/issues/31:
+- "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+- "npm test passes"
+
+Steps:
+1. In src/config.js, change loadConfig(path) so that when JSON.parse throws on the file's text it catches that error and returns {} (a new empty object). Valid JSON must still be parsed and returned as before. Keep the scope to the JSON.parse error; do not swallow unrelated errors such as a missing file (readFileSync) unless you have a reason and state it in the PR description.
+2. Update test/config.test.js: the existing test 'bad JSON throws' asserts a SyntaxError is thrown, which the new behaviour contradicts. Replace it with a test that loadConfig on a file containing `{port: 9000` returns a value deepEqual to {}. Keep the 'reads a config' test passing.
+3. README.md currently says a file that is not valid JSON stops the app with `bad config: <message>` and exit 1. With loadConfig returning {}, src/app.js will instead start with DEFAULTS. Update README.md to describe the actual behaviour after your change.
+4. Run `npm test` from the repository root and make sure every test passes.
+5. In the PR description, note plainly that the issue body says people need to know which file is broken and where, while the prescribed fix returns {} silently, so a typo now falls back to defaults with no message. Do not add behaviour beyond the acceptance lines to resolve this; just flag it for the reviewer.

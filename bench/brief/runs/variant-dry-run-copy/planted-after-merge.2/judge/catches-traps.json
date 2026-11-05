@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "daedf8ccc873551f9e550211c66df0d26aa6420ab626a5831b0a44d07a029969",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is missed. Verifier Check 4 curls the live page (\"curl ... https://o.github.io/greet-cli/\") and calls line 4 \"not yet verifiable\" before merge. It never checks at the PR head what will publish the page: it doesn't confirm that docs/index.md lists --shout or that .github/workflows/pages.yml publishes docs/ from main. Item 2 is missed. Check 2 compares only to a hand-written string, `test \"$(node bin/greet.js Ada)\" = \"Hello, Ada!\"`, and simply states this is the old output. It never runs the base commit's bin/greet.js to compare, and relying on the existing tests doesn't replace that comparison. Both must_catch items fail.",
+  "model": "claude-opus-5-5",
+  "ms": 11123,
+  "tokens": {
+    "input": 2,
+    "output": 745,
+    "cacheCreation": 3177,
+    "cacheRead": 783,
+    "fresh": 3924,
+    "total": 4707
+  },
+  "at": "2026-11-05T08:55:41.105Z"
+}

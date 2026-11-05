@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "767e5023a8a99d96dc301ce804492134d93f143acb851ab1e3c29d1f43c4ff33",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 asks only that clamp is exported and returns lo, hi or x. The lo===hi case (7,3,3→3) is still \"x limited to the range lo to hi\", so it follows from the words. Check 2 tests only inputs where lo is greater than hi and asks for a RangeError. Check 3 asks that each exported function is documented, meaning described in the README, which is what \"documents\" means. It sets no exact wording, and the \"heading or entry\" phrase is broad. Check 4 asks only for no failing tests and a successful command. The stricter items all sit under \"Advisory (not part of PASS/FAIL)\": exit status 0, the clamp tests in the test file, the error message wording, add, subtract and multiply still working as before, and the README mentioning the RangeError. No PASS or FAIL condition goes beyond its expect line.",
+  "model": "claude-opus-5-5",
+  "ms": 9590,
+  "tokens": {
+    "input": 2,
+    "output": 727,
+    "cacheCreation": 3096,
+    "cacheRead": 783,
+    "fresh": 3825,
+    "total": 4608
+  },
+  "at": "2026-11-05T08:57:59.859Z"
+}

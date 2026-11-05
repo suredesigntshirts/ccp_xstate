@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "71427ab142fb38bd2e36a56e4ec7eb11e04d24a8d1eed2d1723552ff61020084",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items. It has exactly two checks, \"Check 1\" and \"Check 2\", one for each expect line. Its npm test and cmp items sit under \"Advisory (not part of PASS/FAIL)\", so they get no verdict. That makes them report-only notes, not a third check, though a stricter grader could read them as one. Check 1's PASS and FAIL are about the JSON array from --tsv matching the plain command's output. Check 2's PASS and FAIL are about README.md mentioning --tsv and saying what it does. Neither condition needs npm test or the CSV tests to pass. The builder brief does ask the builder to run npm test and add a test. That's fine, because must_not only limits verifier checks and the line 1 and 2 conditions. Neither forbidden item appears.",
+  "model": "claude-opus-5-5",
+  "ms": 7285,
+  "tokens": {
+    "input": 2,
+    "output": 557,
+    "cacheCreation": 2722,
+    "cacheRead": 783,
+    "fresh": 3281,
+    "total": 4064
+  },
+  "at": "2026-11-05T08:57:10.940Z"
+}

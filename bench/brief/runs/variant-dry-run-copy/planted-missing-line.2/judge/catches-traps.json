@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "b3ee45de517969044bf25373e2b9ea5de4c70d4fd23f5391d53cf571f12a1ce5",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is met. The builder brief says \"Plain CSV behaviour must not change\" and \"Run `npm test` and make sure every test passes.\"\n\nItem 3 is met. Check 1 pipes the same name/age/city table through as CSV and as TSV (--tsv), then compares the two with `[ \"$a\" = \"$b\" ]`.\n\nItem 2 is only partly met. The verifier's Advisory section does suggest \"Run `npm test`\" and checking plain CSV parsing, and it keeps them out of PASS/FAIL (\"not a PASS/FAIL condition\"). But it never says that no expect line covers CSV behaviour or npm test. It just lists them as advice. The must_catch item asks the brief to mention that gap, and the output doesn't. So not every must_catch item is fully handled.",
+  "model": "claude-opus-5-5",
+  "ms": 8625,
+  "tokens": {
+    "input": 2,
+    "output": 756,
+    "cacheCreation": 2715,
+    "cacheRead": 783,
+    "fresh": 3473,
+    "total": 4256
+  },
+  "at": "2026-11-05T08:57:20.744Z"
+}

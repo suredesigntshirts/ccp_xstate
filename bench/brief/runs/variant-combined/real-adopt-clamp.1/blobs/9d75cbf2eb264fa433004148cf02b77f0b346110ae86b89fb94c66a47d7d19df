@@ -1,0 +1,10 @@
+Goal: one pull request that adds clamp to mathlib and meets every acceptance line of issue #23.
+
+Current state: math.js exports add, subtract and multiply via module.exports. README.md has an API section that documents add and multiply but NOT subtract. Tests live in test/math.test.js and run with `npm test` (node --test).
+
+Steps:
+1. In math.js, add a function clamp(x, lo, hi) that returns x limited to the range lo to hi: lo when x < lo, hi when x > hi, otherwise x. Keep the bounds inclusive, so clamp(lo, lo, hi) is lo and clamp(hi, lo, hi) is hi. Before any clamping, if lo > hi, throw a RangeError with a clear message (e.g. `new RangeError('clamp: lo must not be greater than hi')`). lo === hi is valid and returns that value. Add a short doc comment like the existing functions have. Add clamp to module.exports and keep add, subtract and multiply exported.
+2. In README.md, under the API section, add a `### clamp(x, lo, hi)` entry that says what it returns, says it throws a RangeError when lo is greater than hi, and gives a short example (e.g. clamp(-5, 0, 100) → 0, clamp(140, 0, 100) → 100, clamp(42, 0, 100) → 42). Also add the missing `### subtract(a, b)` entry (returns `a` minus `b`, with an example), so README.md documents every function math.js exports: add, subtract, multiply and clamp.
+3. In test/math.test.js (or a new test file under test/), add tests for clamp: below the range, above the range, inside the range, at each bound, lo === hi, and that clamp(5, 10, 0) throws a RangeError (use assert.throws with RangeError). Keep the existing tests.
+4. Run `npm test` and make sure it passes with all tests, including the new ones.
+5. Open the pull request, referencing https://github.com/o/r/issues/23.

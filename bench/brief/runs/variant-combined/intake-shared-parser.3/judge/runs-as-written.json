@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "178f9bae5848dc0b7bcfcd1c2e9604fb558937996181960aa7c505690071d6b7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the single `test` script. All the named files exist: bin/csv2json.js, src/parse.js, test/csv.test.js, README.md and package.json. Each `printf … | node bin/csv2json.js [--tsv]` pipe is valid shell, and `npm test` maps to \"node --test\". The cmp checks also work as written. `printf '%s\\n' '…' | cmp - /tmp/outN` is valid, and Check 1's \"cmp comparison above\" writes to /tmp/out before comparing. In Check 5, putting `'[{\"a\\tb\":\"1\\t2\"}]'` through %s correctly keeps the literal backslash-t. `grep -n -- '--tsv' test/*.js` is valid, and the builder's JS literal `'[{\"a\\\\tb\":\"1\\\\t2\"}]\\n'` is valid JavaScript. The only script that doesn't exist, `npm run test:cli`, appears just as an advisory to run \"If a test:cli script exists\". `npm install` is likewise only run if dependencies are declared. Nothing in either brief would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 7655,
+  "tokens": {
+    "input": 2,
+    "output": 747,
+    "cacheCreation": 5861,
+    "cacheRead": 783,
+    "fresh": 6610,
+    "total": 7393
+  },
+  "at": "2026-11-05T08:54:37.041Z"
+}

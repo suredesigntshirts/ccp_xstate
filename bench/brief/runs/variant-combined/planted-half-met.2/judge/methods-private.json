@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "541e4af393dc8fdd56d44825dbd744e3c19c960fa4218682336dc09aae6ba39a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for probes that appear in both. The builder brief hands over the verifier's own inputs and expected outputs. Step 1 says \"padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42'\", which match Check 1 exactly. Step 4 asks for tests on ('abcde', 5 -> 'abcde') and ('abcdef', 3 -> 'abcdef'), which are nearly the same as Check 2's probes. Step 5 also gives the builder an inline script, `import * as m from './index.js'; console.log(Object.keys(m))`, then a check of README sections against its output. That is essentially Check 3's listing probe. The builder may write its own tests, but these are the verifier's specific probe cases and script, not just the bar. Running `npm test` is allowed, but the other overlaps break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 9360,
+  "tokens": {
+    "input": 2,
+    "output": 716,
+    "cacheCreation": 3096,
+    "cacheRead": 783,
+    "fresh": 3814,
+    "total": 4597
+  },
+  "at": "2026-11-05T08:56:33.825Z"
+}

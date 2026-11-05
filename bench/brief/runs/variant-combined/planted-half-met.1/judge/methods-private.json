@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "77af77fa9d9d673360c306706ab90e4a14f90e61cd7be2fa83652b0a86a1f82c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's checks, and the criterion fails. Step 1 of the builder brief gives the exact inputs and expected outputs that Check 1 uses: \"padLeft('42', 5, '0') === '00042' and padLeft('ab', 4) === '  ab'\". Check 1 runs those same calls and passes only when it gets \"00042\" and \"  ab\". Step 2 also tells the builder to test exactly those cases. That is a shared probe (a set of inputs with expected outputs), which the criterion forbids. The builder brief also repeats Check 3's FAIL condition almost word for word: \"adding only padLeft will not meet the README line\" against \"a PR that adds only a padLeft section fails this check.\" Telling the builder to run `npm test` and write its own tests is allowed. The copied examples and the restated FAIL condition are not.",
+  "model": "claude-opus-5-5",
+  "ms": 27222,
+  "tokens": {
+    "input": 2,
+    "output": 557,
+    "cacheCreation": 3146,
+    "cacheRead": 783,
+    "fresh": 3705,
+    "total": 4488
+  },
+  "at": "2026-11-05T08:56:44.299Z"
+}

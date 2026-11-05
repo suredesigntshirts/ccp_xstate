@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e878a3a0acd522df9aef4cba91d515d3a08c161853b4a2f423ad6189bb58852c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items. Item 1 holds: Check 3 builds the list of exported functions from `Object.keys(require('./math.js'))` and FAILs if \"any exported function is missing from README.md\". It also says outright that \"subtract … must now be documented too\", so a README that documents clamp but not subtract fails. Item 2 holds: Check 2 tests only `e instanceof RangeError` and asks for no particular message. Check 1 compares return values only, and the lo === hi case follows from \"limited to the range\". Check 3 accepts \"a heading or entry naming it with an explanation\", which leaves the README layout open. Check 4 needs only passing tests. The message-quality and test-content checks are marked \"Advisory (not part of PASS/FAIL)\". The layout details in the builder brief are instructions for the builder, not PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 8895,
+  "tokens": {
+    "input": 2,
+    "output": 635,
+    "cacheCreation": 3113,
+    "cacheRead": 783,
+    "fresh": 3750,
+    "total": 4533
+  },
+  "at": "2026-11-05T08:58:26.480Z"
+}

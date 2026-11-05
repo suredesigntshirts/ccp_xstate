@@ -1,0 +1,30 @@
+At the PR head, from the repository root, run each check below in order. Each check maps to one acceptance line.
+
+Check 1 — expect line: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi"
+Run:
+node -e "const m=require('./math.js');const c=m.clamp;if(typeof c!=='function'){console.log('FAIL: clamp not exported');process.exit(1)}const cases=[[5,0,10,5],[-5,0,100,0],[140,0,100,100],[0,0,100,0],[100,0,100,100],[3,3,3,3],[-7,-10,-2,-7],[-20,-10,-2,-10]];let bad=0;for(const [x,lo,hi,want] of cases){const got=c(x,lo,hi);if(got!==want){bad++;console.log('FAIL clamp('+x+','+lo+','+hi+') = '+got+', want '+want)}}console.log(bad?'FAIL':'PASS');process.exit(bad?1:0)"
+PASS: prints PASS and exits 0 (clamp is an exported function and every case returns x limited to [lo, hi]).
+FAIL: prints any FAIL line or exits non-zero, or the command throws.
+
+Check 2 — expect line: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi"
+Run:
+node -e "const c=require('./math.js').clamp;if(typeof c!=='function'){console.log('FAIL: clamp not exported');process.exit(1)}let bad=0;for(const [x,lo,hi] of [[5,10,0],[0,1,0],[50,100,-100]]){try{c(x,lo,hi);bad++;console.log('FAIL: no throw for clamp('+x+','+lo+','+hi+')')}catch(e){if(!(e instanceof RangeError)){bad++;console.log('FAIL: clamp('+x+','+lo+','+hi+') threw '+(e&&e.name)+', not RangeError')}}}console.log(bad?'FAIL':'PASS');process.exit(bad?1:0)"
+PASS: prints PASS and exits 0 (each call with lo > hi throws a RangeError).
+FAIL: prints any FAIL line or exits non-zero.
+
+Check 3 — expect line: "README.md documents every function math.js exports"
+Run:
+node -e "const fs=require('fs');const m=require('./math.js');const readme=fs.readFileSync('README.md','utf8');const names=Object.keys(m).filter(k=>typeof m[k]==='function');let bad=0;for(const n of names){if(!new RegExp('^#+ .*\\b'+n+'\\s*\\(','m').test(readme)){bad++;console.log('FAIL: README.md has no heading documenting '+n+'()')}}console.log('exports: '+names.join(', '));console.log(bad?'FAIL':'PASS');process.exit(bad?1:0)"
+Then open README.md and confirm that each name in the printed `exports:` list has a section with a description of what it does (not just a bare heading).
+PASS: the command prints PASS and exits 0, and every exported function listed has a describing section in README.md.
+FAIL: the command prints a FAIL line or exits non-zero, or any exported function's section lacks a description. (Note: before the change, subtract is undocumented, so this check fails at the base.)
+
+Check 4 — expect line: "npm test passes"
+Run:
+npm test; echo "exit $?"
+PASS: the last line is `exit 0` and the TAP summary shows `# fail 0`.
+FAIL: any non-zero exit or any failing test.
+
+Advisory (not part of PASS/FAIL):
+- Check that test/math.test.js includes tests for clamp, including a RangeError case.
+- Check that add, subtract and multiply are still exported and unchanged.

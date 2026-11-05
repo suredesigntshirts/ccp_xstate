@@ -201,7 +201,8 @@ test('S5 (6): the brief rule keeps stricter checks under Advisory, and the verif
   for (const wf of ['quick-fix', 'research']) {
     const brief = stageOf(wf, 'brief').rules.find((r) => r.startsWith('The verifier brief has exactly one check per expect line'));
     assert.match(brief, /A check's PASS and FAIL conditions test only what its expect line's words require/);
-    assert.match(brief, /put anything stricter .* under a heading Advisory, never into a PASS or FAIL condition\.$/);
+    // quick-fix's rule names the test for "stricter" (refine-brief-stage, bench/brief/reports/compare-words-test.md)
+    assert.match(brief, /put (?:anything stricter|the stricter test) .* under a heading Advisory, never into a PASS or FAIL condition\.$/);
     assert.doesNotMatch(brief, /adds no other pass or fail condition/);
     const grade = stageOf(wf, 'verify').rules.find((r) => r.startsWith('Grade only issue.expect'));
     assert.equal(grade, "Grade only issue.expect, by what each line's words require. A condition in the brief stricter than its line, or anything under Advisory, is advisory: report it in evidence, never as a FAIL.");

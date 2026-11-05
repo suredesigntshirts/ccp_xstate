@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "6dc44c5eb6f5fd8d685570cd72f7bdc7df062a9a604ccf4b4174cdfb39a45410",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I went through every command in both briefs. Builder: `npm test` maps to the existing script `node --test`, which finds test/math.test.js. The `node -e \"const m=require('./math.js'); console.log(Object.keys(m))\"` check names math.js, which already exists, and its JS is valid. Verifier: Check 1's one-liner is valid JS, uses only single quotes and no `$` or backticks inside the double quotes, and its stated output `function 0 100 42 0 100 3 -2.5 0.5` is correct. Check 2 uses valid try/catch, spread and `instanceof RangeError` syntax and is quoted safely. Check 3's filter/join line is valid. Check 4 is `npm test`. `npm install` runs only if package.json has dependencies, so it is safe either way. Every file a command uses either exists at this commit or is created in an earlier builder step (clamp in math.js), and all arguments fit the programs.",
+  "model": "claude-opus-5-5",
+  "ms": 11470,
+  "tokens": {
+    "input": 2,
+    "output": 702,
+    "cacheCreation": 3179,
+    "cacheRead": 783,
+    "fresh": 3883,
+    "total": 4666
+  },
+  "at": "2026-11-05T08:58:24.219Z"
+}

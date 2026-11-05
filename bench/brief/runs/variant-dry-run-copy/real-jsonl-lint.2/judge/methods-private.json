@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "232fc8e983a369530ba8ee687eebcc0ec020e06b7ba813428e5b870c798454d5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every check in the verifier brief. The builder brief copies the issue's six expect lines word for word, which counts as the bar. It contains none of the verifier's probes:\n- not the `printf` fixtures (`{bad`, `{\"c\":`), or the expected line numbers 2 and 5 / 2 and 4;\n- not the `node --input-type=module -e` import script, the `node -e require(package.json)` one-liner, the `grep -rnE` or the `gh api` queries.\n\nWhat the builder is told to do is allowed: run `npm ci && npm test`, write its own node:test tests, wait for the `test` workflow, and \"run the CLI by hand\" on cases it picks itself, with no fixed inputs or expected outputs. Some spec details, like \"error is a non-empty string\" or \"no phantom row\", overlap with what the verifier checks for. They describe how the tool should behave, not a PASS/FAIL test. The shebang/100755, CRLF, cwd and lockfile items are only advisories in the verifier brief, and the builder gets none of the verifier's commands for them.",
+  "model": "claude-opus-5-5",
+  "ms": 14002,
+  "tokens": {
+    "input": 2,
+    "output": 1152,
+    "cacheCreation": 6757,
+    "cacheRead": 783,
+    "fresh": 7911,
+    "total": 8694
+  },
+  "at": "2026-11-05T09:00:26.519Z"
+}

@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.1",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3 not quoted word for word in the builder brief: \"node bin/greet.js --shout <name> prints the greeting in upper case\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each verifier check against the words of its expect line. Check 1 compares the output to \"HELLO, ADA!\", which is just the defined greeting `Hello, Ada!` in upper case, so it asks for nothing extra. Check 2 compares the output without the flag to the output from before the change, which is what \"unchanged\" means. Check 3 needs `--shout` in docs/index.md plus some explanation of it, which \"documents\" requires. Check 4 needs HTTP 200 and a line containing `--shout` on the published page, which is what \"lists --shout\" means. It also says a pre-merge FAIL depends on merge and deploy, which follows the line's \"after merge\". The stricter checks are all under \"Advisory (not part of any PASS or FAIL condition)\": npm test counts, the flag after the name, the usage line and exit code, and diff file scope. No PASS or FAIL condition demands more than its expect line's words.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository and for valid syntax. bin/greet.js, docs/index.md, test/greet.test.js and .github/workflows/pages.yml are all tracked files, and `npm test` maps to the existing script \"node --test\". The test commands in checks 1 and 2, such as `[ \"$(node bin/greet.js --shout Ada)\" = \"HELLO, ADA!\" ] && echo PASS || echo FAIL`, are valid POSIX shell. Check 3's `grep -n -- '--shout' docs/index.md || echo \"no match\"` uses `--` correctly so the pattern isn't read as an option. Check 4's `curl -sS -w '\\nHTTP %{http_code}\\n' ... | grep -E -- '--shout|^HTTP'` is valid, because curl expands `\\n` in its -w format. If the page isn't published yet, the command still runs and the brief already expects a FAIL. The advisory commands (`npm test`, `node bin/greet.js Ada --shout`, `node bin/greet.js`) only name files that exist. Every command would run as written.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Neither must_catch item is handled in the verifier brief. Item 1: Check 4 reads the live page with `curl ... https://o.github.io/greet-cli/`. It mentions the merge dependency and pages.yml only in a note. It never checks at the PR head that docs/index.md lists --shout and that pages.yml publishes docs/ from main, and it says \"Do not mark it PASS based on docs/index.md alone.\" Item 2: Check 2 compares the output only to hand-written strings (`\"Hello, Ada!\"`, `\"Hello, Ada Lovelace!\"`). It asserts \"These are the outputs the program produced before the change\" but never runs the base commit's bin/greet.js to compare.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Check 4 in the verifier brief does the first must_not item. It runs `curl ... https://o.github.io/greet-cli/` and gives PASS or FAIL from what the live page shows right now: \"PASS: the output contains `HTTP 200` and at least one line containing `--shout`. FAIL: the status is not 200...\". It also tells the verifier to \"Report the actual result as FAIL\". So line 4 gets a verdict from today's live page, even though the brief admits the line can only hold after merge and deploy. The brief does avoid the second item: it says \"Do not mark it PASS based on docs/index.md alone\", so there is no silent PASS. The builder brief is fine, since it only says to mention in the PR that this line can only be confirmed after merge. Because Check 4 breaks the first item, the criterion fails.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier's checks, and several of the verifier's probes turn up in the builder brief. Step 1 gives the input and expected output of Check 1: \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\". Step 2 repeats both of Check 2's input/output pairs: \"`node bin/greet.js Ada` prints `Hello, Ada!\\n`\" and \"`node bin/greet.js 'Ada Lovelace'` prints `Hello, Ada Lovelace!\\n`\". Step 4 says \"The literal text `--shout` must appear in the file\", which is the pass condition of Check 3's grep. This gives the builder the checker's exact tests, not just the bar to meet. Telling the builder to run `npm test` and write its own tests is allowed, but these repeated probes break the criterion.",
+      "cached": false
+    }
+  }
+}

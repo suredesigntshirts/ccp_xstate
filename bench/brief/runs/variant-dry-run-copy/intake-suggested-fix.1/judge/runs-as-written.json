@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "c80b0765621ac92963258890991e4c5a7993d63790b4b96964911061d04b14bc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository: src/app.js, src/config.js, test/config.test.js and the `npm test` script (`node --test`) all exist. The verifier's Checks 1–4 use valid shell. They quote `\"$d/...\"` correctly and use printf escapes that work. Their `node --input-type=module -e` snippets are valid JavaScript: they import './src/config.js' relative to the repo root and use `node:assert/strict`, and `'$d/b.json'` expands because the snippet is in double quotes. Check 5's `npm test 2>&1 | tail -12; echo \"npm exit ${PIPESTATUS[0]}\"` is valid bash. `git checkout \"$BASE\" -- src` and `git checkout HEAD -- src` are valid, and src exists at the base. The `BASE=$(git merge-base HEAD <the PR's target ref>)` line has a placeholder, but it is clearly marked as an example to fill in. The builder's `/position (\\d+)/` is a valid JS regex, and its steps name only existing files and `npm test`. I found no command that fails to run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 9095,
+  "tokens": {
+    "input": 2,
+    "output": 899,
+    "cacheCreation": 5661,
+    "cacheRead": 783,
+    "fresh": 6562,
+    "total": 7345
+  },
+  "at": "2026-11-05T08:54:37.757Z"
+}

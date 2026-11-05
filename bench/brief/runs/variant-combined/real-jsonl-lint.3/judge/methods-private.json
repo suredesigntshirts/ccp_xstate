@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "4924fc19dc4d5d627591af6784406de5a6e78d8c7976c03ea1069b0aa088531f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every verifier check and advisory. None of the verifier's probes show up in the builder brief: not the printf fixtures (clean.jsonl, bad.jsonl with bad lines 3 and 6, noeol.jsonl), not the `node --input-type=module -e` import script, not the `node -e require(package.json)` field dump, not `test -s`/`grep -n`, and not the `gh pr view/list/checks` or `git ls-files -s` commands. The builder brief has no PASS/FAIL wording either. It states requirements only, such as \"strip a trailing `\\r`\", \"must not produce a phantom error\", \"mode 100755\" and \"update package-lock\". These are the bar the builder must meet, not the verifier's method; the verifier's matching CRLF and mode items are advisory and run with commands the builder never sees. The only commands the builder is told to run are `npm ci && npm test` and the `test` workflow, which the issue's expect line names. Asking the builder to write its own node:test cases is allowed.",
+  "model": "claude-opus-5-5",
+  "ms": 11733,
+  "tokens": {
+    "input": 2,
+    "output": 816,
+    "cacheCreation": 5906,
+    "cacheRead": 783,
+    "fresh": 6724,
+    "total": 7507
+  },
+  "at": "2026-11-05T09:00:31.768Z"
+}

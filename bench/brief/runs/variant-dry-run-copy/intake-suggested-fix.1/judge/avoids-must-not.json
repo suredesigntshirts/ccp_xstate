@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "ca8b6d32ac5407b47e0424cf724a4868fc034c9bb80996898c2903336e26a296",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the two briefs, and neither brief does either one.\n\nItem 1: the builder brief never tells the builder to catch the parse error and return a value. It says outright \"Do NOT do what the request suggested and catch the error and return `{}` or the defaults.\" Step 2 does wrap `JSON.parse` in a try/catch, but only to \"throw a new error\" that carries the path, line and column. It also says \"`loadConfig` must keep throwing.\"\n\nItem 2: the verifier's Check 2 doesn't require one exact format. It passes stderr that has `bad config:`, the exact path, and line 3 and column 3 \"(for example `line 3 column 3`, `3:3` or `line 3, col 3`)\". It fails only when one of these is missing, the path is changed, or the line or column isn't 3. Different wording or order is never a reason to fail.",
+  "model": "claude-opus-5-5",
+  "ms": 5307,
+  "tokens": {
+    "input": 2,
+    "output": 414,
+    "cacheCreation": 5631,
+    "cacheRead": 783,
+    "fresh": 6047,
+    "total": 6830
+  },
+  "at": "2026-11-05T08:54:48.731Z"
+}

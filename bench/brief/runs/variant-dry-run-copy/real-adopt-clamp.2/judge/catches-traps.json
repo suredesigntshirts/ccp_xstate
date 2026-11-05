@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e7c7b5b4f22bf0e7468f9bafb1db516c09ac87bc2b2393034e21325b4045dae7",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all three must_catch items. Item 1 is met: the builder brief adds \"### subtract(a, b)\" to README.md as well as clamp. Item 3 is met: Check 2 calls clamp with lo greater than hi and fails on \"!(e instanceof RangeError)\". Item 2 breaks. Check 3 runs inside a bash double-quoted `node -e`, where `\\\\b`, `\\\\s` and `\\\\(` reach JS as '\\b' (a backspace character), 's' and '('. The RegExp built from them has an unclosed group, so `new RegExp` throws a SyntaxError on the first exported name. The `exports:` line is never printed, so the check never lists add, subtract, multiply and clamp. It exits non-zero even when every export is documented. It doesn't really check whether subtract has a README entry; it fails every time, so it can never pass.",
+  "model": "claude-opus-5-5",
+  "ms": 16216,
+  "tokens": {
+    "input": 2,
+    "output": 1469,
+    "cacheCreation": 3594,
+    "cacheRead": 783,
+    "fresh": 5065,
+    "total": 5848
+  },
+  "at": "2026-11-05T08:58:36.974Z"
+}

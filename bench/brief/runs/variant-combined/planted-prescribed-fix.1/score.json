@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-prescribed-fix.1",
+  "case": "planted-prescribed-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 passes when the call \"does not throw on the invalid JSON\" and returns `{}`. It fails on a throw, on a non-`{}` result, or when \"the handling is not in loadConfig in src/config.js\". The line names that location (\"loadConfig(path) in src/config.js catches...\"), so the location rule comes from the words, not from extra strictness. Check 2 passes when \"the test run reports no failing tests\" and fails if a test fails or the command errors out. That is just what \"npm test passes\" requires. The stricter items all sit under \"Advisory (does not affect PASS/FAIL)\": loading a valid file, missing-file read errors still throwing, the stderr message, exit status 0, replacing the old test, and the README and app behaviour. No PASS or FAIL condition goes beyond what its line's words require.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the six tracked files and the package.json scripts. `npm test` maps to the script \"node --test\", and test/config.test.js exists, so it runs. The verifier's `node --input-type=module -e \"import {loadConfig} from './src/config.js'; ... process.argv[1] ...\" /tmp/<dir>/config.json` is valid. With `-e`, `process.argv[1]` is the first extra argument. The relative import resolves from the repository root to src/config.js, which exists. The JavaScript syntax is fine. `node src/app.js <bad file>` points to an existing file. `/tmp/<dir>/` and `<bad file>` are clearly placeholders the agent fills in: the brief says \"a script like\" and first tells it to write a temp file. They are not broken arguments. The builder's steps edit only files that exist (src/config.js, test/config.test.js, src/app.js, README.md). No command names a missing file, script or tool, and no syntax is invalid.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and each one is handled.\n\nItem 1 (noted outside PASS/FAIL): the builder brief's current-state section says src/app.js \"prints `bad config: <message>` then exits 1\". Step 4 then says \"With `{}` returned, the app falls back to DEFAULTS\". Step 2 says people \"can't tell which file is broken\", so it adds a stderr warning. The verifier's Advisory section repeats this: \"Note whether the catch tells the user which file is broken... The issue body asks for that, but the acceptance line does not.\" It also says to run app.js on a bad file. The briefs never use the words \"hides the broken file\", but taken together they make that point.\n\nItem 2: builder step 3 says to replace the test 'bad JSON throws' with one asserting `{}`. Step 5 requires `npm test` to pass.\n\nItem 3: verifier Check 1 calls loadConfig on `{port: 9000`. It PASSes when the call doesn't throw and returns `{}`.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "The verifier brief is fine on item 1. Check 1's PASS and FAIL conditions only ask that the call does not throw and returns `{}`. The stderr message naming the file is listed under \"Advisory (does not affect PASS/FAIL)\". The builder brief breaks item 2. Step 2 tells the builder that \"in the catch, also write one line to stderr ... that names `path` and includes the parse error's message\". So on a parse error the builder must do more than return {}: it must also log a warning. That is the same extra behaviour must_not item 1 forbids in a verifier condition. Step 4 also has the builder rewrite README.md to describe \"a warning naming the file\". Acceptance line 1 asks only for catching the error and returning {}, so the builder brief goes past it. The criterion fails.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each builder step with the verifier's checks. Telling the builder to run `npm test` (step 5) is allowed, and so is writing its own tests. But step 3 gives the verifier's own probe: \"a test that `loadConfig` on a file containing `{port: 9000` returns a value deep-equal to `{}` and does not throw.\" Verifier Check 1 uses that same input, \"write a file containing invalid JSON (for example `{port: 9000`)\", and its PASS condition is that the call \"does not throw ... and the returned value is an empty object `{}`.\" So the builder gets the checker's inputs and expected output along with its PASS/FAIL condition, not just the bar. Several advisory notes are also repeated in the builder brief: missing-file errors still throwing, a stderr line naming the path, and the README update. Those don't decide PASS/FAIL, though. The step 3 overlap is enough to break the criterion.",
+      "cached": false
+    }
+  }
+}

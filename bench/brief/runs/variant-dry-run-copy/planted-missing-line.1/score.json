@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-missing-line.1",
+  "case": "planted-missing-line",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Check 1's expect line asks only that --tsv print the same JSON array the CSV run prints for the same table. The non-empty `[ \"$a\" = \"$b\" ]` → SAME test covers that. But the PASS condition also requires \"the csv line is a JSON array of the two rows: [{\"name\":\"ann\",\"age\":\"30\"},{\"name\":\"bob\",\"age\":\"41\"}]\". That fixes exact values, key order and string types for the CSV path, which the expect line doesn't require. A PR whose TSV and CSV outputs match but differ from that literal would wrongly FAIL. That requirement belongs under Advisory. Check 2 (grep for --tsv plus describing the flag) fits \"documents --tsv\". The Advisory section correctly holds npm test, whether a test was added, and the no-flag CSV regression check. Because Check 1's PASS condition is too strict, the criterion is not met.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs. Every file they name exists at this commit: bin/csv2json.js, src/parse.js, test/csv.test.js and README.md. `npm test` maps to the existing script \"node --test\". The builder's two printf pipelines are valid shell, and printf turns '\\t' into tabs. Step 3 calls execFileSync('node', ['bin/csv2json.js','--tsv']) with an input value, which is valid Node usage. In verifier Check 1, the line `a=$(...); b=$(...); ... [ -n \"$a\" ] && [ \"$a\" = \"$b\" ] && echo SAME || echo DIFFERENT` is valid bash. In Check 2, `grep -n -- '--tsv' README.md; echo \"exit $?\"` uses `--` so grep doesn't read '--tsv' as an option, and $? holds grep's exit status. The advisory's `npm test` runs too. No command names a missing tool, and none has bad arguments or bad syntax.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items. Item 1 holds: the builder brief says \"Do not change how the CSV path behaves or what it prints\", and step 5 says \"Run npm test and make sure every test passes.\" Item 2 holds, though it is a close call: the verifier brief has an \"Advisory (not a pass or fail condition)\" section that suggests running npm test and checking that plain CSV output is unchanged. Both topics sit outside every PASS/FAIL condition. The brief never says in so many words that no expect line covers them. I counted the \"not a pass or fail condition\" label as making that point. Item 3 holds: Check 1 pipes the same name/age table through the CLI once as CSV and once with --tsv, then compares the results (`[ \"$a\" = \"$b\" ]`). All three items are handled.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the verifier brief against both must_not items. It has exactly two checks, one for each expect line: Check 1 compares the CSV and TSV outputs, and Check 2 greps README.md for --tsv. Neither PASS nor FAIL condition requires npm test or the CSV tests to pass. Check 1's PASS needs only \"SAME\" plus the expected JSON array. Check 2's PASS needs only a grep match that describes the flag. The verifier brief does mention npm test, but only under \"Advisory (not a pass or fail condition)\", which asks the verifier to note results without gating on them. I don't count that as a third check, though it is a borderline call. The builder brief also runs npm test, but the must_not items are about the verifier's checks and conditions, so that doesn't break the criterion. Neither must_not item is violated.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, looking for probes that appear in both. Builder step 5 tells the builder to run `printf 'name,age\\nann,30\\nbob,41\\n' | node bin/csv2json.js` and `printf 'name\\tage\\nann\\t30\\nbob\\t41\\n' | node bin/csv2json.js --tsv` and to confirm the outputs match. That is the same pair of inputs and the same comparison as verifier Check 1, so the builder is handed the checker's probe. The expect line only names the command, not these inputs, so the allowance for commands named by expect lines doesn't cover them. Builder step 3 also uses the input/output pair 'a,b\\n1,2\\n' → [{\"a\":\"1\",\"b\":\"2\"}], which shows up in the verifier's advisory check. The README step and the npm test instruction are fine. Because of step 5, the builder brief carries a verifier probe, so the criterion is not met.",
+      "cached": false
+    }
+  }
+}

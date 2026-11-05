@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "682d792cf6a114c40fff0146fd3ab05ac3716eb034d712bd01d6093253c9bc98",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 2–6 stay within their lines, and the behaviour lines are checked by running the CLI and lint(), not by reading the diff. Check 1 is stricter than line 1. Line 1 only says the CLI prints `<file>:<line>: <error>` for every invalid row and exits 1 if there are any, 0 if none. The verifier instead requires the first run to print \"exactly two error lines\" and fails it if \"an extra line appears\". It also requires the clean-file run to print \"nothing before `exit=0`\". So a correct tool that adds a summary line (e.g. \"2 errors\") or prints \"OK\" for a clean file would get FAIL, even though the expect line doesn't forbid that output. This is must_not item 1: a FAIL condition stricter than its line. Check 6's job-name match (`test`) is a minor assumption, not the deciding issue.",
+  "model": "claude-opus-5-5",
+  "ms": 14267,
+  "tokens": {
+    "input": 2,
+    "output": 968,
+    "cacheCreation": 6629,
+    "cacheRead": 783,
+    "fresh": 7599,
+    "total": 8382
+  },
+  "at": "2026-11-05T08:59:59.959Z"
+}

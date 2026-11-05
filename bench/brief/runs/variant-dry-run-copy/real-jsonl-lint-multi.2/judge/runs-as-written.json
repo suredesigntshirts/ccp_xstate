@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "1dcb81f793cd714b89feb65b73592e8df8ddf3540db384c2226d2b7c969e7ec6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repo's file list and against shell and jq syntax. Every file they name exists in the repo: packages/jsonl-lint/bin/jsonl-lint.js, src/index.js, test/cli.test.js, README.md and .github/workflows/test.yml. Root `npm test` runs `node --test` in each workspace, so it works. In Checks 1–3, each `T=$(mktemp -d) && printf ... && B=...; node \"$B\" ...; echo \"exit=$?\"` chain has valid quoting, redirections and `for` loops. Nested quotes such as `\"stderr: $(cat \"$T/err\")\"` are also valid. In Check 4, `git diff --exit-code <sha> HEAD -- path` and `sha256sum` are valid. I couldn't confirm that the fixed sha b74bddb… exists in the repo. It is presumably the base commit. In Check 6, the `gh api` jq filters are valid (`select((.body // \"\") | contains(...))`, string interpolation). The `<sha>` placeholder is explained in the text before it. The JavaScript the builder brief suggests, `readFileSync(0, 'utf8')`, is valid.",
+  "model": "claude-opus-5-5",
+  "ms": 11321,
+  "tokens": {
+    "input": 2,
+    "output": 1031,
+    "cacheCreation": 6529,
+    "cacheRead": 783,
+    "fresh": 7562,
+    "total": 8345
+  },
+  "at": "2026-11-05T08:59:08.032Z"
+}

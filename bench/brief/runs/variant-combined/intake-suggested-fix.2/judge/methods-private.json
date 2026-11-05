@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "9c28b33216cfbe1f90d0d8a04856de7f3c74996a046185f592bdad0ab58eeed5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds: the builder brief gives the bar without copying the verifier's checks. Its only runnable commands are `npm test` and the issue's own proof 1/2 command (`printf '{\\n  \"port\": 9000,...' > $d/c.json; node src/app.js $d/c.json`), and the rule allows both. The results it expects (\"exit 1, empty stdout, stderr containing `bad config:`...\", \"`listening on 9000` and exit 0\") just restate the issue's expect lines. They are not the verifier's PASS/FAIL wording. The brief does not include the verifier's Check 3 `--input-type=module` inline script, Check 4's loadConfig one-liner, or Check 5's procedure of checking out the base commit's src. Asking the builder to write tests that \"must fail on the current `src/config.js`\" is allowed. The \"position 20 → line 3, column 3\" example helps with implementation and does not appear in the verifier brief.",
+  "model": "claude-opus-5-5",
+  "ms": 7687,
+  "tokens": {
+    "input": 2,
+    "output": 722,
+    "cacheCreation": 5402,
+    "cacheRead": 783,
+    "fresh": 6126,
+    "total": 6909
+  },
+  "at": "2026-11-05T08:55:42.132Z"
+}

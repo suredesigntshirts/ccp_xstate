@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "02541534ddbc0f74af0c5584c64dc378e498e089729e328820904fa2a42c233f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief repeats probes from the verifier brief. It tells the builder to add tests where \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!\\n`\". That is the same input and expected output as verifier Check 1 (run `node bin/greet.js --shout Ada`, PASS on `HELLO, ADA!`). It also restates `node bin/greet.js Ada` → `Hello, Ada!\\n`, which matches Check 2's run and expected output. And `Ada --shout` giving the same result appears in the verifier's advisory list. \"Do not change that workflow\" also mirrors Check 4's FAIL condition. The criterion allows telling the builder to write its own tests or run commands an expect line names, but not to hand over the verifier's specific inputs and expected outputs. So the builder gets the checker's methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 14262,
+  "tokens": {
+    "input": 2,
+    "output": 1089,
+    "cacheCreation": 2930,
+    "cacheRead": 783,
+    "fresh": 4021,
+    "total": 4804
+  },
+  "at": "2026-11-05T08:56:34.135Z"
+}

@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.1",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 2, 4 and 5 stay within their wording. Three checks ask for more than the words require:\n\n- **Check 1:** it says PASS only if \"the second command prints nothing before `exit=0`\". Expect line 1 only requires exit 0 when there are no bad rows. It says nothing about output on a clean file.\n- **Check 3:** it requires each object to have \"an `error` property (a string)\". Expect line 3 only says `[{ line, error }]` and gives no type for `error`.\n- **Check 6:** it requires the check-run to be named exactly \"`test`\" and that `git rev-parse HEAD` equals the head sha. The words only say the test workflow is green at the PR head.\n\nNone of these stricter tests is under the Advisory heading, so the criterion fails.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs and found no breakage. Check 1: the `printf` strings contain no `%` and give rows 1–5 as intended. The `$(mktemp -d)` / `echo \"exit=$?\"` chains are valid shell. Check 3: inside bash double quotes, `\\\"` becomes `\"` and `\\n` reaches JS as an escape, so `node --input-type=module -e \"import { lint } from './packages/...'\"` parses, and the relative import resolves from the cwd. Check 4: `node -e \"...require('./packages/jsonl-lint/package.json')...\"` is valid CommonJS, and `npm test -w packages/jsonl-lint` is valid npm syntax. Check 6: the `gh api` jq filters (`select((.body // \"\") | contains(...))`, `\"\\(.number) ...\"`) and the `commits/$sha/check-runs` endpoint are valid, and so is `git rev-parse HEAD; npm ci && npm test`. Builder steps: `node --test` discovers `test/*.test.js` on Node 22, and `spawnSync(process.execPath, [binPath, file])` and `fs.mkdtempSync` are valid. Every file the commands name is created by an earlier builder step. One assumption I couldn't confirm: only the root `test` script was shown, so `npm test -w` relies on the brief's claim that the root `package.json` declares `workspaces: [\"packages/*\"]`.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs handle all four must_catch items.\n1. Builder step 7 says to \"Run `npm install` at the repo root so `package-lock.json` gains the new workspace (otherwise `npm ci` in CI fails…)\" and to commit the updated lock file.\n2. Builder step 6 says to \"replace the 'No tools yet: `packages/` is empty...' bullet\" with a jsonl-lint bullet, not just add a line.\n3. Verifier Check 6 runs the root `npm ci && npm test` and passes only if it \"ends with `exit=0` with the jsonl-lint tests running and passing\". Check 4 fails if the tests \"do not run\". So a skip through --if-present would be noticed, though the brief doesn't name a method like reading the test count.\n4. Check 6 reads GitHub with `gh api`: it finds PRs whose body contains the exact Closes URL, takes the head sha, and checks that sha's check-runs for `test` completed/success. It also confirms the local checkout matches that head sha.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 2–6 stay within their lines, and the behaviour lines are checked by running the CLI and lint(), not by reading the diff. Check 1 is stricter than line 1. Line 1 only says the CLI prints `<file>:<line>: <error>` for every invalid row and exits 1 if there are any, 0 if none. The verifier instead requires the first run to print \"exactly two error lines\" and fails it if \"an extra line appears\". It also requires the clean-file run to print \"nothing before `exit=0`\". So a correct tool that adds a summary line (e.g. \"2 errors\") or prints \"OK\" for a clean file would get FAIL, even though the expect line doesn't forbid that output. This is must_not item 1: a FAIL condition stricter than its line. Check 6's job-name match (`test`) is a minor assumption, not the deciding issue.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with each verifier check. The builder brief has none of the verifier's PASS/FAIL conditions or probes. It never uses the verifier's inline file `'{\"a\":1}\\n\\n{bad\\n[1,2]\\n{\"x\":'` or its expected output (errors on lines 3 and 5). It also leaves out the `node --input-type=module -e` import script, the `gh api ... check-runs` jq query, the `grep -n 'jsonl-lint' README.md` probe and the `git ls-files -s` advisory command. Its test examples are its own (\"rows 1 and 3 valid, row 2 invalid → ... line 2\"). It tells the builder to run `npm ci && npm test` and to write its own tests, and both are allowed. The fragment `{\"x\":` appears only as an example of a torn row, not as a probe with expected outputs. Advice about mode 100755, CRLF and path handling is implementation guidance, not copied checks. So the builder gets the bar without the checker's methods.",
+      "cached": false
+    }
+  }
+}

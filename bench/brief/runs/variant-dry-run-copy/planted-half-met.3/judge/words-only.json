@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "c39468a099b5f263b0782115dc68b977f3f63bfd327b01d7df89a95bc8b22391",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1 and 2 test only behaviour the expect lines require: left-padding, the default space fill, and returning s unchanged when it is already long enough. Check 3 goes further than its words. \"A section for every function\" doesn't say what the heading must look like, but the regex only counts a heading at level ## or deeper that starts with the function name. A section titled \"# padLeft\" or \"## Function: padLeft\" would fail even though the line's words are met. Check 4 also goes further. \"npm test passes\" only needs exit code 0, but PASS also needs the summary to show the exact text '# fail 0'. That depends on which reporter is used: Node's default spec reporter prints \"ℹ fail 0\". These format and exact-wording rules sit inside PASS conditions rather than under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 12472,
+  "tokens": {
+    "input": 2,
+    "output": 963,
+    "cacheCreation": 3390,
+    "cacheRead": 783,
+    "fresh": 4355,
+    "total": 5138
+  },
+  "at": "2026-11-05T08:56:11.207Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "f19fa668596792f7f6002230d475a544205b1c722a4f3495ca062d9f2aba8818",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion fails because the builder brief contains probes that also appear in the verifier brief. Step 5 tells the builder to \"run `node src/app.js <file with {port: 9000>` once and check that it prints the stderr line with the path and then `listening on 8080`\". The verifier's advisory check is the same: same input, same expected output. That command isn't the repo's test suite, isn't named in an expect line, and isn't a test the builder writes itself, so no exemption covers it. Step 3 also hands the builder Check 1's exact input and expected output: the `{port: 9000` input deep-equals {}. It is phrased as a test for the builder to write, but it repeats the verifier's probe. Telling the builder to run `npm test` is fine. The rest is leaked verification.",
+  "model": "claude-opus-5-5",
+  "ms": 9385,
+  "tokens": {
+    "input": 2,
+    "output": 747,
+    "cacheCreation": 2857,
+    "cacheRead": 783,
+    "fresh": 3606,
+    "total": 4389
+  },
+  "at": "2026-11-05T08:58:05.539Z"
+}

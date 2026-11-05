@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "bf91daa838c167acb31cf03160757053a70c6f4f9223c7e1a237bc9742133de3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check against its expect line. Check 1 passes on \"exit code is 1 and `$d/out` is empty\", which matches. Check 2 needs `bad config:`, the exact \"$d/c.json\", and line 3 and column 3 \"in any readable form\", so no exact wording is required. The proof's extra step, confirming the location doesn't come only from Node's message, is under Advisory. Check 3 passes when the script prints `OK` (it threw and the message has the path). Check 4 checks `listening on 9000`, exit 0 and `{\"port\":9000}`. Check 5 needs `npm test` to pass at the head and a path-checking test to fail with the base's src, matching the words. The stricter items (computed location, `cause`, ENOENT, no defaults returned) are all under \"Advisory (does not affect PASS or FAIL)\". Running on Node v22 is a setup step, not a condition.",
+  "model": "claude-opus-5-5",
+  "ms": 13542,
+  "tokens": {
+    "input": 2,
+    "output": 1008,
+    "cacheCreation": 5352,
+    "cacheRead": 783,
+    "fresh": 6362,
+    "total": 7145
+  },
+  "at": "2026-11-05T08:54:29.854Z"
+}

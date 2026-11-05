@@ -1,0 +1,20 @@
+Check each acceptance line of issue https://github.com/o/csv2json/issues/5 at the pull request's head, in this order. Run the commands from the repository root.
+
+Check 1 — expect line: "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+Run, for at least two tables (e.g. a 2-column 1-row table and a 3-column multi-row table):
+  printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv > /tmp/tsv.out
+  printf 'a,b\n1,2\n' | node bin/csv2json.js > /tmp/csv.out
+  diff /tmp/tsv.out /tmp/csv.out
+and likewise with e.g. 'name\tage\tcity\nann\t3\tx\nbob\t4\ty\n' versus 'name,age,city\nann,3,x\nbob,4,y\n'.
+PASS: for every table, the --tsv run on the tab-separated version prints a JSON array that is the same as the one the plain run prints for the comma-separated version (parse both outputs as JSON and compare; they must be deep-equal arrays).
+FAIL: either command errors, the --tsv output is not a JSON array, or the two arrays differ for any table (e.g. a single key containing a tab, or wrong values).
+
+Check 2 — expect line: "README.md documents --tsv"
+Read README.md at the head.
+PASS: README.md mentions the --tsv flag and says what it does (reading tab-separated input).
+FAIL: README.md does not mention --tsv, or mentions it without any explanation of its purpose.
+
+Advisory (not pass/fail conditions):
+- Run `npm test`; note whether it passes and whether a test covering --tsv was added.
+- Note whether the outputs in check 1 are byte-identical (diff exits 0), including the trailing newline.
+- Note whether plain CSV behaviour without the flag is unchanged (existing cli test).

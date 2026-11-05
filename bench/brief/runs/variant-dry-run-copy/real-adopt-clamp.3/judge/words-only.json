@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "04c90c50e846a75ddb2a5cc1a1f430cf429cef3ed23a785510bd09c98d4a40b0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1 and 2 only test what their expect lines say: clamp is exported, returns correct clamped values, and throws a RangeError when lo > hi.\n\nCheck 3 breaks the criterion. Its FAIL condition uses `readme.includes(n+'(')`, so every export must be written exactly as `name(`. \"Documents every function\" doesn't require that wording. A README that describes `subtract` in a table without parentheses would fail. The check also takes its names from `Object.keys` of all exports, so a non-function export would also be required, which the words don't ask for.\n\nCheck 4 also breaks it. Its PASS condition requires the summary to show \"# fail 0\". That output is specific to `node --test`. \"npm test passes\" only requires `npm test` to succeed, which exit 0 already shows.\n\nThese stricter tests sit in PASS/FAIL conditions instead of under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 9455,
+  "tokens": {
+    "input": 2,
+    "output": 837,
+    "cacheCreation": 3282,
+    "cacheRead": 783,
+    "fresh": 4121,
+    "total": 4904
+  },
+  "at": "2026-11-05T08:58:23.414Z"
+}

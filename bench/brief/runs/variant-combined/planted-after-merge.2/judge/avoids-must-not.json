@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "ce0debe11219981935a44b9a5a581ec2c71fe98c33ffca78d12bad75a1fc36ce",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs. Item 1 (fetching the live page): verifier Check 4 says \"Do not fetch or read the live page.\" It judges what is at the head instead: whether pages.yml still publishes docs/ on push to main, and whether docs/index.md contains --shout. The builder brief also says \"Do not try to deploy or check the live site.\" Item 2 (silent PASS): Check 4 sets PASS and FAIL conditions based on files read at the head. The verifier must give evidence (commands and output) for every check, so line 4 cannot pass without evidence. Neither forbidden behaviour appears anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 8893,
+  "tokens": {
+    "input": 2,
+    "output": 335,
+    "cacheCreation": 3378,
+    "cacheRead": 783,
+    "fresh": 3715,
+    "total": 4498
+  },
+  "at": "2026-11-05T08:55:43.359Z"
+}

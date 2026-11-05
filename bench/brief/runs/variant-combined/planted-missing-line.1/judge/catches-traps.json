@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e73dc83514f59c4e5d04eb7868d3ff03db820ce3f2b5f798d6f4eeefc187d05c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is met. The builder brief says \"otherwise keep the current behaviour\", \"Keep the existing tests passing\" and \"Run `npm test` and check that it passes.\" Item 3 is met. Check 1 pipes the same table through the --tsv command and the plain CSV command and compares the two arrays. Item 2 is only partly met. The Advisory section, marked \"(not part of PASS/FAIL)\", suggests running `npm test` and checking that plain CSV behaviour is unchanged. But it never says that no acceptance line covers CSV behaviour or npm test. The \"not part of PASS/FAIL\" label says these checks are ungraded but gives no reason. The criterion asks the brief to mention that gap, and it doesn't, so one must_catch item is not fully handled.",
+  "model": "claude-opus-5-5",
+  "ms": 8131,
+  "tokens": {
+    "input": 2,
+    "output": 783,
+    "cacheCreation": 2789,
+    "cacheRead": 783,
+    "fresh": 3574,
+    "total": 4357
+  },
+  "at": "2026-11-05T08:57:03.654Z"
+}

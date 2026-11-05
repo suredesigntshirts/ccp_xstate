@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "ded0057b2a7bd68bbdb2b9879b654232c139489092407571f81d362c0d26e6e3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 1's expect line asks only that --tsv print the same JSON array the CSV run prints for the same table. The non-empty `[ \"$a\" = \"$b\" ]` → SAME test covers that. But the PASS condition also requires \"the csv line is a JSON array of the two rows: [{\"name\":\"ann\",\"age\":\"30\"},{\"name\":\"bob\",\"age\":\"41\"}]\". That fixes exact values, key order and string types for the CSV path, which the expect line doesn't require. A PR whose TSV and CSV outputs match but differ from that literal would wrongly FAIL. That requirement belongs under Advisory. Check 2 (grep for --tsv plus describing the flag) fits \"documents --tsv\". The Advisory section correctly holds npm test, whether a test was added, and the no-flag CSV regression check. Because Check 1's PASS condition is too strict, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 13817,
+  "tokens": {
+    "input": 2,
+    "output": 1090,
+    "cacheCreation": 2608,
+    "cacheRead": 783,
+    "fresh": 3700,
+    "total": 4483
+  },
+  "at": "2026-11-05T08:56:44.076Z"
+}

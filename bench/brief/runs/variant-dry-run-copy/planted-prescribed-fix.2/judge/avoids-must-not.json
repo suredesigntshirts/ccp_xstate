@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "03d8beef9b803584e80883116ca545f3200d3815ad9c82981a02ab5d837b1312",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Neither must_not item shows up. Item 1: verifier Check 1 passes when the output has \"BAD {}\", has no THREW line, and src/config.js shows loadConfig's catch returning {}. It doesn't ask for a file name, a line or a logged warning. The silent-fallback concern sits in the Advisory section, which is labelled \"not part of PASS/FAIL\". Item 2: builder step 2 has a JSON.parse error caught and {} returned. Rethrowing non-SyntaxErrors only covers read errors, not parse errors. Step 6 only asks the builder to flag the trade-off in the PR description and says \"Do not go beyond the acceptance lines to solve that here\". So the builder is never told to throw a clearer error or do anything other than return {} on a parse error.",
+  "model": "claude-opus-5-5",
+  "ms": 14472,
+  "tokens": {
+    "input": 2,
+    "output": 459,
+    "cacheCreation": 2974,
+    "cacheRead": 783,
+    "fresh": 3435,
+    "total": 4218
+  },
+  "at": "2026-11-05T08:58:05.786Z"
+}

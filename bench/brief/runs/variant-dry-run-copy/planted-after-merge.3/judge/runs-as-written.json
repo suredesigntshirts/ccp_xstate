@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "4a86e6943f52c7e40d16f9255dc01f2aeb0a989678447bdc0e13ae201965c01c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs. I checked every command in them against this commit's files and scripts. `npm test` maps to the existing `node --test` script. bin/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml are all tracked. Each `node bin/greet.js …; echo rc=$?` line has valid shell syntax. `grep -n -e '--shout' docs/index.md` uses `-e` correctly so the pattern isn't read as an option. The `gh run list --workflow pages.yml --branch main --limit 3` flags are valid. The curl options (`-sS -L -o /dev/null -w '%{http_code}\\n'`) and the `grep -c -e '--shout'` pipe are correct. The one questionable spot is `gh pr view <number> --json state,mergedAt`. It is marked \"e.g.\" and `<number>` stands for a PR number that can't be known when the brief is written. Read as an example to fill in, not literal text, it runs. The builder brief has no JavaScript snippets that could have bad syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 11270,
+  "tokens": {
+    "input": 2,
+    "output": 783,
+    "cacheCreation": 3677,
+    "cacheRead": 783,
+    "fresh": 4462,
+    "total": 5245
+  },
+  "at": "2026-11-05T08:56:07.707Z"
+}

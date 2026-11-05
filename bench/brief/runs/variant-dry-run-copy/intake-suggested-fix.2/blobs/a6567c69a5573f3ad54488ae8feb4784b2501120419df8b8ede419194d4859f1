@@ -1,0 +1,31 @@
+Run everything from the repository root at the PR head, on Node v22. There is one check per expect line, in order.
+
+Check 1. Expect: "Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`, `  \"port\": 9000,`, `  greeting: \"x\"`, `}`, exits with code 1 and prints nothing on stdout (in particular no `listening on` line)."
+Run:
+d=$(mktemp -d); printf '{\n  "port": 9000,\n  greeting: "x"\n}\n' > "$d/c.json"; node src/app.js "$d/c.json" >"$d/out" 2>"$d/err"; echo "exit $?"; echo "--- stdout:"; cat "$d/out"; echo "--- stderr:"; cat "$d/err"; echo "--- path given: $d/c.json"; grep -F -c "$d/c.json" "$d/err"
+PASS: the output shows `exit 1` and nothing between `--- stdout:` and `--- stderr:`. FAIL: any other exit code, or any stdout output, including a `listening on` line.
+
+Check 2. Expect: "In that same run, stderr contains `bad config:`, the full path `<tmp>/c.json` exactly as passed on the command line, the line number `3` and the column number `3` of the mistake."
+Use the output of the Check 1 command (the stderr section, plus the grep count printed last).
+PASS: stderr contains `bad config:`, the grep count is 1 or more (the exact string printed after `--- path given:` appears in stderr), and stderr gives line 3 and column 3 of the mistake (for example `line 3 column 3`, `3:3`, or `line 3, col 3`). FAIL: any of these is missing, the path is altered (for example resolved differently or truncated), or the line or column given is not 3.
+
+Check 3. Expect: "Calling `loadConfig(path)` on a file containing `{port: 9000` throws instead of returning a value, and the thrown error's `message` contains `path`."
+Run:
+d=$(mktemp -d); printf '{port: 9000' > "$d/b.json"; node --input-type=module -e "import {loadConfig} from './src/config.js'; try { const v = loadConfig('$d/b.json'); console.log('RETURNED', JSON.stringify(v)); process.exit(2) } catch (e) { console.log(e.message.includes('$d/b.json') ? 'OK' : 'NO PATH: ' + e.message) }"; echo "exit $?"
+PASS: prints `OK` (and `exit 0`). FAIL: prints `RETURNED ...` (exit 2) or `NO PATH: ...`.
+
+Check 4. Expect: "Running `node src/app.js <tmp>/ok.json`, where ok.json contains `{\"port\": 9000}`, exits 0 and prints `listening on 9000` on stdout. `loadConfig` on that file returns `{ port: 9000 }`."
+Run:
+d=$(mktemp -d); printf '{"port": 9000}' > "$d/ok.json"; node src/app.js "$d/ok.json"; echo "exit $?"; node --input-type=module -e "import {loadConfig} from './src/config.js'; console.log(JSON.stringify(loadConfig('$d/ok.json')))"
+PASS: the output is exactly the three lines `listening on 9000`, `exit 0`, `{"port":9000}`. FAIL: a different stdout line, a non-zero exit, or a different loadConfig result, including extra keys.
+
+Check 5. Expect: "`npm test` passes, and the test suite has at least one test that fails at the current base commit and checks that the error from malformed config JSON includes the file path."
+Step A, at the PR head, run: npm test
+Step B: put the PR's test files onto the base commit's source in a temporary worktree and run the tests there. The base commit is 3a99df7. If the PR's base commit differs, set BASE to that commit's SHA instead. Run:
+BASE=3a99df7; t=$(mktemp -d)/base; git worktree add --detach "$t" "$BASE" >/dev/null 2>&1 && cp -R test/. "$t/test/" && (cd "$t" && npm test 2>&1 | grep -E '^(not ok|ok|# (pass|fail))'); git worktree remove --force "$t"
+PASS: Step A reports `# fail 0` and exits 0. Step B shows at least one `not ok` test. Reading that test in `test/` shows it loads malformed config JSON and asserts that the error (its message) includes the file path. FAIL: Step A has any failing test. Or Step B shows no `not ok` line. Or none of the failing tests checks that the file path is in the error.
+
+Advisory (not part of any PASS/FAIL):
+- Read `src/config.js`. Note whether line and column are computed from the source text or taken only from Node's own `(line L column C)` text, which other Node versions may not print. Report it if the location relies only on Node's text.
+- Confirm `loadConfig` does not swallow errors or return `{}` or defaults. Confirm a missing file (`node src/app.js /nonexistent.json`) still exits 1 with a `bad config:` line.
+- Optionally rerun Check 2 with a relative path (for example copy c.json to ./tmp-c.json and run `node src/app.js tmp-c.json`). Check that the path appears as given, not resolved, then delete the file.

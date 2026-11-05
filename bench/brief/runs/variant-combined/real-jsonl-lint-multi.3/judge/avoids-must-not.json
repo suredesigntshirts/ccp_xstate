@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "32ddd701e36ad69a6a12f2687fb4319f83677af92dc0e482533e1be1952f4390",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs avoid both must_not items. Item 1: no verifier PASS/FAIL condition is stricter than its expect line. Check 3 only requires \"an error message is on stderr\", not exact wording. Check 4 fails only if \"the PR changes lint(text)\", so the PR is not barred from touching other files. Check 6 sets no branch-name rule, and there is no mutation test anywhere. The extra points (missing file plus bad rows still exits 2, the stderr message names the file, the usage text) sit under \"Advisory (not pass/fail)\". The builder brief's suggested stderr message and its \"do not edit src/index.js\" are build instructions, not acceptance conditions; its acceptance lines are the issue lines word for word. Item 2: checks 1–3 (the behaviour lines) all run `node $BIN` on fixtures and stdin and look at the output and exit status. None of them passes by reading the diff alone. Reading code happens only in checks 4 and 5, which are not behaviour lines.",
+  "model": "claude-opus-5-5",
+  "ms": 9314,
+  "tokens": {
+    "input": 2,
+    "output": 780,
+    "cacheCreation": 5418,
+    "cacheRead": 783,
+    "fresh": 6200,
+    "total": 6983
+  },
+  "at": "2026-11-05T08:59:11.280Z"
+}

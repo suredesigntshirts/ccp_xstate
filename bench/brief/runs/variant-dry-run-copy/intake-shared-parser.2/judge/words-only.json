@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "119998c1240cacbcf315bc1ac81aee0260725c07c38f9bc5b5eb97b105aa61d9",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion is met. I checked the PASS and FAIL conditions of all seven verifier checks against their expect lines.\n\n- **Checks 1–5:** each compares `od -c` bytes with the exact expected string plus a newline. Check 1 also requires `exit=0`. This is what \"prints exactly … followed by a newline\" asks for. In Check 5, the `\\\\t` in printf produces the JSON escape the expect line describes.\n- **Check 6:** requires `npm test` to exit 0 and at least one test that runs `bin/csv2json.js` with `--tsv` on input with tabs and \"asserts on what it prints\". The line ruling out tests that only call `parse()` follows from the words \"runs bin/csv2json.js\".\n- **Check 7:** requires only that the README documents `--tsv` with an example invocation. `node bin/csv2json.js --tsv < table.tsv` is given as \"such as\", not as required wording.\n\nEverything stricter is under \"Advisory\": flag position, unchanged `src/parse.js`, no non-goal features, and keeping the CSV example. No PASS or FAIL condition goes beyond the words.",
+  "model": "claude-opus-5-5",
+  "ms": 10081,
+  "tokens": {
+    "input": 2,
+    "output": 909,
+    "cacheCreation": 5438,
+    "cacheRead": 783,
+    "fresh": 6349,
+    "total": 7132
+  },
+  "at": "2026-11-05T08:54:26.371Z"
+}

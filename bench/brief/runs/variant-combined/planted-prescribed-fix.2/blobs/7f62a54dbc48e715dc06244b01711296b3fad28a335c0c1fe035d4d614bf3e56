@@ -1,0 +1,19 @@
+Run every check at the pull request's head, from the repository root. There is one check per expect line, in the issue's order.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Read src/config.js and confirm that loadConfig(path) is exported from it and catches the error from JSON.parse. Then run it on invalid JSON:
+  d=$(mktemp -d); printf '{port: 9000' > "$d/config.json"; node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r));" "$d/config.json"
+PASS: the call does not throw, and the printed result is `{}` (an empty object). Anything else written to stderr does not affect the result.
+FAIL: the call throws (a SyntaxError or any other error escapes loadConfig), or it returns something other than an empty object, or loadConfig is not in src/config.js, or the parse error is not caught inside loadConfig.
+
+Check 2. Expect line: "npm test passes"
+Run `npm install` if package.json has dependencies, then run `npm test`.
+PASS: npm test finishes with every test passing.
+FAIL: any test fails, or npm test exits non-zero, or cannot be run.
+
+Advisory (does not decide PASS or FAIL):
+- Check that valid JSON still loads: a file containing {"port": 9000} should return { port: 9000 }.
+- Check that a missing file still throws (only the JSON.parse error should be swallowed); report it if read errors are swallowed too.
+- Check that the old 'bad JSON throws' test in test/config.test.js was replaced by a test that bad JSON returns {}, not just deleted.
+- Note whether a stderr warning names the file and the parse error, which serves the issue's aim that people know what to fix, and whether README.md was updated to match the new behaviour.
+- Run `node src/app.js "$d/config.json"` and note what it prints; with this change it should start on the default port 8080.

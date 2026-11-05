@@ -1,0 +1,26 @@
+Check out the PR head and run every command below from the repository root. Run `npm install` first only if package.json gained dependencies (it has none today). Give one result per check, in this order.
+
+Check 1. Expect: math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+Run:
+node -e "const m=require('./math.js'); const c=m.clamp; if(typeof c!=='function'){console.log('FAIL: clamp not exported');process.exit(1)} const cases=[[5,0,10,5],[-5,0,100,0],[140,0,100,100],[0,0,100,0],[100,0,100,100],[3,3,3,3],[-7,-10,-2,-7],[2.5,1,2,2]]; let ok=true; for(const [x,lo,hi,want] of cases){const got=c(x,lo,hi); console.log('clamp('+x+','+lo+','+hi+') =',got,'want',want); if(got!==want) ok=false} console.log(ok?'PASS':'FAIL'); process.exit(ok?0:1)"
+PASS: it prints PASS and exits 0 (clamp is exported as a function and every case returns the wanted value). FAIL: it prints FAIL, throws, or exits non-zero.
+
+Check 2. Expect: clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+Run:
+node -e "const {clamp}=require('./math.js'); let ok=true; for(const [x,lo,hi] of [[5,10,0],[0,1,0],[50,100,-100]]){ try{ clamp(x,lo,hi); console.log('clamp('+x+','+lo+','+hi+') did not throw'); ok=false }catch(e){ console.log('clamp('+x+','+lo+','+hi+') threw', e && e.constructor && e.constructor.name); if(!(e instanceof RangeError)) ok=false } } console.log(ok?'PASS':'FAIL'); process.exit(ok?0:1)"
+PASS: each call reports throwing RangeError, it prints PASS and exits 0. FAIL: any call does not throw, throws anything other than a RangeError (e.g. TypeError because clamp is missing), or the command exits non-zero.
+
+Check 3. Expect: README.md documents every function math.js exports
+Run:
+node -e "const fs=require('fs'); const names=Object.keys(require('./math.js')); const readme=fs.readFileSync('README.md','utf8'); const missing=names.filter(n=>!readme.includes(n+'(')); console.log('exports:',names.join(', ')); console.log('missing from README:',missing.join(', ')||'none'); process.exit(missing.length?1:0)"
+Then open README.md and read the entry for each listed export.
+PASS: the command prints "missing from README: none" and exits 0, and each export (including clamp and subtract) has an entry that describes what it does. FAIL: the command names any missing export or exits non-zero, or an export is only mentioned without any description of what it does. (At the current base this fails on subtract, which is exported but undocumented.)
+
+Check 4. Expect: npm test passes
+Run:
+npm test; echo "exit $?"
+PASS: exit 0 and the summary shows "# fail 0". FAIL: a non-zero exit or any failing test.
+
+Advisory (not part of PASS/FAIL):
+- Note whether test/math.test.js gained tests for clamp, including an assert.throws for RangeError, and whether package.json's test script was left as `node --test`.
+- Note whether the README clamp entry mentions the RangeError behaviour.

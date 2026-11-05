@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "e090b32f0ef4ead951c3d548e4f016a558efcf308702f7e69284453b703846f8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both checks. Check 1 runs loadConfig on a file holding invalid JSON. It passes on \"PASS: returned {}\" with exit=0, and it fails if loadConfig throws, if deepEqual fails, or if the exit code is not 0. That tests only what the line's words require: the parse error is caught (nothing is thrown) and the result is {}. It also allows any stderr warning, so it doesn't require one. Check 2 passes on \"# fail 0\" with exit=0 and fails on a failing or cancelled test or a non-zero exit. That is just what \"npm test passes\" means. The stricter items all sit under \"Advisory (not part of PASS/FAIL)\": that valid files still load, that a missing file still throws, the stderr path message, test replacement and README wording. None of them appear in a PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 8168,
+  "tokens": {
+    "input": 2,
+    "output": 550,
+    "cacheCreation": 3044,
+    "cacheRead": 783,
+    "fresh": 3596,
+    "total": 4379
+  },
+  "at": "2026-11-05T08:57:53.270Z"
+}

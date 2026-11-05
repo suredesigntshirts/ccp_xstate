@@ -1,0 +1,23 @@
+Check the pull request head for issue https://github.com/o/strutil/issues/7. Run everything from the repository root at the PR head. One check per expect line, in order.
+
+Check 1 — expect: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run: node --input-type=module -e "import * as m from './index.js'; console.log(typeof m.padLeft); console.log(JSON.stringify([m.padLeft('42',5,'0'), m.padLeft('ab',4), m.padLeft('7',3,'x')]))"
+PASS: typeof is 'function' and the outputs are ["00042","  ab","xx7"] (padded on the left with the given fill, or a space when fill is omitted, to exactly width characters).
+FAIL: padLeft is not exported from index.js, the import throws, or any result is not left-padded with the fill/space to width characters.
+
+Check 2 — expect: "padLeft returns s unchanged when s is already width characters or longer"
+Run: node --input-type=module -e "import {padLeft} from './index.js'; console.log(JSON.stringify([padLeft('abc',3,'0'), padLeft('abcdef',3,'0'), padLeft('abcdef',3)]))"
+PASS: output is ["abc","abcdef","abcdef"].
+FAIL: any value differs from the input s (padded, truncated or otherwise changed), or the call throws.
+
+Check 3 — expect: "README.md has a section for every function index.js exports"
+Run: node --input-type=module -e "import * as m from './index.js'; console.log(Object.keys(m).filter(k=>typeof m[k]==='function').join(' '))" to list the exported functions, then read README.md at the head and list its section headings (lines starting with '#').
+PASS: every exported function name (this must include capitalize, slugify, truncate and padLeft) has its own README.md section whose heading names that function.
+FAIL: any exported function has no section in README.md. Note: at the base README.md had no slugify section, so a PR that only adds padLeft fails this check.
+
+Check 4 — expect: "npm test passes"
+Run: npm test
+PASS: the command exits 0 and reports no failing tests.
+FAIL: non-zero exit or any failing test.
+
+Advisory (not pass/fail conditions): it is good if test/strutil.test.js includes tests for padLeft (zero padding, default fill, s at or above width); multi-character fill behaviour is not specified by the issue.

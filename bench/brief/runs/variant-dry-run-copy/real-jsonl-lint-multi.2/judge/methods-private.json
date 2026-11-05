@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "05e6c76309f4e036e84d0487c598b3035063c67f85e57499ae5e60303a4646e6",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's PASS/FAIL conditions and probes. Two of the verifier's specific conditions show up in the builder brief. First, step 3 says \"so output for several files equals the concatenation of single-file runs\". That is Check 1's PASS condition (\"multi-file output equals the concatenation of single-file runs\", tested with diff → SAME), not just the expect line's \"as for one file before\". Second, step 4's missing-file test asks that \"a bad file named after the missing one is still reported on stdout\" and that \"stderr names the missing file\". This copies Check 3 D's probe and PASS condition (missing file first, then bad.jsonl lines still on stdout, stderr names missing.jsonl). The rest of the builder brief stays within what's allowed: restating the expect lines, running npm test, and writing its own tests. But these overlaps give the builder the checker's methods, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 15735,
+  "tokens": {
+    "input": 2,
+    "output": 903,
+    "cacheCreation": 6260,
+    "cacheRead": 783,
+    "fresh": 7165,
+    "total": 7948
+  },
+  "at": "2026-11-05T08:59:47.064Z"
+}

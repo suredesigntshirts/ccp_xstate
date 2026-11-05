@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "a8f34a82706b35bcb37cce0b2db6fd1335ae96402f21963a6e5802d36cf28355",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for every command in both briefs. Each one names files or scripts that exist: bin/csv2json.js and test/csv.test.js are tracked, and `npm test` maps to the \"node --test\" script. The `--tsv` flag is added by builder step 1 before any command uses it. The verifier's `printf '...\\t...' | node bin/csv2json.js --tsv > /tmp/tsv.out` lines are valid shell, since printf turns \\t into tabs. The `node -e \"...\"` snippet is valid shell: inside double quotes it contains no `$`, backticks or `!`. It is also valid JavaScript (JSON.parse, readFileSync, a ternary). `npm install` only runs if package.json lists dependencies, which is fine. `node bin/csv2json.js --tsv < table.tsv` is a usage example to put in the README, not a command anyone is told to run. No command breaks.",
+  "model": "claude-opus-5-5",
+  "ms": 8056,
+  "tokens": {
+    "input": 2,
+    "output": 554,
+    "cacheCreation": 2828,
+    "cacheRead": 783,
+    "fresh": 3384,
+    "total": 4167
+  },
+  "at": "2026-11-05T08:57:02.735Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "d3245edacdebb47c32d798f67319f052278575568908bd8ee13028eded4b72ff",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each of the seven checks' PASS and FAIL conditions with the words of its expect line. Check 1 tests only exit=0 and a byte-exact cmp of `[{\"a\":\"1\",\"b\":\"2\"}]\\n`, which is what line 1 says. Checks 2–5 test only byte-exact output and don't add an exit-code test the lines don't state. Check 5's `printf '[{\"a\\\\tb\":\"1\\\\t2\"}]\\n'` correctly produces the JSON tab escape. Check 6 requires `npm test` to exit 0 plus a test that runs the CLI with --tsv on tab input and \"asserts on its stdout\", which matches \"checks its output\". Check 7 requires only that the flag is described and an example uses it. \"such as `node bin/csv2json.js --tsv < table.tsv`\" is only an illustration. The stricter items (other arguments alongside the flag, README saying \"tab-separated\", no quoting/--sep/--help) all sit under \"Advisory (not part of PASS/FAIL)\". None of the checks adds a stricter requirement.",
+  "model": "claude-opus-5-5",
+  "ms": 9742,
+  "tokens": {
+    "input": 2,
+    "output": 761,
+    "cacheCreation": 5488,
+    "cacheRead": 783,
+    "fresh": 6251,
+    "total": 7034
+  },
+  "at": "2026-11-05T08:54:26.028Z"
+}

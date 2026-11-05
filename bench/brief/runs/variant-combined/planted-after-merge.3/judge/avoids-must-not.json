@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "6432374609c63190c46dafad105471b4d1f2ca54dd3ff3315c4d3da234c6e958",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Neither brief breaks the must_not list. Check 4 in the verifier brief says \"The live page can only be seen after merge; do not fetch it\", so the verdict never depends on today's live page. It is not a silent pass either: it gives the reason it can't see the page and asks for evidence the verifier can collect now. It reads pages.yml and docs/index.md at the PR head. PASS needs both: the workflow \"still publishes the docs folder on pushes to main\" and docs/index.md \"lists `--shout`\". It also names specific FAIL conditions: the workflow is removed, the trigger is changed away from main, the publish path is changed, or `--shout` is missing. The builder brief also tells the builder not to change the workflow and contains nothing that breaks the list.",
+  "model": "claude-opus-5-5",
+  "ms": 12460,
+  "tokens": {
+    "input": 2,
+    "output": 754,
+    "cacheCreation": 2887,
+    "cacheRead": 783,
+    "fresh": 3643,
+    "total": 4426
+  },
+  "at": "2026-11-05T08:56:19.871Z"
+}

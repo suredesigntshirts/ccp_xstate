@@ -1,0 +1,12 @@
+Goal: one pull request for https://github.com/o/strutil/issues/7 (padLeft for invoice numbers) that meets every one of these acceptance lines:
+1. index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+2. padLeft returns s unchanged when s is already width characters or longer
+3. README.md has a section for every function index.js exports
+4. npm test passes
+
+Steps:
+1. Read index.js, README.md, package.json and test/strutil.test.js. The package is an ES module ("type": "module"), and tests run with `node --test`.
+2. In index.js, add and export `padLeft(s, width, fill = ' ')`, written in the same style as the existing functions (a one-line /** */ doc comment). It returns s padded on the left with fill until it is width characters long, e.g. padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42'. When s.length >= width it returns s unchanged. `s.padStart(width, fill)` does both.
+3. In README.md, add a `## padLeft(s, width, fill)` section that describes it, in the style of the existing sections. Important: README.md has no section for `slugify` at the moment, even though index.js exports it. Acceptance line 3 needs a section for EVERY exported function, so also add a `## slugify(s)` section (lower case, words joined by dashes). When you are done, README.md must have a `## name(...)` heading for each of capitalize, slugify, truncate and padLeft. Keep the Tests section at the end.
+4. In test/strutil.test.js, import padLeft and add tests for zero padding ('42',5,'0' -> '00042'), the default space fill ('42',5 -> '   42'), and the unchanged cases (length equal to width, and longer than width).
+5. Run `npm test` and make sure it passes with 0 failures. Then commit and open the pull request, and reference issue #7 in it.

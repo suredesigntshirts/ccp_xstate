@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.2",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file name\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1–4 and 6 stay within their words. Check 4 is limited to the lint function rather than the whole file, and the stricter items are correctly under Advisory. Check 5 adds a requirement its expect line doesn't force. That line only says node:test tests \"cover\" the listed cases and that the README \"documents the usage\". Yet Check 5's PASS requires \"there are node:test tests for each of these cases, and they pass\", and its FAIL includes \"a test fails\". Tests can cover a case without passing, so requiring them to pass goes beyond Check 5's words. Passing belongs to line 6, which already asks for npm test to be green. The README condition also adds \"including `-`\", which is a smaller extra on \"documents the usage\". Because Check 5 holds tests to more than its words require, the criterion fails.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Most of the commands work in this repo. `npm ci` has a lockfile to use, the workspace has a test script, the bin path exists, and `gh pr view`/`gh pr checks` are valid. The builder brief's commands also run as written. The verifier brief breaks the criterion. It sets \"BIN = packages/jsonl-lint/bin/jsonl-lint.js\" as plain prose, not a shell variable, then gives commands like `node BIN a.jsonl bad.jsonl b.jsonl`. Run as written, `node BIN` looks for a file called `BIN` and fails, because there is no `$BIN` assignment. The paths also clash. BIN is relative to the repository root, but a.jsonl, b.jsonl and bad.jsonl are in a temporary directory. From either directory, one of the two relative paths won't resolve. So the CLI checks in Checks 1–3 would not run as written.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs cover all four must_catch items.\n1. Verifier Check 3(d) runs `node BIN a.jsonl missing.jsonl bad.jsonl`. It requires exit 2, a non-empty stderr and stdout \"still containing `bad.jsonl:2: ...`\", so the missing file and the bad row are tested in one run.\n2. Check 4 runs `git diff <merge-base with main>..HEAD -- packages/jsonl-lint/src/index.js`, comparing the head with the base, and fails if lint(text) \"differs in any way\".\n3. Builder step 4 says \"Update packages/jsonl-lint/README.md\" with the multi-file usage, `-` and the exit codes.\n4. Check 6 runs `gh pr view --json body,headRefOid,state` and `gh pr checks`. It requires the body to contain the Closes line and \"the `test` workflow check passes at the head SHA\".",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both briefs.\n\n**Item 1 (nothing stricter than its line):** I read every PASS/FAIL condition in the verifier brief. Check 3(d) asks only for \"a non-empty stderr that mentions the error\", not exact wording. Check 4 fails only if \"the lint(text) function differs\", so it doesn't limit which files the PR may change. Check 6 asks only for the Closes line, a passing workflow and a passing `npm test`. There is no branch-name rule, mutation test or file-touch limit. The exact stderr form (`jsonl-lint: cannot read <file>`) and matching single-file output appear only under \"Advisory (not pass/fail)\". The builder brief gives build steps, not PASS/FAIL conditions.\n\n**Item 2 (no diff-only behaviour checks):** Checks 1–3 each run `node BIN` with set inputs and record stdout, stderr and exit status. Diff and code reading is used only in Checks 4 and 5, which are not behaviour lines.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with every PASS/FAIL condition and probe in the verifier brief. The builder brief has none of the verifier's fixtures: no a.jsonl `{\"a\":1}\\n{\"b\":2}\\n`, no bad.jsonl, no bad2.jsonl. It also has none of its commands, such as `printf '{oops}\\n' | node BIN -`, `node BIN a.jsonl missing.jsonl bad.jsonl` or the `git diff` merge-base check. It never uses PASS/FAIL language. What it does have is requirements: the exit-code order, \"unreadable file plus a bad row gives 2\" and the `jsonl-lint: cannot read <file>` form. These overlap the verifier's advisory notes, but they are the bar the builder must meet, not checking methods. Its step 3 test list (e.g. \"two clean files: exit 0, no stdout\") tells the builder to write its own tests for the issue's cases, which is allowed. Running `npm test` and the test workflow is also allowed. So the builder brief gives the bar without the checker's methods.",
+      "cached": false
+    }
+  }
+}

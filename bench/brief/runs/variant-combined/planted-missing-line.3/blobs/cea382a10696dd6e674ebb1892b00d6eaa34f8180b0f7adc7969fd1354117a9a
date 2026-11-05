@@ -1,0 +1,15 @@
+Check every line at the pull request head. Run `npm install` first only if package.json now lists dependencies.
+
+Check 1. Expect line: "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+Run: from the repository root, run `printf 'name\tage\tcity\nann\t30\tparis\nbob\t25\toslo\n' | node bin/csv2json.js --tsv > /tmp/tsv.out` and `printf 'name,age,city\nann,30,paris\nbob,25,oslo\n' | node bin/csv2json.js > /tmp/csv.out`. Compare the two outputs as parsed JSON, for example with `node -e "const fs=require('fs');const a=JSON.parse(fs.readFileSync('/tmp/tsv.out','utf8'));const b=JSON.parse(fs.readFileSync('/tmp/csv.out','utf8'));console.log(Array.isArray(a)&&JSON.stringify(a)===JSON.stringify(b)?'SAME':'DIFF')"`. Repeat the comparison with a two-column table: TSV 'a\tb\n1\t2\n' against CSV 'a,b\n1,2\n'.
+PASS: in both cases the --tsv command prints a JSON array equal to the array the plain command prints for the CSV form of the same table, with rows keyed by the header row (for example, objects with keys name, age and city for the first table).
+FAIL: either command errors or prints something that is not a JSON array, or the --tsv array differs from the CSV array for either table (for example, a single key 'name\tage\tcity' that still holds tabs).
+
+Check 2. Expect line: "README.md documents --tsv"
+Read README.md at the head.
+PASS: README.md mentions the `--tsv` flag and says it is for tab-separated input, or shows it in a usage example.
+FAIL: README.md does not mention --tsv.
+
+Advisory (not pass/fail):
+- Run `npm test` and note whether it passes, and whether a test for --tsv was added.
+- Note whether plain CSV output for 'a,b\n1,2\n' is still exactly '[{"a":"1","b":"2"}]\n', and whether the --tsv output matches the CSV output byte for byte, trailing newline included.

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "c914bc04433864d589799046f00aacffcb5d8fe46343a66fb452fe32db8b2794",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands work as written. `npm test` maps to `node --test` in package.json. bin/greet.js exists, so `node bin/greet.js --shout Ada`, `node bin/greet.js Ada` and `node bin/greet.js` with no arguments all run. The files the briefs name to read or edit (src/greet.js, test/greet.test.js, docs/index.md, .github/workflows/pages.yml) are all tracked.\n\nCheck 2 in the verifier brief breaks the criterion. `git show <base>:bin/greet.js` keeps a literal `<base>` placeholder. In a shell that `<` is read as input redirection from a file named `base`, so the command fails exactly as written. The brief also gives `git worktree add` with no path or commit. Git rejects that and prints a usage error. Both are in backticks as commands to run, and neither has arguments that fit the program.",
+  "model": "claude-opus-5-5",
+  "ms": 9087,
+  "tokens": {
+    "input": 2,
+    "output": 797,
+    "cacheCreation": 2970,
+    "cacheRead": 783,
+    "fresh": 3769,
+    "total": 4552
+  },
+  "at": "2026-11-05T08:56:02.186Z"
+}

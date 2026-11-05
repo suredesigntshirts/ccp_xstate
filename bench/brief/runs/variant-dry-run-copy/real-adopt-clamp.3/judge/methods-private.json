@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "649d54b73e67415f00be2e862e15b4c114ebef95d073d69a9f3f01fa0efe1c74",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier's probes, and the builder brief gives away several of them. In step 2 it hands the builder exact inputs and outputs that are also Check 1's cases: \"clamp(5, 0, 10) === 5\", \"clamp(-5, 0, 100) === 0\" and \"clamp(140, 0, 100) === 100\". Check 1 tests [5,0,10,5], [-5,0,100,0] and [140,0,100,100]. Its \"assert.throws(() => clamp(5, 10, 0), RangeError)\" is the same as Check 2's [5,10,0] case. Step 3 also says every export must appear \"written as `name(`\", which is exactly what Check 3's `readme.includes(n+'(')` test looks for. Asking the builder to write its own tests is allowed. But these are the verifier's own inputs and expected outputs, plus its pass condition, so the builder is being given the checker rather than just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 6632,
+  "tokens": {
+    "input": 2,
+    "output": 622,
+    "cacheCreation": 3322,
+    "cacheRead": 783,
+    "fresh": 3946,
+    "total": 4729
+  },
+  "at": "2026-11-05T08:59:03.594Z"
+}

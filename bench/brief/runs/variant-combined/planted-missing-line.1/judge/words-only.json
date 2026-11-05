@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "f4eb25568d617aaeb58590d63cbf5bd8db0e26cdabb463558f6cc5b391923ff1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 2 is fine. It passes if README.md mentions --tsv and says it reads tab-separated input, which is what \"documents --tsv\" asks for. Byte-identical output and npm test are correctly left under Advisory. Check 1 breaks the criterion. Its PASS condition adds a fixed literal: \"For the first table that array is [{\\\"name\\\":\\\"ann\\\",\\\"age\\\":\\\"30\\\",\\\"city\\\":\\\"paris\\\"},...]\". The expect line only requires the --tsv output to equal whatever the plain CSV command prints for the same table. It does not fix what values that array holds, for example string versus number ages. Putting a specific expected array inside PASS is stricter than the words require. If the CSV command's real output were different, the verifier would be checking against a value the line never set. That literal belongs under Advisory or should be cut, so the criterion does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 13101,
+  "tokens": {
+    "input": 2,
+    "output": 930,
+    "cacheCreation": 2703,
+    "cacheRead": 783,
+    "fresh": 3635,
+    "total": 4418
+  },
+  "at": "2026-11-05T08:56:46.928Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "9dd6996eb876e909d4bcfe6384a9df5155d11dd5f115596a7f57f21f90cb7793",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 1 asks for more than the expect line says. PASS requires `good.port === 9000`, which is a test that valid JSON still parses. The line \"catches the JSON.parse error and returns {} instead\" doesn't force that. PASS also requires the exact output `{} {\"port\":9000}`. Check 2 is also stricter than \"npm test passes\". PASS requires the summary to read `# fail 0`, which is exact runner-specific wording, and FAIL includes \"reports zero tests run\". All of these stricter tests should be under Advisory, not in the PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 12580,
+  "tokens": {
+    "input": 2,
+    "output": 847,
+    "cacheCreation": 2781,
+    "cacheRead": 783,
+    "fresh": 3630,
+    "total": 4413
+  },
+  "at": "2026-11-05T08:57:19.251Z"
+}

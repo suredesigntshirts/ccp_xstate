@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.1",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1 and 2 test only what their lines say: clamp is exported, it returns x limited to the range (lo equal to hi is still a range), and it throws a RangeError when lo is greater than hi. Check 3 breaks the criterion. It FAILs any exported function whose name is not followed by \"(\" in README.md (`!md.includes(n+\"(\")`). That is an exact-wording rule. \"README.md documents every function\" does not force it, because a README could describe `clamp` without writing \"clamp(\". This rule should have been under Advisory. Check 4 is also somewhat stricter than \"npm test passes\", since it also requires the TAP output to show \"# fail 0\" on top of exit 0. Because check 3 fails, the criterion does not hold for the whole output.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository. The builder brief only runs `npm test`, and package.json defines that as \"node --test\". It edits math.js, README.md and test/math.test.js, and all three are tracked files. The verifier's three `node -e` scripts sit in single quotes and use only double quotes inside, so the shell parses them cleanly. Their JavaScript is valid: the for-of destructuring, try/catch, `instanceof RangeError`, arrow filters and string joins all parse. `require(\"./math.js\")` works because the commands run from the repo root and math.js is CommonJS. `fs.readFileSync(\"README.md\",\"utf8\")` points at an existing file. `npm test; echo \"exit $?\"` is valid bash. No command uses a missing file, script or tool, and every argument fits its program.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one.\n1. The builder brief says \"subtract is NOT documented\". Step 2 adds both \"'### subtract(a, b)'\" and \"'### clamp(x, lo, hi)'\" entries to README.md.\n2. Verifier Check 3 lists the functions math.js exports at the PR head from Object.keys(require(\"./math.js\")). It FAILs if any name is missing from README.md. It also names the expected list \"add, subtract, multiply, clamp\" and notes that \"subtract is missing from README.md at the base commit\".\n3. Verifier Check 2 calls clamp three times with lo greater than hi. It FAILs if a call doesn't throw, or if it throws something that isn't \"e instanceof RangeError\".\nNo part of the output breaks the criterion.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 holds: check 3 lists every exported function and fails if any one is missing, so a README that documents clamp but not subtract fails. Item 2 is broken by the same check. Its command passes a function only if README.md contains the literal text `name(`, as in `!md.includes(n+\"(\")`. Line 3 only asks that every exported function be documented. A README that says \"`subtract` — returns a minus b\" documents subtract but would fail. Requiring signature-style text is a specific README layout, which is stricter than the line. Check 4 is also somewhat strict: it requires the TAP summary to show '# fail 0', but Node's test runner can print a different summary format depending on the output. Checks 1 and 2 match their lines: they test the values clamp returns and that it throws a RangeError for any message.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier's probes, and the builder brief gives away several of them. Step 2 says \"Every function math.js exports must have its name followed by '(' written in README.md.\" That is the exact PASS test in verifier check 3 (`md.includes(n+\"(\")`). Step 2 also names the examples \"clamp(140, 0, 100) // 100 and clamp(-5, 0, 100) // 0\", which are input/expected-output pairs from check 1's case list ([140,0,100,100] and [-5,0,100,0]). Step 3 has the builder write \"assert.throws(() => clamp(5, 10, 0), RangeError)\", which is check 2's probe input [5,10,0]. Asking the builder to write its own tests is allowed, but these copy the checker's specific probes instead of only stating the bar.",
+      "cached": false
+    }
+  }
+}

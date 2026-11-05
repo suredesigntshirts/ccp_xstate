@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "61516d5eba574ca8560a0da062cde864b344d73ff16127be04465541498de7c6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Checked each verifier PASS/FAIL condition against must_not. Checks 1–3 run the CLI on temporary files and stdin and compare output and exit codes. Nothing passes on reading the code (\"reading the diff alone is not enough\"). No condition needs exact stderr wording: check 2 needs only \"a message on stderr (not a lint line)\" with exit=2. Check 3's \"error naming missing.jsonl\" is a reasonable reading of \"error on stderr\", not exact wording. No branch-name rule, mutation test or file-touch limit appears. Check 4's blob hash has a fallback: a different hash still passes if lint's text is identical. The builder's \"that literal text\" for the README is an instruction to the builder. Verifier check 5 only needs the README to document the usage, so it is not a stricter pass condition. Advisory items are marked not pass/fail.",
+  "model": "claude-opus-5-5",
+  "ms": 20040,
+  "tokens": {
+    "input": 2,
+    "output": 1318,
+    "cacheCreation": 6754,
+    "cacheRead": 783,
+    "fresh": 8074,
+    "total": 8857
+  },
+  "at": "2026-11-05T08:59:57.887Z"
+}

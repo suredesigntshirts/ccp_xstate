@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "a1866669e3045c5e16eff4b7a0694836ab7bbca8e89a0969231b3d93cb96c77c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with each verifier check. It has no PASS/FAIL wording. It does not copy Check 3's inline `node --input-type=module -e \"...includes('$d/b.json') ? 'OK'...\"` script, and it does not copy Check 5's method of checking out the base `src/`. The step 6 manual commands (`printf '{\\n  \"port\": 9000,...' > $d/c.json; node src/app.js $d/c.json; echo $?` and the ok.json run) are trimmed versions of the issue's proofs 1 and 4. The criterion allows commands that the proofs name. The test inputs (`{port: 9000`, the four-line file, line 3 column 3) come straight from the issue's expect lines. The brief uses them only to tell the builder what its own tests should check, which is allowed. Step 2 tells the builder to compute line and column itself. That states the bar from the issue's proof 2. It is not the verifier's procedure for reading the code. So the builder gets the bar, not the checker's probes.",
+  "model": "claude-opus-5-5",
+  "ms": 13678,
+  "tokens": {
+    "input": 2,
+    "output": 1024,
+    "cacheCreation": 5394,
+    "cacheRead": 783,
+    "fresh": 6420,
+    "total": 7203
+  },
+  "at": "2026-11-05T08:55:04.294Z"
+}

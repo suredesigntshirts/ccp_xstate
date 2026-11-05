@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "10f6f7f0f7385657c90211c905b54fbb5a588f586019560c988f75966036f77d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with each verifier check. The builder brief has none of the verifier's PASS/FAIL conditions or probes. It never uses the verifier's inline file `'{\"a\":1}\\n\\n{bad\\n[1,2]\\n{\"x\":'` or its expected output (errors on lines 3 and 5). It also leaves out the `node --input-type=module -e` import script, the `gh api ... check-runs` jq query, the `grep -n 'jsonl-lint' README.md` probe and the `git ls-files -s` advisory command. Its test examples are its own (\"rows 1 and 3 valid, row 2 invalid → ... line 2\"). It tells the builder to run `npm ci && npm test` and to write its own tests, and both are allowed. The fragment `{\"x\":` appears only as an example of a torn row, not as a probe with expected outputs. Advice about mode 100755, CRLF and path handling is implementation guidance, not copied checks. So the builder gets the bar without the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 21202,
+  "tokens": {
+    "input": 2,
+    "output": 1043,
+    "cacheCreation": 6633,
+    "cacheRead": 783,
+    "fresh": 7678,
+    "total": 8461
+  },
+  "at": "2026-11-05T09:00:21.163Z"
+}

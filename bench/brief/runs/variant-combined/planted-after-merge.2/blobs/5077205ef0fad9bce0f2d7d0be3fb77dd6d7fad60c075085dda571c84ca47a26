@@ -1,0 +1,14 @@
+Goal: add a --shout flag to the greet CLI (issue https://github.com/o/greet-cli/issues/12). The pull request must meet every one of these lines:
+1. node bin/greet.js --shout <name> prints the greeting in upper case
+2. without --shout the output is unchanged
+3. docs/index.md documents --shout
+4. after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout
+
+Steps:
+1. Read bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml. bin/greet.js currently takes the first argument that does not start with '--' as the name and prints greeting(name) followed by a newline.
+2. In bin/greet.js, detect '--shout' anywhere in process.argv.slice(2). When it is present, print the same greeting converted to upper case (for example `node bin/greet.js --shout Ada` prints `HELLO, ADA!`). It should work before or after the name. Keep the name selection, the usage message and exit status 2 for a missing name as they are.
+3. Leave the output without --shout exactly as it is now, byte for byte (for example `node bin/greet.js Ada` still prints `Hello, Ada!` and a newline). Do not change what greeting() returns for existing callers. If you add a helper or an option to src/greet.js, keep its default behaviour the same.
+4. Add tests in test/greet.test.js (node:test) that run bin/greet.js as a child process: one with --shout showing upper-case output, and one without it showing the unchanged `Hello, <name>!` output. Run `npm test` and make sure every test passes.
+5. Update docs/index.md so it documents --shout: show the usage (for example `node bin/greet.js --shout <name>`) and say that it prints the greeting in upper case. Keep the existing documentation for the plain form.
+6. Line 4 can only be seen after merge. .github/workflows/pages.yml publishes the docs/ directory to GitHub Pages on every push to main, so the docs/index.md change from step 5 is what produces it. Do not change pages.yml or move the docs out of docs/. Do not try to deploy or check the live site.
+7. Open one pull request with these changes and link the issue in it.

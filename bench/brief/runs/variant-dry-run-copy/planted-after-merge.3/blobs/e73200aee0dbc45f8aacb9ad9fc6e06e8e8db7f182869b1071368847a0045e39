@@ -1,0 +1,35 @@
+Verify the pull request for issue https://github.com/o/greet-cli/issues/12 against its acceptance lines. Run every command from the repository root at the PR head, after `npm test` (run it once first and note the result; it is context, not a check). One check per expect line, in order.
+
+Check 1 — expect: "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run:
+  node bin/greet.js --shout Ada; echo rc=$?
+PASS: stdout is exactly `HELLO, ADA!` (the normal greeting `Hello, Ada!` in upper case) followed by a newline, and rc=0.
+FAIL: any other output (e.g. `Hello, Ada!`, mixed case, the name missing or replaced by `--shout`), or a nonzero exit code.
+
+Check 2 — expect: "without --shout the output is unchanged"
+Run:
+  node bin/greet.js Ada; echo rc=$?
+  node bin/greet.js "Ada Lovelace"; echo rc=$?
+  node bin/greet.js; echo rc=$?
+Before the change these print, respectively: `Hello, Ada!` with rc=0; `Hello, Ada Lovelace!` with rc=0; `usage: greet <name>` on stderr with rc=2.
+PASS: all three give exactly that output and exit code.
+FAIL: any difference in text, case, trailing newline, stream, or exit code.
+
+Check 3 — expect: "docs/index.md documents --shout"
+Run:
+  grep -n -e '--shout' docs/index.md; echo rc=$?
+and read docs/index.md.
+PASS: grep finds at least one line (rc=0) and the file tells the reader what `--shout` does (prints the greeting in upper case).
+FAIL: rc=1 (no mention), or `--shout` is mentioned without saying what it does.
+
+Check 4 — expect: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+This line is about the live site after the PR is merged; it cannot be satisfied at the PR head alone. First find out whether the PR is merged (e.g. `gh pr view <number> --json state,mergedAt`) and, if merged, whether the pages workflow run on main after the merge succeeded (`gh run list --workflow pages.yml --branch main --limit 3`). Then run:
+  curl -sS -L -o /dev/null -w '%{http_code}\n' https://o.github.io/greet-cli/
+  curl -sS -L https://o.github.io/greet-cli/ | grep -c -e '--shout'; echo rc=$?
+PASS: the PR is merged and the published page returns HTTP 200 and its content contains `--shout` (grep count ≥ 1, rc=0).
+FAIL: otherwise. If the PR is not merged yet, report FAIL with the reason "not verifiable before merge", and include the HTTP status you saw (at the time this brief was written the page returned 404), so it is clear the check is pending rather than broken by the code.
+
+Advisory (not part of PASS/FAIL):
+- Also try `node bin/greet.js Ada --shout` — it should match check 1's output if the flag works in any position.
+- Look for tests in test/greet.test.js covering both the shout and plain paths, and check that `npm test` passes.
+- Note any change to .github/workflows/pages.yml and whether it still publishes docs/ on push to main.

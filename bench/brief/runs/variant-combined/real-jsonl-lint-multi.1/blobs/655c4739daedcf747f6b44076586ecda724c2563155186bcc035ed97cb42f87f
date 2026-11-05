@@ -1,0 +1,37 @@
+Check out the PR head for issue https://github.com/suredesigntshirts/ccp_machine_test/issues/104 and run every check there. Use a scratch directory outside the repo (e.g. `T=$(mktemp -d)`) holding: a.jsonl = `{"a":1}\n{"b":2}\n`; b.jsonl = `{"c":3}\n`; bad.jsonl = `{"a":1}\n{oops}\n`. B means `node packages/jsonl-lint/bin/jsonl-lint.js`. After each command, record stdout, stderr and the exit status (`echo $?`).
+
+Check 1. Expect line: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before".
+Run `B $T/a.jsonl $T/bad.jsonl $T/b.jsonl $T/bad.jsonl`. Also run `B $T/bad.jsonl` on its own to compare.
+PASS: stdout has a `$T/bad.jsonl:2: <error>` line for each of the two bad.jsonl arguments, in argument order, in the same format as the single-file run, and there are no lines for a.jsonl or b.jsonl.
+FAIL: a file is skipped, the order is wrong, or the format differs from the single-file output.
+
+Check 2. Expect line: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)".
+Run `printf '{oops}\n' | B -`, `printf '{"a":1}\n' | B -`, and `printf '{"a":1}\n' | B - -`.
+PASS: the first run prints a line starting `-:1: `. The second prints no problem lines. The third exits 2.
+FAIL: stdin isn't read, it's reported under a name other than `-`, or `- -` doesn't exit 2.
+
+Check 3. Expect line: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)".
+Run `B $T/a.jsonl $T/b.jsonl` (expect 0), `B $T/a.jsonl $T/bad.jsonl` (expect 1), `B` with no arguments (expect 2), and `B $T/a.jsonl $T/missing.jsonl $T/bad.jsonl` (expect 2).
+PASS: the exit statuses are 0, 1, 2 and 2. In the last run, stderr has an error message and stdout still reports `$T/bad.jsonl:2: ...`.
+FAIL: any status differs, the unreadable file has no stderr message, or checking stops at the missing file.
+
+Check 4. Expect line: "lint(text) in src/index.js is unchanged".
+Run `git diff <merge-base with the PR's target>..HEAD -- packages/jsonl-lint/src/index.js`. Also run `node --test packages/jsonl-lint/test/lint.test.js`.
+PASS: the diff shows no change to the lint function (its signature and body are the same) and the lint tests pass.
+FAIL: the lint function was changed.
+
+Check 5. Expect line: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage".
+Run `cd packages/jsonl-lint && node --test` and read the test files under packages/jsonl-lint/test/ and packages/jsonl-lint/README.md.
+PASS: the tests pass, and node:test tests exist for each case: two clean files, one bad among several, stdin via `-` clean, stdin via `-` bad, a missing file among good ones, two `-` arguments, and no arguments. The README documents multi-file usage and `-` for stdin.
+FAIL: a case has no test, a test fails, or the README doesn't document the new usage.
+
+Check 6. Expect line: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head".
+Run `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state` and `gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test`. At the head, run `npm ci && npm test` at the repo root.
+PASS: it is a single PR on that repo, its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`, the `test` workflow check at the head commit is successful, and npm test passes locally.
+FAIL: the closing line is missing, the workflow at the head is failing or missing, or npm test fails.
+
+Advisory (not pass/fail):
+- When a file is unreadable and another file has bad rows, exit 2 should win over 1.
+- With `- -`, it is cleaner if nothing is read and the message is a usage message.
+- `B` with no args should print a usage message on stderr.
+- Look at whether the tests assert exact exit statuses and stdout lines, and not only that the program ran.

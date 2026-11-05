@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "18fd29c29b5a0974205c6771ec5a9aa805c75cea63d2cc2c338523fa2731b6d4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief against each verifier check. The only commands the builder brief shares with the verifier are in step 6: the c.json printf + `node src/app.js` run and the ok.json run. Both come from the issue's proofs 1 and 4, which the criterion allows. The outcomes the brief expects there (\"bad config: with $d/c.json and line 3 column 3… nothing on stdout, and exit 1\") just restate expect lines 1, 2 and 4, so they describe the bar. None of the verifier's own probes show up in the builder brief: not check 2's `grep -qF ... && echo HAS_PATH`, not check 3's inline script printing `OK`/`NO PATH`, and not check 5's `git checkout fd3ea30 -- src` trick. The builder's test regex `/line 3 column 3|:3:3/` is the builder's own suggestion for tests it writes, not a verifier condition. The builder gets no PASS/FAIL wording. Telling it to run `npm test` and to write tests that fail on the current src/ is allowed.",
+  "model": "claude-opus-5-5",
+  "ms": 13091,
+  "tokens": {
+    "input": 2,
+    "output": 896,
+    "cacheCreation": 6007,
+    "cacheRead": 783,
+    "fresh": 6905,
+    "total": 7688
+  },
+  "at": "2026-11-05T08:55:53.841Z"
+}

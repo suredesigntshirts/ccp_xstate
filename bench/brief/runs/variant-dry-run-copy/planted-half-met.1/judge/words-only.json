@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "13d4addaefece925bc52a045f2fb31716af7a251a9d1f1ddca5110e194d8cf11",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1, 2 and 4 test only what their lines say: padLeft is exported, pads with fill and defaults to a space; s comes back unchanged at or past width; npm test shows `# fail 0` and exit 0. Check 3 breaks the criterion. Its line asks only that README.md has a section for every exported function. But its PASS condition adds \"The exported list includes padLeft and slugify.\" Line 3 doesn't require any particular function to be exported. If slugify were dropped from the exports, line 3 would still hold, yet this check would fail. Requiring padLeft to be exported belongs to line 1, not line 3. This stricter condition sits in PASS when it should be under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 14305,
+  "tokens": {
+    "input": 2,
+    "output": 1088,
+    "cacheCreation": 3432,
+    "cacheRead": 783,
+    "fresh": 4522,
+    "total": 5305
+  },
+  "at": "2026-11-05T08:56:06.283Z"
+}

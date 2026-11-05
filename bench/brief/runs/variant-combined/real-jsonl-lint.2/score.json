@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.2",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for e\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2, 3, 5 and 6 stay within their wording: line numbers 3 and 5, exit codes 0/1/2, non-empty stderr, a `{line, error}` array, the README mentions, and the PR body plus a green workflow and `npm test`. Stricter items, such as the lockfile, CRLF handling, the shebang and stdout-vs-stderr, are kept under Advisory.\n\nCheck 4 breaks the criterion. Its expect line only requires a package.json with certain fields, no runtime dependencies, and node:test tests for five named cases. Check 4 adds \"the workspace tests pass\" to PASS and \"or the tests fail\" to FAIL. Nothing in line 4 says the tests must pass; that comes from line 6. So Check 4 applies a test its own expect line's words don't force, and it isn't marked Advisory.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs. Builder: `npm install`, `npm ci && npm test` and `node packages/jsonl-lint/bin/jsonl-lint.js` all point at files that earlier steps create. Node 22's `node --test` finds `test/*.test.js` by default. `spawnSync(process.execPath, [binPath, ...])` and `fs.mkdtempSync(os.tmpdir())` are valid calls. Verifier: in Check 3, the `node --input-type=module -e \"...\"` quoting holds up. Bash turns `\\\"` into `\"` and leaves `\\n` alone, so the JS gets valid string literals with newline escapes. `npm test --workspace jsonl-lint` works because the root lists `packages/*` as workspaces, which the root test script's use of `--workspaces` supports, and the name `jsonl-lint` is set in step 1. The `gh pr view --json body,headRefOid,state` fields and `gh pr checks` are valid. `test -f`, `grep -n` and `mktemp -d` are standard. Placeholders like `<tmp>` and `<pr>` are meant to be filled in. I found no invalid syntax or missing files.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 is met: builder step 7 says to run `npm install` at the root so package-lock.json includes the workspace, \"otherwise `npm ci` in CI fails\". Item 2 is met: step 6 says to \"replace the 'No tools yet' bullet\". Item 4 is met: Check 6 reads the body and headRefOid with gh pr view and requires the test check \"at the head commit succeeded\". Item 3 fails. Check 4 runs the workspace tests directly, and Check 6 only requires that root `npm ci && npm test` \"passes\". Nothing reads the test count from the root run or breaks lint() to see a test fail, so the verifier would not notice the tests being skipped under `--if-present`.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every verifier PASS/FAIL condition against its expect line. None is stricter than its line. Check 1 asks only for the `<file>:<line>: ` prefix followed by some error text, not exact wording. Check 2 asks for exit 2 and any non-empty stderr. Check 3 checks `line` and `error`. Check 4 checks the fields the line names and \"no non-empty `dependencies`\". Checks 5 and 6 follow their lines. The stricter extras (CRLF, shebang, executable mode, stdout-only output, lockfile) appear only under \"Advisory (not pass/fail)\" or in builder steps. Nothing sets branch-name rules, mutation tests or file-touch limits. Every behaviour line is checked by running the program: the CLI on temp fixtures, `lint` imported and called, `npm test`, and `npm ci && npm test` at the head. File reads are used only where the line is about files (package.json, README, test files).",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with the verifier brief's checks and probes. The builder brief has no PASS/FAIL wording. It also reuses none of the verifier's probes: not the clean.jsonl/bad.jsonl fixture contents (`{bad`, `{\"torn\":` at line 5), not the `node --input-type=module -e` lint script, and not the grep or `test -f` commands. The commands it does give are allowed. Running `node packages/jsonl-lint/bin/jsonl-lint.js` by hand comes from expect line 1, `npm ci && npm test` and the test workflow come from expect line 6, and asking the builder to write its own node:test cases is allowed. Some verifier advisories (CRLF, trailing newline, shebang/executable, package-lock) also show up in the builder brief. There they are build requirements, not probes or pass conditions, so the builder gets the bar without the checker's methods.",
+      "cached": false
+    }
+  }
+}

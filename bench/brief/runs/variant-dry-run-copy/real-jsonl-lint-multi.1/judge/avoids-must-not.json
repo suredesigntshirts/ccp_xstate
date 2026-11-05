@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e75ab41ae0b75acee54dae12a7ec197199fa2356fa3700dddaf447b93e476111",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line. The behaviour checks (1–3) all run the program, so must_not item 2 is avoided. Item 1 is broken in two places. Check 3 requires the second run to write \"an error naming missing.jsonl to stderr\", but line 3 only says \"error on stderr\". That adds a requirement on what stderr says, which is the \"exact stderr wording\" kind of strictness the must_not list rules out. Check 6 requires \"the PR is open\", but line 6 only asks for one PR with the Closes body and green checks at its head. Under check 6, a PR that was merged before verification would fail even though line 6 holds. Builder steps such as \"Edit only … jsonl-lint.js\" are instructions to the builder, not PASS conditions, so I did not count them.",
+  "model": "claude-opus-5-5",
+  "ms": 10088,
+  "tokens": {
+    "input": 2,
+    "output": 887,
+    "cacheCreation": 5467,
+    "cacheRead": 783,
+    "fresh": 6356,
+    "total": 7139
+  },
+  "at": "2026-11-05T08:59:06.802Z"
+}

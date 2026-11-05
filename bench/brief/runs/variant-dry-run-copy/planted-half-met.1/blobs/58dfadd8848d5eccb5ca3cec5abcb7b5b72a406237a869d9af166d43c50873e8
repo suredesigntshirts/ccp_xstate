@@ -1,0 +1,29 @@
+Check out the PR head and run every command from the repository root. Run one check per acceptance line, in this order. A check passes only if its command exits 0 with the output given.
+
+Check 1. Expect line: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+node --input-type=module -e "import { padLeft } from './index.js'; const r = [typeof padLeft === 'function', padLeft('42', 5, '0') === '00042', padLeft('ab', 4) === '  ab', padLeft('7', 3, '*') === '**7', padLeft('', 2, '0') === '00']; console.log(JSON.stringify(r)); process.exit(r.every(Boolean) ? 0 : 1)"; echo "exit=$?"
+PASS: prints [true,true,true,true,true] and exit=0.
+FAIL: any false, an import error (padLeft not exported), or a nonzero exit.
+
+Check 2. Expect line: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+node --input-type=module -e "import { padLeft } from './index.js'; const r = [padLeft('12345', 5, '0') === '12345', padLeft('123456', 5, '0') === '123456', padLeft('abc', 2) === 'abc', padLeft('abc', 0, 'x') === 'abc']; console.log(JSON.stringify(r)); process.exit(r.every(Boolean) ? 0 : 1)"; echo "exit=$?"
+PASS: prints [true,true,true,true] and exit=0.
+FAIL: any false, an error, or a nonzero exit.
+
+Check 3. Expect line: "README.md has a section for every function index.js exports"
+Run:
+node --input-type=module -e "import * as m from './index.js'; import { readFileSync } from 'node:fs'; const heads = readFileSync('README.md', 'utf8').split('\n').filter(l => /^#{1,6}\s/.test(l)); const fns = Object.keys(m).filter(k => typeof m[k] === 'function'); const missing = fns.filter(f => !heads.some(h => new RegExp('\\\\b' + f + '\\\\b').test(h))); console.log('exported:', fns.join(','), 'missing:', missing.join(',') || 'none'); process.exit(missing.length ? 1 : 0)"; echo "exit=$?"
+PASS: prints `missing: none` and exit=0. The exported list includes padLeft and slugify.
+FAIL: any name after `missing:` (on the current base this command reports `missing: slugify`), or a nonzero exit. Then open README.md and confirm each matched heading starts a real section about that function. A heading that only names the function, with no text under it, is a FAIL.
+
+Check 4. Expect line: "npm test passes"
+Run:
+npm test; echo "exit=$?"
+PASS: the TAP summary shows `# fail 0` and exit=0.
+FAIL: any failing test, or a nonzero exit.
+
+Advisory (not part of any PASS/FAIL):
+- Check whether test/strutil.test.js has padLeft tests for default fill, padding, and the width-or-longer case.
+- Check whether padLeft's default fill is a parameter default (fill = ' ') and not hard-coded.

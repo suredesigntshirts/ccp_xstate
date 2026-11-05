@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "ba9589b215efdb341eee8c2e474822a5edaeb9b10e22f6b4c76271de9f81a54e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Checks 1, 2, 5 and 6 mostly stay within their words. Two checks add conditions their words don't require:\n- Check 3: expect line 3 only says `lint(text)` is exported and returns `[{ line, error }]`. The PASS condition also requires \"`line` equal to 2\" and that \"for the clean input it returns an empty array\". Expect line 3 says nothing about line-number values or clean-input results, so these belong under Advisory.\n- Check 4: expect line 4 asks for package.json fields, no runtime dependencies, and node:test tests covering five topics. The check adds \"`npm test -w jsonl-lint` passes\" to PASS and \"or the tests fail\" to FAIL. Expect line 4 doesn't say the tests must pass; that is covered under line 6's npm test.\nBecause of these extra conditions, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 11979,
+  "tokens": {
+    "input": 2,
+    "output": 940,
+    "cacheCreation": 4693,
+    "cacheRead": 783,
+    "fresh": 5635,
+    "total": 6418
+  },
+  "at": "2026-11-05T08:59:06.591Z"
+}

@@ -1,0 +1,14 @@
+Goal: one pull request that meets every one of these acceptance lines:
+1. index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+2. padLeft returns s unchanged when s is already width characters or longer
+3. README.md has a section for every function index.js exports
+4. npm test passes
+
+Context: the repo is an ES module package (package.json "type": "module"). index.js currently exports capitalize, slugify and truncate. README.md has `## capitalize(s)` and `## truncate(s, n)` sections but NO section for slugify. Line 3 covers every exported function, so you must add a slugify section as well as a padLeft section. Tests are in test/strutil.test.js and run with `node --test` (npm test).
+
+Steps:
+1. In index.js, add `export function padLeft(s, width, fill = ' ')` with a one-line doc comment like the other functions. It returns s with fill added on the left until the result is width characters long, and returns s unchanged when s.length >= width. `s.padStart(width, fill)` does this. Examples: padLeft('42', 5, '0') === '00042'; padLeft('ab', 4) === '  ab'; padLeft('12345', 5, '0') === '12345'; padLeft('123456', 5, '0') === '123456'.
+2. In README.md, add a `## slugify(s)` section (it returns `s` trimmed, lower-cased, with runs of non-alphanumeric characters replaced by a single dash and leading/trailing dashes removed) and a `## padLeft(s, width, fill)` section (pads `s` on the left with `fill`, a space by default, to `width` characters; returns `s` unchanged when it is already `width` characters or longer; e.g. `padLeft('42', 5, '0')` gives `00042`). Put them with the other function sections, before `## Tests`. Each section heading must contain the function name exactly as exported.
+3. In test/strutil.test.js, import padLeft and add tests for: zero padding ('42', 5, '0' -> '00042'), default space fill ('ab', 4 -> '  ab'), exactly width ('12345', 5, '0' -> '12345'), and longer than width ('123456', 5, '0' -> '123456').
+4. Run `npm test` and make sure every test passes. Then check that every function exported from index.js has a README.md heading naming it.
+5. Open one pull request with these changes. In the description, link https://github.com/o/strutil/issues/7 and say that the slugify README section was added too, because line 3 requires it.

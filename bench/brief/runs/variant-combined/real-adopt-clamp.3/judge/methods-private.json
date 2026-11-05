@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "f6eb6fea770f1378de4cd39cb4e9c4569fd61e9c2a2675203e13741aed6bc024",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier's checks. Writing its own tests is allowed, but the builder brief copies the verifier's probe inputs and expected outputs. Step 2 lists \"clamp(-5, 0, 100) === 0\", \"clamp(140, 0, 100) === 100\", \"clamp(42, 0, 100) === 42\", the bounds and lo === hi. Check 1 probes the same values and expects the same results. Step 2's \"clamp(5, 10, 0) throws a RangeError\" is the [5,10,0] probe in Check 2. Step 4's `node -e \"...Object.keys(m)...\"` and README heading check closely mirror Check 3's probe. So the builder gets the checker's methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 12589,
+  "tokens": {
+    "input": 2,
+    "output": 843,
+    "cacheCreation": 3170,
+    "cacheRead": 783,
+    "fresh": 4015,
+    "total": 4798
+  },
+  "at": "2026-11-05T08:58:54.610Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "bcac806c9324d71258a804e7dd959ad2b4a7aad389509ee0bfa79316ae1aa379",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared the builder brief with the verifier's checks and probes. The builder brief lists the issue's six expect lines as \"pass/fail conditions\". Those lines are the bar itself, which the criterion allows. The builder brief does not copy any of the verifier's probes. It has none of the inline scripts with expected outputs, and none of the specific inputs such as `{bad` / `{\"c\":` or the line numbers 2 and 5 that the verifier expects. It also has none of the gh api / jq commands or the grep over test files. The commands it gives the builder are allowed ones: `npm ci && npm test`, writing its own node:test tests, and waiting for the `test` workflow. Its behaviour notes on CRLF, the trailing newline, the shebang and empty stdout on exit 2 are written as a spec, with no specific inputs and expected outputs. In the verifier brief they are only advisory. The line \"the string jsonl-lint must appear\" comes close to Check 5's grep, but it just restates expect line 5.",
+  "model": "claude-opus-5-5",
+  "ms": 8919,
+  "tokens": {
+    "input": 2,
+    "output": 816,
+    "cacheCreation": 6500,
+    "cacheRead": 783,
+    "fresh": 7318,
+    "total": 8101
+  },
+  "at": "2026-11-05T09:00:40.377Z"
+}

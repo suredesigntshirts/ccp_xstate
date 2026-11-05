@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "1036736789bc5cbcddecde51abeb4c94d7090b1e01efff729eb93b9f35671dc8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief against the verifier brief and found none of the verifier's own checks in it. Step 5 lists the five printf commands with their expected output and `echo \"exit=$?\"`. These all come from the issue's expect lines and proofs, which the criterion allows. Step 3 asks the builder to write its own tests on the same expect-line inputs, which is also allowed. Several things appear only in the verifier brief: the diff/od -c byte comparisons, the \"grep -n -- '--tsv' test/*.js\" probe, the PASS/FAIL wording (e.g. \"a test that calls only parse() directly\"), and the advisory probes for flag position and \\r\\n endings. The builder brief's line \"The flag may appear anywhere among the arguments\" restates the issue's assumption 2, not a verifier probe. The builder gets the bar, and the verifier's own checking methods stay private.",
+  "model": "claude-opus-5-5",
+  "ms": 8919,
+  "tokens": {
+    "input": 2,
+    "output": 798,
+    "cacheCreation": 5652,
+    "cacheRead": 783,
+    "fresh": 6452,
+    "total": 7235
+  },
+  "at": "2026-11-05T08:55:01.855Z"
+}

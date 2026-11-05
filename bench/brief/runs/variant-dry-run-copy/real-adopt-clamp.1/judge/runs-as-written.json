@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "7557d36ff42ceb147fb027c9fa0132418fb8cd9be3680b51fbcd33702c4b222a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. The builder brief only runs `npm test`, and package.json defines that as \"node --test\". It edits math.js, README.md and test/math.test.js, and all three are tracked files. The verifier's three `node -e` scripts sit in single quotes and use only double quotes inside, so the shell parses them cleanly. Their JavaScript is valid: the for-of destructuring, try/catch, `instanceof RangeError`, arrow filters and string joins all parse. `require(\"./math.js\")` works because the commands run from the repo root and math.js is CommonJS. `fs.readFileSync(\"README.md\",\"utf8\")` points at an existing file. `npm test; echo \"exit $?\"` is valid bash. No command uses a missing file, script or tool, and every argument fits its program.",
+  "model": "claude-opus-5-5",
+  "ms": 9279,
+  "tokens": {
+    "input": 2,
+    "output": 586,
+    "cacheCreation": 3613,
+    "cacheRead": 783,
+    "fresh": 4201,
+    "total": 4984
+  },
+  "at": "2026-11-05T08:58:11.154Z"
+}

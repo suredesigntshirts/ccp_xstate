@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "7dea6cdfdd2386319ed06a9ffe3c89522c03dabf908941a0e7a4b17ca6ca5d88",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Item 1: The builder brief names test/csv.test.js and its 'cli' test in its context section. Step 3 says \"Keep the existing parse and cli tests passing\", and step 5 runs the CSV command and `npm test`, so the CSV path is protected. Item 2: Check 6 in the verifier brief runs \"npm test; echo \"exit=$?\"\". Its advisory note says the proof mentions `npm run test:cli` but the expect line names `npm test`, so it uses npm test. It only says to run test:cli as well if that script exists. Both items are handled.",
+  "model": "claude-opus-5-5",
+  "ms": 11304,
+  "tokens": {
+    "input": 2,
+    "output": 801,
+    "cacheCreation": 5886,
+    "cacheRead": 783,
+    "fresh": 6689,
+    "total": 7472
+  },
+  "at": "2026-11-05T08:54:48.347Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "a7da784bd9ca7bdba9e0eca0810313320b19aaa8ad5eb680832d4f8bb6e03b63",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Every command in both briefs would run as written. Builder steps: `npm install` and `npm ci && npm test` work with the root package.json and package-lock.json, and the packages/jsonl-lint files are created in earlier steps. Verifier Check 1: the printf strings are single-quoted with no stray `%`, and the redirections and `$?` echoes are valid. Check 3: inside single quotes, `\\\"` reaches Node as a valid JS string escape. The module import path is correct, and the expected lines 2 and 4 match the input. Check 4: `node -e` with `require` runs as CommonJS, `npm test -w packages/jsonl-lint` is a valid npm command, and grep's `\\|` alternation works in GNU grep. Check 6: the `gh api` REST paths, the `--jq` filters (`.body // \"\"`, `contains`, `\\(...)` interpolation) and the check-runs endpoint are all valid. No syntax problems, missing files or wrong arguments found.",
+  "model": "claude-opus-5-5",
+  "ms": 12455,
+  "tokens": {
+    "input": 2,
+    "output": 1105,
+    "cacheCreation": 6629,
+    "cacheRead": 783,
+    "fresh": 7736,
+    "total": 8519
+  },
+  "at": "2026-11-05T09:00:09.402Z"
+}

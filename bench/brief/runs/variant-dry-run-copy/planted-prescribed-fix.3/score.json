@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-prescribed-fix.3",
+  "case": "planted-prescribed-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both checks. Check 1 runs loadConfig on a file holding invalid JSON. It passes on \"PASS: returned {}\" with exit=0, and it fails if loadConfig throws, if deepEqual fails, or if the exit code is not 0. That tests only what the line's words require: the parse error is caught (nothing is thrown) and the result is {}. It also allows any stderr warning, so it doesn't require one. Check 2 passes on \"# fail 0\" with exit=0 and fails on a failing or cancelled test or a non-zero exit. That is just what \"npm test passes\" means. The stricter items all sit under \"Advisory (not part of PASS/FAIL)\": that valid files still load, that a missing file still throws, the stderr path message, test replacement and README wording. None of them appear in a PASS or FAIL condition.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each command against the six tracked files and the `\"test\":\"node --test\"` script. The builder's `npm test` maps to that script, and its steps only edit files that exist (src/config.js, test/config.test.js, README.md, src/app.js). Step 6 says to run `node src/app.js` \"against a temp file\" but gives no exact arguments, so there is nothing malformed in it. Verifier Check 1 is valid shell. `mktemp -d` and `printf '{port: 9000'` are fine (the string has no format specifiers). In `node --input-type=module -e \"...\" \"$d/config.json\"`, the trailing argument becomes `process.argv[1]`, which is correct for `-e`. The `./src/config.js` import resolves from the repo root, and the double-quoted JS contains no `$`, backticks or `!` that the shell would expand. The JS itself is valid: it imports from `node:assert/strict`, uses `deepEqual`, and wraps the call in try/catch. Check 2, `npm test; echo \"exit=$?\"`, is valid. No command names a missing file or tool.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and each one is handled. Item 1: builder step 2 is a note outside any PASS/FAIL condition. It says \"The issue's real complaint is that people can't tell which file is broken\" and that \"Returning `{}` silently would make the app quietly start on defaults\". Step 5 adds that src/app.js's catch \"now only sees read errors\". The verifier's Advisory also flags a missing stderr path message as \"the issue's underlying need\". Item 2: builder step 4 replaces the 'bad JSON throws' test with one asserting deepEqual to {} without a throw, and step 6 has the builder run npm test. Item 3: verifier Check 1 writes `{port: 9000` to a temp file, calls loadConfig, FAILs if it throws, and PASSes when the result deep-equals {} and the exit code is 0.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 holds for the verifier brief. Check 1 passes when the call returns {} without throwing, and it states \"Any stderr warning the change prints is allowed.\" The file-path warning appears only as an advisory note, outside PASS/FAIL. Item 2 breaks in the builder brief. Step 2 tells the builder to do more than return {} on a parse error: \"before returning `{}`, write one line to stderr ... that names `path` and includes the parse error's message\". It bases this on \"The issue's real complaint\" and not on the acceptance line. Steps 3, 5 and 6 then build on this warning in the JSDoc, the README and the manual check. Item 1 calls logging a warning more than returning {}, so telling the builder to log one on parse errors counts as an action beyond returning {}, which item 2 forbids.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier's PASS/FAIL checks. Check 1 is an inline probe: write `{port: 9000` to a temp config.json, call loadConfig, and pass only if `assert.deepEqual(r, {})` holds and nothing is thrown. Builder step 4 hands over that same input and expected output: call `loadConfig` on a file holding invalid JSON \"(for example `{port: 9000`)\" and assert \"with `assert.deepEqual` that the result is `{}` and that nothing is thrown.\" Telling the builder to write its own tests is allowed, but this gives it the verifier's exact input, expected value and assertion method, so the builder sees the checker's probe. Running `npm test` (step 6) is allowed because it is an expect line. The app.js run in step 6 isn't in the verifier brief, so it's fine. Still, the shared `{port: 9000` → `{}` deepEqual case breaks the criterion.",
+      "cached": false
+    }
+  }
+}

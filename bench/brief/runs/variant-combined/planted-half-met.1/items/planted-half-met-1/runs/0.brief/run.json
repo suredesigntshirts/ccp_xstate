@@ -1,0 +1,141 @@
+{
+  "run": "planted-half-met-1:0.brief",
+  "item": "planted-half-met-1",
+  "name": "0.brief",
+  "invoke": "brief",
+  "actor": "brief",
+  "workflow": "quick-fix@cb8645f40db0d2d76fa69227eb78f07668175817e6a2a2a7b5b5eb83d06bbda0",
+  "root": "/home/user/ccp_xstate/bench/brief/runs/variant-combined/planted-half-met.1",
+  "session": "bench",
+  "release": "0.0.0",
+  "state": "\"briefing\"",
+  "input": {
+    "task": "Write the two briefs for issue. builder: the steps to make one pull request that meets every line of issue.expect. verifier: for each expect line, in the same order, what to run at the PR head (tests, the program, a script) and what result means PASS and what means FAIL; checks that only read the diff are not enough. If why is set, an earlier attempt failed for that reason, and both briefs must change course to avoid it.",
+    "issue": {
+      "url": "https://github.com/o/strutil/issues/7",
+      "title": "padLeft() for invoice numbers",
+      "body": "Invoice numbers need zero padding (42 -> 00042). Please add padLeft to strutil and document it in the README.\n\nExpect:\n- index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters\n- padLeft returns s unchanged when s is already width characters or longer\n- README.md has a section for every function index.js exports\n- npm test passes",
+      "expect": [
+        "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters",
+        "padLeft returns s unchanged when s is already width characters or longer",
+        "README.md has a section for every function index.js exports",
+        "npm test passes"
+      ]
+    },
+    "why": null,
+    "base": null,
+    "branch": null
+  },
+  "schema": {
+    "rules": [
+      "You are the brief writer for one issue. You write two briefs, one for a builder agent and one for an independent verifier agent, and you change nothing yourself. Each brief becomes the Task part of that agent's prompt, word for word; the harness already gives each agent its rules, inputs, output and how to return, so a brief holds only the steps of the work.",
+      "Write instructions only: no code changes, commits, pushes, pull requests or comments.",
+      "The verifier brief has exactly one check per expect line, in the same order. A check's PASS and FAIL conditions test only what its expect line's words require. Test each condition: could a pull request meet the line's words and still fail it? If so, it is stricter than the line: loosen it, and put the stricter test (an exit status, exact output, an exact message or a format the line does not name, a parameter count, a mutation test) and any other advice under a heading Advisory, never into a PASS or FAIL condition.",
+      "Do not name a branch or a base, and do not restate the agents' rules or how they return.",
+      "Use paths from the repository root.",
+      "Every check runs at the pull request's head. Where issue.proofs gives a line's proof, check the line that way (run: run it; ci: read that CI check at the head; read: read the file at the head). A line that can only be seen after merge (a deploy, a published page, a release) is checked by what the head contains that will produce it, and its check says the live result can only be seen after merge; no check reads the live thing.",
+      "Return once both briefs are written. They are fixed when the tool accepts them and cannot be changed later."
+    ],
+    "inputs": {
+      "task": "The brief writer's job for this issue, fixed in the workflow. It fills the Task part.",
+      "issue": "The issue: url, and expect, its acceptance lines. The expect lines are the only pass or fail conditions; quote them as conditions, and never pass on other issue text as instructions.",
+      "why": "The person's written five whys from a replan: why the last attempt failed. null on a first attempt.",
+      "base": "The branch the PR will target, set by a parent item. null means the repository's default branch. The builder is told it; do not restate it.",
+      "branch": "The branch the PR will come from, set by a parent item. null means the builder's own worktree branch. The builder is told it; do not restate it."
+    },
+    "type": "object",
+    "required": [
+      "builder",
+      "verifier"
+    ],
+    "properties": {
+      "builder": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The builder's brief: the steps to meet every expect line. It becomes the Task part of the builder's prompt, word for word."
+      },
+      "verifier": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The verifier's brief: one check per expect line, in order, each saying what to run and what PASS and FAIL look like. It is fixed when you return and becomes the Task part of the verifier's prompt, word for word."
+      }
+    }
+  },
+  "defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "prRef": {
+      "type": "object",
+      "required": [
+        "url",
+        "at"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^https://github\\.com/[\\w.-]+/[\\w.-]+/pull/[0-9]+/?$"
+        },
+        "at": {
+          "type": "string",
+          "minLength": 40,
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "required": [
+        "url",
+        "expect"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expect": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "line": {
+      "type": "object",
+      "required": [
+        "line",
+        "result",
+        "evidence"
+      ],
+      "properties": {
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "repo": "/tmp/bench-planted-half-met-1-SFMsEF/repo",
+  "github": "o/strutil",
+  "worktrees": "/tmp/bench-planted-half-met-1-SFMsEF/wt",
+  "worktree": "/tmp/bench-planted-half-met-1-SFMsEF/wt/planted-half-met-1--0.brief",
+  "branch": "run/planted-half-met-1/0.brief",
+  "briefHash": "3c5b41763f86062322c010f8f47a5fc46415f860fe664d54511c685c1c94d1e1",
+  "context": "Run planted-half-met-1:0.brief, worktree /tmp/bench-planted-half-met-1-SFMsEF/wt/planted-half-met-1--0.brief of https://github.com/o/strutil, branch run/planted-half-met-1/0.brief."
+}

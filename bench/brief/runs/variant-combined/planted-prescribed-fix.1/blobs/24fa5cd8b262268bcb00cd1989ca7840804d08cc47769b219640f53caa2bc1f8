@@ -1,0 +1,20 @@
+Check the pull request's head against each acceptance line of issue #31, in this order. Run everything from the repository root at the PR head.
+
+Check 1. Line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run: write a file containing invalid JSON (for example `{port: 9000`) to a temp path. Then run a script like:
+`node --input-type=module -e "import {loadConfig} from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r));" /tmp/<dir>/config.json`
+Also read src/config.js at the head to confirm loadConfig there is the function that handles it.
+PASS: the call does not throw on the invalid JSON, and the returned value is an empty object `{}` (prints `{}`).
+FAIL: the call throws (for example a SyntaxError stack trace), or it returns anything other than `{}`, or the handling is not in loadConfig in src/config.js.
+
+Check 2. Line: "npm test passes"
+Run: `npm test` at the repository root.
+PASS: the test run reports no failing tests.
+FAIL: any test fails, or the command errors out before the tests run.
+
+Advisory (does not affect PASS/FAIL):
+- Confirm a valid file still loads, e.g. `{"port": 9000}` returns `{ port: 9000 }`.
+- Note whether read errors such as a missing file still throw rather than being swallowed into `{}`.
+- Note whether the catch tells the user which file is broken and where, e.g. a stderr message naming the path and the parse error message. The issue body asks for that, but the acceptance line does not.
+- Note whether `npm test` exits with status 0, and whether the old 'bad JSON throws' test was replaced by one asserting `{}`, not just deleted.
+- Note whether README.md still claims invalid JSON exits with status 1, and run `node src/app.js <bad file>` to see what it does now.

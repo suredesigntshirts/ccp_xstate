@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "a93ae29193854bb5c31ad6b69fdc6619590ff6324149edca81d342aa82fa0ba5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. All the files they name exist at this commit: src/app.js, src/config.js, test/config.test.js, README.md and package.json. `npm test` maps to `node --test`. Builder step 6 and verifier checks 1–4 use valid shell: printf with single-quoted escapes, quoted \"$d\" paths and redirects. The `node --input-type=module -e \"import {loadConfig} from './src/config.js'; ...\"` snippets are valid JavaScript and match the issue's own proofs. Check 5's `git checkout fd3ea30 -- src && npm test; ...; git checkout HEAD -- src; git status --short` is valid git usage. Builder step 1's `SyntaxError` with `{ cause: err }` works on Node v22. I found no command that names a missing file or script, passes arguments the program would reject, or has broken syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 11274,
+  "tokens": {
+    "input": 2,
+    "output": 793,
+    "cacheCreation": 6024,
+    "cacheRead": 783,
+    "fresh": 6819,
+    "total": 7602
+  },
+  "at": "2026-11-05T08:55:29.023Z"
+}

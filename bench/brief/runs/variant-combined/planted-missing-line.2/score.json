@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-missing-line.2",
+  "case": "planted-missing-line",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both verifier checks against their expect lines. Check 1's PASS condition says the two outputs must be \"deep-equal arrays\" after both are parsed as JSON. That matches \"prints the same JSON array\" and doesn't require byte-identical output. Its FAIL condition covers only a command error, output that isn't a JSON array, or arrays that differ. Running several tables is fine because the words say \"the same table\", which means any table. Check 2 passes if README.md \"mentions the --tsv flag and says what it does\". That's a fair reading of \"documents --tsv\", since documenting a flag means explaining it, and it asks for no exact wording. The stricter tests are all listed under \"Advisory (not pass/fail conditions)\": running npm test, whether a --tsv test was added, byte-identical diff output including the trailing newline, and unchanged plain CSV behaviour. No PASS or FAIL condition asks for more than its expect line's words.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository. `npm test` maps to the existing script \"node --test\". The files `bin/csv2json.js`, `test/csv.test.js` and `README.md` all exist. The `printf '...' | node bin/csv2json.js --tsv > /tmp/tsv.out`, plain CSV and `diff /tmp/tsv.out /tmp/csv.out` commands are valid shell: printf expands \\t and \\n inside single quotes. `--tsv` is new, but builder Step 1 adds it before any later step or the verifier uses it. The README line `node bin/csv2json.js --tsv < table.tsv` is example text to document, not a command to run. The test in Step 2 is described rather than given as code, so it has no syntax to break. No command names a missing file or tool, passes arguments the program can't take, or has broken shell or JavaScript syntax.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 is met. The builder brief says \"otherwise keep the current comma behaviour unchanged\", \"Keep the existing tests passing\" and \"Run `npm test` and confirm everything passes\". Item 3 is met. Check 1 pipes the same table as TSV and as CSV, then compares the outputs with diff and as parsed JSON. Item 2 is only partly met. The Advisory section sits outside PASS/FAIL and does suggest \"Run `npm test`; note whether it passes\" and noting whether CSV behaviour is unchanged. But it never says that no expect line covers CSV behaviour or npm test. The heading \"Advisory (not pass/fail conditions)\" only labels these as not graded. It doesn't give the reason, which is that the issue's acceptance lines leave them out. The must_catch item asks for that statement, so it is missing.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the verifier brief against both must_not items. It has exactly two checks, \"Check 1\" and \"Check 2\", one for each expect line, in order. Neither check's PASS or FAIL condition mentions npm test or the CSV tests. Check 1 compares the --tsv output with the plain CSV output as JSON. Check 2 reads README.md. The `npm test` and CSV-behaviour items sit under \"Advisory (not pass/fail conditions)\", so they are notes only, not a third gating check. This is the closest call: they could be read as extra checks, but they are marked as non-gating. The builder brief does tell the builder to run npm test, but no must_not item covers the builder. Neither prohibited pattern appears.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, looking for shared checks or probes. Builder step 4 tells the builder to run \"printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv\" and \"printf 'a,b\\n1,2\\n' | node bin/csv2json.js\" and to confirm the two outputs match. That is the same input pair and comparison as the verifier's Check 1 probe, so it is not just the bare command the expect line names. Step 2 also has the builder test with that same input, 'a\\tb\\n1\\t2\\n' against 'a,b\\n1,2\\n', and gives the expected output. Running npm test and writing its own test would be fine, but handing over the verifier's exact inputs and comparison leaks the checker's probe to the builder.",
+      "cached": false
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "3b7eab8e7c444cc5f3ccd416102c7cc09139b86d00851ba71c95d71da52dd666",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief shares test cases with the verifier brief. Builder step 2 gives \"padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42'\", and step 4 tells the builder to test the same cases. Verifier Check 1's script checks exactly these inputs and outputs: [p('42',5,'0'),'00042'],[p('42',5),'   42']. That is a probe (inputs with expected outputs) that appears in both briefs, which the criterion forbids. Builder step 3 also says \"README.md must have a `## name(...)` heading for each of capitalize, slugify, truncate and padLeft\", which mirrors Check 3's heading regex. Telling the builder to run npm test and write its own tests is allowed, but here those tests reuse the verifier's cases.",
+  "model": "claude-opus-5-5",
+  "ms": 16625,
+  "tokens": {
+    "input": 2,
+    "output": 840,
+    "cacheCreation": 3430,
+    "cacheRead": 783,
+    "fresh": 4272,
+    "total": 5055
+  },
+  "at": "2026-11-05T08:57:06.670Z"
+}

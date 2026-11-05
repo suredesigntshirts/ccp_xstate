@@ -1,0 +1,26 @@
+Check out the pull request's head and run everything from the repository root. Run `npm install` first only if package.json now has dependencies. There is one check per expect line, in order.
+
+Check 1 — expect: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi".
+Run: node -e "const {clamp}=require('./math.js'); console.log(typeof clamp, clamp(-5,0,100), clamp(140,0,100), clamp(42,0,100), clamp(0,0,100), clamp(100,0,100), clamp(7,3,3), clamp(-2.5,-10,-1), clamp(0.5,0,1))"
+PASS: clamp is a function exported from math.js, and the outputs are `function 0 100 42 0 100 3 -2.5 0.5` (below range gives lo, above gives hi, inside or on a bound gives x).
+FAIL: clamp is not exported (undefined / TypeError), or any value differs from the above.
+
+Check 2 — expect: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi".
+Run: node -e "const {clamp}=require('./math.js'); for (const a of [[5,10,0],[0,1,-1],[50,100,0]]) { try { const r=clamp(...a); console.log('NO THROW', a, r); } catch(e) { console.log(e instanceof RangeError ? 'RangeError' : 'OTHER '+e.constructor.name, a); } }"
+PASS: every line prints `RangeError`.
+FAIL: any line prints `NO THROW` or `OTHER ...`.
+
+Check 3 — expect: "README.md documents every function math.js exports".
+Run: node -e "console.log(Object.keys(require('./math.js')).filter(k=>typeof require('./math.js')[k]==='function').join(' '))" to list the exported functions, then read README.md at the head.
+PASS: for every exported function name listed, README.md contains documentation of that function (its name with a description of what it does). Note the base README lacked subtract, so subtract must now be documented as well as clamp.
+FAIL: any exported function (e.g. subtract or clamp) is not documented in README.md.
+
+Check 4 — expect: "npm test passes".
+Run: npm test
+PASS: the command exits with status 0 and reports no failing tests.
+FAIL: non-zero exit status or any failing test.
+
+Advisory (not pass/fail conditions):
+- Check whether the new tests in test/ actually cover clamp's below/above/inside cases and the RangeError case; a mutation (e.g. swapping lo and hi in the return) should make npm test fail.
+- Check that clamp's README entry mentions the RangeError, and that the RangeError message is descriptive.
+- Note behaviour with NaN inputs, though the issue does not specify it.

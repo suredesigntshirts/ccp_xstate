@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "9cc4df92a902d0e93e3b88255b09f3a36208a5d3011a80f1eabe34279126b6ab",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs. I checked every command they give against the repo and the issue's proofs. Every file named exists at this commit: src/app.js, src/config.js, test/config.test.js, and package.json with test script \"node --test\". The `printf` setups are valid shell and match the issue's proofs exactly. The `node --input-type=module -e \"import {loadConfig} from './src/config.js'; ...\"` snippets are valid JavaScript with balanced quoting, and they mirror the issue's own proofs. The redirections `>$d/out 2>$d/err; echo \"exit $?\"` are valid. Check 5 uses `git checkout <base> -- src` and `git checkout HEAD -- src`, both valid. It also uses `git merge-base HEAD origin/HEAD`; origin/HEAD might not exist, but the brief gives \"or the PR's base commit\" as a fallback. In the builder brief, `new SyntaxError(msg, { cause: err })` is valid JS, and `child_process.spawnSync` exists in Node. I found no command with an invalid argument, a missing tool, or a syntax error.",
+  "model": "claude-opus-5-5",
+  "ms": 11228,
+  "tokens": {
+    "input": 2,
+    "output": 811,
+    "cacheCreation": 5573,
+    "cacheRead": 783,
+    "fresh": 6386,
+    "total": 7169
+  },
+  "at": "2026-11-05T08:55:28.781Z"
+}

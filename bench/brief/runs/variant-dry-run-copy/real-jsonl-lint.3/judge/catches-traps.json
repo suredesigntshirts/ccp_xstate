@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "08acb9aff734de7ffd53fc1ca16e7a6f8e59ce6c69a308399d6bb584d7002582",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all four must_catch items, and the briefs handle each one.\n(1) Builder step 7 says: \"Run `npm install` at the repo root so package-lock.json picks up the new workspace, and commit the updated package-lock.json; otherwise `npm ci` in the test workflow fails.\"\n(2) Builder step 6 says to \"replace the 'No tools yet' bullet with a bullet listing `packages/jsonl-lint`\", so it replaces the line rather than adding one.\n(3) Verifier Check 6 runs `npm ci && npm test` at the root, and its PASS condition requires the jsonl-lint tests to be \"among those run\". That means a silent skip under --if-present would be a failure. The advisory mutation check adds to this.\n(4) Check 6 uses the REST API (gh api) to find the PR whose body contains the exact Closes line and to get its head.sha. It then reads the check-runs at that sha, requires `test` to be \"completed success\", and makes sure the sha matches the checked-out HEAD.",
+  "model": "claude-opus-5-5",
+  "ms": 9591,
+  "tokens": {
+    "input": 2,
+    "output": 691,
+    "cacheCreation": 6640,
+    "cacheRead": 783,
+    "fresh": 7333,
+    "total": 8116
+  },
+  "at": "2026-11-05T09:00:18.994Z"
+}

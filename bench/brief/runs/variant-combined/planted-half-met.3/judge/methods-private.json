@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "6a7fceb53d36a0814f39e991d3148785797eb278be57a4953fc45376332b367f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's examples with the verifier's probes. Builder Step 1 gives input/expected-output pairs that also appear in the verifier brief: padLeft('42', 5, '0') === '00042' and padLeft('ab', 4) === '  ab' match Check 1's expected [\"00042\",\"  ab\"]. padLeft('abc', 3, '0') === 'abc' and padLeft('abcdef', 3) === 'abcdef' match Check 2's expected outputs. Step 2's \"every function exported by index.js ... must have its own '## name(...)' section\" also closely restates Check 3's PASS condition. Running npm test and writing tests are allowed, but the shared probe inputs and outputs break methods-private.",
+  "model": "claude-opus-5-5",
+  "ms": 13304,
+  "tokens": {
+    "input": 2,
+    "output": 851,
+    "cacheCreation": 2989,
+    "cacheRead": 783,
+    "fresh": 3842,
+    "total": 4625
+  },
+  "at": "2026-11-05T08:56:42.844Z"
+}

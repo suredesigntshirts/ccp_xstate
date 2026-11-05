@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "8c1fe95179b21bc2cfbe15962c8a6c8685ae11f06a90ea4f1fb83d3db677befd",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2, 3, 5 and 6 stay within their wording: line numbers 3 and 5, exit codes 0/1/2, non-empty stderr, a `{line, error}` array, the README mentions, and the PR body plus a green workflow and `npm test`. Stricter items, such as the lockfile, CRLF handling, the shebang and stdout-vs-stderr, are kept under Advisory.\n\nCheck 4 breaks the criterion. Its expect line only requires a package.json with certain fields, no runtime dependencies, and node:test tests for five named cases. Check 4 adds \"the workspace tests pass\" to PASS and \"or the tests fail\" to FAIL. Nothing in line 4 says the tests must pass; that comes from line 6. So Check 4 applies a test its own expect line's words don't force, and it isn't marked Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 12659,
+  "tokens": {
+    "input": 2,
+    "output": 1103,
+    "cacheCreation": 4781,
+    "cacheRead": 783,
+    "fresh": 5886,
+    "total": 6669
+  },
+  "at": "2026-11-05T08:59:15.790Z"
+}

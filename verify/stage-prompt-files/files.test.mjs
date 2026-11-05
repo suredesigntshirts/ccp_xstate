@@ -8,7 +8,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 
-import { REPO, STAGES, WORKFLOWS, baseRaw, invokeOf, readJson, stagesOf, load, baseWorkflows } from './lib.mjs';
+import { MERGE_FIXTURES, REPO, STAGES, WORKFLOWS, baseRaw, invokeOf, readJson, stagesOf, load, baseWorkflows } from './lib.mjs';
 
 /** A stage file split by ## heading: { title, sections: { Rules: [lines], ... } }, blank lines dropped except in Task. */
 function sectionsOf(text) {
@@ -73,7 +73,7 @@ for (const w of WORKFLOWS) {
 
   for (const actor of STAGES[w]) {
     test(`${w}/${actor}.md holds exactly the base JSON's words for ${actor}`, () => {
-      const file = join(REPO, 'workflows', w, `${actor}.md`);
+      const file = join(MERGE_FIXTURES, w, `${actor}.md`);
       assert.ok(existsSync(file), file);
       const f = sectionsOf(readFileSync(file, 'utf8'));
       assert.equal(f.title, `# ${actor}`);

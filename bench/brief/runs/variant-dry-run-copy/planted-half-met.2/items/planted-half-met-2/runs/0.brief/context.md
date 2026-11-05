@@ -1,0 +1,1 @@
+Run planted-half-met-2:0.brief, worktree /tmp/bench-planted-half-met-2-MWG6PD/wt/planted-half-met-2--0.brief of https://github.com/o/strutil, branch run/planted-half-met-2/0.brief.

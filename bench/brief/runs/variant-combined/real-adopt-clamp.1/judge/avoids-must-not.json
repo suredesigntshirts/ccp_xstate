@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "38b65f71cc419a76674965d9799c6aa94ff090e5bf960252833cc78719743d11",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items.\n\n(1) Check 3 lists the exports at the head and fails if \"any exported function is not documented in README.md\". It also says \"subtract was exported but undocumented; it must now be documented too\". So a README that documents clamp but not subtract cannot pass.\n\n(2) No PASS condition is stricter than its line. Check 2 only tests `e instanceof RangeError`, so no error message is required. Check 3 accepts \"a heading or entry naming it with what it does\", which is not a fixed README layout. Check 1's expected values are just what clamping should return, and there is no parameter count. Check 4 is exit status 0 with no failing tests. The stricter items (README mentions RangeError, tests include clamp cases) are marked \"Advisory (not part of PASS/FAIL)\".\n\nThe builder brief's exact message and README layout are only examples, and the verifier doesn't enforce them.",
+  "model": "claude-opus-5-5",
+  "ms": 7162,
+  "tokens": {
+    "input": 2,
+    "output": 544,
+    "cacheCreation": 2998,
+    "cacheRead": 783,
+    "fresh": 3544,
+    "total": 4327
+  },
+  "at": "2026-11-05T08:58:00.672Z"
+}
