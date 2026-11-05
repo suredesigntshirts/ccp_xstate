@@ -1,10 +1,19 @@
 {
   "stage": "brief",
-  "about": "What a good brief-stage output must do: one criterion per line, scored met or not met per run. Mechanical criteria are computed by score.mjs from the run's files; judge criteria are graded by one fresh judge session per criterion per output, checked against judge-check/ (hand grades with planted faults). No criterion is weighed against another: there is no overall score. Approved for this item by the building thread as the person's stand-in (plan/decisions/2026-11-05-stage-bench.md).",
+  "about": "What a good brief-stage output must do: one criterion per line, scored met or not met per run. Mechanical criteria are computed by score.mjs from the run's files; judge criteria are graded by one fresh judge session per criterion per output, checked against judge-check/ (hand grades with planted faults). No criterion is weighed against another: there is no overall score. Approved for this item by the building thread as the person's stand-in (plan/decisions/2026-11-05-stage-bench.md); builder-criteria and methods-private added by refine-brief-stage, approved the same way (plan/decisions/2026-11-05-refine-brief-stage-ready.md).",
   "approved": {
     "by": "stand-in: the stage-bench building thread",
     "at": "2026-11-05",
-    "record": "plan/decisions/2026-11-05-stage-bench.md"
+    "record": "plan/decisions/2026-11-05-stage-bench.md",
+    "added": {
+      "criteria": [
+        "builder-criteria",
+        "methods-private"
+      ],
+      "by": "stand-in: the refine-brief-stage building thread",
+      "at": "2026-11-05",
+      "record": "plan/decisions/2026-11-05-refine-brief-stage-ready.md"
+    }
   },
   "criteria": [
     {
@@ -34,6 +43,12 @@
       "from": "Rules: do not name a branch or a base, and do not restate the agents' rules or how they return."
     },
     {
+      "id": "builder-criteria",
+      "by": "mechanical",
+      "says": "The builder brief quotes every expect line word for word, as the bar the build must meet.",
+      "from": "Research 05-distilled finding 2: give the builder the criteria; plan/decisions/2026-11-05-refine-brief-stage-ready.md."
+    },
+    {
       "id": "words-only",
       "by": "judge",
       "says": "Each verifier check's PASS and FAIL conditions test only what its expect line's words require. Anything stricter (a test the words do not force, a mutation test, a branch or file-scope rule, exact wording) is under a heading Advisory, never in a PASS or FAIL condition.",
@@ -58,6 +73,12 @@
       "case": "must_not",
       "says": "The briefs do none of the things in the case's must_not list.",
       "from": "The stage critique of 4 Nov: gameable checks and prescribed fixes."
+    },
+    {
+      "id": "methods-private",
+      "by": "judge",
+      "says": "The builder brief gives the builder the bar, not the checker: it carries none of the verifier brief's checks, that is no PASS or FAIL condition and no probe (an inline script, a set of inputs with expected outputs, a grep) that also appears in the verifier brief. Telling the builder to run the repository's own tests, any command an expect line or the issue's proofs name, or to write its own tests is allowed.",
+      "from": "Research 05-distilled finding 2: keep the verifier's methods to the verifier, so the build cannot be fitted to the probe; plan/decisions/2026-11-05-refine-brief-stage-ready.md."
     }
   ]
 }

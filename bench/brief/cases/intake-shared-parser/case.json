@@ -1,0 +1,85 @@
+{
+  "kind": "planted",
+  "source": "Planted for refine-brief-stage: shape's kept-variant issue for bench/shape's planted-shared-parser (bench/shape/runs/variant-observable/planted-shared-parser.1), on the same seed repo, with line 6's proof changed to name an npm script the repo does not have.",
+  "repo": {
+    "seed": "repo",
+    "message": "csv2json: CSV on stdin to a JSON array",
+    "origin": "https://github.com/o/csv2json.git"
+  },
+  "input": {
+    "issue": {
+      "url": "https://github.com/o/csv2json/issues/5",
+      "title": "csv2json: add a --tsv flag to read tab-separated input",
+      "problem": "bin/csv2json.js reads stdin and always calls parse(text) with no separator, and it ignores every command-line argument. The CLI therefore always splits on commas. Tab-separated input comes out as one column whose key is the whole header line, for example `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` prints [{\"a\\tb\":\"1\\t2\"}]. src/parse.js already accepts a separator as its second argument (sep = ','), but nothing in the CLI exposes it. The README documents only CSV usage.",
+      "reason": "The user's exports now arrive as TSV, so before every run they have to convert tabs to commas with sed. That extra step also corrupts any field that contains a literal comma.",
+      "outcome": "`node bin/csv2json.js --tsv < table.tsv` prints the rows of tab-separated input as a JSON array of objects keyed by the header row. Running without the flag behaves exactly as it does today.",
+      "expect": [
+        "`printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline and exits 0.",
+        "With --tsv, commas inside a field stay literal: `printf 'name\\tnote\\nx\\thello, world\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"name\":\"x\",\"note\":\"hello, world\"}]` followed by a newline.",
+        "With --tsv and several data rows, every row comes out in order: `printf 'a\\tb\\n1\\t2\\n3\\t4\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"},{\"a\":\"3\",\"b\":\"4\"}]` followed by a newline.",
+        "Without the flag, CSV still works as before: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline.",
+        "Without the flag, tabs are not treated as separators: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` prints exactly `[{\"a\\tb\":\"1\\t2\"}]` followed by a newline, which is the current output.",
+        "`npm test` exits 0, and test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and checks its output.",
+        "README.md documents the --tsv flag with an example invocation."
+      ],
+      "proofs": [
+        {
+          "line": "`printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline and exits 0.",
+          "proof": "run",
+          "how": "From the repo root, run: printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \"exit=$?\". The output must be [{\"a\":\"1\",\"b\":\"2\"}] and then exit=0."
+        },
+        {
+          "line": "With --tsv, commas inside a field stay literal: `printf 'name\\tnote\\nx\\thello, world\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"name\":\"x\",\"note\":\"hello, world\"}]` followed by a newline.",
+          "proof": "run",
+          "how": "From the repo root, run: printf 'name\\tnote\\nx\\thello, world\\n' | node bin/csv2json.js --tsv. Compare the output to the expected line."
+        },
+        {
+          "line": "With --tsv and several data rows, every row comes out in order: `printf 'a\\tb\\n1\\t2\\n3\\t4\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"},{\"a\":\"3\",\"b\":\"4\"}]` followed by a newline.",
+          "proof": "run",
+          "how": "From the repo root, run: printf 'a\\tb\\n1\\t2\\n3\\t4\\n' | node bin/csv2json.js --tsv. Compare the output to the expected line."
+        },
+        {
+          "line": "Without the flag, CSV still works as before: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline.",
+          "proof": "run",
+          "how": "From the repo root, run: printf 'a,b\\n1,2\\n' | node bin/csv2json.js. Compare the output to the expected line."
+        },
+        {
+          "line": "Without the flag, tabs are not treated as separators: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` prints exactly `[{\"a\\tb\":\"1\\t2\"}]` followed by a newline, which is the current output.",
+          "proof": "run",
+          "how": "From the repo root, run: printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js. The output must be the JSON [{\"a\\tb\":\"1\\t2\"}], where \\t is the JSON tab escape."
+        },
+        {
+          "line": "`npm test` exits 0, and test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and checks its output.",
+          "proof": "run",
+          "how": "Run npm run test:cli; echo \"exit=$?\" and expect exit=0. Then run grep -n -- '--tsv' test/*.js and read the matching test: it must run bin/csv2json.js with --tsv on input containing tabs and assert on the output."
+        },
+        {
+          "line": "README.md documents the --tsv flag with an example invocation.",
+          "proof": "read",
+          "how": "Read README.md. It must contain an example of the form node bin/csv2json.js --tsv < file and say that the flag means tab-separated input."
+        }
+      ],
+      "non_goals": [
+        "Quoted fields, escaped separators, or any RFC 4180 or full TSV quoting rules. Fields are split naively, as they are today.",
+        "Auto-detecting the separator, or adding a general --sep/--delimiter option.",
+        "Changing what happens with unknown command-line arguments, or adding --help.",
+        "Changing JSON output formatting or how the header row is used."
+      ],
+      "assumptions": [
+        "--tsv means fields are separated by a single tab character (\\t). Rows are still separated by \\n or \\r\\n, as they are today.",
+        "The flag can appear anywhere among the arguments. Input still comes only from stdin.",
+        "The builder may use the existing sep parameter of parse() in src/parse.js. This is suggested, not required.",
+        "Tests stay on the existing node --test setup in test/."
+      ]
+    }
+  },
+  "trap": "Two planted: (1) parse() in src/parse.js is shared with the CSV path, which test/csv.test.js covers through parse and the CLI, so a build that changes parse's default or splitting breaks CSV; (2) proof 6's how runs `npm run test:cli`, but package.json has only a test script, so a brief that copies the proof's command gives a check that cannot run. The non-goals rule out a general --sep option.",
+  "must_catch": [
+    "The builder brief says parse() in src/parse.js is shared with the CSV path and that the existing CSV tests in test/csv.test.js must keep passing.",
+    "The verifier check for line 6 runs `npm test`, as the line says, and not proof 6's `npm run test:cli`, which package.json does not define (or it says that script does not exist and uses npm test)."
+  ],
+  "must_not": [
+    "A verifier check whose PASS or FAIL rests on `npm run test:cli`.",
+    "A builder brief that asks for a general --sep or --delimiter option, which the issue's non-goals rule out."
+  ]
+}

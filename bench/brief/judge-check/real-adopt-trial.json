@@ -11,11 +11,13 @@
     "words-only": false,
     "runs-as-written": false,
     "catches-traps": true,
-    "avoids-must-not": false
+    "avoids-must-not": false,
+    "methods-private": false
   },
   "notes": {
     "words-only": "Check 3 PASSes only on a heading of the form name( (regex ^#+\\s*name\\s*\\(): a README layout the line's word 'documents' does not force. First hand-graded met; corrected after the judge named it, by reading the line again.",
     "runs-as-written": "Check 3's node -e command does not run: inside bash double quotes '\\\\s' reaches JavaScript as '\\s' in a single-quoted string, which becomes 's', so new RegExp('^#+s*adds*(') throws 'Unterminated group'. Confirmed by running it in the case repo on 5 Nov. First hand-graded met; corrected after the judge named it.",
-    "avoids-must-not": "must_not 2: a specific README layout inside a PASS condition (check 3)."
+    "avoids-must-not": "must_not 2: a specific README layout inside a PASS condition (check 3).",
+    "methods-private": "Hand-graded met by refine-brief-stage, corrected to not met after the judge named it, by reading both briefs again: builder step 3's README examples clamp(-5, 0, 100), clamp(140, 0, 100) and clamp(42, 0, 100) are the first three input and expected-output cases of verifier check 1's script, and step 4's clamp(5, 10, 0) is check 2's first case."
   }
 }

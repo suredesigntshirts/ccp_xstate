@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "643cc3a4b4348ce06ca1da4dc8d4f65c3db68b8b1afbf77bf2a8e60d56f80090",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief repeats probes from the verifier brief, so the criterion fails. Step 3 tells the builder to use the README examples `clamp(-5, 0, 100); // 0`, `clamp(140, 0, 100); // 100` and `clamp(42, 0, 100); // 42`. These are the same inputs and expected outputs as the first three cases in verifier Check 1. Step 4 requires `assert.throws(() => clamp(5, 10, 0), RangeError)`, which is the first case in verifier Check 2. Step 5 has the builder run `node -e \"const m=require('./math.js'); console.log(Object.keys(m))\"` and confirm each name has a README heading. That is essentially verifier Check 3's probe (list math.js's exports, then look for each name in README.md). The builder may be told to write its own tests, but these steps hand it the verifier's specific checks.",
+  "model": "claude-opus-5-5",
+  "ms": 9553,
+  "tokens": {
+    "input": 2,
+    "output": 572,
+    "cacheCreation": 3789,
+    "cacheRead": 783,
+    "fresh": 4363,
+    "total": 5146
+  },
+  "at": "2026-11-05T08:25:01.004Z"
+}

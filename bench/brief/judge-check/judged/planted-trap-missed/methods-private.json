@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "9b217404fe393310997e1936c975af20a6d7c13f66142892355151a0c81e1e99",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief for shared probes and shared inputs with expected outputs. Builder step 3's README example uses `clamp(-5, 0, 100); // 0`, `clamp(140, 0, 100); // 100` and `clamp(42, 0, 100); // 42`, which are the first three cases in Check 1's probe (`[-5,0,100,0],[140,0,100,100],[42,0,100,42]`). Builder step 4's `assert.throws(() => clamp(5, 10, 0), RangeError)` uses the same input as Check 2's first case `[5,10,0]`, expecting a RangeError there too. Step 2 also states the inclusive-bound and lo==hi rules that Check 1's cases test. So the builder gets part of the checker's inputs and expected outputs, which breaks the criterion. The acceptance lines (the issue's expect lines), `npm test` and the Object.keys command aren't problems.",
+  "model": "claude-opus-5-5",
+  "ms": 12457,
+  "tokens": {
+    "input": 2,
+    "output": 987,
+    "cacheCreation": 3467,
+    "cacheRead": 783,
+    "fresh": 4456,
+    "total": 5239
+  },
+  "at": "2026-11-05T08:25:13.463Z"
+}

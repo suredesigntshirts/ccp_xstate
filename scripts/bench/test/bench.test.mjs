@@ -11,6 +11,7 @@ import { exportRun } from '../../inspector/export.mjs';
 import { REPO, ambientOf, casesOf, earlierOutput, readJson, stageInput, specOf, workflowVersion } from '../lib.mjs';
 import { benchRun, promptOnly } from '../run.mjs';
 import { judgeCheck, noRestatedRules, oneCheckPerLine, reportOf, scoreRuns } from '../score.mjs';
+import { builderCriteria } from '../stages.mjs';
 import { blindPacket, compareReport, entryDiff, scoredSet, stageEntry } from '../compare.mjs';
 
 const FAKE = fileURLToPath(new URL('./fake-claude.mjs', import.meta.url));
@@ -112,6 +113,15 @@ test('mechanical checks: one check per line, quoted and in order; no branch, bas
   for (const bad of ['git checkout -b feat/x', 'git push -u origin x', 'The branch name must match feat/<n>', 'open the PR against main', 'call the harness return tool']) {
     assert.equal(noRestatedRules({ builder: bad, verifier: '' }).met, false, bad);
   }
+});
+
+test('mechanical check: the builder brief quotes every expect line, in any order', () => {
+  const expect = ['a b', 'c d'];
+  assert.equal(builderCriteria({ builder: 'Meet:\n- c d\n- a b' }, expect).met, true);
+  const half = builderCriteria({ builder: 'Meet: a b. Then make c work.' }, expect);
+  assert.equal(half.met, false);
+  assert.match(half.why, /expect line 2/);
+  assert.equal(builderCriteria({ verifier: 'a b c d' }, expect).met, false);
 });
 
 test('score: mechanical then judge per criterion; verdicts are kept and reused while prompt and model are the same', async () => {

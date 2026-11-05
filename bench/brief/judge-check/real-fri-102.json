@@ -11,13 +11,15 @@
     "words-only": false,
     "runs-as-written": true,
     "catches-traps": false,
-    "avoids-must-not": false
+    "avoids-must-not": false,
+    "methods-private": true
   },
   "notes": {
     "one-check-per-line": "Six numbered items in order, but no line is quoted word for word.",
     "no-restated-rules": "Names a branch-name rule and 'base main'.",
     "words-only": "Item 4 asks for a mutation test; item 6 asks for a branch-name rule and a diff limit: none is in the lines' words.",
     "catches-traps": "npm install for the lock, 'No tools yet' replaced and gh pr checks for line 6 are there, but must_catch 3 is not: 'mutate lint() mentally or briefly' does not tie a real failure to the root npm test, so skipped tests would pass. First hand-graded met; corrected after the judge named it, by reading item 4 again.",
-    "avoids-must-not": "Branch-name rule and mutation test inside pass/fail items."
+    "avoids-must-not": "Branch-name rule and mutation test inside pass/fail items.",
+    "methods-private": "Graded by refine-brief-stage: the builder brief has no PASS or FAIL condition and none of the verifier's probes; its own commands are npm test and checks the builder writes for itself."
   }
 }

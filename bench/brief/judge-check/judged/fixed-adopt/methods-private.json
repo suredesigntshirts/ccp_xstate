@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "c17707a10d3183780adf0466eab6ea5a02c5be10309c023d07daa17daa707914",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief leaks probes that also appear in the verifier brief. In step 3 it gives the inputs and expected outputs `clamp(-5, 0, 100); // 0`, `clamp(140, 0, 100); // 100` and `clamp(42, 0, 100); // 42`. These are the same first three cases in the verifier's Check 1 script. In step 4 it names `assert.throws(() => clamp(5, 10, 0), RangeError)`, and [5,10,0] is the first input in Check 2's probe. Step 5's `node -e \"...Object.keys(m)...\"` check that every exported name is in README.md copies Check 3's probe. None of these is the repository's own test command, a command named in an expect line, or a test the builder came up with. They are the checker's specific inputs and methods handed to the builder.",
+  "model": "claude-opus-5-5",
+  "ms": 7847,
+  "tokens": {
+    "input": 2,
+    "output": 638,
+    "cacheCreation": 3767,
+    "cacheRead": 783,
+    "fresh": 4407,
+    "total": 5190
+  },
+  "at": "2026-11-05T08:24:50.284Z"
+}

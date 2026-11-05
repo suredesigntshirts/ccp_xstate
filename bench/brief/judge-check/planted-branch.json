@@ -11,9 +11,13 @@
     "words-only": true,
     "runs-as-written": true,
     "catches-traps": true,
-    "avoids-must-not": true
+    "avoids-must-not": true,
+    "methods-private": false
   },
   "planted": {
     "no-restated-rules": "names a branch to create and push and the PR base"
+  },
+  "notes": {
+    "methods-private": "Hand-graded met by refine-brief-stage, corrected to not met after the judge named it, by reading both briefs again: builder step 3's README examples clamp(-5, 0, 100), clamp(140, 0, 100) and clamp(42, 0, 100) are the first three input and expected-output cases of verifier check 1's script, and step 4's clamp(5, 10, 0) is check 2's first case."
   }
 }

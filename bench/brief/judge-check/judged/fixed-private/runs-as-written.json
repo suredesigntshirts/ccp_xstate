@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "dd2988d414497871129981df2e4c94f9291e32e4e614da176b71c4efc133f414",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. The builder brief runs only `npm test`, and package.json defines that as `node --test`. The verifier's three `node -e \"...\"` commands all call `require('./math.js')`, and math.js is tracked at this commit. `clamp` doesn't exist yet, but builder step 2 adds it. Check 3 reads README.md, which also exists. In each command the shell quoting holds: double quotes wrap the script and the JS inside uses only single quotes, with no `$` or backticks. The JS parses: a `const` statement can follow the `if(...){...}` block directly, and the destructuring in `for...of`, `try/catch`, `instanceof RangeError`, `Object.keys().filter` and `process.exit` are all valid. Check 4's `npm test` matches the script. One small caveat: `!readme` could trigger history expansion in an interactive bash, but agents run non-interactive shells, where that doesn't happen. Every command would run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 10999,
+  "tokens": {
+    "input": 2,
+    "output": 889,
+    "cacheCreation": 3695,
+    "cacheRead": 783,
+    "fresh": 4586,
+    "total": 5369
+  },
+  "at": "2026-11-05T08:27:05.101Z"
+}

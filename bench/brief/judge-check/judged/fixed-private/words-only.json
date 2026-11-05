@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "d66f6048e18284da939f3716eda578305382580ccbde65e553bf9b2bb90cb75a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 tests that clamp is exported and returns lo, hi or x. The inclusive-bound and \"lo==hi\" cases follow from \"limited to the range lo to hi\". Check 2 requires only that each call with lo > hi throws \"an instance of RangeError\". Check 3 asks that each exported function is named in README.md and that the README \"says what each listed function does\". That is what \"documents every function\" requires. It does not demand a particular heading format, which appears only in the builder brief. Check 4 needs a 0 exit status and no failing or cancelled tests. Under `node --test`, cancelled tests already make the run exit non-zero, so this adds no extra requirement. The stricter items are listed under \"Advisory (not part of any PASS or FAIL condition)\": clamp tests being added, the file scope, and NaN behaviour.",
+  "model": "claude-opus-5-5",
+  "ms": 8539,
+  "tokens": {
+    "input": 2,
+    "output": 772,
+    "cacheCreation": 3646,
+    "cacheRead": 783,
+    "fresh": 4420,
+    "total": 5203
+  },
+  "at": "2026-11-05T08:26:54.101Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "1d9dbc2a82f7426ab60d331512ff5e6b35ffed7fe3bceb16edee2e3875209e11",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief's checks. The verifier's own probes do not appear in the builder brief: the literal torn row `{\"a\":` with no trailing newline, the multiple-bad-rows and empty-file inputs, the \"nothing on stdout\" check, the mutation test (\"break line numbering, and confirm a test would fail\"), the diff-scope audit and the `gh pr checks` SHA match. The builder brief only states required behaviour taken from the issue and CLAUDE.md, for example \"blank/whitespace-only lines are skipped but still counted\", \"Clean input returns []\" and the branch-name convention. Its tests are things it is told to write itself, and its commands are `npm ci && npm test`, both allowed. The closest call is \"tolerate \\r\\n\", which matches the verifier's CRLF input. I count it as a behaviour requirement, not a probe, because it comes with no specific input, expected output or script. So the builder gets the bar, not the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 19831,
+  "tokens": {
+    "input": 2,
+    "output": 1157,
+    "cacheCreation": 3517,
+    "cacheRead": 783,
+    "fresh": 4676,
+    "total": 5459
+  },
+  "at": "2026-11-05T08:25:32.952Z"
+}
