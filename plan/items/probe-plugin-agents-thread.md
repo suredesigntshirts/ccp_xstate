@@ -4,7 +4,7 @@
   "title": "Check the plugin's test agent in a real Projects thread on a release",
   "stage": "s5-parity",
   "kind": "probe",
-  "status": "ready",
+  "status": "done",
   "outcome": "The first Projects thread that starts on a harness release shipping plugins/harness/agents/probe-reader.md shows, in its own session, that ccp-harness:probe-reader is listed and starts, with its tools, model and marker holding.",
   "why": "probe-plugin-agents proved plugin agents on the setup.sh install path with claude -p in a cloud container, but not inside a Projects thread: until 5 Nov 07:15Z new threads resumed a cached container holding 0.1.17 and skipped setup.sh (plan/research/probe-plugin-agents.md). The person re-saved the setup script then, and the thread that picked this item up started on harness-v0.1.24, the release that ships probe-reader. This closes the last step before stage roles move into the plugin.",
   "serves": [
