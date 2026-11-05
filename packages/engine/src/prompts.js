@@ -49,7 +49,7 @@ export const hasStageFiles = (raw) => Object.values(raw?.meta?.actors ?? {}).som
 export function parseStageFile(text, { file, stage }) {
   const lines = text.split('\n');
   const bad = (n, what) => { throw new Error(`${file}:${n}: ${what}`); };
-  const out = { rules: [], inputs: [], output: [], task: null };
+  const out = { rules: [], inputs: [], output: [], task: null, headings: {}, end: lines.length };
   let section = null;
   let titled = false;
   const seen = [];
@@ -70,6 +70,7 @@ export function parseStageFile(text, { file, stage }) {
       if (seen.includes(name)) bad(n, `## ${name} appears twice`);
       if (seen.length && SECTIONS.indexOf(name) < SECTIONS.indexOf(seen.at(-1))) bad(n, `## ${name} is out of order: the sections go ${SECTIONS.join(', ')}`);
       seen.push(name);
+      out.headings[name] = n;
       section = name;
       if (name === 'Task') task = { lines: [], line: null };
       return;
@@ -149,6 +150,15 @@ export function compose(raw, { dir, name = raw?.id ?? 'workflow' }) {
     const at = (n, what) => { throw new Error(`${file}:${n}: ${what}`); };
     const base = `/meta/actors/${esc(actor)}`;
     const props = Object.keys(schema.properties ?? {});
+    // Every output property is described, so no description drops out of the prompt with a deleted line or section.
+    if (props.length && parsed.headings.Output == null) at(parsed.end, `no ## Output section: ${actor}'s output has ${props.join(', ')}, each needs a line`);
+    // The Inputs are exactly the inputs every invoke of this stage gives it, checked here so the error names the line.
+    for (const { inv, at: iat } of invokesOf(spec).filter((x) => x.inv.src === actor)) {
+      const given = Object.keys(inv.input ?? {});
+      for (const x of parsed.inputs) if (!given.includes(x.name)) at(x.line, `${x.name} is not an input of ${actor}: invoke ${inv.id ?? actor} (at ${iat}) gives ${given.join(', ')}`);
+      const missing = given.filter((k) => !parsed.inputs.some((x) => x.name === k));
+      if (missing.length) at(parsed.headings.Inputs, `## Inputs lacks ${missing.join(', ')}: invoke ${inv.id ?? actor} (at ${iat}) gives it, and every input needs its meaning`);
+    }
     let last = -1;
     for (const o of parsed.output) {
       const i = props.indexOf(o.name);
@@ -156,6 +166,8 @@ export function compose(raw, { dir, name = raw?.id ?? 'workflow' }) {
       if (i < last) at(o.line, `${o.name} is out of order: ## Output follows the schema's property order (${props.join(', ')})`);
       last = i;
     }
+    const undescribed = props.filter((p) => !parsed.output.some((o) => o.name === p));
+    if (undescribed.length) at(parsed.headings.Output, `## Output lacks ${undescribed.join(', ')}: every output property of ${actor} needs a line`);
     parsed.rules.forEach((r, i) => { where[`${base}/rules/${i}`] = { file, line: r.line }; });
     for (const x of parsed.inputs) where[`${base}/inputs/${esc(x.name)}`] = { file, line: x.line };
     const described = Object.fromEntries(parsed.output.map((o) => [o.name, o]));
@@ -168,7 +180,7 @@ export function compose(raw, { dir, name = raw?.id ?? 'workflow' }) {
         ? { properties: Object.fromEntries(Object.entries(schema.properties).map(([p, s]) => [p, described[p] ? { ...s, description: described[p].text } : s])) }
         : {})
     };
-    tasks[actor] = { ...parsed.task, file, used: false };
+    tasks[actor] = { ...parsed.task, file, end: parsed.end, used: false };
   }
   // The fixed tasks: an invoke input { prompt: 'task' } takes the Task section of its stage's file.
   for (const { inv, at } of invokesOf(spec)) {
@@ -178,7 +190,7 @@ export function compose(raw, { dir, name = raw?.id ?? 'workflow' }) {
       if (k !== TASK_SOURCE || source[PROMPT] !== TASK_SOURCE || Object.keys(source).length !== 1) bad(`{ "prompt": "task" } is the only prompt source, and only for input task`);
       const t = tasks[inv.src];
       if (!t) bad(`${inv.src} names no stage file to take its task from`);
-      if (t.text == null) bad(`${t.file} has no ## Task section`);
+      if (t.text == null) throw new Error(`${t.file}:${t.end}: no ## Task section, but invoke ${inv.id ?? inv.src} (at ${at}) wires its task from it`);
       inv.input[k] = { value: t.text };
       where[`${at}/input/${esc(k)}/value`] = { file: t.file, line: t.line };
       t.used = true;

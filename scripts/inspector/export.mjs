@@ -1156,7 +1156,7 @@ function sourceRef(src, byName, ctx) {
     label: src.file ? `${src.file}:${src.line}` : 'workflow JSON', detail: src.inlined ? `with ${src.inlined} inlined` : null };
   if (src.input != null) {
     const inp = byName[src.input];
-    return { kind: 'input', input: src.input, meaningAt: src.meaningAt ?? null, from: src.from ?? inp?.from ?? null, label: `input ${src.input}`,
+    return { kind: 'input', input: src.input, meaningAt: src.meaningAt ?? null, from: [src.from, inp?.from].find((f) => typeof f === 'string') ?? null, label: `input ${src.input}`,
       file: src.file ?? null, line: src.line ?? null, meaningFile: src.meaningFile ?? null, meaningLine: src.meaningLine ?? null,
       producer: inp?.producer ?? producerRef(src.producer, ctx) };
   }

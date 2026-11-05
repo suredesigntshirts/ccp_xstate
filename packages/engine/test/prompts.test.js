@@ -75,7 +75,12 @@ test('a malformed stage file is refused at load, naming the file and line', () =
     ['quick-fix/verify.md', (t) => { const [a, b] = [t.match(/^- result: .*$/m)[0], t.match(/^- pr: .*$/m)[0]]; return t.replace(a, '@@').replace(b, a).replace('@@', b); }, /verify\.md:\d+: result is out of order/],
     ['quick-fix/build.md', (t) => `${t}\n## Task\n\nDo it.\n`, /build\.md:\d+: ## Task, but no invoke wires/],
     ['quick-fix/brief.md', (t) => t.replace(/## Rules[\s\S]*?## Inputs/, '## Inputs'), /brief\.md:\d+: no ## Rules section/],
-    ['quick-fix/brief.md', (t) => t.replace('## Inputs', '## Output\n\n## Inputs'), /brief\.md:\d+: ## Inputs is out of order/]
+    ['quick-fix/brief.md', (t) => t.replace('## Inputs', '## Output\n\n## Inputs'), /brief\.md:\d+: ## Inputs is out of order/],
+    ['quick-fix/brief.md', (t) => t.replace(/\n## Output\n[\s\S]*?(?=\n## Task)/, ''), /brief\.md:\d+: no ## Output section: brief's output has builder, verifier/],
+    ['quick-fix/build.md', (t) => t.replace(/^- notes: .*\n/m, ''), /build\.md:\d+: ## Output lacks notes/],
+    ['quick-fix/build.md', (t) => t.replace('- previous:', '- previus:'), /build\.md:\d+: previus is not an input of build/],
+    ['quick-fix/build.md', (t) => t.replace(/^- failure: .*$/m, '$&\n- earlier: the earlier attempts.'), /build\.md:\d+: earlier is not an input of build/],
+    ['quick-fix/build.md', (t) => t.replace(/^- failure: .*\n/m, ''), /build\.md:\d+: ## Inputs lacks failure/]
   ];
   for (const [rel, f, re] of cases) {
     const dir = copy();
@@ -105,7 +110,7 @@ test('words in both the JSON and the stage file, or a task source with no ## Tas
   assert.throws(() => compose(described, { dir: WORKFLOWS, name: 'quick-fix' }), /also describes output pr in the JSON/);
   const noTask = structuredClone(raw);
   noTask.states.building.invoke.input.task = { prompt: 'task' };
-  assert.throws(() => compose(noTask, { dir: WORKFLOWS, name: 'quick-fix' }), /quick-fix\/build\.md has no ## Task section/);
+  assert.throws(() => compose(noTask, { dir: WORKFLOWS, name: 'quick-fix' }), /quick-fix\/build\.md:\d+: no ## Task section/);
   const outside = structuredClone(raw);
   outside.meta.actors.brief.prompt = '../brief.md';
   assert.throws(() => compose(outside, { dir: WORKFLOWS, name: 'quick-fix' }), /prompt must be a \.md path inside the workflow folder/);
