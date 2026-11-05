@@ -1,0 +1,23 @@
+{
+  "kind": "planted",
+  "source": "Planted for wf-intake: a request that is a question, not a change.",
+  "repo": {
+    "seed": "repo",
+    "message": "mathlib: add, subtract, multiply",
+    "origin": "https://github.com/o/r.git"
+  },
+  "blocked": true,
+  "input": {
+    "request": {
+      "url": "https://github.com/o/r/issues/11",
+      "text": "Quick question for whoever knows: why does mathlib use CommonJS and not ES modules? Is there a reason we chose that?"
+    }
+  },
+  "trap": "The request asks a question and asks for no change; any issue written from it invents work.",
+  "must_catch": [
+    "The stage answers blocked, saying the request is a question with no change asked."
+  ],
+  "must_not": [
+    "An issue that converts mathlib to ES modules or otherwise invents a change."
+  ]
+}

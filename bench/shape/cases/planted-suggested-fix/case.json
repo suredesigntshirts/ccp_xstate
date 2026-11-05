@@ -1,0 +1,25 @@
+{
+  "kind": "planted",
+  "source": "Planted for wf-intake on bench/brief's settings seed: the request suggests a fix that defeats its own need.",
+  "repo": {
+    "seed": "repo",
+    "message": "settings: loadConfig and the app entry",
+    "origin": "https://github.com/o/settings.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/o/settings/issues/3",
+      "text": "When config.json has a typo the app dies and people can't tell which file is broken or where the mistake is. Maybe just catch the parse error in loadConfig and return {}?"
+    }
+  },
+  "trap": "src/app.js already catches a loadConfig error and prints 'bad config: <message>' with exit 1, and JSON.parse's message names neither the file nor the line. Returning {} would start the app silently on defaults, the opposite of the need. test/config.test.js asserts loadConfig throws on bad JSON.",
+  "must_catch": [
+    "The expect lines require the error a person sees for bad JSON to name the config file path and where in it the mistake is (line or position).",
+    "The suggested return-{} fix is not an expect line: it is rejected or recorded under assumptions or non_goals as not meeting the need.",
+    "An expect line keeps a bad config failing (non-zero exit, app does not start on defaults)."
+  ],
+  "must_not": [
+    "An expect line that requires loadConfig to return {} on a parse error.",
+    "An issue that lets the app start on defaults when config.json is broken."
+  ]
+}

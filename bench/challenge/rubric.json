@@ -1,0 +1,64 @@
+{
+  "stage": "challenge",
+  "workflow": "intake",
+  "about": "What a good challenge-stage output must do: one criterion per line, scored met or not met per run. Mechanical criteria are computed by score.mjs (scripts/bench/stages.mjs) from the run's files and each case's planted lines (must_fail, must_pass, result); judge criteria are graded by one fresh judge session per criterion per output, checked against judge-check/. The clean cases make a challenger that fails everything score badly. Approved for wf-intake by the building thread as the person's stand-in (plan/decisions/2026-11-05-wf-intake-ready.md).",
+  "approved": {
+    "by": "stand-in: the wf-intake building thread",
+    "at": "2026-11-05",
+    "record": "plan/decisions/2026-11-05-wf-intake-ready.md"
+  },
+  "criteria": [
+    {
+      "id": "returned",
+      "by": "mechanical",
+      "needs": "run",
+      "says": "The stage returns through the return tool, and the host accepts its first return.",
+      "from": "Rules: return once every expect line has an entry; the host refuses lines that skip, add or reorder, or a result that disagrees with them."
+    },
+    {
+      "id": "changes-nothing",
+      "by": "mechanical",
+      "needs": "run",
+      "says": "The run leaves its worktree as it found it: no file added, changed or deleted.",
+      "from": "Rules: change nothing."
+    },
+    {
+      "id": "verdict-right",
+      "by": "mechanical",
+      "says": "The overall result is the one the case expects: FAIL for an issue with a planted hole, PASS for a sound one.",
+      "from": "Rules: FAIL a line a wrong build meets; PASS only lines you could not break."
+    },
+    {
+      "id": "fails-planted",
+      "by": "mechanical",
+      "says": "Every line the case planted broken (must_fail) is FAIL.",
+      "from": "Rules: FAIL a line when a wrong build meets it, it is ambiguous, or only checkable after merge."
+    },
+    {
+      "id": "passes-sound",
+      "by": "mechanical",
+      "says": "Every line the case holds sound (must_pass) is PASS.",
+      "from": "Rules: do not FAIL a line for style, wording, or a stricter test its words do not need."
+    },
+    {
+      "id": "evidence-grounded",
+      "by": "judge",
+      "says": "Each FAIL's evidence names a concrete wrong build (what it changes and why it meets the line yet misses the request), two concrete readings, or the concrete reason the line shows only after merge; each PASS's evidence names a wrong build tried and why the line catches it. Files, scripts and behaviour it cites are real in the repository.",
+      "from": "Output: lines evidence. Research finding 3: an independent reader commits to concrete expectations."
+    },
+    {
+      "id": "catches-traps",
+      "by": "judge",
+      "case": "must_catch",
+      "says": "The output handles every item in the case's must_catch list.",
+      "from": "The holes each case plants, and the clean cases' need for real evidence."
+    },
+    {
+      "id": "avoids-must-not",
+      "by": "judge",
+      "case": "must_not",
+      "says": "The output does none of the things in the case's must_not list.",
+      "from": "The holes each case plants; over-strict FAILs on sound lines."
+    }
+  ]
+}

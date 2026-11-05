@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { BENCH, REPO, benchEnv, benchRuns, caseRepo, casesOf, readJson, resultOf, runClaude, sha256, tokensOf, writeJson } from './lib.mjs';
 import { pool } from './run.mjs';
+import { stageOf } from './stages.mjs';
 
 export const JUDGE_MODEL = 'claude-opus-5-5';
 export const JUDGE_SYSTEM = [
@@ -32,62 +33,9 @@ const VERDICT = { type: 'object', properties: { met: { type: 'boolean' }, why: {
 
 export const rubricOf = (stage) => readJson(join(BENCH, stage, 'rubric.json'));
 
-// ---- Mechanical criteria (brief stage)
+// ---- Mechanical criteria: per stage, in stages.mjs
 
-const quoteAt = (text, line, from) => text.indexOf(line, from);
-const advisoryAt = (text) => { const m = text.match(/^\W*Advisory\b/im); return m ? m.index : text.length; };
-
-/** One check per expect line, in order, each quoting its line word for word; numbered checks, if any, are 1..N. */
-export function oneCheckPerLine(result, expect) {
-  const v = String(result?.verifier ?? '');
-  const body = v.slice(0, advisoryAt(v));
-  let at = -1;
-  for (const [i, line] of expect.entries()) {
-    const next = quoteAt(body, line, at + 1);
-    if (next < 0) return { met: false, why: `expect line ${i + 1} is not quoted word for word${quoteAt(body, line, 0) >= 0 ? ' after the line before it (out of order)' : ''}: ${JSON.stringify(line.slice(0, 80))}` };
-    at = next;
-  }
-  const numbers = [...body.matchAll(/\bCheck\s+(\d+)\b/gi)].map((m) => Number(m[1]));
-  const distinct = [...new Set(numbers)].sort((a, b) => a - b);
-  if (distinct.length && (distinct.length !== expect.length || distinct.some((n, i) => n !== i + 1))) {
-    return { met: false, why: `the brief numbers its checks ${distinct.join(', ')}, for ${expect.length} expect lines` };
-  }
-  return { met: true, why: `all ${expect.length} lines quoted in order${distinct.length ? `, checks numbered 1 to ${expect.length}` : ''}` };
-}
-
-// A branch named for the builder to make or push, a PR base, a branch-name rule, or how agents return.
-export const RESTATED = Object.freeze([
-  ['creates a branch', /\bgit\s+(?:checkout|switch)\s+-[bcB]\b|\bgit\s+branch\s+(?!--show-current\b)[\w./-]+/i],
-  ['pushes a named branch', /\bgit\s+push\s+(?:-u|--set-upstream)\b/i],
-  ['gives a branch-name rule', /\bbranch[- ]names?\b|\bbranch (?:must|should) (?:be named|match|follow)/i],
-  ['names a PR base', /\bbase[: ]+[`'"]?main\b|--base\b|\b(?:PR|pull request)\b[^.\n]{0,40}\b(?:to|into|targets?|against)\s+[`'"]?main\b/i],
-  ['restates how agents return', /harness__return|\breturn tool\b|\bharness return\b|ToolSearch/i]
-]);
-
-export function noRestatedRules(result) {
-  const hits = [];
-  for (const part of ['builder', 'verifier']) {
-    const text = String(result?.[part] ?? '');
-    for (const [what, re] of RESTATED) {
-      const m = text.match(re);
-      if (m) hits.push(`${part} ${what}: ${JSON.stringify(m[0])}`);
-    }
-  }
-  return hits.length ? { met: false, why: hits.join('; ') } : { met: true, why: 'no branch, base, branch-name rule or return mechanics named' };
-}
-
-export function returned(bench) {
-  if (!bench) return { met: null, why: 'not a bench run' };
-  if (!bench.accepted) return { met: false, why: `no result accepted (${bench.returns.length} return calls; session ${bench.claude?.stop ?? '?'})` };
-  return bench.firstReturnAccepted ? { met: true, why: 'first return accepted' } : { met: false, why: `accepted after ${bench.returns.filter((r) => r.refused).length} refusals: ${bench.returns.filter((r) => r.refused).map((r) => r.refused.rule).join(', ')}` };
-}
-
-export function changesNothing(bench) {
-  if (!bench) return { met: null, why: 'not a bench run' };
-  return bench.changed.length ? { met: false, why: `worktree changed: ${bench.changed.slice(0, 5).join('; ')}` } : { met: true, why: 'worktree clean' };
-}
-
-const MECHANICAL = { returned: (s) => returned(s.bench), 'changes-nothing': (s) => changesNothing(s.bench), 'one-check-per-line': (s) => oneCheckPerLine(s.result, s.case.input.issue.expect), 'no-restated-rules': (s) => noRestatedRules(s.result) };
+export { changesNothing, noRestatedRules, oneCheckPerLine, returned, RESTATED } from './stages.mjs';
 
 // ---- Judge criteria
 
@@ -113,13 +61,14 @@ export function repoFacts(c) {
 }
 
 /** The judge prompt for one criterion and one output: everything the judge sees besides its system prompt. */
-export function judgePrompt({ criterion, c, result }) {
+export function judgePrompt({ criterion, c, result, stage = 'brief' }) {
+  const st = stageOf(stage);
   const list = (xs) => xs.map((x, i) => `${i + 1}. ${x}`).join('\n');
   const parts = [`# Criterion ${criterion.id}\n\n${criterion.says}`];
   if (criterion.case) parts.push(`# The case's ${criterion.case} list\n\n${list(c[criterion.case] ?? [])}`);
-  parts.push(`# The issue's expect lines, in order\n\n${list(c.input.issue.expect)}`);
-  if (criterion.id === 'runs-as-written') parts.push(`# The repository\n\n${repoFacts(c)}`);
-  parts.push(`# The output to grade\n\nThe brief stage wrote two briefs: one for a builder agent that makes one pull request, one for a verifier agent that checks that pull request at its head.\n\n<builder-brief>\n${result?.builder ?? ''}\n</builder-brief>\n\n<verifier-brief>\n${result?.verifier ?? ''}\n</verifier-brief>`);
+  parts.push(...st.judgeCase(c));
+  if (st.repoFacts.includes(criterion.id)) parts.push(`# The repository\n\n${repoFacts(c)}`);
+  parts.push(st.judgeOutput(result));
   parts.push('# Grading rule\n\nAnswer met: true only if the criterion holds for the whole output; otherwise met: false. Answer through the structured output.');
   return parts.join('\n\n');
 }
@@ -139,7 +88,8 @@ export async function judge({ prompt, model = JUDGE_MODEL }) {
  * Score one subject ({ id, case, result, bench?, judgeDir }) on every criterion. A judge verdict is read from
  * judgeDir/<criterion>.json when its prompt hash and model match, else asked (unless noJudge: then met is null).
  */
-export async function scoreOne(subject, { rubric, model = JUDGE_MODEL, rejudge = false, noJudge = false }) {
+export async function scoreOne(subject, { rubric, stage = rubric.stage ?? 'brief', model = JUDGE_MODEL, rejudge = false, noJudge = false }) {
+  const MECHANICAL = stageOf(stage).mechanical;
   const out = {};
   for (const cr of rubric.criteria) {
     if (cr.by === 'mechanical') {
@@ -150,7 +100,7 @@ export async function scoreOne(subject, { rubric, model = JUDGE_MODEL, rejudge =
     }
     if (!subject.result) { out[cr.id] = { by: 'judge', met: false, why: 'no result' }; continue; }
     if (cr.case && !(subject.case[cr.case] ?? []).length) { out[cr.id] = { by: 'judge', met: null, why: `the case has no ${cr.case} items` }; continue; }
-    const prompt = judgePrompt({ criterion: cr, c: subject.case, result: subject.result });
+    const prompt = judgePrompt({ criterion: cr, c: subject.case, result: subject.result, stage });
     const promptSha = sha256(prompt);
     const file = join(subject.judgeDir, `${cr.id}.json`);
     const cached = existsSync(file) ? readJson(file) : null;
@@ -177,7 +127,7 @@ export async function scoreRuns({ stage, dir, model, rejudge, noJudge, parallel 
   const cases = Object.fromEntries(casesOf(stage, [...new Set(runs.map((r) => r.bench.case))].join(',') || null).map((c) => [c.id, c]));
   return pool(runs, parallel, async (r) => {
     const subject = { id: r.name, case: cases[r.bench.case], result: resultOf(r), bench: r.bench, judgeDir: join(r.dir, 'judge') };
-    const score = await scoreOne(subject, { rubric, model, rejudge, noJudge });
+    const score = await scoreOne(subject, { rubric, stage, model, rejudge, noJudge });
     writeJson(join(r.dir, 'score.json'), { stage, run: r.name, case: r.bench.case, judgeModel: model, rubricSha: sha256(JSON.stringify(rubric)), criteria: score });
     log(`${r.name}: ${Object.entries(score).map(([k, v]) => `${k}=${mark(v.met)}`).join(' ')}`);
     return { run: r.name, case: r.bench.case, k: r.bench.k, bench: r.bench, score };
@@ -252,7 +202,7 @@ export async function judgeCheck({ stage, extra = [], out = join(BENCH, stage, '
   const cases = Object.fromEntries(casesOf(stage).map((c) => [c.id, c]));
   const rows = await pool(entries, parallel, async (e) => {
     if (!cases[e.case]) throw new Error(`${e.file}: no case ${e.case}`);
-    const score = await scoreOne({ id: e.id, case: cases[e.case], result: e.result, bench: null, judgeDir: join(out, e.id) }, { rubric, model, rejudge });
+    const score = await scoreOne({ id: e.id, case: cases[e.case], result: e.result, bench: null, judgeDir: join(out, e.id) }, { rubric, stage, model, rejudge });
     log(`${e.id}: ${Object.entries(score).map(([k, v]) => `${k}=${mark(v.met)}${e.grades?.[k] === undefined ? '' : v.met === e.grades[k] ? '' : '(!)'}`).join(' ')}`);
     return { entry: e, score };
   });
@@ -266,11 +216,11 @@ export async function judgeCheck({ stage, extra = [], out = join(BENCH, stage, '
     agreement[cr.id] = { by: cr.by, agree: same.length, graded: graded.length, disagree: graded.filter((r) => !same.includes(r)).map((r) => r.entry.id) };
   }
   for (const r of rows) for (const k of Object.keys(r.entry.planted ?? {})) if (r.score[k]?.met !== false) misses.push({ entry: r.entry.id, criterion: k, got: r.score[k]?.met ?? null, why: r.score[k]?.why });
-  return { rows, agreement, misses, model };
+  return { rows, agreement, misses, model, stage };
 }
 
-export function agreementOf({ rows, agreement, misses, model }) {
-  const L = ['# Judge check: brief stage', '', `Generated by \`node scripts/bench/score.mjs --stage brief --judge-check\`. Judge model: ${model}. Hand grades are in each entry's \`grades\`; \`planted\` names the criteria a planted-bad entry was made to fail.`, ''];
+export function agreementOf({ rows, agreement, misses, model, stage = 'brief' }) {
+  const L = [`# Judge check: ${stage} stage`, '', `Generated by \`node scripts/bench/score.mjs --stage ${stage} --judge-check\`. Judge model: ${model}. Hand grades are in each entry's \`grades\`; \`planted\` names the criteria a planted-bad entry was made to fail.`, ''];
   L.push('| Criterion | by | Agreement with hand grades | Disagreed on |', '|---|---|---|---|');
   for (const [k, a] of Object.entries(agreement)) L.push(`| ${k} | ${a.by} | ${a.graded ? `${a.agree}/${a.graded}` : 'not graded'} | ${a.disagree.join(', ') || 'none'} |`);
   L.push('', `Planted faults caught: ${rows.reduce((n, r) => n + Object.keys(r.entry.planted ?? {}).length, 0) - misses.length} of ${rows.reduce((n, r) => n + Object.keys(r.entry.planted ?? {}).length, 0)}.${misses.length ? ` Missed: ${misses.map((m) => `${m.entry} ${m.criterion}`).join(', ')}.` : ''}`, '');

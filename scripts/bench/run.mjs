@@ -20,9 +20,10 @@ import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import {
-  RELEASE, SESSION, ambientOf, benchEnv, caseRepo, casesOf, claudeBin, prepareRun, readJson, runClaude, sha256, specOf, startAgent,
+  REPO, RELEASE, SESSION, ambientOf, benchEnv, caseRepo, casesOf, claudeBin, prepareRun, readJson, runClaude, sha256, specOf, startAgent,
   streamRows, tokensOf, transcriptOf, trimTranscript, workflowVersion, writeJson
 } from './lib.mjs';
+import { workflowOfStage } from './stages.mjs';
 
 const SERVER = fileURLToPath(new URL('./return-server.mjs', import.meta.url));
 /** The tools a bench session may use without asking: what a stage agent uses, and the return tool. */
@@ -153,6 +154,12 @@ export async function promptOnly({ stage, version, c = null, input = null, runId
   }
 }
 
+/** The workflow a stage is benched in: bench/<stage>/rubric.json's workflow, else the stage's known workflow. */
+export const benchWorkflow = (stage) => {
+  const f = join(REPO, 'bench', stage, 'rubric.json');
+  return workflowOfStage(stage, existsSync(f) ? readJson(f) : null);
+};
+
 /** Run `fn` over `list`, at most n at a time, in order of start. */
 export async function pool(list, n, fn) {
   const out = new Array(list.length);
@@ -175,7 +182,7 @@ async function main() {
       'prompt-only': { type: 'boolean', default: false }, input: { type: 'string' }, 'run-id': { type: 'string' }
     }
   });
-  const version = workflowVersion({ workflow: o.workflow, rev: o.rev, pinned: o.pinned ?? null });
+  const version = workflowVersion({ name: benchWorkflow(o.stage), workflow: o.workflow, rev: o.rev, pinned: o.pinned ?? null });
   if (o['prompt-only']) {
     let input = null;
     if (o.input) { const j = readJson(o.input); input = j.input && j.run ? j.input : j; }

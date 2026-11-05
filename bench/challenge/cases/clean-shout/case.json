@@ -1,0 +1,68 @@
+{
+  "kind": "planted",
+  "source": "A sound issue for the greet-cli request: a challenger that fails it is too strict.",
+  "repo": {
+    "seed": "repo",
+    "message": "greet-cli: greet <name>",
+    "origin": "https://github.com/o/greet-cli.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/o/greet-cli/issues/12",
+      "text": "Support folks asked for a louder greeting for the lobby screen. Can we get a --shout option on greet, and make sure it shows up on the published docs site so they can point people at it?"
+    },
+    "issue": {
+      "url": "https://github.com/o/greet-cli/issues/12",
+      "title": "Add --shout to greet",
+      "problem": "greet has no way to print a louder greeting.",
+      "reason": "The lobby screen needs a greeting that stands out.",
+      "outcome": "--shout exists and is documented in docs/, which the pages workflow publishes on merge.",
+      "expect": [
+        "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "docs/index.md documents the --shout option with an example",
+        "npm test passes and includes a test that runs greet with --shout"
+      ],
+      "proofs": [
+        {
+          "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+          "proof": "run",
+          "how": "node bin/greet.js --shout Ada"
+        },
+        {
+          "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+          "proof": "run",
+          "how": "node bin/greet.js Ada"
+        },
+        {
+          "line": "docs/index.md documents the --shout option with an example",
+          "proof": "read",
+          "how": "docs/index.md"
+        },
+        {
+          "line": "npm test passes and includes a test that runs greet with --shout",
+          "proof": "run",
+          "how": "npm test"
+        }
+      ],
+      "non_goals": [
+        "Checking the published page: it updates only after merge."
+      ],
+      "assumptions": []
+    }
+  },
+  "result": "PASS",
+  "must_pass": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "trap": "None: a sound issue. The after-merge part is moved to the outcome and non_goals.",
+  "must_catch": [
+    "Every line PASSes with evidence naming the wrong build tried."
+  ],
+  "must_not": [
+    "A FAIL for wording, style, or a stricter test the words do not need."
+  ]
+}

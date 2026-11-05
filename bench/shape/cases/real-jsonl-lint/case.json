@@ -1,0 +1,25 @@
+{
+  "kind": "real",
+  "source": "The first real issue's request (ccp_machine_test #102, the jsonl-lint tool), restated as the person's words, on the product test repo at the commit it was built from.",
+  "repo": {
+    "git": "https://github.com/suredesigntshirts/ccp_machine_test",
+    "commit": "b772affa43bc0bbdf580648684e42b1a4f838471",
+    "origin": "https://github.com/suredesigntshirts/ccp_machine_test.git"
+  },
+  "input": {
+    "request": {
+      "url": "https://github.com/suredesigntshirts/ccp_machine_test/issues/102",
+      "text": "We keep journals as JSONL and a torn or hand-edited row breaks the readers. Add a small jsonl-lint tool to this repo: give it a file, it tells me every row that isn't valid JSON with its line number, and exits non-zero if there are any. A missing file should be an error too."
+    }
+  },
+  "trap": "README.md says 'No tools yet: packages/ is empty, and npm test says so and passes', which the new tool makes false; the root npm test runs workspaces with --if-present, so a workspace without a test script passes silently; the test workflow runs npm ci, which fails unless package-lock.json gains the new workspace.",
+  "must_catch": [
+    "An expect line requires the tool to have tests that npm test at the root actually runs (not skipped by --if-present).",
+    "An expect line covers the README's 'No tools yet' statement (the root README lists the tool or no longer says there are none).",
+    "Expect lines pin the output form (file and 1-based line per bad row) and distinct exit codes for bad rows and for a missing file or no argument."
+  ],
+  "must_not": [
+    "An expect line that can only be checked after merge, such as a release or a published package.",
+    "An issue whose lines a tool with no tests run by npm test meets."
+  ]
+}
