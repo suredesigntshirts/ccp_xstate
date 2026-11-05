@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "752ba8e3f83f20b90a29c0186ae438495c78a8ecf0ac47652b81dbb70528e1f5",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 2 holds. Neither PASS/FAIL condition depends on npm test: Check 1 requires exit=0, a JSON array and SAME, and Check 2 requires grep_exit=0 and a line that documents the flag. Item 1 breaks. The verifier brief has two numbered checks, but it then adds an \"Advisory (not part of PASS/FAIL)\" section. That section tells the verifier to \"Run `npm test`. All tests, including the existing CSV tests, should pass\", and also to check that running without flags \"should behave exactly as before\". The section has no say in the verdict, but it is still an instruction to run npm test and the CSV tests and judge the result. That is the \"third check for npm test or CSV behaviour\" the must_not list describes. So the brief has more checks than the two expect lines.",
+  "model": "claude-opus-5-5",
+  "ms": 10448,
+  "tokens": {
+    "input": 2,
+    "output": 750,
+    "cacheCreation": 3044,
+    "cacheRead": 783,
+    "fresh": 3796,
+    "total": 4579
+  },
+  "at": "2026-11-05T08:40:26.632Z"
+}

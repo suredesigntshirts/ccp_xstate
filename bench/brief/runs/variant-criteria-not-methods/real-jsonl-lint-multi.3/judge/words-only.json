@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "d2fb3abc10a7d225364c6df48da75d6f883de1f914a3f08eed13d69bfcc37731",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 5 and 6 stay within their lines. Three conditions go further than the words require:\n- **Check 3:** PASS requires \"stderr names missing.jsonl\". Expect line 3 only asks for an \"error on stderr\". Naming the file is a stricter test.\n- **Check 4:** PASS requires \"(empty diff)\" for the whole of packages/jsonl-lint/src/index.js, which is a file-scope rule. Expect line 4 only says lint(text) is unchanged.\n- **Check 4:** PASS also requires that the lint tests pass, which line 4 does not ask for.\n\nThese stricter tests belonged under the Advisory heading, but they appear in PASS conditions, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 10116,
+  "tokens": {
+    "input": 2,
+    "output": 816,
+    "cacheCreation": 4805,
+    "cacheRead": 783,
+    "fresh": 5623,
+    "total": 6406
+  },
+  "at": "2026-11-05T08:42:03.442Z"
+}

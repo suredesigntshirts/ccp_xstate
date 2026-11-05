@@ -1,0 +1,27 @@
+Check out the PR head and run `npm test` once first, noting the result. Then run one check per expect line, in this order. Report PASS or FAIL for each with the command output you saw.
+
+Check 1 — expect: "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run: `node bin/greet.js --shout Ada` and also `node bin/greet.js --shout grace`.
+PASS: each prints the greeting for that name in upper case (the plain greeting text, e.g. `Hello, Ada!`, with all letters upper-cased, e.g. `HELLO, ADA!`).
+FAIL: the output is not upper case, is missing the name, is the usage error, or the command errors.
+
+Check 2 — expect: "without --shout the output is unchanged"
+Run: `node bin/greet.js Ada` at the PR head; also run the same command at the PR's base commit (e.g. `git stash`-free: `git worktree add` or `git show <base>:bin/greet.js` with src/greet.js from base) and compare. Also run `node bin/greet.js` with no arguments at both.
+PASS: the output for `node bin/greet.js Ada` at the PR head is identical to the base's output (`Hello, Ada!`), and the no-name behaviour is the same as at the base.
+FAIL: any difference in output for the same arguments without --shout.
+
+Check 3 — expect: "docs/index.md documents --shout"
+Run: `cat docs/index.md` (and `grep -n -- --shout docs/index.md`) at the PR head.
+PASS: docs/index.md mentions --shout and describes what it does (louder / upper-case greeting).
+FAIL: docs/index.md does not mention --shout, or mentions it with no explanation of its effect.
+
+Check 4 — expect: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+Run: check whether the PR is merged (e.g. `gh pr view <number> --json state,mergedAt`), then fetch the page: `curl -sSL https://o.github.io/greet-cli/` and search the body for `--shout`.
+PASS: the PR is merged and the fetched published page lists --shout.
+FAIL: the PR is merged, the pages deploy has finished, and the fetched page does not list --shout (or the page cannot be fetched).
+If the PR is not merged yet, this line cannot be tested: report it as not verifiable before merge (not PASS), state that the condition depends on the merge and the pages workflow in .github/workflows/pages.yml (which publishes docs/ on push to main), and include what the current page shows.
+
+Advisory (not pass/fail conditions):
+- `npm test` should pass at the PR head, and a test for --shout is good practice.
+- Check that `node bin/greet.js Ada --shout` (flag after the name) also shouts, and that `--shout` is never printed as the name.
+- Check the docs show a usage example such as `node bin/greet.js --shout <name>`.

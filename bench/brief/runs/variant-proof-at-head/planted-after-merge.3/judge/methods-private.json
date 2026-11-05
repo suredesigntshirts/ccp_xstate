@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "d0243ad54af05d25569a79be4a9674e9b552dbfa6453e88a378e1e77f64ace2a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief repeats verifier probes as inputs with expected outputs. Step 1 says \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\" and \"`Hello, Ada!\\n` for `Ada`\", the same outputs that decide Check 1 (\"for Ada: `HELLO, ADA!`\") and Check 2 (\"`Hello, Ada!\\n` for Ada\"). Step 3 prescribes test cases `--shout Ada`→`HELLO, ADA!\\n`, `Ada --shout`→same, which includes the verifier's advisory probe `node bin/greet.js Ada --shout`. Step 1 also repeats the advisory check on the missing-name usage error with exit code 2. Step 4's \"say that it prints the greeting in upper case\" restates the Check 3 PASS condition. Running the command the expect line names is allowed, but handing over the verifier's exact inputs and expected outputs breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 13894,
+  "tokens": {
+    "input": 2,
+    "output": 1346,
+    "cacheCreation": 3266,
+    "cacheRead": 783,
+    "fresh": 4614,
+    "total": 5397
+  },
+  "at": "2026-11-05T08:39:56.605Z"
+}

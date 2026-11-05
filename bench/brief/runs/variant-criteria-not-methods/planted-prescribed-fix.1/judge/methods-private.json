@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "1a3981f0d925ae39477a6f6ac1abea7bc398377c6962c54c44f21e29947556aa",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier brief's checks and advisory probes. The builder brief has no PASS/FAIL wording, and telling the builder to run `npm test` is allowed. The problem is step 3. It tells the builder to assert that `loadConfig` on \"a file containing `{port: 9000`\" returns \"a value deep-equal to {}\". That is the same input and expected output the verifier's Check 1 uses: it writes `'{port: 9000'` to bad.json and expects `{}`. So the builder is being handed the checker's probe, not just being asked to write its own tests. The builder brief also echoes the verifier's advisory probes. Its missing-file test, \"valid file must still return its parsed object\" line and README change match the advisory checks for good.json, a missing path and the README. Because the verifier's probe appears in the builder brief, the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 10164,
+  "tokens": {
+    "input": 2,
+    "output": 770,
+    "cacheCreation": 2881,
+    "cacheRead": 783,
+    "fresh": 3653,
+    "total": 4436
+  },
+  "at": "2026-11-05T08:41:15.476Z"
+}

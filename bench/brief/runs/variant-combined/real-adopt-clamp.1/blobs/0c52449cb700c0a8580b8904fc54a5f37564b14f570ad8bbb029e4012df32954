@@ -1,0 +1,26 @@
+Check out the pull request head and run every check there. Run `npm test` once first if dependencies matter (there are none; package.json has no dependencies).
+
+Check 1 — expect line: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi"
+Run: node -e "const m=require('./math.js'); console.log(typeof m.clamp, m.clamp(-5,0,100), m.clamp(140,0,100), m.clamp(42,0,100), m.clamp(0,0,100), m.clamp(100,0,100), m.clamp(7,3,3), m.clamp(-2.5,-10,-1))"
+PASS: clamp is exported as a function and the output is `function 0 100 42 0 100 3 -2.5` (below the range gives lo, above gives hi, inside or at a bound gives x).
+FAIL: clamp is not exported (typeof is not `function`, or the require throws), or any of those values differ.
+
+Check 2 — expect line: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi"
+Run: node -e "const {clamp}=require('./math.js'); for (const a of [[5,10,0],[0,1,-1],[50,100,0]]) { try { clamp(...a); console.log('no throw', a) } catch (e) { console.log(e instanceof RangeError ? 'RangeError' : 'other: '+e) } }"
+PASS: all three lines print `RangeError`.
+FAIL: any line prints `no throw` or `other: ...`.
+
+Check 3 — expect line: "README.md documents every function math.js exports"
+Run: node -e "console.log(Object.keys(require('./math.js')).join(' '))" to list the exports at the head, then read README.md at the head.
+PASS: for every exported name listed (at least add, subtract, multiply and clamp), README.md has documentation of that function (a heading or entry naming it with what it does).
+FAIL: any exported function is not documented in README.md. Note that before this change subtract was exported but undocumented; it must now be documented too.
+
+Check 4 — expect line: "npm test passes"
+Run: npm test
+PASS: the command exits with status 0 and reports no failing tests.
+FAIL: non-zero exit status or any failing test.
+
+Advisory (not part of PASS/FAIL):
+- Check that the tests include clamp cases, including a RangeError case for lo > hi.
+- Check that clamp(5, 5, 5) returns 5 (lo === hi is not an error).
+- Check that the README clamp entry mentions the RangeError behaviour.

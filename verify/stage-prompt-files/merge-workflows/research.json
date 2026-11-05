@@ -1,0 +1,183 @@
+{
+  "id": "research",
+  "description": "A question to a verified, published report. Three researchers run at once; the join waits for each to end, answered or failed; every source is a ref the host fetched.",
+  "initial": "planning",
+  "context": { "issue": null, "why": null, "plan": null, "answers": null, "draft": null, "verdict": null, "decision": null, "post": null, "failure": null, "drafted": null, "redrafted": null },
+  "output": { "issue": "context.issue", "draft": "context.draft", "verdict": "context.verdict", "post": "context.post" },
+  "states": {
+    "planning": {
+      "meta": { "needs": ["hasIssue"] },
+      "invoke": {
+        "id": "brief", "src": "brief",
+        "input": {
+          "task": { "prompt": "task" },
+          "issue": "context.issue", "why": "context.why"
+        },
+        "onDone": { "target": "researching", "actions": [{ "type": "set", "params": { "plan": "event.output" } }] },
+        "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
+      }
+    },
+    "researching": {
+      "meta": { "needs": ["hasPlan"] },
+      "invoke": [
+        {
+          "id": "q1", "src": "researcher",
+          "input": { "question": "context.plan.questions.0", "task": "context.plan.researcher" },
+          "onDone": [
+            { "target": "writing", "actions": [{ "type": "set", "params": { "answers.q1": "event.output" } }] },
+            { "actions": [{ "type": "set", "params": { "answers.q1": "event.output" } }] }
+          ],
+          "onError": [
+            { "target": "writing", "actions": [{ "type": "set", "params": { "answers.q1.error": "event.error" } }] },
+            { "actions": [{ "type": "set", "params": { "answers.q1.error": "event.error" } }] }
+          ]
+        },
+        {
+          "id": "q2", "src": "researcher",
+          "input": { "question": "context.plan.questions.1", "task": "context.plan.researcher" },
+          "onDone": [
+            { "target": "writing", "actions": [{ "type": "set", "params": { "answers.q2": "event.output" } }] },
+            { "actions": [{ "type": "set", "params": { "answers.q2": "event.output" } }] }
+          ],
+          "onError": [
+            { "target": "writing", "actions": [{ "type": "set", "params": { "answers.q2.error": "event.error" } }] },
+            { "actions": [{ "type": "set", "params": { "answers.q2.error": "event.error" } }] }
+          ]
+        },
+        {
+          "id": "q3", "src": "researcher",
+          "input": { "question": "context.plan.questions.2", "task": "context.plan.researcher" },
+          "onDone": [
+            { "target": "writing", "actions": [{ "type": "set", "params": { "answers.q3": "event.output" } }] },
+            { "actions": [{ "type": "set", "params": { "answers.q3": "event.output" } }] }
+          ],
+          "onError": [
+            { "target": "writing", "actions": [{ "type": "set", "params": { "answers.q3.error": "event.error" } }] },
+            { "actions": [{ "type": "set", "params": { "answers.q3.error": "event.error" } }] }
+          ]
+        }
+      ]
+    },
+    "writing": {
+      "meta": { "needs": ["answered", "draftsLeft"] },
+      "invoke": {
+        "id": "write", "src": "write",
+        "input": { "issue": "context.issue", "task": "context.plan.writer", "answers": "context.answers", "verdict": "context.verdict" },
+        "onDone": { "target": "verifying", "actions": [{ "type": "set", "params": { "draft": "event.output", "verdict": { "value": null } } }, { "type": "set", "params": { "redrafted": "context.drafted", "drafted": { "value": true } } }] },
+        "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
+      }
+    },
+    "verifying": {
+      "meta": { "needs": ["hasDraft"] },
+      "invoke": {
+        "id": "verify", "src": "verify",
+        "input": { "issue": "context.issue", "task": "context.plan.verifier", "draft": "context.draft", "answers": "context.answers" },
+        "onDone": [
+          { "target": "awaitingPublish", "actions": [{ "type": "set", "params": { "verdict": "event.output" } }] },
+          { "target": "writing", "guard": "failed", "actions": [{ "type": "set", "params": { "verdict": "event.output" } }] },
+          { "target": "replanning", "actions": [{ "type": "set", "params": { "verdict": "event.output" } }] }
+        ],
+        "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
+      }
+    },
+    "awaitingPublish": {
+      "meta": { "needs": ["passed"] },
+      "after": { "checkBack": { "description": "no answer an hour after the ask: nothing moves; the wake brings the thread back to the waiting item (fix-waiting-wake)" } },
+      "invoke": {
+        "id": "ask", "src": "ask",
+        "input": { "question": { "value": "Publish this verified report?" }, "choices": { "value": ["approve", "reject"] }, "draft": "context.draft", "verdict": "context.verdict" },
+        "onDone": [
+          { "target": "publishing", "actions": [{ "type": "set", "params": { "decision": "event.output" } }] },
+          { "target": "replanning", "actions": [{ "type": "set", "params": { "decision": "event.output" } }] }
+        ],
+        "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
+      }
+    },
+    "publishing": {
+      "meta": { "needs": ["passed", "approved"] },
+      "invoke": {
+        "id": "post", "src": "post",
+        "input": { "text": "context.draft.text", "sources": "context.draft.sources" },
+        "onDone": { "target": "done", "actions": [{ "type": "set", "params": { "post": "event.output" } }] },
+        "onError": { "target": "replanning", "actions": [{ "type": "set", "params": { "failure": "event.error" } }] }
+      }
+    },
+    "replanning": {
+      "after": { "checkBack": { "description": "no answer an hour after the ask: nothing moves; the wake brings the thread back to the waiting item (fix-waiting-wake)" } },
+      "invoke": {
+        "id": "ask", "src": "ask",
+        "input": { "question": { "value": "This research stalled. Replan it with a written five whys, or drop it?" }, "choices": { "value": ["replan", "drop"] }, "answers": "context.answers", "verdict": "context.verdict", "failure": "context.failure" },
+        "onDone": [
+          { "target": "planning", "guard": "replan", "actions": [{ "type": "set", "params": { "why": "event.output.why", "plan": { "value": null }, "answers": { "value": null }, "draft": { "value": null }, "verdict": { "value": null }, "decision": { "value": null }, "failure": { "value": null }, "drafted": { "value": null }, "redrafted": { "value": null } } }] },
+          { "target": "dropped", "guard": "drop", "actions": [{ "type": "set", "params": { "decision": "event.output" } }] }
+        ],
+        "onError": "dropped"
+      }
+    },
+    "done": { "type": "final", "meta": { "needs": ["isPosted"] } },
+    "dropped": { "type": "final" }
+  },
+  "meta": {
+    "delays": { "checkBack": 3600000 },
+    "guards": {
+      "hasIssue": ["context.issue.url", "context.issue.expect"],
+      "hasPlan": ["context.plan.questions", "context.plan.researcher", "context.plan.writer", "context.plan.verifier"],
+      "answered": ["context.answers.q1", "context.answers.q2", "context.answers.q3"],
+      "draftsLeft": [{ "path": "context.redrafted", "in": [null] }],
+      "hasDraft": ["context.draft.text", "context.draft.sources"],
+      "failed": [{ "path": "context.verdict.result", "in": ["FAIL"] }],
+      "passed": [{ "path": "context.verdict.result", "in": ["PASS"] }],
+      "approved": [{ "path": "context.decision.choice", "in": ["approve"] }],
+      "replan": [{ "path": "event.output.choice", "in": ["replan"] }, "event.output.why"],
+      "drop": [{ "path": "event.output.choice", "in": ["drop"] }],
+      "isPosted": ["context.post.ref"]
+    },
+    "input": { "type": "object", "required": ["issue"], "properties": { "issue": { "$ref": "#issue" } } },
+    "events": {},
+    "actors": {
+      "brief": {
+        "prompt": "research/brief.md",
+        "type": "object", "required": ["questions", "researcher", "writer", "verifier"],
+        "properties": {
+          "questions": { "type": "array", "minItems": 3, "items": { "type": "string", "minLength": 1 } },
+          "researcher": { "type": "string", "minLength": 1 },
+          "writer": { "type": "string", "minLength": 1 },
+          "verifier": { "type": "string", "minLength": 1 }
+        }
+      },
+      "researcher": {
+        "prompt": "research/researcher.md",
+        "type": "object", "required": ["text", "sources"],
+        "properties": {
+          "text": { "type": "string", "minLength": 1 },
+          "sources": { "type": "array", "minItems": 1, "items": { "$ref": "#ref" } }
+        }
+      },
+      "write": {
+        "prompt": "research/write.md",
+        "type": "object", "required": ["text", "sources"],
+        "properties": {
+          "text": { "type": "string", "minLength": 1 },
+          "sources": { "type": "array", "minItems": 1, "items": { "$ref": "#ref" } }
+        }
+      },
+      "verify": {
+        "prompt": "research/verify.md",
+        "type": "object", "required": ["result", "issue", "lines", "sources"],
+        "properties": {
+          "result": { "enum": ["PASS", "FAIL"] },
+          "issue": { "$ref": "#issue" },
+          "lines": { "type": "array", "minItems": 1, "items": { "$ref": "#line" }, "covers": "issue.expect" },
+          "sources": { "type": "array", "items": { "$ref": "#ref" } }
+        }
+      },
+      "ask": { "type": "object", "required": ["choice", "by"], "properties": { "choice": { "type": "string" }, "by": { "type": "string", "minLength": 1 }, "why": { "type": "string" } } },
+      "post": { "type": "object", "required": ["ref"], "properties": { "ref": { "type": "string", "minLength": 1 } } }
+    },
+    "schemas": {
+      "ref": { "type": "object", "required": ["url", "at"], "properties": { "url": { "type": "string", "minLength": 1 }, "at": { "type": "string", "minLength": 1 } } },
+      "issue": { "type": "object", "required": ["url", "expect"], "properties": { "url": { "type": "string", "minLength": 1 }, "expect": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } },
+      "line": { "type": "object", "required": ["line", "result", "evidence"], "properties": { "line": { "type": "string", "minLength": 1 }, "result": { "enum": ["PASS", "FAIL"] }, "evidence": { "type": "string", "minLength": 1 } } }
+    }
+  }
+}

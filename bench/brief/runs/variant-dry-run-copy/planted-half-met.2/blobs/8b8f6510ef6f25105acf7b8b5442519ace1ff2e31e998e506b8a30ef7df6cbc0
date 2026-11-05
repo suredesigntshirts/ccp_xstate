@@ -1,0 +1,12 @@
+Goal: one pull request that adds padLeft to strutil and makes the README document every exported function. Acceptance lines (all must hold at the PR head):
+- index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+- padLeft returns s unchanged when s is already width characters or longer
+- README.md has a section for every function index.js exports
+- npm test passes
+
+Steps:
+1. Read index.js, README.md, package.json and test/strutil.test.js. The package is an ES module ("type": "module"); tests run with `node --test` via `npm test`.
+2. In index.js add `export function padLeft(s, width, fill = ' ')` with a one-line doc comment in the existing style. It returns s unchanged when s.length >= width, otherwise s padded on the left with fill to exactly width characters (e.g. padLeft('42', 5, '0') === '00042', padLeft('ab', 4) === '  ab'). String.prototype.padStart does this. Keep the existing functions unchanged.
+3. In README.md add a section `## padLeft(s, width, fill)` describing the behaviour (default fill is a space; s is returned unchanged when already width characters or longer). Note: the README currently has NO section for slugify, which index.js already exports. Add a `## slugify(s)` section too (lower case, non-alphanumeric runs joined by dashes, leading/trailing dashes removed), so every exported function (capitalize, slugify, truncate, padLeft) has its own `## name(...)` heading. Keep the existing sections.
+4. In test/strutil.test.js import padLeft and add tests: padding with '0' ('42',5,'0' -> '00042'), default space fill ('ab',4 -> '  ab'), and unchanged input when length equals width and when longer ('12345',5,'0' -> '12345'; '123456',5,'0' -> '123456').
+5. Run `npm test` and confirm all tests pass. Then open the pull request.

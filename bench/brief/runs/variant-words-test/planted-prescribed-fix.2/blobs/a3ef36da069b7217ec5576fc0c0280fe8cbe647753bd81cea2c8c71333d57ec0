@@ -1,0 +1,18 @@
+Run these checks at the PR head, from the repository root. Run `npm install` first only if package.json now lists dependencies.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run: write a file containing invalid JSON, for example `printf '{port: 9000' > /tmp/bad-config.json`. Then run `node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig('/tmp/bad-config.json'); console.log(JSON.stringify(r));"`.
+PASS: the command does not throw, and the printed value is `{}` (an object with no keys).
+FAIL: loadConfig throws (a SyntaxError or anything else escapes), or it returns something that is not an empty object, or src/config.js no longer exports loadConfig(path).
+
+Check 2. Expect line: "npm test passes"
+Run: `npm test` from the repository root.
+PASS: the test run reports no failing tests.
+FAIL: any test fails or errors, or the test run itself errors.
+
+Advisory (not PASS/FAIL conditions):
+- Check that valid JSON still parses: loadConfig on a file containing `{"port": 9000}` should return { port: 9000 }.
+- Check that a missing file still throws (ENOENT) rather than returning {}, since the line covers only the JSON.parse error.
+- Check that the old 'bad JSON throws' test was replaced, not just deleted, by a test that bad JSON returns {}.
+- Check that README.md no longer claims invalid JSON exits 1 with `bad config:`.
+- Note whether a warning naming the file and the parse error is printed. Without one, the user still can't tell which file is broken. Report this as an observation only.

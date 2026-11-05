@@ -1,0 +1,13 @@
+Goal: one pull request that meets every one of these acceptance lines:
+1. index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+2. padLeft returns s unchanged when s is already width characters or longer
+3. README.md has a section for every function index.js exports
+4. npm test passes
+
+Steps:
+1. Read index.js, README.md, package.json and test/strutil.test.js. index.js uses ES module syntax (`export function`), and `npm test` runs `node --test`.
+2. In index.js, add and export `padLeft(s, width, fill)`. Put a short doc comment above it, the same way the other functions have one. It must pad `s` on the left with `fill` until the result is exactly `width` characters long. When `fill` is not given (undefined), use a single space. When `s.length >= width`, return `s` unchanged. Example: padLeft('42', 5, '0') === '00042', padLeft('42', 5) === '   42', padLeft('12345', 3, '0') === '12345'. The simplest way is `String.prototype.padStart`. Leave the existing exports alone.
+3. In README.md, make sure there is a `## name(args)` section for EVERY function index.js exports, not only the new one. Note: README.md currently has sections for capitalize and truncate but NOT for slugify, even though index.js exports slugify. Add a `## slugify(s)` section that describes what it does (lower case, runs of non-alphanumeric characters become single dashes, leading and trailing dashes removed). Add a `## padLeft(s, width, fill)` section that describes the padding, the default space fill and the unchanged result when s is already long enough, and gives the invoice example 42 -> 00042. Match the style of the sections already there. Keep them above the `## Tests` section.
+4. In test/strutil.test.js, import padLeft and add tests for: zero fill ('42', 5, '0' -> '00042'), default space fill ('42', 5 -> '   42'), s equal to width ('abc', 3, '0' -> 'abc') and s longer than width ('abcdef', 3, '0' -> 'abcdef').
+5. Run `npm test` and confirm every test passes. Then go back through every `export` in index.js and confirm each exported function has a matching README.md section.
+6. Open the pull request, linking https://github.com/o/strutil/issues/7.

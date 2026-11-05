@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "40b296125c1d6844eb4829d4bc3f1c40b75a7fe7d6758ce19ea86a5b897e80ea",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 only tests that clamp is exported as a function and that sample values (including the boundaries and decimals) come back \"limited to [lo, hi]\". That is what the words require. Check 2 only tests that a RangeError is thrown for three cases where lo > hi. Check 3 requires each exported function to have a README entry that \"names it and describes what it does\". That is a fair reading of \"documents\"; the hard-coded list of names is only a note. Check 4 only requires \"fail 0 and exits 0\". The stricter items sit under \"Advisory (not part of PASS/FAIL)\": that lo===hi doesn't throw, how clear the error message is, that tests exist, and the README style and RangeError mention. No PASS or FAIL condition has a test, mutation, branch or file-scope rule, or exact-wording rule beyond what the words require.",
+  "model": "claude-opus-5-5",
+  "ms": 8388,
+  "tokens": {
+    "input": 2,
+    "output": 652,
+    "cacheCreation": 3086,
+    "cacheRead": 783,
+    "fresh": 3740,
+    "total": 4523
+  },
+  "at": "2026-11-05T08:40:55.797Z"
+}

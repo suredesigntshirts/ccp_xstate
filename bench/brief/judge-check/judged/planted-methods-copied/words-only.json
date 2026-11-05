@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "37dd2ad3545402a3e4f53b61042b96a0639dc2fa1594db23c956fc8b2a033fdf",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 needs clamp to be exported and to limit x to lo..hi. Its cases (below the range, above it, inside it, at the bounds, lo equal to hi, negative ranges, a float) all follow from \"limited to the range lo to hi\". Check 2 tests only \"instance of RangeError\" when lo is greater than hi, which is what the words say. Check 3 confirms every exported function is named in README.md and that README.md \"says what each listed function does\". That is what \"documents\" means. It does not demand a heading format. Check 4 is exit status 0 with zero failing tests, which is what \"passes\" means. The stricter items (clamp tests added, file scope, add/subtract/multiply unchanged, NaN behaviour) sit only under \"Advisory (not part of any PASS or FAIL condition)\". The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 10813,
+  "tokens": {
+    "input": 2,
+    "output": 893,
+    "cacheCreation": 4395,
+    "cacheRead": 783,
+    "fresh": 5290,
+    "total": 6073
+  },
+  "at": "2026-11-05T08:26:56.406Z"
+}

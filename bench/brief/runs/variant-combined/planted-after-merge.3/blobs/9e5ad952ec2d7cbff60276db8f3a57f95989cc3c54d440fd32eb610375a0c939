@@ -1,0 +1,26 @@
+Run every check at the pull request's head. First run `npm test` once to get context; the checks below decide the result.
+
+Check 1. Expect line: "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run: `node bin/greet.js --shout Ada`.
+PASS: the output is the greeting in upper case, i.e. the normal greeting for Ada (`Hello, Ada!`) with every letter upper-cased (`HELLO, ADA!`).
+FAIL: the command errors, prints nothing, prints the greeting with any lower-case letters, or treats `--shout` as the name.
+
+Check 2. Expect line: "without --shout the output is unchanged"
+Run: `node bin/greet.js Ada` at the head, and also at the base of the pull request (for example `git show <base>:bin/greet.js` into a temporary copy of the repo, or `git worktree add` at the merge base), then compare the two outputs. Also run `node bin/greet.js` with no arguments in both places.
+PASS: for both commands the output at the head is the same as at the base (`Hello, Ada!` for the first).
+FAIL: either output differs between head and base.
+
+Check 3. Expect line: "docs/index.md documents --shout"
+Read docs/index.md at the head.
+PASS: the file mentions `--shout` and says what it does (makes the greeting upper case / louder).
+FAIL: the file does not mention `--shout`, or mentions it without saying what it does.
+
+Check 4. Expect line: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+The live page can only be seen after merge; do not fetch it. Instead read .github/workflows/pages.yml and docs/index.md at the head.
+PASS: the pages workflow still publishes the docs folder on pushes to main, and docs/index.md at the head lists `--shout`, so the published page will list it after merge.
+FAIL: the workflow no longer publishes docs (removed, trigger changed away from main, or path changed so docs/index.md is not published), or docs/index.md at the head does not list `--shout`.
+
+Advisory (not part of PASS/FAIL):
+- `node bin/greet.js Ada --shout` should also print `HELLO, ADA!`.
+- `npm test` should exit 0, and the PR should add tests for --shout.
+- The exact expected shout output is `HELLO, ADA!` followed by a newline.

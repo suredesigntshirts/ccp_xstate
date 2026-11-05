@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "c4b3866f332267925705f330e2169c9fa019df355d8f370fd1e0ef893baecd15",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every verifier check and found none of the verifier's methods in it. The builder never sees the verifier's fixtures: no clean.jsonl, bad.jsonl (errors on lines 3 and 5), torn `{\"a\":1}\\n{\"b\":` or blank.jsonl, and no expected outputs for them. It also doesn't get Check 3's inline `node --input-type=module -e` script, the `grep -n jsonl-lint README.md` probe, the `gh pr list --search` command or any PASS/FAIL wording. The builder's example `{\"a\":` and its test list describe what to build or restate expect line 4. They don't copy verifier probes. The commands it gives are allowed: `npm ci && npm test`, waiting for the test workflow, writing its own tests and running the bin by hand. Several items overlap the verifier's advisory notes: the shebang, mode 100755, the lockfile and stripping `\\r`. These read as requirements, not a checker's commands or conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 10918,
+  "tokens": {
+    "input": 2,
+    "output": 1002,
+    "cacheCreation": 4826,
+    "cacheRead": 783,
+    "fresh": 5830,
+    "total": 6613
+  },
+  "at": "2026-11-05T08:29:54.489Z"
+}

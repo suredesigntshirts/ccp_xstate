@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "231874a6d830f44da17e72914678f5237393cf3b5edb25ceebf2e11df7bf55d1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the briefs, and both are covered.\n\nItem 1 (non-goal): The builder brief says \"`loadConfig` must still throw\" and \"never return `{}` or defaults for a malformed file.\" It also says not to change how read errors such as ENOENT are handled. Together these rule out swallowing the error or falling back to defaults.\n\nItem 2 (SyntaxError test): The builder brief lists `test/config.test.js` with its two tests. In step 1 it names \"the existing `bad JSON throws` test (which asserts `SyntaxError`)\". It says that throwing a `SyntaxError` with the new message, or setting `cause` to the original, keeps that test valid. So the builder knows that wrapping the error in a different error type would change that test's outcome. The verifier's Check 5 doesn't repeat this, but the criterion only needs the builder brief or Check 5 to carry it.",
+  "model": "claude-opus-5-5",
+  "ms": 6270,
+  "tokens": {
+    "input": 2,
+    "output": 622,
+    "cacheCreation": 5671,
+    "cacheRead": 783,
+    "fresh": 6295,
+    "total": 7078
+  },
+  "at": "2026-11-05T08:55:32.700Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "6cbe1c1e87aef870b3b90279c0601697bd8046e771d8031414103439d344e1ff",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. `npm test` works, since package.json has the test script. The Check 1 and Check 2 one-liners are valid shell and ES-module JavaScript, and the files they read exist. Check 3 breaks. Its JavaScript sits inside a double-quoted shell string, and bash turns `\\\\s` and `\\\\b` into `\\s` and `\\b` before Node sees them. Inside a JavaScript string literal, `'\\s'` becomes a plain `s` and `'\\b'` becomes a backspace character. So the pattern `'^#{2,}\\\\s+\\`?'+f+'\\\\b'` reaches the regex as `^#{2,}s+`?name<backspace>`. That can never match a real `## slugify(s)` heading. The command runs but always reports every export as missing and prints FAIL, even on a correct PR. Because of these layered escapes, it does not work as written in this repository.",
+  "model": "claude-opus-5-5",
+  "ms": 15339,
+  "tokens": {
+    "input": 2,
+    "output": 1149,
+    "cacheCreation": 3443,
+    "cacheRead": 783,
+    "fresh": 4594,
+    "total": 5377
+  },
+  "at": "2026-11-05T08:56:26.547Z"
+}

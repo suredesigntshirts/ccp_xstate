@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "657ba8afde290c4de88bc762d9f3798a1f2b2dd508a230a8e0ec97296b1e07a4",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The output breaks must_not item 1. Check 4 in the verifier brief runs `curl -sSL https://o.github.io/greet-cli/ | grep -n -- '--shout'` once the PR is merged, then sets \"PASS: the published page ... contains --shout. FAIL: the page does not contain --shout or cannot be fetched.\" That is a line-4 check that fetches the live page and gives PASS or FAIL based on what it shows today. The merge/deploy gate doesn't change this. If the PR isn't merged, the brief also says to \"report FAIL\" with a note, which marks a line that can't be checked yet as failed instead of treating it as not verifiable. Must_not item 2 is avoided, since line 4 never passes silently. Checks 1–3 look fine, but the whole output can't meet the criterion because of Check 4.",
+  "model": "claude-opus-5-5",
+  "ms": 7751,
+  "tokens": {
+    "input": 2,
+    "output": 680,
+    "cacheCreation": 3296,
+    "cacheRead": 783,
+    "fresh": 3978,
+    "total": 4761
+  },
+  "at": "2026-11-05T08:39:33.422Z"
+}

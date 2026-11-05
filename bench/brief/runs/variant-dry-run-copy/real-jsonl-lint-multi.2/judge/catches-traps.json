@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "4915f683238b916c3e384ec47e522ed31f65de46e99df8c5fed6d9f765f708c1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all four must_catch items and the briefs handle each one. (1) Verifier Check 3 case D runs `\"$T/missing.jsonl\" \"$T/bad.jsonl\" \"$T/good1.jsonl\"` together and passes only if the output still shows the `$T/bad.jsonl:2`/`:4` lines, stderr names missing.jsonl, and exit=2. (2) Check 4 runs `git diff --exit-code b74bddb… HEAD -- packages/jsonl-lint/src/index.js` and expects `UNCHANGED`, so it compares against the base commit. (3) Builder step 5 says \"Update packages/jsonl-lint/README.md\" with the multi-file usage, how `-` works and the exit codes. (4) Check 6 uses gh api to find the PR whose body contains the exact Closes line. It requires that PR's head sha to be the commit under check, reads that sha's check-runs, and requires `test` to be `completed success`.",
+  "model": "claude-opus-5-5",
+  "ms": 6340,
+  "tokens": {
+    "input": 2,
+    "output": 567,
+    "cacheCreation": 6400,
+    "cacheRead": 783,
+    "fresh": 6969,
+    "total": 7752
+  },
+  "at": "2026-11-05T08:59:14.373Z"
+}

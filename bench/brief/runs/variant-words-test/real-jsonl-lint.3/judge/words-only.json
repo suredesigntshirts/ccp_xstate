@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "a863910bdd3ffc2fe7c837f2cab5f089a998a75fcae6dc055cb63ca47cc28aff",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line.\n\n- **Check 1** tests 1-based line numbers, skipped blank lines, the unterminated last line (\"one starting `bad.jsonl:5: `\") and exit codes 1 and 0. The issue does not fix the error wording, so the check accepts \"some error text\".\n- **Check 2** asks only for non-empty stderr and exit 2.\n- **Check 3** asks for the exported lint, the array shape and the 1-based line.\n- **Check 4** accepts \"extra flags or file arguments after `node --test`\". It also requires the tests to pass, which line 6's green `npm test` already forces.\n- **Check 5** asks only that the package README exists and the root README mentions the tool.\n- **Check 6** matches its expect line: one PR, the Closes line in the body, and green `npm test` and workflow at the head.\n\nThe stricter items sit under \"Advisory (not pass/fail)\": the lockfile, CRLF, the shebang and the stdout/naming checks. No PASS or FAIL condition requires exact wording, a mutation test or a branch rule.",
+  "model": "claude-opus-5-5",
+  "ms": 11955,
+  "tokens": {
+    "input": 2,
+    "output": 1100,
+    "cacheCreation": 5275,
+    "cacheRead": 783,
+    "fresh": 6377,
+    "total": 7160
+  },
+  "at": "2026-11-05T08:42:29.812Z"
+}

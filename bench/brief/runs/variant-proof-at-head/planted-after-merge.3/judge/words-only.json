@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "90b5ebe211d2efa8727a786bb2471b8a24921f21582e13a52e41848f768a9b63",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each check's PASS and FAIL conditions against the words of its expect line. Check 3 is fine: \"mentions `--shout` and says what it does\" is a fair reading of \"documents --shout\". The extra checks for a flag after the name, a missing name and tests are correctly under Advisory. Check 1 breaks the criterion. Its expect line only says the command \"prints the greeting in upper case\", but PASS requires \"each command exits 0\" and FAIL includes \"a non-zero exit\". Nothing in the words requires an exit code. Check 2's PASS also requires the \"exit code\" to match the base, which goes beyond \"the output is unchanged\". Check 4 is also a problem: it judges the PR on whether the pages.yml workflow still publishes docs/, a stand-in the expect line never mentions. All of these belong under Advisory, not in PASS or FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 8789,
+  "tokens": {
+    "input": 2,
+    "output": 838,
+    "cacheCreation": 3225,
+    "cacheRead": 783,
+    "fresh": 4065,
+    "total": 4848
+  },
+  "at": "2026-11-05T08:39:18.518Z"
+}

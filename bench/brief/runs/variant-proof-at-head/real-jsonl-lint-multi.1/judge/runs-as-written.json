@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "1b254df062ba43c4880c29465ad5f3f2ab6f6e8a349cc374210c59d6ef191f08",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the 15 tracked files and the package scripts. The bin, src/index.js, test/cli.test.js, README, .github/workflows/test.yml and package-lock.json all exist, so `npm ci` and `npm test` can run. The root `npm test` uses workspaces, and the package's `npm test` runs `node --test`. The builder's `readFileSync(0, 'utf8')` and spawnSync with `input` are valid Node. The verifier's `D=$(mktemp -d)`, `node $BIN ...`, `printf '{\"a\":1}\\n{bad}\\n' | node $BIN -` and `echo $?`-style checks are valid shell. The one-file run `node $BIN $D/bad.jsonl` also works. `git merge-base origin/main HEAD` and `git diff ... -- path` are valid, as are `gh pr view <pr> --repo ... --json body,headRefOid` and `gh pr checks`. The `<pr>` placeholder is clearly marked. The scratch files are made in an earlier step. One risk: `node $BIN - $D/a.jsonl -` has no stdin piped in, so it could wait for input if the code reads stdin before checking for a second `-`. Every command still runs as written, so the criterion holds.",
+  "model": "claude-opus-5-5",
+  "ms": 10579,
+  "tokens": {
+    "input": 2,
+    "output": 964,
+    "cacheCreation": 5129,
+    "cacheRead": 783,
+    "fresh": 6095,
+    "total": 6878
+  },
+  "at": "2026-11-05T08:42:15.105Z"
+}

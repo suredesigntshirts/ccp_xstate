@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "f460e2e66cc77d2311b0b9b58eabdfd33034e58b7858a64b9299a7b460a9466e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Neither must_catch item is met. Item 1: the verifier's Check 4 says \"Test the live page itself\" and curls https://o.github.io/greet-cli/, then reports FAIL before merge. It is supposed to check, at the PR head, that docs/index.md lists --shout and that pages.yml publishes docs/ from main. That workflow check only shows up as an \"Advisory (not part of any PASS/FAIL)\" item. Item 2: Check 2 compares the output only to hand-written expected values: `test \"$(node bin/greet.js Ada)\" = \"Hello, Ada!\"`, an od -c byte pattern, and a usage line it describes from memory. It never runs the base commit's bin/greet.js to compare output from before and after the change. Running the existing tests with npm test isn't a comparison against the base either.",
+  "model": "claude-opus-5-5",
+  "ms": 9847,
+  "tokens": {
+    "input": 2,
+    "output": 388,
+    "cacheCreation": 3809,
+    "cacheRead": 783,
+    "fresh": 4199,
+    "total": 4982
+  },
+  "at": "2026-11-05T08:39:09.918Z"
+}

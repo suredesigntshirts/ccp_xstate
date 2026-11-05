@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "ccbd04251ef057f6ad175efcd05d4ccc3e753b428b6ceb34405b9b3822705c7c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion is met: every command in both briefs would run as written in this repository. Builder brief: the files it reads and edits (bin/csv2json.js, src/parse.js, test/csv.test.js, README.md) are all tracked. `npm test` runs the existing \"node --test\" script, which picks up test/*.test.js files. The README line `node bin/csv2json.js --tsv < table.tsv` is example text to add, not a command to run. Verifier brief: the `printf '...\\t...' | node bin/csv2json.js --tsv > /tmp/tsv.out; echo \"exit $?\"` pipelines are valid shell, and the plain CSV pipeline is too. `cmp /tmp/tsv.out /tmp/csv.out && cat /tmp/csv.out` compares files made by the commands before it. `grep -n -- '--tsv' README.md` puts `--` before the pattern, so grep doesn't read `--tsv` as an option. The single-column `printf 'a\\n1\\n2\\n'` repeat and the advisory commands are also valid. The `--tsv` flag itself is added by the builder before the verifier runs.",
+  "model": "claude-opus-5-5",
+  "ms": 7745,
+  "tokens": {
+    "input": 2,
+    "output": 699,
+    "cacheCreation": 2694,
+    "cacheRead": 783,
+    "fresh": 3395,
+    "total": 4178
+  },
+  "at": "2026-11-05T08:40:26.264Z"
+}

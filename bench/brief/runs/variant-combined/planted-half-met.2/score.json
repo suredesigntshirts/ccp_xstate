@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.2",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4 not quoted word for word in the builder brief: \"index.js exports padLeft(s, width, fill), which pads s on the left with fill (a \""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each PASS/FAIL condition against the words of its expect line. Checks 1, 2 and 4 hold. For example, padLeft('a',3,'x') giving \"xxa\" follows directly from \"pads s on the left with fill … to width characters\", and the exit-status check is correctly placed under Advisory. Check 3 breaks the criterion. Its PASS condition says the listed exported functions \"must include at least capitalize, slugify, truncate and padLeft\". Expect line 3 only requires \"a section for every function index.js exports\". It does not require which functions are exported. Suppose a PR removed or renamed slugify and documented everything it still exports. That PR would meet line 3's words but fail this condition. Requiring \"text about it\" that \"describes it\" also goes a little beyond \"has a section\". These stricter tests belong under Advisory, not in a PASS condition.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for every command in both briefs. `npm test` runs because package.json defines the \"test\" script as `node --test`, and test/strutil.test.js exists. Each `node --input-type=module -e \"...\"` command imports './index.js', which is tracked, and resolves it from the repository root. The JavaScript is valid in all of them: the array literals, JSON.stringify, `Object.keys(m).filter(k=>typeof m[k]==='function').join(' ')` and the named import `{padLeft}`. The shell quoting also holds: single quotes sit inside double quotes, and there is no `$`, backtick or `!` to be expanded. padLeft is a valid import in the verifier commands because the builder's step 1 adds that export earlier. Steps that edit files or open the pull request are actions, not shell commands. I couldn't confirm the \"type\": \"module\" claim, because only the scripts field of package.json is shown. Even so, the import commands would run whether index.js is ESM or CommonJS.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs handle all three must_catch items. (1) Builder step 3 says \"also add a `## slugify(s)` section, which is currently missing\", next to the padLeft section in step 2. (2) Verifier Check 3 lists the functions index.js exports at the PR head and says the list \"must include at least capitalize, slugify, truncate and padLeft\". Its FAIL line is \"any exported function has no section. Watch slugify in particular\". (3) Verifier Check 1 calls padLeft('42',5) with no fill argument and expects \"   42\" (spaces on the left, 5 characters). It FAILs on \"not a space when fill is omitted\". No part of the output breaks the criterion.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the verifier brief against both must_not items, and it breaks neither. Item 1: Check 3 lists the exported functions and says they \"must include at least capitalize, slugify, truncate and padLeft\". It also says \"Watch slugify in particular\", so a README with a padLeft section but no slugify section fails. Item 2: the PASS values in Checks 1 and 2 (\"00042\", \"   42\", \"xxa\", unchanged strings) follow directly from the expect lines. There is no parameter-count check and no rule that fill must be one character; the multi-character fill case is marked advisory only. Check 3 defines a section loosely as \"a heading naming the function plus text about it\", which is a plain reading of \"section\", not a required layout. The builder's `## name(...)` heading format is only an instruction to the builder, not a pass/fail condition. Exit status and test coverage are advisory too.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, looking for probes that appear in both. The builder brief hands over the verifier's own inputs and expected outputs. Step 1 says \"padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42'\", which match Check 1 exactly. Step 4 asks for tests on ('abcde', 5 -> 'abcde') and ('abcdef', 3 -> 'abcdef'), which are nearly the same as Check 2's probes. Step 5 also gives the builder an inline script, `import * as m from './index.js'; console.log(Object.keys(m))`, then a check of README sections against its output. That is essentially Check 3's listing probe. The builder may write its own tests, but these are the verifier's specific probe cases and script, not just the bar. Running `npm test` is allowed, but the other overlaps break the criterion.",
+      "cached": false
+    }
+  }
+}

@@ -1,0 +1,13 @@
+Make one pull request for https://github.com/o/strutil/issues/7 that meets every one of these acceptance lines:
+- index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+- padLeft returns s unchanged when s is already width characters or longer
+- README.md has a section for every function index.js exports
+- npm test passes
+
+Steps:
+1. Read index.js, README.md, package.json and test/strutil.test.js. The package is an ES module ("type": "module"); index.js currently exports capitalize, slugify and truncate. `npm test` runs `node --test`.
+2. In index.js add and export `padLeft(s, width, fill = ' ')` with a short doc comment in the style of the existing functions. It returns `s` unchanged when `s.length >= width`; otherwise it adds `fill` on the left until the result is exactly `width` characters (e.g. padLeft('42', 5, '0') === '00042', padLeft('ab', 4) === '  ab'). `s.padStart(width, fill)` meets this for a one-character fill. Do not change the existing functions.
+3. In README.md make sure there is a section for EVERY function index.js exports, not only the new one. Note that README.md today has sections for capitalize and truncate but NONE for slugify, so add a `## slugify(s)` section (describe it: lower case, runs of non-alphanumerics become single dashes, leading/trailing dashes removed) as well as a `## padLeft(s, width, fill)` section (pads on the left with fill, default a space, to width characters; returns s unchanged when already width or longer; mention the 42 -> 00042 example). Use the same `## name(args)` heading style as the existing sections and keep them before the `## Tests` section.
+4. In test/strutil.test.js import padLeft and add tests: padLeft('42', 5, '0') === '00042'; padLeft('ab', 4) === '  ab' (default space); padLeft('abcde', 5, '0') === 'abcde' and padLeft('abcdef', 3) === 'abcdef' (unchanged when already width or longer).
+5. Run `npm test` and confirm it exits 0 with all tests passing. Also check that every name in `node -e "import('./index.js').then(m=>console.log(Object.keys(m)))"` has a matching heading in README.md.
+6. Commit and open the pull request referencing issue #7.

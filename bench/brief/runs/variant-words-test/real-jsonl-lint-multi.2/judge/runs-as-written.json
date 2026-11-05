@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "ec09aee400ff27f311b8c31fe033b799b5b734ce6f68a6cc02a644011216777c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository facts. Every file they name is tracked at this commit: bin/jsonl-lint.js, src/index.js, both test files, the README, .github/workflows/test.yml and package-lock.json (so `npm ci` works). `npm test` and `npm test --workspace packages/jsonl-lint` fit the scripts shown. `cd packages/jsonl-lint && node --test` is valid. The gh commands (`pr view --json body,headRefOid,state`, `pr list --search 104 --state all`, `pr checks --watch`) use real flags. `git diff $(git merge-base HEAD origin/main) HEAD -- …` and `git worktree add $T/base <sha>` are valid. In the `node -e \"import(...).then(m=>console.log(JSON.stringify(m.lint('{\\\"a\\\":1}\\n{bad\\n\\n3'))))\"` line, the shell quoting is valid and leaves valid JavaScript. The scratch file setup uses `mktemp -d` and `cp` correctly. Stdin redirections like `node $CLI - - < $T/good1.jsonl` are valid. Placeholders like `<pr>` stand for values the agent fills in. I found no command that would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 9917,
+  "tokens": {
+    "input": 2,
+    "output": 914,
+    "cacheCreation": 5799,
+    "cacheRead": 783,
+    "fresh": 6715,
+    "total": 7498
+  },
+  "at": "2026-11-05T08:41:49.342Z"
+}

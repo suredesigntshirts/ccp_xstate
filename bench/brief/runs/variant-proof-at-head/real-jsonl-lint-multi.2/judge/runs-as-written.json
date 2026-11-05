@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "19e19f3b4085aed052710890ea58428c12f9c9839df70e1d60d1e1a4feca115e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands hold up. Both briefs name tracked files: bin/jsonl-lint.js, src/index.js, test/cli.test.js, test/lint.test.js, README.md and .github/workflows/test.yml. `readFileSync(0,'utf8')`, spawnSync with `input`, `npm ci` (a package-lock.json exists), `npm test --workspace packages/jsonl-lint`, `node --test packages/jsonl-lint/test/lint.test.js` and the printf/gh/git commands are all valid.\n\nThe failure is in the verifier brief. It sets B to the repo-relative path `packages/jsonl-lint/bin/jsonl-lint.js`, then has the verifier make a scratch dir for c1.jsonl, c2.jsonl and b.jsonl. It then runs `node B c1.jsonl b.jsonl c2.jsonl` and similar commands. Run from the repo root, the bare scratch file names don't resolve. Run from the scratch dir, B doesn't resolve. No single working directory makes those commands work as written. The verifier would have to use an absolute path for B or a scratch-dir prefix on each file.",
+  "model": "claude-opus-5-5",
+  "ms": 13100,
+  "tokens": {
+    "input": 2,
+    "output": 1267,
+    "cacheCreation": 5397,
+    "cacheRead": 783,
+    "fresh": 6666,
+    "total": 7449
+  },
+  "at": "2026-11-05T08:42:20.938Z"
+}

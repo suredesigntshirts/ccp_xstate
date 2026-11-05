@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "219ad4d8873be1615a919df9e9e2f5449152f0d5fa3305a5807e2757121180a8",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief. Step 6 of the builder brief (\"Self-check before opening the PR\") copies the verifier's probes word for word. `test \"$(node bin/greet.js --shout Ada)\" = \"HELLO, ADA!\" && echo PASS || echo FAIL` is the same as Check 1, `test \"$(node bin/greet.js Ada)\" = \"Hello, Ada!\" && echo PASS || echo FAIL` is the same as Check 2, and `grep -n -- '--shout' docs/index.md` is the same as Check 3. These are inline scripts with expected outputs, PASS/FAIL conditions and a grep, not just a command named by an expect line or the repository's tests. Telling the builder to run `npm test` is allowed, but sharing these probes breaks the rule that the builder brief carries none of the verifier's checks.",
+  "model": "claude-opus-5-5",
+  "ms": 10776,
+  "tokens": {
+    "input": 2,
+    "output": 794,
+    "cacheCreation": 3468,
+    "cacheRead": 783,
+    "fresh": 4264,
+    "total": 5047
+  },
+  "at": "2026-11-05T08:39:22.244Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "7dac8ab0eb472bab379c12559e2085f1928bc2e3164baa1a51032f519fcaf73e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the 6 tracked files and the package.json script. Builder: the files it reads (bin/csv2json.js, src/parse.js, test/csv.test.js, README.md) all exist. `npm test` maps to \"node --test\". The SAME/DIFFERENT pipeline is valid POSIX shell: printf handles the \\n and \\t escapes, `$(...)` captures the output, and `[ \"$c\" = \"$t\" ] && ... || ...` is well-formed. The JS snippet `execFileSync('node', ['bin/csv2json.js', '--tsv'], ...)` is valid and resolves from the repo root when node --test runs. Verifier: Check 1 is the same pipeline with the echo lines added, which is valid. Check 2's `grep -n -- '--tsv' README.md` uses `--` correctly so grep doesn't read the pattern as an option. The advisory `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` and `npm test` both run. The --tsv flag itself is created by the builder's earlier step. No command names a missing file or tool, and none has invalid arguments or syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 10573,
+  "tokens": {
+    "input": 2,
+    "output": 665,
+    "cacheCreation": 2811,
+    "cacheRead": 783,
+    "fresh": 3478,
+    "total": 4261
+  },
+  "at": "2026-11-05T08:40:41.222Z"
+}

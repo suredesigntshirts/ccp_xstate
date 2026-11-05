@@ -1,0 +1,24 @@
+Goal: add a --tsv flag to the CLI so tab-separated stdin is parsed with a tab separator, and leave the behaviour without the flag unchanged. Issue: https://github.com/o/csv2json/issues/5.
+
+What exists now:
+- bin/csv2json.js reads stdin with readFileSync(0, 'utf8'), calls parse(text) with no separator, ignores process.argv, and writes JSON.stringify(result) followed by "\n".
+- src/parse.js exports parse(text, sep = ','). It splits rows on /\r?\n/ and fields on sep.
+- test/csv.test.js uses node:test and already has a 'cli' test that runs execFileSync('node', ['bin/csv2json.js'], { input, encoding: 'utf8' }).
+- package.json: "test": "node --test".
+
+Steps:
+1. In bin/csv2json.js, check whether '--tsv' appears anywhere in process.argv.slice(2). If it does, call parse(text, '\t'). If it does not, call parse(text) exactly as now. Keep the output format unchanged: JSON.stringify of the result plus one "\n". Do not add --sep/--delimiter, --help, separator auto-detection, quoting rules, or handling of unknown arguments. Leave src/parse.js unchanged unless you really need to change it, and keep its default ',' behaviour.
+2. In test/, add node:test tests that run bin/csv2json.js the way the existing 'cli' test does, passing args ['bin/csv2json.js', '--tsv'], and assert strict equality on stdout:
+   - input 'a\tb\n1\t2\n' gives '[{"a":"1","b":"2"}]\n'
+   - input 'name\tnote\nx\thello, world\n' gives '[{"name":"x","note":"hello, world"}]\n'
+   - input 'a\tb\n1\t2\n3\t4\n' gives '[{"a":"1","b":"2"},{"a":"3","b":"4"}]\n'
+   Also add a test with no flag: input 'a\tb\n1\t2\n' gives '[{"a\\tb":"1\\t2"}]\n', where the output contains the JSON escape backslash-t. Keep the existing tests.
+3. In README.md, add a short section on the --tsv flag. Say that it reads tab-separated input, and include the example invocation `node bin/csv2json.js --tsv < table.tsv`. Keep the existing CSV example.
+4. From the repo root, check each of these:
+   - printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv; echo "exit=$?" prints [{"a":"1","b":"2"}] and then exit=0
+   - printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv prints [{"name":"x","note":"hello, world"}]
+   - printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv prints [{"a":"1","b":"2"},{"a":"3","b":"4"}]
+   - printf 'a,b\n1,2\n' | node bin/csv2json.js prints [{"a":"1","b":"2"}]
+   - printf 'a\tb\n1\t2\n' | node bin/csv2json.js prints [{"a\tb":"1\t2"}], with a literal backslash-t in the output
+   - npm test exits 0
+5. Open one pull request that contains these changes and links the issue.

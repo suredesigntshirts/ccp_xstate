@@ -13,7 +13,9 @@
     "planted-prescribed-fix",
     "real-adopt-clamp",
     "real-jsonl-lint",
-    "real-jsonl-lint-multi"
+    "real-jsonl-lint-multi",
+    "intake-shared-parser",
+    "intake-suggested-fix"
   ],
   "runs": [
     "planted-after-merge.1",
@@ -36,6 +38,24 @@
     "real-jsonl-lint.3",
     "real-jsonl-lint-multi.1",
     "real-jsonl-lint-multi.2",
-    "real-jsonl-lint-multi.3"
-  ]
+    "real-jsonl-lint-multi.3",
+    "intake-shared-parser.1",
+    "intake-shared-parser.2",
+    "intake-shared-parser.3",
+    "intake-suggested-fix.1",
+    "intake-suggested-fix.2",
+    "intake-suggested-fix.3"
+  ],
+  "extended": {
+    "by": "refine-brief-stage",
+    "cases": [
+      "intake-shared-parser",
+      "intake-suggested-fix"
+    ],
+    "workflow": {
+      "sha256": "8d046c5a5d4746c47cefdb839624f315a7fab6a91be5af44c749d6bc402adbd3",
+      "source": "workflows/quick-fix.json and workflows/quick-fix/"
+    },
+    "why": "Runs for the intake-shaped cases, made on the quick-fix pin of 5 Nov whose brief file is byte for byte the one the first 21 runs pinned (the pin moved only through the build and verify stages)."
+  }
 }

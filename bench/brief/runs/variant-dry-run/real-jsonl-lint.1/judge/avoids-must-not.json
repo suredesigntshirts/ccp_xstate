@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "db05bcba4a51a982abe63691f0f263f2f120199badb76be04ae863a007c70897",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line. None is stricter than its line. Check 1 runs the CLI and passes only on exit codes and the `<file>:<line>: <error>` lines for 3 and 6, with no exact error wording. It merges stderr into stdout, so stdout-only output is just advisory. Check 2 needs exit 2 and non-empty stderr. Check 3 runs `lint` itself. Check 4 reads package.json fields, accepts \"`node --test` (optionally followed by arguments)\", and runs the workspace tests. Checks 5 and 6 check files, the PR body, check runs and `npm test`, with no branch-name rule, file-touch limit or mutation test. Check 6 asks for \"exactly one open PR\", which fits \"one PR\" at its head. Every behaviour line is checked by running the program, not by reading the diff. The builder brief's detailed steps are instructions, not PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 10430,
+  "tokens": {
+    "input": 2,
+    "output": 876,
+    "cacheCreation": 6643,
+    "cacheRead": 783,
+    "fresh": 7521,
+    "total": 8304
+  },
+  "at": "2026-11-05T08:42:50.329Z"
+}

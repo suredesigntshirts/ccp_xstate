@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "093470c082783c5ddc2e82499d11bf46991b5f33bd2d230b461948a31dd83f4c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the PASS and FAIL conditions of all seven checks against their expect lines. Checks 1–5 require stdout to be \"exactly\" the text \"followed by one newline\" (plus \"exit=0\" for check 1). The expect lines say \"prints exactly … followed by a newline\", so a byte-for-byte cmp is what the words require. FAIL wording like \"missing or extra newline\" and \"rows missing or out of order\" follows from \"exactly\" and \"every row comes out in order\". Check 6 requires npm test to exit 0 and a test that runs bin/csv2json.js with --tsv on tab input and asserts on the output, which matches the expect line. Check 7 requires README.md to describe --tsv with an example command; it does not require the \"< file\" form or exact wording. Everything stricter is under the Advisory heading, not in any PASS or FAIL condition: test:cli, the README form \"node bin/csv2json.js --tsv < table.tsv\", the flag's position among arguments, and the non-goals.",
+  "model": "claude-opus-5-5",
+  "ms": 13078,
+  "tokens": {
+    "input": 2,
+    "output": 1037,
+    "cacheCreation": 5797,
+    "cacheRead": 783,
+    "fresh": 6836,
+    "total": 7619
+  },
+  "at": "2026-11-05T08:54:29.384Z"
+}

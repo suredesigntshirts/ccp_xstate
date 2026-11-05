@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "intake-suggested-fix.1",
+  "case": "intake-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 5 lines quoted in order, checks numbered 1 to 5"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5 not quoted word for word in the builder brief: \"Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 asks only for \"exit code is 1 and `$d/out` is empty\". Check 2 asks for `bad config:`, the path \"exactly as passed\" and line 3 / column 3 \"in any readable form\", all taken from the expect line, with no exact wording forced. Check 3 asks for `OK`, meaning it threw and the message contains the path. Check 4 asks for `listening on 9000`, exit 0 and a deep-equal `{port: 9000}`, which is just what \"returns `{ port: 9000 }`\" means. Check 5 asks that npm test passes at head and that at least one test checking the path fails against base src/, matching the expect line. The stricter items (computing line/column instead of relying on Node's message, missing-file behavior, absolute-path resolution) all sit under \"Advisory (not pass/fail)\". No stricter test, mutation test or branch rule appears in any PASS or FAIL condition.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the six tracked files and the `node --test` script. The builder brief only runs `npm test` and `node src/app.js $d/c.json` or `ok.json`, and both files exist. In the verifier brief, Checks 1–3 copy the issue's proofs word for word. Their printf strings and the quoting of `'$d/b.json'` inside the double-quoted `-e` code are valid shell. Check 4 adds `import assert from 'node:assert/strict'` and `assert.deepEqual(v, {port: 9000})`, which is valid ESM because `--input-type=module` is set. Check 5 uses `git merge-base HEAD <default branch>`, `git worktree add`, `git checkout <base> -- src` and `npm test`. All are real git commands with correct arguments. The `<base>` and `<default branch>` placeholders are the same kind of placeholder the issue's own proofs use. I found no command that names a missing file, takes wrong arguments or has broken syntax.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the builder brief. Item 1 holds: the brief says \"do NOT make `loadConfig` catch the error and return `{}` or defaults (the issue's suggested fix is rejected)\", and step 1 adds \"throw a new error (do not return)\". Item 2 holds: the brief names test/config.test.js and says \"The existing test `bad JSON throws` expects a `SyntaxError`; either keep throwing a SyntaxError (e.g. a new SyntaxError with the original as `cause`) or update that test.\" That warns the builder that wrapping the error changes that test's outcome. So the builder brief covers both items, which is enough for the criterion as written.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against both briefs and neither one is broken. Item 1: the builder brief does tell the builder to wrap `JSON.parse` in try/catch. But it says to rethrow, \"throw a new error (do not return)\", and it says up front \"do NOT make `loadConfig` catch the error and return `{}` or defaults\". Nothing in it tells the builder to return a value. Item 2: verifier Check 2 accepts line 3 and column 3 \"in any readable form (e.g. `line 3 column 3`, `3:3`, `line 3, col 3`)\". It fails a run only if one of the four pieces is missing or the numbers are wrong, so a run with different wording or order still passes. Neither brief does anything on the must_not list.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief against each verifier check. The builder brief has no PASS/FAIL wording. It doesn't include the verifier's inline `node --input-type=module` probes, the `assert.deepEqual` / `EQUAL` script, or the merge-base/worktree method from Check 5. Step 6 has the builder run `node src/app.js $d/c.json` on the four-line file and expect exit 1, no stdout and `bad config:`, path, 3/3 on stderr. That is the command from the issue's proofs 1–2, and the expected results restate expect lines 1–2, which counts as the bar. Step 5 asks the builder to write its own tests, using inputs from the expect lines (`{port: 9000`, the four-line file). The criterion allows that. \"Run `npm test`\" is also allowed. Nothing in the builder brief is a check that belongs only to the verifier.",
+      "cached": true
+    }
+  }
+}

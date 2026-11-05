@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "fd88e5a1ad699c86bf05d9acbd3866227b4a9234bd946574d923572a5ee24189",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 requires only \"exit code is 1 and `$d/out` is empty.\" Check 2 requires `bad config:`, the exact path as passed, and line 3 and column 3 \"in any readable form,\" which matches \"exactly as passed.\" Check 3 passes only on `OK`, meaning it throws and the message contains the path. Check 4 requires exit 0, `listening on 9000`, and a result deep-equal to `{ port: 9000 }`. Check 5 requires that `npm test` passes and that at least one path-asserting malformed-JSON test fails against base `src/`. That is the proof's own method, not a stricter rule. The stricter items are all under \"Advisory (not PASS/FAIL conditions)\": whether line and column are computed or passed through from Node, the checks against swallowing errors, ENOENT and README, and whether the error is still a SyntaxError. No check adds exact wording, a mutation test, or a branch or file-scope rule.",
+  "model": "claude-opus-5-5",
+  "ms": 15695,
+  "tokens": {
+    "input": 2,
+    "output": 778,
+    "cacheCreation": 5514,
+    "cacheRead": 783,
+    "fresh": 6294,
+    "total": 7077
+  },
+  "at": "2026-11-05T08:55:17.551Z"
+}

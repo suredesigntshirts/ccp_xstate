@@ -1,0 +1,29 @@
+Check the pull request's head checkout. Run every command from the repository root. Run each check below in order and give each one PASS or FAIL with the evidence (the command and its output).
+
+Check 1 — expect line: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+node --input-type=module -e "import * as m from './index.js'; const p=m.padLeft; console.log(typeof p, JSON.stringify([p('42',5,'0'), p('42',5), p('',3,'x'), p('7',4,'*')]))"
+PASS: the output is `function ["00042","   42","xxx","***7"]`. That means padLeft is exported, pads on the left with fill up to width characters, and uses a space when fill is not given. Also read index.js at the head and confirm padLeft is declared with the parameters (s, width, fill).
+FAIL: padLeft is not exported (typeof is not `function`, or the import fails), any output value is different, or the declaration does not take s, width, fill.
+
+Check 2 — expect line: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+node --input-type=module -e "import {padLeft as p} from './index.js'; console.log(JSON.stringify([p('abc',3,'0'), p('abcdef',3,'0'), p('abc',3), p('abcdef',2)]))"
+PASS: the output is `["abc","abcdef","abc","abcdef"]`.
+FAIL: any value is different (for example, truncated or padded), or the command throws.
+
+Check 3 — expect line: "README.md has a section for every function index.js exports"
+Run:
+node --input-type=module -e "import * as m from './index.js'; console.log(Object.keys(m).filter(k=>typeof m[k]==='function').join(' '))"
+to list the exported functions. Then run `grep -n '^#' README.md` to list the README headings. Read README.md at the head.
+PASS: every exported function name listed (at least capitalize, slugify, truncate, padLeft) has its own README.md section, meaning a heading naming that function with text under it that describes it.
+FAIL: any exported function has no README.md section. Note that the base README lacked a slugify section, so check slugify in particular.
+
+Check 4 — expect line: "npm test passes"
+Run: `npm test`
+PASS: it exits with code 0 and reports no failing tests.
+FAIL: it exits non-zero or reports any failing test.
+
+Advisory (not part of any PASS/FAIL):
+- See whether test/strutil.test.js has padLeft tests for the default fill and the already-long case.
+- See whether the padLeft README section mentions the invoice example (42 -> 00042).

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "279aa16332d0661396ff5e8b5a7d32297ff71f8bfe1062634cfa360dd61d7d34",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier's checks. Step 3 of the builder brief tells the builder to run `--tsv` on 'a\\tb\\n1\\t2\\n' and assert that the output equals the no-flag run on 'a,b\\n1,2\\n', giving '[{\"a\":\"1\",\"b\":\"2\"}]\\n'. The verifier's Check 1 uses the same pair as a PASS/FAIL probe: \"printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv, compared with printf 'a,b\\n1,2\\n' | node bin/csv2json.js\". So the builder brief carries a probe from the verifier brief: the same inputs with the same expected output. The builder is allowed to write its own tests, but handing it the verifier's exact inputs and expected result breaks the rule. Step 4, which says the literal `--tsv` must appear in README.md, comes from the expect line itself, so it is fine. Step 3 alone is enough to fail the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 6217,
+  "tokens": {
+    "input": 2,
+    "output": 594,
+    "cacheCreation": 2708,
+    "cacheRead": 783,
+    "fresh": 3304,
+    "total": 4087
+  },
+  "at": "2026-11-05T08:29:10.346Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "6c8affe06eafe91097e0c315031dfefe866a3270c22ac96ea9ded8224d5deb47",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief's checks and probes. In step 5, the builder brief tells the builder to run the expect-line commands and gives their expected outputs, for example \"printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \\\"exit=$?\\\"\". The criterion allows commands named by the expect lines and proofs. The test cases in step 3 use the expect lines' own inputs and outputs, and writing its own tests is allowed. Both are the bar, not checker methods. The builder brief has none of the verifier's own methods: no `od -c`/`cat -A` byte checks, no `grep -n -- '--tsv' test/*.js`, and no PASS/FAIL wording. Its guidance on flag position and README wording comes from the issue's assumptions and proof 7, not from the verifier's advisory items. Running `npm test` is allowed. No verifier-only probe appears in the builder brief.",
+  "model": "claude-opus-5-5",
+  "ms": 8929,
+  "tokens": {
+    "input": 2,
+    "output": 820,
+    "cacheCreation": 5383,
+    "cacheRead": 783,
+    "fresh": 6205,
+    "total": 6988
+  },
+  "at": "2026-11-05T08:54:56.202Z"
+}

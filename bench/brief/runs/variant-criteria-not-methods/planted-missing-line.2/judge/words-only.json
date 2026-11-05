@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "ca930d17ce36dc387cdd3113d1f86d01f8fd90c33fb62f43fada2fc80901e1d7",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the verifier's PASS/FAIL conditions against each expect line. Check 2 is fine: a README mention of --tsv that says what the flag does matches \"documents --tsv\". Check 1 is not. Its PASS requires \"both commands exit 0 every time\", and its FAIL triggers when \"either command exits non-zero\". Expect line 1 only asks that --tsv read tab input on stdin and print the same JSON array as the plain command. It says nothing about exit status. Check 1 also requires a set output shape, \"a JSON array of objects keyed by the header row\", with a literal example. The words only require the --tsv output to match whatever the plain CSV command prints, not that it has a given structure. Both requirements are stricter than the expect line and belong under Advisory, not in PASS/FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 10067,
+  "tokens": {
+    "input": 2,
+    "output": 910,
+    "cacheCreation": 2630,
+    "cacheRead": 783,
+    "fresh": 3542,
+    "total": 4325
+  },
+  "at": "2026-11-05T08:40:18.519Z"
+}

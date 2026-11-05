@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "6fbdc72a4587b601ef3065c7d4ebf7e9981641db2a76e42bbdf656635f619033",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the verifier brief, and both are handled. Item 1: Check 4 says \"The live page can only be seen after merge; do not fetch it\". It then has the verifier read .github/workflows/pages.yml and docs/index.md at the head. PASS needs the workflow to still publish docs on pushes to main and docs/index.md to list `--shout`. That is exactly the required approach of checking what will publish the page. Item 2: Check 2 runs `node bin/greet.js Ada`, and the no-argument case, at both the head and the base (\"git show <base>:bin/greet.js ... or git worktree add at the merge base\"). It then compares the two outputs. PASS means head matches base. So it doesn't rely only on a hand-written expected string.",
+  "model": "claude-opus-5-5",
+  "ms": 5223,
+  "tokens": {
+    "input": 2,
+    "output": 378,
+    "cacheCreation": 2966,
+    "cacheRead": 783,
+    "fresh": 3346,
+    "total": 4129
+  },
+  "at": "2026-11-05T08:56:07.410Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "152ff1b04575063d84354c22709f260697224bf8ad7c2c46dbd40a44c1b42c37",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief for any check or probe that appears in both. Builder step 5 includes the README-heading inline script (\"node --input-type=module -e \\\"import * as m from './index.js'; ... process.exit(missing.length ? 1 : 0)\\\"\") word for word, along with its pass condition (\"must print `missing: none` and exit 0\"). That is the same probe and PASS condition as verifier Check 3. This script isn't a repository test or a command named by an expect line, so the allowed exception doesn't cover it. The builder brief also uses inputs and expected outputs from verifier Check 1: padLeft('42', 5, '0') === '00042' and padLeft('ab', 5) === '   ab'. So the builder is handed the checker's methods, not just the bar, and the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 9222,
+  "tokens": {
+    "input": 2,
+    "output": 413,
+    "cacheCreation": 548,
+    "cacheRead": 3848,
+    "fresh": 963,
+    "total": 4811
+  },
+  "at": "2026-11-05T08:44:12.316Z"
+}

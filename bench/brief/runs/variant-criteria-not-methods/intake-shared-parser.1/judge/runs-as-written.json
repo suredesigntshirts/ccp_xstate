@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "ab25a2e9ffe687651d403170b790b50b0618d6dac1f9dd2e1995124cd2de3ab5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Checked every command in both briefs against this commit. All named files exist: bin/csv2json.js, src/parse.js, test/csv.test.js and README.md. Both briefs use `npm test`, which matches package.json's \"test\":\"node --test\", and they avoid the issue's nonexistent `npm run test:cli`. Verifier checks 1–5 use valid bash: printf, cmp with `-` and /tmp/o1, and process substitution `<(printf '%s\\n' ...)`. In check 5, '%s\\n' keeps `\\t` as the literal JSON escape, so the expected string matches what JSON.stringify prints. Check 6's `grep -n -- '--tsv' test/*.js` and check 7's grep on README.md are valid. The builder's execFileSync approach and the JS string `[{\"a\\\\tb\":\"1\\\\t2\"}]\\n` are valid. One minor point: the advisory example `node bin/csv2json.js foo --tsv` gets no stdin and could wait for input. It is only an illustrative \"e.g.\" outside PASS/FAIL, so I did not count it as a break.",
+  "model": "claude-opus-5-5",
+  "ms": 14250,
+  "tokens": {
+    "input": 2,
+    "output": 1348,
+    "cacheCreation": 5713,
+    "cacheRead": 783,
+    "fresh": 7063,
+    "total": 7846
+  },
+  "at": "2026-11-05T08:38:09.698Z"
+}

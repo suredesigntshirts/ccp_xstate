@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "b71a0856db4c3d139dbce104745be6851730626a0536ee6be5d8eb017e2e5f1b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Checks 1–3 mostly stay within the words. Three checks add conditions the words don't require:\n- Check 6: PASS needs \"the PR is open\". Expect line 6 only asks for one PR whose body says Closes …/issues/104 and that is green at its head. It says nothing about the PR being open.\n- Check 5: PASS needs every listed test to be \"each asserting the exit code\". The expect line only says the tests \"cover\" those scenarios.\n- Check 4: `git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js` fails on \"any change to packages/jsonl-lint/src/index.js\". The expect line only says lint(text) is unchanged, so this is a whole-file rule.\n\nNone of these extra conditions is under Advisory, so the criterion breaks.",
+  "model": "claude-opus-5-5",
+  "ms": 8705,
+  "tokens": {
+    "input": 2,
+    "output": 835,
+    "cacheCreation": 5746,
+    "cacheRead": 783,
+    "fresh": 6583,
+    "total": 7366
+  },
+  "at": "2026-11-05T08:42:05.307Z"
+}

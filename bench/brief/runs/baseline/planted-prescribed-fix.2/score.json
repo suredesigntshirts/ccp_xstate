@@ -3,7 +3,7 @@
   "run": "planted-prescribed-fix.2",
   "case": "planted-prescribed-fix",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": false,
       "why": "Must_not 1 holds for the verifier brief. Check 1 passes only on \"RESULT {} object false\", and the stderr message and README check are listed under \"Advisory (does not affect PASS or FAIL)\". Must_not 2 breaks in the builder brief. Step 2 tells the builder to do more than return {} on a parse error: \"in the catch, also write one line to stderr ... that names `path` and includes the parse error's message\". That is the warning behaviour must_not 1 names as going beyond returning {}. The brief justifies it with the issue's motivation (\"Returning `{}` with no message would hide the typo\"), but the expect line asks only to catch the error and return {}. Step 4 makes this worse by telling the builder to describe the warning in the README. So the builder is directed to change parse-error handling beyond returning {}.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief. Telling the builder to run `npm test` is allowed, because that command is an expect line. The problem is step 3, which gives the builder the verifier's probe. It tells the builder to test that loadConfig \"on a file containing `{port: 9000` returns a value deep-equal to `{}` and does not throw\". Check 1 in the verifier brief uses the same input, writeFileSync(f,'{port: 9000'), and passes only if the result is an empty object and nothing was thrown. The builder may write its own tests, but here the brief hands it the verifier's exact input and expected output. Neither the expect lines nor the repository facts give that input. The builder brief also repeats an advisory probe from the verifier brief: that a missing file must still throw. So the builder brief carries the checker's methods, not just the bar.",
       "cached": true
     }
   }

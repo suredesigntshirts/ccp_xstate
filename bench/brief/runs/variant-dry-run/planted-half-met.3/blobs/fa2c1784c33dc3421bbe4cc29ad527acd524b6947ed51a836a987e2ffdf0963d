@@ -1,0 +1,30 @@
+Verify the pull request for https://github.com/o/strutil/issues/7 at its head commit. Run every command from the repository root. There is one check per expect line, in order.
+
+Check 1 — expect: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+  node --input-type=module -e 'import { padLeft } from "./index.js"; const c = [[padLeft("42", 5, "0"), "00042"], [padLeft("42", 5), "   42"], [padLeft("ab", 4, "*"), "**ab"], [padLeft("x", 1, "0"), "x"], [padLeft("", 3, "0"), "000"]]; let ok = true; for (const [got, want] of c) { const pass = got === want; ok = ok && pass; console.log(JSON.stringify(got), pass ? "==" : "!=", JSON.stringify(want)); } console.log(ok ? "ALL OK" : "MISMATCH");'
+PASS: the import succeeds and the last line is ALL OK (left padding with the given fill, a space when fill is omitted, to exactly width characters).
+FAIL: an import error (padLeft not exported), any thrown error, or MISMATCH.
+
+Check 2 — expect: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+  node --input-type=module -e 'import { padLeft } from "./index.js"; const c = [["00042", 5, "0"], ["123456", 5, "0"], ["hello", 3], ["abc", 0, "*"]]; let ok = true; for (const [s, w, f] of c) { const got = padLeft(s, w, f); const pass = got === s; ok = ok && pass; console.log(JSON.stringify([s, w, f]), "->", JSON.stringify(got), pass ? "unchanged" : "CHANGED"); } console.log(ok ? "ALL OK" : "MISMATCH");'
+PASS: every line says unchanged and the last line is ALL OK.
+FAIL: any CHANGED line, MISMATCH, or an error.
+
+Check 3 — expect: "README.md has a section for every function index.js exports"
+Run:
+  node --input-type=module -e 'import * as m from "./index.js"; import fs from "node:fs"; const r = fs.readFileSync("README.md", "utf8"); const fns = Object.keys(m).filter((k) => typeof m[k] === "function"); const miss = fns.filter((k) => !new RegExp("^#{1,6}\\s+`?" + k + "\\b", "m").test(r)); console.log("exports: " + fns.join(",")); console.log(miss.length ? "MISSING: " + miss.join(",") : "ALL PRESENT");'
+Then open README.md and confirm each matched heading starts a section that actually describes that function.
+PASS: the script prints ALL PRESENT, and every exported function (including slugify, which had no section before this change, and padLeft) has its own heading with a description beneath it.
+FAIL: the script prints MISSING for any name, or some function's heading has no describing content.
+
+Check 4 — expect: "npm test passes"
+Run:
+  npm test
+PASS: exit code 0 and the summary shows fail 0.
+FAIL: non-zero exit code or any failing test.
+
+Advisory (not part of any PASS/FAIL):
+- Note whether test/strutil.test.js gained padLeft tests and whether existing tests were left intact.
+- Note behaviour with a multi-character fill or non-string input, if you look, but do not fail on it.

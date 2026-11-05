@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-prescribed-fix.2",
+  "case": "planted-prescribed-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1's PASS needs the command to print `{}` and src/config.js to show \"loadConfig catching the error thrown by JSON.parse and returning {}\". Its FAIL cases are a throw or non-zero exit, output other than `{}`, the function not being exported, and the result not coming from the catch. The \"not exported\" case is the closest to being stricter than the words. I still count it as within them: the line names loadConfig(path) in src/config.js as the module's function, and the code already exports it. Check 2 only requires that `npm test` exits 0 with no failing tests. Every stricter item sits under \"Advisory (not part of PASS or FAIL)\": valid JSON still parsing, a missing file still throwing, the replaced test, the README and the error-reporting gap.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs. `npm test` exists: package.json defines \"test\":\"node --test\", and the briefs run it from the repository root. The verifier's `node --input-type=module -e \"import { loadConfig } from './src/config.js'; ... process.argv[1] ...\" <path>` is valid. With -e, process.argv[1] is the first extra argument. The relative import resolves from the root, where src/config.js exists. The shell quoting is sound: single quotes sit inside double quotes, with no $ or backticks to expand. The JavaScript syntax is valid. The briefs name src/config.js, src/app.js, test/config.test.js and README.md, and all four are tracked files. One thing can't be confirmed here: whether src/config.js is ESM or CommonJS. Either way, current Node handles the named import. The \"write a temp file\" step is a plain instruction, not a literal command. I found nothing that would fail as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one. Item 1: the conflict is raised outside the PASS/FAIL conditions. The verifier's Advisory says \"Returning {} silently does not do that… Note this as a gap for follow-up\". Another Advisory note says README is out of date \"because src/app.js will start with defaults\" rather than stopping with exit 1. Builder step 6 adds a PR note that the fix \"silently falls back to {}\" and doesn't report the broken file. Item 2: builder step 3 replaces the 'bad JSON throws' test with one where bad JSON deep-equals {}, and step 5 requires npm test to pass. Item 3: verifier Check 1 calls loadConfig on a file containing `{port: 9000`. It PASSes when the command exits 0 and prints exactly `{}`, and FAILs on a throw.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against the two briefs.\n\n1. The verifier's PASS for Check 1 asks only that the command \"exits 0 and prints exactly `{}`\" and that the JSON.parse error is caught and {} returned. FAIL lists only throwing, wrong output, a missing export, or {} not coming from the catch. Neither condition asks for a file name, a line or a warning. The missing file/location report shows up only in the Advisory section, which is labelled \"not part of PASS or FAIL\" and \"not a failure of either line\".\n\n2. The builder brief says \"When JSON.parse throws, return {} instead of throwing\" and catches only the parse error. It doesn't ask for a clearer error or logging. Step 6 only asks for a note in the PR description about a possible follow-up, which doesn't change what happens on a parse error.\n\nNeither forbidden behaviour appears in either brief.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, looking for probes that appear in both. Builder step 3 tells it to write a test that \"`loadConfig(file('{port: 9000'))` deep-equals {}\". Verifier Check 1 uses the same probe: it writes invalid JSON \"such as `{port: 9000`\" and passes only if loadConfig returns exactly `{}`. The rule does let the brief tell the builder to write its own tests. Here, though, the brief supplies the exact input and expected output the checker uses, so the builder gets the checker's probe rather than only the bar. Step 3 also asks for a test that a missing path still throws, which repeats a verifier advisory check. Step 2's try/catch around JSON.parse repeats the verifier's read check but mostly restates the expect line. The shared `{port: 9000` → `{}` probe is enough to break the criterion.",
+      "cached": true
+    }
+  }
+}

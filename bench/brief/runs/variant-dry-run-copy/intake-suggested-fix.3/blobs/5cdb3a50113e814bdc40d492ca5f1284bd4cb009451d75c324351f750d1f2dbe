@@ -1,0 +1,38 @@
+Run every check at the PR head from the repository root, on Node v22 (`node --version`). The base commit is fd3ea30. Each check matches one expect line, in the same order.
+
+Check 1. Expect: "Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`, `  "port": 9000,`, `  greeting: "x"`, `}`, exits with code 1 and prints nothing on stdout (in particular no `listening on` line)."
+Run:
+d=$(mktemp -d); printf '{\n  "port": 9000,\n  greeting: "x"\n}\n' > "$d/c.json"; node src/app.js "$d/c.json" >"$d/out" 2>"$d/err"; echo "exit $?"; echo "--stdout:"; cat "$d/out"; echo "--stderr:"; cat "$d/err"; echo "--path given: $d/c.json"
+PASS: it prints `exit 1` and nothing between `--stdout:` and `--stderr:` (stdout is empty, so no `listening on` line).
+FAIL: any other exit code, or any stdout output.
+Keep this shell open: check 2 uses the same `$d`.
+
+Check 2. Expect: "In that same run, stderr contains `bad config:`, the full path `<tmp>/c.json` exactly as passed on the command line, the line number `3` and the column number `3` of the mistake."
+Using the stderr captured in check 1 (or run this, which repeats that setup):
+d=$(mktemp -d); printf '{\n  "port": 9000,\n  greeting: "x"\n}\n' > "$d/c.json"; node src/app.js "$d/c.json" 2>"$d/err"; cat "$d/err"; grep -qF 'bad config:' "$d/err" && echo HAS_PREFIX; grep -qF "$d/c.json" "$d/err" && echo HAS_PATH
+PASS: it prints both `HAS_PREFIX` and `HAS_PATH`, and the printed stderr states line 3 and column 3 of the mistake (e.g. `line 3 column 3`, `3:3`, or `line 3, column 3`).
+FAIL: `HAS_PREFIX` or `HAS_PATH` is missing (the path is absent or altered, e.g. resolved differently from the argument), or stderr gives no line 3 / column 3. At the base commit this check fails: stderr has no path.
+
+Check 3. Expect: "Calling `loadConfig(path)` on a file containing `{port: 9000` throws instead of returning a value, and the thrown error's `message` contains `path`."
+Run:
+d=$(mktemp -d); printf '{port: 9000' > "$d/b.json"; node --input-type=module -e "import {loadConfig} from './src/config.js'; try { const v = loadConfig('$d/b.json'); console.log('RETURNED', JSON.stringify(v)); process.exit(2) } catch (e) { console.log(e.message.includes('$d/b.json') ? 'OK' : 'NO PATH: ' + e.message) }"
+PASS: it prints `OK`.
+FAIL: it prints `RETURNED ...` (loadConfig returned a value, e.g. `{}`) or `NO PATH: ...`. At the base commit it prints `NO PATH: ...`.
+
+Check 4. Expect: "Running `node src/app.js <tmp>/ok.json`, where ok.json contains `{\"port\": 9000}`, exits 0 and prints `listening on 9000` on stdout. `loadConfig` on that file returns `{ port: 9000 }`."
+Run:
+d=$(mktemp -d); printf '{"port": 9000}' > "$d/ok.json"; node src/app.js "$d/ok.json"; echo "exit $?"; node --input-type=module -e "import {loadConfig} from './src/config.js'; console.log(JSON.stringify(loadConfig('$d/ok.json')))"
+PASS: the output is exactly `listening on 9000`, `exit 0`, `{"port":9000}` on three lines.
+FAIL: any other output or exit code.
+
+Check 5. Expect: "`npm test` passes, and the test suite has at least one test that fails at the current base commit and checks that the error from malformed config JSON includes the file path."
+Run at the PR head:
+npm test; echo "exit $?"
+Then run the PR's tests against the base commit's source, and restore it afterwards:
+git checkout fd3ea30 -- src && npm test; echo "exit $?"; git checkout HEAD -- src; git status --short
+PASS: the first run ends with `# fail 0` and `exit 0`. The second run (base `src/`, PR `test/`) has at least one failing test, and reading that test in `test/` shows it asserts that the error from malformed config JSON (its message, or app stderr) includes the file path. `git status --short` is empty afterwards.
+FAIL: the first run fails, or the second run has no failing test, or no failing test checks the file path in the malformed-JSON error.
+
+Advisory (not part of PASS/FAIL):
+- Read `src/config.js` to see whether the line and column are computed from the file text/position, or only come from Node's own message. If they come only from Node's message, note that other Node versions may print no line/column.
+- Confirm `loadConfig` does not swallow errors or return `{}`/defaults, and that a missing file still gives an exit-1 `bad config:` line (e.g. `node src/app.js /nonexistent.json; echo $?`).

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "28d5661afe39f9a1c0d212b9521e32305fcb2f190f83481b788738f7d6ac871b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for shared inputs with expected outputs. Most of the builder brief restates the expect lines or tells the builder to write and run its own tests, which the criterion allows. One verifier probe leaks into it, though. Builder step 4(c) gives the input `{\"a\":1}\\n{\"b\":` and says \"the last line is reported\". That is the verifier's `torn.jsonl` fixture exactly (`{\"a\":1}\\n{\"b\":`), and Check 1 expects it to print `<path>:2: ` and exit 1. Since an input and its expected result appear in both briefs, the builder sees part of the checker's test set. The other checks didn't leak: no other verifier fixture, PASS/FAIL condition or inline script appears in the builder brief.",
+  "model": "claude-opus-5-5",
+  "ms": 7032,
+  "tokens": {
+    "input": 2,
+    "output": 586,
+    "cacheCreation": 5112,
+    "cacheRead": 783,
+    "fresh": 5700,
+    "total": 6483
+  },
+  "at": "2026-11-05T08:29:46.862Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "d84cd3adb1dbd86098e9eb07e6fd5d952f0175a49cebc57d705b219646d96959",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items, and the briefs handle both.\n\nItem 1: The builder brief names \"test/csv.test.js uses node:test and execFileSync to run the CLI\" in its current state, then says \"Keep the existing tests passing\". It also requires the CSV behaviour to keep working, both as a pre-PR check and as an acceptance line: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` -> `[{\"a\":\"1\",\"b\":\"2\"}]`. It tells the builder to leave src/parse.js alone (\"The simplest change is to src/parse.js not at all\", which is garbled but clear enough) and to call parse(text) \"exactly as now\" without the flag. So the CSV path is protected. One weakness: it never says outright that parse() is shared with the CSV path.\n\nItem 2: Verifier check 6 runs \"npm test; echo \\\"exit=$?\\\"\". The advisory says \"there is no such script\" for `npm run test:cli` and to use npm test instead.",
+  "model": "claude-opus-5-5",
+  "ms": 9963,
+  "tokens": {
+    "input": 2,
+    "output": 751,
+    "cacheCreation": 6243,
+    "cacheRead": 783,
+    "fresh": 6996,
+    "total": 7779
+  },
+  "at": "2026-11-05T08:44:12.539Z"
+}

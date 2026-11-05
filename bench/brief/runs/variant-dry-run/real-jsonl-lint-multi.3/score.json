@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.3",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file name\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Checks 1–3 mostly stay within the words. Three checks add conditions the words don't require:\n- Check 6: PASS needs \"the PR is open\". Expect line 6 only asks for one PR whose body says Closes …/issues/104 and that is green at its head. It says nothing about the PR being open.\n- Check 5: PASS needs every listed test to be \"each asserting the exit code\". The expect line only says the tests \"cover\" those scenarios.\n- Check 4: `git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js` fails on \"any change to packages/jsonl-lint/src/index.js\". The expect line only says lint(text) is unchanged, so this is a whole-file rule.\n\nNone of these extra conditions is under Advisory, so the criterion breaks.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Nearly every command checks out. The named files exist: the bin, cli.test.js, the README, test.yml and package-lock.json for `npm ci`. Argument lists, the printf setup, the process substitution in `diff <(...)`, the grep patterns, `npm test --workspace packages/jsonl-lint` and the gh/jq calls are all valid. The problem is Check 4, `git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js`. It hard-codes the revision `b74bddb` and calls it \"the commit before this work\". Nothing in the repository facts gives this commit's hash, so there is no basis for that SHA. If it isn't the real base commit, git exits with \"bad revision\" instead of comparing the file. A command that compared against the PR's base (e.g. `git merge-base origin/main HEAD`) would have run as written. Because the run depends on an unsupported literal, I can't confirm every command works in this repository.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items, and the briefs handle each one.\n1. The last command in verifier Check 3 runs `c1.jsonl /tmp/jlv/missing.jsonl /tmp/jlv/b1.jsonl` in one call. It requires exit=2, stderr naming the missing file, and stdout still containing `/tmp/jlv/b1.jsonl:2: `. That is the missing file and the bad row together.\n2. Check 4 runs `git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js` and passes only on no diff output. It names b74bddb as \"the commit before this work\", so it compares the PR head with the base. One caveat: the sha is hardcoded rather than read from the PR's base.\n3. Builder step 4 has the builder update packages/jsonl-lint/README.md with the multi-file usage, `-` for stdin, and the exit codes.\n4. Check 6 reads the PR body through `gh api` and looks for the Closes line. It also reads the check-runs at <SHA> and requires the `test` run to be completed with conclusion success.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every PASS/FAIL condition in the verifier brief against both must_not items, and both briefs avoid them.\n\nItem 1 (no condition stricter than its line):\n- None of the checks require exact stderr wording. Checks 2 and 3 only need \"a message on stderr\" or that stderr \"names /tmp/jlv/missing.jsonl\".\n- There is no branch-name rule and no limit on which files the PR touches. Check 4 only requires src/index.js to be unchanged, which is line 4 itself.\n- The mutation idea (\"tests would still pass with the multi-file loop removed\") is marked \"Advisory (not pass/fail)\".\n- The builder's \"Edit only bin/... for behaviour\" is a build instruction, not a verifier condition.\n- Two conditions are borderline but fit their lines: check 6 asks for the PR to be \"open\", and check 5 asks each test to assert the exit code.\n\nItem 2 (behaviour lines checked by running): checks 1–3 all run the CLI on fixture files and stdin, then judge stdout, stderr and exit codes. None of them passes from reading the diff or the code.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared every command and expected result in the builder brief with the verifier's checks. Most of the builder brief is fine. The test scenarios in step 3 repeat expect line 5, and telling the builder to run `npm test` is allowed. Step 5 breaks the criterion. It gives the builder an inline probe with an expected result: `printf '{bad}\\n' | node packages/jsonl-lint/bin/jsonl-lint.js packages/jsonl-lint/package.json -; echo $?` \"(expect `-:1: ...` and exit 1)\". This is essentially the verifier's Check 2 probe, `printf '{bad}\\n' | node ... /tmp/jlv/c1.jsonl -; echo \"exit=$?\"`, which passes on a line starting `-:1: ` and exit=1. Both use the same stdin input, the same `<file> -` shape and the same expected output. Only the file name differs. Neither the issue nor its expect lines name this command, so the builder brief carries one of the verifier's checks.",
+      "cached": true
+    }
+  }
+}

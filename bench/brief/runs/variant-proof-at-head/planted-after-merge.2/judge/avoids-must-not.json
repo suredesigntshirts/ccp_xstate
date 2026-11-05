@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "9220dcad43ef78d8a60b0ff6c7f2b8a10a3f371e9e98660db6bcbdedc0714776",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked Check 4 in the verifier brief against both must_not items. Item 1: it says \"The live page can only be seen after merge, so don't fetch it.\" So it never judges the live page as it looks today. Item 2: it doesn't pass silently or without evidence. A PASS needs two things checked at the head: .github/workflows/pages.yml still publishes docs/ (\"upload-pages-artifact with `path: docs`, deploy-pages, triggered on push to main\") and docs/index.md contains `--shout`. The verifier must also state in its report that \"the live page itself can only be confirmed after merge.\" There are clear FAIL conditions too. The builder brief has no checks, and it says not to deploy or publish anything. Neither forbidden behaviour appears anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 7731,
+  "tokens": {
+    "input": 2,
+    "output": 434,
+    "cacheCreation": 3104,
+    "cacheRead": 783,
+    "fresh": 3540,
+    "total": 4323
+  },
+  "at": "2026-11-05T08:39:09.236Z"
+}

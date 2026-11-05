@@ -1,0 +1,34 @@
+Run everything from the repository root at the PR head. For exact-output checks, capture stdout to a file and compare bytes against the expected text with cmp, e.g. `printf '%s\n' 'EXPECTED' > /tmp/exp; <command> > /tmp/out; echo "exit=$?"; cmp /tmp/out /tmp/exp && echo SAME`, using single quotes so the expected JSON is literal.
+
+Check 1 — expect: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv` prints exactly `[{"a":"1","b":"2"}]` followed by a newline and exits 0.
+Run: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv > /tmp/o1; echo "exit=$?"; printf '%s\n' '[{"a":"1","b":"2"}]' > /tmp/e1; cmp /tmp/o1 /tmp/e1 && echo SAME`.
+PASS: exit=0 and SAME. FAIL: nonzero exit, or any byte difference (missing/extra newline, different content).
+
+Check 2 — expect: With --tsv, commas inside a field stay literal: `printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv` prints exactly `[{"name":"x","note":"hello, world"}]` followed by a newline.
+Run: `printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv > /tmp/o2; printf '%s\n' '[{"name":"x","note":"hello, world"}]' > /tmp/e2; cmp /tmp/o2 /tmp/e2 && echo SAME`.
+PASS: SAME. FAIL: any byte difference.
+
+Check 3 — expect: With --tsv and several data rows, every row comes out in order: `printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv` prints exactly `[{"a":"1","b":"2"},{"a":"3","b":"4"}]` followed by a newline.
+Run: `printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv > /tmp/o3; printf '%s\n' '[{"a":"1","b":"2"},{"a":"3","b":"4"}]' > /tmp/e3; cmp /tmp/o3 /tmp/e3 && echo SAME`.
+PASS: SAME. FAIL: any byte difference, missing row, or wrong order.
+
+Check 4 — expect: Without the flag, CSV still works as before: `printf 'a,b\n1,2\n' | node bin/csv2json.js` prints exactly `[{"a":"1","b":"2"}]` followed by a newline.
+Run: `printf 'a,b\n1,2\n' | node bin/csv2json.js > /tmp/o4; printf '%s\n' '[{"a":"1","b":"2"}]' > /tmp/e4; cmp /tmp/o4 /tmp/e4 && echo SAME`.
+PASS: SAME. FAIL: any byte difference.
+
+Check 5 — expect: Without the flag, tabs are not treated as separators: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js` prints exactly `[{"a\tb":"1\t2"}]` followed by a newline, which is the current output.
+Run: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js > /tmp/o5; printf '%s\n' '[{"a\tb":"1\t2"}]' > /tmp/e5; cmp /tmp/o5 /tmp/e5 && echo SAME`. (Here `%s` keeps `\t` as the two literal characters backslash and t, which is the JSON tab escape the output must contain.)
+PASS: SAME. FAIL: any byte difference, e.g. output split into keys a and b, or raw tab bytes instead of the \t escape.
+
+Check 6 — expect: `npm test` exits 0, and test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and checks its output.
+Run: `npm test; echo "exit=$?"`. Then `grep -n -- '--tsv' test/*` and read the matching test(s).
+PASS: exit=0, and at least one test under test/ executes bin/csv2json.js with the --tsv argument, feeds it input containing tab characters, and asserts on its output. FAIL: nonzero exit, or no such test (e.g. only parse() is called directly, the input has no tabs, or the output is not asserted).
+
+Check 7 — expect: README.md documents the --tsv flag with an example invocation.
+Run: `cat README.md`.
+PASS: README.md mentions --tsv, says what the flag does (tab-separated input), and includes an example command running bin/csv2json.js with --tsv. FAIL: --tsv not mentioned, no example invocation using it, or no description of its meaning.
+
+Advisory (not PASS/FAIL conditions):
+- Note if --tsv placed after other arguments also works (e.g. `node bin/csv2json.js foo --tsv`).
+- Note if the diff adds a general --sep option, quoting rules, --help, or changes JSON formatting; these are non-goals.
+- Note if the existing CSV tests in test/csv.test.js were removed or weakened.

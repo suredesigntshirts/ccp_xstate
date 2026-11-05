@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "15cf87433c3b1de6159ffbae693b0729b2121f1aa390c268dc32879a0bd8d2fc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief against each verifier check. The builder brief has no PASS/FAIL wording. It doesn't include the verifier's inline `node --input-type=module` probes, the `assert.deepEqual` / `EQUAL` script, or the merge-base/worktree method from Check 5. Step 6 has the builder run `node src/app.js $d/c.json` on the four-line file and expect exit 1, no stdout and `bad config:`, path, 3/3 on stderr. That is the command from the issue's proofs 1–2, and the expected results restate expect lines 1–2, which counts as the bar. Step 5 asks the builder to write its own tests, using inputs from the expect lines (`{port: 9000`, the four-line file). The criterion allows that. \"Run `npm test`\" is also allowed. Nothing in the builder brief is a check that belongs only to the verifier.",
+  "model": "claude-opus-5-5",
+  "ms": 13331,
+  "tokens": {
+    "input": 2,
+    "output": 798,
+    "cacheCreation": 5376,
+    "cacheRead": 783,
+    "fresh": 6176,
+    "total": 6959
+  },
+  "at": "2026-11-05T08:38:34.109Z"
+}

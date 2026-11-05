@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "75fe03804ff02ad5fb564f417b257d9cab235b22acf810a27c9113b7097e9ff0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Neither must_not item shows up in the briefs. First item: the builder brief does have the builder catch the error, but only to throw it again: \"Wrap only the `JSON.parse` call in try/catch. On a parse error, throw a new error…\". It also forbids the bad fix outright: \"Do NOT make `loadConfig` catch the error and return `{}` or the defaults\". So loadConfig never catches the error and returns a value. Second item: the verifier's Check 2 isn't tied to one exact format. The grep for HAS_LOC accepts both `line 3 … column 3` and `:3:3`. The PASS rule also says \"HAS_LOC counts, and so does any other clear line-3/column-3 wording you can see in the printed stderr.\" It fails only when the prefix, the path or the line/column is missing, not when the wording or order is different. Check 1's FAIL conditions cover only the exit code and stdout.",
+  "model": "claude-opus-5-5",
+  "ms": 6198,
+  "tokens": {
+    "input": 2,
+    "output": 496,
+    "cacheCreation": 5763,
+    "cacheRead": 783,
+    "fresh": 6261,
+    "total": 7044
+  },
+  "at": "2026-11-05T08:39:12.893Z"
+}

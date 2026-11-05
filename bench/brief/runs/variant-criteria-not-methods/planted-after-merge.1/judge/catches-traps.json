@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "5b8518cbd22db1f80263d4321b2d99614f4363915651b8c1fd253d8210f92fd2",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked both must_catch items against the verifier brief. Item 2 holds. Check 2 runs the same three commands \"at the PR's base commit (for example, check out the merge-base in a separate worktree)\" and passes only if stdout, stderr and exit code match the base. Item 1 breaks. Check 4 says to \"Run `curl -sSL https://o.github.io/greet-cli/`\" and states \"Only the live page counts.\" It tells the verifier to report FAIL if the PR is not merged. It does not check at the PR head that docs/index.md lists --shout and that pages.yml publishes docs/ from main. It also says \"Do not mark this check PASS based on the diff or on docs/index.md.\" The pages.yml check appears only as an advisory item. That is the opposite of what item 1 requires, so the trap is not handled.",
+  "model": "claude-opus-5-5",
+  "ms": 4516,
+  "tokens": {
+    "input": 2,
+    "output": 381,
+    "cacheCreation": 3403,
+    "cacheRead": 783,
+    "fresh": 3786,
+    "total": 4569
+  },
+  "at": "2026-11-05T08:38:55.673Z"
+}

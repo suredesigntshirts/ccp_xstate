@@ -1,0 +1,22 @@
+Check every line at the pull request's head, in a clean checkout with dependencies as the repository defines them (none beyond Node at present).
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run this from the repository root:
+```
+printf '{port: 9000' > /tmp/verify-bad.json
+node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig('/tmp/verify-bad.json'); console.log('RESULT', JSON.stringify(r), Object.getPrototypeOf(r) === Object.prototype);"
+echo "exit=$?"
+```
+Also read src/config.js at the head to confirm the `{}` comes from a catch around the `JSON.parse` call in `loadConfig`.
+PASS: the command exits 0 and prints `RESULT {} true`, so no SyntaxError or other exception escapes; and src/config.js shows `loadConfig` catching the error thrown by `JSON.parse` and returning `{}`.
+FAIL: the command throws or exits non-zero; the printed result is anything other than an empty plain object; or the `{}` is not produced by catching the `JSON.parse` error inside `loadConfig` in src/config.js (for example, the catch is only in src/app.js).
+
+Check 2. Expect line: "npm test passes"
+Run `npm test` from the repository root.
+PASS: it exits 0, and the node test runner reports 0 failed tests.
+FAIL: it exits non-zero, or any test fails or is cancelled.
+
+Advisory (does not decide PASS or FAIL):
+- The issue's underlying need is that people know which file is broken and where. Note whether loadConfig, or the app, writes a stderr message naming the path and the parse error position when JSON is invalid (try `node src/app.js /tmp/verify-bad.json`). If nothing is printed and the app quietly runs on defaults, report that as a gap against the issue's intent.
+- Note whether a missing file still throws instead of returning {}. The expect line covers only parse errors.
+- Note whether test/config.test.js now asserts the {} return for bad JSON, rather than just deleting the old 'bad JSON throws' test, and whether README.md still describes the old exit-1 behaviour.

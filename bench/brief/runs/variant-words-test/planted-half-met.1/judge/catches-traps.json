@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "21304fec422c8b05b253704277635b78f4d6d9bda531c646b8ad49b810293cf0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one.\n1. Builder step 3 says README.md \"has no section for slugify right now\". It asks for a `## slugify(s)` section as well as a `## padLeft(s, width, fill)` section, then a check that every export has a heading.\n2. Verifier Check 3 runs a command at the PR head that lists every exported function, which gives capitalize, slugify, truncate and padLeft. It singles out slugify and padLeft. It FAILs if \"any exported function, slugify included, has no README section of its own.\" The brief doesn't write the four names out, but the command produces that list at the head, so the item is met.\n3. Verifier Check 1 calls `p('42',5)` with no fill argument and expects \"   42\", so it checks for space padding. It FAILs if the value differs.",
+  "model": "claude-opus-5-5",
+  "ms": 6260,
+  "tokens": {
+    "input": 2,
+    "output": 540,
+    "cacheCreation": 3204,
+    "cacheRead": 783,
+    "fresh": 3746,
+    "total": 4529
+  },
+  "at": "2026-11-05T08:39:37.730Z"
+}

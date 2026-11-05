@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "13fadad0ae39a080493c8645fd98263174fe47aaf141e1019f47e05782fa3430",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for probes that appear in both. Builder step 3 tells it to write a test that \"`loadConfig(file('{port: 9000'))` deep-equals {}\". Verifier Check 1 uses the same probe: it writes invalid JSON \"such as `{port: 9000`\" and passes only if loadConfig returns exactly `{}`. The rule does let the brief tell the builder to write its own tests. Here, though, the brief supplies the exact input and expected output the checker uses, so the builder gets the checker's probe rather than only the bar. Step 3 also asks for a test that a missing path still throws, which repeats a verifier advisory check. Step 2's try/catch around JSON.parse repeats the verifier's read check but mostly restates the expect line. The shared `{port: 9000` → `{}` probe is enough to break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 9406,
+  "tokens": {
+    "input": 2,
+    "output": 785,
+    "cacheCreation": 2807,
+    "cacheRead": 783,
+    "fresh": 3594,
+    "total": 4377
+  },
+  "at": "2026-11-05T08:41:22.290Z"
+}

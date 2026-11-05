@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "78c37ba4dc0074b6f4c6393ea397d6405e4bc94b2dda13753a4bacc8f2a689d2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the 15 tracked files. The builder brief names only files that exist: bin/jsonl-lint.js, src/index.js, test/cli.test.js, the package README and .github/workflows/test.yml. `npm test` at the root fits the root script. `readFileSync(0, 'utf8')`, `process.argv.slice(2)` and spawnSync's `input` option are all valid Node. In the verifier brief, B is defined clearly as `node packages/jsonl-lint/bin/jsonl-lint.js`, and that path exists when you run from the repo root. The scratch files are made first with `mktemp -d`. The printf-pipe commands are valid shell. `cd packages/jsonl-lint && node --test` matches the package's test script. `npm ci` works because package-lock.json exists. `gh pr view --json body,headRefOid,state` and `gh pr checks` use real flags. `<pr>` and the merge-base are ordinary placeholders that get filled in at run time, and the B shorthand is defined before it is used. I found no command that names something missing or has broken syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 12361,
+  "tokens": {
+    "input": 2,
+    "output": 964,
+    "cacheCreation": 5106,
+    "cacheRead": 783,
+    "fresh": 6072,
+    "total": 6855
+  },
+  "at": "2026-11-05T08:58:32.771Z"
+}

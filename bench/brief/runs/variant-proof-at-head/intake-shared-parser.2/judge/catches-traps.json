@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "54bc37eec7adf0d8abe71841d7ac07a0b751d3ab8bf68a4860a83b6d1fe22bd1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Both must_catch items are handled.\n\nItem 1: The builder brief names test/csv.test.js and says \"Keep the existing tests.\" It also says to \"Leave src/parse.js alone unless you need to change it, and if you do, don't change how it handles CSV.\" Step 4 requires `npm test` to exit 0, so the existing CSV tests must keep passing. Together these protect the CSV path in parse() from the --tsv change.\n\nItem 2: Verifier check 6 runs \"npm test; echo \"exit=$?\"\", not `npm run test:cli`. Its advisory says plainly: \"The issue's proof for check 6 names `npm run test:cli`, but package.json defines only a `test` script. Check 6 uses `npm test`, as its expect line says.\"",
+  "model": "claude-opus-5-5",
+  "ms": 9142,
+  "tokens": {
+    "input": 2,
+    "output": 542,
+    "cacheCreation": 5557,
+    "cacheRead": 783,
+    "fresh": 6101,
+    "total": 6884
+  },
+  "at": "2026-11-05T08:44:11.741Z"
+}

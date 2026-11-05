@@ -1,0 +1,11 @@
+Goal: one pull request that meets both of these lines:
+1. "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+2. "npm test passes"
+
+Steps:
+1. Read src/config.js, src/app.js, test/config.test.js and README.md. Today loadConfig(path) returns JSON.parse(readFileSync(path, 'utf8')), so bad JSON throws a SyntaxError. src/app.js catches any error from loadConfig, prints `bad config: <message>` and exits 1, and README.md describes that behaviour.
+2. In src/config.js, wrap only the JSON.parse call in try/catch so that when the file text is not valid JSON, loadConfig returns {} instead of throwing. Leave the readFileSync call outside the try, so a missing or unreadable file still throws as before. Keep the export name and the signature loadConfig(path).
+3. Optional, and it serves the issue's aim that people can tell which file is broken and where: in the catch, write a one-line warning to stderr that names the path and the parse error message (for example `bad config <path>: <error.message>`) before returning {}. The function must still return {} and must not throw.
+4. Update test/config.test.js. The existing test 'bad JSON throws' expects a SyntaxError, which contradicts line 1. Replace it with a test that loadConfig on a file containing `{port: 9000` returns {} (assert.deepEqual) and does not throw. Keep the 'reads a config' test.
+5. Update README.md so it describes the new behaviour: a file that is not valid JSON is ignored and the app starts with its defaults. If you added the stderr warning, mention it. Leave src/app.js working; its try/catch can stay for read errors.
+6. Run `npm test` from the repository root and make sure every test passes. Then open the pull request and include the npm test output in its description.

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "73553b4cc8eb6b8a78b69b05045d62b63eb9197ae75bc19048ee59ec9459854c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, and the builder brief contains the verifier's probes. Builder step 2 gives \"padLeft('42', 5, '0') === '00042', padLeft('ab', 4) === '  ab'\". Step 4 adds padLeft('abcde', 5, '0') === 'abcde' and padLeft('abcdef', 3) === 'abcdef'. These are the same inputs and expected outputs the verifier uses in Check 1 ([\"00042\",\"  ab\",...]) and Check 2 ([\"abcde\",\"abcdef\",...]). Step 5 also has the builder run an export-listing node -e command and match the names to README headings. That is essentially the probe in verifier Check 3. Step 3 repeats the verifier's specific note that README.md has no slugify section. Telling the builder to write its own tests is allowed. Here, though, the brief supplies the checker's exact input/output sets, so the methods are not kept private.",
+  "model": "claude-opus-5-5",
+  "ms": 7547,
+  "tokens": {
+    "input": 2,
+    "output": 687,
+    "cacheCreation": 3222,
+    "cacheRead": 783,
+    "fresh": 3911,
+    "total": 4694
+  },
+  "at": "2026-11-05T08:39:58.688Z"
+}

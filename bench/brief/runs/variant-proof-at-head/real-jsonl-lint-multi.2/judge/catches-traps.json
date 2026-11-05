@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "88c89a0f7bc563fd386af451cf39de2a6dccd3e7e57545c6dba361cc77b4639e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs handle all four must_catch items.\n1. Check 3 runs `node B c1.jsonl missing.jsonl b.jsonl` in one command. It requires exit 2, stderr naming missing.jsonl, and \"stdout must still contain the b.jsonl:2 and b.jsonl:3 lines\". So the missing file and the bad rows are tested together.\n2. Check 4 runs `git diff $(git merge-base origin/main HEAD) HEAD -- packages/jsonl-lint/src/index.js`, which compares the head with the base commit.\n3. Builder step 5 says \"Update packages/jsonl-lint/README.md\" and lists the usage, stdin, order and exit codes it must describe.\n4. Check 6 uses `gh pr view` for the body and headRefOid and `gh pr checks` on the PR. It requires the Closes line and that \"the test workflow check for the head commit succeeded\".",
+  "model": "claude-opus-5-5",
+  "ms": 7002,
+  "tokens": {
+    "input": 2,
+    "output": 657,
+    "cacheCreation": 5268,
+    "cacheRead": 783,
+    "fresh": 5927,
+    "total": 6710
+  },
+  "at": "2026-11-05T08:42:27.941Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "678ea31441d728ae2ea169df844dd8c59618b06d53b2743a0cf7795940881ddc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I checked every command in both briefs against the 6 tracked files and package.json.\n\n- `npm test` maps to `node --test`. That picks up `test/csv.test.js`, which exists.\n- `bin/csv2json.js` and `README.md` exist.\n- The `printf '…\\t…' | node bin/csv2json.js [--tsv] > /tmp/…` pipelines are valid shell, and `printf` turns `\\t` and `\\n` into tabs and newlines.\n- `grep -n -- '--tsv' README.md` puts `--` before the pattern, so grep doesn't read `--tsv` as an option.\n- The `node -e '…process.argv[1]…' FILE` helper is correct, since under `-e` the first extra argument is `argv[1]`. FILE is a placeholder for the output files.\n- The JavaScript in the briefs, such as `parse(input, '\\t')`, is valid.\n- The README usage example `node bin/csv2json.js --tsv < table.tsv` is text to document, not a command to run.\n\nI found no command that names a missing file or script, passes a bad argument, or has broken syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 9088,
+  "tokens": {
+    "input": 2,
+    "output": 850,
+    "cacheCreation": 2920,
+    "cacheRead": 783,
+    "fresh": 3772,
+    "total": 4555
+  },
+  "at": "2026-11-05T08:40:13.718Z"
+}

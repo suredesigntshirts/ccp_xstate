@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "e4b648dfc182a46fbeb657e437079b5f431a323a086ab93508d881a919101c2d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 tests only `exit 1` and empty stdout. The stderr greps run there are used only in Check 2. Check 2 tests `bad config:`, the exact path, and line 3 / column 3, and it accepts any clear wording for the location. Check 3 tests only that the call throws and that the message includes the path (`OK` vs `RETURNED`/`NO PATH`). Check 4 requires `listening on 9000`, exit 0, and a deepEqual against `{ port: 9000 }`. Its \"any other stdout\" reads as stdout that differs from the expected line, which the expect line covers. Check 5 requires `# fail 0` at the head and at least one path-asserting test that is `not ok` on the base. The stricter items are under \"Advisory (not pass/fail)\": whether line and column are computed by the repo, swallowed errors, ENOENT changes, and absolute paths. No PASS or FAIL condition adds an extra requirement.",
+  "model": "claude-opus-5-5",
+  "ms": 13563,
+  "tokens": {
+    "input": 2,
+    "output": 1249,
+    "cacheCreation": 5735,
+    "cacheRead": 783,
+    "fresh": 6986,
+    "total": 7769
+  },
+  "at": "2026-11-05T08:38:43.189Z"
+}

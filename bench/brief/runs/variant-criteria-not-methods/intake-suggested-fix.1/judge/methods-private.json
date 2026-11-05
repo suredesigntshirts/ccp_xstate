@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "65ad29762cb5ac650dde21bfbf33172757aaa8c1346ff31d44b0167200e0e997",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared the builder brief with the verifier brief, looking for shared PASS/FAIL conditions or probes. The builder brief has no PASS/FAIL wording. It does not include the verifier's scripts: the `wc -c` stdout check, the `node --input-type=module -e` loadConfig probe, the `git checkout <base> -- src` base-commit procedure, or the `/nonexistent.json` missing-file probe. It does repeat the expect lines word for word and tells the builder to run `npm test` and try the program by hand on c.json and ok.json. Those runs come from the expect lines and the issue's proofs, which the rule allows. The builder's tests (a)/(b) are tests it writes itself, which is also allowed. Step 3 says to \"Work out line and column yourself\" and gives a design check (\"position is 20\"). That check is not in the verifier brief, and the verifier's similar Advisory note comes from the issue's own proof 2. It is not a PASS/FAIL condition or a probe.",
+  "model": "claude-opus-5-5",
+  "ms": 10194,
+  "tokens": {
+    "input": 2,
+    "output": 944,
+    "cacheCreation": 5326,
+    "cacheRead": 783,
+    "fresh": 6272,
+    "total": 7055
+  },
+  "at": "2026-11-05T08:38:28.841Z"
+}

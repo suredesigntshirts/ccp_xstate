@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.3",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2 and 4 only test what their lines say: clamp is exported and limits x to the range, it throws a RangeError when lo > hi, and npm test passes. Check 3 is stricter than its line. \"README.md documents every function math.js exports\" says nothing about format. But the script's regex '^#+\\s*name\\s*\\(' requires a Markdown heading for each function. The PASS condition says \"each exported function has a heading\", and FAIL says \"any exported function has no heading in README.md\". A README that documented subtract or clamp in a list, a table or prose would fail even though the line's words are met. This heading-format rule belongs under Advisory, not in the PASS/FAIL conditions, so the criterion does not hold.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs. The builder's `npm test` works, since package.json defines `node --test`. Verifier checks 1, 2 and 4 are valid JavaScript inside double quotes and only use math.js and README.md, which exist. Check 3 breaks. Its regex pieces `'^#+\\\\s*'+n+'\\\\s*\\\\('` sit inside a double-quoted bash string, and bash turns each `\\\\` into `\\`. JavaScript then reads the string literals `'\\s*'` and `'\\('`, and those unnecessary escapes collapse to `s*` and `(`. So the pattern becomes `^#+s*adds*(`, which has an unclosed `(`. `new RegExp` throws \"SyntaxError: Invalid regular expression … Unterminated group\", so the command crashes even when README.md is correct. That means at least one command does not run as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs catch all three must_catch items.\n\nItem 1: Builder step 2 says to add both a \"### subtract(a, b)\" entry and a \"### clamp(x, lo, hi)\" entry. It also says \"Every name in math.js's module.exports must end up with its own heading.\"\n\nItem 2: Verifier check 3 reads the exports from math.js at the PR head, prints them (\"exports:\"), and exits 1 if any has no README heading. It names \"add, subtract, multiply and clamp\" and says to FAIL if any exported function is undocumented. It also points out that subtract was undocumented before this PR and must be documented now.\n\nItem 3: Verifier check 2 calls clamp with lo > hi in three cases, e.g. [5,10,0]. It throws unless `e instanceof RangeError`, and its FAIL condition covers any error that \"is not a RangeError\".",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 holds: Check 3 takes function names from Object.keys(require('./math.js')), so a README missing subtract fails. Item 2 breaks in Check 3. Its script requires each function to match the regex '^#+\\\\s*'+n+'\\\\s*\\\\(', a markdown heading like \"### name(\". PASS also needs \"each exported function has a heading with a description in README.md\". Line 3 only says README.md \"documents every function math.js exports\". A README documenting subtract in a list, a table or prose meets the line but fails this check. That is the \"specific README layout\" requirement the must_not list forbids. Checks 1, 2 and 4 match their lines and are not stricter.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief contains inputs and expected outputs taken from the verifier's probes, so the criterion fails. Builder step 3 names \"clamp(-5, 0, 100) === 0\", \"clamp(140, 0, 100) === 100\", \"clamp(42, 0, 100) === 42\" and \"assert.throws(() => clamp(5, 10, 0), RangeError)\". Verifier Check 1's case list uses the same first three: [-5,0,100,0], [140,0,100,100], [42,0,100,42]. Check 2 uses the same throwing call, [5,10,0]. The builder is allowed to write its own tests, but here it is handed the checker's exact cases rather than just the bar. Step 2's line \"Every name in math.js's module.exports must end up with its own heading\" also closely restates Check 3's heading test. Running npm test is allowed and is not the problem.",
+      "cached": true
+    }
+  }
+}

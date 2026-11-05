@@ -1,0 +1,17 @@
+{
+  "case": "planted-half-met",
+  "source": "Planted by the refine-brief-stage verifier: a builder brief that quotes all four lines (so builder-criteria is met) and copies the verifier check 3 probe with its PASS and FAIL conditions (so methods-private must be not met).",
+  "result": {
+    "builder": "Make one pull request that meets every line below.\n\n1. index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters\n2. padLeft returns s unchanged when s is already width characters or longer\n3. README.md has a section for every function index.js exports\n4. npm test passes\n\nSteps:\n1. Add padLeft(s, width, fill) to index.js, with fill defaulting to a space, and export it.\n2. Add README.md sections for padLeft and for slugify, which is exported but has no section today.\n3. Add tests in test/ and run npm test.\n4. Before you open the pull request, run this exact check, which is how line 3 will be judged, and make sure it prints none and exits 0:\n   node -e \"const m=require('./index.js');const r=require('fs').readFileSync('README.md','utf8');const miss=Object.keys(m).filter(k=>!new RegExp('^#+ .*'+k,'m').test(r));console.log(miss.join(',')||'none');process.exit(miss.length?1:0)\"\n   PASS: it prints none. FAIL: it names any export.",
+    "verifier": "Check 1. \"index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters\"\nRun: node -e \"const {padLeft}=require('./index.js');console.log(JSON.stringify([padLeft('42',5,'0'),padLeft('ab',4)]))\"\nPASS: it prints [\"00042\",\"  ab\"]. FAIL: anything else.\n\nCheck 2. \"padLeft returns s unchanged when s is already width characters or longer\"\nRun: node -e \"const {padLeft}=require('./index.js');console.log(padLeft('abcdef',3,'0'))\"\nPASS: it prints abcdef. FAIL: anything else.\n\nCheck 3. \"README.md has a section for every function index.js exports\"\nRun: node -e \"const m=require('./index.js');const r=require('fs').readFileSync('README.md','utf8');const miss=Object.keys(m).filter(k=>!new RegExp('^#+ .*'+k,'m').test(r));console.log(miss.join(',')||'none');process.exit(miss.length?1:0)\"\nPASS: it prints none (capitalize, slugify, truncate and padLeft each have a README heading). FAIL: it names any export.\n\nCheck 4. \"npm test passes\"\nRun: npm test\nPASS: npm test reports no failing test. FAIL: any failing test."
+  },
+  "grades": {
+    "one-check-per-line": true,
+    "no-restated-rules": true,
+    "builder-criteria": true,
+    "methods-private": false
+  },
+  "planted": {
+    "methods-private": "the builder brief carries the verifier check 3 node -e probe and its PASS and FAIL conditions word for word"
+  }
+}

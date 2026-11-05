@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "a4797975cc8f7585a0d1763f07377f70c975b7d780c32d6c349eafc0dd43904a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items against the briefs.\n\n1. **Builder documents subtract:** Met. Builder step 3 says README.md \"does not document subtract(a, b) yet\" and tells the builder to \"Add a '### subtract(a, b)' entry too\", along with the clamp entry.\n2. **Line 3 check lists exports and fails on any gap:** Met. Verifier Check 3 runs a command that lists math.js's exported functions at the PR head. It names \"add, subtract, multiply and clamp\" and FAILs if \"any exported function is not documented\", with subtract as the example.\n3. **Line 2 check requires a RangeError:** Met. Verifier Check 2 calls clamp with lo > hi three times and prints `e instanceof RangeError`. PASS needs 'true RangeError' on every line, and it FAILs on no throw or on a throw that isn't a RangeError.\n\nAll three items are handled.",
+  "model": "claude-opus-5-5",
+  "ms": 5509,
+  "tokens": {
+    "input": 2,
+    "output": 478,
+    "cacheCreation": 3057,
+    "cacheRead": 783,
+    "fresh": 3537,
+    "total": 4320
+  },
+  "at": "2026-11-05T08:41:27.622Z"
+}

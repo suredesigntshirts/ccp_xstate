@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.3",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1 and 2 only test what their expect lines say: clamp is exported, returns correct clamped values, and throws a RangeError when lo > hi.\n\nCheck 3 breaks the criterion. Its FAIL condition uses `readme.includes(n+'(')`, so every export must be written exactly as `name(`. \"Documents every function\" doesn't require that wording. A README that describes `subtract` in a table without parentheses would fail. The check also takes its names from `Object.keys` of all exports, so a non-function export would also be required, which the words don't ask for.\n\nCheck 4 also breaks it. Its PASS condition requires the summary to show \"# fail 0\". That output is specific to `node --test`. \"npm test passes\" only requires `npm test` to succeed, which exit 0 already shows.\n\nThese stricter tests sit in PASS/FAIL conditions instead of under Advisory.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repo. The builder's only command is `npm test`, and package.json defines it as `node --test`. That picks up test/math.test.js through Node's default test-file patterns. Verifier checks 1–3 are `node -e` scripts that read ./math.js and README.md, both of which exist. Their JavaScript is valid: destructuring in for-of loops, try/catch, `instanceof RangeError`, `Object.keys`, `readFileSync`. The bash quoting also holds: each script sits in double quotes, uses only single quotes inside, and has no `$` or backticks. One caveat: check 3's `!readme` could trigger history expansion, but only in an interactive bash, not in the non-interactive shell an agent runs. Check 4, `npm test; echo \"exit $?\"`, is valid shell. Checks 1–2 depend on clamp, which the builder's step 1 creates, so their failure at base is expected and isn't a syntax problem. No command names a missing file, script or tool.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one. (1) The builder brief, step 3, says README.md \"currently does not document subtract at all although math.js exports it\" and tells the builder to \"also add a `### subtract(a, b)` section\" next to the clamp section. (2) Verifier Check 3 runs Object.keys(require('./math.js')) at the PR head and prints the exports, which there are add, subtract, multiply and clamp. It fails if any export is missing from README.md, and it names subtract outright: \"each export (including clamp and subtract) has an entry\". (3) Verifier Check 2 calls clamp three times with lo greater than hi and sets ok=false if `!(e instanceof RangeError)`. It fails when a call \"throws anything other than a RangeError\", so any other error does not pass.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Must_not 1 is avoided. Check 3 reads the export names from `Object.keys(require('./math.js'))`, so a README that covers clamp but not subtract fails. Must_not 2 is broken in Check 3. A README entry only counts if it contains the literal text `n+'('`, so an export documented as \"`subtract` — returns a minus b\" with no parenthesis fails even though line 3 is met. That turns a builder-side formatting choice (\"written as `name(` in its heading\") into a verifier FAIL condition, which is a README layout requirement stricter than the line. Check 4 is also stricter than its line: besides exit 0, it requires the summary to show \"# fail 0\". That text is specific to one reporter; node's spec reporter prints \"ℹ fail 0\" instead. Line 4 only asks that npm test passes. Checks 1 and 2 match their lines.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier's probes, and the builder brief gives away several of them. In step 2 it hands the builder exact inputs and outputs that are also Check 1's cases: \"clamp(5, 0, 10) === 5\", \"clamp(-5, 0, 100) === 0\" and \"clamp(140, 0, 100) === 100\". Check 1 tests [5,0,10,5], [-5,0,100,0] and [140,0,100,100]. Its \"assert.throws(() => clamp(5, 10, 0), RangeError)\" is the same as Check 2's [5,10,0] case. Step 3 also says every export must appear \"written as `name(`\", which is exactly what Check 3's `readme.includes(n+'(')` test looks for. Asking the builder to write its own tests is allowed. But these are the verifier's own inputs and expected outputs, plus its pass condition, so the builder is being given the checker rather than just the bar.",
+      "cached": false
+    }
+  }
+}

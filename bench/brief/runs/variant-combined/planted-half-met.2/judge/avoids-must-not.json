@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "1dbe2ce5aafb04dc6f04764256383ad1466c5dd52fd0340a64c38d7da3055d14",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items, and it breaks neither. Item 1: Check 3 lists the exported functions and says they \"must include at least capitalize, slugify, truncate and padLeft\". It also says \"Watch slugify in particular\", so a README with a padLeft section but no slugify section fails. Item 2: the PASS values in Checks 1 and 2 (\"00042\", \"   42\", \"xxa\", unchanged strings) follow directly from the expect lines. There is no parameter-count check and no rule that fill must be one character; the multi-character fill case is marked advisory only. Check 3 defines a section loosely as \"a heading naming the function plus text about it\", which is a plain reading of \"section\", not a required layout. The builder's `## name(...)` heading format is only an instruction to the builder, not a pass/fail condition. Exit status and test coverage are advisory too.",
+  "model": "claude-opus-5-5",
+  "ms": 9749,
+  "tokens": {
+    "input": 2,
+    "output": 742,
+    "cacheCreation": 3075,
+    "cacheRead": 783,
+    "fresh": 3819,
+    "total": 4602
+  },
+  "at": "2026-11-05T08:56:24.463Z"
+}

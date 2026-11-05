@@ -1,0 +1,24 @@
+Goal: one pull request that meets every line below (issue https://github.com/o/strutil/issues/7):
+1. index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+2. padLeft returns s unchanged when s is already width characters or longer
+3. README.md has a section for every function index.js exports
+4. npm test passes
+
+Steps:
+1. In index.js (an ES module, `"type": "module"`), add and export `padLeft(s, width, fill = ' ')`, following the style of the existing functions (a one-line JSDoc comment above it). It must return `s` padded on the left with `fill` until it is `width` characters long, e.g. padLeft('42', 5, '0') === '00042' and padLeft('ab', 4) === '  ab'. When `s.length >= width` it must return `s` unchanged (no truncation). `String.prototype.padStart` does this.
+2. Update README.md so it has a `## name(args)` section for EVERY function index.js exports. Note: README.md today has sections for capitalize and truncate but NOT for slugify, which index.js already exports. Add a `## slugify(s)` section (lower case, words joined by dashes) as well as a `## padLeft(s, width, fill)` section that describes the padding, the space default for `fill`, and that `s` is returned unchanged when it is already `width` characters or longer (mention the invoice example 42 -> 00042). Keep the existing sections and the `## Tests` section.
+3. In test/strutil.test.js, import padLeft and add tests: padLeft('42', 5, '0') === '00042'; padLeft('ab', 4) === '  ab'; padLeft('12345', 5, '0') === '12345'; padLeft('123456', 5, '0') === '123456'.
+4. Run `npm test` from the repository root and make sure it passes with 0 failures.
+5. Self-check README coverage by running from the repository root:
+node --input-type=module -e "
+import * as m from './index.js';
+import { readFileSync } from 'node:fs';
+const readme = readFileSync('README.md', 'utf8');
+const fns = Object.keys(m).filter(k => typeof m[k] === 'function');
+const missing = fns.filter(f => !new RegExp('^#{1,6} +' + f + '\\\\b', 'm').test(readme));
+console.log('exported functions:', fns.join(', '));
+console.log('missing README sections:', missing.join(', ') || 'none');
+process.exit(missing.length ? 1 : 0);
+"
+It must print `missing README sections: none` and exit 0.
+6. Commit the changes to index.js, README.md and test/strutil.test.js and open the pull request referencing issue #7.

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "311f2a9efa4f316e45be5afd7e7d50e1beaaa823f6305e0b7e657a5b08697a08",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not item 1 is avoided. Check 3 finds the exported functions at runtime and prints MISSING if subtract has no entry, so a README that documents clamp but not subtract fails.\n\nItem 2 is broken in Check 3. Its script only counts a function as documented if a markdown heading matches the regex `'^#+\\\\s*`?'+n+'\\\\s*\\\\('`, and \"PASS: the script prints OK\". A README that documents subtract or clamp in a bullet list, a table or plain prose would satisfy \"README.md documents every function math.js exports\" but would print MISSING and FAIL. That makes the check depend on a specific README layout, which is stricter than its line.\n\nChecks 1, 2 and 4 match their lines. Check 2 tests `instanceof RangeError` and does not require a particular message. Nothing in the builder brief breaks the list.",
+  "model": "claude-opus-5-5",
+  "ms": 7639,
+  "tokens": {
+    "input": 2,
+    "output": 647,
+    "cacheCreation": 3481,
+    "cacheRead": 783,
+    "fresh": 4130,
+    "total": 4913
+  },
+  "at": "2026-11-05T08:41:46.538Z"
+}

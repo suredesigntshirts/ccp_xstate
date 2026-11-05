@@ -1,0 +1,13 @@
+Make one pull request that meets both acceptance lines of issue https://github.com/o/settings/issues/31:
+- "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+- "npm test passes"
+
+Current state: src/config.js has `loadConfig(path)` returning `JSON.parse(readFileSync(path, 'utf8'))`. src/app.js already wraps loadConfig in try/catch, prints `bad config: <message>` and exits 1. test/config.test.js has a test 'bad JSON throws' that asserts loadConfig throws SyntaxError on `{port: 9000`, and README.md documents the exit-1 behaviour. `npm test` runs `node --test`.
+
+Steps:
+1. In src/config.js, change loadConfig so that when JSON.parse throws, the error is caught and the function returns `{}`. Keep valid files returning their parsed object unchanged. Catch only the parse failure: read the file outside the try (or rethrow non-SyntaxError errors) so a missing or unreadable file still throws as before.
+2. Optionally, inside the catch, write one line to stderr (e.g. `console.error`) that names the path and the parse error message, so a person can still tell which file is broken. Do not throw.
+3. In test/config.test.js, replace the 'bad JSON throws' test with one asserting `loadConfig(file('{port: 9000'))` deep-equals `{}`. Keep the 'reads a config' test. Add a test that a missing file still throws if you kept that behaviour.
+4. Update README.md so it no longer says invalid JSON stops the app with exit 1; describe the new behaviour (invalid JSON falls back to the defaults, plus the warning if you added one).
+5. Run `npm test` and make sure it passes with 0 failures. Also run `printf '{port: 9000' > /tmp/bad.json && node src/app.js /tmp/bad.json` and confirm it prints `listening on 8080` with no stack trace.
+6. In the PR description, note that this change replaces the previous `bad config` exit-1 error with a fallback to defaults, so reviewers know about that trade-off.

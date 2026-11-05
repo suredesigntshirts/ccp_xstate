@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "83d034f4cb200a2d433861d36614b05f3de351c6c2a154390ec6b3c707333db4",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief. Builder step 6 copies the verifier's Check 1 and Check 2 word for word: the same `node -e` scripts with the same case arrays (e.g. `[[-5,0,100,0],[140,0,100,100],...]` and `[[5,10,0],[0,1,0],[50,100,0],[-3,-1,-2]]`) and the same PASS/FAIL conditions. It even says \"the verifier will run them\". So the builder gets the checker's probes and PASS/FAIL conditions, which the criterion forbids. The other steps would be fine on their own: running npm test, writing its own clamp tests, and the expect lines restated. Step 6 breaks the criterion for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 7060,
+  "tokens": {
+    "input": 2,
+    "output": 353,
+    "cacheCreation": 4436,
+    "cacheRead": 783,
+    "fresh": 4791,
+    "total": 5574
+  },
+  "at": "2026-11-05T08:27:31.726Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "3c5f7a81d02650ff1faabc621d39e7db222d0ddec215317c1037b75fd97a924c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Check 1's expect line only says loadConfig \"catches the JSON.parse error and returns {} instead\". But its PASS condition also requires the good file to print `{\"port\":9000}`, and its FAIL condition includes \"does not return the parsed object for the good file\". The words don't force that test. It is a regression check and belongs under Advisory. Check 2's expect line is just \"npm test passes\", yet its PASS condition also requires \"the TAP summary shows `# fail 0`\". That ties the result to a specific output format the words don't require. The advisory section correctly holds the missing-file, README and test-file checks. Still, the two stricter conditions above sit inside PASS/FAIL, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 9333,
+  "tokens": {
+    "input": 2,
+    "output": 819,
+    "cacheCreation": 2884,
+    "cacheRead": 783,
+    "fresh": 3705,
+    "total": 4488
+  },
+  "at": "2026-11-05T08:40:42.194Z"
+}

@@ -1,0 +1,43 @@
+Run every command from the repository root with the PR head checked out. Each check is one acceptance line, in order. Report PASS or FAIL per check with the output that decided it.
+
+Check 1. Expect line: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before"
+Run:
+T=$(mktemp -d) && printf '{"a":1}\n' > "$T/a.jsonl" && printf '{"b":2}\n{oops}\n' > "$T/b.jsonl" && printf '[1]\nnope\n' > "$T/c.jsonl" && echo "T=$T" && node packages/jsonl-lint/bin/jsonl-lint.js "$T/a.jsonl" "$T/b.jsonl" "$T/c.jsonl"; echo "exit=$?"
+PASS: stdout has exactly two report lines, first `<T>/b.jsonl:2: <JSON.parse message>` then `<T>/c.jsonl:2: <JSON.parse message>` (in that order, file path exactly as passed), nothing for a.jsonl. Also the existing single-file tests in packages/jsonl-lint/test/cli.test.js still pass (seen in check 5's run). FAIL: a file is skipped, the order differs, the prefix format differs, or only the first file is checked.
+
+Check 2. Expect line: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)"
+Run each:
+printf '{"a":1}\n' | node packages/jsonl-lint/bin/jsonl-lint.js -; echo "exit=$?"
+printf '{"a":1}\n{bad\n' | node packages/jsonl-lint/bin/jsonl-lint.js -; echo "exit=$?"
+printf '{"a":1}\n' | node packages/jsonl-lint/bin/jsonl-lint.js - -; echo "exit=$?"
+PASS: first prints nothing and exit=0; second prints exactly one line starting `-:2: ` and exit=1; third prints an error on stderr and exit=2. FAIL: `-` is treated as a file path (e.g. ENOENT for '-'), the prefix is not `-`, or `- -` does not exit 2.
+
+Check 3. Expect line: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)"
+Run each:
+T=$(mktemp -d) && printf '{"a":1}\n' > "$T/a.jsonl" && printf '[2]\n' > "$T/d.jsonl" && node packages/jsonl-lint/bin/jsonl-lint.js "$T/a.jsonl" "$T/d.jsonl"; echo "exit=$?"
+T=$(mktemp -d) && printf '{"a":1}\n' > "$T/a.jsonl" && printf '{"b":2}\n{oops}\n' > "$T/b.jsonl" && node packages/jsonl-lint/bin/jsonl-lint.js "$T/a.jsonl" "$T/missing.jsonl" "$T/b.jsonl"; echo "exit=$?"
+node packages/jsonl-lint/bin/jsonl-lint.js; echo "exit=$?"
+PASS: first exit=0 with no output; second writes an error naming missing.jsonl to stderr, still prints `<T>/b.jsonl:2: ...` on stdout, and exit=2; third writes a message to stderr and exit=2. Check 1's run must have shown exit=1. FAIL: any exit code differs, or the run stops at the missing file without reporting b.jsonl.
+
+Check 4. Expect line: "lint(text) in src/index.js is unchanged"
+Run:
+git fetch -q origin main && git diff --exit-code "$(git merge-base origin/main HEAD)" HEAD -- packages/jsonl-lint/src/index.js; echo "exit=$?"
+PASS: no diff printed and exit=0. FAIL: any diff in lint (or the file) shown.
+
+Check 5. Expect line: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage"
+Run:
+npm test -w packages/jsonl-lint 2>&1 | tail -12; echo "exit=${PIPESTATUS[0]}"
+grep -n -e '<file> \[<file>' -e '`-`' -e 'stdin' packages/jsonl-lint/README.md; echo "exit=$?"
+Then read packages/jsonl-lint/test/*.test.js.
+PASS: tests pass (fail 0, exit=0); the node:test files contain tests for each of: two clean files, one bad file among several, stdin via `-` clean, stdin via `-` bad, a missing file among good ones, two `-` arguments, no arguments; and the README documents multi-file usage and `-` for stdin (grep finds them, and reading confirms). FAIL: any listed case has no test, tests fail, or the README lacks the usage.
+
+Check 6. Expect line: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head"
+Run (N = the PR number; use the REST API, GraphQL is unavailable):
+N=<PR number>; gh api repos/suredesigntshirts/ccp_machine_test/pulls/$N --jq '{state,base:.base.ref,head:.head.sha,body}'; SHA=$(gh api repos/suredesigntshirts/ccp_machine_test/pulls/$N --jq .head.sha); gh api "repos/suredesigntshirts/ccp_machine_test/commits/$SHA/check-runs" --jq '.check_runs[] | {name,status,conclusion}'
+npm test 2>&1 | tail -5; echo "exit=${PIPESTATUS[0]}"
+PASS: the PR is open on suredesigntshirts/ccp_machine_test, its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`, the head SHA equals the commit you tested, the `test` check run is completed with conclusion success, and local `npm test` exits 0. FAIL: body lacks that line, the test workflow is missing, pending or failing at the head, or npm test fails.
+
+Advisory (not pass/fail):
+- Confirm `- -` exits 2 promptly without waiting on stdin (e.g. run it with no pipe and see it does not hang).
+- Check a single-file run's output is byte-identical to main's for the same file.
+- No new runtime dependencies in packages/jsonl-lint/package.json.

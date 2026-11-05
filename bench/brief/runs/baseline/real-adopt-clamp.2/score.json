@@ -3,7 +3,7 @@
   "run": "real-adopt-clamp.2",
   "case": "real-adopt-clamp",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": false,
       "why": "Must_not item 1 holds. Check 3's script fails when subtract has no heading, and the brief says plainly that \"subtract was undocumented before this PR, so it must be documented now.\"\n\nItem 2 breaks in Check 3. Its regex `'^#+\\\\s*'+f+'\\\\s*\\\\('` only accepts a function as documented if it has a Markdown heading of the form \"# name(\". The FAIL condition also says \"any exported function has no heading or no description.\" Line 3 only requires that README.md documents every exported function. A README that documented subtract and clamp in a table, a list or prose would meet line 3 but fail this check. That is a PASS condition tied to a specific README layout, which is stricter than its line.\n\nChecks 1, 2 and 4 stay within their lines. Check 2 only tests for `instanceof RangeError` and does not require a particular error message.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier's probes, and the builder brief leaks some of them. Step 2 gives the README examples \"clamp(-5, 0, 100); // 0, clamp(140, 0, 100); // 100 and clamp(42, 0, 100); // 42\". Those are the same inputs and expected outputs as the first three cases in Check 1's script. Step 3 tells the builder to write \"assert.throws(() => clamp(5, 10, 0), RangeError)\". That is the same input as Check 2's first probe case, [5,10,0], with the same RangeError expectation. Step 2's \"Every name in math.js's module.exports must have its own heading\" closely matches the heading-per-export regex in Check 3. So the builder brief carries checks from the verifier brief, not just the bar. Telling the builder to run npm test and write its own tests is allowed, but these shared cases are not.",
       "cached": true
     }
   }

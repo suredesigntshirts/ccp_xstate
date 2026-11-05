@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-missing-line.1",
+  "case": "planted-missing-line",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Check 2 is fine: grep plus a requirement that a line actually documents the flag matches \"README.md documents --tsv\". Check 1 goes further than its expect line in three places. Its PASS condition requires \"exit=0\", but the words only say the command reads input and prints a JSON array, not how it exits. It requires the outputs to be \"byte-identical\" via cmp, but \"the same JSON array\" would also be met by the same array with different whitespace. It also fixes the exact CSV output \"(here [{\\\"name\\\":\\\"Ada\\\",...}])\", which the words never specify, since they only compare against whatever the CSV run prints. The exit-code and byte-identity checks belong under Advisory, not in PASS or FAIL. The FAIL condition repeats the \"exits non-zero\" test. So the criterion does not hold for the whole output.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the six tracked files and the package.json scripts. `npm test` maps to `node --test`, which finds test/csv.test.js. Each `node bin/csv2json.js` call points at a tracked file. In the mktemp/printf/cmp one-liner, the files are written to \"$d\" before they are read, the quoting is valid and the `&&` / `||` chains are correct. In the verifier, `echo \"exit=$?\"` comes right after the `--tsv` run, so it reports that run's exit code. `grep -n -- '--tsv' README.md` uses `--` so grep doesn't read the pattern as an option, and README.md exists. The JS fragments are valid: `process.argv.slice(2)`, `parse(input, '\\t')` and the escaped test strings. The `parse(text, sep = ',')` signature is stated as a fact about the repo. I couldn't confirm it from the file list, but it doesn't break any command. Commit and PR are ordinary steps. I found no command that would fail as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and each one is handled.\n1. Builder brief: step 2 says \"running without flags behaves exactly as it does now\". Step 5 says \"Run `npm test` and make sure every test passes\", and step 3 says \"Keep the existing tests\". Neither expect line asks for this.\n2. Verifier brief: the \"Advisory (not part of PASS/FAIL)\" section suggests running `npm test` with the existing CSV tests and says no-flag behaviour should stay the same. It never says outright \"no expect line covers this\". But labelling it as not part of PASS/FAIL, under Advisory, does show that no line covers it, which fits the example the item gives.\n3. Check 1 writes the same table as t.csv and t.tsv, runs the CLI on each (the TSV one with --tsv), and compares the two outputs with `cmp`. It passes only if the command prints SAME.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 2 holds. Neither PASS/FAIL condition depends on npm test: Check 1 requires exit=0, a JSON array and SAME, and Check 2 requires grep_exit=0 and a line that documents the flag. Item 1 breaks. The verifier brief has two numbered checks, but it then adds an \"Advisory (not part of PASS/FAIL)\" section. That section tells the verifier to \"Run `npm test`. All tests, including the existing CSV tests, should pass\", and also to check that running without flags \"should behave exactly as before\". The section has no say in the verdict, but it is still an instruction to run npm test and the CSV tests and judge the result. That is the \"third check for npm test or CSV behaviour\" the must_not list describes. So the brief has more checks than the two expect lines.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, and the criterion breaks. Builder step 5 copies verifier Check 1's probe almost word for word: the inline script `d=$(mktemp -d); printf 'name,age,city\\nAda,36,London\\nBob,,Paris\\n' > \"$d/t.csv\"; printf 'name\\tage\\tcity...' ... cmp \"$d/csv.out\" \"$d/tsv.out\" && echo SAME`. It uses the same inputs, and it adds the pass condition \"The command must print SAME\", which matches the verifier's PASS. The exceptions don't cover this. It isn't the repo's own tests, it isn't a test the builder writes, and no expect line names it, since expect line 1 only names `node bin/csv2json.js --tsv`, not this script or these inputs. Step 4's \"The literal text `--tsv` must appear in README.md\" also matches the verifier's grep check. So the builder is handed the checker's method, not just the bar.",
+      "cached": true
+    }
+  }
+}

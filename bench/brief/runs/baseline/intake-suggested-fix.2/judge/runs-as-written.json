@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "91af880c8747cd666ac8dadecc220cc432131b9e936483870c7e19395636785d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. The builder's commands are `npm test`, which maps to the `node --test` script, and `node src/app.js $d/c.json`; both `src/app.js` and `test/config.test.js` exist at this commit. The verifier's Check 1 `printf '{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n' > $d/c.json; ... wc -c < $d/out` is valid shell. Check 3 copies the issue's own proof, and its quoting works: `$d` expands inside the double-quoted JavaScript, and the single-quoted path strings are valid. Check 4 adds `import assert from 'node:assert/strict'` with `deepEqual`, which is valid ESM on Node 22. Check 5 uses `git merge-base HEAD <PR base ref>`, with an explicit placeholder, and a worktree copy, which is a reasonable procedure. The suggested `child_process.spawnSync` exists in Node. I found no command that names a missing file or tool, misuses arguments or has a syntax error.",
+  "model": "claude-opus-5-5",
+  "ms": 7895,
+  "tokens": {
+    "input": 2,
+    "output": 681,
+    "cacheCreation": 5629,
+    "cacheRead": 783,
+    "fresh": 6312,
+    "total": 7095
+  },
+  "at": "2026-11-05T08:28:48.557Z"
+}

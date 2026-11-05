@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "b2b2faca3d0477fc3e4ad025ff6f9f304fe15b37075354294f44f7ddf5b47083",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for every command in both briefs. Every file they name is in the tracked list: bin/csv2json.js, README.md and test/csv.test.js. `npm test` maps to the real script `node --test`. The `--tsv` flag gets added in builder step 1, before the step-4 checks use it. The printf strings with `\\t` and `\\n` are valid. The `diff <(...) <(...) && echo SAME` line is valid bash process substitution, and the verifier brief says outright to run everything in bash. One small caveat: the builder brief doesn't name a shell, but agent shells are normally bash, so I don't count that as a break. In `grep -n -- '--tsv' README.md`, the `--` correctly stops `--tsv` being read as a grep option. The JavaScript the brief describes is valid: `process.argv.slice(2)` with `includes`, `parse(input, '\\t')` (which fits `parse(text, sep = ',')`), and `JSON.stringify(...)` followed by a newline.",
+  "model": "claude-opus-5-5",
+  "ms": 13306,
+  "tokens": {
+    "input": 2,
+    "output": 641,
+    "cacheCreation": 2862,
+    "cacheRead": 783,
+    "fresh": 3505,
+    "total": 4288
+  },
+  "at": "2026-11-05T08:57:25.721Z"
+}

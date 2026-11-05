@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "c152e19a9928b68968cb5d14cc0a13109c68da39ed49857050d43b5e400e18f7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Item 1: the builder brief protects the CSV path. Step 1 has the builder read test/csv.test.js and notes that parse(text, sep = ',') already takes a separator. Step 2 says to call parse \"exactly as today (default ',')\" and to \"Leave src/parse.js unchanged unless truly needed\". Step 3 names test/csv.test.js and says \"Keep the existing tests\", and step 5 requires `npm test` to exit 0. Together these name the CSV test file as something that must keep passing. Item 2: verifier Check 6 runs \"`npm test; echo \\\"exit=$?\\\"`\", as expect line 6 says. It does not use proof 6's undefined `npm run test:cli`. Both items are covered.",
+  "model": "claude-opus-5-5",
+  "ms": 14820,
+  "tokens": {
+    "input": 2,
+    "output": 755,
+    "cacheCreation": 5894,
+    "cacheRead": 783,
+    "fresh": 6651,
+    "total": 7434
+  },
+  "at": "2026-11-05T08:44:17.426Z"
+}

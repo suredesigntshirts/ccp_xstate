@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.3",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4 not quoted word for word in the builder brief: \"node bin/greet.js --shout <name> prints the greeting in upper case\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each check's PASS and FAIL conditions against the words of its expect line. Check 3 is fine: \"mentions `--shout` and says what it does\" is a fair reading of \"documents --shout\". The extra checks for a flag after the name, a missing name and tests are correctly under Advisory. Check 1 breaks the criterion. Its expect line only says the command \"prints the greeting in upper case\", but PASS requires \"each command exits 0\" and FAIL includes \"a non-zero exit\". Nothing in the words requires an exit code. Check 2's PASS also requires the \"exit code\" to match the base, which goes beyond \"the output is unchanged\". Check 4 is also a problem: it judges the PR on whether the pages.yml workflow still publishes docs/, a stand-in the expect line never mentions. All of these belong under Advisory, not in PASS or FAIL.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the tracked files and package.json. `node bin/greet.js --shout Ada`, `node bin/greet.js Ada` and the 'Grace Hopper' variants all use bin/greet.js, which exists. `npm test` maps to the \"test\" script (\"node --test\"). `node -e \"import('./src/greet.js').then(m=>console.log(m.greeting('Ada')))\"` is valid shell quoting and valid JavaScript, and src/greet.js exists. Dynamic import also works if that file is CommonJS. `grep -n -- --shout docs/index.md` uses `--` correctly before the pattern, and docs/index.md exists. `git merge-base HEAD origin/HEAD` is valid git syntax, and the brief gives \"the base commit of the PR\" as a fallback. The files the briefs read (.github/workflows/pages.yml, test/greet.test.js, src/greet.js) all exist at this commit. I found no invalid syntax or missing file in either brief.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the verifier brief. Item 1: Check 4 says \"This can only be seen after merge. Do not fetch or read the live page.\" It then checks the head instead. It confirms that pages.yml still runs on push to main and uploads `docs` with upload-pages-artifact and deploy-pages. It also greps docs/index.md for --shout. Item 2: Check 2 runs `node bin/greet.js Ada` and the 'Grace Hopper' case at the head. It runs the same commands \"at the merge base ... in a separate checkout or worktree, and compare\". PASS requires stdout and exit code to be byte-for-byte the same as at the base. So it compares with the output from before the change, not only with the hand-written string. Both traps are caught.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked Check 4 in the verifier brief against both items on the must_not list. Item 1 (fetching the live page): the brief says \"Do not fetch or read the live page.\" It judges Check 4 on what the PR head contains instead: pages.yml must still publish docs/ on push to main, and `grep -n -- --shout docs/index.md` must find the flag. Item 2 (a silent PASS with no evidence): PASS needs that workflow and grep evidence. FAIL conditions are spelled out, and the report must \"say that the live result can only be seen after merge.\" So the PASS is neither silent nor unsupported. The builder brief doesn't add any check for line 4 that would break either item. It only tells the builder to leave the docs and workflow in place and to mention in the PR that the page updates after merge. Neither must_not item is broken.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief repeats verifier probes as inputs with expected outputs. Step 1 says \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\" and \"`Hello, Ada!\\n` for `Ada`\", the same outputs that decide Check 1 (\"for Ada: `HELLO, ADA!`\") and Check 2 (\"`Hello, Ada!\\n` for Ada\"). Step 3 prescribes test cases `--shout Ada`→`HELLO, ADA!\\n`, `Ada --shout`→same, which includes the verifier's advisory probe `node bin/greet.js Ada --shout`. Step 1 also repeats the advisory check on the missing-name usage error with exit code 2. Step 4's \"say that it prints the greeting in upper case\" restates the Check 3 PASS condition. Running the command the expect line names is allowed, but handing over the verifier's exact inputs and expected outputs breaks the criterion.",
+      "cached": true
+    }
+  }
+}

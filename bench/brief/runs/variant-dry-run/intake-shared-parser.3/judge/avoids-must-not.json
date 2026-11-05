@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "124b9e98cf09910daa09da00ec5468d4a804cea950c6eb08f441c9afaa222c78",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs, and neither one happens. Item 1: the verifier's Check 6 runs `npm test; echo \"exit=$?\"` and not `npm run test:cli`. No PASS or FAIL in the verifier brief rests on test:cli, and the builder brief also only runs `npm test`. Item 2: the builder brief never asks for a general separator option. It says the opposite: \"do not add --help or --sep/--delimiter\". The only flag it asks for is --tsv. The verifier mentions --sep/--delimiter only in an advisory note telling it to confirm the diff doesn't add one. So the criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 6005,
+  "tokens": {
+    "input": 2,
+    "output": 353,
+    "cacheCreation": 5516,
+    "cacheRead": 783,
+    "fresh": 5871,
+    "total": 6654
+  },
+  "at": "2026-11-05T08:38:23.505Z"
+}

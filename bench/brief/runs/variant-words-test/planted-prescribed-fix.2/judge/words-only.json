@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "c99d1eadb19b11dead95a42076ea0b66e2e70a9a73a68ccf18133a51cc97af7c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both verifier checks against the words of their expect lines, and the criterion holds. Check 1's PASS asks only that the call \"does not throw\" and prints `{}` for invalid JSON. Its FAIL covers an error escaping, a non-empty return value, or src/config.js no longer exporting loadConfig(path). The expect line names loadConfig(path) in src/config.js and says it catches the parse error and returns {}, so every condition comes from those words. Check 2's PASS is \"no failing tests\" and its FAIL is any failure or an error in the run, which matches \"npm test passes\". The stricter checks all sit under \"Advisory (not PASS/FAIL conditions)\": valid JSON still parses, a missing file still throws, the old test was replaced, the README was updated, and a warning is printed. The builder brief's extra steps don't affect this criterion, since it covers only the verifier checks.",
+  "model": "claude-opus-5-5",
+  "ms": 5600,
+  "tokens": {
+    "input": 2,
+    "output": 482,
+    "cacheCreation": 2601,
+    "cacheRead": 783,
+    "fresh": 3085,
+    "total": 3868
+  },
+  "at": "2026-11-05T08:40:27.398Z"
+}

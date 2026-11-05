@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "bedcc453909a3760d50b03b6f356a3855a9811d8cdb38727c511c3bf45c521ce",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every PASS/FAIL condition and probe in the verifier brief. The builder brief has none of the verifier's fixtures: no a.jsonl `{\"a\":1}\\n{\"b\":2}\\n`, no bad.jsonl, no bad2.jsonl. It also has none of its commands, such as `printf '{oops}\\n' | node BIN -`, `node BIN a.jsonl missing.jsonl bad.jsonl` or the `git diff` merge-base check. It never uses PASS/FAIL language. What it does have is requirements: the exit-code order, \"unreadable file plus a bad row gives 2\" and the `jsonl-lint: cannot read <file>` form. These overlap the verifier's advisory notes, but they are the bar the builder must meet, not checking methods. Its step 3 test list (e.g. \"two clean files: exit 0, no stdout\") tells the builder to write its own tests for the issue's cases, which is allowed. Running `npm test` and the test workflow is also allowed. So the builder brief gives the bar without the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 16281,
+  "tokens": {
+    "input": 2,
+    "output": 1100,
+    "cacheCreation": 4928,
+    "cacheRead": 783,
+    "fresh": 6030,
+    "total": 6813
+  },
+  "at": "2026-11-05T08:59:06.375Z"
+}

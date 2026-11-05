@@ -1,0 +1,12 @@
+Criteria the build must meet (from the issue, word for word):
+- index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+- padLeft returns s unchanged when s is already width characters or longer
+- README.md has a section for every function index.js exports
+- npm test passes
+
+Steps:
+1. Read index.js, README.md, package.json and test/strutil.test.js. index.js currently exports capitalize, slugify and truncate; README.md has sections only for capitalize and truncate, so slugify is already undocumented.
+2. In index.js add and export `padLeft(s, width, fill = ' ')`, following the style of the existing functions (short doc comment, ES module export). It returns s with fill prepended until the result is exactly width characters (for example `s.padStart(width, fill)`), and returns s unchanged when s.length >= width. Example: padLeft('42', 5, '0') === '00042'; padLeft('42', 5) === '   42'; padLeft('12345', 3, '0') === '12345'.
+3. In README.md add a `## padLeft(s, width, fill)` section describing the behaviour, including the default space fill and the unchanged-when-long-enough rule, and add a `## slugify(s)` section (lower case, words joined by dashes, leading/trailing dashes removed), so that every function exported by index.js has its own `## name(...)` section. Keep the existing sections and the Tests section.
+4. In test/strutil.test.js import padLeft and add tests covering: zero padding ('42', 5, '0' -> '00042'), default space fill, and returning s unchanged when its length equals width and when it exceeds width.
+5. Run `npm test` and make sure all tests pass. Then open one pull request with these changes.

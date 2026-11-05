@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "a1c56a4ba05bcc9259477d9f38ab1e4f2b92406f1e6d650548dd485492a3f6ca",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion fails. Step 5 of the builder brief gives the builder the verifier's own probe. It has the builder run `c=$(printf 'name,age,city\\nAda,36,London\\nLin,,Paris\\n' | node bin/csv2json.js); t=$(printf 'name\\tage\\tcity\\nAda\\t36\\tLondon\\nLin\\t\\tParis\\n' | node bin/csv2json.js --tsv); [ \"$c\" = \"$t\" ] && echo SAME || echo DIFFERENT` and \"confirm it prints SAME\". Verifier Check 1 runs the same inline script with the same inputs, and its PASS condition is that the last line is SAME. That is a shared probe with its expected output, so it is not just a command named by an expect line. Telling the builder to run `npm test` and write its own --tsv test (step 3, with a different table) is allowed, and the README step doesn't copy the verifier's grep. Step 5 alone is enough to break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 6268,
+  "tokens": {
+    "input": 2,
+    "output": 537,
+    "cacheCreation": 2788,
+    "cacheRead": 783,
+    "fresh": 3327,
+    "total": 4110
+  },
+  "at": "2026-11-05T08:41:02.221Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "4f9029af16800f1210a3214d2d2d09d21c9b906484d14007cbb317a71a0758fd",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with every probe in the verifier brief. Checks 1 and 2 don't leak: the builder never sees the name/age/city table, the cmp step or the grep. But the builder brief contains a probe that also sits in the verifier brief. The builder is told to test 'a,b\\n1,2\\n' piped to `node bin/csv2json.js` and to expect \"'[{\"a\":\"1\",\"b\":\"2\"}]\\n'\". The verifier's Advisory section has the same probe: \"printf 'a,b\\n1,2\\n' | node bin/csv2json.js gives [{\"a\":\"1\",\"b\":\"2\"}]\". Advisory doesn't change PASS or FAIL, but it is still an input with an expected output that the checker uses. The criterion bans any such shared probe, so the builder brief carries a verifier check. The builder's hand check (\"at least two rows and three columns\") also mirrors the shape of the verifier's table.",
+  "model": "claude-opus-5-5",
+  "ms": 7553,
+  "tokens": {
+    "input": 2,
+    "output": 703,
+    "cacheCreation": 2737,
+    "cacheRead": 783,
+    "fresh": 3442,
+    "total": 4225
+  },
+  "at": "2026-11-05T08:41:00.586Z"
+}

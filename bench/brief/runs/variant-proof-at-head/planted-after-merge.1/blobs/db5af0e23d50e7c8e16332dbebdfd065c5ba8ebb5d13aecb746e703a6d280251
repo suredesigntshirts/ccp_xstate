@@ -1,0 +1,26 @@
+Run every check at the pull request's head, from the repository root. Run `npm install` first only if package.json at the head added dependencies.
+
+Check 1 — expect: "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run: `node bin/greet.js --shout Ada` and `node bin/greet.js Ada --shout`, and also `node bin/greet.js Ada` to get the normal greeting.
+PASS: each --shout run exits 0 and its stdout equals the upper-case form of the normal greeting for the same name (for the current greeting, `HELLO, ADA!` followed by a newline).
+FAIL: either --shout run exits non-zero, prints the usage message, prints the greeting not in upper case, or prints something other than the upper-cased greeting.
+
+Check 2 — expect: "without --shout the output is unchanged"
+Run: at the head, `node bin/greet.js Ada; echo "exit=$?"` and `node bin/greet.js; echo "exit=$?"` (capture stdout and stderr separately). Then get the same outputs from the code before the change (e.g. `git stash`-free: `git worktree add /tmp/greet-base <merge-base of the PR>` or `git show <merge-base>:bin/greet.js` with its src) and compare. Also run `npm test` at the head.
+PASS: `node bin/greet.js Ada` prints exactly `Hello, Ada!\n` with exit 0, the no-name run behaves the same as before the change (stdout, stderr and exit code 2 match the base), and `npm test` passes.
+FAIL: any output or exit code differs from the base when --shout is not given, or `npm test` fails.
+
+Check 3 — expect: "docs/index.md documents --shout"
+Read: docs/index.md at the head.
+PASS: the file mentions `--shout` and says what it does (prints the greeting in upper case).
+FAIL: docs/index.md does not mention --shout, or mentions it without saying what it does.
+
+Check 4 — expect: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+The live page can only be seen after merge; do not fetch it. Check what the head contains that will produce it. Read: .github/workflows/pages.yml and docs/index.md at the head.
+PASS: .github/workflows/pages.yml still runs on push to main and uploads the `docs` directory as the Pages artifact and deploys it, and docs/index.md at the head lists --shout (so the published page will list it once merged).
+FAIL: the workflow no longer publishes docs/ on push to main (removed, path changed, trigger changed), or docs/index.md at the head does not list --shout.
+
+Advisory
+- Check test/greet.test.js has a test for the --shout output; its absence is worth noting but is not a FAIL.
+- Note whether --shout works when placed before and after the name; both are covered in Check 1.
+- Note any change to what `greeting(name)` in src/greet.js returns.

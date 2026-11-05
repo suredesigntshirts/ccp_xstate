@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c9101b4621162e2b1f3deb91a1a52219b64a64350429c043f054f2366046fc6c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1–3 run the program and compare exit codes and stdout, so they meet must_not item 2. Item 1 is broken in Check 4. Expect line 4 only says \"lint(text) in src/index.js is unchanged\". Check 4 instead fails on any change to the whole file: \"FAIL: any diff in packages/jsonl-lint/src/index.js\". The test is `git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js`. So adding an export or a comment would fail the check even if lint(text) stayed the same. That is a limit on which files the PR may touch. Check 5 is also slightly stricter than its line. It requires the README to describe \"the exit codes for several files\", while the line only asks that the README \"documents the usage\". The advisory notes don't affect any verdict, and the builder's own steps are guidance, not PASS/FAIL conditions. Check 4 alone breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 10088,
+  "tokens": {
+    "input": 2,
+    "output": 962,
+    "cacheCreation": 6843,
+    "cacheRead": 783,
+    "fresh": 7807,
+    "total": 8590
+  },
+  "at": "2026-11-05T08:42:42.411Z"
+}

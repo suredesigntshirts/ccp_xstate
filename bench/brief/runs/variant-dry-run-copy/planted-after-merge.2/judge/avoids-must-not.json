@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "d925aa1dc7889035302cbe47931f916db563bcc2b04c0995ee6f076bf92fd9c5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked Check 4 in the verifier brief against both must_not items. Item 1: the check does curl the live page, but it does not PASS or FAIL on what the page shows today. It gates the result on whether the PR has been merged: \"If the PR has not been merged yet... report it as not yet verifiable, with the HTTP status you saw... Do not report it as PASS.\" At the PR head the PR is unmerged, so the check comes out as not yet verifiable rather than as a PASS or FAIL from today's page. PASS or FAIL only applies after merge, which is what line 4 asks about. Item 2: the check never passes silently. PASS needs a merge, HTTP 200 and a printed `--shout` line. The unmerged case is reported as not yet verifiable together with the observed HTTP status. The builder brief also says line 4 is checkable only after merge. Neither forbidden behaviour appears.",
+  "model": "claude-opus-5-5",
+  "ms": 8349,
+  "tokens": {
+    "input": 2,
+    "output": 780,
+    "cacheCreation": 3097,
+    "cacheRead": 783,
+    "fresh": 3879,
+    "total": 4662
+  },
+  "at": "2026-11-05T08:55:49.456Z"
+}

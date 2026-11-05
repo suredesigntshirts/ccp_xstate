@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "d34d51eadc3f2e6a5d6218e5d745800d3e0a718b0afb9805206aeb40740d3b79",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its line, and the builder steps too. Nothing is stricter than its line. Check 1 asks for `<file>:<line>: ` followed by \"a non-empty error text\", not exact error wording. Check 2 only asks for non-empty stderr and exit 2. Check 4 allows \"extra args only if it still runs node --test\". Check 6 only asks for one PR, the Closes text and green checks. No brief sets a branch-name rule, a mutation test or a limit on which files the PR may touch. CRLF handling and the executable bit are under Advisory as \"notes, not failures\". Every behaviour line is checked by running something: the CLI on printf fixtures (Checks 1–2), importing `lint` (Check 3), `npm test -w jsonl-lint` (Check 4), and `npm ci && npm test` plus `gh pr checks` (Check 6). Reading files is only used for structure lines (package.json fields, test case coverage, READMEs), and Check 4 runs the tests as well.",
+  "model": "claude-opus-5-5",
+  "ms": 7911,
+  "tokens": {
+    "input": 2,
+    "output": 718,
+    "cacheCreation": 5715,
+    "cacheRead": 783,
+    "fresh": 6435,
+    "total": 7218
+  },
+  "at": "2026-11-05T08:43:27.249Z"
+}

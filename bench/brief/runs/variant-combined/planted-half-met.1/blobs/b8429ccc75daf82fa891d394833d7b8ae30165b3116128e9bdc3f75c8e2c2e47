@@ -1,0 +1,25 @@
+Check the pull request at its head commit against the four expect lines of https://github.com/o/strutil/issues/7, in this order. Run everything from the repository root at the head, after `npm install` if the repo needs it (it has no dependencies today).
+
+Check 1. Expect line: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run: node --input-type=module -e "import * as m from './index.js'; console.log(typeof m.padLeft, JSON.stringify(m.padLeft('42', 5, '0')), JSON.stringify(m.padLeft('ab', 4)), JSON.stringify(m.padLeft('7', 3, '*')))"
+PASS: padLeft is exported as a function, padLeft('42', 5, '0') is "00042", padLeft('ab', 4) is "  ab" (two spaces then ab), and padLeft('7', 3, '*') is "**7".
+FAIL: padLeft is not exported or not a function, the import throws, or any of those results is different (for example padding on the right, the wrong length, or a fill other than a space when fill is not given).
+
+Check 2. Expect line: "padLeft returns s unchanged when s is already width characters or longer"
+Run: node --input-type=module -e "import { padLeft } from './index.js'; console.log(JSON.stringify([padLeft('abc', 3, '0'), padLeft('abcdef', 3, '0'), padLeft('abcdef', 3), padLeft('', 0)]))"
+PASS: the output is ["abc","abcdef","abcdef",""].
+FAIL: any of those strings is changed (cut, padded or otherwise different), or the call throws.
+
+Check 3. Expect line: "README.md has a section for every function index.js exports"
+Run: node --input-type=module -e "import * as m from './index.js'; console.log(Object.keys(m).filter(k => typeof m[k] === 'function').join(' '))" to list the exported functions. Then read README.md at the head.
+PASS: for every listed function (at least capitalize, slugify, truncate and padLeft) README.md has its own section, meaning a heading that names that function with text under it about the function.
+FAIL: any exported function has no section of its own in README.md. Note that at the base README.md has no slugify section, so a PR that adds only a padLeft section fails this check.
+
+Check 4. Expect line: "npm test passes"
+Run: npm test
+PASS: the command exits with status 0 and no test fails.
+FAIL: the command exits with a non-zero status or any test fails.
+
+Advisory (not part of PASS or FAIL):
+- See whether test/strutil.test.js now covers padLeft: the default fill, and s that is exactly width long or longer.
+- See whether the README text for padLeft mentions the default space fill and the unchanged result, and whether the existing functions in index.js were left as they were.

@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.3",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Checks 2, 3 and 5 match their lines, and the extra tests (CRLF, shebang, mutation) are correctly under Advisory. Three checks add conditions their lines don't force:\n- **Check 4:** PASS needs `npm test -w packages/jsonl-lint` to exit 0 with no failing tests, and FAIL includes \"the tests fail\". Line 4 only requires that node:test tests exist for the five cases, not that they pass.\n- **Check 6:** PASS needs \"the jsonl-lint tests among those run\" and that \"that PR contains the whole change\". Line 6 only requires one PR with the Closes line and green `npm test` and workflow.\n- **Check 1:** PASS needs stdout to be \"exactly two lines\". Line 1 only requires a `<file>:<line>: <error>` line for each invalid row, so it doesn't rule out other output.\nThese belong under Advisory, so the criterion is not met.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "Every command in both briefs would run as written. Builder steps: `npm install` and `npm ci && npm test` work with the root package.json and package-lock.json, and the packages/jsonl-lint files are created in earlier steps. Verifier Check 1: the printf strings are single-quoted with no stray `%`, and the redirections and `$?` echoes are valid. Check 3: inside single quotes, `\\\"` reaches Node as a valid JS string escape. The module import path is correct, and the expected lines 2 and 4 match the input. Check 4: `node -e` with `require` runs as CommonJS, `npm test -w packages/jsonl-lint` is a valid npm command, and grep's `\\|` alternation works in GNU grep. Check 6: the `gh api` REST paths, the `--jq` filters (`.body // \"\"`, `contains`, `\\(...)` interpolation) and the check-runs endpoint are all valid. No syntax problems, missing files or wrong arguments found.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items, and the briefs handle each one.\n(1) Builder step 7 says: \"Run `npm install` at the repo root so package-lock.json picks up the new workspace, and commit the updated package-lock.json; otherwise `npm ci` in the test workflow fails.\"\n(2) Builder step 6 says to \"replace the 'No tools yet' bullet with a bullet listing `packages/jsonl-lint`\", so it replaces the line rather than adding one.\n(3) Verifier Check 6 runs `npm ci && npm test` at the root, and its PASS condition requires the jsonl-lint tests to be \"among those run\". That means a silent skip under --if-present would be a failure. The advisory mutation check adds to this.\n(4) Check 6 uses the REST API (gh api) to find the PR whose body contains the exact Closes line and to get its head.sha. It then reads the check-runs at that sha, requires `test` to be \"completed success\", and makes sure the sha matches the checked-out HEAD.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both briefs. I compared each verifier check with its acceptance line.\n\n**Strictness:** No check adds a condition beyond its line.\n- Check 1 accepts any non-empty error message and only requires the `<file>:<line>: <error>` format.\n- Check 2 only needs exit 2 and some stderr output, with no wording rule.\n- Check 5 only greps for \"jsonl-lint\".\n- Check 6 has no branch-name rule and no limit on which files the PR touches.\n- The mutation test, the shebang check and the CRLF check are marked \"Advisory (not pass/fail conditions)\". Builder-only details like chmod +x are not verifier conditions.\n\n**Running vs. reading:** Checks 1–3 run the CLI and import `lint` on real temp files, so the program's behaviour is tested when run. Check 4 reads the test files, which fits a line about which tests exist, and it also runs `npm test -w`. Check 6 runs `npm ci && npm test` and queries the check runs.\n\n**Borderline point:** Check 4 also fails if the workspace tests fail, which line 4 does not ask for. Line 6 already requires `npm test` to pass, so this adds no new requirement.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. I compared the builder brief with the verifier's checks and probes. The builder brief lists the issue's six expect lines as \"pass/fail conditions\". Those lines are the bar itself, which the criterion allows. The builder brief does not copy any of the verifier's probes. It has none of the inline scripts with expected outputs, and none of the specific inputs such as `{bad` / `{\"c\":` or the line numbers 2 and 5 that the verifier expects. It also has none of the gh api / jq commands or the grep over test files. The commands it gives the builder are allowed ones: `npm ci && npm test`, writing its own node:test tests, and waiting for the `test` workflow. Its behaviour notes on CRLF, the trailing newline, the shebang and empty stdout on exit 2 are written as a spec, with no specific inputs and expected outputs. In the verifier brief they are only advisory. The line \"the string jsonl-lint must appear\" comes close to Check 5's grep, but it just restates expect line 5.",
+      "cached": false
+    }
+  }
+}

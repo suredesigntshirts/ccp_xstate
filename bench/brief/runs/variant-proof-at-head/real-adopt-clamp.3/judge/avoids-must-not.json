@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c62fb8597d0f6cdd3e9c2326ffaee83c919029c35b13d70c5e631c6a46a865d3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 holds: Check 3 takes function names from Object.keys(require('./math.js')), so a README missing subtract fails. Item 2 breaks in Check 3. Its script requires each function to match the regex '^#+\\\\s*'+n+'\\\\s*\\\\(', a markdown heading like \"### name(\". PASS also needs \"each exported function has a heading with a description in README.md\". Line 3 only says README.md \"documents every function math.js exports\". A README documenting subtract in a list, a table or prose meets the line but fails this check. That is the \"specific README layout\" requirement the must_not list forbids. Checks 1, 2 and 4 match their lines and are not stricter.",
+  "model": "claude-opus-5-5",
+  "ms": 11974,
+  "tokens": {
+    "input": 2,
+    "output": 841,
+    "cacheCreation": 3352,
+    "cacheRead": 783,
+    "fresh": 4195,
+    "total": 4978
+  },
+  "at": "2026-11-05T08:42:01.423Z"
+}

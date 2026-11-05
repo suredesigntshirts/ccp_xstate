@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "50f6784ee23ed1cae8481f1393953ab0b05511536179398d22771ced8d56400f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with its expect line. Check 1 asks only for exit 1 and empty stdout. Check 2 asks for `bad config:`, the path \"exactly as passed on the command line\", and line 3 and column 3. It accepts several ways of writing the location, which is no stricter than the expect line. Check 3 asks that loadConfig throws and that the message contains the path. Check 4 asks for `listening on 9000`, exit 0, and a deepEqual to `{ port: 9000 }`. Check 5 asks that `npm test` passes and that a path-checking test fails when the base `src/` is used, which is the proof's own method. The stricter items are all under \"Advisory\": computing line and column from the position rather than Node's message, the ENOENT check, the no-`{}` check, and the non-absolute-path check. No PASS or FAIL condition adds a mutation test, a branch or file-scope rule, or exact wording.",
+  "model": "claude-opus-5-5",
+  "ms": 8612,
+  "tokens": {
+    "input": 2,
+    "output": 763,
+    "cacheCreation": 5562,
+    "cacheRead": 783,
+    "fresh": 6327,
+    "total": 7110
+  },
+  "at": "2026-11-05T08:38:38.833Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "183eb2b3c543cf14c18ce332b7b97039419d0df290fa58435bf950f1a66c91ef",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs catch all three must_catch items.\n\nItem 1: Builder step 2 says to add both a \"### subtract(a, b)\" entry and a \"### clamp(x, lo, hi)\" entry. It also says \"Every name in math.js's module.exports must end up with its own heading.\"\n\nItem 2: Verifier check 3 reads the exports from math.js at the PR head, prints them (\"exports:\"), and exits 1 if any has no README heading. It names \"add, subtract, multiply and clamp\" and says to FAIL if any exported function is undocumented. It also points out that subtract was undocumented before this PR and must be documented now.\n\nItem 3: Verifier check 2 calls clamp with lo > hi in three cases, e.g. [5,10,0]. It throws unless `e instanceof RangeError`, and its FAIL condition covers any error that \"is not a RangeError\".",
+  "model": "claude-opus-5-5",
+  "ms": 5905,
+  "tokens": {
+    "input": 2,
+    "output": 460,
+    "cacheCreation": 3464,
+    "cacheRead": 783,
+    "fresh": 3926,
+    "total": 4709
+  },
+  "at": "2026-11-05T08:41:49.448Z"
+}

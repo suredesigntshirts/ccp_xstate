@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "dd5a78263a5ad7ff4c1c9d3aaca8fa886debb042e0664c9040a0c81c78c2a765",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands work as written. The builder steps are fine: npm install, npm ci && npm test, chmod. The Check 3 `node --input-type=module -e \"…\"` quoting and escapes come out as valid JS. The Check 4 `node -e \"const p=require(...)\"` is valid. The gh commands (`pr view --json body,headRefOid,files`, `pr list --search`, `pr checks`) take valid arguments. The problem is that every verifier command in Checks 1 and 2 uses `$T`, as in `printf ... > $T/clean.jsonl` and `node ... $T/does-not-exist.jsonl >$T/o1`, but no step ever sets it. The brief only says to use a scratch directory \"e.g. `mktemp -d`\" and never gives `T=$(mktemp -d)`. Run as written, `$T` is empty, so the files go to `/clean.jsonl`, `/o1` and so on at the filesystem root. Those writes may fail, or may clobber files, and the PASS lines that expect `$T/bad.jsonl:3:` don't line up with the intended scratch path. Because these commands depend on a variable no earlier step creates, the brief breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 19042,
+  "tokens": {
+    "input": 2,
+    "output": 1274,
+    "cacheCreation": 6035,
+    "cacheRead": 783,
+    "fresh": 7311,
+    "total": 8094
+  },
+  "at": "2026-11-05T08:59:41.536Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "45eef9bd4f49c2043be90b25fa2415b42304d93725276c0f31eb37b5f450123f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier brief's probes. Most of the builder brief sets the bar: the expect lines quoted as is, the behaviour to implement, which tests to write, running `npm test` and watching the workflow. All of that is allowed. Step 5 breaks the criterion. It tells the builder to check that \"`git diff b74bddb HEAD -- packages/jsonl-lint/src/index.js` prints nothing once committed\". That is the same probe as verifier Check 4 (`git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js`), and it carries the same pass condition: no diff output. Expect line 4 only says lint(text) is unchanged. It names no command, so the exception for commands named by the issue doesn't cover this one. Because the verifier's check reached the builder, the methods aren't private.",
+  "model": "claude-opus-5-5",
+  "ms": 9063,
+  "tokens": {
+    "input": 2,
+    "output": 708,
+    "cacheCreation": 6843,
+    "cacheRead": 783,
+    "fresh": 7553,
+    "total": 8336
+  },
+  "at": "2026-11-05T08:42:51.475Z"
+}

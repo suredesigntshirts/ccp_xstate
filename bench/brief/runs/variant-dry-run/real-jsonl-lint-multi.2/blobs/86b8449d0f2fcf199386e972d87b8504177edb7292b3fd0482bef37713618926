@@ -1,0 +1,73 @@
+Verify the PR for https://github.com/suredesigntshirts/ccp_machine_test/issues/104 at its head commit. Check out the PR head, run everything from the repository root, and give one verdict per check below, in order. Each check quotes its acceptance line; PASS and FAIL test only that line.
+
+Setup (run once; later shell calls must re-define B and T as on the first line):
+```
+B=packages/jsonl-lint/bin/jsonl-lint.js; T=/tmp/jl-verify; rm -rf "$T" && mkdir -p "$T"
+printf '{"a":1}\n' > "$T/a.jsonl"; printf '{"b":2}\n\n{"c":3}' > "$T/b.jsonl"; printf '{"a":1}\n{bad}\n' > "$T/bad.jsonl"; printf '{"x":\n{"y":1}\n[1,\n' > "$T/bad2.jsonl"
+npm ci
+```
+
+Check 1. "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before"
+Run (this builds the expected output with the single-file program as it was before the change, at commit b74bddb, then removes it):
+```
+B=packages/jsonl-lint/bin/jsonl-lint.js; T=/tmp/jl-verify
+git show b74bddb:packages/jsonl-lint/bin/jsonl-lint.js > packages/jsonl-lint/bin/old-jsonl-lint.tmp.mjs
+{ node packages/jsonl-lint/bin/old-jsonl-lint.tmp.mjs "$T/bad.jsonl"; node packages/jsonl-lint/bin/old-jsonl-lint.tmp.mjs "$T/bad2.jsonl"; } > "$T/expected.txt"
+rm packages/jsonl-lint/bin/old-jsonl-lint.tmp.mjs
+node "$B" "$T/a.jsonl" "$T/bad.jsonl" "$T/b.jsonl" "$T/bad2.jsonl" > "$T/actual.txt"; echo "exit=$?"
+diff "$T/expected.txt" "$T/actual.txt"; echo "diffexit=$?"
+node "$B" "$T/bad2.jsonl" "$T/bad.jsonl"
+```
+PASS: diffexit=0 (the multi-file stdout is exactly the old single-file outputs of bad.jsonl then bad2.jsonl: 3 lines in `<file>:<line>: <error>` form, lines 2; 1; 3), and the last command prints the bad2.jsonl lines before the bad.jsonl line. FAIL: any difference, a file missing from the output, or the order not following the arguments.
+
+Check 2. "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)"
+Run:
+```
+B=packages/jsonl-lint/bin/jsonl-lint.js; T=/tmp/jl-verify
+printf '{"a":1}\n' | node "$B" -; echo "exit=$?"
+printf '{"a":1}\n{bad}\n' | node "$B" -; echo "exit=$?"
+printf '{bad}\n' | node "$B" "$T/a.jsonl" - "$T/bad.jsonl"; echo "exit=$?"
+node "$B" - "$T/a.jsonl" - < /dev/null; echo "exit=$?"
+printf '{"a":1}\n' | node "$B" - -; echo "exit=$?"
+```
+PASS: first prints nothing, exit=0; second prints one line starting `-:2: `, exit=1; third prints `-:1: ...` followed by `/tmp/jl-verify/bad.jsonl:2: ...`, exit=1; the two runs with two `-` arguments each exit=2 with a message on stderr. FAIL: stdin not read, a name other than `-` in the report, or two `-` not giving exit 2.
+
+Check 3. "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)"
+Run:
+```
+B=packages/jsonl-lint/bin/jsonl-lint.js; T=/tmp/jl-verify
+node "$B" "$T/a.jsonl" "$T/b.jsonl"; echo "exit=$?"
+node "$B" "$T/a.jsonl" "$T/bad.jsonl" "$T/b.jsonl"; echo "exit=$?"
+node "$B" > "$T/out" 2> "$T/err"; echo "exit=$?"; echo '--stdout'; cat "$T/out"; echo '--stderr'; cat "$T/err"
+node "$B" "$T/a.jsonl" "$T/missing.jsonl" "$T/bad.jsonl" "$T/b.jsonl" > "$T/out" 2> "$T/err"; echo "exit=$?"; echo '--stdout'; cat "$T/out"; echo '--stderr'; cat "$T/err"
+node "$B" "$T/a.jsonl" "$T/missing.jsonl" "$T/b.jsonl"; echo "exit=$?"
+```
+PASS: exits are 0, 1, 2, 2, 2 in that order; the no-argument run has a message on stderr; the missing-file run has a stderr message naming missing.jsonl and stdout still holding `/tmp/jl-verify/bad.jsonl:2: ...` (the files after the missing one were still checked). FAIL: any other exit code, no stderr message, or checking stopping at the unreadable file.
+
+Check 4. "lint(text) in src/index.js is unchanged"
+Run:
+```
+git diff --exit-code b74bddb HEAD -- packages/jsonl-lint/src/index.js; echo "diffexit=$?"
+node --input-type=module -e "import { lint } from './packages/jsonl-lint/src/index.js'; import assert from 'node:assert/strict'; assert.deepEqual(lint('{\"a\":1}\n'), []); const p = lint('{\"a\":1}\n\n{bad}\r\n{\"t\":'); assert.deepEqual(p.map(x => x.line), [3, 4]); console.log('lint OK')"
+```
+PASS: no diff output and diffexit=0 (b74bddb is the commit before this change), and `lint OK` printed. FAIL: any diff in packages/jsonl-lint/src/index.js or the assertion failing.
+
+Check 5. "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage"
+Run `(cd packages/jsonl-lint && npm test)` and read packages/jsonl-lint/test/*.test.js and packages/jsonl-lint/README.md.
+PASS: the tests pass and use node:test, and there is a test that runs the bin for each of: two clean files; one bad file among several; `-` on stdin with clean input; `-` on stdin with bad input; a missing file among good ones; two `-` arguments; no arguments. The README shows the `<file> [<file> ...]` usage, says `-` reads stdin, and describes the exit codes for several files. FAIL: any of the seven cases without a test, a test failure, or the README still showing only single-file usage.
+
+Check 6. "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head"
+Run (with <pr> the PR number):
+```
+gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json state,body,headRefOid
+git rev-parse HEAD
+gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test
+gh pr list --repo suredesigntshirts/ccp_machine_test --state open --search "104 in:body"
+npm test
+```
+PASS: the PR is open on suredesigntshirts/ccp_machine_test, its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`, headRefOid equals the commit you checked, the `test` check shows pass for that head, no other open PR claims this issue, and root `npm test` exits 0 with no failing tests. FAIL: missing or different Closes line, the test workflow failing, pending or missing at the head, more than one PR for the change, or `npm test` failing.
+
+Advisory (not part of any PASS/FAIL):
+- Note whether the unreadable-file message has the form `jsonl-lint: cannot read <file>: <reason>` like before, and whether a clean multi-file run writes nothing to stderr.
+- Note whether the bin still has no runtime dependencies and the diff stays inside packages/jsonl-lint/.
+- Run `git status --short` at the end; Check 1 makes a temporary file in packages/jsonl-lint/bin/ and removes it, so the tree should be clean.

@@ -1,0 +1,25 @@
+Check the pull request for issue https://github.com/o/strutil/issues/7 at its head commit. Run `npm install` only if package.json gained dependencies (it has none today). Run every command from the repository root. There is one check per expect line, in order.
+
+Check 1 — expect: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+`node --input-type=module -e "import * as m from './index.js'; const r=[typeof m.padLeft, JSON.stringify(m.padLeft('42',5,'0')), JSON.stringify(m.padLeft('42',5)), JSON.stringify(m.padLeft('7',3,'x')), JSON.stringify(m.padLeft('',4,'0'))]; console.log(r.join(' '))"`
+PASS: output is exactly `function "00042" "   42" "xx7" "0000"` (padLeft is an exported function; padding with the given fill on the left reaches width characters; with no fill the padding is spaces). FAIL: padLeft is not exported, the call throws, or any value differs (wrong side, wrong length, or a non-space default fill).
+
+Check 2 — expect: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+`node --input-type=module -e "import {padLeft} from './index.js'; console.log(JSON.stringify([padLeft('12345',5,'0'), padLeft('123456',3,'0'), padLeft('abc',3), padLeft('abcd',2)]))"`
+PASS: output is exactly `["12345","123456","abc","abcd"]`. FAIL: any string is padded, truncated or otherwise changed, or the call throws.
+
+Check 3 — expect: "README.md has a section for every function index.js exports"
+Run:
+`node --input-type=module -e "import * as m from './index.js'; import fs from 'node:fs'; const md=fs.readFileSync('README.md','utf8'); const fns=Object.keys(m).filter(k=>typeof m[k]==='function'); const missing=fns.filter(f=>!new RegExp('^#+\\s+'+f+'\\b','m').test(md)); console.log('exports:',fns.join(','),'missing:',missing.join(',')||'none')"`
+Then open README.md and confirm each such heading is followed by text describing that function.
+PASS: `missing: none` is printed and each exported function (this must include capitalize, slugify, truncate and padLeft, plus any other exported function) has its own README heading with a description under it. FAIL: any exported function has no section — note that slugify had no README section before this change, so a PR that only adds padLeft fails this check.
+
+Check 4 — expect: "npm test passes"
+Run: `npm test`
+PASS: exit code 0 and the summary shows `# fail 0`. FAIL: non-zero exit code or any failing test.
+
+Advisory (not part of PASS/FAIL):
+- Check that the existing functions capitalize, slugify and truncate behave as before (e.g. the original tests in test/strutil.test.js still exist and pass).
+- It is good if the PR adds tests for padLeft covering default fill and the unchanged-when-long case.

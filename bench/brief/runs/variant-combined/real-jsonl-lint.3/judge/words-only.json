@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "b3862017f04d94a68081edcfe834bfb8120a8aafc9eaefce5245cbbc71bb135d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each check's PASS/FAIL conditions with the words of its expect line. Check 1 asks for reports on lines 3 and 6, nothing for blank or valid lines, the `<file>:<line>: <error>` form and exits 1/0. The words \"blank lines skipped\" and \"an unterminated last line checked\" require all of this. Check 2 asks only for exit 2 and non-empty stderr. Empty stdout is left to Advisory. Check 3's second call returning `[]` for a trailing newline is also forced, because the empty trailing row is a blank line and must be skipped. Check 4 allows extra flags after `node --test`. It asks for passing tests, which line 6's green npm test already forces. Check 6 runs `npm ci && npm test`, and the workflow itself runs `npm ci`, so a green workflow already requires it. Shebang, file mode, CRLF, lockfile and mutation checks all sit under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 16117,
+  "tokens": {
+    "input": 2,
+    "output": 1337,
+    "cacheCreation": 5865,
+    "cacheRead": 783,
+    "fresh": 7204,
+    "total": 7987
+  },
+  "at": "2026-11-05T08:59:22.493Z"
+}

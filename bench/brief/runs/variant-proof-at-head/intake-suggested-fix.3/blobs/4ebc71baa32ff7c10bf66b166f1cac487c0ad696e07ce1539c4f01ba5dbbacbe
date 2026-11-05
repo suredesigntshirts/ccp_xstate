@@ -1,0 +1,25 @@
+Run every check at the pull request's head, with the repo's Node (v22) from the repository root. Run each check, not just the diff. Report PASS or FAIL per check with the output you saw.
+
+Check 1 — expect: "Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`, `  \"port\": 9000,`, `  greeting: \"x\"`, `}`, exits with code 1 and prints nothing on stdout (in particular no `listening on` line)."
+Run: `d=$(mktemp -d); printf '{\n  "port": 9000,\n  greeting: "x"\n}\n' > $d/c.json; node src/app.js $d/c.json >$d/out 2>$d/err; echo "exit $?"; cat $d/out; wc -c < $d/out`
+PASS: exit code is 1 and stdout ($d/out) is empty (0 bytes). FAIL: any other exit code, or any stdout output (including a `listening on` line).
+
+Check 2 — expect: "In that same run, stderr contains `bad config:`, the full path `<tmp>/c.json` exactly as passed on the command line, the line number `3` and the column number `3` of the mistake."
+Run: using the same $d from Check 1, `cat $d/err`, then `grep -F "bad config:" $d/err` and `grep -F "$d/c.json" $d/err`.
+PASS: stderr contains `bad config:`, contains the exact string `$d/c.json` as passed (not rewritten), and states the mistake's location as line 3 and column 3 (e.g. `line 3 column 3` or `c.json:3:3`). FAIL: any one of these is missing, or the line/column shown is not 3 and 3.
+
+Check 3 — expect: "Calling `loadConfig(path)` on a file containing `{port: 9000` throws instead of returning a value, and the thrown error's `message` contains `path`."
+Run: `d=$(mktemp -d); printf '{port: 9000' > $d/b.json; node --input-type=module -e "import {loadConfig} from './src/config.js'; try { const v = loadConfig('$d/b.json'); console.log('RETURNED', JSON.stringify(v)); process.exit(2) } catch (e) { console.log(e.message.includes('$d/b.json') ? 'OK' : 'NO PATH: ' + e.message) }"`
+PASS: prints `OK`. FAIL: prints `RETURNED ...` (exit 2) or `NO PATH: ...`.
+
+Check 4 — expect: "Running `node src/app.js <tmp>/ok.json`, where ok.json contains `{\"port\": 9000}`, exits 0 and prints `listening on 9000` on stdout. `loadConfig` on that file returns `{ port: 9000 }`."
+Run: `d=$(mktemp -d); printf '{"port": 9000}' > $d/ok.json; node src/app.js $d/ok.json; echo "exit $?"; node --input-type=module -e "import {loadConfig} from './src/config.js'; console.log(JSON.stringify(loadConfig('$d/ok.json')))"`
+PASS: stdout of the app is `listening on 9000`, exit is 0, and the second command prints `{"port":9000}`. FAIL: anything else.
+
+Check 5 — expect: "`npm test` passes, and the test suite has at least one test that fails at the current base commit and checks that the error from malformed config JSON includes the file path."
+Run: `npm test` at the head. Then find the PR's base commit (`git merge-base HEAD <the PR's target ref>`), put the base commit's `src/` in place while keeping the head's `test/` (`git checkout <base-sha> -- src`), run `npm test` again, and afterwards restore the head's `src/` (`git checkout HEAD -- src`).
+PASS: `npm test` passes at the head, AND with the base `src/` at least one test fails that asserts the malformed-JSON error message contains the config file's path (read that test to confirm what it asserts). FAIL: `npm test` fails at the head, or no test fails against the base `src/`, or the only failing tests do not check the file path.
+
+Advisory (not pass/fail conditions):
+- Read `src/config.js` to see whether line and column come only from Node's own message text. If they do, note that other Node versions may not show the location.
+- Note whether `loadConfig` returns `{}` or defaults anywhere for parse errors (a non-goal), and whether a missing config file still yields exit 1 with `bad config:`.

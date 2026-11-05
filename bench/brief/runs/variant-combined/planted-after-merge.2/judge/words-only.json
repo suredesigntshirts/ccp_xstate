@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "a4546104196c275b84247de3dc8e3bce21cbbd0d665eb9f35a01f91f15ccfb20",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 asks only that each --shout run print the greeting \"with every letter upper-cased\". The exact string with a trailing newline, and the flag working after the name, are under Advisory. Check 2 compares base and head output (stdout, plus stderr for the no-name run), which is what \"output is unchanged\" means. Exit status is under Advisory. Check 3 needs the file to mention --shout and describe it or show how to use it, with no exact wording required. Check 4 checks that the workflow still publishes docs/ on push to main and that docs/index.md contains --shout. The page can't list --shout after merge unless both are true, so this is not stricter than the line. Running npm test, test coverage and greeting() behaviour are context or Advisory only. No check adds a mutation test, a file-scope rule or an exact-wording rule.",
+  "model": "claude-opus-5-5",
+  "ms": 12962,
+  "tokens": {
+    "input": 2,
+    "output": 746,
+    "cacheCreation": 3380,
+    "cacheRead": 783,
+    "fresh": 4128,
+    "total": 4911
+  },
+  "at": "2026-11-05T08:55:17.258Z"
+}

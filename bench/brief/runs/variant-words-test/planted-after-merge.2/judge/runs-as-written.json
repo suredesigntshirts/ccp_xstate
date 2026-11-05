@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "825cb4673cffd337c36e49fce4b15ac4637a56ae37bb078fd7ec0562a06f6117",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands are fine: `node bin/greet.js --shout Ada`, `npm test` (the script is `node --test`), `cat`/`grep -n -- --shout docs/index.md`, `gh pr view <number> --json state,mergedAt` and `curl -sSL …` are all valid and name files that exist. The builder brief's commands are fine too. Check 2 in the verifier brief breaks the criterion. It gives \"`git stash`-free: `git worktree add` or `git show <base>:bin/greet.js` with src/greet.js from base\". `git worktree add` with no path is missing a required argument, so it fails with a usage error. `git show <base>:bin/greet.js` only prints the file's contents. It does not run the base version, and the brief gives no runnable steps for running the base with src/greet.js from base. So the base comparison command would not run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 10262,
+  "tokens": {
+    "input": 2,
+    "output": 823,
+    "cacheCreation": 3273,
+    "cacheRead": 783,
+    "fresh": 4098,
+    "total": 4881
+  },
+  "at": "2026-11-05T08:38:53.254Z"
+}

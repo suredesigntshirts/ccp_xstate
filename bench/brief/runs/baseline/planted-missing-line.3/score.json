@@ -3,7 +3,7 @@
   "run": "planted-missing-line.3",
   "case": "planted-missing-line",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": true,
       "why": "I checked the output against both must_not items. Item 1: the verifier brief has exactly two checks, one per expect line (\"There is one check per acceptance line, in order\"). npm test and the plain-CSV comparison appear only under \"Advisory (not pass/fail conditions)\", which says to note results, not to gate on them. That makes them advisory notes, not a third check. Item 2: Check 1's PASS needs both commands to exit 0, the CSV output to be a JSON array and the --tsv output to match it (SAME). Check 2's PASS needs README.md to mention --tsv and explain it. Neither PASS nor FAIL condition requires npm test or the CSV tests to pass. The builder brief asks the builder to run npm test, but neither must_not item covers builder steps. The briefs avoid both items.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's steps with the verifier's checks. Builder step 3 says to write a test that feeds 'a\\tb\\n1\\t2\\n' to `--tsv` and expects the output to match the CSV run on 'a,b\\n1,2\\n', which is '[{\"a\":\"1\",\"b\":\"2\"}]\\n'. Verifier Check 1 uses the same probe: \"do the same with a two-column table: 'a\\tb\\n1\\t2\\n' against 'a,b\\n1,2\\n'\". So the builder gets one of the checker's own input/expected-output pairs. The rule allows telling the builder to write its own tests, but it bars probes that also appear in the verifier brief. Step 5's 'a\\tb\\n1\\t2\\n3\\t4\\n' table and the README check don't overlap. The three-column name/age/city table isn't leaked either. Still, the shared two-column probe means the criterion doesn't hold for the whole output.",
       "cached": true
     }
   }

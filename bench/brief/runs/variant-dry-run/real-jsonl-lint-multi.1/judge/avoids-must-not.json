@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "1b13ad359933a8aeb1ecd1715c04dbf708a0bfd164937410d45674b66ee3c6d5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line. Checks 1–3 cover the behaviour lines and each one runs the CLI (`node $B ...`, piped stdin, exit codes, a stdout diff against single-file runs); none passes a behaviour line by reading the code alone. Their conditions only test what the lines say: the `<file>:<line>: <error>` format, file order, `-` naming, exit codes 0/1/2, and that stderr has \"a message\" with no exact wording. Check 4 (empty diff of index.js) and Check 5 (reading the tests and README) read files, but they cover lines 4–5, not lines 1–3. Check 6 requires one PR, the Closes text and green checks, which is no stricter than line 6. Neither brief adds a branch-name rule or a mutation test. The builder's suggested stderr text (\"jsonl-lint: cannot read\") is guidance, not a check. Changes outside the package are only advisory (\"not pass/fail\"), so no file-scope limit is enforced.",
+  "model": "claude-opus-5-5",
+  "ms": 10722,
+  "tokens": {
+    "input": 2,
+    "output": 961,
+    "cacheCreation": 5660,
+    "cacheRead": 783,
+    "fresh": 6623,
+    "total": 7406
+  },
+  "at": "2026-11-05T08:42:33.577Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "2fa277768c1b523ef00cb966b2fa879d4935edb6af6832cbe8c5e00420058e15",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not 1 holds: Check 3 lists every exported function and fails if any, including slugify, has no README section (\"slugify had no section before this change, so it must be added too\"). Must_not 2 breaks in two places. First, Check 3 only counts a section when a heading matches the regex `'^#{1,6} +' + f + '\\\\b'`, with the function name right after the hashes. A valid section titled \"## `padLeft(s, width, fill)`\" or \"### Function: padLeft\" would fail, so the check requires a README layout the line never asks for. Second, Check 4's PASS needs \"the output shows `# fail 0`\". That ties \"npm test passes\" to one test runner's output format, which is stricter than a zero exit with no failing tests. Checks 1 and 2 do not test parameter count or require fill to be one character.",
+  "model": "claude-opus-5-5",
+  "ms": 10044,
+  "tokens": {
+    "input": 2,
+    "output": 871,
+    "cacheCreation": 3535,
+    "cacheRead": 783,
+    "fresh": 4408,
+    "total": 5191
+  },
+  "at": "2026-11-05T08:40:04.276Z"
+}

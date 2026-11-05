@@ -1,0 +1,40 @@
+Check the pull request head. Run every command from the repository root. There are seven checks, one per acceptance line, in order. For each one, report PASS or FAIL and include the evidence (the exact output, made visible with `od -c` or `cat -A` where the check calls for it).
+
+Check 1. Expect line: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv` prints exactly `[{"a":"1","b":"2"}]` followed by a newline and exits 0.
+Run: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv; echo "exit=$?"`. Also run `printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv | od -c` to see the exact bytes.
+PASS: stdout is exactly `[{"a":"1","b":"2"}]` followed by one newline and nothing else, and the next line is exit=0.
+FAIL: any other stdout (extra or missing characters, no trailing newline, extra lines) or a non-zero exit.
+
+Check 2. Expect line: With --tsv, commas inside a field stay literal: `printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv` prints exactly `[{"name":"x","note":"hello, world"}]` followed by a newline.
+Run: `printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv | od -c`.
+PASS: stdout is exactly `[{"name":"x","note":"hello, world"}]` followed by one newline.
+FAIL: any other output.
+
+Check 3. Expect line: With --tsv and several data rows, every row comes out in order: `printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv` prints exactly `[{"a":"1","b":"2"},{"a":"3","b":"4"}]` followed by a newline.
+Run: `printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv | od -c`.
+PASS: stdout is exactly `[{"a":"1","b":"2"},{"a":"3","b":"4"}]` followed by one newline.
+FAIL: any other output, including the rows in a different order or a row missing.
+
+Check 4. Expect line: Without the flag, CSV still works as before: `printf 'a,b\n1,2\n' | node bin/csv2json.js` prints exactly `[{"a":"1","b":"2"}]` followed by a newline.
+Run: `printf 'a,b\n1,2\n' | node bin/csv2json.js | od -c`.
+PASS: stdout is exactly `[{"a":"1","b":"2"}]` followed by one newline.
+FAIL: any other output.
+
+Check 5. Expect line: Without the flag, tabs are not treated as separators: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js` prints exactly `[{"a\tb":"1\t2"}]` followed by a newline, which is the current output.
+Run: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js | od -c`.
+PASS: stdout is the JSON text `[{"a\tb":"1\t2"}]`, where each \t is the two characters backslash and t (the JSON tab escape), followed by one newline.
+FAIL: any other output, for example `[{"a":"1","b":"2"}]` (tabs being split) or a raw tab byte in place of the escape.
+
+Check 6. Expect line: `npm test` exits 0, and test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and checks its output.
+Run: `npm test; echo "exit=$?"`. Then run `grep -n -- '--tsv' test/*.js` and read each matching test.
+PASS: exit=0, and at least one test in test/ runs bin/csv2json.js with the --tsv argument, feeds it input that contains tab characters, and asserts on the output it produces.
+FAIL: npm test exits non-zero, or no test in test/ runs bin/csv2json.js with --tsv on tab-containing input and checks the output (for example, a test that only calls parse() directly, or a test that runs the CLI but asserts nothing about its output).
+
+Check 7. Expect line: README.md documents the --tsv flag with an example invocation.
+Read README.md at the head.
+PASS: README.md mentions the --tsv flag and includes an example invocation that uses it, such as `node bin/csv2json.js --tsv < table.tsv`.
+FAIL: README.md does not mention --tsv, or mentions it without any example invocation.
+
+Advisory (does not affect PASS/FAIL):
+- The issue's proof notes for check 6 mention `npm run test:cli`, but package.json at the base defines only a `test` script. The expect line names `npm test`, so check 6 uses that. If the head happens to add a test:cli script, you may run it too and note the result.
+- Worth noting, not as conditions: whether the README says plainly that --tsv means tab-separated input, whether the flag works when it is not the first argument (e.g. `node bin/csv2json.js foo --tsv`), whether src/parse.js stayed unchanged, and whether the diff adds anything the issue rules out (quoting rules, separator auto-detection, --sep/--delimiter, --help, changes to how unknown arguments are handled, changes to JSON formatting).

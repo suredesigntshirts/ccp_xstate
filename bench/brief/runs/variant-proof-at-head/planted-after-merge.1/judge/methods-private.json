@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "671b9beda2d6f1c7f6fdaf18fa078c8ae08a465caed586ae54d3b888f44b83bf",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the builder brief for verifier probes and conditions, and it carries several. Builder step 1 says \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline\", and step 4 asks for a test expecting \"`HELLO, ADA!\\n`\". Those are Check 1's input (Ada) and expected output. Step 2 states Check 2's PASS condition: \"`node bin/greet.js Ada` prints `Hello, Ada!\\n`\" and the no-name run writes usage to stderr and exits 2. Step 3's \"do not change .github/workflows/pages.yml\" repeats Check 4's FAIL condition. Running the command the expect line names would be allowed. But the brief hands the builder the checker's exact inputs and expected outputs, so it gives the builder the checker's methods and not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 11943,
+  "tokens": {
+    "input": 2,
+    "output": 1021,
+    "cacheCreation": 3235,
+    "cacheRead": 783,
+    "fresh": 4258,
+    "total": 5041
+  },
+  "at": "2026-11-05T08:39:14.789Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "38480ea2bffe53fe88719226336f8356e4ada8e77f314c36c56d7c313f55c006",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands hold up. The verifier's `node --input-type=module -e` import works with its shell escaping, the `require` call works from the root, and `npm test -w jsonl-lint`, `gh pr list/view/checks` (including the `body,headRefOid` fields) and `git update-index --chmod=+x` are all valid. `node --test` finds `test/*.test.js` with no arguments.\n\nOne JavaScript call breaks. Builder step 4 says to write fixtures with `fs.mkdtempSync(os.tmpdir())`. `mkdtempSync` treats its argument as a name prefix and adds six random characters, so this tries to create something like `/tmpAb12Cd` in `/`, not a directory inside `/tmp`. On a CI runner without root this fails with EACCES, so the tests would not run as written. The correct call is `fs.mkdtempSync(path.join(os.tmpdir(), 'jsonl-'))`. Because one command fails, the criterion is not met for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 15059,
+  "tokens": {
+    "input": 2,
+    "output": 1275,
+    "cacheCreation": 5077,
+    "cacheRead": 783,
+    "fresh": 6354,
+    "total": 7137
+  },
+  "at": "2026-11-05T08:42:42.591Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "4ce10bf252bb60ae3d15cba7d7bf36a8c0a756a5b841cb9fab15fd4523c33f6c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the verifier brief. Item 1 is handled. Check 4 says \"The live page can only be seen after merge, so don't fetch it.\" At the head, it then confirms that .github/workflows/pages.yml still publishes docs on push to main and that docs/index.md contains `--shout`. Item 2 is handled. Check 2 runs the commands at the head and again on a copy of the base commit (\"git worktree add /tmp/base-greet $(git merge-base HEAD origin/HEAD)\"). It passes only if stdout, stderr and the exit code are identical, so it compares against the pre-change output and doesn't rely only on a hand-written expected string. Both traps are caught.",
+  "model": "claude-opus-5-5",
+  "ms": 4085,
+  "tokens": {
+    "input": 2,
+    "output": 300,
+    "cacheCreation": 3181,
+    "cacheRead": 783,
+    "fresh": 3483,
+    "total": 4266
+  },
+  "at": "2026-11-05T08:39:01.504Z"
+}

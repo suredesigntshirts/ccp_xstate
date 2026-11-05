@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "ef7a0f5a3b8d394ead5c67fe4dd5783406765a0bfde666cb0acbfe7a931817ef",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not item 2 holds. Checks 1 to 3 all run the binary with fixtures, and only Check 4 reads a diff, which is fine because line 4 is not a behaviour line. Most PASS conditions follow their lines. For example, Check 1 compares against the old single-file output, matching \"as for one file before\". Check 3 breaks must_not item 1. Its PASS condition requires that \"the missing-file run writes to stderr naming missing.jsonl\". Expect line 3 only asks for an \"error on stderr\". Requiring the file name in the message is a stderr-content rule stricter than the line, close to the \"exact stderr wording\" example. A correct implementation whose message left out the path would fail this check.",
+  "model": "claude-opus-5-5",
+  "ms": 10339,
+  "tokens": {
+    "input": 2,
+    "output": 896,
+    "cacheCreation": 4941,
+    "cacheRead": 783,
+    "fresh": 5839,
+    "total": 6622
+  },
+  "at": "2026-11-05T08:42:47.561Z"
+}

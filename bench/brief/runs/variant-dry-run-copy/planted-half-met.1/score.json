@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.1",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1, 2 and 4 test only what their lines say: padLeft is exported, pads with fill and defaults to a space; s comes back unchanged at or past width; npm test shows `# fail 0` and exit 0. Check 3 breaks the criterion. Its line asks only that README.md has a section for every exported function. But its PASS condition adds \"The exported list includes padLeft and slugify.\" Line 3 doesn't require any particular function to be exported. If slugify were dropped from the exports, line 3 would still hold, yet this check would fail. Requiring padLeft to be exported belongs to line 1, not line 3. This stricter condition sits in PASS when it should be under Advisory.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs and all of them should run as written. Every file and tool they name exists at this commit: index.js, README.md, test/strutil.test.js, and `npm test`, which maps to `node --test`. The verifier's `node --input-type=module -e \"...\"` commands are valid shell and valid JavaScript. In Check 3, bash's double quotes turn `'\\\\\\\\b'` into JS `'\\\\b'`, which is the regex `\\b`. `'\\n'` and `\\s` pass through to JS unchanged. The ESM imports of './index.js' and 'node:fs' are well-formed, and `process.exit` plus `echo \"exit=$?\"` correctly report the exit code. One small risk: the `!heads` in Check 3 would trigger history expansion only in an interactive bash, not in the non-interactive shell agents use. The builder's steps (`padStart`, `npm test`) also fit the repo. I found no command that names a missing file or uses invalid syntax.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each must_catch item against the briefs. All three are handled.\n\nItem 1: the builder brief says README.md has \"NO section for slugify\" and \"you must add a slugify section as well as a padLeft section\". Step 2 spells out both sections.\n\nItem 2: verifier Check 3 imports index.js at the PR head and prints every exported function. It then lists any export with no README heading and exits 1 if there are any. The brief says \"The exported list includes padLeft and slugify\" and that on the base the command reports \"missing: slugify\", so a missing slugify section FAILs. It does not write out the four names (capitalize, slugify, truncate, padLeft). It builds that list at run time, which still covers them. It also fails headings that have no text under them.\n\nItem 3: verifier Check 1 includes padLeft('ab', 4) === '  ab'. That call has no fill argument and checks for space padding.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Item 1: Check 3 lists every exported function and exits 1 if any has no README heading. The brief notes the base reports \"missing: slugify\" and says the exported list must include slugify, so a README with only a padLeft section fails. Item 2: Checks 1 and 2 test only padding values, the default space fill and the unchanged-when-long-enough case. Nothing checks parameter count or that fill is one character. Check 3 accepts a heading of any level that names the function as a whole word, so no README layout is forced. Builder steps like \"before ## Tests\" are guidance, not pass/fail conditions. Two borderline points don't count as stricter: Check 3 fails a heading with no text under it, which fits what a \"section\" is, and Check 4 looks for \"# fail 0\", which assumes TAP output but is paired with the exit code. Neither must_not item is broken.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's steps with the verifier's checks, and the builder brief contains the verifier's probes. Builder step 1 lists \"padLeft('42', 5, '0') === '00042'; padLeft('ab', 4) === '  ab'; padLeft('12345', 5, '0') === '12345'; padLeft('123456', 5, '0') === '123456'\", and step 3 repeats those four cases as the required tests. The same input/output pairs are in verifier Check 1 ('42',5,'0'→'00042'; 'ab',4→'  ab') and Check 2 ('12345' and '123456' with width 5). The criterion allows the builder to write its own tests, but not to be given a set of inputs with expected outputs that also appears in the verifier brief. Step 4's \"check that every function exported from index.js has a README.md heading naming it\" also closely matches Check 3's method. So the builder brief does not keep the checker's methods private.",
+      "cached": false
+    }
+  }
+}

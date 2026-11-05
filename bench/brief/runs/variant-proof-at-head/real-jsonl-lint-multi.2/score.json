@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.2",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 5 test only what their lines require. Three checks ask for more:\n- **Check 6:** PASS requires \"there is one open PR on that repo\". Expect line 6 says only \"one PR … whose body says Closes …\". It never says the PR must be open, so a merged PR would wrongly fail.\n- **Check 3:** PASS requires \"stderr must name missing.jsonl\". The expect line only asks for an \"error on stderr\".\n- **Check 4:** PASS also requires that `lint.test.js` passes. Expect line 4 only says lint(text) is unchanged.\n\nThese stricter tests are inside PASS conditions rather than under Advisory, so the criterion fails.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Most commands hold up. Both briefs name tracked files: bin/jsonl-lint.js, src/index.js, test/cli.test.js, test/lint.test.js, README.md and .github/workflows/test.yml. `readFileSync(0,'utf8')`, spawnSync with `input`, `npm ci` (a package-lock.json exists), `npm test --workspace packages/jsonl-lint`, `node --test packages/jsonl-lint/test/lint.test.js` and the printf/gh/git commands are all valid.\n\nThe failure is in the verifier brief. It sets B to the repo-relative path `packages/jsonl-lint/bin/jsonl-lint.js`, then has the verifier make a scratch dir for c1.jsonl, c2.jsonl and b.jsonl. It then runs `node B c1.jsonl b.jsonl c2.jsonl` and similar commands. Run from the repo root, the bare scratch file names don't resolve. Run from the scratch dir, B doesn't resolve. No single working directory makes those commands work as written. The verifier would have to use an absolute path for B or a scratch-dir prefix on each file.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs handle all four must_catch items.\n1. Check 3 runs `node B c1.jsonl missing.jsonl b.jsonl` in one command. It requires exit 2, stderr naming missing.jsonl, and \"stdout must still contain the b.jsonl:2 and b.jsonl:3 lines\". So the missing file and the bad rows are tested together.\n2. Check 4 runs `git diff $(git merge-base origin/main HEAD) HEAD -- packages/jsonl-lint/src/index.js`, which compares the head with the base commit.\n3. Builder step 5 says \"Update packages/jsonl-lint/README.md\" and lists the usage, stdin, order and exit codes it must describe.\n4. Check 6 uses `gh pr view` for the body and headRefOid and `gh pr checks` on the PR. It requires the Closes line and that \"the test workflow check for the head commit succeeded\".",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 2 holds: checks 1 to 3 all run `node B ...` and don't pass on reading the code. Check 5 reads the tests, which is fine because line 5 is not a behaviour line. Item 1 breaks in Check 3. Line 3 asks only for an \"error on stderr\" when a file can't be read, but the verifier requires \"stderr must name missing.jsonl\". An implementation that writes a valid error such as \"jsonl-lint: a file could not be read\" meets line 3 and would still FAIL. That is a condition on the content of the stderr message, stricter than the line. The builder brief adds the same kind of rule (\"stderr names the missing file\") to the tests it asks for, but that is guidance, not a check. The other checks stay within their lines. Check 1 compares output against lint(), Check 2 asks for \"a message on stderr\", and the advisory notes are not pass/fail.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with each verifier check. The builder brief has no PASS or FAIL wording. It also contains none of the verifier's concrete probes: no scratch files c1/c2/b.jsonl or their contents, no `printf … | node B -` commands, no `git diff $(git merge-base …)`, no `gh pr checks`, no `node -e` comparison against lint(). What it does contain is the expect lines (allowed), \"Run `npm test`\" (allowed), and a list of node:test cases for the builder to write itself, such as \"a missing file among good ones… exit 2, stderr names the missing file\". Those cases restate expect lines 3 and 5. They describe tests the builder writes, which the criterion allows, not the verifier's input/output probes. The builder brief sets the bar without carrying the checker's methods.",
+      "cached": true
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "6b255e6449f8ca65d2722bcec1a6d2f57fac9b82ac5ba2c3fe0c65e20e7b7ed1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its line. None is stricter than its line. Check 1 asks for the `<path>:N: ` prefix followed by \"a non-empty error\", so no exact wording is required. Check 2 asks only for a non-empty stderr and exit 2. Check 3 asks for an array of objects with line and error. Check 6 asks for \"a single PR for this issue\" and has no branch-name or file-touch limit. There are no mutation tests. The stricter extras (shebang, CRLF handling, the lock file, stdout being empty) are labeled \"Advisory (not pass/fail)\", and the builder's step instructions are not verdict conditions. The behaviour lines are checked by running the program: Checks 1–3 run the CLI or import lint on temp fixtures, and Check 4 runs `npm test -w jsonl-lint` as well as reading the test files. Reading files is only used where the line is about structure (package.json fields, test coverage, README presence), and Check 6 runs npm test and checks the workflow status.",
+  "model": "claude-opus-5-5",
+  "ms": 10283,
+  "tokens": {
+    "input": 2,
+    "output": 773,
+    "cacheCreation": 4942,
+    "cacheRead": 783,
+    "fresh": 5717,
+    "total": 6500
+  },
+  "at": "2026-11-05T08:43:04.958Z"
+}

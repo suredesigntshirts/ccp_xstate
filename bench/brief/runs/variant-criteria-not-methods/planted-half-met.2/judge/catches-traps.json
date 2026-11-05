@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "50e6665ef6fe5165dd44aa0538fc07d45216ab37d285e9c82b285c6fa1cd3ea9",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "All three must_catch items are handled.\n1. Builder step 3 says README.md has no section for slugify and tells the builder to \"Add a `## slugify(s)` section too\", along with the padLeft section.\n2. Verifier Check 3 prints the exports at the PR head. Its PASS line names \"capitalize, slugify, truncate and padLeft\". It FAILs if any export is missing and says that if slugify \"is still missing, this check FAILS\".\n3. Verifier Check 1 calls `m.padLeft('42',5)` with no fill and expects \"   42\", which checks the default space padding.\n\nOne side note, outside this criterion: in Check 3, bash's double quotes may turn `'\\\\b'` into the JS string `'\\b'` (a backspace character). That would make the heading regex fail to match, so the check could report every export as missing. The trap itself is still covered.",
+  "model": "claude-opus-5-5",
+  "ms": 8677,
+  "tokens": {
+    "input": 2,
+    "output": 750,
+    "cacheCreation": 3247,
+    "cacheRead": 783,
+    "fresh": 3999,
+    "total": 4782
+  },
+  "at": "2026-11-05T08:39:58.285Z"
+}

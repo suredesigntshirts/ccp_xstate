@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "22e1a39e4eea41e3f428954c27ac5bdc45abf2a64e07a9e5428903eebefebf4e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion fails because the builder brief gives away probes that the verifier also uses. Builder step 2 says \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\". Verifier Check 1 runs `node bin/greet.js --shout Ada` and uses `HELLO, ADA!` as its PASS example. Builder step 3 says \"`node bin/greet.js Ada` still prints `Hello, Ada!`\". Verifier Check 2 runs the same command and uses `Hello, Ada!` as the base output. Step 2 also asks for the flag to work \"before or after the name\", and step 3 keeps exit status 2 for a missing name. Both repeat the verifier's advisory probes. These are inputs with expected outputs that appear in both briefs, so the builder is handed the checker's methods instead of just the bar. The allowed parts are fine: running `npm test` and writing its own tests.",
+  "model": "claude-opus-5-5",
+  "ms": 6411,
+  "tokens": {
+    "input": 2,
+    "output": 597,
+    "cacheCreation": 3421,
+    "cacheRead": 783,
+    "fresh": 4020,
+    "total": 4803
+  },
+  "at": "2026-11-05T08:55:49.772Z"
+}

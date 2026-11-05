@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "16eb6c03f8267a5a86f78c3c08fd33533d98c17eeeba587192133420c6bfbb25",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and each one is handled. (1) The verifier's Advisory section, which sits outside PASS/FAIL, says the fix \"falls back silently to defaults and gives no message naming the broken file or position, even though the issue's motivation was helping people find what to fix.\" The builder brief also notes that src/app.js currently prints `bad config: <message>`, and that once the fix lands \"the app's defaults apply\". Together these cover the app starting on defaults instead of printing 'bad config'. (2) Builder step 3 has the builder replace the 'bad JSON throws' test with one asserting that loadConfig returns {}, and step 5 requires npm test to pass. (3) Verifier Check 1 writes `{port: 9000` to a file, calls loadConfig on it, and passes on `BAD {}` with no `THREW` line.",
+  "model": "claude-opus-5-5",
+  "ms": 7769,
+  "tokens": {
+    "input": 2,
+    "output": 609,
+    "cacheCreation": 3080,
+    "cacheRead": 783,
+    "fresh": 3691,
+    "total": 4474
+  },
+  "at": "2026-11-05T08:57:51.313Z"
+}

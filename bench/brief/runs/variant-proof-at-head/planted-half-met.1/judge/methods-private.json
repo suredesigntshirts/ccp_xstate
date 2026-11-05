@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "ea63ef39aa2dbe14d9329a3eeba5ab933eb6f463859861acdb43e26d5347cc71",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief. Builder step 1 gives the cases \"padLeft('42', 5, '0') === '00042'; padLeft('42', 5) === '   42'\". Verifier Check 1 runs those same two calls and expects \"00042\" \"   42\", so the builder gets inputs with expected outputs from the verifier's probe. Builder step 3 repeats '42', 5, '0' -> '00042' as a required test. Builder step 4 also tells the builder to \"confirm every name exported from index.js has a `## <name>(` heading in README.md\", which is the same check as the verifier's Check 3 probe (each exported name matched against a README heading). Running npm test is allowed, but these repeats hand the builder the checker's own methods.",
+  "model": "claude-opus-5-5",
+  "ms": 14906,
+  "tokens": {
+    "input": 4,
+    "output": 964,
+    "cacheCreation": 6589,
+    "cacheRead": 1566,
+    "fresh": 7557,
+    "total": 9123
+  },
+  "at": "2026-11-05T08:40:17.750Z"
+}

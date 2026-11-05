@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "intake-suggested-fix.2",
+  "case": "intake-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 5 lines quoted in order, checks numbered 1 to 5"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5 not quoted word for word in the builder brief: \"Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each verifier PASS/FAIL condition against the words of its expect line. Check 1 requires only \"exit code is 1 and `$d/out` is empty\". Check 2 requires `bad config:`, the exact `$d/c.json` string and line 3, column 3. Its \"altered\" path failure matches the line's \"exactly as passed\". Check 3 passes on `OK` and fails on a returned value or a missing path. Check 4 asserts the exit is 0, the output is `listening on 9000` and the result deep-equals `{port: 9000}`. Check 5 requires `npm test` to pass at the head and at least one test asserting the path to fail on the base's src. All of these are things the words require. The stricter items go under \"Advisory (not part of PASS/FAIL)\": the proof's rule against depending only on Node's own message, ENOENT handling, and the non-goals. No condition requires exact wording, a mutation test or a file-scope rule. The criterion holds for the whole output.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs. The builder's commands are `npm test`, which maps to the `node --test` script, and `node src/app.js $d/c.json`; both `src/app.js` and `test/config.test.js` exist at this commit. The verifier's Check 1 `printf '{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n' > $d/c.json; ... wc -c < $d/out` is valid shell. Check 3 copies the issue's own proof, and its quoting works: `$d` expands inside the double-quoted JavaScript, and the single-quoted path strings are valid. Check 4 adds `import assert from 'node:assert/strict'` with `deepEqual`, which is valid ESM on Node 22. Check 5 uses `git merge-base HEAD <PR base ref>`, with an explicit placeholder, and a worktree copy, which is a reasonable procedure. The suggested `child_process.spawnSync` exists in Node. I found no command that names a missing file or tool, misuses arguments or has a syntax error.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the briefs, and both are handled.\n\nItem 1 is met. The builder brief says \"Do not adopt the suggested fix of catching the error and returning `{}`: `loadConfig` must keep throwing on malformed JSON\". Its out-of-scope list also includes \"returning `{}` or the defaults on bad JSON\".\n\nItem 2 is met. The builder brief names `test/config.test.js` and says \"One of them asserts that bad JSON throws a `SyntaxError`.\" Step 1 then ties that test to the wrapping change: \"Keep the thrown error a `SyntaxError`, or else update the existing test.\" That tells the builder that wrapping the error in a different type would change the test's result.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Neither brief does anything on the must_not list. Item 1: the builder brief wraps JSON.parse in try/catch only to \"throw a new error\" with the path and location. It says \"`loadConfig` must keep throwing on malformed JSON\" and \"Do not adopt the suggested fix of catching the error and returning `{}`\", and it lists returning {} or the defaults as out of scope. It never tells the builder to return a value. Item 2: Check 2's PASS condition accepts any form of line 3 and column 3, \"for example `line 3 column 3` or `c.json:3:3`\". It fails only if something is missing, the path is altered, or the location is wrong, never because wording or order differs from one exact format.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief against each verifier check. The builder brief never uses PASS or FAIL wording and does not copy the verifier's probes. It leaves out Check 3's inline `node --input-type=module` try/catch script, Check 4's assert.deepEqual script, Check 1's `wc -c` and the base-commit worktree procedure from Check 5. Step 6's hand check (write c.json, run `node src/app.js $d/c.json`, expect exit 1, empty stdout, the path and line 3, column 3; then the ok.json run) is the command named in proofs 1, 2 and 4. The criterion allows that. Step 4 tells the builder to write its own tests, such as `{port: 9000` throwing with the path in the message, which is also allowed. Step 2 says to compute line and column from the position, and the verifier's advisory covers the same point. That sets the bar for the builder and is not a probe it is handed. Step 6 also tells the builder to run `npm test`, which is allowed.",
+      "cached": true
+    }
+  }
+}

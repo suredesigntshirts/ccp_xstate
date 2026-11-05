@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "4d287f047a10f8f9b047e87949aa4459a3bcc0a3a534afb032fffde93c706e2c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs. Every path they use is tracked at this commit or created earlier in the same command: bin/jsonl-lint.js, src/index.js, test/cli.test.js, the README and .github/workflows/test.yml. The verifier's checks make their temp files with mktemp before reading them. The shell syntax is valid: the &&/; chains and printf are fine, the escaped quotes in `node -e \"import('./packages/...')...\"` come out as valid JavaScript, and the jq filters (`(.body // \"\")`, `\\(.name)`) are well formed. `git rev-parse HEAD:path` and `npm test --workspace packages/jsonl-lint` are valid commands. The grep -e patterns are valid regex, and the gh api endpoints exist. One weak spot: the builder's hand test `... a.jsonl - b.jsonl` names files that don't exist. It still runs (it would just report a read error), and it says \"with real files\", so the builder is meant to supply them. That doesn't break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 12465,
+  "tokens": {
+    "input": 2,
+    "output": 1132,
+    "cacheCreation": 7022,
+    "cacheRead": 783,
+    "fresh": 8156,
+    "total": 8939
+  },
+  "at": "2026-11-05T08:59:25.384Z"
+}

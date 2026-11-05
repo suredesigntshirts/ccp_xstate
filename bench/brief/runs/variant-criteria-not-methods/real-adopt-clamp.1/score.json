@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.1",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each PASS and FAIL condition against the words of its expect line. Checks 1, 2 and 4 hold. The cases in Check 1 are just examples of \"limited to the range\". Check 2 accepts any RangeError. Check 4's \"# fail 0\" matches what \"passes\" means. Check 3 breaks the criterion. Its PASS condition needs the script to print OK, and the script only finds a function if a markdown heading matches `^#+\\s*name\\s*\\(`. The expect line only says README.md \"documents every function math.js exports\". A function documented in a bullet list, a table or plain prose would still meet those words but would fail this check. Requiring a heading format is stricter than the words, so it belongs under Advisory, not in the PASS condition.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs against the repository and for valid shell and JavaScript syntax. The builder's `npm test` and `node -e \"...Object.keys(require('./math.js'))\"` commands are fine, and so are the verifier's checks 1, 2 and 4. Check 3 breaks. Inside bash double quotes, `\\\\s` and `\\\\(` each become one backslash, so JavaScript receives the string literals `'^#+\\s*'` and `'\\s*\\('`. JavaScript drops unknown escapes in strings, so `\\s` becomes `s` and `\\(` becomes `(`. `new RegExp` then gets something like `^#+s*adds*(`, which has an unclosed group and throws a SyntaxError (\"Unterminated group\"). The check fails no matter what README.md says, so it doesn't run as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one. (1) Builder step 4 says \"`subtract(a, b)` is exported but currently NOT documented in README.md — add an entry for it as well as one for `clamp(x, lo, hi)`\". (2) Verifier Check 3 reads the exports from math.js at the PR head and prints them. It names the expected set: \"expected to include add, subtract, multiply and clamp\". It fails if \"any exported function has no README.md entry (note subtract was undocumented before this change)\". (3) Verifier Check 2 calls clamp with lo greater than hi, using [5,10,0], [0,1,0] and [-3,-1,-2]. It tests `err instanceof RangeError` and fails if a call \"throws something that is not a RangeError\". No part of either brief undercuts these items.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "must_not item 1 is avoided: Check 3 reads the exports at runtime, including subtract, and fails if any is missing. Item 2 is broken: Check 3's PASS needs the script to print OK, and that script only accepts a heading matching `'^#+\\\\s*'+n+'\\\\s*\\\\('`, so each exported function must have its own markdown heading like \"### name(\". A README that documents subtract or clamp in a list, a table or prose would FAIL. That demands a specific README layout, which is stricter than \"README.md documents every function math.js exports\". Check 4 also requires the output to show `# fail 0`, slightly more than \"npm test passes\", though that is minor. Checks 1 and 2 test behaviour and the RangeError type only, not exact messages.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief's probes and found two overlaps. First, builder step 2 gives input/output examples, \"clamp(-5, 0, 100) is 0, clamp(140, 0, 100) is 100, clamp(50, 0, 100) is 50\", and the lo === hi case. All of these also appear in the case list of the verifier's Check 1 script. Second, builder step 5 tells the builder to run `node -e \"console.log(Object.keys(require('./math.js')))\"` and confirm each name appears as a heading in README.md's API section. That is the same probe as verifier Check 3, which lists the exports from Object.keys and matches each against a README heading. Neither of these is a repo test, a command named by an expect line, or a test the builder writes itself, so the exemptions don't cover them. Running `npm test` is allowed, but these shared checks break the criterion.",
+      "cached": true
+    }
+  }
+}

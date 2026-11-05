@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "103f54b86fc1f694b8b1fd91bf9eddc1642c9bd258b4c7f836429a07ceb9aeb9",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 holds. The builder brief says output without the flag \"stays exactly as it is now\" and \"Run npm test and make sure every test passes.\" Item 3 holds. Check 1 pipes the same name/age/city table in as TSV and as CSV and compares the two outputs with cmp. Item 2 holds only in part. The verifier brief has an \"Advisory (not part of PASS or FAIL)\" section that suggests \"Run npm test and report any failure\" and a check that default CSV output is unchanged. But it never says that no expect line covers CSV behaviour or npm test. The must_catch item asks for that statement explicitly. The section only implies it by placing these checks outside the gate. Because that required mention is missing, the briefs do not handle every must_catch item.",
+  "model": "claude-opus-5-5",
+  "ms": 12570,
+  "tokens": {
+    "input": 2,
+    "output": 842,
+    "cacheCreation": 2756,
+    "cacheRead": 783,
+    "fresh": 3600,
+    "total": 4383
+  },
+  "at": "2026-11-05T08:40:31.784Z"
+}

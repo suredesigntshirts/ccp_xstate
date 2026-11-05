@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "ff4efa38ce6fa5d004e1f7e6ee75f7cc4dc51cb0a614019c92d969e0a01f9266",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief against each verifier check. The builder brief never uses PASS or FAIL wording and does not copy the verifier's probes. It leaves out Check 3's inline `node --input-type=module` try/catch script, Check 4's assert.deepEqual script, Check 1's `wc -c` and the base-commit worktree procedure from Check 5. Step 6's hand check (write c.json, run `node src/app.js $d/c.json`, expect exit 1, empty stdout, the path and line 3, column 3; then the ok.json run) is the command named in proofs 1, 2 and 4. The criterion allows that. Step 4 tells the builder to write its own tests, such as `{port: 9000` throwing with the path in the message, which is also allowed. Step 2 says to compute line and column from the position, and the verifier's advisory covers the same point. That sets the bar for the builder and is not a probe it is handed. Step 6 also tells the builder to run `npm test`, which is allowed.",
+  "model": "claude-opus-5-5",
+  "ms": 7464,
+  "tokens": {
+    "input": 2,
+    "output": 681,
+    "cacheCreation": 5613,
+    "cacheRead": 783,
+    "fresh": 6296,
+    "total": 7079
+  },
+  "at": "2026-11-05T08:29:10.306Z"
+}

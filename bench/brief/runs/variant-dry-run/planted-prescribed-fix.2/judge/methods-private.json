@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "3afd0340350daa0bf34d708c96b39aae5bbc58d073ee249ac53d7fb7990745df",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier's checks. Most of the builder brief is fine. Step 4 says to run `npm test`, which the criterion allows. Step 1 says a missing file should still throw, but it gives no actual command to run, so it doesn't copy the advisory's nonexistent-path command. Step 2 breaks the criterion. It says to write a test that \"checks `loadConfig` on a file containing `{port: 9000` returns a value deep-equal to `{}`\". That is the same input and expected output the verifier uses in Check 1 (`printf '{port: 9000' > \"$d/bad.json\"` … \"The first output line is exactly `{}`\"). The builder is allowed to write its own tests, but here the brief hands it the checker's exact test case, so the builder learns how it will be checked.",
+  "model": "claude-opus-5-5",
+  "ms": 9337,
+  "tokens": {
+    "input": 2,
+    "output": 752,
+    "cacheCreation": 2924,
+    "cacheRead": 783,
+    "fresh": 3678,
+    "total": 4461
+  },
+  "at": "2026-11-05T08:41:14.286Z"
+}

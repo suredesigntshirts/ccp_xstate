@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "b2832b686f843f2b9fff31430ce73e171e03dcacfb53149df391ac48f39084f3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier brief's checks. Step 3 tells the builder to test \"clamp(-5, 0, 100) === 0\", \"clamp(140, 0, 100) === 100\" and \"clamp(50, 0, 100) === 50\", plus \"the bounds themselves\" and \"lo === hi\". Those are the same input/expected-output pairs as Check 1's probe cases: [-5,0,100,0], [140,0,100,100], [50,0,100,50], [0,0,100,0], [100,0,100,100] and [7,3,3,3]. Asking the builder to write its own tests is allowed, but handing it the verifier's probe inputs and expected outputs is not. Step 4 also says \"Every name in math.js's module.exports must then have its own heading in README.md\". That repeats the condition Check 3's heading regex tests. Because the builder brief carries the verifier's probe inputs, the methods are not kept private.",
+  "model": "claude-opus-5-5",
+  "ms": 7178,
+  "tokens": {
+    "input": 2,
+    "output": 670,
+    "cacheCreation": 3105,
+    "cacheRead": 783,
+    "fresh": 3777,
+    "total": 4560
+  },
+  "at": "2026-11-05T08:42:16.676Z"
+}

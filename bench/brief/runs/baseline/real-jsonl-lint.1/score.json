@@ -3,7 +3,7 @@
   "run": "real-jsonl-lint.1",
   "case": "real-jsonl-lint",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": true,
       "why": "I checked every verifier PASS/FAIL condition against its expect line. None is stricter than its line. No check asks for exact error wording (\"non-empty error message\"), a branch-name rule, a mutation test or a limit on which files the PR may touch. The extras (shebang, mode 100755, lockfile, CRLF) are marked \"Advisory (not a pass/fail condition)\". Every behaviour line is checked by running something. Checks 1–2 run the CLI on temp files and look at stdout, stderr and exit codes. Check 3 imports lint and calls it. Check 4 runs `npm test` in the package as well as reading the test files. Check 6 runs `npm ci && npm test` and queries the workflow run. Check 5 only reads files, but its line is about files existing, not about runtime behaviour. The builder brief adds details such as engines and a bin entry, but these are build instructions, not pass conditions.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. I compared the builder brief with each verifier check. The builder brief never copies the verifier's fixtures or probes. It does not use mixed.jsonl (`'{\"a\":1}\\n\\n   \\n{bad\\n{\"c\":3}\\n{\"d\":'`), noeol-ok.jsonl, the `node --input-type=module -e` lint probe or the package.json `node -e` probe. Its one torn-row example, `'{\"a\":1}\\n{\"b\":'`, is its own and differs from the verifier's inputs. Step 7 asks for a hand run with exit codes \"0, 1, 1, 2, 2\", but that restates expect lines 1–2 using general cases, not verifier inputs paired with expected outputs. Running `npm ci && npm test` and waiting for the workflow are commands that expect line 6 names, so they are allowed. Telling the builder to write its own node:test tests is also allowed. The mode 100755, lockfile and CRLF items overlap only the verifier's advisory notes, which are explicitly not PASS/FAIL conditions and contain no probe. No PASS or FAIL condition or verifier probe is passed to the builder.",
       "cached": true
     }
   }

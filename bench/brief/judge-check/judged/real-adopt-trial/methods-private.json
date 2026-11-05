@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "ff5cb6ece2bfb1bb29946a60b9c5a1bf758a718b2be967e459a5c2792ca4eb8a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief against the verifier brief's probes, and some of them were passed to the builder. Builder step 3's README example uses `clamp(-5, 0, 100); // 0`, `clamp(140, 0, 100); // 100` and `clamp(42, 0, 100); // 42`. Those are the first three input/expected-output cases in verifier Check 1. Builder step 4 asks for `assert.throws(() => clamp(5, 10, 0), RangeError)`, which matches Check 2's first case [5,10,0]. Builder step 5 also has the builder run `node -e \"...Object.keys(m)...\"` and confirm each name has a README heading. Step 3 asks for a `### name(...)` heading for every export. Together these copy Check 3's probe: list the exports and match each to a `name(` heading. Telling the builder to run `npm test` is allowed, but these other overlaps hand the checker's methods to the builder.",
+  "model": "claude-opus-5-5",
+  "ms": 6699,
+  "tokens": {
+    "input": 2,
+    "output": 588,
+    "cacheCreation": 3818,
+    "cacheRead": 783,
+    "fresh": 4408,
+    "total": 5191
+  },
+  "at": "2026-11-05T08:25:13.120Z"
+}

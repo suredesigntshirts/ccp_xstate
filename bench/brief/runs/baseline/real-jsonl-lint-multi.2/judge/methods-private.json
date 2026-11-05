@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "663ef42b20002306b41503c7dfc9e8d0587d6b118f15d2ed3d69f5c28c0c89fd",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Not met: the builder brief contains some of the verifier's own probes. Most of it is the bar: the behaviour spec, the case list from expect line 5, and running npm test and the workflow are all allowed. But some tests it tells the builder to write are the verifier's input sets with their expected results. Test (e), \"good, missing, bad... include a bad file so you can see its lines on stdout\", matches Check 3's run `clean1 missing bad`, whose PASS needs exit 2 and `bad.jsonl:2:` on stdout. The extra test where \"a bad file comes before a clean one, to show that order is kept\" matches Check 1's third run (bad, clean1, bad2), and the issue doesn't ask for it. Test (b) \"clean, bad, clean\" copies Check 1's multi-file run. Step 2 also repeats the verifier's advisory checks: reject a double `-` \"before... anything is printed to stdout\", and exit 2 \"wins over bad rows\".",
+  "model": "claude-opus-5-5",
+  "ms": 15483,
+  "tokens": {
+    "input": 2,
+    "output": 1192,
+    "cacheCreation": 5463,
+    "cacheRead": 783,
+    "fresh": 6657,
+    "total": 7440
+  },
+  "at": "2026-11-05T08:29:43.569Z"
+}

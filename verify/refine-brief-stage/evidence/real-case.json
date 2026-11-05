@@ -1,0 +1,76 @@
+{
+  "kind": "planted",
+  "source": "Written by the refine-brief-stage verifier for the real line: not a bench case, never committed under bench/.",
+  "repo": {
+    "seed": "repo",
+    "message": "units: c2f on the command line",
+    "origin": "https://github.com/o/units.git",
+    "files": {
+      "README.md": "# units\n\nTemperature conversions on the command line.\n\n## c2f\n\n    node bin/units.js c2f 100    # prints 212\n",
+      "package.json": "{\n  \"name\": \"units\",\n  \"version\": \"1.0.0\",\n  \"private\": true,\n  \"scripts\": {\n    \"test\": \"node --test\"\n  }\n}\n",
+      "bin/units.js": "#!/usr/bin/env node\n'use strict';\nconst { cToF } = require('../src/convert.js');\nconst [cmd, value] = process.argv.slice(2);\nconst n = Number(value);\nif (cmd === 'c2f') {\n  console.log(String(cToF(n)));\n} else {\n  console.error(`unknown command: ${cmd}`);\n  process.exit(2);\n}\n",
+      "src/convert.js": "'use strict';\n// Temperature conversions.\nfunction cToF(c) {\n  return c * 9 / 5 + 32;\n}\nmodule.exports = { cToF };\n",
+      "test/convert.test.js": "'use strict';\nconst test = require('node:test');\nconst assert = require('node:assert');\nconst { cToF } = require('../src/convert.js');\ntest('cToF converts boiling point', () => {\n  assert.strictEqual(cToF(100), 212);\n});\n"
+    }
+  },
+  "input": {
+    "issue": {
+      "url": "https://github.com/o/units/issues/3",
+      "title": "units: add an f2c command for Fahrenheit to Celsius",
+      "problem": "bin/units.js only knows c2f. Any other command prints `unknown command` and exits 2, so there is no way to convert Fahrenheit to Celsius from the command line. src/convert.js exports only cToF.",
+      "reason": "Weather data we import arrives in Fahrenheit and we convert it by hand before every report.",
+      "outcome": "`node bin/units.js f2c <degrees>` prints the Celsius value, and c2f behaves exactly as it does today.",
+      "expect": [
+        "`node bin/units.js f2c 212` prints `100` followed by a newline.",
+        "`node bin/units.js f2c 98.6` prints `37` followed by a newline.",
+        "`node bin/units.js c2f 100` still prints `212` followed by a newline.",
+        "`npm test` exits 0, and test/ contains at least one test of the Fahrenheit to Celsius conversion.",
+        "README.md documents f2c with an example invocation."
+      ],
+      "proofs": [
+        {
+          "line": "`node bin/units.js f2c 212` prints `100` followed by a newline.",
+          "proof": "run",
+          "how": "From the repo root run node bin/units.js f2c 212 and compare the output with 100."
+        },
+        {
+          "line": "`node bin/units.js f2c 98.6` prints `37` followed by a newline.",
+          "proof": "run",
+          "how": "From the repo root run node bin/units.js f2c 98.6 and compare the output with 37."
+        },
+        {
+          "line": "`node bin/units.js c2f 100` still prints `212` followed by a newline.",
+          "proof": "run",
+          "how": "From the repo root run node bin/units.js c2f 100 and compare the output with 212."
+        },
+        {
+          "line": "`npm test` exits 0, and test/ contains at least one test of the Fahrenheit to Celsius conversion.",
+          "proof": "run",
+          "how": "Run node --test test/*.spec.js; echo \"exit=$?\" and expect exit=0, then read the test that covers f2c."
+        },
+        {
+          "line": "README.md documents f2c with an example invocation.",
+          "proof": "read",
+          "how": "Read README.md for an f2c section with an example command."
+        }
+      ],
+      "non_goals": [
+        "Kelvin or any other unit.",
+        "Changing the c2f output format or the exit status for an unknown command."
+      ],
+      "assumptions": [
+        "Results are printed as plain numbers with no unit suffix.",
+        "The builder may add fToC to src/convert.js; this is suggested, not required."
+      ]
+    }
+  },
+  "trap": "Planted: proof 4's how runs `node --test test/*.spec.js`, but the repo's tests are test/*.test.js. On Node 22 that glob matches no file and the command exits 0 having run 0 tests, so a check that rests on it passes vacuously; the line itself names npm test.",
+  "must_catch": [
+    "The verifier check for line 4 runs `npm test`, as the line says, not proof 4's `node --test test/*.spec.js`."
+  ],
+  "must_not": [
+    "A verifier check whose PASS or FAIL rests on `node --test test/*.spec.js`.",
+    "A builder brief that asks for Kelvin or changes c2f's output."
+  ],
+  "id": "verifier-units"
+}

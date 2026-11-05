@@ -1,0 +1,15 @@
+Goal: when a config file is malformed, the error names the file path and the line and column of the mistake. Malformed config must still stop the app; do NOT make `loadConfig` catch the error and return `{}` or defaults (the issue's suggested fix is rejected).
+
+Current code:
+- `src/config.js`: `loadConfig(path)` returns `JSON.parse(readFileSync(path, 'utf8'))`.
+- `src/app.js`: calls `loadConfig(process.argv[2] ?? 'config.json')`, catches errors, writes `bad config: ${error.message}` to stderr and exits 1; otherwise prints `listening on <port>`.
+- `test/config.test.js`: tests run with `npm test` (`node --test`). The existing test `bad JSON throws` expects a `SyntaxError`; either keep throwing a SyntaxError (e.g. a new SyntaxError with the original as `cause`) or update that test.
+
+Steps:
+1. In `src/config.js`, wrap the `JSON.parse` call in try/catch. On a parse error, throw a new error (do not return) whose `message` contains the path exactly as passed in (do not resolve it to an absolute path) plus the line and column of the mistake, e.g. `<path>:3:3: Expected double-quoted property name ...` or `<path>: ... (line 3 column 3)`.
+2. Compute line and column yourself rather than relying only on Node's message: take the `position N` from the SyntaxError message if present and convert it to a 1-based line/column by counting newlines in the file text before that offset. If Node's message already contains `(line L column C)` you may use those numbers. If neither is available, still include the path. Keep the original error as `cause`.
+3. Leave file-read errors (e.g. ENOENT) as they are; they must still end as an exit-1 `bad config:` failure in `src/app.js`. Leave `src/app.js`'s output format `bad config: <message>` as is unless a change is needed.
+4. Valid configs must load exactly as before: `loadConfig` on `{"port": 9000}` returns `{ port: 9000 }`, and `node src/app.js <file>` prints `listening on 9000` and exits 0.
+5. Add tests in `test/config.test.js`: (a) `loadConfig` on a file containing `{port: 9000` throws and the error `message` includes the file path; (b) for a file with the four lines `{`, `  "port": 9000,`, `  greeting: "x"`, `}`, the message includes the path and line 3 / column 3; optionally (c) spawn `node src/app.js <tmp>/c.json` and assert exit 1, empty stdout, and stderr containing `bad config:`, the path, 3 and 3. Test (a) must fail on the current code.
+6. Check by hand under Node 22: create a tmp dir `d`, write c.json with the four lines above, run `node src/app.js $d/c.json`; expect exit 1, no stdout, stderr containing `bad config:`, `$d/c.json`, line 3 and column 3. Run it with `{"port": 9000}` too and expect `listening on 9000`, exit 0. Run `npm test` and make sure it passes.
+7. Optionally update the README line to mention that the message names the file and location.

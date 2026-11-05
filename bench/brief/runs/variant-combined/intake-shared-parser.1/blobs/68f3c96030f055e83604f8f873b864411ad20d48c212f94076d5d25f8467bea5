@@ -1,0 +1,33 @@
+Check out the pull request's head. Run every command from the repository root. Run each check below, in order, and give each one PASS or FAIL with the actual output you saw. Use `| od -c` or `| cat -A` where you need to see exact bytes, such as the trailing newline or JSON tab escapes.
+
+Check 1. Expect line: "`printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv` prints exactly `[{"a":"1","b":"2"}]` followed by a newline and exits 0."
+Run: printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv; echo "exit=$?"
+PASS: stdout is exactly [{"a":"1","b":"2"}] followed by a newline, and then exit=0. FAIL: any other output, a missing newline, or a nonzero exit.
+
+Check 2. Expect line: "With --tsv, commas inside a field stay literal: `printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv` prints exactly `[{"name":"x","note":"hello, world"}]` followed by a newline."
+Run: printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv
+PASS: stdout is exactly [{"name":"x","note":"hello, world"}] followed by a newline. FAIL: anything else.
+
+Check 3. Expect line: "With --tsv and several data rows, every row comes out in order: `printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv` prints exactly `[{"a":"1","b":"2"},{"a":"3","b":"4"}]` followed by a newline."
+Run: printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv
+PASS: stdout is exactly [{"a":"1","b":"2"},{"a":"3","b":"4"}] followed by a newline. FAIL: anything else, including rows that are missing or out of order.
+
+Check 4. Expect line: "Without the flag, CSV still works as before: `printf 'a,b\n1,2\n' | node bin/csv2json.js` prints exactly `[{"a":"1","b":"2"}]` followed by a newline."
+Run: printf 'a,b\n1,2\n' | node bin/csv2json.js
+PASS: stdout is exactly [{"a":"1","b":"2"}] followed by a newline. FAIL: anything else.
+
+Check 5. Expect line: "Without the flag, tabs are not treated as separators: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js` prints exactly `[{"a\tb":"1\t2"}]` followed by a newline, which is the current output."
+Run: printf 'a\tb\n1\t2\n' | node bin/csv2json.js | od -c
+PASS: stdout is the JSON text [{"a\tb":"1\t2"}], where each \t is the two-character JSON escape (a backslash then t, not a raw tab), followed by a newline. FAIL: anything else, such as output split into keys a and b.
+
+Check 6. Expect line: "`npm test` exits 0, and test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and checks its output."
+Run: npm test; echo "exit=$?". Then run grep -n -- '--tsv' test/*.js and read each matching test.
+PASS: npm test gives exit=0, and at least one test in test/ runs bin/csv2json.js with the --tsv argument, gives it input that contains tab characters, and asserts on the output. FAIL: a nonzero exit, or no test in test/ that does all of this.
+
+Check 7. Expect line: "README.md documents the --tsv flag with an example invocation."
+Read README.md at the head.
+PASS: README.md mentions the --tsv flag and shows an example command that uses it, for example node bin/csv2json.js --tsv < file. FAIL: the flag is not mentioned, or there is no example invocation that uses it.
+
+Advisory (not part of any PASS or FAIL):
+- The issue's proof for check 6 names `npm run test:cli`. package.json at base defines only a `test` script. If the PR adds test:cli, run it too and report the result, but judge check 6 on `npm test` only.
+- You may also note whether the --tsv tests assert exact output strings, whether --tsv works when other arguments come before it, whether README.md says the flag means tab-separated input, and whether the diff stays within the non-goals (no --sep, no quoting rules, no change to unknown-argument handling).

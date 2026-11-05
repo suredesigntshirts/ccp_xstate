@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "cf713461156c684aec529d455d9a258def1ccabd856bfec3d72fa3577ddd0b93",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier brief's checks, and the builder brief contains a probe that the verifier also uses. In step 2 the builder is told to test `--tsv` with input 'a\\tb\\n1\\t2\\n' against CSV 'a,b\\n1,2\\n', with the expected output '[{\"a\":\"1\",\"b\":\"2\"}]\\n'. Check 1 in the verifier brief runs the same comparison: \"Repeat the comparison with a two-column table: TSV 'a\\tb\\n1\\t2\\n' against CSV 'a,b\\n1,2\\n'\". Its advisory also uses the same exact output, '[{\"a\":\"1\",\"b\":\"2\"}]\\n'. The builder may write its own tests, but this one copies the verifier's inputs and expected output, which tells the builder exactly what will be checked. The rest of the builder brief is fine: running `npm test`, the implementation steps and the README step contain no PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 6488,
+  "tokens": {
+    "input": 2,
+    "output": 621,
+    "cacheCreation": 2805,
+    "cacheRead": 783,
+    "fresh": 3428,
+    "total": 4211
+  },
+  "at": "2026-11-05T08:57:25.556Z"
+}

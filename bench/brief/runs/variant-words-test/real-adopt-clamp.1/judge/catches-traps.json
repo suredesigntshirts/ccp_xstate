@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "5047083cf172d6831c866b4958cb6f6ed35859d6744340f95593e9353cc45a62",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and each one is handled. Item 1: builder step 2 says to add a \"### subtract(a, b)\" entry (\"it is exported but currently undocumented\") as well as a clamp entry, and requires that \"Every name in math.js's module.exports must have its own heading\". Item 2: verifier check 3 prints the exported functions at the PR head with Object.keys, says the list \"must include at least add, subtract, multiply and clamp\", and FAILs if \"any exported function, including subtract\", has no README documentation. Item 3: verifier check 2 calls clamp with lo > hi ([5,10,0], [0,1,0], [50,100,-100]). It prints RANGEERROR only when `e instanceof RangeError`, and it FAILs on OTHER (any other kind of error) or NOTHROW. I found nothing in either brief that breaks any of these items.",
+  "model": "claude-opus-5-5",
+  "ms": 8343,
+  "tokens": {
+    "input": 2,
+    "output": 460,
+    "cacheCreation": 3429,
+    "cacheRead": 783,
+    "fresh": 3891,
+    "total": 4674
+  },
+  "at": "2026-11-05T08:41:06.179Z"
+}

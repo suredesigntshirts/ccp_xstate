@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.2",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS/FAIL conditions with its expect line. Check 3 matches its line's words. Check 4 uses the workflow as a stand-in for the live page, which is reasonable. Checks 1 and 2 go further than their words.\n\nCheck 1's expect line only says the CLI \"prints the greeting in upper case\". Its PASS still requires that \"each exits 0\", and its FAIL includes \"a non-zero exit\". The exit status isn't part of what gets printed.\n\nCheck 2's expect line says \"the output is unchanged\". Its PASS requires that \"stdout, stderr and exit code are identical\", and it expects \"the usage message with exit 2\". An exit code is not output, so the words don't force this comparison. The builder brief's \"must still exit 2\" adds to it.\n\nThese exit-code requirements belong under Advisory, but they sit inside the PASS and FAIL conditions, so the criterion fails.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the tracked files and scripts. `node bin/greet.js ...` uses bin/greet.js, which exists. `npm test` maps to the `node --test` script in package.json. `cat docs/index.md` and reading `.github/workflows/pages.yml` point at tracked files. The quoting in `--shout 'Grace Hopper'` is valid shell. `node bin/greet.js Ada; echo \"exit=$?\"` is valid too. `git worktree add /tmp/base-greet $(git merge-base HEAD origin/HEAD)` is valid git syntax. It depends on origin/HEAD being set, but the brief offers it only as an example (\"or check out the PR's base commit some other way\"), so there is a working fallback. The test file the builder edits, test/greet.test.js, exists and is picked up by `node --test`. No command names a missing file or tool, or uses invalid arguments or syntax.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the verifier brief. Item 1 is handled. Check 4 says \"The live page can only be seen after merge, so don't fetch it.\" At the head, it then confirms that .github/workflows/pages.yml still publishes docs on push to main and that docs/index.md contains `--shout`. Item 2 is handled. Check 2 runs the commands at the head and again on a copy of the base commit (\"git worktree add /tmp/base-greet $(git merge-base HEAD origin/HEAD)\"). It passes only if stdout, stderr and the exit code are identical, so it compares against the pre-change output and doesn't rely only on a hand-written expected string. Both traps are caught.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked Check 4 in the verifier brief against both must_not items. Item 1: it says \"The live page can only be seen after merge, so don't fetch it.\" So it never judges the live page as it looks today. Item 2: it doesn't pass silently or without evidence. A PASS needs two things checked at the head: .github/workflows/pages.yml still publishes docs/ (\"upload-pages-artifact with `path: docs`, deploy-pages, triggered on push to main\") and docs/index.md contains `--shout`. The verifier must also state in its report that \"the live page itself can only be confirmed after merge.\" There are clear FAIL conditions too. The builder brief has no checks, and it says not to deploy or publish anything. Neither forbidden behaviour appears anywhere in the output.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, looking for input/expected-output pairs that appear in both. Builder step 2 gives the example \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\" and requires plain `Hello, Ada!` plus newline, with a missing name still exiting 2. Verifier Check 1 runs `node bin/greet.js --shout Ada` and expects `HELLO, ADA!`. Check 2 expects `Hello, Ada!` with exit 0 and the usage message with exit 2. Builder step 3 also tells the builder to test `Ada --shout` → `HELLO, ADA!`, which is the same as the verifier's advisory probe. Telling the builder to write tests is allowed, but these specific inputs and expected outputs are the verifier's own probes repeated in the builder brief. So the builder brief does contain the checker's methods, and the criterion is not met.",
+      "cached": true
+    }
+  }
+}

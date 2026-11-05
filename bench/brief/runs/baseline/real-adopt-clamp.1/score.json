@@ -3,7 +3,7 @@
   "run": "real-adopt-clamp.1",
   "case": "real-adopt-clamp",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": false,
       "why": "Item 1 is avoided. Check 3 lists every exported function, subtract included, so a README that documents clamp but not subtract fails. Item 2 is broken by Check 3. Its script passes a function only if a Markdown heading matches `'^#+\\\\s*'+n+'\\\\s*\\\\('`. Its FAIL condition is \"any exported function has no heading\". So the README must use one layout: a heading per function, written as `name(`. The expect line only asks that README.md \"documents every function math.js exports\". A README that documents subtract in a table, a bullet list or prose would meet that line but fail this check. That is a PASS/FAIL condition stricter than its line. Checks 1, 2 and 4 match their lines: Check 2 asks only for a RangeError instance, with no exact message.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The criterion fails because the builder brief contains probes that also appear in the verifier brief. Step 2 asks for the README examples \"clamp(-5, 0, 100) // 0, clamp(140, 0, 100) // 100, clamp(42, 0, 100) // 42\". These are the first three input/expected-output cases in Check 1. Step 3 asks for the test \"assert.throws(() => clamp(5, 10, 0), RangeError)\", and [5,10,0] is the first RangeError input in Check 2. Step 4 has the builder run a node -e script that lists Object.keys of math.js and checks each name has a ### heading in README.md. That is the same check as Check 3's export-vs-heading script. Telling the builder to run `npm test` is allowed, but these shared inputs and the near-identical README check hand the checker's methods to the builder.",
       "cached": true
     }
   }

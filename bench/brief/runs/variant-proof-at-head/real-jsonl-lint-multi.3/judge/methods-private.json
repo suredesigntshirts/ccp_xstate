@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "d892c32b41bed4278af4d694358e953ef23af56905b7b04af6717f0de4914f9b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief and found none of the verifier's checks in it. The builder brief has no PASS or FAIL conditions. It also leaves out the verifier's fixtures (clean1/bad1/bad2.jsonl contents), its exact commands (`printf ... | node BIN - -`, the reversed-argument run), the comparison against the base commit, and the `git diff <base>...HEAD` probe. Step 3 does list test cases, such as order across two bad files and a missing file whose neighbour's bad row is still reported. The builder writes those tests itself, which the criterion allows, and each case restates an expect line (1, 3 or 5) rather than repeating a verifier probe. \"Do not modify src/index.js\" restates expect line 4. Running `npm test` and waiting for the `test` workflow are both named by expect line 6, so they are allowed too. The builder brief gives the bar without the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 8766,
+  "tokens": {
+    "input": 2,
+    "output": 801,
+    "cacheCreation": 4942,
+    "cacheRead": 783,
+    "fresh": 5745,
+    "total": 6528
+  },
+  "at": "2026-11-05T08:42:56.329Z"
+}

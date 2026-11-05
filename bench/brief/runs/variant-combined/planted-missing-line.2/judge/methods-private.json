@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "42c0ab9f4c2d0d10a92c17a136bfff62630b53cb0b97537b88f8402631b5c2e5",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for shared checks or probes. Builder step 4 tells the builder to run \"printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv\" and \"printf 'a,b\\n1,2\\n' | node bin/csv2json.js\" and to confirm the two outputs match. That is the same input pair and comparison as the verifier's Check 1 probe, so it is not just the bare command the expect line names. Step 2 also has the builder test with that same input, 'a\\tb\\n1\\t2\\n' against 'a,b\\n1,2\\n', and gives the expected output. Running npm test and writing its own test would be fine, but handing over the verifier's exact inputs and comparison leaks the checker's probe to the builder.",
+  "model": "claude-opus-5-5",
+  "ms": 6232,
+  "tokens": {
+    "input": 2,
+    "output": 545,
+    "cacheCreation": 2802,
+    "cacheRead": 783,
+    "fresh": 3349,
+    "total": 4132
+  },
+  "at": "2026-11-05T08:57:20.129Z"
+}

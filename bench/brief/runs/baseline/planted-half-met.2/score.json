@@ -3,7 +3,7 @@
   "run": "planted-half-met.2",
   "case": "planted-half-met",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": true,
       "why": "Must_not 1: Check 3 takes the exports straight from index.js and looks for each one in README.md's headings. If README.md had padLeft but no slugify section, the check would print \"missing: slugify\" and FAIL. The brief also notes that slugify had no README section before this change. Must_not 2: none of the PASS conditions is stricter than its line. Checks 1 and 2 use only single-character fills and the default, and expect exactly what the lines describe. Nothing fixes a parameter count or requires fill to be one character; multi-character fill is listed as advisory only. Check 3 accepts a heading at any level (\"^#+\\s\") that names the function. That is the minimal markdown meaning of \"section\", not an imposed layout. Check 4 requires exit code 0 and fail 0, which matches \"npm test passes\". The builder's \"## heading\" instruction is guidance for the builder, not a verifier condition.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief repeats the verifier's probes. Step 2 gives padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42', and step 4 asks for tests on those cases. Verifier Check 1 tests the same inputs and expects \"00042\" and \"   42\", so the builder gets the checker's input/output pairs, not just the bar. Step 5 also has an inline script (node -e \"import('./index.js').then(m=>console.log(Object.keys(m)))\") and asks the builder to confirm each export has a README heading. That is Check 3's method, and no expect line or issue proof names this command. Running npm test and writing its own tests are allowed, but these shared probes break the criterion.",
       "cached": true
     }
   }

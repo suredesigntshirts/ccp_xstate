@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "2f90c8ac0139587d1c9c4f274ac8035c18c5fbb5be33c48d27ce271fdc3f7dd8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs handle all three must_catch items. Item 1: builder step 3 says to \"Also add a `### subtract(a, b)` entry (it is exported but currently undocumented)\" alongside the clamp entry. Item 2: verifier Check 3 builds the export list from math.js at the PR head with Object.keys and prints it. It exits 1 if any listed function is missing from README.md, and a reader must confirm README.md says what each one does. The note states that \"a build that documents only clamp FAILs here,\" which covers subtract. The readme.includes() name match is loose, but the required reading of each entry makes up for it. Item 3: verifier Check 2 calls clamp with lo greater than hi and counts a failure when `!(e instanceof RangeError)`. Its FAIL condition names a plain Error or TypeError as failing.",
+  "model": "claude-opus-5-5",
+  "ms": 7707,
+  "tokens": {
+    "input": 2,
+    "output": 649,
+    "cacheCreation": 4522,
+    "cacheRead": 783,
+    "fresh": 5173,
+    "total": 5956
+  },
+  "at": "2026-11-05T08:27:16.507Z"
+}

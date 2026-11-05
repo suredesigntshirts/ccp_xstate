@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "6bd429293537f8b710061e82589e21ac21696ac7bd3605f038dd492d4f3ab1da",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 2, 4 and 5 stay within their wording. Three checks ask for more than the words require:\n\n- **Check 1:** it says PASS only if \"the second command prints nothing before `exit=0`\". Expect line 1 only requires exit 0 when there are no bad rows. It says nothing about output on a clean file.\n- **Check 3:** it requires each object to have \"an `error` property (a string)\". Expect line 3 only says `[{ line, error }]` and gives no type for `error`.\n- **Check 6:** it requires the check-run to be named exactly \"`test`\" and that `git rev-parse HEAD` equals the head sha. The words only say the test workflow is green at the PR head.\n\nNone of these stricter tests is under the Advisory heading, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 8662,
+  "tokens": {
+    "input": 2,
+    "output": 805,
+    "cacheCreation": 6592,
+    "cacheRead": 783,
+    "fresh": 7399,
+    "total": 8182
+  },
+  "at": "2026-11-05T08:59:12.258Z"
+}

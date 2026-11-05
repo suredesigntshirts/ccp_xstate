@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c5e00d5cea48c6147a1d9ec503f0be50cc9306184d555392a9060093ca05a0d5",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not 1 is avoided. Check 3 reads the export names from `Object.keys(require('./math.js'))`, so a README that covers clamp but not subtract fails. Must_not 2 is broken in Check 3. A README entry only counts if it contains the literal text `n+'('`, so an export documented as \"`subtract` — returns a minus b\" with no parenthesis fails even though line 3 is met. That turns a builder-side formatting choice (\"written as `name(` in its heading\") into a verifier FAIL condition, which is a README layout requirement stricter than the line. Check 4 is also stricter than its line: besides exit 0, it requires the summary to show \"# fail 0\". That text is specific to one reporter; node's spec reporter prints \"ℹ fail 0\" instead. Line 4 only asks that npm test passes. Checks 1 and 2 match their lines.",
+  "model": "claude-opus-5-5",
+  "ms": 15932,
+  "tokens": {
+    "input": 2,
+    "output": 862,
+    "cacheCreation": 3298,
+    "cacheRead": 783,
+    "fresh": 4162,
+    "total": 4945
+  },
+  "at": "2026-11-05T08:58:56.961Z"
+}

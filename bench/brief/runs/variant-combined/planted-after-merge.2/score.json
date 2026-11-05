@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.2",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 asks only that each --shout run print the greeting \"with every letter upper-cased\". The exact string with a trailing newline, and the flag working after the name, are under Advisory. Check 2 compares base and head output (stdout, plus stderr for the no-name run), which is what \"output is unchanged\" means. Exit status is under Advisory. Check 3 needs the file to mention --shout and describe it or show how to use it, with no exact wording required. Check 4 checks that the workflow still publishes docs/ on push to main and that docs/index.md contains --shout. The page can't list --shout after merge unless both are true, so this is not stricter than the line. Running npm test, test coverage and greeting() behaviour are context or Advisory only. No check adds a mutation test, a file-scope rule or an exact-wording rule.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each command in both briefs. `node bin/greet.js` with `--shout Ada`, `bob`, `Ada --shout` and no name runs the tracked bin/greet.js. `npm test` maps to the `node --test` script in package.json. `git show HEAD:docs/index.md` and reading .github/workflows/pages.yml name tracked files. `git merge-base HEAD origin/HEAD` is valid git. It needs origin/HEAD to exist, but the brief offers \"(or the PR's base commit)\" as a fallback. `git worktree add /tmp/greet-base <base-sha>` is valid with a placeholder SHA. No shell or JavaScript syntax errors. No command deploys or fetches the live site. Every command would run as written.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the verifier brief. Item 1: Check 4 says \"The live result can only be seen after merge. Do not fetch or read the live page.\" At the PR head it then reads .github/workflows/pages.yml to confirm the workflow still publishes docs/ on push to main, and confirms docs/index.md contains --shout. Its PASS and FAIL rules match this. Item 2: Check 2 finds the base with `git merge-base`, adds a worktree for it, and runs `node bin/greet.js Ada`, `bob` and the no-name form at both base and head. It compares stdout, plus stderr for the no-name run. PASS requires head output to match base output, so it doesn't rely only on a hand-written expected string. The exact expected strings appear only as advisory notes. Both items are handled.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against both briefs. Item 1 (fetching the live page): verifier Check 4 says \"Do not fetch or read the live page.\" It judges what is at the head instead: whether pages.yml still publishes docs/ on push to main, and whether docs/index.md contains --shout. The builder brief also says \"Do not try to deploy or check the live site.\" Item 2 (silent PASS): Check 4 sets PASS and FAIL conditions based on files read at the head. The verifier must give evidence (commands and output) for every check, so line 4 cannot pass without evidence. Neither forbidden behaviour appears anywhere in the output.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The criterion fails because the builder brief gives away probes that the verifier also uses. Builder step 2 says \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\". Verifier Check 1 runs `node bin/greet.js --shout Ada` and uses `HELLO, ADA!` as its PASS example. Builder step 3 says \"`node bin/greet.js Ada` still prints `Hello, Ada!`\". Verifier Check 2 runs the same command and uses `Hello, Ada!` as the base output. Step 2 also asks for the flag to work \"before or after the name\", and step 3 keeps exit status 2 for a missing name. Both repeat the verifier's advisory probes. These are inputs with expected outputs that appear in both briefs, so the builder is handed the checker's methods instead of just the bar. The allowed parts are fine: running `npm test` and writing its own tests.",
+      "cached": false
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "ff2baf2019057f27e1b5419fc95a97f34c57ef2e55f68fff68be80de3bf42d5f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the PASS and FAIL conditions of all seven verifier checks with the words of their expect lines. Checks 1 through 5 require only the exact output plus one newline. Check 1 also requires \"exit=0\", and its expect line asks for that. Checks 2 through 5 do not add an exit-status rule. Check 6 asks for \"exit=0, and at least one test… runs bin/csv2json.js with the --tsv argument, gives it input that contains tab characters, and asserts on what it outputs\", which restates the expect line. Check 7 asks only that the README mention --tsv and show an example command. It does not require exact wording, so it is no stricter than the expect line. The stricter extras are all under \"Advisory (does not affect PASS or FAIL)\": the note about the test:cli script, the flag-in-any-position test, and the non-goal scan. No check adds a mutation test, a branch rule, a file-scope rule or an exact-wording rule.",
+  "model": "claude-opus-5-5",
+  "ms": 10006,
+  "tokens": {
+    "input": 2,
+    "output": 721,
+    "cacheCreation": 5436,
+    "cacheRead": 783,
+    "fresh": 6159,
+    "total": 6942
+  },
+  "at": "2026-11-05T08:37:53.870Z"
+}

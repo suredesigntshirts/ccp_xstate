@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "687d8838587e2949fe44596c4518ab038b2ac2903c112863f05a3e9dfb9f9eb2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repo. Everything they name exists at this commit: bin/csv2json.js, test/*.js, README.md, and the `npm test` script (\"node --test\"). Neither brief uses the issue's missing `npm run test:cli`; both use `npm test` instead. The printf format strings contain no stray `%`. Check 5 correctly uses `printf '%s\\n' '[{\"a\\tb\":\"1\\t2\"}]'`, which keeps a literal backslash-t. `cmp -` with `<(...)` is valid bash, and the brief says to run in bash. `grep -n -- '--tsv' test/*.js` and the same grep on README.md are well-formed. The redirect to /tmp/v1.out followed by `echo \"exit=$?\"` correctly captures node's exit status. In the builder brief, the JS literal `'[{\"a\\\\tb\":\"1\\\\t2\"}]\\n'` correctly gives the JSON tab escape, and the execFileSync args `['bin/csv2json.js', '--tsv']` fit the existing test pattern. The advisory `node bin/csv2json.js foo --tsv` is valid too, because the CLI ignores unknown arguments.",
+  "model": "claude-opus-5-5",
+  "ms": 9200,
+  "tokens": {
+    "input": 2,
+    "output": 863,
+    "cacheCreation": 5508,
+    "cacheRead": 783,
+    "fresh": 6373,
+    "total": 7156
+  },
+  "at": "2026-11-05T08:38:05.596Z"
+}

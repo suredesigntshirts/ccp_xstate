@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "a627e9235ae6dbad6f470f5f4d536aac21a2a1edab6beedb0eb6765e8dcf63ad",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all four checks. I compared each check's PASS/FAIL conditions with the words of its expect line.\n\nCheck 1 only tests that clamp is exported and returns x, lo or hi as the words require. The lo===hi case [3,3,3,3] is still a range from lo to hi, so it isn't stricter.\n\nCheck 2 only tests that lo > hi throws a RangeError.\n\nCheck 3 uses a heading-matching script, but it adds \"judge by the README's content\" when a function is documented in another form. Its PASS condition is just \"every exported function is described in README.md\", so no heading format is required.\n\nCheck 4 asks for \"exit code 0 and the summary shows fail 0\". With `node --test` this is the same as the suite passing. It's a borderline extra format requirement, but it doesn't test anything beyond the words.\n\nThe stricter items (new clamp tests, add/subtract/multiply unchanged) are under \"Advisory (does not affect PASS/FAIL)\".",
+  "model": "claude-opus-5-5",
+  "ms": 13159,
+  "tokens": {
+    "input": 2,
+    "output": 1056,
+    "cacheCreation": 3461,
+    "cacheRead": 783,
+    "fresh": 4519,
+    "total": 5302
+  },
+  "at": "2026-11-05T08:41:19.702Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "76485ade1fccf53555c8bccff81f3d7449c8063c28dc0c6a4742aeb4f4c9b87e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one.\n\n1. The builder brief's step 3 says README \"currently does NOT document subtract\" and asks for a \"### subtract(a, b)\" entry as well as clamp, so every export is covered.\n2. Verifier check 3 runs a node command at the PR head that lists the exported functions. Those are add, subtract, multiply and clamp. It notes that \"subtract must now be documented as well as clamp\", and it FAILs if \"any exported function (e.g. subtract or clamp) is not documented\". The brief doesn't name all four functions itself; it gets the list from the command, which I counted as listing them.\n3. Verifier check 2 calls clamp with lo > hi in three cases and uses `e instanceof RangeError`. It FAILs on `NO THROW` or `OTHER ...`, so an error of the wrong type fails.",
+  "model": "claude-opus-5-5",
+  "ms": 7057,
+  "tokens": {
+    "input": 2,
+    "output": 603,
+    "cacheCreation": 3259,
+    "cacheRead": 783,
+    "fresh": 3864,
+    "total": 4647
+  },
+  "at": "2026-11-05T08:58:31.277Z"
+}

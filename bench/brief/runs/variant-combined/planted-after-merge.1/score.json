@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.1",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4 not quoted word for word in the builder brief: \"node bin/greet.js --shout <name> prints the greeting in upper case\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Check 1 only asks for the upper-cased greeting. Exact `HELLO, ADA!\\n`, exit 0 and the flag-after-name case are under Advisory. Check 2 compares head output to the merge base without --shout, which is what \"unchanged\" means. Check 3 asks that docs/index.md mention --shout and say what it does, which \"documents\" requires. Check 4 can't fetch the live page before merge, so it checks the source of that page: the workflow still publishes docs/ on push to main, and docs/index.md lists --shout. It also reports that the live result waits for merge. This is a borderline call: a PR that moved publishing to another folder that also lists --shout would fail check 4 even though the expect line could still hold. I treat it as a stand-in for \"after merge … lists --shout\" rather than an extra rule. Usage exit 2, `npm test` passing and test coverage are all under Advisory. No PASS or FAIL condition requires exact wording, a mutation test, or a branch or file-scope rule.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each command in both briefs against the tracked files and package.json. Every one runs as written. The builder brief runs `npm test`, which exists as \"node --test\". It also runs `node bin/greet.js --shout Ada`, and bin/greet.js is tracked; the flag itself is something the builder adds. The verifier brief runs `node bin/greet.js --shout Ada/bob` and `node bin/greet.js Ada/bob`, plus `cat docs/index.md`, and it reads .github/workflows/pages.yml. All of those files exist at this commit. For the base comparison it uses `git merge-base` and `git worktree add`. These are real git subcommands, described in prose and used correctly. No script or file is named that is missing. No arguments are wrong for their program. There is no JavaScript, and the shell syntax is valid throughout. The brief also tells the verifier not to fetch the live page, so no URL command is given. The criterion holds for the whole output.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the verifier brief against both must_catch items, and both are met.\n\nItem 1: Check 4 says \"The live page can only be seen after merge; do not fetch it.\" Instead it reads .github/workflows/pages.yml and docs/index.md at the head. To pass, the workflow must still publish docs/ on push to main and docs/index.md must list --shout. The verifier also has to report that the live result can only be confirmed after merge.\n\nItem 2: Check 2 runs `node bin/greet.js Ada` and `node bin/greet.js bob` both at the head and at the merge base, using a separate worktree. To pass, the head output must be \"identical to the output at the base for each command\". The hand-written strings are only given as expected values, so the check doesn't rely on them alone.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against Check 4 in the verifier brief. Item 1: the brief says \"The live page can only be seen after merge; do not fetch it.\" It never fetches the live page, so nothing passes or fails on what the page shows today. Item 2: it doesn't pass silently or without evidence. A PASS needs evidence from the PR head: .github/workflows/pages.yml still publishes docs/ on push to main, and docs/index.md lists --shout. The verifier must also \"Report that the live result can only be confirmed after merge.\" Clear FAIL conditions are given too. Nothing in the builder brief or Checks 1–3 breaks either item.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's steps with the verifier brief's checks, and the builder brief gives away several of the checker's probes. Step 2 says \"`node bin/greet.js Ada` must still print `Hello, Ada!\\n` and exit 0\". That is the same input and expected output as verifier Check 2 (\"expected `Hello, Ada!`\"). Step 3 tells the builder to test that \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!\\n`\". That is Check 1's exact probe (\"Run: `node bin/greet.js --shout Ada`… e.g. `HELLO, ADA!`\"). Writing its own tests is allowed, but here the brief hands the builder the verifier's specific input and expected output. Step 1's \"`--shout Ada` and `Ada --shout`\" also repeats the verifier's advisory probe. Step 5 restates part of Check 4's PASS condition: the workflow publishes docs/ on push to main. So the builder brief does not keep the checker's methods private.",
+      "cached": false
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "3ca9189a63fa375987c5e76c36faaf1faf05e97198bdba0729fa17700a514982",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each of the seven verifier checks with its expect line, and none of the PASS or FAIL conditions asks for more than the words do. Checks 1–5 compare output byte for byte with cmp, which is what \"prints exactly … followed by a newline\" requires. Check 1 also tests \"exits 0\". Check 5 uses `%s` to keep `\\t` as the JSON escape. Check 6 runs `npm test`, as the expect line says, rather than the proof's `test:cli`. Its PASS condition asks for a test that runs bin/csv2json.js with --tsv on input containing tabs and asserts on the output, matching \"runs … with --tsv on tab-separated input and checks its output\". Check 7's PASS asks that the README mention --tsv, say what it does and give an example. That fairly reads \"documents the --tsv flag with an example invocation\", although \"say what it does\" is the least literal part. The stricter items (flag position, non-goal violations, weakened existing tests) are all under \"Advisory\".",
+  "model": "claude-opus-5-5",
+  "ms": 15606,
+  "tokens": {
+    "input": 2,
+    "output": 884,
+    "cacheCreation": 5804,
+    "cacheRead": 783,
+    "fresh": 6690,
+    "total": 7473
+  },
+  "at": "2026-11-05T08:37:59.476Z"
+}

@@ -1,0 +1,13 @@
+Criteria the build must meet (expect lines, word for word):
+- index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+- padLeft returns s unchanged when s is already width characters or longer
+- README.md has a section for every function index.js exports
+- npm test passes
+
+Steps:
+1. Read index.js, README.md, package.json and test/strutil.test.js. index.js is an ES module ("type": "module") that currently exports capitalize, slugify and truncate. `npm test` runs `node --test`, which picks up test/strutil.test.js.
+2. Add to index.js an exported function `padLeft(s, width, fill = ' ')`. Give it a short doc comment like the other functions. It returns `s` with copies of `fill` added on the left until the result is exactly `width` characters long, e.g. padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42'. When `s.length >= width`, return `s` unchanged. `String.prototype.padStart` does this; you can use it.
+3. Update README.md so it has a `## name(args)` section for EVERY function index.js exports. The README is already missing a section for `slugify`. Add a `## slugify(s)` section that describes what it does (lower case, runs of non-alphanumeric characters become single dashes, leading and trailing dashes removed). Add a `## padLeft(s, width, fill)` section that describes the padding, the default space fill, and the unchanged result when s is already width characters or longer, with the invoice example (42 -> 00042). Keep the existing sections and the Tests section, and keep the function sections in the same order as in index.js.
+4. Add tests for padLeft to test/strutil.test.js: zero fill to width, the default space fill, s exactly width long, and s longer than width.
+5. Run `npm test` and make sure every test passes. Then compare the list of `export function` names in index.js with the `##` headings in README.md and confirm each export has a section.
+6. Commit the changes to index.js, README.md and test/strutil.test.js, then open the pull request.

@@ -1,0 +1,33 @@
+Check out the PR head of the pull request for https://github.com/suredesigntshirts/ccp_machine_test/issues/104 and run `npm ci` at the repo root. Make fixtures in a temp dir: clean1.jsonl (`{"a":1}\n{"b":2}\n`), clean2.jsonl (`{"c":3}\n`), bad1.jsonl (`{"a":1}\n{oops}\n`) and bad2.jsonl (`{bad}\n{"x":1}\n{"torn":`). BIN means packages/jsonl-lint/bin/jsonl-lint.js. Run every command at the PR head and record its exit code, stdout and stderr.
+
+Check 1. Expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before".
+Run `node BIN clean1.jsonl bad1.jsonl clean2.jsonl bad2.jsonl`, passing the paths exactly as you will compare them. Then run `node BIN bad2.jsonl bad1.jsonl`. For comparison, run `node BIN bad1.jsonl` and `node BIN bad2.jsonl` one at a time, both at the head and at the PR's base commit (git show <base>:packages/jsonl-lint/bin/jsonl-lint.js to a temp file next to an untouched copy of src, or use a checkout of the base).
+PASS: stdout of the multi-file run is the bad1 lines (`<path>:2: <error>`) followed by the bad2 lines (`<path>:1: ...`, `<path>:3: ...`). Each line matches what the old single-file CLI printed for that file, and the order follows the arguments (the reversed run prints the bad2 lines first).
+FAIL: a file is skipped, the order is wrong, or the line format differs from the old single-file output.
+
+Check 2. Expect: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)".
+Run `printf '{"a":1}\n{oops}\n' | node BIN clean1.jsonl -`, `printf '{"a":1}\n' | node BIN -`, and `printf '{}\n' | node BIN - -`.
+PASS: the first prints `-:2: <error>` and exits 1. The second prints nothing and exits 0. The third exits 2 with a message on stderr.
+FAIL: stdin is not read, it is reported under a different name, or `- -` does not exit 2.
+
+Check 3. Expect: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)".
+Run `node BIN clean1.jsonl clean2.jsonl`, `node BIN clean1.jsonl bad1.jsonl`, `node BIN` with no arguments, and `node BIN clean1.jsonl missing.jsonl bad1.jsonl`.
+PASS: the exit codes are 0, 1, 2 and 2. The no-argument run writes to stderr. The missing-file run writes to stderr naming missing.jsonl, and stdout still contains bad1's `:2:` line.
+FAIL: any exit code differs, an error is missing from stderr, or the bad1 row is not reported when a missing file comes before it.
+
+Check 4. Expect: "lint(text) in src/index.js is unchanged".
+Run `git diff <base>...HEAD -- packages/jsonl-lint/src/index.js`.
+PASS: the diff is empty.
+FAIL: the diff shows any change to the file.
+
+Check 5. Expect: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage".
+Read the test files under packages/jsonl-lint/test/ at the head and run `npm test` in packages/jsonl-lint. Read packages/jsonl-lint/README.md.
+PASS: there are node:test tests for each of: two clean files; one bad file among several; stdin via `-` clean; stdin via `-` bad; a missing file among good ones; two `-` arguments; no arguments. They all pass. The README documents multi-file usage and `-` for stdin.
+FAIL: any listed case has no test, a test fails, or the README does not document the new usage.
+
+Check 6. Expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head".
+Use `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid` and `gh pr checks <pr>`, and run `npm test` at the repo root.
+PASS: exactly one PR does this change. Its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`. Root `npm test` exits 0. The `test` workflow check at the head SHA has succeeded.
+FAIL: the closing line is missing, `npm test` fails, or the test check failed or is missing at the head.
+
+Advisory (not pass/fail): check that a single-file run behaves exactly as before, and that error messages containing newlines are flattened to one line.

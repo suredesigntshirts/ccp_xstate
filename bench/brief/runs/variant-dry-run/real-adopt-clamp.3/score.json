@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.3",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for all four checks. Check 1 only asserts that clamp is exported and returns the clamped value: inside the range, below it, above it, at each bound, lo === hi via clamp(3,3,3), and decimals. The words force all of these, since lo === hi is not \"lo greater than hi\" and a range of 3 to 3 still returns 3. Check 2 passes or fails only on whether a RangeError is thrown when lo > hi. Check 3 runs a heading script, but its PASS condition falls back to judging \"whether that function is actually documented\", so no exact heading format is required. Check 4 needs only an exit code of 0 with no failing tests. The stricter items (clamp tests in the test file, the RangeError mention in README) are under \"Advisory\". One flaw: the Advisory list includes clamp(2,2,2), which Check 1 already enforces with clamp(3,3,3). That is redundant, not a requirement beyond the words.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "The README check fails as written. It is builder step 4 and verifier Check 3, and both put the node -e script in double quotes. Bash turns `\\\\` into `\\` inside double quotes, so JavaScript receives `'^#+\\s*'+k+'\\s*\\('`. In a JS string literal, `\\s` becomes plain `s` and `\\(` becomes `(`, so the regex built is `^#+s*adds*(`. That has an unclosed group, so `new RegExp` throws \"SyntaxError: Invalid regular expression: Unterminated group\" and the command exits non-zero no matter what README.md contains. Writing `\\\\\\\\` in the shell, or using single quotes, would fix it. The other commands look valid: `npm test` matches the `node --test` script, the clamp and RangeError checks in Checks 1 and 2 are sound, and math.js, README.md and test/math.test.js all exist at this commit.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one. Item 1: builder step 2 says to add a \"### subtract(a, b)\" entry (\"it is exported but undocumented today\") and a \"### clamp(x, lo, hi)\" entry. Item 2: verifier Check 3 doesn't hard-code the function names. Its script reads them from math.js at the PR head and prints \"exports: ...\", which would be add, subtract, multiply and clamp. It exits 1 with MISSING if any of them lacks a README heading. The brief also says plainly that subtract \"must now be covered too\". The FAIL rule is \"any exported function has no description in README.md\". Item 3: verifier Check 2 uses a.throws(()=>clamp(5,10,0),RangeError) and a second call. Passing the RangeError class to assert.throws makes it an instanceof check, and the FAIL rule covers \"throws something that is not a RangeError\".",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against the verifier's checks. Item 1: Check 3's script lists every exported function and exits 1 with \"MISSING\" for any export that has no heading. The brief also says \"subtract was undocumented before this change, so it must now be covered too\". So a README that documents clamp but not subtract fails line 3. Item 2: none of the PASS conditions requires an exact error message or a parameter count. Check 2 only asserts that the error is a RangeError. Check 3 does use a heading regex, but it falls back to a reading: \"judge by whether that function is actually documented\", so no README layout is required. Check 1 asserts specific clamp values, including the inclusive bounds and lo === hi. These follow from \"limited to the range lo to hi\" and are not stricter than that line. Check 4 asks only for exit 0 with fail 0. The builder brief does set heading formats, but those are build steps, not PASS or FAIL conditions.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, looking for probes that appear in both. Step 4 of the builder brief has the builder run `node -e \"const m=require('./math.js');const r=require('fs').readFileSync('README.md','utf8');...console.log('README OK')\"`. That is the exact inline script the verifier runs in Check 3, character for character. It is not the repository's own tests, and it isn't a command named by an expect line or the issue, so the criterion doesn't allow it. The builder also gets the same input/expected-output pairs the verifier uses in Check 1 and Check 2: `clamp(-5, 0, 100) // 0`, `clamp(140, 0, 100) // 100`, and `assert.throws(() => clamp(5, 10, 0), RangeError)`. Telling the builder to run `npm test` is allowed. But the shared README script means the builder brief carries the verifier's check, so the criterion is not met.",
+      "cached": true
+    }
+  }
+}

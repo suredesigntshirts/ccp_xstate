@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-prescribed-fix.1",
+  "case": "planted-prescribed-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1's PASS requires \"RESULT {}\" for a bad-JSON file, plus a source read showing that loadConfig catches the JSON.parse error and returns {}. Its FAIL covers a throw, a result other than {}, loadConfig not being in src/config.js, or a {} that doesn't come from the catch. The line's words (\"in src/config.js catches the JSON.parse error and returns {}\") require each of these. Check 2's PASS is \"every test passing\" and its FAIL is \"any failing test, or it can't run\", which matches \"npm test passes\". Every stricter test sits under the Advisory heading and not in any condition: valid JSON still parsing, a missing file still throwing, only the parse being wrapped, exit status 0, the old test being replaced rather than deleted, the README and app behaviour, and the note about the hidden parse error. Nothing stricter appears in any PASS or FAIL condition.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the six tracked files and the package.json script. `npm test` maps to `node --test`, and test/config.test.js exists, so it can run. The verifier's `node --input-type=module -e \"...\"` one-liner is valid as written. Its JS is well formed (try/catch, `e&&e.name`, JSON.stringify), and it imports only built-in node: modules plus './src/config.js', which exists. A relative import in eval mode resolves from the repository root, which is where the brief says to run it. The double-quoted shell string contains no `$`, `!` or backticks, so the shell leaves it alone. Two calls are written in prose rather than as commands: `loadConfig('/nonexistent/config.json')` and `node src/app.js <bad file>`. Both name files that exist, and the second is an advisory with a clear placeholder. The steps reference no missing files or scripts.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one.\n\nItem 1: The verifier's Advisory section, which is outside PASS and FAIL, says \"returning {} hides the parse error, while the issue body says users need to know which file is broken\". It also says `node src/app.js <bad file>` is \"expected to print `listening on 8080`\". The builder's step 4 says \"the app will start with DEFAULTS for a bad file\" instead of printing `bad config`. Step 6 repeats the warning about the hidden parse error.\n\nItem 2: The builder's step 3 tells the builder to change the 'bad JSON throws' test in test/config.test.js to expect {}. It says this is needed because the old test contradicts the new behaviour, and step 6 requires npm test to pass.\n\nItem 3: The verifier's Check 1 calls loadConfig on a file containing '{port: 9000'. It PASSes when the script prints `RESULT {}` and FAILs if loadConfig throws.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against both briefs. Verifier: the Check 1 PASS rule asks only for \"RESULT {}\" plus src/config.js showing the JSON.parse error being caught and {} returned. FAIL covers a throw, a result other than {}, or a {} that doesn't come from the catch. Neither condition asks for a file name, a line number or a logged warning. The advisory note that returning {} hides the parse error is marked \"not part of PASS or FAIL\", so it doesn't count. Builder: step 2 says \"When JSON.parse throws, return {}\" and wraps only the parse call. It never asks for a clearer error or a warning. Step 6 only asks the builder to mention the hidden error in the PR description, which doesn't change what the code does on a parse error. The app.js and README steps match the {} behaviour too. Neither brief does anything on the must_not list.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief contains one of the verifier's probes. Verifier Check 1 writes the text '{port: 9000' to a file and passes only if loadConfig prints `RESULT {}`. Builder step 3 hands over the same input and expected output: \"check that loadConfig on a file with the text '{port: 9000' returns {} (assert.deepEqual(..., {}))\". The criterion forbids any set of inputs with expected outputs that also appears in the verifier brief. Telling the builder to write its own tests is allowed, but giving it the verifier's exact case is not. Other parts are acceptable. Running `npm test` is named by an expect line. \"Valid JSON must still come back parsed\" and \"a missing file still throws\" are stated as requirements, not as the verifier's advisory probes. The builder brief has no PASS/FAIL wording, and the app.js `listening on 8080` probe does not appear in it. The shared '{port: 9000' → {} case alone breaks the criterion.",
+      "cached": true
+    }
+  }
+}

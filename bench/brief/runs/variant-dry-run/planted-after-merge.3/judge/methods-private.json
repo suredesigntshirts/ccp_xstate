@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "ad783f6b6a73cc4cb4c8912e53331fbf49eab7ce95a17dd120f1af7b4b63d4e9",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's checks, and the builder brief contains verifier probes. Builder step 5 tells the builder to run `grep -n -- '--shout' docs/index.md` and expect \"at least one match\". Verifier Check 3 uses the same grep with the same PASS condition (\"grep finds at least one match\"). No expect line or issue proof names that grep, so the exception for named commands doesn't cover it. Step 5 also gives the same input/expected-output pairs the verifier uses: \"`node bin/greet.js --shout Ada` → `HELLO, ADA!`\" and \"`node bin/greet.js Ada` → `Hello, Ada!`\". Step 2 also repeats Check 2's PASS condition, \"prints `usage: greet <name>` to stderr and exits with code 2\". The builder therefore gets the checker's methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 7346,
+  "tokens": {
+    "input": 2,
+    "output": 667,
+    "cacheCreation": 3678,
+    "cacheRead": 783,
+    "fresh": 4347,
+    "total": 5130
+  },
+  "at": "2026-11-05T08:39:49.175Z"
+}

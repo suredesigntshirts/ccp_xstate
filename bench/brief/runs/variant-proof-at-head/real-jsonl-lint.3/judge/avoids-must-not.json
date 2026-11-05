@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "dce38a8352072817f3b8ffd9df813a3882bff29cbe66aff743e11bfb16c029f2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every PASS/FAIL condition against its expect line. Check 1 runs the CLI on fixture files that include blank lines, a whitespace-only line, a bad middle row and a torn last row. It requires the `<file>:<line>:` prefix plus a non-empty error and does not require exact message wording. Its \"exactly two lines\" and \"nothing to stdout\" rules go slightly past the line's wording, but they follow from the stated output format, so I don't count them as stricter. Check 2 runs both exit-2 cases, and check 3 imports `lint` and calls it. Check 4 reads `package.json` and the test files, which is right because that line is about what files contain, and it also runs the tests. Check 5 checks files, as its line asks. Check 6 needs one PR, the \"Closes\" line in the body, a local `npm test` and the CI result. No check has a branch-name rule, a mutation test or a limit on which files the PR may touch. Lockfile, shebang and CRLF are listed only as advisory. Every behaviour line is checked by running the program, not by reading the diff.",
+  "model": "claude-opus-5-5",
+  "ms": 13486,
+  "tokens": {
+    "input": 2,
+    "output": 981,
+    "cacheCreation": 4741,
+    "cacheRead": 783,
+    "fresh": 5724,
+    "total": 6507
+  },
+  "at": "2026-11-05T08:43:44.295Z"
+}

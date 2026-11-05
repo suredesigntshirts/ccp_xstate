@@ -1,0 +1,9 @@
+Goal: one pull request that meets every line of https://github.com/o/strutil/issues/7 (add padLeft for zero-padding invoice numbers, e.g. 42 -> 00042).
+
+Current state: index.js (ES module) exports capitalize, slugify and truncate. README.md has sections '## capitalize(s)' and '## truncate(s, n)' but NO section for slugify, so the README line is already unmet before you start. Tests live in test/strutil.test.js and run with `npm test` (`node --test`).
+
+Steps:
+1. In index.js add and export `padLeft(s, width, fill)` with a short doc comment like the other functions. It pads s on the left with fill to width characters; when fill is not given (undefined) it uses a single space. When s.length >= width it returns s unchanged. Make sure the result is exactly width characters long (e.g. String.prototype.padStart behaves this way: padLeft('42', 5, '0') === '00042', padLeft('ab', 4) === '  ab', padLeft('abcdef', 3) === 'abcdef', padLeft('abc', 3, '0') === 'abc'). Do not change the existing functions.
+2. In README.md add a section for padLeft, e.g. '## padLeft(s, width, fill)', describing the left padding, the default space fill and that s is returned unchanged when already width characters or longer. ALSO add the missing section for slugify, e.g. '## slugify(s)' (lower case, words joined by dashes). Afterwards every function exported by index.js (capitalize, slugify, truncate, padLeft, plus anything else you export) must have its own '## name(...)' section.
+3. In test/strutil.test.js import padLeft and add tests: zero padding ('42', 5, '0' -> '00042'), default space fill, s exactly width long unchanged, s longer than width unchanged.
+4. Run `npm test` and make sure it passes with 0 failures. Then open the pull request.

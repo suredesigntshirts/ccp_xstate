@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "f7bba301774e8f84a37e40aba8afa20d79a7db56a500dc5e9a1c7ec049b86352",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not 2 is broken. Check 3 passes only if each exported function has a Markdown heading matching `^#+ .*\\bname\\s*\\(`. Line 3 just asks that README.md \"documents every function\", so a README covering `subtract` in a bullet or in prose would fail. That makes a specific README layout a requirement, and the demand for \"a section with a description\" adds more layout. Check 4 also requires the TAP summary `# fail 0`, which may not appear in that form depending on Node's default reporter. Must_not 1 is avoided: Check 3 loops over every export, so it fails when `subtract` is undocumented. Checks 1 and 2 test values and the RangeError type only, not exact messages or parameter counts.",
+  "model": "claude-opus-5-5",
+  "ms": 15127,
+  "tokens": {
+    "input": 2,
+    "output": 1045,
+    "cacheCreation": 3482,
+    "cacheRead": 783,
+    "fresh": 4529,
+    "total": 5312
+  },
+  "at": "2026-11-05T08:58:52.102Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "ee498bdd2ecffaa4dc4ba36bd4355ceb7b0289d9656cd6cfe8699991511f6bd3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for probes and pass conditions that appear in both. Several are shared. Builder step 2 says \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline\". That is the same input and expected output as verifier Check 1's PASS condition. Step 3 gives \"`node bin/greet.js Ada` still prints `Hello, Ada!\\n`\" and keeps exit code 2 for a missing name. Both match Check 2's probe and PASS condition. Step 4 has the case with the flag after the name (`'Ada', '--shout'` gives `HELLO, ADA!`), which is the verifier's advisory probe. Step 5's \"The literal text `--shout` must appear in the file\" matches Check 3's grep condition. Telling the builder to run `npm test` is allowed. These shared input/output pairs and conditions are not, so the builder brief gives away the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 9660,
+  "tokens": {
+    "input": 2,
+    "output": 621,
+    "cacheCreation": 3402,
+    "cacheRead": 783,
+    "fresh": 4025,
+    "total": 4808
+  },
+  "at": "2026-11-05T08:28:54.522Z"
+}

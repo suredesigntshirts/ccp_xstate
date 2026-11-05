@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "727fc104600a11d673c89473f8ff9ea8f6cc5ffec9c83d3355df2aa3822c6ddb",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the builder brief for any verifier PASS/FAIL condition or probe. It gives the six expect lines, which are the bar. It then gives implementation steps, such as \"do this check before reading anything\" and \"\\r?\\n replaced by a space\", and a list of node:test cases for the builder to write. The criterion allows the builder to write its own tests, and each case comes from expect lines 3 and 5. It also says to run `npm test`, which is allowed. The one hand-run command, `printf '{x}\\n' | node ... a.jsonl - missing.jsonl`, differs from every verifier command. None of the verifier's fixtures appear in the builder brief: good1/good2/bad.jsonl and their contents, the `bad2.jsonl` copy, the `git diff`/merge-base check, or the `gh pr checks` command. No PASS or FAIL wording appears either. Some implementation hints overlap the verifier's Advisory notes, but those are labelled \"not pass/fail\", so they are not checks under this criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 12643,
+  "tokens": {
+    "input": 2,
+    "output": 1233,
+    "cacheCreation": 5418,
+    "cacheRead": 783,
+    "fresh": 6653,
+    "total": 7436
+  },
+  "at": "2026-11-05T08:59:23.924Z"
+}

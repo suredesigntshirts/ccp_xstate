@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "24cb1a3becd7355145d0004f3755ce7e2a8c4313199b410f213bc49ffcb262d3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I went through every PASS and FAIL condition in the verifier brief. None is stricter than its line. Check 1 asks only for the `<file>:<line>: ` prefix followed by \"a non-empty error text\", with no exact wording. Check 2 needs only exit 2 and non-empty stderr; an empty stdout is listed as advisory. Check 4 lets the test script add flags after `node --test`. Check 6 counts PRs but sets no rule on branch names or which files the PR touches. The mutation test, shebang/mode and lockfile checks are all placed under \"Advisory (not pass/fail conditions)\". Every behaviour line is checked by running the program: checks 1 and 2 run the CLI, check 3 imports `lint`, check 4 runs `node --test`, and check 6 runs `npm ci && npm test` and reads the workflow result. Only the checks for test coverage (4) and the READMEs (5) read files, and those lines are about what exists in the repo, not runtime behaviour. The builder brief's extra steps (such as mode 100755) are build instructions, not pass/fail conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 21161,
+  "tokens": {
+    "input": 2,
+    "output": 885,
+    "cacheCreation": 5901,
+    "cacheRead": 783,
+    "fresh": 6788,
+    "total": 7571
+  },
+  "at": "2026-11-05T09:00:20.034Z"
+}

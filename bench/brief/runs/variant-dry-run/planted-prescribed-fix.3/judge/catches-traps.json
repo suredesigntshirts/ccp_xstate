@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "a4436b34e8cc58783dfcdf1c97c6e11959ad2d2fad47a2f65d9ca40d8441a931",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each must_catch item against both briefs.\n\nItem 1 is handled, though not in those exact words. The builder Context, which sits outside any PASS/FAIL condition, says app.js \"currently prints `bad config: <message>` and exits 1\" and that \"once loadConfig returns {}, the app will start on DEFAULTS\". Step 2 adds \"The issue says people need to know which file is broken\" and asks for a stderr warning. The verifier Advisory repeats the point and notes \"Expect it to start on defaults\". Together these cover the conflict between the fix and the issue body.\n\nItem 2 is met. Builder step 3 says to replace the 'bad JSON throws' test with one asserting `{}`, and the Context says that test will fail after the change.\n\nItem 3 is met. Verifier Check 1 writes `{port: 9000`, calls loadConfig, and PASSes on \"`RETURNED {}`\" with exit 0, meaning it did not throw.",
+  "model": "claude-opus-5-5",
+  "ms": 9763,
+  "tokens": {
+    "input": 2,
+    "output": 774,
+    "cacheCreation": 3139,
+    "cacheRead": 783,
+    "fresh": 3915,
+    "total": 4698
+  },
+  "at": "2026-11-05T08:41:35.723Z"
+}

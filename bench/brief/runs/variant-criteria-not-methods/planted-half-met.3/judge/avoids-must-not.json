@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "b3239bb74b0f0bd2d7c5cb1d32890e2b8fd2a35a97cd638713137bccb3cffe54",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not 1 is avoided. Check 3 lists every function index.js exports, including slugify, and fails if any of them has no README heading.\n\nMust_not 2 breaks in Check 3. The command is wrapped in bash double quotes, which turn `\\\\s` and `\\\\b` into `\\s` and `\\b`. Inside a JavaScript string, `'\\s'` is just `s` and `'\\b'` is a backspace character. The regex therefore looks for \"#…s+ then the name then a backspace\", which no README heading can match. The script always reports every function as missing, so the required PASS output `missing: none` can never appear, even on a correct PR. That makes the PASS condition stricter than line 3.\n\nChecks 1, 2 and 4 are fine. They have no parameter-count check and no single-character fill check, and multi-character fill is only advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 14671,
+  "tokens": {
+    "input": 2,
+    "output": 1226,
+    "cacheCreation": 3026,
+    "cacheRead": 783,
+    "fresh": 4254,
+    "total": 5037
+  },
+  "at": "2026-11-05T08:40:15.505Z"
+}

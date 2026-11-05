@@ -1,0 +1,26 @@
+Check the pull request's head commit. Run `npm test` once at the head first. Then do the checks below, one per acceptance line, in this order. Each check is PASS or FAIL.
+
+Check 1. Expect line: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters".
+Run this from the repo root: `node --input-type=module -e "import * as m from './index.js'; const r=[typeof m.padLeft, m.padLeft('42',5,'0'), JSON.stringify(m.padLeft('42',5)), m.padLeft('7',3,'x')]; console.log(r.join('|'))"`.
+PASS: the output is `function|00042|"   42"|xx7`. That means padLeft is exported, pads on the left with fill to width characters, and uses a space when fill is not given.
+FAIL: padLeft is missing or not a function, the import throws, or any of the values differ.
+
+Check 2. Expect line: "padLeft returns s unchanged when s is already width characters or longer".
+Run: `node --input-type=module -e "import {padLeft} from './index.js'; console.log([padLeft('12345',5,'0'), padLeft('123456',5,'0'), padLeft('abc',2), padLeft('abc',3)].join('|'))"`.
+PASS: the output is `12345|123456|abc|abc`.
+FAIL: any value differs from its input s, or the call throws.
+
+Check 3. Expect line: "README.md has a section for every function index.js exports".
+Run: `node --input-type=module -e "import * as m from './index.js'; import fs from 'node:fs'; const md=fs.readFileSync('README.md','utf8'); const fns=Object.keys(m).filter(k=>typeof m[k]==='function'); const missing=fns.filter(f=>!new RegExp('^#+\\s*'+f+'\\b','m').test(md)); console.log('exports:',fns.join(','),'missing:',missing.join(',')||'none')"`. Also read README.md at the head to confirm that each matched heading starts a real section about that function.
+PASS: `missing: none`, and every exported function (at least capitalize, slugify, truncate, padLeft) has its own README heading/section. Note that slugify had no section before this change, so it must have been added.
+FAIL: any exported function, including slugify, has no README section.
+
+Check 4. Expect line: "npm test passes".
+Run: `npm test` at the head.
+PASS: exit code 0 and no failing tests reported.
+FAIL: a non-zero exit code or any failing test.
+
+Advisory (not part of any PASS/FAIL):
+- Check that test/strutil.test.js has tests that cover padLeft (default fill, explicit fill, s equal to and longer than width).
+- Check that the README padLeft section mentions the default space fill and the unchanged-when-long behaviour.
+- Report any change outside index.js, README.md and the test file.

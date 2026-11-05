@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "7cd1d4a22ad86b845f831b8b5867a1e42419e21676daa1a50b404936fbfcf553",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands are fine. `npm test` maps to `node --test`. Check 1's `node --input-type=module -e \"...\"` quotes correctly: the JS uses only single quotes inside the double-quoted string, with no `$`, backticks or `!`. It imports `./src/config.js`, which exists. One command breaks the criterion: the verifier's advisory step says \"Run `node src/app.js <bad-file>`\". As written, `<bad-file>` is a placeholder. In a shell it reads as input redirection from a file named `bad-file>`, which is invalid syntax. No earlier step creates a bad file at a known path, since Check 1's file sits in a random mkdtemp directory. Nothing in the repository facts shows that src/app.js reads a config path from argv, so the argument may not fit the program at all. Because this command can't run as written, the criterion fails for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 11633,
+  "tokens": {
+    "input": 2,
+    "output": 916,
+    "cacheCreation": 3060,
+    "cacheRead": 783,
+    "fresh": 3978,
+    "total": 4761
+  },
+  "at": "2026-11-05T08:41:25.959Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "6b30f5c001109a089555cf449d1a805cf95dc82be413fb7cf636002f8d227e54",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most of the builder brief describes the bar and allows the builder to run `npm ci && npm test` and write its own tests, which the criterion permits. But it ends with a \"You are done when all of these hold:\" block made of explicit PASS/FAIL conditions. These include \"PASS when `printf '{\"a\":1}\\n{bad\\n' > /tmp/x.jsonl; node ... ` prints exactly `/tmp/x.jsonl:2: `... FAIL otherwise\", \"PASS when `node ... /nope; echo $?` prints 2\", and a `grep -n jsonl-lint README.md` probe. The criterion forbids any PASS or FAIL condition in the builder brief. These probes also repeat checks in the verifier brief: item 1 checks a bad row with file:line output and exit 1, item 2 checks that a missing file exits 2, and item 5 checks that the root README lists the tool. So the builder is handed the checker's methods, and the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 6397,
+  "tokens": {
+    "input": 2,
+    "output": 577,
+    "cacheCreation": 3739,
+    "cacheRead": 783,
+    "fresh": 4318,
+    "total": 5101
+  },
+  "at": "2026-11-05T08:25:23.909Z"
+}

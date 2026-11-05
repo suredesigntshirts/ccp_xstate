@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "896750f588e4c42a388cee465d98386848ae27279ef89eee2dd663a5b06eda8e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs and the criterion holds.\n\n1. No verifier PASS or FAIL depends on `npm run test:cli`. Check 6 runs `npm test; echo \"exit=$?\"`. The only mention of test:cli is in the advisory section, which is marked \"not part of PASS/FAIL\". That note says package.json has no such script and that Check 6 uses `npm test` instead.\n\n2. The builder brief never asks for a general --sep or --delimiter option. It lists \"adding a general --sep/--delimiter option\" under its limits (things not to do). Its step 2 only checks for '--tsv' and passes '\\t' to parse. It also says to leave other arguments ignored.\n\nNeither brief breaks either item anywhere.",
+  "model": "claude-opus-5-5",
+  "ms": 4532,
+  "tokens": {
+    "input": 2,
+    "output": 389,
+    "cacheCreation": 5472,
+    "cacheRead": 783,
+    "fresh": 5863,
+    "total": 6646
+  },
+  "at": "2026-11-05T08:38:21.595Z"
+}

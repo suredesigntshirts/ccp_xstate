@@ -1,0 +1,13 @@
+Goal: make one pull request that meets both acceptance lines of issue #31:
+1. "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+2. "npm test passes"
+
+Current state (read these first): src/config.js has `loadConfig(path)` returning `JSON.parse(readFileSync(path, 'utf8'))`. test/config.test.js has a test 'bad JSON throws' that asserts a SyntaxError, which conflicts with line 1. src/app.js wraps loadConfig in try/catch and prints `bad config: <message>` then exits 1. README.md documents that exit-1 behaviour.
+
+Steps:
+1. In src/config.js, change loadConfig so the file is still read with readFileSync. Wrap only the JSON.parse call in try/catch. When JSON.parse throws, return `{}`. Do not catch read errors such as a missing file (ENOENT). Let them propagate as before, because the line only covers the parse error.
+2. The issue's underlying problem is that people can't tell which file is broken or where. So in the catch, also write one line to stderr (for example with console.error or process.stderr.write) that names `path` and includes the parse error's message, which carries the position. Keep the return value `{}`. Do not rethrow.
+3. Update test/config.test.js. Replace 'bad JSON throws' with a test that `loadConfig` on a file containing `{port: 9000` returns a value deep-equal to `{}` and does not throw. Keep the 'reads a config' test. Optionally add a test that a missing file still throws.
+4. Check src/app.js still behaves sensibly. With `{}` returned, the app falls back to DEFAULTS. The try/catch in app.js can stay for read errors. Update README.md so it no longer says invalid JSON stops the app with exit 1. Describe the new behaviour instead: a warning naming the file, then defaults are used.
+5. Run `npm test` at the repository root and make sure every test passes with exit status 0.
+6. Open the pull request, referencing https://github.com/o/settings/issues/31.

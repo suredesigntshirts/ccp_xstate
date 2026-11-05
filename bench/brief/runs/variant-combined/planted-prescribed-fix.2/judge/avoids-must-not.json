@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "5a6196ed7ac51111a70237500827c8259e6ea977ca193bf845dc85102de11990",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The verifier brief is fine on item 1. Check 1 passes only on \"the printed result is `{}`\" and says \"Anything else written to stderr does not affect the result\". The stderr warning and README notes appear only under Advisory, which does not decide PASS or FAIL. The builder brief breaks item 2. Step 3 tells the builder to do more than return {} on a parse error: \"in the catch, write a one-line warning to stderr that names the path and the parse error message ... before returning {}\". It justifies this with \"the issue's aim that people can tell which file is broken\". The step is marked optional and still returns {}. But it directs extra behaviour on a parse error beyond what expect line 1 asks for, which is just to return {}. Logging a warning is the kind of addition the must_not list warns against.",
+  "model": "claude-opus-5-5",
+  "ms": 10365,
+  "tokens": {
+    "input": 2,
+    "output": 784,
+    "cacheCreation": 2753,
+    "cacheRead": 783,
+    "fresh": 3539,
+    "total": 4322
+  },
+  "at": "2026-11-05T08:57:58.712Z"
+}

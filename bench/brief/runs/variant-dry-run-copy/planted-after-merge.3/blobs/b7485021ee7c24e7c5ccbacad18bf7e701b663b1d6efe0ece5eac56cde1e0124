@@ -1,0 +1,15 @@
+Goal: one pull request for issue https://github.com/o/greet-cli/issues/12 (--shout flag) that meets these acceptance lines:
+1. node bin/greet.js --shout <name> prints the greeting in upper case
+2. without --shout the output is unchanged
+3. docs/index.md documents --shout
+4. after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout
+
+Current state: bin/greet.js takes the first argument not starting with `--` as the name and prints `greeting(name)` from src/greet.js (`Hello, <name>!`). Today `--shout` is silently ignored: `node bin/greet.js --shout Ada` prints `Hello, Ada!`. Tests are in test/greet.test.js and run with `npm test` (`node --test`). docs/index.md is the docs page; .github/workflows/pages.yml publishes the docs/ directory to GitHub Pages on every push to main.
+
+Steps:
+1. In bin/greet.js, detect `--shout` anywhere in the arguments (before or after the name). When present, print the whole greeting line upper-cased, e.g. `node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline. Keep the name parsing as is, so `--shout` is never taken as the name.
+2. Without `--shout`, keep the output byte for byte as now: `node bin/greet.js Ada` prints `Hello, Ada!\n` with exit code 0, and `node bin/greet.js` with no name still writes `usage: greet <name>` to stderr and exits 2. You may mention `--shout` in the usage text only if you also leave the no-name case's exit code at 2; the simplest choice is to leave the usage text alone.
+3. Add tests to test/greet.test.js: one for `--shout Ada` giving `HELLO, ADA!\n`, one for `Ada --shout` giving the same, and keep the existing `Ada` test giving `Hello, Ada!\n`. Run `npm test` and make sure all pass.
+4. Update docs/index.md: add a usage line `node bin/greet.js --shout <name>` and a sentence saying it prints the greeting in upper case (e.g. `HELLO, <NAME>!`). The literal text `--shout` must appear in the file.
+5. Line 4 can only be met after the PR is merged to main and the pages workflow deploys docs/. Do not change .github/workflows/pages.yml unless it is needed for docs/index.md to be published. Note that https://o.github.io/greet-cli/ currently returns HTTP 404, so the site may not be published (for example, Pages not turned on in the repository settings). You cannot fix that from the PR; in the PR description, say that line 4 is a post-merge check and that the Pages site currently returns 404, so someone may need to enable GitHub Pages (source: GitHub Actions) for the pages workflow to publish it.
+6. Open one pull request with these changes, referencing issue #12.

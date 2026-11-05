@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "2fcc60a9d0391ff768e96896820cee106626eb0723713bdccdd3946d84a3443e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Builder: `npm install`, `npm ci && npm test` and `node packages/jsonl-lint/bin/jsonl-lint.js` all point at files that earlier steps create. Node 22's `node --test` finds `test/*.test.js` by default. `spawnSync(process.execPath, [binPath, ...])` and `fs.mkdtempSync(os.tmpdir())` are valid calls. Verifier: in Check 3, the `node --input-type=module -e \"...\"` quoting holds up. Bash turns `\\\"` into `\"` and leaves `\\n` alone, so the JS gets valid string literals with newline escapes. `npm test --workspace jsonl-lint` works because the root lists `packages/*` as workspaces, which the root test script's use of `--workspaces` supports, and the name `jsonl-lint` is set in step 1. The `gh pr view --json body,headRefOid,state` fields and `gh pr checks` are valid. `test -f`, `grep -n` and `mktemp -d` are standard. Placeholders like `<tmp>` and `<pr>` are meant to be filled in. I found no invalid syntax or missing files.",
+  "model": "claude-opus-5-5",
+  "ms": 14950,
+  "tokens": {
+    "input": 2,
+    "output": 992,
+    "cacheCreation": 4953,
+    "cacheRead": 783,
+    "fresh": 5947,
+    "total": 6730
+  },
+  "at": "2026-11-05T08:59:30.745Z"
+}

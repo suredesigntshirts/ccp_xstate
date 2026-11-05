@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "4529d802a8026f1a00f065f1ec5240a815cc9fe26b1442f3db9dce7057bcdc0c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Each one names something that exists at this commit or is made earlier in the same command. Files that exist include packages/jsonl-lint/bin/jsonl-lint.js, src/index.js, test/cli.test.js, README.md and .github/workflows/test.yml. The temp files are made by `mktemp -d` and `printf` inside the same command. The shell syntax is valid: `&&` chains, `; echo \"exit=$?\"`, `${PIPESTATUS[0]}`, and single-quoted grep patterns such as `'`-`'`. `npm test -w packages/jsonl-lint` works because the root test script already uses `--workspaces`. `git diff --exit-code \"$(git merge-base origin/main HEAD)\" HEAD -- path` and the `gh api` REST calls with `--jq` are well-formed. The builder's `readFileSync(0, 'utf8')` and spawnSync `input` are valid Node. The only non-literal piece is `N=<PR number>`, and the brief marks it as a placeholder (\"N = the PR number\"), so it doesn't count against the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 9310,
+  "tokens": {
+    "input": 2,
+    "output": 823,
+    "cacheCreation": 5735,
+    "cacheRead": 783,
+    "fresh": 6560,
+    "total": 7343
+  },
+  "at": "2026-11-05T08:58:50.912Z"
+}

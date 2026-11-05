@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "8b1c062d2f88ed756d818d71ac7811bc455eace3165325e900466534946a9be4",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier's checks, and the builder brief contains the verifier's probes. Builder step 1 lists \"padLeft('42', 5, '0') === '00042'; padLeft('ab', 4) === '  ab'; padLeft('12345', 5, '0') === '12345'; padLeft('123456', 5, '0') === '123456'\", and step 3 repeats those four cases as the required tests. The same input/output pairs are in verifier Check 1 ('42',5,'0'→'00042'; 'ab',4→'  ab') and Check 2 ('12345' and '123456' with width 5). The criterion allows the builder to write its own tests, but not to be given a set of inputs with expected outputs that also appears in the verifier brief. Step 4's \"check that every function exported from index.js has a README.md heading naming it\" also closely matches Check 3's method. So the builder brief does not keep the checker's methods private.",
+  "model": "claude-opus-5-5",
+  "ms": 7445,
+  "tokens": {
+    "input": 2,
+    "output": 650,
+    "cacheCreation": 3471,
+    "cacheRead": 783,
+    "fresh": 4123,
+    "total": 4906
+  },
+  "at": "2026-11-05T08:56:55.024Z"
+}

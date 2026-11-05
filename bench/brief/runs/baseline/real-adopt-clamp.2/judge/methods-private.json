@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "5d387ff3515886fdafd6bbe0b17cc32b1af6b3f9aea7fb8518becdad39889c20",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier's probes, and the builder brief leaks some of them. Step 2 gives the README examples \"clamp(-5, 0, 100); // 0, clamp(140, 0, 100); // 100 and clamp(42, 0, 100); // 42\". Those are the same inputs and expected outputs as the first three cases in Check 1's script. Step 3 tells the builder to write \"assert.throws(() => clamp(5, 10, 0), RangeError)\". That is the same input as Check 2's first probe case, [5,10,0], with the same RangeError expectation. Step 2's \"Every name in math.js's module.exports must have its own heading\" closely matches the heading-per-export regex in Check 3. So the builder brief carries checks from the verifier brief, not just the bar. Telling the builder to run npm test and write its own tests is allowed, but these shared cases are not.",
+  "model": "claude-opus-5-5",
+  "ms": 6175,
+  "tokens": {
+    "input": 2,
+    "output": 609,
+    "cacheCreation": 3250,
+    "cacheRead": 783,
+    "fresh": 3861,
+    "total": 4644
+  },
+  "at": "2026-11-05T08:29:26.092Z"
+}

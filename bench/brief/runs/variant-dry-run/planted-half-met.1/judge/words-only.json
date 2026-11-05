@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "e11c89b7de76608de99e81f914af59cefe64836e6281e4a4e802aa2de927d50e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1 and 2 are fine. Every assertion in them follows from the expect line's words: zero and space padding, exact width, and s unchanged when it is width long or longer. Two checks break the criterion. Check 4's expect line is only \"npm test passes\", which exit 0 satisfies. Its PASS condition also requires that it \"reports `# fail 0`\". That is an exact-output rule, and it can wrongly fail: node --test's spec reporter (the default in newer Node) prints \"ℹ fail 0\", not \"# fail 0\". Check 3's script only counts a heading that starts with the function name (`^#{1,6}\\s+`?name\\b`). That fixes a heading format the words \"a section for every function\" don't require: a section headed \"## Using padLeft\" would fail. Both extra rules belong under Advisory, not in PASS/FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 14619,
+  "tokens": {
+    "input": 2,
+    "output": 1299,
+    "cacheCreation": 3574,
+    "cacheRead": 783,
+    "fresh": 4875,
+    "total": 5658
+  },
+  "at": "2026-11-05T08:39:35.435Z"
+}

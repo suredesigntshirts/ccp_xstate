@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "d46155a5f393b841dc0f50bbfe2f337410907638a9993a22aee32f133fab97ee",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and both briefs cover each one.\n1. Builder step 2 says \"ALSO add the missing section for slugify, e.g. '## slugify(s)'\", next to the padLeft section.\n2. Verifier Check 3 lists the exported functions with Object.keys on index.js. Its PASS line says the list \"must include capitalize, slugify, truncate and padLeft\". It FAILs if \"any exported function has no section in README.md\". It also notes that a PR adding only padLeft fails, because slugify still has no section.\n3. Verifier Check 1 calls m.padLeft('ab',4) without a fill argument and expects \"  ab\", so it checks that the default fill is a space.",
+  "model": "claude-opus-5-5",
+  "ms": 5673,
+  "tokens": {
+    "input": 2,
+    "output": 418,
+    "cacheCreation": 3034,
+    "cacheRead": 783,
+    "fresh": 3454,
+    "total": 4237
+  },
+  "at": "2026-11-05T08:56:18.785Z"
+}

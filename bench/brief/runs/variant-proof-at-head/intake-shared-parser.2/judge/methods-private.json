@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "28ee487a33b2995d25048acc33652acafcff17fcdf6d76082fb4f558faf6262e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared the builder brief with the verifier brief's checks, probes and advisories. The commands in builder step 4 (for example `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \"exit=$?\"`) and their expected outputs are the issue's own proof commands and expect lines, which the criterion allows. Step 2's test inputs and outputs are also the expect lines, written as the builder's own tests, which is allowed too. The builder brief has none of the verifier-only methods: no `grep -n -- '--tsv' test/*.js`, no `od -c`/`cat -A` byte check, no PASS/FAIL wording, and no `foo --tsv` argument-position probe. It does say the flag may appear \"anywhere in process.argv\", but that restates the issue's assumption and isn't a probe. It also gives `npm test` and not `test:cli`, matching the expect line.",
+  "model": "claude-opus-5-5",
+  "ms": 8410,
+  "tokens": {
+    "input": 2,
+    "output": 781,
+    "cacheCreation": 5509,
+    "cacheRead": 783,
+    "fresh": 6292,
+    "total": 7075
+  },
+  "at": "2026-11-05T08:38:28.556Z"
+}

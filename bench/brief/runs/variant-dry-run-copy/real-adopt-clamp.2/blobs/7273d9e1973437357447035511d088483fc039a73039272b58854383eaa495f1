@@ -1,0 +1,13 @@
+Make one pull request that meets every one of these acceptance lines:
+- math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+- clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+- README.md documents every function math.js exports
+- npm test passes
+
+Repository facts: math.js is CommonJS and currently ends with `module.exports = { add, subtract, multiply };`. Tests live in test/math.test.js and run with `npm test` (which is `node --test`). README.md has an `## API` section with `### add(a, b)` and `### multiply(a, b)` headings; it has NO entry for `subtract`, so the third line fails today until you add one.
+
+Steps:
+1. In math.js add a function `clamp(x, lo, hi)` with a short doc comment in the same style as the others. If `lo > hi`, throw `new RangeError(...)` with a clear message. Otherwise return `lo` when `x < lo`, `hi` when `x > hi`, else `x` (so clamp(-5, 0, 100) is 0, clamp(140, 0, 100) is 100, clamp(5, 0, 10) is 5, and lo === hi is allowed). Add `clamp` to `module.exports`, keeping add, subtract and multiply exported.
+2. In README.md, under `## API`, add a `### subtract(a, b)` section (returns `a` minus `b`, with a small example) and a `### clamp(x, lo, hi)` section that says it returns `x` limited to the range `lo` to `hi` and throws a `RangeError` when `lo` is greater than `hi`, with an example such as clamp(140, 0, 100) // 100. Keep the existing heading style `### name(args)` so each exported function has its own heading.
+3. In test/math.test.js, import clamp and add tests: values below, inside and above the range, the boundaries, lo === hi, negative ranges, and `assert.throws(() => clamp(5, 10, 0), RangeError)`.
+4. Run `npm test` and confirm it exits 0 with no failing tests before opening the pull request.

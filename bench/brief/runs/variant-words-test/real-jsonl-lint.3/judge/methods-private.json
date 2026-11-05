@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "6016cf7bdb122efdb949cd3b73ef56a15a79d3187a614afa08abf4838d60eb88",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion is met. I compared the builder brief with the verifier brief's PASS/FAIL conditions and probes. None of the verifier's concrete probes appear in the builder brief:\n- the clean.jsonl, bad.jsonl and blank.jsonl inputs;\n- the expected `bad.jsonl:3:`/`bad.jsonl:5:` lines;\n- the inline `node --input-type=module -e \"import { lint }…\"` script;\n- the `grep -n jsonl-lint README.md` and `gh pr list --search 102` commands.\n\nThe builder gets the expect lines and an implementation plan. Its testing steps (\"Write node:test tests… 0 for a clean file, 1… 2 with stderr output\") tell it to write its own tests, which is allowed, and it is told to run `npm ci`/`npm test`, which is also allowed. Some builder statements overlap with verifier advisory notes: \"strip a trailing \\r\", \"A trailing newline… must not produce an extra row or error\" and the package-lock update. These are implementation requirements, not PASS/FAIL conditions or concrete probe inputs with expected outputs, so the builder brief has the bar without the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 10543,
+  "tokens": {
+    "input": 2,
+    "output": 1038,
+    "cacheCreation": 5315,
+    "cacheRead": 783,
+    "fresh": 6355,
+    "total": 7138
+  },
+  "at": "2026-11-05T08:43:11.639Z"
+}

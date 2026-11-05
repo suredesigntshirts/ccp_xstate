@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "278a3025df9efa9a960bb78de9f989e8119c2f5d9383ea5c438c09d6e3ccca74",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1–5 use byte-exact `cmp` comparisons. That is forced, because each expect line says \"prints exactly … followed by a newline\", and Check 1 also tests \"exits 0\" as stated. Check 6's PASS needs `npm test` to exit 0 and a test that runs `--tsv` on input containing tabs and asserts on the output. That matches \"runs bin/csv2json.js with --tsv on tab-separated input and checks its output\". Check 7's PASS asks that the README say the flag is for tab-separated input and show an example. Describing what a flag does is part of \"documents the --tsv flag\", so this is a borderline case, not an extra requirement, and its FAIL condition only requires mention plus an example. The stricter items (flag in another position, scope creep) sit under \"Advisory (does not affect PASS/FAIL)\". No mutation test, branch rule or exact-wording rule appears in any PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 11669,
+  "tokens": {
+    "input": 2,
+    "output": 1044,
+    "cacheCreation": 6272,
+    "cacheRead": 783,
+    "fresh": 7318,
+    "total": 8101
+  },
+  "at": "2026-11-05T08:27:55.937Z"
+}

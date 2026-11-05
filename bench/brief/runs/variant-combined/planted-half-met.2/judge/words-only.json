@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "474cf9d57a95da6c9e94bead4b55ff0a26609c13f3268b6ee734c5190e7a8be4",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each PASS/FAIL condition against the words of its expect line. Checks 1, 2 and 4 hold. For example, padLeft('a',3,'x') giving \"xxa\" follows directly from \"pads s on the left with fill … to width characters\", and the exit-status check is correctly placed under Advisory. Check 3 breaks the criterion. Its PASS condition says the listed exported functions \"must include at least capitalize, slugify, truncate and padLeft\". Expect line 3 only requires \"a section for every function index.js exports\". It does not require which functions are exported. Suppose a PR removed or renamed slugify and documented everything it still exports. That PR would meet line 3's words but fail this condition. Requiring \"text about it\" that \"describes it\" also goes a little beyond \"has a section\". These stricter tests belong under Advisory, not in a PASS condition.",
+  "model": "claude-opus-5-5",
+  "ms": 11456,
+  "tokens": {
+    "input": 2,
+    "output": 782,
+    "cacheCreation": 3054,
+    "cacheRead": 783,
+    "fresh": 3838,
+    "total": 4621
+  },
+  "at": "2026-11-05T08:56:00.459Z"
+}

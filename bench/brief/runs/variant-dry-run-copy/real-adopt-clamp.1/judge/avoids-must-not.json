@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "8d5ebe963a706c0bcd347b6e4119e067cd0d36c464de73e78f9094c60a33e1e0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 holds: check 3 lists every exported function and fails if any one is missing, so a README that documents clamp but not subtract fails. Item 2 is broken by the same check. Its command passes a function only if README.md contains the literal text `name(`, as in `!md.includes(n+\"(\")`. Line 3 only asks that every exported function be documented. A README that says \"`subtract` — returns a minus b\" documents subtract but would fail. Requiring signature-style text is a specific README layout, which is stricter than the line. Check 4 is also somewhat strict: it requires the TAP summary to show '# fail 0', but Node's test runner can print a different summary format depending on the output. Checks 1 and 2 match their lines: they test the values clamp returns and that it throws a RangeError for any message.",
+  "model": "claude-opus-5-5",
+  "ms": 9623,
+  "tokens": {
+    "input": 2,
+    "output": 761,
+    "cacheCreation": 3581,
+    "cacheRead": 783,
+    "fresh": 4344,
+    "total": 5127
+  },
+  "at": "2026-11-05T08:58:25.841Z"
+}

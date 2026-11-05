@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "e7947a52de3092224340d73b22c15a165747209f0c72230df431fc02fa26bb2c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each command in both briefs against the tracked files and package.json. Every one runs as written. The builder brief runs `npm test`, which exists as \"node --test\". It also runs `node bin/greet.js --shout Ada`, and bin/greet.js is tracked; the flag itself is something the builder adds. The verifier brief runs `node bin/greet.js --shout Ada/bob` and `node bin/greet.js Ada/bob`, plus `cat docs/index.md`, and it reads .github/workflows/pages.yml. All of those files exist at this commit. For the base comparison it uses `git merge-base` and `git worktree add`. These are real git subcommands, described in prose and used correctly. No script or file is named that is missing. No arguments are wrong for their program. There is no JavaScript, and the shell syntax is valid throughout. The brief also tells the verifier not to fetch the live page, so no URL command is given. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 8866,
+  "tokens": {
+    "input": 2,
+    "output": 521,
+    "cacheCreation": 3088,
+    "cacheRead": 783,
+    "fresh": 3611,
+    "total": 4394
+  },
+  "at": "2026-11-05T08:55:25.812Z"
+}

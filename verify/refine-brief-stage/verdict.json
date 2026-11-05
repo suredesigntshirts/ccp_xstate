@@ -1,0 +1,53 @@
+{
+  "item": "refine-brief-stage",
+  "verified_sha": "aacf88d9fdf5236e52b04febe60a4042f83acb7b",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GYt5vLWiBPxWfjCUH",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "rubric",
+      "status": "MET",
+      "command": "npm ci; node scripts/bench/score.mjs --stage brief --judge-check --out <tmp> (then again with --extra evidence/verifier-methods-copied.json --extra evidence/verifier-paraphrased.json); score.mjs --runs <copy of bench/brief/runs/baseline> --no-judge --report <tmp>; node --test verify/refine-brief-stage/rubric.test.mjs",
+      "excerpt": "Re-run at aacf88d (only a plan/decisions line changed since aa275c1): verify/refine-brief-stage 41 pass. rubric.json: builder-criteria by mechanical, methods-private by judge, approved.added names both, by the stand-in, record plan/decisions/2026-11-05-refine-brief-stage-ready.md. judge-check exit 0: methods-private 11/11 agreement, planted faults caught 11 of 11; 2 planted-bad for methods-private (planted-methods-copied, planted-methods-pass). My two briefs: verifier-methods-copied (quotes all 4 lines, copies the verifier's check-3 node -e probe with PASS/FAIL) -> builder-criteria met, methods-private **not**; verifier-paraphrased (line 2 paraphrased, no probe) -> builder-criteria **not**, methods-private met; with them 13 of 13 planted caught, builder-criteria 2/2. Baseline rescored with --no-judge: all 27 runs carry both criteria, builder-criteria 18/27, methods-private 11/27, every table line equal to the committed baseline.md (only the title and the hand-written section differ)."
+    },
+    {
+      "id": "cases",
+      "status": "MET",
+      "command": "node --test verify/refine-brief-stage/cases.test.mjs (engine check() of each new issue minus url against workflows/intake.json meta.schemas #shaped; seed repos built by scripts/bench/lib.mjs caseRepo and run; old cases and old baseline runs hashed against evidence/main-fixtures.json taken from origin/main d1a37a0)",
+      "excerpt": "Re-run at aacf88d (only a plan/decisions line changed since aa275c1): verify/refine-brief-stage 41 pass. intake-shared-parser and intake-suggested-fix: check() returns [] (and a copy without proofs fails, so the check is live); both carry proofs, non_goals, assumptions, 2 must_catch, 2 must_not. Traps are real: csv2json package.json has only `test`, `npm run test:cli` fails (Missing script), parse(text, sep = ',') is shared and test/csv.test.js covers it; settings test asserts `throws(..., SyntaxError)` and `node src/app.js c.json` already prints `(line 3 column 3)`, exit 1. Baseline has intake-*.1..3. The 37 files of the 7 old cases hash equal to main; the 21 old runs' files equal main except score.json (gained builder-criteria and methods-private, every old verdict's met and why unchanged) and a new judge/methods-private.json each."
+    },
+    {
+      "id": "variants",
+      "status": "MET",
+      "command": "node --test verify/refine-brief-stage/variants.test.mjs (each set copied and rescored with --no-judge, totals against the decision table; compare.mjs rerun for every variant and diffed with bench/brief/reports/compare-*.md; the brief actor in each run's pinned workflow blob diffed with the baseline's); read the decision's candidate list and the PR body",
+      "excerpt": "Everything that was run holds: each set's 27 runs pin one brief stage file; dry-run, proof-at-head, criteria-not-methods and dry-run-copy each add one rule and words-test rewrites one rule in place, nothing else in the actor differs. Rescored totals equal the decision's table for all 7 sets, and all 6 compares regenerate identical to the committed ones apart from the Generated line. All runs use claude-opus-5-5, 9 cases x 3. The PR names the target and kept/dropped for the 5 variants run. Round 2 (aacf88d): candidate 5, traps-named, is now named in the PR variants table and in the decision's After the build as not run, with the budget reason (about 2.86M fresh stage tokens plus about 4.75M in judge sessions of the 9M) and its target kept as a next target. The decision made it conditional on that budget, and my own count of the committed runs agrees, so every candidate is accounted for: 5 run with kept or dropped by the rule, 1 not run by its own condition."
+    },
+    {
+      "id": "kept",
+      "status": "MET",
+      "command": "node --test verify/refine-brief-stage/variants.test.mjs (kept test: combined rules rebuilt from the baseline actor + words-test's rewritten rule + proof-at-head's added rule; blind test: compare.mjs --blind --seed 1 and 2 regenerate packet.md and key.json); cmp bench/brief/variants/combined/quick-fix/brief.md workflows/quick-fix/brief.md; read reports/blind-combined*/read.md, key.json, unblinded.md",
+      "excerpt": "Re-run at aacf88d (only a plan/decisions line changed since aa275c1): verify/refine-brief-stage 41 pass. The rebuilt rule list equals the combined set's pinned rules and the Rules section of workflows/quick-fix/brief.md on the branch; variants/combined/quick-fix/brief.md is byte-identical to it, and the rest of variants/combined (quick-fix.json without the prompt path, build.md, verify.md) equals the branch's, so the combined set's pin (cb8645f4) is the branch's workflow. Combined vs baseline from the rescored sets: one-check-per-line 27/27, no-restated-rules 27/27, words-only 10->20, runs-as-written 19->23, catches-traps 20->20, avoids-must-not 18->24, methods-private 11->11, builder-criteria 18->12, the one lower criterion, accepted in writing in the decision ('proof-at-head kept, with a trade accepted here'). Two blind reads committed with keys; both packets and keys regenerate byte for byte from the sets. My own unblinding: seed 1 baseline 7, combined 0, even 2; seed 2 baseline 5, combined 1, even 3, as the decision says. The outcome's 'a blind read agrees' is therefore not met, as recorded; this Expect line asks only that the read be committed with its key."
+    },
+    {
+      "id": "real",
+      "status": "MET",
+      "command": "wrote my own case (evidence/real-case.json: a units CLI seed repo; planted trap: proof 4 says run `node --test test/*.spec.js`, which matches no file and exits 0 with 0 tests on Node 22); node scripts/bench/run.mjs --stage brief --out <tmp> --case verifier-units --k 3 --model claude-opus-5-5 at the branch (pin cb8645f4); ran every command the six briefs give in the seed repo at the case commit; node --test verify/refine-brief-stage/real.test.mjs",
+      "excerpt": "Re-run at aacf88d (only a plan/decisions line changed since aa275c1): verify/refine-brief-stage 41 pass. 3 real runs, each accepted on the first return (30-40 s, 13.8k-14.5k fresh tokens), results in evidence/real-runs.json. Every verifier check 4 runs `npm test` and puts the spec glob only under Advisory, naming it as matching nothing (trap caught 3 of 3). Every command given runs as written in the repo: c2f, cat README.md, npm install, npm test, node --test, the spec glob (0 tests), the unknown-command probes; the f2c commands print `unknown command: f2c` only because the change is not built. No builder brief has a PASS or FAIL condition. Runs 1 and 2 quote all 5 expect lines in the builder brief (builder-criteria met), so a real run meets the line as written. Run 3 restates them in its own words (builder-criteria not met): that matches the combined version's 12/27 on builder-criteria, the trade the decision accepted, and means the builder-brief half of this line holds in 2 of 3 runs, not every run."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #120 at aacf88d",
+      "excerpt": "ci / test: completed, success (09:26:45Z to 09:29:13Z) at head aacf88d. Round 1: also success at aa275c1. The verdict / gates check failed only because this verdict did not yet mark every line MET. My own tests: node --test verify/refine-brief-stage/*.test.mjs: 41 pass, 0 fail."
+    }
+  ],
+  "notes": [
+    "The decision's candidate 2 also said 'The issue input's meaning names the fields intake adds'; the proof-at-head variant and the kept file only add the rule, and the issue input's meaning is unchanged. The item's outputs list 'what the brief does with intake's fields' for docs/prompts.md; the docs change describes the judge's view of them, not what the brief does. Neither is an Expect line.",
+    "verify/refine-brief-stage/evidence/main-fixtures.json holds hashes from origin/main d1a37a0 because CI clones at depth 1."
+  ],
+  "history": [
+    "Round 1 at aa275c1 (verdict 7756588): 5 MET, variants NOT MET (traps-named, candidate 5, neither run nor named in the PR or decision). Round 2: builder added the not-run line with its budget reason in aacf88d (decision and PR body); re-stamped all 6 MET."
+  ]
+}

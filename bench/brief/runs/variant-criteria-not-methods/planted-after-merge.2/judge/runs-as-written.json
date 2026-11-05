@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "d6a6d5a0ecc3ea5a48c31f6d8e93f45f544f5d5ac02f62f280eb3a9fc28cd0af",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I checked every command in both briefs against the tracked files and the scripts in package.json.\n- `npm test` maps to `node --test`, which finds test/greet.test.js.\n- bin/greet.js exists, so `node bin/greet.js --shout Ada`, `node bin/greet.js Ada --shout`, `node bin/greet.js Ada`/`Grace` and the no-argument run are all valid.\n- `grep -n -- '--shout' docs/index.md` is valid: `--` stops grep reading the pattern as an option, and the file exists.\n- `gh run list --workflow pages.yml` names a workflow file that exists.\n- `curl -sSL https://o.github.io/greet-cli/` is valid syntax.\n- `gh pr view <number> --json state,mergedAt` is marked \"e.g.\", and `<number>` is a stand-in for the PR number the verifier will have. Typed literally, the shell would read `<number>` as a redirect, but the flags and fields themselves are valid.\n- The worktree step gives no command, so there is nothing to break.\n- `node bin/greet.js --shout <name>` in builder step 4 is text for the docs page, not a command to run.\n\nNo command names a missing file or has bad syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 10802,
+  "tokens": {
+    "input": 2,
+    "output": 889,
+    "cacheCreation": 3436,
+    "cacheRead": 783,
+    "fresh": 4327,
+    "total": 5110
+  },
+  "at": "2026-11-05T08:38:58.832Z"
+}

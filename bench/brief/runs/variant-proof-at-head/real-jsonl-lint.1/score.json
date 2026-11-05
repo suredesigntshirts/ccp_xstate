@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.1",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for e\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1 to 5 stay within those words. Line numbers, exit codes, stderr output, the package.json fields and the five listed test cases are all required by the expect lines. Strict extras such as the shebang, CRLF handling and the lockfile are correctly placed under Advisory. Check 6 goes further than its line. Its PASS requires \"exactly one open PR\". The expect line only says \"one PR\", so a merged or closed PR would fail a condition the words do not force. It also makes `npm ci` a FAIL condition (\"`npm ci` or `npm test` failing\"), but the expect line only requires npm test and the workflow to be green. These stricter tests should sit under Advisory, not in PASS or FAIL.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs; all would run as written. Builder: `chmod +x`, `npm install`, `npm ci && npm test` use files that exist or that earlier steps create. The root test script already runs `npm test --workspaces`, so workspaces are configured. Verifier: the printf/`node packages/jsonl-lint/bin/jsonl-lint.js $T/...; echo $?` commands are valid. In Check 3, `node --input-type=module -e \"import {lint} from './packages/jsonl-lint/src/index.js'; ...\"` quotes correctly in bash: `\\\"` becomes `\"` and `\\n` stays a JS escape. The JS is valid, and a relative import from eval resolves against the current directory. `npm test -w jsonl-lint` works once the workspace exists. `gh pr list --search \"102 in:body\" --state all`, `gh pr view --json body,headRefOid,state` and `gh pr checks -R` use real flags and fields. The `cd packages/jsonl-lint` step is covered by \"run every check from the repository root\". The `<n>` placeholders are filled from the earlier `gh pr list` result.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked the briefs against all four must_catch items. Item 3 fails, so the criterion is not met.\n\nItems 1, 2 and 4 hold. The builder's step 7 says to \"Run `npm install` at the repo root so `package-lock.json` includes the new workspace\" and commit it. Step 6 says to \"replace the 'No tools yet' bullet\". Verifier check 6 reads the PR body and headRefOid and requires the `test` check to pass \"for the PR's head commit\".\n\nItem 3 is missing. Check 4 runs `npm test -w jsonl-lint` and `node --test` inside the package. Check 6 only requires the root `npm test` to exit 0. Neither one confirms that the jsonl-lint tests actually run under the root script, for example by reading the test count or by breaking lint() and seeing a test fail. Because the root script uses `--if-present`, a skipped workspace would still exit 0. Only the builder brief mentions \"not skipped\", and this item asks for it in the verifier brief.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every verifier check against the expect lines. None is stricter than its line. Check 1 asks only for a non-empty error after `<file>:<line>: `, not exact wording. Check 2 asks only that stderr is non-empty and the exit code is 2. Check 3 checks the line numbers and the `{line, error}` shape. Check 4 allows `dependencies` to be \"absent or empty\". Check 6 has no branch-name or file-scope rule, though \"exactly one open PR\" is slightly narrower than \"one PR\". The builder's \"avoid devDependencies too\" is guidance, not a pass or fail condition. The checks for run-time behaviour execute the program: lines 1 and 2 run the bin on temp files and check stdout, stderr and exit codes. Line 3 imports and calls `lint`, and line 6 runs `npm ci && npm test` and reads the CI checks. Only lines 4 and 5 read files, and those lines ask about file contents (package.json fields, tests present, READMEs), and line 4 also runs the tests.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with every verifier check and found none of the verifier's checks in it. It gives no PASS/FAIL conditions and doesn't reuse the verifier's inputs or expected outputs: the bad.jsonl file with findings on lines 3 and 6, the single-row `{\"a\":1}` file, the `node --input-type=module -e` lint call expecting lines 3 and 4, the `test -s`/`grep` README probes and the `gh pr checks` commands. Its torn-row example `{\"a\":1}\\n{\"b\":` is not an input the verifier uses. Step 7 tells the builder to run `npm ci && npm test`, which the repository and expect line 6 name, so it is allowed. Step 4 asks the builder to write its own tests, which is also allowed. Step 8's manual sanity check only restates expect lines 1–2 (exit 0, 1 and 2, output to stderr) without the verifier's fixtures or expected line numbers. So the brief gives the builder the bar, not the checker.",
+      "cached": true
+    }
+  }
+}

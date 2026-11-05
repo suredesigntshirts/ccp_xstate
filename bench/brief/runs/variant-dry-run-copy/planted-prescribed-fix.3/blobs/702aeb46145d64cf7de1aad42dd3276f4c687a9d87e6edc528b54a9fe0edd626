@@ -1,0 +1,17 @@
+Run every check at the PR head, from the repository root. Install nothing; the project has no dependencies. Each check below matches one acceptance line, in the same order.
+
+Check 1. Acceptance line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run:
+d=$(mktemp -d) && printf '{port: 9000' > "$d/config.json" && node --input-type=module -e "import { loadConfig } from './src/config.js'; import assert from 'node:assert/strict'; let r; try { r = loadConfig(process.argv[1]); } catch (e) { console.log('FAIL: threw ' + e.name + ': ' + e.message); process.exit(1); } assert.deepEqual(r, {}); console.log('PASS: returned {}');" "$d/config.json"; echo "exit=$?"
+PASS: stdout contains `PASS: returned {}` and the last line is `exit=0`. Any stderr warning the change prints is allowed.
+FAIL: it prints `FAIL: threw ...` (loadConfig still throws on invalid JSON), it prints an AssertionError (the return value is not deep-equal to `{}`), or the last line shows any exit code other than 0.
+
+Check 2. Acceptance line: "npm test passes"
+Run:
+npm test; echo "exit=$?"
+PASS: the TAP summary shows `# fail 0` and the last line is `exit=0`.
+FAIL: any test fails or is cancelled, or the exit code is not 0.
+
+Advisory (not part of PASS/FAIL):
+- Before this change, check 1 printed `FAIL: threw SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)`. Check 2 already passed, with 2 tests.
+- Note it, without failing anything, if any of these hold: a valid file such as `{"port": 9000}` no longer returns `{ port: 9000 }`; a missing file now returns `{}` instead of throwing (the line covers only the JSON.parse error); there is no stderr message naming the file path on invalid JSON (the issue's underlying need); the old 'bad JSON throws' test was deleted with no test for the new `{}` behaviour; or README.md still says invalid JSON exits 1.

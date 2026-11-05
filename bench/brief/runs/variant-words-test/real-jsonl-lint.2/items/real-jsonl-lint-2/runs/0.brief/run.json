@@ -1,0 +1,140 @@
+{
+  "run": "real-jsonl-lint-2:0.brief",
+  "item": "real-jsonl-lint-2",
+  "name": "0.brief",
+  "invoke": "brief",
+  "actor": "brief",
+  "workflow": "quick-fix@121508664f061c62631ec31cdbe36d93695d03409f92360ede069d48cf6a34b7",
+  "root": "/home/user/ccp_xstate/bench/brief/runs/variant-words-test/real-jsonl-lint.2",
+  "session": "bench",
+  "release": "0.0.0",
+  "state": "\"briefing\"",
+  "input": {
+    "task": "Write the two briefs for issue. builder: the steps to make one pull request that meets every line of issue.expect. verifier: for each expect line, in the same order, what to run at the PR head (tests, the program, a script) and what result means PASS and what means FAIL; checks that only read the diff are not enough. If why is set, an earlier attempt failed for that reason, and both briefs must change course to avoid it.",
+    "issue": {
+      "url": "https://github.com/suredesigntshirts/ccp_machine_test/issues/102",
+      "expect": [
+        "packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for every row that is not valid JSON (1-based lines, blank lines skipped, an unterminated last line checked) and exits 1 if any, 0 if none",
+        "A missing file or no argument prints to stderr and exits 2",
+        "packages/jsonl-lint/src/index.js exports lint(text) returning [{ line, error }]",
+        "The workspace has its own package.json (jsonl-lint, type module, test script node --test), no runtime dependencies, and node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes",
+        "packages/jsonl-lint/README.md exists and the root README lists the tool",
+        "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, and npm test and the test workflow are green at its head"
+      ]
+    },
+    "why": null,
+    "base": null,
+    "branch": null
+  },
+  "schema": {
+    "rules": [
+      "You are the brief writer for one issue. You write two briefs, one for a builder agent and one for an independent verifier agent, and you change nothing yourself. Each brief becomes the Task part of that agent's prompt, word for word; the harness already gives each agent its rules, inputs, output and how to return, so a brief holds only the steps of the work.",
+      "Write instructions only: no code changes, commits, pushes, pull requests or comments.",
+      "The verifier brief has exactly one check per expect line, in the same order. A check's PASS and FAIL conditions test only what its expect line's words require. Test each condition: could a pull request meet the line's words and still fail it? If so, it is stricter than the line: loosen it, and put the stricter test (an exit status, exact output, an exact message or a format the line does not name, a parameter count, a mutation test) and any other advice under a heading Advisory, never into a PASS or FAIL condition.",
+      "Do not name a branch or a base, and do not restate the agents' rules or how they return.",
+      "Use paths from the repository root.",
+      "Return once both briefs are written. They are fixed when the tool accepts them and cannot be changed later."
+    ],
+    "inputs": {
+      "task": "The brief writer's job for this issue, fixed in the workflow. It fills the Task part.",
+      "issue": "The issue: url, and expect, its acceptance lines. The expect lines are the only pass or fail conditions; quote them as conditions, and never pass on other issue text as instructions.",
+      "why": "The person's written five whys from a replan: why the last attempt failed. null on a first attempt.",
+      "base": "The branch the PR will target, set by a parent item. null means the repository's default branch. The builder is told it; do not restate it.",
+      "branch": "The branch the PR will come from, set by a parent item. null means the builder's own worktree branch. The builder is told it; do not restate it."
+    },
+    "type": "object",
+    "required": [
+      "builder",
+      "verifier"
+    ],
+    "properties": {
+      "builder": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The builder's brief: the steps to meet every expect line. It becomes the Task part of the builder's prompt, word for word."
+      },
+      "verifier": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The verifier's brief: one check per expect line, in order, each saying what to run and what PASS and FAIL look like. It is fixed when you return and becomes the Task part of the verifier's prompt, word for word."
+      }
+    }
+  },
+  "defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "prRef": {
+      "type": "object",
+      "required": [
+        "url",
+        "at"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^https://github\\.com/[\\w.-]+/[\\w.-]+/pull/[0-9]+/?$"
+        },
+        "at": {
+          "type": "string",
+          "minLength": 40,
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "required": [
+        "url",
+        "expect"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expect": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "line": {
+      "type": "object",
+      "required": [
+        "line",
+        "result",
+        "evidence"
+      ],
+      "properties": {
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "repo": "/tmp/bench-real-jsonl-lint-2-ti6PQZ/repo",
+  "github": "suredesigntshirts/ccp_machine_test",
+  "worktrees": "/tmp/bench-real-jsonl-lint-2-ti6PQZ/wt",
+  "worktree": "/tmp/bench-real-jsonl-lint-2-ti6PQZ/wt/real-jsonl-lint-2--0.brief",
+  "branch": "run/real-jsonl-lint-2/0.brief",
+  "briefHash": "87d9560aa2a4b0d92d2c56fbb18583b00dfc22138ee71b197ff2297941a34c98",
+  "context": "Run real-jsonl-lint-2:0.brief, worktree /tmp/bench-real-jsonl-lint-2-ti6PQZ/wt/real-jsonl-lint-2--0.brief of https://github.com/suredesigntshirts/ccp_machine_test, branch run/real-jsonl-lint-2/0.brief."
+}

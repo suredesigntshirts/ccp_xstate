@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "93d387641a0e0a45d44660e30b819f6e692463eb16aa42fbdc97aadf68dcf99a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 3 and 4 stay within their lines. Check 1 compares the output to `HELLO, ADA!`. Check 3 needs the docs to describe or show usage of --shout. Check 4 needs the PR merged, HTTP 200 and `--shout` on the page. Check 2 goes further. Its PASS condition needs \"the existing `greeting` and `cli` tests pass under npm test\". Its FAIL condition triggers if \"either existing test fails or has been changed\". The expect line only says the CLI output without --shout is unchanged, and the first command (`test \"$(node bin/greet.js Ada)\" = \"Hello, Ada!\"`) already checks that. Requiring the `greeting()` unit test to pass, and failing a PR that edits the existing tests, are tests the words don't force. They should go under Advisory, not in the PASS or FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 14126,
+  "tokens": {
+    "input": 2,
+    "output": 1217,
+    "cacheCreation": 3098,
+    "cacheRead": 783,
+    "fresh": 4317,
+    "total": 5100
+  },
+  "at": "2026-11-05T08:55:18.906Z"
+}

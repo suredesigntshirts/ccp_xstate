@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "0a499d0b52fc0331f8c7a8d3a19c8add8d3fb7668d254a3f6fb5ce9332c10ee1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 3 and 4 hold. Check 1 tests for the greeting in upper case. Check 3 tests that docs/index.md mentions --shout and documents it. Check 4 tests that the published page contains --shout, and it reports FAIL when the PR isn't merged yet. Check 2 breaks the criterion. Its Run says to \"Compare stdout, stderr and exit status\" against the base commit, and its FAIL fires when \"any of these outputs differs from the base.\" The expect line only says \"the output is unchanged.\" An exit status is not output, so the words do not force comparing it. That comparison makes the FAIL condition stricter than the words, and it should have been placed under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 11500,
+  "tokens": {
+    "input": 2,
+    "output": 880,
+    "cacheCreation": 3297,
+    "cacheRead": 783,
+    "fresh": 4179,
+    "total": 4962
+  },
+  "at": "2026-11-05T08:39:11.095Z"
+}

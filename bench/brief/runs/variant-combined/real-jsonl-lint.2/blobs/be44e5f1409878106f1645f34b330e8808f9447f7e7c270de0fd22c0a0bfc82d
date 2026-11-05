@@ -1,0 +1,36 @@
+Check out the pull request's head. Run every check there. Work in a temp dir (mktemp -d) for test fixtures. Give one PASS or FAIL per check, with the evidence (commands and output).
+
+Check 1 — expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for every row that is not valid JSON (1-based lines, blank lines skipped, an unterminated last line checked) and exits 1 if any, 0 if none".
+Run: create clean.jsonl with `{"a":1}\n{"b":2}\n`; create bad.jsonl with `{"a":1}\n\n{bad\n{"c":3}\n{"torn":` (no trailing newline; line 2 blank, line 3 bad, line 5 unterminated). Run `node packages/jsonl-lint/bin/jsonl-lint.js <tmp>/clean.jsonl; echo $?` and the same for bad.jsonl.
+PASS: clean prints no error rows and exits 0; bad prints a line starting `<tmp>/bad.jsonl:3: ` followed by an error text and a line starting `<tmp>/bad.jsonl:5: ` followed by an error text, no row for lines 1, 2 or 4, and exits 1.
+FAIL: any other exit code, a missing row for line 3 or 5, a wrong line number, an error reported for the blank line or a valid row, or rows not in the `<file>:<line>: <error>` form.
+
+Check 2 — expect: "A missing file or no argument prints to stderr and exits 2".
+Run: `node packages/jsonl-lint/bin/jsonl-lint.js <tmp>/nope.jsonl >out 2>err; echo $?` and `node packages/jsonl-lint/bin/jsonl-lint.js >out 2>err; echo $?`, inspecting err each time.
+PASS: both exit 2 and both write non-empty output to stderr.
+FAIL: either exits other than 2, or its stderr is empty.
+
+Check 3 — expect: "packages/jsonl-lint/src/index.js exports lint(text) returning [{ line, error }]".
+Run: `node --input-type=module -e "import {lint} from './packages/jsonl-lint/src/index.js'; console.log(JSON.stringify(lint('{\"a\":1}\n{bad\n')), JSON.stringify(lint('{\"a\":1}\n')))"`.
+PASS: lint is an exported function; the first result is an array containing an object with `line` equal to 2 and an `error` property; the second is an empty array.
+FAIL: import fails, lint is not exported, it returns something other than an array, or items lack `line` or `error`.
+
+Check 4 — expect: "The workspace has its own package.json (jsonl-lint, type module, test script node --test), no runtime dependencies, and node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes".
+Run: read packages/jsonl-lint/package.json; read the test files under packages/jsonl-lint; run `npm test --workspace jsonl-lint` (or `cd packages/jsonl-lint && npm test`).
+PASS: package.json has name `jsonl-lint`, type `module`, scripts.test is `node --test`, and no non-empty `dependencies`; the tests use node:test and include cases for a clean file, a bad middle row, a torn last row, blank lines, and the exit codes; the workspace tests pass.
+FAIL: any of those fields is wrong or missing, there are runtime dependencies, one of the five named cases has no test, or the tests fail.
+
+Check 5 — expect: "packages/jsonl-lint/README.md exists and the root README lists the tool".
+Run: `test -f packages/jsonl-lint/README.md && echo ok`; `grep -n jsonl-lint README.md`.
+PASS: the file exists and the root README.md mentions jsonl-lint as a tool.
+FAIL: the file is missing or the root README does not list it.
+
+Check 6 — expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, and npm test and the test workflow are green at its head".
+Run: `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state`; `gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test`; at the head run `npm ci && npm test`.
+PASS: the PR is on suredesigntshirts/ccp_machine_test, its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102`, the `test` workflow check at the head commit succeeded, and `npm ci && npm test` passes locally.
+FAIL: the body lacks that text, the test check is failing, pending or absent at the head, or npm test fails.
+
+Advisory (not pass/fail):
+- Check that package-lock.json was updated to include the workspace; `npm ci` fails otherwise.
+- Check that CRLF input does not produce false errors, that a file ending in a newline gives no error for the empty final line, and that bin/jsonl-lint.js has a shebang and executable mode.
+- Check the error rows go to stdout and that exit 2 cases print nothing to stdout.

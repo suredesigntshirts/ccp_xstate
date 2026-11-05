@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "70fbc22475959a7fb7b5d312178f67d380bdbe90657361825187801d83fbe166",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS/FAIL conditions with the words of its expect line. Check 1 asks for more than its line does. Expect line 1 only says the tool prints `<file>:<line>: <error>` for every invalid row and exits 1 or 0. It never forbids other output. Yet Check 1 requires that clean.jsonl \"prints nothing to stdout\" and that bad.jsonl \"prints exactly two lines\", and it fails on \"any other output lines\". So a summary line or an \"OK\" message would fail a tool that meets the words. Check 1 also fails a tool that reports the whitespace-only line 4, but the brief's own Advisory says whitespace-only handling is \"not pass/fail\", so the two contradict each other. Check 4 also requires that the test run \"passes\". Line 4 only asks for tests to exist; passing belongs to line 6. These stricter conditions should be under Advisory, not in PASS or FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 9734,
+  "tokens": {
+    "input": 2,
+    "output": 801,
+    "cacheCreation": 4704,
+    "cacheRead": 783,
+    "fresh": 5507,
+    "total": 6290
+  },
+  "at": "2026-11-05T08:43:00.480Z"
+}

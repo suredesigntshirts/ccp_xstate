@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "8083766fc56d5d2ac3c7f362d14c5bb74d9df11e12f46804f657d22c8ac26491",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Each file they name is tracked at this commit: bin/greet.js, docs/index.md, test/greet.test.js and .github/workflows/pages.yml. `npm test` maps to the existing \"node --test\" script. The shell lines are valid as written: `test \"$(node bin/greet.js --shout Ada)\" = \"HELLO, ADA!\" && echo PASS || echo FAIL`, `grep -n -- '--shout' docs/index.md` (the `--` stops grep reading the pattern as an option), `node bin/greet.js Ada | od -c` and `node bin/greet.js; echo rc=$?`. The curl lines use real flags: `-sS -L --max-time 20 -o /dev/null -w '%{http_code}\\n'`. The `--shout` commands depend on code the builder adds in an earlier step, so that counts as \"made by an earlier step.\" The briefs contain no JavaScript snippets, so there is no JS syntax to check. I found nothing that would fail to parse or name a missing file or tool.",
+  "model": "claude-opus-5-5",
+  "ms": 7481,
+  "tokens": {
+    "input": 2,
+    "output": 680,
+    "cacheCreation": 3816,
+    "cacheRead": 783,
+    "fresh": 4498,
+    "total": 5281
+  },
+  "at": "2026-11-05T08:39:00.069Z"
+}

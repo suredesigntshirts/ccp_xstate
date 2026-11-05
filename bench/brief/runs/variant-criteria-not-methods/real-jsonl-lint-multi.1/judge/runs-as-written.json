@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "424490450e73178c3c6c5aeccf7220fc3430a16e1affcd06fda1740202375960",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most of the commands are fine. `npm ci` has a package-lock.json to use. `npm test` and `node --test` match the scripts. The bin, src, test and README paths all exist, and the gh/git commands are well formed. The verifier brief breaks, though. It sets \"BIN=packages/jsonl-lint/bin/jsonl-lint.js\", a path relative to the repo root. Then it says to \"Make a scratch directory with: c1.jsonl …\" and runs commands such as `node $BIN b1.jsonl c1.jsonl b2.jsonl` and `node $BIN - < b1.jsonl`. The fixture files live in the scratch directory and BIN is relative to the repo root, so no working directory makes these commands work as written. Run from the repo root, b1.jsonl isn't found; run from the scratch directory, $BIN isn't found. The brief never makes BIN absolute and never uses scratch-dir paths, so Checks 1–3 fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 8915,
+  "tokens": {
+    "input": 2,
+    "output": 819,
+    "cacheCreation": 5645,
+    "cacheRead": 783,
+    "fresh": 6466,
+    "total": 7249
+  },
+  "at": "2026-11-05T08:41:58.860Z"
+}

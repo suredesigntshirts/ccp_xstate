@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "c55716b70652d992ff4b3dcd16ada9172a6b90c01aae121c9f6e8566f56f1169",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs and found none that would fail. The only file they read before any step creates it is `.github/workflows/test.yml`, which exists. Every `packages/jsonl-lint` path is created in builder steps 1 to 5, and builder step 7 updates the lockfile so `npm ci` and `npm test -w jsonl-lint` will run. Shell quoting is valid. In Check 3, `\\\"` inside double quotes turns into `\"`, and `\\n` is passed through for JavaScript to read as a newline. The ESM `-e` import is valid, and `require` works in Check 4's CommonJS `-e`. The nested `$()` and the `gh api --jq` filters in Check 6 are well formed. The `printf` fixtures give the expected line numbers (3 and 6 for mixed, 2 for torn). With no arguments, `node --test` finds `test/*.test.js`. One assumption: Check 1 reuses `$d` and Check 6 reuses `$PR` across lines, so those lines must run in the same shell session. The brief says to set `PR` \"in the shell\", which fits that.",
+  "model": "claude-opus-5-5",
+  "ms": 11691,
+  "tokens": {
+    "input": 2,
+    "output": 1121,
+    "cacheCreation": 6821,
+    "cacheRead": 783,
+    "fresh": 7944,
+    "total": 8727
+  },
+  "at": "2026-11-05T08:43:11.039Z"
+}

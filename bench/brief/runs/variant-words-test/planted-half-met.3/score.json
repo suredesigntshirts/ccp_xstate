@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.3",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 4 hold. Check 1's expected values follow from padding on the left, the default space and the exact width. Check 2 only asks that s comes back unchanged. Check 4 asks that all tests pass, and the exit-status-0 point sits under Advisory. Check 3 breaks the criterion. Its PASS condition requires \"a heading that names that function, with text describing it.\" Expect line 3 only asks that README.md \"has a section for every function index.js exports.\" It does not say the section must contain descriptive text. That added content requirement is a test the words do not force, and it sits in the PASS condition when it belongs under Advisory.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository. They name only files that exist: index.js, README.md, package.json and test/strutil.test.js. `npm test` maps to the \"test\" script, `node --test`. The builder's `node -e \"import('./index.js').then(m=>console.log(Object.keys(m)))\"` is valid CommonJS eval with a dynamic import, which resolves from the current directory. Each verifier `node --input-type=module -e \"...\"` uses valid ESM import syntax. Their double-quoted shell strings contain only single quotes, with no `$`, backticks or `!` that would break them. JSON.stringify, Object.keys and the filter calls are well-formed JavaScript. `grep -n '^#' README.md` is valid. The builder steps edit only existing files and run `npm test` after the edits, so nothing depends on a file that has not been made yet. I found no command that would fail as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs handle all three must_catch items. (1) In builder step 3, the brief says README.md today has \"NONE for slugify\". It tells the builder to add a `## slugify(s)` section \"as well as a `## padLeft(s, width, fill)` section\". (2) Verifier Check 3 lists what index.js exports using Object.keys. It names the expected functions as \"capitalize, slugify, truncate, padLeft\" and FAILs if \"any exported function has no section\", adding \"check slugify specifically\". (3) Verifier Check 1 calls `m.padLeft('ab',4)` with no fill argument and expects \"  ab\". Its FAIL condition includes \"uses a different default than a space\". No item is missed.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both briefs against the two must_not items and found neither.\n\nItem 1: Check 3 cannot pass when only padLeft is documented. Its PASS condition needs \"every exported function (expected at least capitalize, slugify, truncate, padLeft) has its own section\". Its FAIL note adds \"check slugify specifically\".\n\nItem 2: No PASS or FAIL condition goes beyond its line.\n- Check 1 only tests fills of one character and never requires that fill be a single character.\n- Check 2 only compares values with the input.\n- Check 3 requires a heading naming each exported function, with text describing it. It doesn't require a heading format or position. The `## name(args)` style and the place before `## Tests` are listed as advisory only.\n- Check 4 requires the tests to pass. Exit status and test coverage are advisory.\n\nNo check counts parameters. The builder brief's padStart remark is a note on how to build it, not a check. \"With text describing it\" is a reasonable reading of \"section\", not an added layout rule.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, and the builder brief contains the verifier's probes. Builder step 2 gives \"padLeft('42', 5, '0') === '00042', padLeft('ab', 4) === '  ab'\". Step 4 adds padLeft('abcde', 5, '0') === 'abcde' and padLeft('abcdef', 3) === 'abcdef'. These are the same inputs and expected outputs the verifier uses in Check 1 ([\"00042\",\"  ab\",...]) and Check 2 ([\"abcde\",\"abcdef\",...]). Step 5 also has the builder run an export-listing node -e command and match the names to README headings. That is essentially the probe in verifier Check 3. Step 3 repeats the verifier's specific note that README.md has no slugify section. Telling the builder to write its own tests is allowed. Here, though, the brief supplies the checker's exact input/output sets, so the methods are not kept private.",
+      "cached": true
+    }
+  }
+}

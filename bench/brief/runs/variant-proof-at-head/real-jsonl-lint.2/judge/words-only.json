@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "5648b896f2eab4ac20fdf4fea1972129ccff7705b66d8217dd6ff93e930c905f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 2–6 stay within their expect lines, and the extras (lockfile, CRLF, phantom trailing line) are correctly placed under Advisory. Check 1 goes further than its words. Expect line 1 only requires that `<file>:<line>: <error>` is printed for every bad row, plus the exit codes. It does not say nothing else may be printed. Yet Check 1's PASS condition for (b) demands \"stdout has exactly two lines\", and its FAIL condition includes \"a missing or extra line\". For (c) it requires \"exits 0 with no output\". So a correct tool that also prints a summary line, or an \"OK\" message on clean input, would fail. Those output-only-these-lines rules are stricter than the words and should have been Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 10545,
+  "tokens": {
+    "input": 2,
+    "output": 738,
+    "cacheCreation": 4701,
+    "cacheRead": 783,
+    "fresh": 5441,
+    "total": 6224
+  },
+  "at": "2026-11-05T08:42:59.614Z"
+}

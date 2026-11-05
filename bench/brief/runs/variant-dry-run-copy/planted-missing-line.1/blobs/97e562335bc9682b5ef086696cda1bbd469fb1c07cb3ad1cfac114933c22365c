@@ -1,0 +1,15 @@
+Run every check at the PR head, from the repository root.
+
+Check 1. Expect line: "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+Run:
+a=$(printf 'name,age\nann,30\nbob,41\n' | node bin/csv2json.js); b=$(printf 'name\tage\nann\t30\nbob\t41\n' | node bin/csv2json.js --tsv); echo "csv: $a"; echo "tsv: $b"; [ -n "$a" ] && [ "$a" = "$b" ] && echo SAME || echo DIFFERENT
+PASS: the last line printed is SAME, and the csv line is a JSON array of the two rows: [{"name":"ann","age":"30"},{"name":"bob","age":"41"}].
+FAIL: the last line is DIFFERENT, or either command errors. A FAIL example is keys that still contain a tab, such as "name\tage".
+
+Check 2. Expect line: "README.md documents --tsv"
+Run:
+grep -n -- '--tsv' README.md; echo "exit $?"
+PASS: at least one line of README.md is printed, then exit 0, and the matching text describes the --tsv flag (for example, as reading tab-separated input).
+FAIL: exit 1 (no match), or the only match does not describe the flag.
+
+Advisory (not a pass or fail condition): run npm test and note any failing tests. Also note whether the PR adds a test for --tsv, and whether the CLI with no flag still prints [{"a":"1","b":"2"}] for input 'a,b\n1,2\n'.

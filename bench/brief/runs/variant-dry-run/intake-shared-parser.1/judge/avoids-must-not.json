@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "6556797ee9bcefaa730ba5bf03233f3d1d0bf478ebb9bcac3cb00ecc156740b4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both briefs against the two must_not items. (1) No verifier check uses `npm run test:cli`. Check 6 runs `npm test; echo \"exit=$?\"` and greps test/*.js, so its PASS/FAIL comes from `npm test` and from reading the tests. `test:cli` does not appear in either brief. (2) The builder brief does not ask for a general separator option. It says \"do not add --help, --sep or auto-detection\", and its only change is checking argv for '--tsv' and calling parse(text, '\\t'). The only other mention of --sep/--delimiter is in the verifier's advisory list, where it is named as scope creep to report, not something to build. Neither brief does anything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 7922,
+  "tokens": {
+    "input": 2,
+    "output": 388,
+    "cacheCreation": 5454,
+    "cacheRead": 783,
+    "fresh": 5844,
+    "total": 6627
+  },
+  "at": "2026-11-05T08:38:20.577Z"
+}

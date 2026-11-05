@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "7ee37a6e888d83b283cea24ce96a7a86293d756fcd2bdc1a262aeda1b55818f5",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief. Builder step 4 contains a \"sanity check, which must print SAME\": `csv=$(printf 'name,age,city\\nAda,36,London\\nBob,,Paris\\n' | node bin/csv2json.js); tsv=$(printf 'name\\tage\\tcity...' | node bin/csv2json.js --tsv); ... [ \"$csv\" = \"$tsv\" ] && echo SAME || echo DIFFERENT`. This is the same inline script that the verifier brief's Check 1 runs, with the same inputs. Check 1's PASS condition, that the last line printed is SAME, is also given to the builder as a requirement. Neither the expect lines nor the issue's proofs name this script, and it isn't one of the repository's tests. So the builder brief passes on the verifier's probe and its pass condition, and the criterion breaks. The other parts are fine: `npm test`, the builder writing its own test, and the README instruction don't break it.",
+  "model": "claude-opus-5-5",
+  "ms": 10091,
+  "tokens": {
+    "input": 2,
+    "output": 426,
+    "cacheCreation": 2809,
+    "cacheRead": 783,
+    "fresh": 3237,
+    "total": 4020
+  },
+  "at": "2026-11-05T08:41:05.119Z"
+}

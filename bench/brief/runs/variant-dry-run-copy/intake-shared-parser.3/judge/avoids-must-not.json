@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "818b78f8efe035ea55b36f76eee8ce8c0fc161028988ddcbc2d36e99b53e3ce4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs, and neither brief does either one.\n\n1. **`npm run test:cli`:** The proof for line 6 uses this command, but the verifier's Check 6 doesn't. It runs `npm test; echo \"exit=$?\"`, and its PASS condition is based on that exit code plus reading the test that matches `--tsv`. The command `test:cli` doesn't appear anywhere in either brief. The builder brief also uses `npm test` (\"Run npm test and each of the commands below\").\n\n2. **General separator option:** The builder brief doesn't ask for a `--sep` or `--delimiter` option. It forbids one: \"Do not change how unknown arguments are handled, add --help, add a general --sep/--delimiter option, auto-detect the separator, or add quoting rules.\" It asks only for a `--tsv` check that calls parse(text, '\\t').\n\nThe verifier brief mentions `--sep` only in its advisory scope note, which flags it as a non-goal and doesn't ask for it.",
+  "model": "claude-opus-5-5",
+  "ms": 7062,
+  "tokens": {
+    "input": 2,
+    "output": 466,
+    "cacheCreation": 5726,
+    "cacheRead": 783,
+    "fresh": 6194,
+    "total": 6977
+  },
+  "at": "2026-11-05T08:54:51.675Z"
+}

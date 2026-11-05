@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "a390c42598c47ca1c2693ca312dbb84d7dbd94b6d40a99eae9093da83e03d50f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief. Expect line 5 already names the test cases, so listing them for the builder is allowed. The builder brief goes further and gives each case the same expected result the verifier checks: \"two clean files (exit 0, no output)\", \"one bad among several (exit 1, only that file's lines, order preserved)\", \"stdin `-` ... bad (1, prefix `-:N: `)\". These are sets of inputs with expected outputs that also appear in the verifier brief. The builder brief also passes on verifier checks the issue doesn't state. \"a missing file among good/bad ones (exit 2...)\" with \"2 takes precedence over 1\" matches the verifier's \"confirm exit is 2 not 1 when a missing file and a bad row coexist\". \"validate argv before reading anything\" matches the verifier's \"`- -` (exit 2 ... even with stdin provided)\". So the builder gets the checker's methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 10192,
+  "tokens": {
+    "input": 2,
+    "output": 983,
+    "cacheCreation": 3144,
+    "cacheRead": 783,
+    "fresh": 4129,
+    "total": 4912
+  },
+  "at": "2026-11-05T08:25:23.689Z"
+}

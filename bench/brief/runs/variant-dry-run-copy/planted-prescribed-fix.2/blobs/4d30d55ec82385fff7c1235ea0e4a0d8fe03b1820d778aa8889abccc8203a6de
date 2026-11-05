@@ -1,0 +1,20 @@
+Check out the PR head and run each check from the repository root. There is one check per acceptance line of issue https://github.com/o/settings/issues/31, in order.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run:
+node --input-type=module -e "import { mkdtempSync, writeFileSync } from 'node:fs'; import { tmpdir } from 'node:os'; import { join } from 'node:path'; import { loadConfig } from './src/config.js'; const d = mkdtempSync(join(tmpdir(), 'v-')); const bad = join(d, 'bad.json'); writeFileSync(bad, '{port: 9000'); const good = join(d, 'good.json'); writeFileSync(good, '{\"port\": 9000}'); let r; try { r = loadConfig(bad); } catch (e) { console.log('THREW ' + e.name); process.exit(1); } console.log('BAD ' + JSON.stringify(r)); console.log('GOOD ' + JSON.stringify(loadConfig(good)));"; echo "exit=$?"
+Also open src/config.js and confirm that loadConfig is defined there and that the JSON.parse call is inside a try/catch whose catch returns {}.
+PASS: the output contains the line `BAD {}`, there is no `THREW` line, and src/config.js shows loadConfig catching the JSON.parse error and returning {}.
+FAIL: the output contains `THREW ...`, the BAD line shows anything other than `{}`, the command fails to import ./src/config.js, or the {} fallback is not in loadConfig in src/config.js.
+
+Check 2. Expect line: "npm test passes"
+Run:
+npm test; echo "exit=$?"
+PASS: the output ends with `exit=0` and the TAP summary shows `# fail 0`.
+FAIL: the exit code is not 0, or any test is reported failing or cancelled.
+
+Advisory (not part of PASS/FAIL):
+- In check 1, the GOOD line should read `GOOD {"port":9000}`, showing valid JSON still parses.
+- A missing file passed to loadConfig should still throw instead of returning {}, so only the parse error is swallowed.
+- test/config.test.js should have a test for the new {} result, replacing the old 'bad JSON throws' test, and README.md should no longer say bad JSON stops the app with exit 1.
+- The prescribed fix falls back silently to defaults and gives no message naming the broken file or position, even though the issue's motivation was helping people find what to fix. Mention this in your report if the PR does not acknowledge it.

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "5322ac79b783008f2596682a1a56d7f145af404cdee6e8554e4a210b877887f3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief. The builder brief has no PASS or FAIL conditions. It also leaves out the verifier's own methods: the `od -c` byte checks and `/tmp/o1` redirect, the `grep -n -- '--tsv' test/*.js` inspection, and the advisory `foo --tsv` position probe. Step 4 lists commands such as `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \"exit=$?\"`, but these come straight from the issue's expect lines and proofs, which the criterion allows. Step 2's inputs and expected outputs repeat the expect lines, which are the bar, and are given as tests for the builder to write itself, which is also allowed. Telling it to run `npm test` is allowed too. So the builder gets the bar but none of the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 8317,
+  "tokens": {
+    "input": 2,
+    "output": 797,
+    "cacheCreation": 5477,
+    "cacheRead": 783,
+    "fresh": 6276,
+    "total": 7059
+  },
+  "at": "2026-11-05T08:38:22.606Z"
+}

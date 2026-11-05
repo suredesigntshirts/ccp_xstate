@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "80f10ed9bb729975f0a1add0f66c3dac5e58841a66fe62591640721dea5eaf39",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's checks. The builder brief contains the verifier's probes. Its README examples \"clamp(-5, 0, 100) // 0, clamp(140, 0, 100) // 100, clamp(42, 0, 100) // 42\" are the exact inputs and expected outputs of the verifier's Check 1 cases. Its \"assert.throws(() => clamp(1, 5, 0), RangeError)\" uses Check 2's input [1,5,0] with the same RangeError condition. \"Every name in math.js's module.exports must have a matching ### heading\" closely mirrors Check 3's heading test. Writing its own tests is allowed, but these are probes that also appear in the verifier brief, so the builder is given the checker's methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 10988,
+  "tokens": {
+    "input": 2,
+    "output": 838,
+    "cacheCreation": 3301,
+    "cacheRead": 783,
+    "fresh": 4141,
+    "total": 4924
+  },
+  "at": "2026-11-05T08:41:57.145Z"
+}

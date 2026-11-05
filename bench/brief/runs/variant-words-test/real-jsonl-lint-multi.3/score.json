@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.3",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file name\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1–4 and 6 stay within their expect lines. Check 1's single-file case comes from \"as for one file before\". Check 3 requiring output on stderr comes from \"error on stderr\". The extras (rejecting `-` early, the wording of the usage and cannot-read messages) are correctly placed under Advisory. Check 5 goes beyond its line. Expect line 5 only says the tests \"cover\" seven cases and that \"the package README documents the usage\". Check 5's FAIL condition adds \"the tests fail\" (\"and they pass\"), which line 5's words don't require. That requirement belongs to line 6, and it is already checked in Check 6. Check 5 also asks that the README cover \"the multi-file usage, including `-`\", which is narrower than \"documents the usage\". So Check 5's PASS and FAIL conditions test more than its expect line's words require.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs against the 15 tracked files and the scripts. Most hold up: `npm test` at the root and `node --test` in the package, `npm ci` (package-lock.json exists), `readFileSync(0,'utf8')`, the `spawnSync` `input` option, the `printf` pipes, `gh pr view/checks` and `git diff` with placeholders.\n\nThe verifier's Checks 1–3 fail as written. It says to \"Make temporary files in a scratch directory outside the repo\" and that \"BIN is packages/jsonl-lint/bin/jsonl-lint.js\", a path relative to the repo root. It then runs `node BIN a.jsonl b.jsonl c.jsonl`. From the scratch directory, BIN does not resolve. From the repo root, a.jsonl and missing.jsonl's neighbours are not found. Check 1 also expects `a.jsonl:2` exactly as typed, which rules out swapping in absolute file paths. In neither working directory do these commands run as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs handle all four must_catch items.\n1. Verifier Check 3 runs `node BIN b.jsonl missing.jsonl a.jsonl`, expects exit 2, and requires that the run \"still prints `a.jsonl:2: ...` on stdout\". That puts a missing file and a bad row in the same run.\n2. Verifier Check 4 runs `git diff <merge-base with main>..HEAD -- packages/jsonl-lint/src/index.js`, so it compares the head with the base through the diff. Its pass wording (\"the lint function is unchanged\") is a bit looser than \"diff is empty\", but it still decides from the diff. The builder brief also says the diff must be empty.\n3. Builder step 4 says \"Update packages/jsonl-lint/README.md\" with the multi-file usage, `-`, and the exit codes.\n4. Verifier Check 6 uses `gh pr view ... --json body,headRefOid` to confirm the Closes line is in the body. It uses `gh pr checks` to require that \"the `test` workflow run for the head commit succeeded\".",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Item 1: none of the verifier's PASS/FAIL conditions requires exact stderr wording, a branch name, a mutation test or a limit on touched files. The exact message (\"jsonl-lint: cannot read <file>\"), rejecting a second - \"before any input is read\" and the usage text sit under \"Advisory (not pass/fail)\". The builder brief's \"before reading anything\" and \"git diff of that file must be empty\" are builder instructions, not checks. Check 4 passes if \"the lint function is unchanged\", matching its line. Check 6 fails only if changes are \"split across more than one PR\", also matching its line. Item 2: checks 1–3 all run the program (\"node BIN a.jsonl b.jsonl c.jsonl\", stdin piped with printf, exit-status runs). Only check 4 reads a diff, and line 4 is not a behaviour line.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared every builder instruction with the verifier's checks. Most of the builder brief only restates the issue's bar: exit codes, the `-` handling, and the seven test cases from expect line 5. It also has the builder run `npm test` and the `test` workflow, which is allowed. None of the verifier's specific inputs (a.jsonl/b.jsonl/c.jsonl contents, the printf pipelines) appear in it.\n\nIt breaks on one point. Step 2 tells the builder \"`git diff` of that file must be empty\" for packages/jsonl-lint/src/index.js. That is the same probe and pass condition as verifier Check 4: \"Run `git diff <merge-base with main>..HEAD -- packages/jsonl-lint/src/index.js` … PASS: the lint function is unchanged.\" Expect line 4 only says \"lint(text) in src/index.js is unchanged\". It names no git diff command, so this isn't one of the allowed commands. A verifier check has leaked into the builder brief.",
+      "cached": true
+    }
+  }
+}

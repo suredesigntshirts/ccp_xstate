@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "e1e029a01bab020b5b112e599eb134bac225c69100fdf70c9c9ee189a4b5119a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository and for valid syntax. bin/greet.js, docs/index.md, test/greet.test.js and .github/workflows/pages.yml are all tracked files, and `npm test` maps to the existing script \"node --test\". The test commands in checks 1 and 2, such as `[ \"$(node bin/greet.js --shout Ada)\" = \"HELLO, ADA!\" ] && echo PASS || echo FAIL`, are valid POSIX shell. Check 3's `grep -n -- '--shout' docs/index.md || echo \"no match\"` uses `--` correctly so the pattern isn't read as an option. Check 4's `curl -sS -w '\\nHTTP %{http_code}\\n' ... | grep -E -- '--shout|^HTTP'` is valid, because curl expands `\\n` in its -w format. If the page isn't published yet, the command still runs and the brief already expects a FAIL. The advisory commands (`npm test`, `node bin/greet.js Ada --shout`, `node bin/greet.js`) only name files that exist. Every command would run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 7675,
+  "tokens": {
+    "input": 2,
+    "output": 626,
+    "cacheCreation": 3294,
+    "cacheRead": 783,
+    "fresh": 3922,
+    "total": 4705
+  },
+  "at": "2026-11-05T08:55:23.093Z"
+}

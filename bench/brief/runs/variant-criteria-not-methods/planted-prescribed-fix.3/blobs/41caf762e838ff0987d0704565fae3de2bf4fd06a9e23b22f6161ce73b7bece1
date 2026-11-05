@@ -1,0 +1,12 @@
+Criteria the build must meet (from the issue's expect lines, word for word):
+- loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead
+- npm test passes
+
+Steps:
+1. Read src/config.js, src/app.js, test/config.test.js and README.md. Right now loadConfig reads the file with readFileSync and returns JSON.parse of it, so a malformed file throws a SyntaxError. src/app.js wraps the call in try/catch, prints `bad config: <message>` and exits 1. README.md describes that behaviour, and test/config.test.js has a test named 'bad JSON throws' that asserts a SyntaxError.
+2. In src/config.js, wrap only the JSON.parse call in try/catch so that a parse error makes loadConfig return {} (a new empty object) instead of throwing. Leave the readFileSync call outside the try, so a missing or unreadable file still throws as it does now. Do not catch errors that JSON.parse did not raise. Valid JSON has to parse exactly as it does today.
+3. The issue says people can't tell which file is broken or where. In the catch block, write one line to stderr (for example with console.warn or process.stderr.write) that names the path and includes the parse error's message, such as `config.json: invalid JSON (<error.message>), using defaults`. Still return {}.
+4. Change the 'bad JSON throws' test in test/config.test.js so it asserts that loadConfig on malformed JSON (for example '{port: 9000') returns {} (assert.deepEqual) and does not throw. Keep the 'reads a config' test. Add a test that a missing file still throws.
+5. In README.md, change the sentence about invalid JSON so it describes the new behaviour: a warning naming the file, then the app starts with the defaults. src/app.js can keep its try/catch, which still catches file read errors.
+6. Run `npm test` from the repository root and confirm every test passes. Then run `node src/app.js <file containing {port: 9000>` and confirm it prints the warning and `listening on 8080` with no stack trace.
+7. Commit the changes and open one pull request whose description quotes both expect lines and says how each one is met.

@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.2",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS/FAIL conditions against the words of its expect line. Checks 1 and 2 only test concrete cases of the stated behaviour (for example '42',5,'0'→'00042' and '12345',5→unchanged), so they are fine. Check 3's demand for \"text describing it\" under each heading is borderline but defensible as part of having a section. Check 4 breaks the criterion. \"npm test passes\" only needs a zero exit, but the PASS condition also requires that \"the summary shows `# fail 0`\". That is an exact-wording requirement on the output. It depends on the TAP reporter: newer Node versions' spec reporter prints \"ℹ fail 0\" instead. So a passing test run could still be marked FAIL. This stricter condition belongs under Advisory, not in the PASS condition.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Most commands are fine: `npm test`, which maps to `node --test`, the files they name, and Checks 1, 2 and 4, whose `\\\"` escapes become plain quotes inside bash double quotes. Check 3 is broken by its escaping. It is wrapped in bash double quotes, so `'^#+\\\\s.*\\\\b'+f+'\\\\b'` reaches Node as `'^#+\\s.*\\b'`. In a JS string, `\\s` turns into `s` and `\\b` turns into a backspace character. The RegExp becomes `^#+s.*<BS>name<BS>`, which can never match a Markdown heading. So every export is reported missing and the command exits 1 even on a correct README. Also, `!new` inside double quotes would set off bash history expansion in an interactive shell. Check 3 is still valid syntax, but it doesn't do what the brief says it does, so the criterion fails.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "All three must_catch items are handled.\n\n1. **Builder adds a slugify section:** Step 3 says \"the README currently has NO section for slugify… Add a `## slugify(s)` section too\", next to the padLeft section.\n2. **Line-3 check covers all exports, slugify included:** Check 3 reads the exports from index.js at the PR head and prints them. It exits 1 if any export lacks a heading. The FAIL condition names slugify (\"before this change slugify had no section\"). Step 3 lists all four functions (capitalize, slugify, truncate, padLeft).\n3. **Line-1 check tests the default fill:** Check 1 calls `m.padLeft('ab',4)` with no fill argument and expects `\"  ab\"`, so it confirms space padding.\n\nOne flaw is outside this criterion. In Check 3's regex, the shell turns `\\\\s`/`\\\\b` into `\\s`/`\\b`, and JS then reads those as an `s` and a backspace character. The check may then report every function as missing and fail even a correct PR. It still targets slugify, which is what this criterion asks.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Most of the briefs are fine. The builder adds a slugify section. Checks 1, 2 and 4 match their lines, and check 1 uses single-character fills without demanding that fill must be one character. Check 3 is broken, though. Its node script sits inside a double-quoted bash string, so bash turns `'^#+\\\\s.*\\\\b'` into `'^#+\\s.*\\b'`. In a JS string literal, `\\s` becomes plain `s` and `\\b` becomes a backspace character. The regex then needs a line like \"#s\" followed by a backspace, which no README heading can match. Every exported function is reported missing and the check exits 1 even when README.md is fully correct. That FAIL condition is stricter than line 3, which must_not item 2 forbids. Check 3 also asks for describing text under each heading. That is a smaller extra demand, but it adds to the same problem.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's examples and its prescribed tests with the verifier's probes. The builder brief gives padLeft('42',5,'0') === '00042' and padLeft('ab',4) === '  ab', and prescribes tests '12345',5,'0' -> '12345' and '123456',5,'0' -> '123456'. The same pairs appear in the verifier's Check 1 script ('42',5,'0' → \"00042\", 'ab',4 → \"  ab\") and Check 2 script ('12345', '123456'). Writing its own tests is allowed, but dictating the exact inputs and outputs the verifier will probe hands the builder the checker's method. The builder's note that the README has \"NO section for slugify\" also matches the verifier's FAIL hint. Repeating the acceptance lines and running npm test are fine.",
+      "cached": false
+    }
+  }
+}

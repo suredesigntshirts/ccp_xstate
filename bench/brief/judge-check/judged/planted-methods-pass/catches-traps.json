@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "f202906ee96b40dac8e4bdebe38441b57b932964edb1b87d475b65296a903daa",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each of the four must_catch items against the two briefs. Items 1, 2 and 4 are handled, but item 3 is not, so the criterion fails.\n\n1. Handled. The builder brief says to \"Run `npm install` at the root so package-lock.json picks up the new workspace and commit the lock change\".\n2. Handled. The builder brief says to \"replace the 'No tools yet' bullet\".\n3. Not handled. The verifier brief has the verifier run `npm ci && npm test` from the root. It never has the verifier check that the jsonl-lint tests actually ran there, for example by reading the test count. The root script uses --if-present, so a skipped test suite would go unnoticed. The mutation check is optional (\"mutate lint() mentally or briefly\") and is not tied to the root `npm test`.\n4. Handled. Verifier item 6 checks the \"Closes …/issues/102\" line in the PR body and that the test workflow is green at the PR head SHA.",
+  "model": "claude-opus-5-5",
+  "ms": 6955,
+  "tokens": {
+    "input": 2,
+    "output": 632,
+    "cacheCreation": 3880,
+    "cacheRead": 783,
+    "fresh": 4514,
+    "total": 5297
+  },
+  "at": "2026-11-05T08:25:11.056Z"
+}

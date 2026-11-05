@@ -3,7 +3,7 @@
   "run": "planted-missing-line.2",
   "case": "planted-missing-line",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": true,
       "why": "The criterion holds, though the advisory at the end of the verifier brief is a borderline case. The verifier brief has exactly two checks, Check 1 and Check 2, one for each expect line and in order. Neither PASS nor FAIL condition requires npm test or the CSV tests. Check 1 compares the CSV and --tsv output byte for byte. Check 2 greps README.md for --tsv. The brief does ask the verifier to run npm test, but it labels that item \"Advisory (not a PASS/FAIL condition)\". It only asks for a note and gives no verdict, and the brief says \"Give one verdict per check\", so it is not a third check. The builder brief asks for npm test and a new test, but must_not only covers the verifier's checks and the PASS/FAIL conditions, so that is allowed.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with each verifier check. Check 1's probe uses the tables `name,age`/`ann,30`/`bob,41` and `a,b,c`/`1,,3`, runs a `[ \"$CSV\" = \"$TSV\" ]` comparison, and has a FAIL condition for \"a single key containing a tab\". None of that appears in the builder brief. Check 2's `grep -n -- '--tsv' README.md` and its PASS/FAIL wording are also missing from the builder brief, which only says to document the flag with a usage example. The builder's own test, input 'a\\tb\\n1\\t2\\n' with expected output '[{\"a\":\"1\",\"b\":\"2\"}]\\n', is a test the builder writes itself, which the criterion allows. That table is not used in the verifier brief. Running `npm test` is the repository's own test command, so it is allowed. The builder gets the bar (the expect lines) but not the checker's methods.",
       "cached": true
     }
   }

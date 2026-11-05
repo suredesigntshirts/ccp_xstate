@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.2",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each verifier check's PASS/FAIL conditions against the words of its expect line. Check 1's sample values (\"00042\", \"   42\", \"**ab\", \"xxx\") all follow from left padding with fill, using a space as the default, up to width. Check 2 only tests cases where s is width characters or longer and expects s back unchanged. Check 3 fails only when an exported function has no README heading. \"Section\" fairly implies a heading, and \"with section text below it\" is a mild gloss of the same idea, not a separate test. Check 4 needs exit code 0 and \"# fail 0\". With node --test that is the same thing as passing, not an extra rule. The stricter items, test coverage for padLeft, README accuracy and multi-character fill, sit under \"Advisory (not part of any PASS/FAIL)\". No mutation, branch or file-scope rule appears in any condition.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Most commands are sound. `npm test` maps to `node --test` in package.json, `git status` runs fine, and verifier Checks 1, 2 and 4 use valid quoting and valid ESM import code. Check 3 breaks. Its JS sits inside a bash double-quoted string, which turns `'\\\\b'` into `'\\b'`. To JavaScript, `'\\b'` in a string is a backspace character, not a word boundary. So `new RegExp('\\b' + f + '\\b')` looks for backspace characters, never matches a README heading, and every export is printed as missing. The check would FAIL even on a correct PR, so this command does not run as intended as written. (`'\\n'` survives unchanged and works, but the `\\\\b` escaping is wrong.)",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "All three must_catch items are handled.\n1. Builder step 3 says README.md has no section for slugify and tells the builder to \"Add a `## slugify(s)` section too\", along with the padLeft section.\n2. Verifier Check 3 prints the exports at the PR head. Its PASS line names \"capitalize, slugify, truncate and padLeft\". It FAILs if any export is missing and says that if slugify \"is still missing, this check FAILS\".\n3. Verifier Check 1 calls `m.padLeft('42',5)` with no fill and expects \"   42\", which checks the default space padding.\n\nOne side note, outside this criterion: in Check 3, bash's double quotes may turn `'\\\\b'` into the JS string `'\\b'` (a backspace character). That would make the heading regex fail to match, so the check could report every export as missing. The trap itself is still covered.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against the two briefs.\n\nItem 1: Check 3 builds the list from the module's actual exports and compares it with the README headings. A README that has padLeft but no slugify gives \"missing: slugify\". The brief also says outright: \"if it is still missing, this check FAILS.\" So this item is not broken.\n\nItem 2: Check 1's values ('00042', '   42', '**ab', 'xxx') all follow from line 1, and nothing tests a multi-character fill or limits fill to one character. Check 2 only asks that s comes back unchanged. Check 3 accepts a heading at any level that names the function, so it doesn't force a layout. \"With section text below it\" is a reasonable reading of \"section\". Check 4 asks for exit code 0 and zero failures. The parameter count isn't checked, and the multi-character fill note is advisory only. The builder's `## name(...)` instruction isn't a PASS/FAIL condition, so I didn't count it.\n\nOne weak spot, which I judged minor: Check 4 looks for the literal \"# fail 0\", which some test output formats don't print even when all tests pass.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's examples and test cases with the verifier's probes, and the briefs share input and expected-output pairs. Builder step 2 gives \"padLeft('42', 5, '0') === '00042'; padLeft('42', 5) === '   42'\", and verifier Check 1 expects exactly those values. Builder step 4 has the builder write tests for \"'12345',5,'0' -> '12345'; '123456',3,'0' -> '123456'\", and verifier Check 2 tests exactly those inputs. Telling the builder to write its own tests is allowed. Here, though, the brief hands the builder the verifier's own inputs and expected outputs, which the criterion forbids. The rest of the builder brief (the expect lines, the README guidance and running npm test) is fine. The shared probes alone mean the criterion is not met.",
+      "cached": true
+    }
+  }
+}

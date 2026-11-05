@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "d5108776cc3d6e7bd3c1cfa06f8727dca937362c8c4b517a3ed570aa2127918a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief carries the verifier's checks. Step 5 tells the builder the README Usage must show \"`<file> [<file> ...]` (that literal text)\" and to write \"`-` reads stdin\" in backticks. Those are exactly the two patterns the verifier's check 5 greps for ('<file> \\[<file> \\.\\.\\.\\]' and '`-`'), so the builder is shaped around the grep probe. Step 4 also repeats verifier PASS conditions as test requirements. \"a bad file after the missing one still reported on stdout\" and \"message on stderr naming it\" match check 3's second command. \"two bad files checking their lines appear in argument order\" matches check 1's ordering condition. \"a read error wins over bad rows\" matches check 3's expected exit=2 for c1/missing/b1. The hand-run command in step 6 is a different input from the verifier's, and telling the builder to run npm test is allowed. Even so, the leaked grep literal and the copied pass conditions break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 11092,
+  "tokens": {
+    "input": 2,
+    "output": 1059,
+    "cacheCreation": 6756,
+    "cacheRead": 783,
+    "fresh": 7817,
+    "total": 8600
+  },
+  "at": "2026-11-05T09:00:08.981Z"
+}

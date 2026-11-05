@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "d914ee5680d9f0be0862e1772582e48b39e3c321069091b60cceb7bc180fb913",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each PASS and FAIL condition against the words of its expect line. Checks 1, 2 and 4 hold. The cases in Check 1 are just examples of \"limited to the range\". Check 2 accepts any RangeError. Check 4's \"# fail 0\" matches what \"passes\" means. Check 3 breaks the criterion. Its PASS condition needs the script to print OK, and the script only finds a function if a markdown heading matches `^#+\\s*name\\s*\\(`. The expect line only says README.md \"documents every function math.js exports\". A function documented in a bullet list, a table or plain prose would still meet those words but would fail this check. Requiring a heading format is stricter than the words, so it belongs under Advisory, not in the PASS condition.",
+  "model": "claude-opus-5-5",
+  "ms": 7048,
+  "tokens": {
+    "input": 2,
+    "output": 606,
+    "cacheCreation": 3282,
+    "cacheRead": 783,
+    "fresh": 3890,
+    "total": 4673
+  },
+  "at": "2026-11-05T08:41:16.242Z"
+}

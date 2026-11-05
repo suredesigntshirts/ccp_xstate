@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "11c85531252448f4a36523d378dc2d377e7b2c71544f6fc2884425fed3a3ca1d",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands are fine. `npm test`, `npm ci` (package-lock.json is tracked), `node --test`, `git merge-base`, `gh pr view` and `gh pr checks` all fit this repository. The builder's step-5 example is valid shell and is only an illustration.\n\nThe verifier brief breaks the criterion. It says \"Use a scratch temp directory for fixture files\" and sets \"BIN=packages/jsonl-lint/bin/jsonl-lint.js\", which is relative to the repo root. Its commands then pass bare fixture names, like `node $BIN good1.jsonl bad.jsonl good2.jsonl`. Run from the repo root, good1.jsonl and the other fixtures don't exist there, so they would be reported as unreadable. Run from the temp directory, `$BIN` doesn't resolve. Either way, Checks 1–3 can't run as written and would give wrong results. Neither brief creates these files where the commands look for them.",
+  "model": "claude-opus-5-5",
+  "ms": 8997,
+  "tokens": {
+    "input": 2,
+    "output": 855,
+    "cacheCreation": 5685,
+    "cacheRead": 783,
+    "fresh": 6542,
+    "total": 7325
+  },
+  "at": "2026-11-05T08:58:54.075Z"
+}

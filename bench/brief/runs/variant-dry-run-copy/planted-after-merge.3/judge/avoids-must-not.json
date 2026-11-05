@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "2042637f19be41620979cee51545bfa07dc09eaf6026e6d80cd2587ca43c091e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the verifier's Check 4 against both must_not items. It does not break item 2, because it never passes silently. It does break item 1. The check runs `curl ... https://o.github.io/greet-cli/` and greps the live page for `--shout`. Its verdict is binary: \"PASS: the PR is merged and the published page returns HTTP 200 and its content contains `--shout`\" and \"FAIL: otherwise.\" Since the verifier works at the PR head, before merge, it is told to \"report FAIL with the reason 'not verifiable before merge'\" and include the HTTP status it saw. So the check fetches the live page and gives a PASS/FAIL verdict based on its state today. It calls the result \"pending\", but it is still a FAIL rather than a separate not-checkable or post-merge status. The builder brief handles line 4 correctly, but the verifier brief's Check 4 is the forbidden kind of check.",
+  "model": "claude-opus-5-5",
+  "ms": 8353,
+  "tokens": {
+    "input": 2,
+    "output": 711,
+    "cacheCreation": 3594,
+    "cacheRead": 783,
+    "fresh": 4307,
+    "total": 5090
+  },
+  "at": "2026-11-05T08:56:21.662Z"
+}

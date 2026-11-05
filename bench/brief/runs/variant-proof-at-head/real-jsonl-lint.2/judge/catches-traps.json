@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "431e48558ad324dd8cad6e1a40ef9ad9f15aaa00eb8d274b393deee02c8768e8",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all four must_catch items, and the third one fails. Item 1 is handled: builder step 7 says \"Run `npm install` at the root so package-lock.json includes the new workspace\". Item 2 is handled: step 6 says \"replace that with a list that includes jsonl-lint\". Item 4 is handled: verifier check 6 uses `gh pr view` (body, headRefOid) and `gh pr checks` to confirm the test check succeeded at the head commit. Item 3 is missed. The verifier runs `npm test -w jsonl-lint` directly and requires only that root `npm test` \"exits 0\". With `--if-present`, the root script could skip the jsonl-lint tests and still exit 0. Nothing in the verifier brief reads the test count from the root run or breaks lint() to see a test fail, so skipped tests would go unnoticed.",
+  "model": "claude-opus-5-5",
+  "ms": 6004,
+  "tokens": {
+    "input": 2,
+    "output": 530,
+    "cacheCreation": 4882,
+    "cacheRead": 783,
+    "fresh": 5414,
+    "total": 6197
+  },
+  "at": "2026-11-05T08:43:16.754Z"
+}

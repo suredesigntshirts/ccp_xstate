@@ -1,0 +1,11 @@
+Goal: one pull request that adds padLeft to strutil, documents every exported function in the README, and keeps npm test passing.
+
+Current state: index.js (an ES module, "type": "module") exports capitalize, slugify and truncate. README.md has sections for capitalize(s) and truncate(s, n) only. It has NO section for slugify, so the README line is half-met already. Tests are in test/strutil.test.js and run with `npm test` (node --test).
+
+Steps:
+1. In index.js add `export function padLeft(s, width, fill = ' ')` with a short doc comment like the other functions. It pads s on the left with fill until the result is width characters long. When fill is not given, it pads with a single space. When s.length >= width, it returns s unchanged. Keep the result exactly width characters, so padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42'. Using String.prototype.padStart is fine.
+2. In README.md add a `## padLeft(s, width, fill)` section that says what it does: pads on the left, the default is a space, and s comes back unchanged when it is already width or longer. Give the invoice example 42 -> 00042.
+3. In README.md also add a `## slugify(s)` section, which is currently missing. Make sure every function index.js exports (capitalize, slugify, truncate, padLeft) has its own `## name(...)` heading. Keep the existing sections and the Tests section.
+4. In test/strutil.test.js import padLeft and add tests: zero padding ('42', 5, '0' -> '00042'), the default space fill ('42', 5 -> '   42'), the exact-width case ('abcde', 5 -> 'abcde') and the longer case ('abcdef', 3 -> 'abcdef').
+5. Run `npm test` and confirm it reports 0 failures. Also run `node --input-type=module -e "import * as m from './index.js'; console.log(Object.keys(m))"` and confirm each name it prints has a README section.
+6. Open the pull request, and link https://github.com/o/strutil/issues/7 in the description.

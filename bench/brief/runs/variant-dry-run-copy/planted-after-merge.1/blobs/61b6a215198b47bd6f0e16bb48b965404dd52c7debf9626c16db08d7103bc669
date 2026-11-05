@@ -1,0 +1,34 @@
+Check the pull request head against each of the four expect lines of issue #12, in order. Run every command from the repository root at the PR head. Give each check a PASS or FAIL verdict.
+
+Check 1. Expect: "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run:
+[ "$(node bin/greet.js --shout Ada)" = "HELLO, ADA!" ] && echo PASS || echo FAIL
+PASS: it prints PASS, meaning the output is the greeting `Hello, Ada!` in upper case.
+FAIL: it prints FAIL, meaning the output is mixed or lower case, missing, or different.
+
+Check 2. Expect: "without --shout the output is unchanged"
+Run:
+[ "$(node bin/greet.js Ada)" = "Hello, Ada!" ] && echo PASS || echo FAIL; [ "$(node bin/greet.js 'Ada Lovelace')" = "Hello, Ada Lovelace!" ] && echo PASS || echo FAIL
+These are the outputs the program produced before the change.
+PASS: both commands print PASS.
+FAIL: either command prints FAIL.
+
+Check 3. Expect: "docs/index.md documents --shout"
+Run:
+grep -n -- '--shout' docs/index.md || echo "no match"
+Then read the matching lines.
+PASS: at least one line of docs/index.md mentions `--shout` and says what it does or how to use it.
+FAIL: it prints "no match", or `--shout` appears without any explanation of the flag.
+
+Check 4. Expect: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+Run:
+curl -sS -w '\nHTTP %{http_code}\n' https://o.github.io/greet-cli/ | grep -E -- '--shout|^HTTP'
+PASS: the output contains `HTTP 200` and at least one line containing `--shout`.
+FAIL: the status is not 200, or no line contains `--shout`.
+This line only holds after the PR is merged and the pages workflow (.github/workflows/pages.yml, which publishes docs/ on push to main) has run. Before that, this check cannot pass; when this brief was written, the URL returned HTTP 404. Report the actual result as FAIL and say plainly that it depends on the merge and deploy. Do not mark it PASS based on docs/index.md alone.
+
+Advisory (not part of any PASS or FAIL condition):
+- Run `npm test` and report the `# pass` and `# fail` counts.
+- Try `node bin/greet.js Ada --shout` (flag after the name). It should also print `HELLO, ADA!`.
+- Check that `node bin/greet.js` with no name still prints the usage line and exits 2.
+- Check that the diff touches nothing beyond bin/greet.js, src/greet.js, test/greet.test.js and docs/index.md, and does not change .github/workflows/pages.yml.

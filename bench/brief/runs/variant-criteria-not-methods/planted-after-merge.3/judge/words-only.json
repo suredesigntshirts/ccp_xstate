@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "f188ef368abfa2aa0a41212ca394e087e35d300262cf41997cce134ccb26bfda",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 3 and 4 stay within their words. Check 4 makes passing depend only on the fetched page containing `--shout`, and the merge and workflow lookups are only context. Check 2 goes beyond its words. The expect line says only \"the output is unchanged\", but PASS also needs \"stdout, stderr and the exit code ... match the base exactly\", and FAIL covers \"any difference in ... exit code\". An exit code is not output, so that part belongs under Advisory. Check 1 has the same problem: \"prints the greeting in upper case\" does not mention exit codes, yet PASS needs \"both exit 0\" and FAIL fires if \"either command exits non-zero\". Both are rules the words do not force, sitting inside PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 9551,
+  "tokens": {
+    "input": 2,
+    "output": 736,
+    "cacheCreation": 3451,
+    "cacheRead": 783,
+    "fresh": 4189,
+    "total": 4972
+  },
+  "at": "2026-11-05T08:39:20.340Z"
+}

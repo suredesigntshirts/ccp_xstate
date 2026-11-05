@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "59df2beb462a32bf37b3b1b3cdf255264fdc5a151eec19552c9fc82f10362215",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. All of them would run as written. `node bin/greet.js` with `--shout Ada`, `'Grace Hopper'` or no name points at bin/greet.js, which is tracked at this commit. `npm test` maps to the existing \"node --test\" script. `npm install` works without dependencies. `grep -n -- '--shout' docs/index.md` uses `--` correctly, and docs/index.md exists. `curl -sSL <url>` is valid. `gh pr view --json state,mergedAt` uses real JSON fields and works on the checked-out PR branch. Checking out the merge-base in a worktree is an ordinary git operation. The quoting is valid shell, and no JavaScript syntax is given. Every file the briefs name exists: bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml. I found no command that breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 5973,
+  "tokens": {
+    "input": 2,
+    "output": 537,
+    "cacheCreation": 3408,
+    "cacheRead": 783,
+    "fresh": 3947,
+    "total": 4730
+  },
+  "at": "2026-11-05T08:38:51.156Z"
+}

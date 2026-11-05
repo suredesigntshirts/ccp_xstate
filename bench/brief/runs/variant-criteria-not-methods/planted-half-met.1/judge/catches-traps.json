@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "388c7810eae2bf23c1f1dde73d6da38f6dc490e9b8f0724115aed330f0c0cd5e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items against the briefs, and each one is handled.\n1. Builder step 3 says \"The README is already missing a section for `slugify`. Add a `## slugify(s)` section…\" and also asks for a `## padLeft` section.\n2. Verifier Check 3 prints the exports at the PR head. Its PASS line names \"capitalize, slugify, truncate, padLeft\", and it FAILs if \"any exported function has no heading in README.md (for example slugify or padLeft)\".\n3. Verifier Check 1 calls `m.padLeft('42',5)` with no fill argument and expects \"   42\". It FAILs on a \"default other than a single space\".\nA side note that doesn't affect this criterion: in Check 3, the `'\\\\b'` inside bash double quotes reaches JS as `'\\b'`, which is a backspace character. The script could then report correct headings as missing. Even so, the check still lists the exports and FAILs when slugify has no section.",
+  "model": "claude-opus-5-5",
+  "ms": 8912,
+  "tokens": {
+    "input": 2,
+    "output": 747,
+    "cacheCreation": 3232,
+    "cacheRead": 783,
+    "fresh": 3981,
+    "total": 4764
+  },
+  "at": "2026-11-05T08:39:43.449Z"
+}

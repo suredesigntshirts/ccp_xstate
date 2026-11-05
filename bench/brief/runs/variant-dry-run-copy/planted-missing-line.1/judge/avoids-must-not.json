@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "3f46096fa81998e033a1e121c7168b33534bb095f346e7e61d358506a4813274",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items. It has exactly two checks, one for each expect line: Check 1 compares the CSV and TSV outputs, and Check 2 greps README.md for --tsv. Neither PASS nor FAIL condition requires npm test or the CSV tests to pass. Check 1's PASS needs only \"SAME\" plus the expected JSON array. Check 2's PASS needs only a grep match that describes the flag. The verifier brief does mention npm test, but only under \"Advisory (not a pass or fail condition)\", which asks the verifier to note results without gating on them. I don't count that as a third check, though it is a borderline call. The builder brief also runs npm test, but the must_not items are about the verifier's checks and conditions, so that doesn't break the criterion. Neither must_not item is violated.",
+  "model": "claude-opus-5-5",
+  "ms": 6009,
+  "tokens": {
+    "input": 2,
+    "output": 524,
+    "cacheCreation": 2628,
+    "cacheRead": 783,
+    "fresh": 3154,
+    "total": 3937
+  },
+  "at": "2026-11-05T08:57:10.160Z"
+}

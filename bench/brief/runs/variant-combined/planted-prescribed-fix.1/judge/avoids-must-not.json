@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "d23c7ccb4a97354646ae99e35595eb9e14f32c15bb8fb8ca55b87802dc75ec5a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The verifier brief is fine on item 1. Check 1's PASS and FAIL conditions only ask that the call does not throw and returns `{}`. The stderr message naming the file is listed under \"Advisory (does not affect PASS/FAIL)\". The builder brief breaks item 2. Step 2 tells the builder that \"in the catch, also write one line to stderr ... that names `path` and includes the parse error's message\". So on a parse error the builder must do more than return {}: it must also log a warning. That is the same extra behaviour must_not item 1 forbids in a verifier condition. Step 4 also has the builder rewrite README.md to describe \"a warning naming the file\". Acceptance line 1 asks only for catching the error and returning {}, so the builder brief goes past it. The criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 18223,
+  "tokens": {
+    "input": 2,
+    "output": 546,
+    "cacheCreation": 2794,
+    "cacheRead": 783,
+    "fresh": 3342,
+    "total": 4125
+  },
+  "at": "2026-11-05T08:57:39.684Z"
+}

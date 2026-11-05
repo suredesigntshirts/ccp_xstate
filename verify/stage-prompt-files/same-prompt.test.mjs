@@ -8,10 +8,11 @@ import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 
 import { loadWorkflow } from '../../packages/engine/src/index.js';
-import { REPO, STAGES, WORKFLOWS, baseWorkflows, inputFor, load, readJson, renderOn } from './lib.mjs';
+import { MERGE_FIXTURES, REPO, STAGES, WORKFLOWS, baseWorkflows, inputFor, load, readJson, renderOn } from './lib.mjs';
 
 const baseDir = baseWorkflows();
-const headDir = join(REPO, 'workflows');
+// The head as this item merged it (lib.mjs MERGE_FIXTURES): a later item may change a stage's words on purpose.
+const headDir = MERGE_FIXTURES;
 
 // Every committed run folder: { folder, root, item, run.json } (bench runs, the stage-contract trials).
 const journals = execFileSync('git', ['-C', REPO, 'ls-files', '*/items/*.jsonl'], { encoding: 'utf8' }).trim().split('\n').filter(Boolean);

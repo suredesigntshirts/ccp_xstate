@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "03bb314aff662eb5c4d3e50d83d22c49bbfdcef2784117dc3e7e22193c81390b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief contains one of the verifier's probes. Verifier Check 1 writes the text '{port: 9000' to a file and passes only if loadConfig prints `RESULT {}`. Builder step 3 hands over the same input and expected output: \"check that loadConfig on a file with the text '{port: 9000' returns {} (assert.deepEqual(..., {}))\". The criterion forbids any set of inputs with expected outputs that also appears in the verifier brief. Telling the builder to write its own tests is allowed, but giving it the verifier's exact case is not. Other parts are acceptable. Running `npm test` is named by an expect line. \"Valid JSON must still come back parsed\" and \"a missing file still throws\" are stated as requirements, not as the verifier's advisory probes. The builder brief has no PASS/FAIL wording, and the app.js `listening on 8080` probe does not appear in it. The shared '{port: 9000' → {} case alone breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 9317,
+  "tokens": {
+    "input": 2,
+    "output": 741,
+    "cacheCreation": 2921,
+    "cacheRead": 783,
+    "fresh": 3664,
+    "total": 4447
+  },
+  "at": "2026-11-05T08:40:47.408Z"
+}

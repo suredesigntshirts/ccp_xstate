@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "6ae9a4b8ccdfa05d5b97af85bfdf27022a0e105e819a7d97a18b2428d4f6eaa7",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. Most of them would run as written: the files they name exist, `npm test` matches package.json (the issue's proof uses `npm run test:cli`, which doesn't exist), `cmp -` and `grep -n -- '--tsv'` take valid arguments, and the JS in the tests is valid.\n\nCheck 5 in the verifier brief breaks the criterion. Its main command `printf '[{\"a\\\\\\\\tb\":\"1\\\\\\\\t2\"}]\\n' > /tmp/e5` is in single quotes, so printf sees `\\\\\\\\t`. printf turns each `\\\\` into one backslash, so the file gets `a\\\\tb` with two backslashes instead of the one-backslash JSON escape `a\\tb`. The `cmp` would then report a difference on a correct PR, so the check fails falsely. The brief admits this with \"adjust the escaping if needed\" and offers a `node -e` fallback that does work. Still, the command as written gives the wrong expected bytes.",
+  "model": "claude-opus-5-5",
+  "ms": 17583,
+  "tokens": {
+    "input": 2,
+    "output": 963,
+    "cacheCreation": 6338,
+    "cacheRead": 783,
+    "fresh": 7303,
+    "total": 8086
+  },
+  "at": "2026-11-05T08:28:13.522Z"
+}

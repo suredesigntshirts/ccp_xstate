@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.3",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four verifier checks, and each PASS/FAIL condition tests only what its expect line's words require. Check 1 runs `--shout Ada` and passes when the greeting is \"with every letter upper-cased\". Its \"treats `--shout` as the name\" fail case follows from printing the greeting at all. Check 2 compares head with base for `Ada` and for no arguments, which is what \"output is unchanged\" means. Check 3 needs the file to mention `--shout` and say what it does, which is a fair reading of \"documents\". Check 4 can't fetch the live page before merge, so it checks the stand-in the words force: the workflow still publishes docs on pushes to main, and docs/index.md lists `--shout`. The stricter items (the `Ada --shout` order, `npm test` exiting 0, added tests, the exact output with its newline) are all under \"Advisory (not part of PASS/FAIL)\". No check uses mutation tests, branch rules or exact-wording rules.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Most commands work as written. `npm test` maps to `node --test` in package.json. bin/greet.js exists, so `node bin/greet.js --shout Ada`, `node bin/greet.js Ada` and `node bin/greet.js` with no arguments all run. The files the briefs name to read or edit (src/greet.js, test/greet.test.js, docs/index.md, .github/workflows/pages.yml) are all tracked.\n\nCheck 2 in the verifier brief breaks the criterion. `git show <base>:bin/greet.js` keeps a literal `<base>` placeholder. In a shell that `<` is read as input redirection from a file named `base`, so the command fails exactly as written. The brief also gives `git worktree add` with no path or commit. Git rejects that and prints a usage error. Both are in backticks as commands to run, and neither has arguments that fit the program.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the verifier brief, and both are handled. Item 1: Check 4 says \"The live page can only be seen after merge; do not fetch it\". It then has the verifier read .github/workflows/pages.yml and docs/index.md at the head. PASS needs the workflow to still publish docs on pushes to main and docs/index.md to list `--shout`. That is exactly the required approach of checking what will publish the page. Item 2: Check 2 runs `node bin/greet.js Ada`, and the no-argument case, at both the head and the base (\"git show <base>:bin/greet.js ... or git worktree add at the merge base\"). It then compares the two outputs. PASS means head matches base. So it doesn't rely only on a hand-written expected string.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Neither brief breaks the must_not list. Check 4 in the verifier brief says \"The live page can only be seen after merge; do not fetch it\", so the verdict never depends on today's live page. It is not a silent pass either: it gives the reason it can't see the page and asks for evidence the verifier can collect now. It reads pages.yml and docs/index.md at the PR head. PASS needs both: the workflow \"still publishes the docs folder on pushes to main\" and docs/index.md \"lists `--shout`\". It also names specific FAIL conditions: the workflow is removed, the trigger is changed away from main, the publish path is changed, or `--shout` is missing. The builder brief also tells the builder not to change the workflow and contains nothing that breaks the list.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief repeats probes from the verifier brief. It tells the builder to add tests where \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!\\n`\". That is the same input and expected output as verifier Check 1 (run `node bin/greet.js --shout Ada`, PASS on `HELLO, ADA!`). It also restates `node bin/greet.js Ada` → `Hello, Ada!\\n`, which matches Check 2's run and expected output. And `Ada --shout` giving the same result appears in the verifier's advisory list. \"Do not change that workflow\" also mirrors Check 4's FAIL condition. The criterion allows telling the builder to write its own tests or run commands an expect line names, but not to hand over the verifier's specific inputs and expected outputs. So the builder gets the checker's methods, not just the bar.",
+      "cached": false
+    }
+  }
+}

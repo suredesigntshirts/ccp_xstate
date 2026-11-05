@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "8f7ef0a29ce6856913c1c908019fbd6814a3551e33fbfbb37adc5284c3b7dbe5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line.\n\n- **Check 1:** it requires padLeft to be an exported function and to left-pad with the fill, or a space when no fill is given, to exactly width characters. The sample outputs (\"00042\", \"  ab\", \"xx7\") follow directly from those words.\n- **Check 2:** it requires s to come back unchanged at width and above width. That matches \"already width characters or longer\".\n- **Check 3:** it requires every exported function to have its own README section, and the heading must name the function. That is a fair reading of \"a section for every function\". The named list (capitalize, slugify, truncate, padLeft) comes from the export list.\n- **Check 4:** it requires exit 0 and no failing tests, which is what \"npm test passes\" means.\n\nThe stricter items appear only under \"Advisory (not pass/fail conditions)\": padLeft tests in test/strutil.test.js and multi-character fill behaviour. No check adds a mutation test, branch or file-scope rule, or exact-wording requirement.",
+  "model": "claude-opus-5-5",
+  "ms": 10348,
+  "tokens": {
+    "input": 2,
+    "output": 809,
+    "cacheCreation": 2948,
+    "cacheRead": 783,
+    "fresh": 3759,
+    "total": 4542
+  },
+  "at": "2026-11-05T08:56:00.121Z"
+}

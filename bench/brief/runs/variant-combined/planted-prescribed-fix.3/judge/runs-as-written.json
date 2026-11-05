@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "6333375f10eb6ad7f2933a5b7daf06118b33b2307d725b19b4838714f80d4d9a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs. Files: src/config.js, src/app.js, test/config.test.js and README.md are all tracked at this commit. `npm test` maps to the existing \"node --test\" script. The verifier's one-liner is valid as written. It uses `mktemp -d` and `printf` into \"$d/config.json\". The `node --input-type=module -e \"...\" \"$d/config.json\"` call passes the path in process.argv[1], which is correct for -e. The relative import './src/config.js' resolves from the repository root, where the brief says to run it. The JavaScript in the quotes is valid. The advisory `node src/app.js \"$d/config.json\"` reuses $d from the same shell. The builder's `node src/app.js <file with {port: 9000>` is a placeholder description, not a literal command. Small risk: the facts don't confirm that app.js takes a path argument, but nothing contradicts it.",
+  "model": "claude-opus-5-5",
+  "ms": 12397,
+  "tokens": {
+    "input": 2,
+    "output": 1088,
+    "cacheCreation": 2872,
+    "cacheRead": 783,
+    "fresh": 3962,
+    "total": 4745
+  },
+  "at": "2026-11-05T08:57:42.646Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "43229a123085ce3fbd18ba5adbb66264310fa92b7b5159c0495cefa3ae33100d",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is met. The builder brief says to keep the output format \"so CSV output does not change\", to \"Keep the existing tests passing\" and to \"Run `npm test` and confirm every test passes\". Item 3 is met. Check 1 pipes the same tables through as TSV and as CSV and compares the parsed JSON (\"SAME\"/\"DIFF\"). Item 2 is only partly met. The Advisory section, marked \"not pass/fail\", does suggest \"Run `npm test` and note whether it passes\" and asks the verifier to note the plain CSV output. But it never says that no expect line covers CSV behaviour or npm test. The item requires that statement, and the brief only implies it by putting these points under Advisory. So the briefs do not handle every must_catch item.",
+  "model": "claude-opus-5-5",
+  "ms": 10053,
+  "tokens": {
+    "input": 2,
+    "output": 740,
+    "cacheCreation": 2850,
+    "cacheRead": 783,
+    "fresh": 3592,
+    "total": 4375
+  },
+  "at": "2026-11-05T08:57:12.789Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "5c53d6ada59e6ce67a6ec21ba906dcae593cf2237a75c274654f61b6c9143aac",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the builder brief. Item 1 is met. Step 1 says \"Never return `{}`, defaults or any other value for malformed JSON.\" The out-of-scope line also lists \"swallowing errors or returning defaults.\" Item 2 is met as well. The \"Current code\" section names `test/config.test.js` and says one of its tests \"checks that `{port: 9000` throws `SyntaxError`.\" Step 1 then says \"a SyntaxError is preferred, so the existing `assert.throws(..., SyntaxError)` test still passes.\" The brief never says outright that wrapping the error would break that test. It does point out that the existing test asserts SyntaxError, and it tells the builder to keep throwing a SyntaxError so the test still passes. That covers the trap.",
+  "model": "claude-opus-5-5",
+  "ms": 8727,
+  "tokens": {
+    "input": 2,
+    "output": 516,
+    "cacheCreation": 5684,
+    "cacheRead": 783,
+    "fresh": 6202,
+    "total": 6985
+  },
+  "at": "2026-11-05T08:38:55.706Z"
+}

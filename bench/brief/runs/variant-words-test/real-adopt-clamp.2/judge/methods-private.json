@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "5e33b8009a590b5d9d65152cef784f5c571b08015dcd46c0d00070bc28092431",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's checks, and the builder brief contains two of the verifier's probes. First, step 5 tells the builder to \"check that each name in `Object.keys(require('./math.js'))` appears in README.md\". That is the probe from Check 3, which runs Object.keys on math.js and tests `r.includes(k)` for each name. Second, step 4 gives the exact input and expected result `assert.throws(() => clamp(5, 10, 1), RangeError)`, and Check 2 uses the same case, [5,10,1] → RangeError. The rule does let the builder write its own tests. But spelling out an input/expected-output pair that the verifier also uses hands the builder the checker's method, not just the bar. Running `npm test` is allowed. The two items above are not, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 8139,
+  "tokens": {
+    "input": 2,
+    "output": 578,
+    "cacheCreation": 3127,
+    "cacheRead": 783,
+    "fresh": 3707,
+    "total": 4490
+  },
+  "at": "2026-11-05T08:41:24.600Z"
+}

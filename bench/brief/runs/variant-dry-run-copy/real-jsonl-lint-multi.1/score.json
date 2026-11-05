@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.1",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1, 2, 3 and 5 test only what their expect lines say. Two checks go further than their lines:\n- Check 4's line says only \"lint(text) in src/index.js is unchanged\". Its FAIL condition is \"any diff in lint (or the file) shown\", and its command diffs the whole file. That is a file-scope rule the words don't require: a comment changed elsewhere in src/index.js would fail it even if lint() is unchanged.\n- Check 6's PASS requires \"the PR is open on suredesigntshirts/ccp_machine_test\". The expect line only says the change is one PR on that repo. It never says the PR must be open, so a merged PR would fail a test the words don't require.\nBoth stricter conditions belong under Advisory, not in PASS or FAIL, so the criterion is not met.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs. Each one names something that exists at this commit or is made earlier in the same command. Files that exist include packages/jsonl-lint/bin/jsonl-lint.js, src/index.js, test/cli.test.js, README.md and .github/workflows/test.yml. The temp files are made by `mktemp -d` and `printf` inside the same command. The shell syntax is valid: `&&` chains, `; echo \"exit=$?\"`, `${PIPESTATUS[0]}`, and single-quoted grep patterns such as `'`-`'`. `npm test -w packages/jsonl-lint` works because the root test script already uses `--workspaces`. `git diff --exit-code \"$(git merge-base origin/main HEAD)\" HEAD -- path` and the `gh api` REST calls with `--jq` are well-formed. The builder's `readFileSync(0, 'utf8')` and spawnSync `input` are valid Node. The only non-literal piece is `N=<PR number>`, and the brief marks it as a placeholder (\"N = the PR number\"), so it doesn't count against the criterion.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items against the briefs, and each one is handled.\n(1) Verifier Check 3's second command runs `a.jsonl missing.jsonl b.jsonl`, where b.jsonl has a bad row. PASS requires the stderr error, \"still prints `<T>/b.jsonl:2: ...`\" and exit=2, so the combined case is tested, not each case alone.\n(2) Check 4 runs `git diff --exit-code \"$(git merge-base origin/main HEAD)\" HEAD -- packages/jsonl-lint/src/index.js` and needs no diff. That compares the file at the PR head against the base.\n(3) Builder step 6 says \"Update packages/jsonl-lint/README.md\" and covers multi-file usage, `-`, and the exit codes.\n(4) Check 6 uses gh api to read the PR body and head sha, then the check-runs at that sha. It requires the Closes line and the `test` check to be completed with conclusion success.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every verifier PASS/FAIL condition against its expect line. The behaviour checks (1–3) all run the program, so must_not item 2 is avoided. Item 1 is broken in two places. Check 3 requires the second run to write \"an error naming missing.jsonl to stderr\", but line 3 only says \"error on stderr\". That adds a requirement on what stderr says, which is the \"exact stderr wording\" kind of strictness the must_not list rules out. Check 6 requires \"the PR is open\", but line 6 only asks for one PR with the Closes body and green checks at its head. Under check 6, a PR that was merged before verification would fail even though line 6 holds. Builder steps such as \"Edit only … jsonl-lint.js\" are instructions to the builder, not PASS conditions, so I did not count them.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with every check in the verifier brief. None of the verifier's probes appear in the builder brief. That covers its mktemp fixtures with specific inputs (e.g. '{\"b\":2}\\n{oops}\\n'), the piped `printf | node ... -` runs, the `git diff --exit-code` merge-base command, the README grep patterns and the gh api check-runs query. The builder brief also has no PASS/FAIL wording. It gives the bar: the six quoted expect lines plus implementation steps such as \"If `-` appears more than once: usage error ... exit 2\". Step 5 lists the cases and the expected behaviour for tests the builder writes itself, which the criterion allows. Step 7 tells it to run `npm test`, also allowed. Some lines overlap with verifier advisories (\"byte-for-byte as before\", \"do not hang\"). Those only restate requirements from expect line 1 and the usage-error rule. They are not checks or probes, and the advisories are not pass/fail anyway.",
+      "cached": false
+    }
+  }
+}

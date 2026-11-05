@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "90b37cab9088aff8ca0a5c569233c6fa7e1f939938b2738e9387c0748e2fa607",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Check 1 tests the `<path>:<line>: ` shape, 1-based numbering, skipped blank lines, the torn last line and exit codes 0 and 1, all named in expect line 1. \"Exactly one line\" follows from \"every row that is not valid JSON\": an extra line would report a valid row. Check 2 tests only exit 2 and non-empty stderr. Check 3 tests the exported lint, the array shape and line/error, and an empty array for clean input, which the meaning of \"returning [{ line, error }]\" covers. Check 4 accepts \"node --test (optionally with args)\" and requires the listed cases. Its \"tests pass\" condition is backed by line 6's green npm test. Check 6 follows \"one PR\", the Closes line and \"green\". The stricter items (shebang and executable bit, CRLF, lockfile, stdout/stderr separation, phantom trailing-newline error) all sit under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 11227,
+  "tokens": {
+    "input": 2,
+    "output": 785,
+    "cacheCreation": 4905,
+    "cacheRead": 783,
+    "fresh": 5692,
+    "total": 6475
+  },
+  "at": "2026-11-05T08:42:27.530Z"
+}

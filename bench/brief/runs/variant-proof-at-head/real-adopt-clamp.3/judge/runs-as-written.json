@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "76b59b26aedf4be67917bec1bd0b3eb32f54f7e45096e08fd46ea53280eb1e8e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. The builder's `npm test` works, since package.json defines `node --test`. Verifier checks 1, 2 and 4 are valid JavaScript inside double quotes and only use math.js and README.md, which exist. Check 3 breaks. Its regex pieces `'^#+\\\\s*'+n+'\\\\s*\\\\('` sit inside a double-quoted bash string, and bash turns each `\\\\` into `\\`. JavaScript then reads the string literals `'\\s*'` and `'\\('`, and those unnecessary escapes collapse to `s*` and `(`. So the pattern becomes `^#+s*adds*(`, which has an unclosed `(`. `new RegExp` throws \"SyntaxError: Invalid regular expression … Unterminated group\", so the command crashes even when README.md is correct. That means at least one command does not run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 12426,
+  "tokens": {
+    "input": 2,
+    "output": 862,
+    "cacheCreation": 3384,
+    "cacheRead": 783,
+    "fresh": 4248,
+    "total": 5031
+  },
+  "at": "2026-11-05T08:41:43.542Z"
+}

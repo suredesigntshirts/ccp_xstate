@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "9c91072931aec958b8895e95e30d5f5dda9ed448a514499f73ba488a7fb477ce",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items. It says \"run one check for each acceptance line\" and has exactly two checks: Check 1 for the --tsv JSON equality and Check 2 for the README. That matches the two expect lines. The brief does say to run `npm test`, but only under \"Advisory (not part of PASS or FAIL)\", so it is reported and not graded. It is not a third check. Check 1's PASS and FAIL conditions rely only on comparing the --tsv output with the CSV output. Check 2's conditions rely only on the README content. Neither condition requires npm test or the CSV tests to pass. The builder brief asks the builder to run npm test, but neither must_not item covers the builder brief. Neither prohibited pattern appears.",
+  "model": "claude-opus-5-5",
+  "ms": 6062,
+  "tokens": {
+    "input": 2,
+    "output": 545,
+    "cacheCreation": 2737,
+    "cacheRead": 783,
+    "fresh": 3284,
+    "total": 4067
+  },
+  "at": "2026-11-05T08:40:31.280Z"
+}

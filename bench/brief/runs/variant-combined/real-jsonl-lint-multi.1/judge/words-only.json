@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "dc5dbe491713d58cf075d7e9f97edc0bb552679fa10578788bb82387d09e78ed",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 3 and 6 stay within their words. Check 4 breaks the criterion. Its expect line only says \"lint(text) in src/index.js is unchanged\", but the PASS condition also requires that `node --test packages/jsonl-lint/test/lint.test.js` passes (\"and the lint tests pass\"). The expect line doesn't require that test, so it belongs under Advisory. Check 5 does the same thing: the PASS condition requires \"the tests pass\" and the FAIL condition includes \"a test fails\". Its expect line asks only that tests \"cover\" the listed cases and that the README documents the usage. Whether the tests pass falls under expect line 6, not 5. Because these extra conditions are inside PASS and FAIL rather than under Advisory, the criterion does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 13473,
+  "tokens": {
+    "input": 2,
+    "output": 858,
+    "cacheCreation": 4797,
+    "cacheRead": 783,
+    "fresh": 5657,
+    "total": 6440
+  },
+  "at": "2026-11-05T08:58:20.374Z"
+}

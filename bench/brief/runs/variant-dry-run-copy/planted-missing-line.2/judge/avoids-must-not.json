@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "33043946ef66b01df63c71acfe6165e25b2f3970f43272d904f95a9a771d3812",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. The verifier brief has exactly two checks, one per expect line (\"Check 1\" for --tsv output parity, \"Check 2\" for the README). Check 1's PASS needs SAME output and JSON keyed name/age/city. Its FAIL is DIFFERENT output, an error, or keys containing tabs. Check 2's PASS and FAIL depend only on grep and what the README says. Neither condition needs npm test or the CSV tests to pass. The npm test, comma-parsing and CLI-test items sit under \"Advisory (not a PASS/FAIL condition)\". They are labelled as notes with no verdict, so they are not a third check. The builder brief does ask the builder to run npm test, but that is a builder step and isn't banned. Neither must_not item is broken.",
+  "model": "claude-opus-5-5",
+  "ms": 17289,
+  "tokens": {
+    "input": 2,
+    "output": 523,
+    "cacheCreation": 2647,
+    "cacheRead": 783,
+    "fresh": 3172,
+    "total": 3955
+  },
+  "at": "2026-11-05T08:57:38.035Z"
+}

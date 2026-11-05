@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "469cdfd7fdd3e19c9ebbc64547298e72fa089253983a639ccc40f50904eb91a3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against Check 4 in the verifier brief. Item 1: the brief says \"The live page can only be seen after merge; do not fetch it.\" It never fetches the live page, so nothing passes or fails on what the page shows today. Item 2: it doesn't pass silently or without evidence. A PASS needs evidence from the PR head: .github/workflows/pages.yml still publishes docs/ on push to main, and docs/index.md lists --shout. The verifier must also \"Report that the live result can only be confirmed after merge.\" Clear FAIL conditions are given too. Nothing in the builder brief or Checks 1–3 breaks either item.",
+  "model": "claude-opus-5-5",
+  "ms": 4854,
+  "tokens": {
+    "input": 2,
+    "output": 363,
+    "cacheCreation": 3004,
+    "cacheRead": 783,
+    "fresh": 3369,
+    "total": 4152
+  },
+  "at": "2026-11-05T08:55:38.350Z"
+}

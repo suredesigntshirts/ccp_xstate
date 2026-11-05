@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "a9ad5d8583b977170e5bec3d8d17f555335f7efed6b10fe6a65426abb978dafd",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier PASS/FAIL condition with the words of its expect line. Checks 1, 2, 3 and 5 test only what their expect lines say: exit 1 with empty stdout; `bad config:`, the exact path and line 3 column 3; `OK` meaning it threw and the message has the path; tests pass at head and a path-asserting test fails at base. Check 4 breaks the criterion. Its PASS needs \"the output is exactly the three lines `listening on 9000`, `exit 0`, `{\\\"port\\\":9000}`\", and its FAIL covers \"a different stdout line\". Expect line 4 only requires exit 0, that stdout includes `listening on 9000`, and that loadConfig returns `{ port: 9000 }`. It does not rule out other output. Stderr is also not redirected in that command, so a harmless Node warning would fail the check. Demanding exact output is stricter than the words and belongs under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 11449,
+  "tokens": {
+    "input": 2,
+    "output": 902,
+    "cacheCreation": 5620,
+    "cacheRead": 783,
+    "fresh": 6524,
+    "total": 7307
+  },
+  "at": "2026-11-05T08:55:11.817Z"
+}

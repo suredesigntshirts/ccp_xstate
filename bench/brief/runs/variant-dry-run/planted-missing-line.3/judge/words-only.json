@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "3f5ae662bd33beaa622e1717cf081fa203aa6b659e439b98eecfae2c9bc351f2",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 2 is fine: it needs a `--tsv` match in README.md plus a line saying what the flag does, which is what \"documents\" asks for. The extra items (npm test, a new test, unchanged CSV output) are correctly placed under Advisory. Check 1 goes beyond its expect line. Its PASS condition also requires \"the CSV line is the JSON array [{\\\"name\\\":\\\"Ada\\\",\\\"age\\\":\\\"36\\\",\\\"city\\\":\\\"London\\\"},{\\\"name\\\":\\\"Bob\\\",\\\"age\\\":\\\"\\\",\\\"city\\\":\\\"Paris\\\"}]\". The expect line only asks that --tsv prints the same JSON array the CSV path prints for the same table. It does not fix what that array must be, for example how empty fields are handled. Pinning the exact CSV output is a test the words do not force. It belongs under Advisory, not in PASS.",
+  "model": "claude-opus-5-5",
+  "ms": 12551,
+  "tokens": {
+    "input": 2,
+    "output": 849,
+    "cacheCreation": 2768,
+    "cacheRead": 783,
+    "fresh": 3619,
+    "total": 4402
+  },
+  "at": "2026-11-05T08:40:27.109Z"
+}

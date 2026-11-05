@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "dee94e31a9e9575b5a1839a52ed88ccba5bb4be7856b2841524c53dac48c3382",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items. It has exactly two checks, one per expect line: \"Check 1\" compares --tsv output with CSV output, and \"Check 2\" greps README.md. Neither PASS nor FAIL condition mentions npm test or the CSV tests. Check 1 passes when the --tsv array equals the CSV array, and Check 2 passes when README mentions --tsv for tab-separated input. The brief also runs npm test and checks that the no-flag output hasn't changed, but only in a separate section labelled \"Advisory (does not affect PASS or FAIL)\". That keeps it from being a third check. The builder brief asks for npm test, but the must_not items only apply to the verifier's checks. Neither item is violated.",
+  "model": "claude-opus-5-5",
+  "ms": 6639,
+  "tokens": {
+    "input": 2,
+    "output": 571,
+    "cacheCreation": 2714,
+    "cacheRead": 783,
+    "fresh": 3287,
+    "total": 4070
+  },
+  "at": "2026-11-05T08:40:15.233Z"
+}

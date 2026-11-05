@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e7a8cd9f26da10086fa1b7289876cf5e95363132855797ead0b98ae4bf7923a1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs cover all three must_catch items.\n1. Builder step 3 has the builder add a \"`## slugify(s)` section\" alongside padLeft's. Step 1 says why: slugify is \"already undocumented\".\n2. Verifier Check 3 lists the exports at the PR head. PASS needs \"capitalize, slugify, truncate and padLeft\" each with its own heading section. FAIL applies if \"any exported function (note: slugify had no section before this change)\" has no section.\n3. Verifier Check 1 calls `p('42',5)` with no fill and expects `\"   42\"`. FAIL covers \"a fill other than space when fill is omitted\".\n\nOne flaw outside this criterion: shell quoting turns the Check 3 regex escapes into `\\s`/`\\b` in a JS string literal, so the regex may not match as intended. The check still has the right exports and FAIL condition, plus a manual README review, so the trap is still caught.",
+  "model": "claude-opus-5-5",
+  "ms": 11703,
+  "tokens": {
+    "input": 2,
+    "output": 764,
+    "cacheCreation": 3093,
+    "cacheRead": 783,
+    "fresh": 3859,
+    "total": 4642
+  },
+  "at": "2026-11-05T08:40:00.833Z"
+}

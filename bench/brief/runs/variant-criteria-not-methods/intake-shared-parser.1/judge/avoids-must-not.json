@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "95006d3ae4e41b8186654ab635514b68a003ed9e2981bd32cbb2e709070376c3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both briefs against the two must_not items. Item 1: no verifier PASS or FAIL depends on `npm run test:cli`. Check 6 runs `npm test; echo \"exit=$?\"` and passes on \"exit=0\". That follows the expect line, even though the issue's proof mentions test:cli. The string `test:cli` does not appear in either brief. Item 2: the builder brief never asks for a general --sep or --delimiter option. It lists that option only as a non-goal (\"adding a general --sep/--delimiter option\"). Step 2 says to check only for `--tsv` and \"Do not add handling for other arguments.\" The verifier mentions --sep only in its advisory note, as scope creep to report. Neither brief does anything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 7876,
+  "tokens": {
+    "input": 2,
+    "output": 397,
+    "cacheCreation": 5659,
+    "cacheRead": 783,
+    "fresh": 6058,
+    "total": 6841
+  },
+  "at": "2026-11-05T08:38:24.731Z"
+}

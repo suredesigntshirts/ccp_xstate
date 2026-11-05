@@ -32,6 +32,14 @@ export function baseWorkflows() {
   return out;
 }
 
+/**
+ * The stage files and workflow JSON as this item merged them (commit 40ae1b6, the last to touch them before
+ * refine-brief-stage), committed beside these tests (merge-workflows/). The words-kept tests compare the base JSON
+ * with these: they prove the move into files kept every word, which is a fact about this item's merge. A later item
+ * that changes a stage's words on purpose (refine-brief-stage changed quick-fix/brief.md) changes workflows/, not this.
+ */
+export const MERGE_FIXTURES = new URL('./merge-workflows/', import.meta.url).pathname;
+
 /** A scratch copy of this checkout's workflows/ (with the stage folders). */
 export function scratchWorkflows() {
   const dir = mkdtempSync(join(tmpdir(), 'v-spf-wf-'));

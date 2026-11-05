@@ -1,0 +1,23 @@
+Do every check at the PR head, from the repository root. Run `npm install` first only if package.json now lists dependencies.
+
+Check 1 — math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi.
+Run: node -e "const m=require('./math.js');const c=m.clamp;if(typeof c!=='function')throw new Error('clamp not exported');const cases=[[-5,0,100,0],[140,0,100,100],[50,0,100,50],[0,0,100,0],[100,0,100,100],[7,3,3,3],[-2.5,-10,-1,-2.5],[-20,-10,-1,-10]];for(const [x,lo,hi,want] of cases){const got=c(x,lo,hi);if(got!==want)throw new Error('clamp('+x+','+lo+','+hi+')='+got+', want '+want)}console.log('OK')"
+PASS: it prints OK and exits 0. FAIL: it throws, exits non-zero, or clamp is missing from the exports.
+
+Check 2 — clamp(x, lo, hi) throws a RangeError when lo is greater than hi.
+Run: node -e "const {clamp}=require('./math.js');for(const a of [[5,10,0],[0,1,-1],[50,100,0]]){let e;try{clamp(...a)}catch(err){e=err}if(!(e instanceof RangeError))throw new Error('no RangeError for '+a+': '+e)}console.log('OK')"
+PASS: it prints OK and exits 0. FAIL: any of these calls returns normally or throws something that is not a RangeError.
+
+Check 3 — README.md documents every function math.js exports.
+Run: node -e "const m=require('./math.js');const r=require('fs').readFileSync('README.md','utf8');const fns=Object.keys(m).filter(k=>typeof m[k]==='function');const miss=fns.filter(n=>!new RegExp('^#+\\s*'+n+'\\s*\\(','m').test(r));console.log('exports:',fns.join(','));if(miss.length)throw new Error('undocumented: '+miss.join(','));console.log('OK')"
+After that, read README.md and confirm each exported function (this should include add, subtract, multiply and clamp) has an entry that describes what it does. The script only checks for a heading, so if it fails but you find a real description written another way, judge by reading.
+PASS: every exported function has a README.md entry that describes it. FAIL: any exported function, subtract included, is missing from README.md or has only a bare name with no description.
+
+Check 4 — npm test passes.
+Run: npm test ; echo EXIT=$?
+PASS: EXIT=0 and the output reports zero failing tests. FAIL: a non-zero exit or any failing test.
+
+Advisory (not part of PASS/FAIL):
+- Check whether the added tests cover clamp, including the RangeError case.
+- Check whether the README clamp entry mentions the RangeError.
+- Note it if the diff changes add, subtract or multiply.

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "2a49df6a4d0ed7056b6afa62320e1ff3a5ad55a31810afd4e81ae48f9e839ddd",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for checks that appear in both. The criterion fails at builder step 5. That step gives the builder the exact inline script used in verifier Check 1 (`d=$(mktemp -d) && printf '{port: 9000' > \"$d/config.json\" && node --input-type=module -e \"import { loadConfig } ...\"`). It also gives Check 1's PASS condition: \"It should print `{}` and `exit=0`, with no stack trace.\" Neither expect line names this script; they name only `npm test`. Telling the builder to run `npm test` is allowed. So is suggesting its own test in step 3. But passing on the verifier's own probe and its expected output breaks the rule that the builder gets the bar, not the checker.",
+  "model": "claude-opus-5-5",
+  "ms": 5821,
+  "tokens": {
+    "input": 2,
+    "output": 467,
+    "cacheCreation": 3112,
+    "cacheRead": 783,
+    "fresh": 3581,
+    "total": 4364
+  },
+  "at": "2026-11-05T08:41:06.542Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "bfdc4430b211f8b78e33ed67ba158cfa8f01f66f3d880b5b4fe7a67fdf2c70d7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the package.json scripts. `npm test` maps to the script \"node --test\", and test/config.test.js exists, so it runs. The verifier's `node --input-type=module -e \"import {loadConfig} from './src/config.js'; ... process.argv[1] ...\" /tmp/<dir>/config.json` is valid. With `-e`, `process.argv[1]` is the first extra argument. The relative import resolves from the repository root to src/config.js, which exists. The JavaScript syntax is fine. `node src/app.js <bad file>` points to an existing file. `/tmp/<dir>/` and `<bad file>` are clearly placeholders the agent fills in: the brief says \"a script like\" and first tells it to write a temp file. They are not broken arguments. The builder's steps edit only files that exist (src/config.js, test/config.test.js, src/app.js, README.md). No command names a missing file, script or tool, and no syntax is invalid.",
+  "model": "claude-opus-5-5",
+  "ms": 16225,
+  "tokens": {
+    "input": 2,
+    "output": 1048,
+    "cacheCreation": 2820,
+    "cacheRead": 783,
+    "fresh": 3870,
+    "total": 4653
+  },
+  "at": "2026-11-05T08:57:09.847Z"
+}

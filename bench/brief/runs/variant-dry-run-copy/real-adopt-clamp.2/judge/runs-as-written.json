@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "1303458818e6296888238d146fe35712cdd49f2a121ae640ae9edb8fa3d417fb",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. The builder's `npm test` runs, and so do the commands for Checks 1, 2 and 4. Check 3 breaks. It is wrapped in bash double quotes, where `\\\\` becomes `\\`. So JavaScript gets `'^#+ .*\\b'+n+'\\s*\\('`. Inside a JS string literal, `\\b` is a backspace character, `\\s` becomes `s` and `\\(` becomes `(`. The pattern passed to `new RegExp` ends in `s*(`, an unterminated group. That throws a SyntaxError on the first exported name. So Check 3 cannot print PASS for any README, even a correct one. Getting a regex escape through both the shell and a JS string needs `\\\\\\\\b`, `\\\\\\\\s` and `\\\\\\\\(`, or single-quoted shell. As written, this command is broken.",
+  "model": "claude-opus-5-5",
+  "ms": 9923,
+  "tokens": {
+    "input": 2,
+    "output": 875,
+    "cacheCreation": 3514,
+    "cacheRead": 783,
+    "fresh": 4391,
+    "total": 5174
+  },
+  "at": "2026-11-05T08:58:20.757Z"
+}

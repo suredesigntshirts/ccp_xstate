@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "0e55ee470957c132f0656ce40ae466109d8e87994cbd2753d09c78b42b152ea2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the PASS and FAIL conditions of both verifier checks against their expect lines. Check 1 passes only if the call on invalid JSON \"does not throw\" and prints `{}`. It fails if an error escapes, the result isn't an empty object, loadConfig isn't in src/config.js, or \"the parse error is not caught inside loadConfig\". Each of these follows from \"catches the JSON.parse error and returns {} instead\". The step that confirms the function is exported only makes the import-based run possible; it adds no stricter rule. Check 2 passes if every test passes, and fails if a test fails or npm test exits non-zero or can't run. All of that follows from \"npm test passes\". The stricter checks all sit under \"Advisory (does not decide PASS or FAIL)\": valid JSON still loading, a missing file still throwing, the old test being replaced, the stderr warning, the README update and the app.js run. No condition requires exact wording or file scope.",
+  "model": "claude-opus-5-5",
+  "ms": 9968,
+  "tokens": {
+    "input": 2,
+    "output": 712,
+    "cacheCreation": 2721,
+    "cacheRead": 783,
+    "fresh": 3435,
+    "total": 4218
+  },
+  "at": "2026-11-05T08:57:28.120Z"
+}

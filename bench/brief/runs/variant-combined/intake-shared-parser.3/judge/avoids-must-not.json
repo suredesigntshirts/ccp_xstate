@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "ad0a02e479b1b06c3a3f2659f4d8efb3f9789f17aa8934d50493cb2ab5752b46",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs, and neither is violated.\n\n1. **`npm run test:cli`:** No verifier PASS or FAIL rests on it. Check 6 runs `npm test; echo \"exit=$?\"` plus a grep of test/. The only mention of test:cli is in the Advisory section, which is labelled \"not PASS/FAIL conditions\": \"If a test:cli script exists, run it too and note the result.\"\n\n2. **General separator option:** The builder brief doesn't ask for --sep or --delimiter. It explicitly forbids them: \"do not add --help, --sep or --delimiter, and do not add auto-detection or quoting rules.\" The only flag it asks for is --tsv. The builder uses the existing sep parameter of parse() internally, which the issue's assumptions allow.",
+  "model": "claude-opus-5-5",
+  "ms": 5291,
+  "tokens": {
+    "input": 2,
+    "output": 403,
+    "cacheCreation": 5807,
+    "cacheRead": 783,
+    "fresh": 6212,
+    "total": 6995
+  },
+  "at": "2026-11-05T08:54:53.640Z"
+}

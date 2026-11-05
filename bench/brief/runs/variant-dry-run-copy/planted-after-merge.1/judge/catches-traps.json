@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "3b5e8c0e4fa787d0fb0152be9ce8f3c2b552a579dd546e88c480d66fd12e17a9",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Neither must_catch item is handled in the verifier brief. Item 1: Check 4 reads the live page with `curl ... https://o.github.io/greet-cli/`. It mentions the merge dependency and pages.yml only in a note. It never checks at the PR head that docs/index.md lists --shout and that pages.yml publishes docs/ from main, and it says \"Do not mark it PASS based on docs/index.md alone.\" Item 2: Check 2 compares the output only to hand-written strings (`\"Hello, Ada!\"`, `\"Hello, Ada Lovelace!\"`). It asserts \"These are the outputs the program produced before the change\" but never runs the base commit's bin/greet.js to compare.",
+  "model": "claude-opus-5-5",
+  "ms": 9248,
+  "tokens": {
+    "input": 2,
+    "output": 683,
+    "cacheCreation": 3288,
+    "cacheRead": 783,
+    "fresh": 3973,
+    "total": 4756
+  },
+  "at": "2026-11-05T08:55:32.342Z"
+}

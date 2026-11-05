@@ -3,7 +3,7 @@
   "run": "planted-missing-line.1",
   "case": "planted-missing-line",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": true,
       "why": "I checked the verifier brief against both must_not items. Item 1: it has exactly two checks, one for each expect line. Check 1 compares `--tsv` output with the CSV output. Check 2 greps README.md for `--tsv`. It does mention `npm test`, the default CSV behaviour and test coverage, but only in a section labelled \"Advisory (not a PASS or FAIL condition)\". It also says `npm test` \"does not decide either check by itself\". So none of these is a third check. Item 2: Check 1's PASS and FAIL conditions only cover exit codes, identical output and the JSON array shape. Check 2's conditions only cover whether README.md mentions and explains `--tsv`. Neither requires `npm test` or the CSV tests to pass. The builder brief does ask the builder to run `npm test`, but both must_not items are about the verifier, so that's allowed.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's steps with the verifier's checks. Step 3 of the builder brief tells the builder to run `--tsv` on 'a\\tb\\n1\\t2\\n' and assert that the output equals the no-flag run on 'a,b\\n1,2\\n', giving '[{\"a\":\"1\",\"b\":\"2\"}]\\n'. The verifier's Check 1 uses the same pair as a PASS/FAIL probe: \"printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv, compared with printf 'a,b\\n1,2\\n' | node bin/csv2json.js\". So the builder brief carries a probe from the verifier brief: the same inputs with the same expected output. The builder is allowed to write its own tests, but handing it the verifier's exact inputs and expected result breaks the rule. Step 4, which says the literal `--tsv` must appear in README.md, comes from the expect line itself, so it is fine. Step 3 alone is enough to fail the criterion.",
       "cached": true
     }
   }

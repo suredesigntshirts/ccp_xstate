@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "63f8e0f6805a37208819ff7080595e50fe15a9e501d6579f738a25cb25a27139",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier PASS and FAIL condition against the words of its expect line. Checks 1, 2, 5 and 6 stay within what their lines require. Check 3 breaks the criterion. Its PASS requires exit 2 for `good1.jsonl missing.jsonl bad.jsonl`, a run that has both an unreadable file and a bad row. The expect line says both \"1 if any row in any file is bad\" and \"2 if … any file can't be read\", so its words don't settle which code wins when both happen. The brief's own Advisory section lists this exact case (\"a missing file mixed with bad files still exits 2 (not 1)\") as advisory, yet Check 3 makes it pass/fail, which is stricter than the words. Check 4 also adds a requirement the words don't force: that lint.test.js passes. So the criterion doesn't hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 10350,
+  "tokens": {
+    "input": 2,
+    "output": 912,
+    "cacheCreation": 5378,
+    "cacheRead": 783,
+    "fresh": 6292,
+    "total": 7075
+  },
+  "at": "2026-11-05T08:58:45.076Z"
+}

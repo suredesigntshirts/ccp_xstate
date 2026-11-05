@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "ef220114ebdbf92a98a1d69cbc62ff882b61d0c2094c08c0f53e3f32c7cb5d28",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. `npm test` exists in package.json, and the Check 1 and Check 2 one-liners are valid and fit `node --input-type=module -e`. Check 3 is broken by its quoting. The JavaScript sits inside a bash double-quoted string, so the shell turns `'^#+\\\\s*'` and `'\\\\b'` into `'^#+\\s*'` and `'\\b'`. JavaScript then reads `'\\s'` as just `s` and `'\\b'` as a backspace character. The regex that gets built is `^#+s*capitalize<backspace>`, which never matches a heading like `## capitalize(s)`. So the command would always print every export as missing. Its PASS output, `missing: none`, can never appear, even when the README is correct. Run as written, that command doesn't work in this repository, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 11668,
+  "tokens": {
+    "input": 2,
+    "output": 1005,
+    "cacheCreation": 3149,
+    "cacheRead": 783,
+    "fresh": 4156,
+    "total": 4939
+  },
+  "at": "2026-11-05T08:39:41.922Z"
+}

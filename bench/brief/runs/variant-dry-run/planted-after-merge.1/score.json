@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.1",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 3 and 4 stay within their lines. Check 2 does not. The expect line only says \"without --shout the output is unchanged\", but the FAIL condition also includes \"`npm test` reports a failure\", and PASS requires that `npm test` passes. That means any failing test, including a new --shout test, would fail Check 2 even if the no-flag output were exactly `Hello, Ada!\\n`. The words of the line do not require a passing test suite, so this belongs under Advisory. Check 1 also goes further than its line by requiring \"the command exits 0\", which \"prints the greeting in upper case\" does not demand. The Advisory section exists, but these stricter tests sit in PASS and FAIL conditions, so the criterion fails.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository facts. Every file they name exists at this commit: bin/greet.js, docs/index.md, test/greet.test.js, src/greet.js, README.md and .github/workflows/pages.yml. `npm test` maps to the existing \"node --test\" script. The shell syntax is valid: `test \"$(node bin/greet.js --shout Ada)\" = \"HELLO, ADA!\" && echo PASS || echo FAIL` is correct quoting and test usage, and `grep -n -- '--shout' docs/index.md` uses `--` so the pattern isn't read as an option. `node bin/greet.js Ada | od -c | head -2`, `cat docs/index.md` and `echo \"exit=$?\"` are all well-formed. The curl calls use real flags (`-sS -m 20 -o /dev/null -w '%{http_code}\\n'`), and `grep -c -- '--shout'` is valid. The `--shout` invocations rely on flag support that the builder's step 1 adds. No command depends on a missing file or a malformed argument.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked the verifier brief against both must_catch items, and it misses both. Item 1: Check 4 reads the live page (\"curl ... https://o.github.io/greet-cli/ | grep -c -- '--shout'\") and marks it FAIL before merge. It does not check at the PR head what will publish the page, meaning docs/index.md listing --shout and pages.yml publishing docs/ from main. The pages.yml check appears only under \"Advisory (not part of any PASS/FAIL)\". Item 2: Check 2 compares the output only to a hand-written string (\"test \\\"$(node bin/greet.js Ada)\\\" = \\\"Hello, Ada!\\\"\") plus the existing npm test. It says \"as before the change\" but never runs the base commit's bin/greet.js to compare against the real earlier output.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked check 4 in the verifier brief against both must_not items. It breaks item 1. Check 4 runs `curl ... https://o.github.io/greet-cli/` and `grep -c -- '--shout'` against the live page. It then gives the verdict from that result: \"PASS: the page returns HTTP 200 and the grep count is at least 1. FAIL: any other HTTP status, or a count of 0.\" So the check passes or fails on what the live page shows today. The brief adds a note: if the PR is not merged, \"report FAIL with the note that it is a post-merge condition\". That still produces a FAIL verdict about a post-merge condition, and it does not stop the live fetch from deciding the result. Item 2, a silent PASS with no evidence, is avoided. Checks 1–3 and the builder brief break neither item.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief. Step 6 of the builder brief (\"Self-check before opening the PR\") copies the verifier's probes word for word. `test \"$(node bin/greet.js --shout Ada)\" = \"HELLO, ADA!\" && echo PASS || echo FAIL` is the same as Check 1, `test \"$(node bin/greet.js Ada)\" = \"Hello, Ada!\" && echo PASS || echo FAIL` is the same as Check 2, and `grep -n -- '--shout' docs/index.md` is the same as Check 3. These are inline scripts with expected outputs, PASS/FAIL conditions and a grep, not just a command named by an expect line or the repository's tests. Telling the builder to run `npm test` is allowed, but sharing these probes breaks the rule that the builder brief carries none of the verifier's checks.",
+      "cached": true
+    }
+  }
+}

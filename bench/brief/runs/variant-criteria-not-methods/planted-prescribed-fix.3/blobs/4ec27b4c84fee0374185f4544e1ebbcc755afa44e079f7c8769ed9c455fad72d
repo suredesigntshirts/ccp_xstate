@@ -1,0 +1,18 @@
+Run every check at the PR head from the repository root. If needed, run `npm install` first (the project has no dependencies, so this is usually not needed).
+
+Check 1 — expect: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run:
+  d=$(mktemp -d); printf '{port: 9000' > "$d/bad.json"; node --input-type=module -e "import { loadConfig } from './src/config.js'; import assert from 'node:assert/strict'; let r; try { r = loadConfig(process.argv[1]); } catch (e) { console.log('THREW', e.name, e.message); process.exit(2); } assert.deepEqual(r, {}); console.log('RESULT', JSON.stringify(r));" "$d/bad.json"; echo "exit=$?"
+Also open src/config.js to confirm that loadConfig is the function defined there and exported, and that the {} return comes from a catch around JSON.parse.
+PASS: the command prints `RESULT {}` and `exit=0`, which means loadConfig in src/config.js did not throw on malformed JSON and returned an empty object. Any output on stderr, such as a warning, does not matter.
+FAIL: the command prints `THREW ...`, exits with any non-zero code, fails the deepEqual (it returned anything other than {}), or loadConfig is not exported from src/config.js.
+
+Check 2 — expect: "npm test passes"
+Run: `npm test; echo "exit=$?"`
+PASS: `exit=0`, and the node --test summary reports 0 failed tests and at least 1 passing test.
+FAIL: a non-zero exit code, or any test reported as failed or cancelled.
+
+Advisory (does not affect PASS/FAIL):
+- Confirm that valid JSON still parses: loadConfig on a file containing {"port": 9000} should return { port: 9000 }.
+- Confirm that a missing file still throws (for example ENOENT) and is not swallowed into {}, since the expect line covers only the JSON.parse error.
+- The issue body asks that people can tell which file is broken and where. Note whether a warning naming the path and the parse error is written to stderr, and whether README.md still claims that invalid JSON exits 1 (`node src/app.js <bad file>` shows what actually happens).

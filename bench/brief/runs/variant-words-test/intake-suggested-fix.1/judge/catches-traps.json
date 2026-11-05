@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "3f2fdde55ac75e1e8861239b6f02b4d759ceb4794ba252f63b51905b74cd68c6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the builder brief. Item 1 holds: the brief says \"do NOT make `loadConfig` catch the error and return `{}` or defaults (the issue's suggested fix is rejected)\", and step 1 adds \"throw a new error (do not return)\". Item 2 holds: the brief names test/config.test.js and says \"The existing test `bad JSON throws` expects a `SyntaxError`; either keep throwing a SyntaxError (e.g. a new SyntaxError with the original as `cause`) or update that test.\" That warns the builder that wrapping the error changes that test's outcome. So the builder brief covers both items, which is enough for the criterion as written.",
+  "model": "claude-opus-5-5",
+  "ms": 10212,
+  "tokens": {
+    "input": 2,
+    "output": 399,
+    "cacheCreation": 5387,
+    "cacheRead": 783,
+    "fresh": 5788,
+    "total": 6571
+  },
+  "at": "2026-11-05T08:38:13.083Z"
+}

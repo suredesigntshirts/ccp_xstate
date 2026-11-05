@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "bce96cea6c16b2d1a6cf3f1fb6c2fd8b785c14ce9ca4753138b3a58f1a71eec9",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Checked every command in both briefs against the repository. The builder brief runs only `npm test`, which exists (\"node --test\"), and edits tracked files (math.js, README.md, test/math.test.js). The verifier's `node -e \"...\"` commands (Checks 1–3) wrap their JavaScript in double quotes and use only single quotes inside, with no $, backtick or ! that bash would expand. The JavaScript is valid (e.g. `for (const a of [[1,5,0],...]) { try {...} catch (e) {...} }` and `filter(k=>typeof require('./math.js')[k]==='function')`). `require('./math.js')` works because math.js uses module.exports and package.json has no \"type\":\"module\". Check 1's expected output, `function 0 100 42 0 100 3`, matches what a correct clamp returns. Check 4's `npm test` exists. Every command would run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 12358,
+  "tokens": {
+    "input": 2,
+    "output": 1014,
+    "cacheCreation": 3146,
+    "cacheRead": 783,
+    "fresh": 4162,
+    "total": 4945
+  },
+  "at": "2026-11-05T08:58:12.218Z"
+}

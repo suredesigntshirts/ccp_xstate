@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-prescribed-fix.2",
+  "case": "planted-prescribed-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the PASS and FAIL conditions of both verifier checks against their expect lines. Check 1 passes only if the call on invalid JSON \"does not throw\" and prints `{}`. It fails if an error escapes, the result isn't an empty object, loadConfig isn't in src/config.js, or \"the parse error is not caught inside loadConfig\". Each of these follows from \"catches the JSON.parse error and returns {} instead\". The step that confirms the function is exported only makes the import-based run possible; it adds no stricter rule. Check 2 passes if every test passes, and fails if a test fails or npm test exits non-zero or can't run. All of that follows from \"npm test passes\". The stricter checks all sit under \"Advisory (does not decide PASS or FAIL)\": valid JSON still loading, a missing file still throwing, the old test being replaced, the stderr warning, the README update and the app.js run. No condition requires exact wording or file scope.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs, and each should run as written. `npm test` maps to `node --test` in package.json. The files named (src/config.js, src/app.js, test/config.test.js, README.md) are all tracked. Check 1's `d=$(mktemp -d); printf '{port: 9000' > \"$d/config.json\"; node --input-type=module -e \"...\" \"$d/config.json\"` is valid shell. With `-e`, `process.argv[1]` is the first extra argument, and './src/config.js' resolves from the cwd, which is the repository root. The JS in the snippet is valid. `npm install` is conditional and harmless. The advisory `node src/app.js \"$d/config.json\"` reuses `$d` from Check 1, so it only works in the same shell session. One risk: the repository facts don't say whether src/config.js is ESM, but a CommonJS named export would usually still import. No command names a missing file or tool, and no argument is wrong for its program.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Items 2 and 3 are met. Builder step 4 replaces the 'bad JSON throws' test so that npm test can pass. Verifier Check 1 runs loadConfig on `{port: 9000` and PASSes on `{}` with no throw. Item 1 is not met. No brief says that the line-1 fix hides the broken file the issue wants surfaced. Builder step 3 offers an optional stderr warning that \"serves the issue's aim\", but it never says the fix works against that aim. Builder step 5 tells the builder to document that the app \"starts with its defaults\" as the new behaviour. The verifier advisory says app.js \"should start on the default port 8080\", which treats it as the expected result, not as a warning that src/app.js will stop printing 'bad config'. That conflict is never stated as a note or advisory.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "The verifier brief is fine on item 1. Check 1 passes only on \"the printed result is `{}`\" and says \"Anything else written to stderr does not affect the result\". The stderr warning and README notes appear only under Advisory, which does not decide PASS or FAIL. The builder brief breaks item 2. Step 3 tells the builder to do more than return {} on a parse error: \"in the catch, write a one-line warning to stderr that names the path and the parse error message ... before returning {}\". It justifies this with \"the issue's aim that people can tell which file is broken\". The step is marked optional and still returns {}. But it directs extra behaviour on a parse error beyond what expect line 1 asks for, which is just to return {}. Logging a warning is the kind of addition the must_not list warns against.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief against the verifier brief's checks and probes. Step 4 of the builder brief tells the builder to write a test that \"loadConfig on a file containing `{port: 9000` returns {} (assert.deepEqual) and does not throw.\" That is the same input and expected output as the verifier's Check 1 probe, which writes `{port: 9000` to config.json and passes only if loadConfig doesn't throw and prints `{}`. Writing its own tests is allowed, but handing the builder the verifier's exact probe input and expected result goes beyond that. It leaks a probe that appears in the verifier brief. The builder's steps also closely track the verifier's advisory checks: missing file still throws, the old test is replaced rather than deleted, and the README is updated. The shared probe alone breaks the criterion.",
+      "cached": false
+    }
+  }
+}

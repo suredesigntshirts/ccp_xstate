@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "be583fac2c0bc6069eef36eedcd6e0157a11f600a2840c9c21bd706821ce89e7",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. Most of them would run as written: `npm test`, `npm test -w packages/jsonl-lint`, the `node -e` import (its quoting and escapes are valid), `git merge-base HEAD origin/main`, and the `gh pr view`/`gh pr checks` calls. The verifier brief breaks the criterion, though. It sets the relative path `BIN=packages/jsonl-lint/bin/jsonl-lint.js` and puts a.jsonl, b.jsonl and bad.jsonl in a new temp dir. Every check then runs `node $BIN a.jsonl bad.jsonl b.jsonl` with bare file names. From the repository root the bare names don't exist. From the temp dir `$BIN` doesn't resolve. Either way these commands fail as written: you'd get read errors, or \"Cannot find module\". BIN needs to be an absolute path, or the files need temp-dir paths.",
+  "model": "claude-opus-5-5",
+  "ms": 10416,
+  "tokens": {
+    "input": 2,
+    "output": 910,
+    "cacheCreation": 5645,
+    "cacheRead": 783,
+    "fresh": 6557,
+    "total": 7340
+  },
+  "at": "2026-11-05T08:41:46.362Z"
+}

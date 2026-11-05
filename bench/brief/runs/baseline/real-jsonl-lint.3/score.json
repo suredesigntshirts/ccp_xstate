@@ -3,7 +3,7 @@
   "run": "real-jsonl-lint.3",
   "case": "real-jsonl-lint",
   "judgeModel": "claude-opus-5-5",
-  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
   "criteria": {
     "returned": {
       "by": "mechanical",
@@ -24,6 +24,11 @@
       "by": "mechanical",
       "met": true,
       "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for e\""
     },
     "words-only": {
       "by": "judge",
@@ -47,6 +52,12 @@
       "by": "judge",
       "met": true,
       "why": "I checked every verifier PASS/FAIL condition against its expect line. None is stricter than its line. Check 1 asks only for the `<path>:<n>: ` prefix followed by \"non-empty error text\", with no exact wording. Check 2 asks only for \"non-empty stderr\" and exit 2. Check 3 checks the shape, not the message. Check 6 checks what the line itself asks for. No check sets branch-name rules, mutation tests or limits on which files the PR may touch. The shebang, file mode, lock file and CRLF checks are marked Advisory, so they do not decide PASS or FAIL. The behaviour lines are checked by running things: checks 1 and 2 run the bin on fixtures, check 3 imports the module and calls it, and check 4 runs `npm test` while looking at the tests. Only checks 4 and 5 read files directly, and those lines describe file contents. The builder brief's extras, such as `private` and `engines`, are build instructions, not PASS/FAIL conditions.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with every verifier check and found none of the verifier's methods in it. The builder never sees the verifier's fixtures: no clean.jsonl, bad.jsonl (errors on lines 3 and 5), torn `{\"a\":1}\\n{\"b\":` or blank.jsonl, and no expected outputs for them. It also doesn't get Check 3's inline `node --input-type=module -e` script, the `grep -n jsonl-lint README.md` probe, the `gh pr list --search` command or any PASS/FAIL wording. The builder's example `{\"a\":` and its test list describe what to build or restate expect line 4. They don't copy verifier probes. The commands it gives are allowed: `npm ci && npm test`, waiting for the test workflow, writing its own tests and running the bin by hand. Several items overlap the verifier's advisory notes: the shebang, mode 100755, the lockfile and stripping `\\r`. These read as requirements, not a checker's commands or conditions.",
       "cached": true
     }
   }

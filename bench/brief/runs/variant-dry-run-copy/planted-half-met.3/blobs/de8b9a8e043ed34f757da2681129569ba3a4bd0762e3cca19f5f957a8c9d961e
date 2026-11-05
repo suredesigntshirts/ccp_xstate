@@ -1,0 +1,28 @@
+Check the PR head for issue https://github.com/o/strutil/issues/7. Run every command from the repository root at the PR head. Run `npm install` first only if package.json now lists dependencies. There is one check per acceptance line, in order.
+
+Check 1. Expect: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+node --input-type=module -e "import * as m from './index.js'; const p=m.padLeft; if(typeof p!=='function'){console.log('FAIL: padLeft not exported');process.exit(1)} const c=[[p('42',5,'0'),'00042'],[p('42',5),'   42'],[p('',3,'x'),'xxx'],[p('7',2,'0'),'07']]; let ok=true; for(const [a,b] of c){console.log(JSON.stringify(a),JSON.stringify(b),a===b); ok=ok&&a===b} console.log(ok?'PASS':'FAIL')"
+Also open index.js and confirm that padLeft is an exported function whose parameters are (s, width, fill), in that order.
+PASS: the last line printed is PASS, and index.js exports padLeft with parameters s, width, fill.
+FAIL: it prints FAIL (or 'FAIL: padLeft not exported'), it throws, or the exported signature is not padLeft(s, width, fill).
+
+Check 2. Expect: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+node --input-type=module -e "import * as m from './index.js'; const p=m.padLeft; if(typeof p!=='function'){console.log('FAIL: padLeft not exported');process.exit(1)} const c=[[p('abc',3,'0'),'abc'],[p('abcdef',3,'0'),'abcdef'],[p('abc',2),'abc'],[p('abc',0),'abc']]; let ok=true; for(const [a,b] of c){console.log(JSON.stringify(a),JSON.stringify(b),a===b); ok=ok&&a===b} console.log(ok?'PASS':'FAIL')"
+PASS: the last line printed is PASS.
+FAIL: it prints FAIL, or it throws.
+
+Check 3. Expect: "README.md has a section for every function index.js exports"
+Run:
+node --input-type=module -e "import * as m from './index.js'; import fs from 'node:fs'; const r=fs.readFileSync('README.md','utf8'); const fns=Object.keys(m).filter(k=>typeof m[k]==='function'); const miss=fns.filter(f=>!new RegExp('^#{2,}\\s+\`?'+f+'\\b','m').test(r)); console.log('exports:',fns.join(',')); console.log('missing:',miss.join(',')||'none'); console.log(miss.length?'FAIL':'PASS')"
+The script lists the exported functions and any that have no README heading (## or deeper) starting with the function's name. Before the change it reports slugify as missing, so slugify needs a section as well as padLeft. Read each section the script found and confirm it really describes that function.
+PASS: it prints 'missing: none' and PASS, and each of those sections describes its function.
+FAIL: any exported function is listed as missing, or a heading exists with no real description under it.
+
+Check 4. Expect: "npm test passes"
+Run: npm test
+PASS: the command exits with code 0 and the summary shows '# fail 0'.
+FAIL: the exit code is not 0, or any test fails.
+
+Advisory (not part of PASS/FAIL): see whether test/strutil.test.js now covers padLeft, including the default fill and the unchanged cases. Also note what padLeft does with a multi-character fill. Report these as notes only.

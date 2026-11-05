@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "16f43d3bd36a8a9b3c471cc439c029c2d1de56e6522d90a2232ccae876fc930f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for probes that appear in both. Builder step 5 tells the builder to run `printf 'name,age\\nann,30\\nbob,41\\n' | node bin/csv2json.js` and `printf 'name\\tage\\nann\\t30\\nbob\\t41\\n' | node bin/csv2json.js --tsv` and to confirm the outputs match. That is the same pair of inputs and the same comparison as verifier Check 1, so the builder is handed the checker's probe. The expect line only names the command, not these inputs, so the allowance for commands named by expect lines doesn't cover them. Builder step 3 also uses the input/output pair 'a,b\\n1,2\\n' → [{\"a\":\"1\",\"b\":\"2\"}], which shows up in the verifier's advisory check. The README step and the npm test instruction are fine. Because of step 5, the builder brief carries a verifier probe, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 13424,
+  "tokens": {
+    "input": 2,
+    "output": 669,
+    "cacheCreation": 2650,
+    "cacheRead": 783,
+    "fresh": 3321,
+    "total": 4104
+  },
+  "at": "2026-11-05T08:57:23.585Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "f1c895c66731376cc36e104cc1814aac773a2d03a34f757154e00510ca016b04",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Items 2 and 3 are met. Builder step 4 replaces the 'bad JSON throws' test so that npm test can pass. Verifier Check 1 runs loadConfig on `{port: 9000` and PASSes on `{}` with no throw. Item 1 is not met. No brief says that the line-1 fix hides the broken file the issue wants surfaced. Builder step 3 offers an optional stderr warning that \"serves the issue's aim\", but it never says the fix works against that aim. Builder step 5 tells the builder to document that the app \"starts with its defaults\" as the new behaviour. The verifier advisory says app.js \"should start on the default port 8080\", which treats it as the expected result, not as a warning that src/app.js will stop printing 'bad config'. That conflict is never stated as a note or advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 9013,
+  "tokens": {
+    "input": 2,
+    "output": 652,
+    "cacheCreation": 2859,
+    "cacheRead": 783,
+    "fresh": 3513,
+    "total": 4296
+  },
+  "at": "2026-11-05T08:57:48.346Z"
+}

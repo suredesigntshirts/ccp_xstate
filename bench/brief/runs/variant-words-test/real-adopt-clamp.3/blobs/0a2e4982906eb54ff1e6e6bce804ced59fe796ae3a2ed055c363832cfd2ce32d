@@ -1,0 +1,26 @@
+Check out the PR head and run every check from the repository root. Give each check PASS or FAIL with the evidence (the commands you ran and their output).
+
+Check 1. Expect line: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi".
+Run: node -e "const m=require('./math.js'); console.log(typeof m.clamp, m.clamp(-5,0,100), m.clamp(140,0,100), m.clamp(42,0,100), m.clamp(0,0,100), m.clamp(100,0,100), m.clamp(-3,-10,-1), m.clamp(2.5,1,3))"
+PASS: typeof is 'function' and the results are 0 100 42 0 100 -3 2.5. In other words, values below lo give lo, values above hi give hi, and values inside the range (including the endpoints) come back unchanged.
+FAIL: clamp is missing or is not a function, the call throws, or any of those results is different.
+
+Check 2. Expect line: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi".
+Run: node -e "const {clamp}=require('./math.js'); for (const a of [[5,10,0],[0,1,-1],[50,100,0]]) { try { clamp(...a); console.log('no throw', a); } catch(e) { console.log(e instanceof RangeError, e.constructor.name); } }"
+PASS: all three calls throw, and each line prints 'true RangeError'.
+FAIL: any call returns without throwing, or throws something that is not a RangeError.
+
+Check 3. Expect line: "README.md documents every function math.js exports".
+Run: node -e "console.log(Object.keys(require('./math.js')).filter(k=>typeof require('./math.js')[k]==='function').join(' '))" to list the exported functions. Then open README.md and look for documentation of each one.
+PASS: every exported function name printed (which should include add, subtract, multiply and clamp) appears in README.md with a description of what it does.
+FAIL: any exported function is not documented in README.md. For example, subtract is exported but missing from the README.
+
+Check 4. Expect line: "npm test passes".
+Run: npm test
+PASS: the command exits with status 0 and reports no failing tests.
+FAIL: the exit status is not 0, or any test fails.
+
+Advisory (does not affect PASS or FAIL):
+- Check that test/math.test.js now includes tests for clamp, both for clamping and for the RangeError.
+- Ideally each function has its own heading under README.md's '## API' section.
+- Check that lo === hi returns that value, e.g. clamp(7,3,3) === 3.

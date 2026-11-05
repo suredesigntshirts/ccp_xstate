@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.2",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS/FAIL conditions with the words of its expect line. Checks 1, 2 and 4 hold. Check 1 only tests that clamp is exported and clamps values. Check 2 only tests that a RangeError is thrown when lo > hi. Check 4 only needs `npm test` to exit 0. Check 3 breaks the criterion. Its PASS needs \"the script reports nothing missing\", and the script counts a function as documented only if README.md matches the regex `\\bname\\s*\\(`, meaning the name followed by a parenthesis. \"README.md documents every function math.js exports\" does not require that format. For example, a README entry like \"subtract — returns a minus b\" documents subtract but would fail. That is an exact-wording rule the words don't force, and it sits in a PASS/FAIL condition instead of under Advisory.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs. Most of them are fine. `npm test` maps to `node --test`. The builder's `node -e \"...Object.keys(m)...\"` is valid, and verifier checks 1 and 2 are valid JS inside double quotes.\n\nVerifier check 3 fails. Its script sits inside double quotes and builds `new RegExp('\\\\b'+n+'\\\\s*\\\\(')`. In bash double quotes, `\\\\` becomes `\\`, so node receives `'\\b'+n+'\\s*\\('`. In JS, `'\\b'` is a backspace character, `'\\s'` is just `s`, and `'\\('` is just `(`. The pattern therefore becomes `<backspace>adds*(`. That pattern has an unterminated group, so `new RegExp` throws a SyntaxError on the first export. The check errors out whatever README.md contains, which means this command does not run as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and each one is handled.\n\n1. The builder brief's step 2 says to add \"a `### subtract(a, b)` entry\" next to the clamp entry. It also notes that subtract is \"exported but NOT documented.\"\n2. Verifier Check 3 gets the exports at the PR head with Object.keys and says they include \"at minimum ... add, subtract, multiply, clamp.\" It FAILs if \"any exported function (note subtract was previously undocumented) has no README entry.\"\n3. Verifier Check 2 calls clamp with lo > hi in three cases, sets ok=e instanceof RangeError, and FAILs if a call \"throws something that is not a RangeError.\"\n\nThere is one possible flaw. Check 3's regex '\\\\b' sits inside a shell double-quoted string, so the shell may collapse it to '\\b' and the script could error out. If it does, the check produces a false FAIL. It does not let a missing subtract entry slip through, and the manual README read still covers it.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 is avoided. Check 3 reads the export list from math.js and requires a README match for each function, and its FAIL condition names subtract. A README that documents clamp but not subtract therefore fails. Checks 1, 2 and 4 stay within their lines: there is no exact error message, no parameter count, and boundary or float cases are still covered by \"limited to the range\". Item 2 breaks in Check 3. Its PASS needs \"the script reports nothing missing\", and the script matches each name only with the regex `\\bname\\s*\\(`, so the name must be followed by an opening parenthesis. A README that documents subtract in another valid form, such as a table row \"| `subtract` | returns a minus b |\" or \"`subtract` — subtracts b from a\", would FAIL. That makes the check depend on a specific README format, which is stricter than \"README.md documents every function math.js exports\".",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief contains probes taken from the verifier brief. Step 1 lists exact input/output pairs: \"clamp(-5, 0, 100) === 0, clamp(140, 0, 100) === 100, clamp(50, 0, 100) === 50, and lo === hi is allowed\". The first three cases are, word for word, the first three cases in Check 1's script ([-5,0,100,0],[140,0,100,100],[50,0,100,50]), so the builder gets the checker's own test vectors. Step 4 also gives the builder an inline `node -e` script that runs Object.keys over math.js and compares the names against README headings. That is essentially the probe in Check 3 (exported names checked against README.md). Telling the builder to run `npm test` and write its own tests is allowed, but these shared inputs/expected outputs and the near-copy of the README probe break the criterion.",
+      "cached": true
+    }
+  }
+}

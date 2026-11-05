@@ -1,0 +1,13 @@
+Criteria the build must meet (from the issue, word for word):
+- node bin/greet.js --shout <name> prints the greeting in upper case
+- without --shout the output is unchanged
+- docs/index.md documents --shout
+- after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout
+
+Steps:
+1. Read bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md, README.md and .github/workflows/pages.yml. The CLI currently takes the first argument that does not start with `--` as the name and prints `Hello, <name>!` followed by a newline. The pages workflow publishes the `docs/` directory to https://o.github.io/greet-cli/ on every push to main.
+2. In bin/greet.js, detect a `--shout` argument (it may come before or after the name). When present, print the same greeting converted to upper case (e.g. `node bin/greet.js --shout Ada` prints `HELLO, ADA!` and a newline). Keep the name lookup so `--shout` is never taken as the name. When `--shout` is absent, the output must be byte-for-byte what it is today (`Hello, Ada!\n` for `Ada`), and the usage error with exit code 2 for a missing name must stay as it is.
+3. Add tests to test/greet.test.js covering: `--shout Ada` gives `HELLO, ADA!\n`; `Ada --shout` gives the same; plain `Ada` still gives `Hello, Ada!\n`. Keep the existing tests unchanged.
+4. Update docs/index.md to document the `--shout` flag: show the usage `node bin/greet.js --shout <name>` and say that it prints the greeting in upper case (e.g. `HELLO, <NAME>!`). Keep the existing content about the plain form. Because the pages workflow publishes `docs/` as-is, this change to docs/index.md is what makes the published page list `--shout` once the PR is merged to main and the workflow runs; do not change the workflow.
+5. Run `npm test` and confirm every test passes. Also run `node bin/greet.js --shout Ada` and `node bin/greet.js Ada` by hand and check the outputs.
+6. Open one pull request with these changes. In the PR description, state plainly that the last criterion (the published docs page listing --shout) can only be confirmed after merge, once the pages workflow has deployed; do not claim it as met before then.

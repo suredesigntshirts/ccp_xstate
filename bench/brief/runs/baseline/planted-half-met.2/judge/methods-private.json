@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "80a1bc5230ce0421774f761e1998c3eb3f267f9ee8d746a2ed8e6f57b6853ca6",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief repeats the verifier's probes. Step 2 gives padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42', and step 4 asks for tests on those cases. Verifier Check 1 tests the same inputs and expects \"00042\" and \"   42\", so the builder gets the checker's input/output pairs, not just the bar. Step 5 also has an inline script (node -e \"import('./index.js').then(m=>console.log(Object.keys(m)))\") and asks the builder to confirm each export has a README heading. That is Check 3's method, and no expect line or issue proof names this command. Running npm test and writing its own tests are allowed, but these shared probes break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 10933,
+  "tokens": {
+    "input": 2,
+    "output": 908,
+    "cacheCreation": 3213,
+    "cacheRead": 783,
+    "fresh": 4123,
+    "total": 4906
+  },
+  "at": "2026-11-05T08:29:04.099Z"
+}

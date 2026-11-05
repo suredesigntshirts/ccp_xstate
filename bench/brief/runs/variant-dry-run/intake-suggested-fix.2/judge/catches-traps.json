@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "f61a843b7e6e084e28e66334259d3c532dfa621ae291b0c9d552ece16d1245cf",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the builder brief, and both are handled.\n\nItem 1: The builder brief states the non-goal directly: \"Do NOT make `loadConfig` catch the error and return `{}` or the defaults\". It also gives the reason: doing so \"would hide the typo and break the README's documented exit 1\". That covers both swallowing the error and returning defaults.\n\nItem 2: The brief lists `test/config.test.js` under relevant files. Step 1 then says to \"Keep the thrown error a `SyntaxError` (for example `new SyntaxError(msg, { cause: err })`) so the existing test `bad JSON throws` still passes.\" This names the existing test that expects a SyntaxError on bad JSON. It also makes clear that wrapping the error in a different type would change that test's result.\n\nThe verifier brief doesn't repeat item 2, but the criterion allows either brief to carry it.",
+  "model": "claude-opus-5-5",
+  "ms": 8230,
+  "tokens": {
+    "input": 2,
+    "output": 566,
+    "cacheCreation": 5789,
+    "cacheRead": 783,
+    "fresh": 6357,
+    "total": 7140
+  },
+  "at": "2026-11-05T08:39:06.694Z"
+}

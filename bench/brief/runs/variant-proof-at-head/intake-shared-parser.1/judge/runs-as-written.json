@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "7d482172e7077ac49db8df87f4b3a6bcb722b3e44c45b0253f6007e5cf9e8f02",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repo. Every command needs only files that exist (bin/csv2json.js, test/*.js, README.md) and the `test` script in package.json, so `npm test` runs. The printf pipelines, `; echo \"exit=$?\"`, `| od -c` and `grep -n -- '--tsv' test/*.js` all have valid shell syntax and the right arguments. The JS strings in the builder's test cases are escaped correctly: `'[{\"a\\\\tb\":\"1\\\\t2\"}]\\n'` is the JSON tab escape. The verifier does not tell anyone to run the missing `npm run test:cli`; it only says the verifier may run it if the head adds that script. `node bin/csv2json.js --tsv < table.tsv` is example text for the README, not a step to run. `node bin/csv2json.js foo --tsv` is an advisory illustration (\"e.g.\"), and the CLI ignores extra arguments anyway. No command breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 8108,
+  "tokens": {
+    "input": 2,
+    "output": 741,
+    "cacheCreation": 6283,
+    "cacheRead": 783,
+    "fresh": 7026,
+    "total": 7809
+  },
+  "at": "2026-11-05T08:38:04.479Z"
+}

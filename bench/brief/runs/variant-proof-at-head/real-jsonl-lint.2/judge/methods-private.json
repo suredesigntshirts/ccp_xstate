@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "af0d22f27f25583fcb7445f3cdacc57bf689842a3fd993ba750c90c603b4fe61",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every verifier check. The builder brief never uses the verifier's probe inputs. It doesn't include clean.jsonl `{\"a\":1}\\n{\"b\":2}\\n`, bad.jsonl with lines 3 and 5 expected, the whitespace-only blank.jsonl, or the inline `node --input-type=module -e \"import {lint}...\"` script with `lint('{\"a\":1}\\n{bad\\n')`. It also has no PASS or FAIL wording. Its torn-row example `{\"a\":` is not the verifier's `{\"d\":` file. It does state requirements: CRLF stripping, no phantom blank row at the end, and the 0/1/2 exit codes with stderr output. These describe the bar from the expect lines, not the verifier's checks. The commands it gives are allowed: `npm ci && npm test`, waiting for the `test` workflow, and the tests the builder writes itself. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 7929,
+  "tokens": {
+    "input": 2,
+    "output": 725,
+    "cacheCreation": 4740,
+    "cacheRead": 783,
+    "fresh": 5467,
+    "total": 6250
+  },
+  "at": "2026-11-05T08:43:33.486Z"
+}

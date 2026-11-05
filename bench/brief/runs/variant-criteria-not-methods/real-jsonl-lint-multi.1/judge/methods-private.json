@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "5fb21276ce5801642b0e3e5e389c9b8c3dcab0225d35096ec04b7f8c65f85e0d",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder's Step 4 test list with the verifier's checks. Asking the builder to write its own tests is allowed. Here, though, the brief prescribes the verifier's own probe scenarios with their expected outcomes, beyond what the expect lines require:\n- \"a missing file among good ones (put it in the middle, and also a case with a bad file alongside it): exit 2, stderr names the missing file…\" matches Check 3 (d) `c1 missing c2` and (e) `b1 missing b2`.\n- \"several bad files: output appears in argument order\" matches Check 1's reordered runs.\n- \"`-` mixed with a named file\" matches Check 2's `c1.jsonl - < b2.jsonl`.\n- \"stdout holds only the bad file's lines … matching `lint()` of its text\" is Check 1's way of computing the expected output.\n- \"check this up front, before reading anything\" repeats the verifier's Advisory.\n\nThese hand the builder the checker's inputs, expected outputs and PASS conditions, so the builder brief does not keep the verifier's methods private.",
+  "model": "claude-opus-5-5",
+  "ms": 10614,
+  "tokens": {
+    "input": 2,
+    "output": 1063,
+    "cacheCreation": 5376,
+    "cacheRead": 783,
+    "fresh": 6441,
+    "total": 7224
+  },
+  "at": "2026-11-05T08:42:28.884Z"
+}

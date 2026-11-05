@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "2d35937d39faa9fdbb6150bb6cf1ef6891c7acd01a9cc200e68005cd3eed6266",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Item 1: The builder brief says \"Do NOT make `loadConfig` swallow the error or return `{}`/defaults.\" This fully covers it. Item 2: Builder step 1 says to throw a new error, with \"a SyntaxError is a good choice, so the existing test `bad JSON throws` that asserts `SyntaxError` still passes\". That sentence doesn't name the file. But \"Relevant files\" names `test/config.test.js` as the node:test file, and step 4 adds tests to that file. So the brief points to the test and its SyntaxError assertion. It also makes clear that wrapping the error in a non-SyntaxError type would break that test. The verifier's advisory section repeats the point (\"the original `bad JSON throws` test asserts that\"). Both items are handled.",
+  "model": "claude-opus-5-5",
+  "ms": 15414,
+  "tokens": {
+    "input": 2,
+    "output": 828,
+    "cacheCreation": 5724,
+    "cacheRead": 783,
+    "fresh": 6554,
+    "total": 7337
+  },
+  "at": "2026-11-05T08:39:01.447Z"
+}

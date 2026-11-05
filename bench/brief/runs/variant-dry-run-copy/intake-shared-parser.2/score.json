@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "intake-shared-parser.2",
+  "case": "intake-shared-parser",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 2 is not quoted word for word: \"With --tsv, commas inside a field stay literal: `printf 'name\\\\tnote\\\\nx\\\\thello, w\""
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6, 7 not quoted word for word in the builder brief: \"`printf 'a\\\\tb\\\\n1\\\\t2\\\\n' | node bin/csv2json.js --tsv` prints exactly `[{\\\"a\\\":\\\"1\\\",\\\"\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion is met. I checked the PASS and FAIL conditions of all seven verifier checks against their expect lines.\n\n- **Checks 1–5:** each compares `od -c` bytes with the exact expected string plus a newline. Check 1 also requires `exit=0`. This is what \"prints exactly … followed by a newline\" asks for. In Check 5, the `\\\\t` in printf produces the JSON escape the expect line describes.\n- **Check 6:** requires `npm test` to exit 0 and at least one test that runs `bin/csv2json.js` with `--tsv` on input with tabs and \"asserts on what it prints\". The line ruling out tests that only call `parse()` follows from the words \"runs bin/csv2json.js\".\n- **Check 7:** requires only that the README documents `--tsv` with an example invocation. `node bin/csv2json.js --tsv < table.tsv` is given as \"such as\", not as required wording.\n\nEverything stricter is under \"Advisory\": flag position, unchanged `src/parse.js`, no non-goal features, and keeping the CSV example. No PASS or FAIL condition goes beyond the words.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the 6 tracked files and the scripts in package.json. The files named all exist: bin/csv2json.js, test/*.js (test/csv.test.js) and README.md. Both briefs run `npm test`, which maps to `node --test`. They avoid the issue's `npm run test:cli`, which doesn't exist. The shell syntax is valid, including the `[ \"$(… | od -c)\" = \"$(printf '…' | od -c)\" ] && echo PASS || echo FAIL` comparisons. In Check 5, `'[{\"a\\\\tb\":\"1\\\\t2\"}]\\n'` correctly makes printf output a literal backslash-t, which matches the JSON escape. None of the printf format strings contains a stray %. The builder's JavaScript `execFileSync('node', ['bin/csv2json.js', '--tsv'], { input, encoding: 'utf8' })` and `JSON.stringify([{ 'a\\tb': '1\\t2' }]) + '\\n'` are valid. `node bin/csv2json.js --tsv < table.tsv` is example text for the README, not a command to run. The advisory `node bin/csv2json.js x --tsv` is just an example of the flag appearing among other arguments. Every command would run as written.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "Both must_catch items are handled.\n\nItem 1: The builder brief keeps the CSV path safe. It says to add tests to test/csv.test.js and \"Keep the existing tests\". It also says \"npm test, which must exit 0\", so the existing CSV tests must keep passing. Without the flag it says to call \"parse(text) exactly as today\", and that \"src/parse.js should not need changes\". Step 4 also checks the CSV behaviour: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` -> [{\"a\":\"1\",\"b\":\"2\"}].\n\nItem 2: Check 6 in the verifier brief runs \"npm test; echo \\\"exit=$?\\\"\", as expect line 6 says. It does not use proof 6's undefined `npm run test:cli` anywhere.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both briefs against the two must_not items. 1) The verifier's Check 6 runs `npm test; echo \"exit=$?\"`, not `npm run test:cli`. No check anywhere uses test:cli, so no PASS or FAIL depends on it, even though the issue's proof suggests it. 2) The builder brief never asks for a general separator option. It says the opposite: \"don't add --help, a --sep/--delimiter option, auto-detection or quoting rules.\" The verifier's advisory section also lists --sep as a non-goal to point out. Both items on the list are avoided across the whole output.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with every verifier check. The verifier's own probes, the `od -c` byte comparisons with `&& echo PASS || echo FAIL`, never show up in the builder brief. Step 4's printf commands and expected outputs are the commands the expect lines and proofs name, which is allowed. Step 2's test cases are tests the builder writes itself, also allowed, and their inputs and outputs come from the expect lines. Step 3's README example `node bin/csv2json.js --tsv < table.tsv` and \"tab-separated input\" match proof 7's wording (\"of the form node bin/csv2json.js --tsv < file\"). They do not come from a verifier-only condition, and Check 7 mentions that example only with \"such as\". The brief has no PASS/FAIL wording and none of the verifier's FAIL rules, such as \"A test that only calls parse() directly... does not count\". \"src/parse.js should not need changes\" also appears in the verifier's advisory list, but that list never decides PASS or FAIL. So the criterion holds throughout.",
+      "cached": false
+    }
+  }
+}

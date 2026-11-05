@@ -1,0 +1,49 @@
+Check the pull request for https://github.com/suredesigntshirts/ccp_machine_test/issues/104 at its head commit. Check out the head, run `npm ci` at the repository root, and run each check below in order. For the CLI checks, make a temporary directory with these files: a.jsonl = `{"a":1}\n{"b":2}\n` (clean), b.jsonl = `{"c":3}\n` (clean), bad.jsonl = `{"a":1}\n{oops}\n` (bad row 2). BIN = packages/jsonl-lint/bin/jsonl-lint.js. After every command, record stdout, stderr and the exit status (`echo $?`).
+
+Check 1. Expect line: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before".
+Run `node BIN a.jsonl bad.jsonl b.jsonl`, then `node BIN bad.jsonl a.jsonl bad2.jsonl`, where bad2.jsonl is a copy of bad.jsonl. Then run `node BIN bad.jsonl` on its own.
+PASS: in each multi-file run, every bad row of every named file appears as `<file>:<line>: <error>` with the file name as given. Output for an earlier argument comes before output for a later one: bad.jsonl's line before bad2.jsonl's. The single-file run prints `bad.jsonl:2: <error>`.
+FAIL: a file named after the first is not checked, a bad row is missing or in the wrong format, or the order does not follow the arguments.
+
+Check 2. Expect line: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)".
+Run `printf '{oops}\n' | node BIN -` and `printf '{"a":1}\n' | node BIN a.jsonl -`. Then run `printf '{"a":1}\n' | node BIN - -`.
+PASS: the first run prints a line beginning `-:1: `. The second run prints no problem lines. The `- -` run exits 2.
+FAIL: stdin is not read, it is reported under some name other than `-`, or `- -` does not exit 2.
+
+Check 3. Expect line: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)".
+Run:
+(a) `node BIN a.jsonl b.jsonl` — expect exit 0
+(b) `node BIN a.jsonl bad.jsonl b.jsonl` — expect exit 1
+(c) `node BIN` — expect exit 2
+(d) `node BIN a.jsonl missing.jsonl bad.jsonl` — expect exit 2, a non-empty stderr that mentions the error, and stdout still containing `bad.jsonl:2: ...`
+PASS: all four behave as expected.
+FAIL: any wrong exit status; (d) has nothing on stderr; or (d) does not report bad.jsonl.
+
+Check 4. Expect line: "lint(text) in src/index.js is unchanged".
+Run `git diff <merge-base with main>..HEAD -- packages/jsonl-lint/src/index.js` and read the file at the head.
+PASS: the lint function's signature and body are identical to the base.
+FAIL: the lint(text) function differs in any way.
+
+Check 5. Expect line: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage".
+Read the test files under packages/jsonl-lint/test/ at the head and run `npm test --workspace packages/jsonl-lint`. Read packages/jsonl-lint/README.md.
+PASS: there are node:test tests for each of these cases, and they pass:
+- two clean files
+- one bad file among several
+- stdin via `-`, clean
+- stdin via `-`, bad
+- a missing file among good ones
+- two `-` arguments
+- no arguments
+The README also documents multi-file usage, including `-`.
+FAIL: any of those cases has no test, a test fails, or the README does not document the new usage.
+
+Check 6. Expect line: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head".
+Run `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state`, `gh pr checks <pr>`, and `npm test` at the repo root.
+PASS: the body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`, the `test` workflow check passes at the head SHA, and `npm test` exits 0 locally.
+FAIL: any of these is missing or failing.
+
+Advisory (not pass/fail):
+- Check that the exact single-file output and stderr match the previous version.
+- Check that `- -` fails before reading stdin.
+- Check that an unreadable file plus a bad row exits 2, not 1.
+- Check that stderr for a missing file uses the `jsonl-lint: cannot read <file>: ...` form.

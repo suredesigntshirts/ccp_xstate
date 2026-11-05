@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "8312380ff037c2b631a78ba83317464a0c8717e5a98dbb8cbbf0c9d00f5e7320",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 4 hold. Check 1 tests that clamp is exported and returns the clamped value, including at the boundaries, and those values follow from \"x limited to the range lo to hi\". Check 2 tests RangeError when lo > hi. Check 4 tests only that `npm test` exits 0. The mutation test and the test-file and message-quality notes are correctly under Advisory.\n\nCheck 3 breaks the criterion. Its PASS condition says the printed export list \"must include at least add, subtract, multiply and clamp\". The line \"README.md documents every function math.js exports\" only requires that whatever math.js exports is documented. It does not require add, subtract or multiply to stay exported, and no other expect line does either. So a PR that dropped one of them and documented the rest would meet the words but fail this check. That stricter rule belongs under Advisory, not in PASS.",
+  "model": "claude-opus-5-5",
+  "ms": 10085,
+  "tokens": {
+    "input": 2,
+    "output": 919,
+    "cacheCreation": 3300,
+    "cacheRead": 783,
+    "fresh": 4221,
+    "total": 5004
+  },
+  "at": "2026-11-05T08:40:48.210Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "41dd857d07b264612ff70b84baa9557957eb4a00fb0068777a28313dcc5bcf05",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion fails at builder step 4. It tells the builder to run `diff <(printf 'name\\tage\\tcity\\nAda\\t36\\tLondon\\nBob\\t41\\tParis\\n' | node bin/csv2json.js --tsv) <(printf 'name,age,city\\n...' | node bin/csv2json.js) && echo SAME` and confirm it prints SAME. Check 1 in the verifier brief uses this exact diff, with the same Ada/Bob inputs, and its PASS condition is that the last line is SAME. So the builder gets the verifier's own probe and its PASS condition. The allowed cases don't cover it: the expect line only names `node bin/csv2json.js --tsv`, not this script with fixed inputs. It isn't the repo's own test command either. Telling the builder to run `npm test` and write its own test (step 3) is fine. Step 2's \"literal text `--tsv` must appear in README.md\" also hints at the verifier's grep in Check 2, but the shared diff probe is enough to fail the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 7339,
+  "tokens": {
+    "input": 2,
+    "output": 522,
+    "cacheCreation": 2838,
+    "cacheRead": 783,
+    "fresh": 3362,
+    "total": 4145
+  },
+  "at": "2026-11-05T08:57:52.890Z"
+}

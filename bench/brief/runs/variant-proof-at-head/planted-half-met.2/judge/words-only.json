@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "7363f7e05e66adcc3aa0952830e4c8157671a2e340d2400d1819b75ea809a22d",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Checks 1, 2 and 4 only test values and behaviour that their lines require. Check 3 breaks the criterion. Its PASS condition needs `missing: none` from a regex, `'^#+\\\\s*'+f+'\\\\b'`, that only matches a heading starting with the function's name. \"A section for every function\" doesn't require that heading format. The regex is also broken: bash double quotes turn `\\\\s` into `\\s` and `\\\\b` into `\\b`, and in a JS string those become a literal \"s\" and a backspace character. So even `## padLeft(s, width, fill)` would not match, and Check 3 would fail a README that meets the line. That makes the PASS condition stricter than the words, and it isn't under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 14456,
+  "tokens": {
+    "input": 2,
+    "output": 1312,
+    "cacheCreation": 3097,
+    "cacheRead": 783,
+    "fresh": 4411,
+    "total": 5194
+  },
+  "at": "2026-11-05T08:39:30.253Z"
+}

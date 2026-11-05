@@ -86,3 +86,68 @@ tokens. Past it, the item steps back with what was measured rather than running 
 - If the judge check disagrees with the hand grades on methods-private, its wording changes, never the judge's answer.
 - If a variant improves its target on the planted cases but loses it on the real ones, it is dropped: the real cases
   are the ones the bench exists to predict.
+
+## After the build (5 Nov)
+
+Decisions made while building, as the person's stand-in. Every set is 9 cases at k = 3 with claude-opus-5-5, scored
+by the same judge; reports and compares are in `bench/brief/reports/`, run sets in `bench/brief/runs/`, the variant
+files in `bench/brief/variants/`. Totals are runs met out of 27:
+
+| Criterion | baseline | dry-run | proof-at-head | words-test | criteria-not-methods | dry-run-copy | combined |
+|---|---|---|---|---|---|---|---|
+| one-check-per-line | 27 | 27 | 27 | 27 | 23 | 26 | 27 |
+| no-restated-rules | 27 | 26 | 27 | 27 | 26 | 26 | 27 |
+| builder-criteria | 18 | 20 | 12 | 19 | 27 | 20 | 12 |
+| words-only | 10 | 8 | 10 | 19 | 12 | 8 | 20 |
+| runs-as-written | 19 | 22 | 20 | 22 | 16 | 23 | 23 |
+| catches-traps | 20 | 23 | 22 | 20 | 18 | 21 | 20 |
+| avoids-must-not | 18 | 17 | 17 | 24 | 15 | 16 | 24 |
+| methods-private | 11 | 7 | 12 | 11 | 11 | 10 | 11 |
+
+returned and changes-nothing are 27 of 27 in every set.
+
+- **Judge check corrected, not the judge.** The judge failed methods-private on the 7 adopt-trial briefs that were
+  hand-graded met. It was right: their README examples and throws case are check 1's and check 2's own inputs. The
+  grades were corrected, `fixed-private` was added as a passing base, and the check agrees 11 of 11.
+- **A case corrected.** intake-shared-parser's first must_catch asked for the word "shared"; it now asks for the
+  outcome (the CSV path kept passing). One-check-per-line and builder-criteria now accept a quoted line whose double
+  quotes are escaped (`\"`), which intake-suggested-fix's lines force.
+- **words-test kept.** Its target, words-only, went from 10 to 19, and avoids-must-not from 18 to 24. No criterion is
+  worse.
+- **proof-at-head kept, with a trade accepted here.** It fixes the after-merge trap (catches-traps and avoids-must-not
+  on planted-after-merge 0 of 3 to 3 of 3), the failure the baseline report named first. It costs builder-criteria
+  (18 to 12) and one avoids-must-not run. Builder-criteria is new, and losing it means the builder gets lines in the
+  writer's words rather than quoted. That is worth less than a verifier that can never pass a PR with an after-merge
+  line.
+- **dry-run dropped, and so was dry-run-copy.** Both raise runs-as-written (to 22 and 23), but each loses words-only,
+  avoids-must-not and methods-private. dry-run also missed its own target case: in real-adopt-clamp the session ran a
+  correctly escaped regex and then wrote it into the brief with half the backslashes. The combined version reaches 23
+  on runs-as-written without either rule, and fixes real-adopt-clamp in 3 of 3.
+- **criteria-not-methods dropped.** It gets builder-criteria to 27 of 27, but its target methods-private does not
+  move (11), and one-check-per-line, runs-as-written, catches-traps and avoids-must-not all get worse.
+- **traps-named not run.** It was the conditional fifth candidate. The sets that were run, about 2.86M fresh stage tokens plus about 4.75M in judge sessions, left too little of the 9M step-back budget for another 27-run set and its judging. Its target, catches-traps on planted-missing-line, stays a next target (below).
+- **combined (words-test + proof-at-head) kept** as the new `workflows/quick-fix/brief.md`. Against the baseline it is
+  better on words-only (10 to 20), runs-as-written (19 to 23) and avoids-must-not (18 to 24). catches-traps is level
+  at 20: it gains the after-merge case and loses one run each on missing-line, prescribed-fix and jsonl-lint.
+  builder-criteria is worse (18 to 12), the trade accepted above.
+
+## The blind reads disagree
+
+Two blind reads by a fresh `claude -p` session in an empty folder, with no tools and no settings, prefer the baseline.
+The seed 1 read is 7 to 0 with 2 even, and the seed 2 read is 5 to 1 with 3 even
+(`bench/brief/reports/blind-combined/`, `blind-combined-seed2/`, each with its key). The reasons they give are the
+ones this rubric scores as faults. They prefer checks that are "more mechanical", that require exit 0 or one exact
+output string where the line names neither, and, on planted-after-merge, a verifier that fetches the live page and
+FAILs until merge. The reader is not told that a stricter check fails a good build and costs a rebuild, or that a PR
+whose after-merge line FAILs at its head can never pass. Those are the 4 Nov stage critique's findings, and they are
+why words-only and the after-merge case exist.
+
+Decided: keep the combined version on the scores, and record that the outcome's "a blind A/B read agrees" is not met.
+The blind read stays a check on taste, not a gate. The disagreement is real information, though: a reader without the
+harness's rules prefers strictness. The next refinement should either give the blind reader the stage's
+constraints (its Rules section), or test whether the scored criteria predict real-run outcomes, which is the
+prompt-refinement decision's own stop rule. One remark from both reads is worth its own variant: the baseline more
+often gives the verifier a script that fails on its own, where the combined version leaves more checks to reading.
+
+Next targets for the brief: builder-criteria and methods-private, the two new criteria no variant improved without
+losses, and catches-traps on planted-missing-line (1 of 3 and 0 of 3).

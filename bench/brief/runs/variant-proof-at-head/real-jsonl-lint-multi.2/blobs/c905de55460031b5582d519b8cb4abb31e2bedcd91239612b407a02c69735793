@@ -1,0 +1,37 @@
+Check the pull request for issue https://github.com/suredesigntshirts/ccp_machine_test/issues/104 at its head commit. Run `npm ci` at the repository root first. In the commands below, B is packages/jsonl-lint/bin/jsonl-lint.js. Make a scratch dir with clean files c1.jsonl (`{"a":1}\n`) and c2.jsonl (`[1]\n\n"x"\n`), and a bad file b.jsonl (`{"a":1}\n{bad}\n{"t":`). Then run one check per expect line, in order.
+
+Check 1. Expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before"
+Run `node B c1.jsonl b.jsonl c2.jsonl`. Then copy b.jsonl to b2.jsonl and run `node B b.jsonl b2.jsonl`.
+PASS: in the first run, stdout is exactly `b.jsonl:2: <msg>` and `b.jsonl:3: <msg>`, one per line, where each <msg> is the JSON.parse error for that row (compare with `node -e` printing lint() from packages/jsonl-lint/src/index.js). In the second run, all of b.jsonl's lines come before all of b2.jsonl's lines, each with the file name exactly as given.
+FAIL: a file is skipped, the order is wrong, the format differs, or a clean file prints anything.
+
+Check 2. Expect: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)"
+Run `printf '{bad}\n' | node B -`, `printf '{"a":1}\n' | node B -; echo $?`, and `printf '{}\n' | node B - c1.jsonl -; echo $?`.
+PASS: the first run prints `-:1: <msg>` and exits 1. The second run prints nothing and exits 0. The third run exits 2 with a message on stderr.
+FAIL: stdin is not read, the name is not `-`, or a second `-` does not exit 2.
+
+Check 3. Expect: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)"
+Run and record exit codes:
+- `node B c1.jsonl c2.jsonl` should exit 0.
+- `node B c1.jsonl b.jsonl` should exit 1.
+- `node B` (no args) should exit 2, with stderr not empty.
+- `node B c1.jsonl missing.jsonl b.jsonl` should exit 2. stderr must name missing.jsonl, and stdout must still contain the b.jsonl:2 and b.jsonl:3 lines.
+PASS: all four hold.
+FAIL: any one does not.
+
+Check 4. Expect: "lint(text) in src/index.js is unchanged"
+Run `git fetch origin main` and `git diff $(git merge-base origin/main HEAD) HEAD -- packages/jsonl-lint/src/index.js`. Also run `node --test packages/jsonl-lint/test/lint.test.js`.
+PASS: the lint function's body and signature have no diff, and the lint tests pass.
+FAIL: the lint function is changed.
+
+Check 5. Expect: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage"
+Read packages/jsonl-lint/test/*.test.js and run `npm test --workspace packages/jsonl-lint`. Read packages/jsonl-lint/README.md.
+PASS: the tests pass, and they include node:test cases for each of: two clean files, one bad file among several, `-` with clean stdin, `-` with bad stdin, a missing file among good ones, two `-` arguments, and no arguments. The README documents multiple file arguments and `-` for stdin.
+FAIL: any of those cases is missing, a test fails, or the README does not document this usage.
+
+Check 6. Expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head"
+Run `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state` and `gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test`. Run `npm test` at the repository root at the head.
+PASS: there is one open PR on that repo, and its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`. The `test` workflow check for the head commit succeeded, and the local `npm test` exits 0.
+FAIL: the closing line is missing, the workflow check is failing or missing at the head, or npm test fails.
+
+Advisory (not pass/fail): note whether a second `-` exits before printing any lint output, and whether an unreadable `-` or a directory argument is handled gracefully.

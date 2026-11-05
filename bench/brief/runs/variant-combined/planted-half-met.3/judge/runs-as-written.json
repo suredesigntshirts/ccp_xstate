@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "85b70b5957dc6e1c230c43aae98837098d0b92a76dfa2bc08b466243e443b906",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. The builder brief only runs `npm test`, and package.json defines that script as `node --test`. The verifier brief has three `node --input-type=module -e \"...\"` one-liners. Each is double-quoted for the shell, with single-quoted JS strings inside, so the quoting is valid. The JS is also valid: `import * as m from './index.js'`, `import {padLeft} from './index.js'`, the `JSON.stringify` arrays, and `Object.keys(m).filter(k=>typeof m[k]==='function')`. The `>` sits inside double quotes, so the shell won't treat it as a redirect. Relative imports in `--input-type=module` eval resolve against the working directory, and the brief says to run from the repo root, where index.js is tracked. index.js, README.md and test/strutil.test.js all exist at this commit. padLeft comes from the builder's earlier step. `npm test` is a real script. I found no command that would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 12989,
+  "tokens": {
+    "input": 2,
+    "output": 762,
+    "cacheCreation": 3001,
+    "cacheRead": 783,
+    "fresh": 3765,
+    "total": 4548
+  },
+  "at": "2026-11-05T08:56:13.111Z"
+}

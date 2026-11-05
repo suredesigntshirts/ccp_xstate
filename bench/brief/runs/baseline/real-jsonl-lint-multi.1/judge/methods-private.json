@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "93a93e6ddf41fb407b0565fc424546f444b059afa9f95a65e02d16e160a741d8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief against each verifier check. The builder brief repeats the issue's six expect lines word for word. The criterion allows that, since those lines are the bar. It does not include any of the verifier's own checks: no fixture contents (a.jsonl, bad.jsonl with bad rows on lines 2 and 4, bad2.jsonl), no `node -e` script that computes expected lines from lint(), no `git diff` against baseRefOid, no `gh pr checks` commands, and no PASS/FAIL wording. Some of its test cases overlap with verifier checks, such as \"two bad files to check that output follows argument order\" and \"add a bad file to the mix and assert its lines still appear\". These are tests the builder writes itself, which the criterion allows, and they come straight from expect lines 1, 3 and 5. They give no inputs or exact outputs. The rest is steps the builder is allowed to run: `npm test` and waiting for the test workflow. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 13695,
+  "tokens": {
+    "input": 2,
+    "output": 1116,
+    "cacheCreation": 5992,
+    "cacheRead": 783,
+    "fresh": 7110,
+    "total": 7893
+  },
+  "at": "2026-11-05T08:29:39.827Z"
+}

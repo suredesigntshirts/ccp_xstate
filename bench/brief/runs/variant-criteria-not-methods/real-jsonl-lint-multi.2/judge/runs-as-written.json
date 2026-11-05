@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "e115a19df2c620e9fa81362cc6abcaa25adf0abeebeeb0c6614475ff61bc6146",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the commands in both briefs. The builder's commands look runnable: the file paths exist, it uses `npm test` at the root, and `spawnSync` with `input` is valid Node. The verifier brief has a path conflict, though. It says \"Make a temp dir with fixtures\" (a.jsonl, b.jsonl, bad.jsonl), then sets the relative path `BIN=packages/jsonl-lint/bin/jsonl-lint.js` and runs `node $BIN a.jsonl bad.jsonl b.jsonl` and similar commands. If these run from the temp dir, the relative BIN path doesn't exist there. If they run from the repo root, a.jsonl, bad.jsonl and the other fixtures aren't there and can't be read. Either way, Checks 1–3 don't work as written. The brief needs an absolute BIN path or fixture paths that include the temp dir. Check 1 also uses bad2.jsonl, which only gets described in passing and is never made in the fixture step.",
+  "model": "claude-opus-5-5",
+  "ms": 8966,
+  "tokens": {
+    "input": 2,
+    "output": 830,
+    "cacheCreation": 5591,
+    "cacheRead": 783,
+    "fresh": 6423,
+    "total": 7206
+  },
+  "at": "2026-11-05T08:42:13.287Z"
+}

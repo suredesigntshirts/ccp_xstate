@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "8804ddd9b293ff3796f6d96cb4e5ecb8131399706db69084c52f977c64bb05fb",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1, 3 and 4 mostly stay within their wording: an exact upper-cased greeting, `--shout` in the docs with an explanation, and the live page listing `--shout`. Check 2 goes further. Its expect line says only \"without --shout the output is unchanged\", but its PASS condition also requires \"`npm test` reports `# fail 0`, including the original tests `greeting` and `cli`\". Those words don't require the test suite to pass. That belongs under Advisory, not in a PASS condition. Check 2 also requires the no-name run to exit with `rc=2`. An exit code is arguably not \"output\", so that is stricter too. Because Check 2's PASS/FAIL conditions include a test the words don't force, the criterion fails for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 9031,
+  "tokens": {
+    "input": 2,
+    "output": 712,
+    "cacheCreation": 3735,
+    "cacheRead": 783,
+    "fresh": 4449,
+    "total": 5232
+  },
+  "at": "2026-11-05T08:38:52.587Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "edd168b7250955d7668f91f8c25b0f45518fff715b59a3ce7eb3b0a758c0599e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Checks 3 and 4 hold: \"documents\" fairly implies saying what the flag does, and \"after merge\" justifies requiring the PR to be merged and the live page to be fetched. Check 1 goes beyond its words. PASS requires \"each `--shout` run exits 0\", and FAIL includes \"a `--shout` run exits non-zero\". \"prints the greeting in upper case\" says nothing about exit codes. Check 2 also goes beyond its words. Its expect line is about output, but PASS requires \"stdout, stderr and the exit code are identical\", and it adds the no-name usage case. An exit code is not output, so this is stricter than \"the output is unchanged\". These exit-code tests should be under Advisory, not in the PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 7574,
+  "tokens": {
+    "input": 2,
+    "output": 750,
+    "cacheCreation": 3327,
+    "cacheRead": 783,
+    "fresh": 4079,
+    "total": 4862
+  },
+  "at": "2026-11-05T08:38:45.152Z"
+}

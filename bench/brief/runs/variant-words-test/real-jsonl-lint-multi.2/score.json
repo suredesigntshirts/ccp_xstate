@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.2",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each check's PASS and FAIL conditions against its expect line. Checks 1, 2, 3, 5 and 6 stay within their words. Ordering, `-` naming, the exit codes, the error on stderr, the case list and \"green at its head\" all trace back to the lines. Check 4 breaks the criterion. Line 4 only says \"lint(text) in src/index.js is unchanged\", which a code diff settles. But the PASS condition also asks for a runtime comparison: \"the two outputs are identical\", taken from running lint on one sample input at the base commit and at the head. FAIL adds \"or the outputs differ.\" That behavioural test is something the words don't require, and it can fail even when lint's code is identical (for example, if a helper changed). It belongs under Advisory, not in the PASS or FAIL conditions.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository facts. Every file they name is tracked at this commit: bin/jsonl-lint.js, src/index.js, both test files, the README, .github/workflows/test.yml and package-lock.json (so `npm ci` works). `npm test` and `npm test --workspace packages/jsonl-lint` fit the scripts shown. `cd packages/jsonl-lint && node --test` is valid. The gh commands (`pr view --json body,headRefOid,state`, `pr list --search 104 --state all`, `pr checks --watch`) use real flags. `git diff $(git merge-base HEAD origin/main) HEAD -- …` and `git worktree add $T/base <sha>` are valid. In the `node -e \"import(...).then(m=>console.log(JSON.stringify(m.lint('{\\\"a\\\":1}\\n{bad\\n\\n3'))))\"` line, the shell quoting is valid and leaves valid JavaScript. The scratch file setup uses `mktemp -d` and `cp` correctly. Stdin redirections like `node $CLI - - < $T/good1.jsonl` are valid. Placeholders like `<pr>` stand for values the agent fills in. I found no command that would fail as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs handle all four must_catch items.\n1. Verifier Check 3 runs `node $CLI $T/good1.jsonl $T/missing.jsonl $T/bad.jsonl` in one command. It expects exit 2, an error on stderr and stdout still reporting `$T/bad.jsonl:2: ...`. That is the missing file and the bad row together, not each alone.\n2. Check 4 runs `git diff $(git merge-base HEAD origin/main) HEAD -- packages/jsonl-lint/src/index.js`. It also compares lint output against a worktree at the base commit, so \"unchanged\" is checked against the diff.\n3. Builder step 5 says \"Update `packages/jsonl-lint/README.md` to document the usage: several files, `-` for stdin...\".\n4. Check 6 reads the PR body with `gh pr view` and runs `gh pr checks`. It requires the body to contain the Closes line and the test workflow run for the head commit to have succeeded.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Neither must_not item shows up. Checks 1–3 (the behaviour lines) all run the program: `node $CLI` on temp files, stdin via `-`, `- -`, no arguments and a missing file. None of them passes on reading the diff. Their PASS/FAIL conditions match the issue lines. Check 3 only asks for \"an error message about the unreadable file\" on stderr, not exact wording. No check sets a branch-name rule, a mutation test or a limit on which files the PR may touch. Check 6 fails only if the change is \"split over several PRs\". The advisory section says outright that rejecting `- -` before reading and the exact usage wording \"are not required by the lines\". The builder brief's \"Rewrite only the CLI\" and \"e.g.\" message text are build guidance, not PASS/FAIL conditions. Check 4 reads the diff, but line 4 is not a behaviour line, and it also runs `lint` at head and at base to compare the outputs.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with every check in the verifier brief. The builder brief has no PASS or FAIL wording. It also contains none of the verifier's probes: no scratch-file contents such as `{\"a\":1}\\n{bad\\n3\\n`, no `node -e` lint comparison, no `git diff`/merge-base check, no `git worktree` base run and no grep. Its step 4 tells the builder to write its own node:test cases. The expectations given there (e.g. \"exit 2, stderr names the missing file, a bad row in another given file is still reported on stdout\", \"lines start with `-:`\") restate the issue's expect lines. They do not copy a verifier input set. The remaining commands are allowed: `npm test` and `gh pr checks --watch`, which the issue's proofs name. The builder brief gives the bar, not the checker's methods.",
+      "cached": true
+    }
+  }
+}

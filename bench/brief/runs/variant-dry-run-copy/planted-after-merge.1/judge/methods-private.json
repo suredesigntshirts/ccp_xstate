@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "cb5786c39fbc5d4dbbfb6d0ac45a6709703db0b8e43aa92404a0db34c0edbeaf",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier's checks, and several of the verifier's probes turn up in the builder brief. Step 1 gives the input and expected output of Check 1: \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\". Step 2 repeats both of Check 2's input/output pairs: \"`node bin/greet.js Ada` prints `Hello, Ada!\\n`\" and \"`node bin/greet.js 'Ada Lovelace'` prints `Hello, Ada Lovelace!\\n`\". Step 4 says \"The literal text `--shout` must appear in the file\", which is the pass condition of Check 3's grep. This gives the builder the checker's exact tests, not just the bar to meet. Telling the builder to run `npm test` and write its own tests is allowed, but these repeated probes break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 7736,
+  "tokens": {
+    "input": 2,
+    "output": 525,
+    "cacheCreation": 3253,
+    "cacheRead": 783,
+    "fresh": 3780,
+    "total": 4563
+  },
+  "at": "2026-11-05T08:55:46.207Z"
+}

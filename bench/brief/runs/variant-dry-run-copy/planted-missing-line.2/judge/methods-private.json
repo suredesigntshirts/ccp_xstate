@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "9a2106591887f5a67f3f52cc9172205017afbb2ab7c8282c51c25146d56bdd21",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief to see whether any check or probe appears in both. Step 4 of the builder brief contains a hand check: `printf 'name\\tage\\tcity\\nann\\t3\\tOslo\\nbob\\t40\\t\\n' | node bin/csv2json.js --tsv` \"should print exactly what\" `printf 'name,age,city\\nann,3,Oslo\\nbob,40,\\n' | node bin/csv2json.js` prints. That is the same input set and the same equality condition as the verifier's Check 1 probe and its SAME PASS condition. This is not just a command the expect line names. The expect line names `node bin/csv2json.js --tsv`, not these inputs and their comparison. So the builder brief gives away the checker's own probe. The other builder steps are allowed: running `npm test`, writing its own CLI test, and the README instruction, which doesn't mention the verifier's grep. Step 4 alone breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 7065,
+  "tokens": {
+    "input": 2,
+    "output": 510,
+    "cacheCreation": 2669,
+    "cacheRead": 783,
+    "fresh": 3181,
+    "total": 3964
+  },
+  "at": "2026-11-05T08:57:45.101Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "022fce707c7fd02d7805071cc4a2708eecc7b441e7a810a68ffdf93a6f5f37c2",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 3, 5 and 6 test only what their lines require. Check 1's two-bad-rows test follows from \"every row\". Check 3's \"line 2 for the bad row\" follows from the line numbering. The stricter items (mutation test, shebang/executable bit, CRLF, the lockfile) are under Advisory, as they should be.\n\nCheck 4 breaks the criterion. Its PASS condition includes \"npm test passes\" (run as `cd packages/jsonl-lint && npm test`), and its FAIL condition includes \"tests fail\". Expect line 4 only says the workspace has a package.json with the listed fields, no runtime dependencies, and node:test tests covering five cases. It says nothing about those tests passing inside the workspace. Passing tests are required only by line 6, and only for npm test at the PR head. So Check 4 adds a pass/fail test that line 4's words do not force, and it should have gone under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 13240,
+  "tokens": {
+    "input": 2,
+    "output": 1013,
+    "cacheCreation": 4708,
+    "cacheRead": 783,
+    "fresh": 5723,
+    "total": 6506
+  },
+  "at": "2026-11-05T08:42:01.726Z"
+}

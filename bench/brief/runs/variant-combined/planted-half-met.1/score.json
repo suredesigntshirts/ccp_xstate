@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.1",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the PASS and FAIL conditions of all four verifier checks against the words of their expect lines. Check 1 tests export, left padding, the default space fill and reaching width ('00042', '  ab', '**7'). The line's words require all of these, and the extra '*' example is still padding with fill. Check 2 tests only that s comes back unchanged when s.length >= width, including ('', 0). Check 3 asks for \"a heading that names that function with text under it\", which is a fair reading of \"a section\". Its slugify note follows from the repository facts and is not a stricter rule. Check 4 is just exit status 0 with no failing test. The stricter items (test coverage of padLeft, README wording, existing functions left as they were) appear only under \"Advisory (not part of PASS or FAIL)\". No PASS or FAIL condition includes a mutation test, a branch or file-scope rule, or exact wording.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for every command in both briefs. The builder brief only runs `npm test`, and package.json defines that script as `node --test`. The verifier brief runs `npm install`, which works with no dependencies, and `npm test`. Its three `node --input-type=module -e \"...\"` one-liners import './index.js', a tracked file, from the repo root. In each one-liner the JavaScript is valid: `import * as m`, `import { padLeft }`, `JSON.stringify(...)` and `Object.keys(m).filter(k => typeof m[k] === 'function').join(' ')`. The shell quoting is also safe. Double quotes wrap the code, single quotes are used inside, and there are no `$`, backticks or `!` that bash would expand. The arguments, such as `padLeft('', 0)` and `padLeft('7', 3, '*')`, match the planned signature. padLeft doesn't exist at the base commit, but the builder's step 1 adds it before any of these commands run.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items against the briefs, and each one is handled. (1) Builder step 3 says to \"add a `## slugify(s)` section ... and a `## padLeft(s, width, fill)` section\". The repository facts also warn that \"slugify has NO section yet\". (2) Verifier Check 3 lists the exported functions at the head (\"at least capitalize, slugify, truncate and padLeft\"). It FAILs if \"any exported function has no section of its own\" and notes that a PR adding only a padLeft section fails. (3) Verifier Check 1 calls `m.padLeft('ab', 4)` with no fill argument and expects \"  ab\" (two spaces). It FAILs on \"a fill other than a space when fill is not given\". No part of either brief contradicts these items.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Neither must_not item shows up in the briefs. Item 1: verifier Check 3 lists every exported function, including slugify. It fails the PR if \"any exported function has no section of its own.\" It also says outright that \"a PR that adds only a padLeft section fails this check.\" Item 2: none of the PASS/FAIL conditions goes beyond its line. Check 1 tests a multi-character-free fill ('*') and the default space, but never requires fill to be one character. Check 3 asks only for \"a heading that names that function with text under it.\" That is just what a section is, not a required layout like `## name(args)` or a fixed order. No check counts parameters. Check 2 tests only the unchanged result, and Check 4 only that the exit status is 0. The style guidance in the builder brief (\"keep them above ## Tests\") tells the builder what to do. It is not a verifier PASS/FAIL condition.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief's checks, and the criterion fails. Step 1 of the builder brief gives the exact inputs and expected outputs that Check 1 uses: \"padLeft('42', 5, '0') === '00042' and padLeft('ab', 4) === '  ab'\". Check 1 runs those same calls and passes only when it gets \"00042\" and \"  ab\". Step 2 also tells the builder to test exactly those cases. That is a shared probe (a set of inputs with expected outputs), which the criterion forbids. The builder brief also repeats Check 3's FAIL condition almost word for word: \"adding only padLeft will not meet the README line\" against \"a PR that adds only a padLeft section fails this check.\" Telling the builder to run `npm test` and write its own tests is allowed. The copied examples and the restated FAIL condition are not.",
+      "cached": false
+    }
+  }
+}

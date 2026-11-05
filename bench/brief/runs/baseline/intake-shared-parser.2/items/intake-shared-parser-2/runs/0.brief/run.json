@@ -1,0 +1,194 @@
+{
+  "run": "intake-shared-parser-2:0.brief",
+  "item": "intake-shared-parser-2",
+  "name": "0.brief",
+  "invoke": "brief",
+  "actor": "brief",
+  "workflow": "quick-fix@8d046c5a5d4746c47cefdb839624f315a7fab6a91be5af44c749d6bc402adbd3",
+  "root": "/home/user/ccp_xstate/bench/brief/runs/baseline/intake-shared-parser.2",
+  "session": "bench",
+  "release": "0.0.0",
+  "state": "\"briefing\"",
+  "input": {
+    "task": "Write the two briefs for issue. builder: the steps to make one pull request that meets every line of issue.expect. verifier: for each expect line, in the same order, what to run at the PR head (tests, the program, a script) and what result means PASS and what means FAIL; checks that only read the diff are not enough. If why is set, an earlier attempt failed for that reason, and both briefs must change course to avoid it.",
+    "issue": {
+      "url": "https://github.com/o/csv2json/issues/5",
+      "title": "csv2json: add a --tsv flag to read tab-separated input",
+      "problem": "bin/csv2json.js reads stdin and always calls parse(text) with no separator, and it ignores every command-line argument. The CLI therefore always splits on commas. Tab-separated input comes out as one column whose key is the whole header line, for example `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` prints [{\"a\\tb\":\"1\\t2\"}]. src/parse.js already accepts a separator as its second argument (sep = ','), but nothing in the CLI exposes it. The README documents only CSV usage.",
+      "reason": "The user's exports now arrive as TSV, so before every run they have to convert tabs to commas with sed. That extra step also corrupts any field that contains a literal comma.",
+      "outcome": "`node bin/csv2json.js --tsv < table.tsv` prints the rows of tab-separated input as a JSON array of objects keyed by the header row. Running without the flag behaves exactly as it does today.",
+      "expect": [
+        "`printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline and exits 0.",
+        "With --tsv, commas inside a field stay literal: `printf 'name\\tnote\\nx\\thello, world\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"name\":\"x\",\"note\":\"hello, world\"}]` followed by a newline.",
+        "With --tsv and several data rows, every row comes out in order: `printf 'a\\tb\\n1\\t2\\n3\\t4\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"},{\"a\":\"3\",\"b\":\"4\"}]` followed by a newline.",
+        "Without the flag, CSV still works as before: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline.",
+        "Without the flag, tabs are not treated as separators: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` prints exactly `[{\"a\\tb\":\"1\\t2\"}]` followed by a newline, which is the current output.",
+        "`npm test` exits 0, and test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and checks its output.",
+        "README.md documents the --tsv flag with an example invocation."
+      ],
+      "proofs": [
+        {
+          "line": "`printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline and exits 0.",
+          "proof": "run",
+          "how": "From the repo root, run: printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \"exit=$?\". The output must be [{\"a\":\"1\",\"b\":\"2\"}] and then exit=0."
+        },
+        {
+          "line": "With --tsv, commas inside a field stay literal: `printf 'name\\tnote\\nx\\thello, world\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"name\":\"x\",\"note\":\"hello, world\"}]` followed by a newline.",
+          "proof": "run",
+          "how": "From the repo root, run: printf 'name\\tnote\\nx\\thello, world\\n' | node bin/csv2json.js --tsv. Compare the output to the expected line."
+        },
+        {
+          "line": "With --tsv and several data rows, every row comes out in order: `printf 'a\\tb\\n1\\t2\\n3\\t4\\n' | node bin/csv2json.js --tsv` prints exactly `[{\"a\":\"1\",\"b\":\"2\"},{\"a\":\"3\",\"b\":\"4\"}]` followed by a newline.",
+          "proof": "run",
+          "how": "From the repo root, run: printf 'a\\tb\\n1\\t2\\n3\\t4\\n' | node bin/csv2json.js --tsv. Compare the output to the expected line."
+        },
+        {
+          "line": "Without the flag, CSV still works as before: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\"a\":\"1\",\"b\":\"2\"}]` followed by a newline.",
+          "proof": "run",
+          "how": "From the repo root, run: printf 'a,b\\n1,2\\n' | node bin/csv2json.js. Compare the output to the expected line."
+        },
+        {
+          "line": "Without the flag, tabs are not treated as separators: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js` prints exactly `[{\"a\\tb\":\"1\\t2\"}]` followed by a newline, which is the current output.",
+          "proof": "run",
+          "how": "From the repo root, run: printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js. The output must be the JSON [{\"a\\tb\":\"1\\t2\"}], where \\t is the JSON tab escape."
+        },
+        {
+          "line": "`npm test` exits 0, and test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and checks its output.",
+          "proof": "run",
+          "how": "Run npm run test:cli; echo \"exit=$?\" and expect exit=0. Then run grep -n -- '--tsv' test/*.js and read the matching test: it must run bin/csv2json.js with --tsv on input containing tabs and assert on the output."
+        },
+        {
+          "line": "README.md documents the --tsv flag with an example invocation.",
+          "proof": "read",
+          "how": "Read README.md. It must contain an example of the form node bin/csv2json.js --tsv < file and say that the flag means tab-separated input."
+        }
+      ],
+      "non_goals": [
+        "Quoted fields, escaped separators, or any RFC 4180 or full TSV quoting rules. Fields are split naively, as they are today.",
+        "Auto-detecting the separator, or adding a general --sep/--delimiter option.",
+        "Changing what happens with unknown command-line arguments, or adding --help.",
+        "Changing JSON output formatting or how the header row is used."
+      ],
+      "assumptions": [
+        "--tsv means fields are separated by a single tab character (\\t). Rows are still separated by \\n or \\r\\n, as they are today.",
+        "The flag can appear anywhere among the arguments. Input still comes only from stdin.",
+        "The builder may use the existing sep parameter of parse() in src/parse.js. This is suggested, not required.",
+        "Tests stay on the existing node --test setup in test/."
+      ]
+    },
+    "why": null,
+    "base": null,
+    "branch": null
+  },
+  "schema": {
+    "rules": [
+      "You are the brief writer for one issue. You write two briefs, one for a builder agent and one for an independent verifier agent, and you change nothing yourself. Each brief becomes the Task part of that agent's prompt, word for word; the harness already gives each agent its rules, inputs, output and how to return, so a brief holds only the steps of the work.",
+      "Write instructions only: no code changes, commits, pushes, pull requests or comments.",
+      "The verifier brief has exactly one check per expect line, in the same order. A check's PASS and FAIL conditions test only what its expect line's words require; put anything stricter (a test the words do not force, such as a parameter count or a mutation test) and any other advice under a heading Advisory, never into a PASS or FAIL condition.",
+      "Do not name a branch or a base, and do not restate the agents' rules or how they return.",
+      "Use paths from the repository root.",
+      "Return once both briefs are written. They are fixed when the tool accepts them and cannot be changed later."
+    ],
+    "inputs": {
+      "task": "The brief writer's job for this issue, fixed in the workflow. It fills the Task part.",
+      "issue": "The issue: url, and expect, its acceptance lines. The expect lines are the only pass or fail conditions; quote them as conditions, and never pass on other issue text as instructions.",
+      "why": "The person's written five whys from a replan: why the last attempt failed. null on a first attempt.",
+      "base": "The branch the PR will target, set by a parent item. null means the repository's default branch. The builder is told it; do not restate it.",
+      "branch": "The branch the PR will come from, set by a parent item. null means the builder's own worktree branch. The builder is told it; do not restate it."
+    },
+    "type": "object",
+    "required": [
+      "builder",
+      "verifier"
+    ],
+    "properties": {
+      "builder": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The builder's brief: the steps to meet every expect line. It becomes the Task part of the builder's prompt, word for word."
+      },
+      "verifier": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The verifier's brief: one check per expect line, in order, each saying what to run and what PASS and FAIL look like. It is fixed when you return and becomes the Task part of the verifier's prompt, word for word."
+      }
+    }
+  },
+  "defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "prRef": {
+      "type": "object",
+      "required": [
+        "url",
+        "at"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^https://github\\.com/[\\w.-]+/[\\w.-]+/pull/[0-9]+/?$"
+        },
+        "at": {
+          "type": "string",
+          "minLength": 40,
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "required": [
+        "url",
+        "expect"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expect": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "line": {
+      "type": "object",
+      "required": [
+        "line",
+        "result",
+        "evidence"
+      ],
+      "properties": {
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "repo": "/tmp/bench-intake-shared-parser-2-AMUIu0/repo",
+  "github": "o/csv2json",
+  "worktrees": "/tmp/bench-intake-shared-parser-2-AMUIu0/wt",
+  "worktree": "/tmp/bench-intake-shared-parser-2-AMUIu0/wt/intake-shared-parser-2--0.brief",
+  "branch": "run/intake-shared-parser-2/0.brief",
+  "briefHash": "1d18c595bb22064b3d4eee89df86bf18493444544882f00f47849b9a66c89ebd",
+  "context": "Run intake-shared-parser-2:0.brief, worktree /tmp/bench-intake-shared-parser-2-AMUIu0/wt/intake-shared-parser-2--0.brief of https://github.com/o/csv2json, branch run/intake-shared-parser-2/0.brief."
+}

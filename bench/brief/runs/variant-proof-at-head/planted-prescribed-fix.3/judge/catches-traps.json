@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "cd7edbaca1c123686ad8448826ffb11b02f3af5eb73044518fb0f4082a67498a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Items 2 and 3 are met, but item 1 is not. Item 2: builder step 3 replaces 'bad JSON throws' with a test that the result is deepEqual to {}, and the context says that test \"contradicts line 1 and must change\". Item 3: verifier Check 1 calls loadConfig on `{port: 9000` and PASSes on `{} 0 true` with no throw. Item 1: no brief says, in a note or under Advisory, that line 1's fix hides the broken file, or that src/app.js would start on defaults instead of printing 'bad config'. The builder brief works around it by adding a stderr warning and updating the README to say the app \"starts with the defaults\". The verifier Advisory only asks to \"Check whether the parse failure prints a warning… users need to know which file is broken\". Both assume the problem without stating it.",
+  "model": "claude-opus-5-5",
+  "ms": 18441,
+  "tokens": {
+    "input": 2,
+    "output": 1220,
+    "cacheCreation": 3243,
+    "cacheRead": 783,
+    "fresh": 4465,
+    "total": 5248
+  },
+  "at": "2026-11-05T08:41:30.720Z"
+}

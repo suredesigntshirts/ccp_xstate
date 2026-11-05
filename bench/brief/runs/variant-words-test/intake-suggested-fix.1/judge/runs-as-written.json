@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "8e7f46954ed0727f95ccffdd7809bfab694dc115899f37c6893f14bc19be8bf9",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the `node --test` script. The builder brief only runs `npm test` and `node src/app.js $d/c.json` or `ok.json`, and both files exist. In the verifier brief, Checks 1–3 copy the issue's proofs word for word. Their printf strings and the quoting of `'$d/b.json'` inside the double-quoted `-e` code are valid shell. Check 4 adds `import assert from 'node:assert/strict'` and `assert.deepEqual(v, {port: 9000})`, which is valid ESM because `--input-type=module` is set. Check 5 uses `git merge-base HEAD <default branch>`, `git worktree add`, `git checkout <base> -- src` and `npm test`. All are real git commands with correct arguments. The `<base>` and `<default branch>` placeholders are the same kind of placeholder the issue's own proofs use. I found no command that names a missing file, takes wrong arguments or has broken syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 9318,
+  "tokens": {
+    "input": 2,
+    "output": 779,
+    "cacheCreation": 5391,
+    "cacheRead": 783,
+    "fresh": 6172,
+    "total": 6955
+  },
+  "at": "2026-11-05T08:38:02.870Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "8a1775f7e575104fdc34be108ebea73b88b0ddd09fa57a786066ecdd78d56f20",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief's commands run as written: the files exist, and `npm test` and `node --test` match the package scripts. The verifier brief does not. It defines BIN as the relative path `packages/jsonl-lint/bin/jsonl-lint.js`, creates a.jsonl, bad.jsonl and the other fixtures in a separate scratch dir, then runs `node BIN a.jsonl bad.jsonl ...` and expects bare prefixes like `bad.jsonl:2: ...`. From the repo root the fixture files don't exist; from the scratch dir the relative BIN path doesn't exist. So Checks 1–3 can't run as written without the verifier rewriting the path. The other commands are valid: `npm ci` (lockfile present), git diff/merge-base, `node --test` on lint.test.js, and the gh calls with a PR placeholder.",
+  "model": "claude-opus-5-5",
+  "ms": 16376,
+  "tokens": {
+    "input": 2,
+    "output": 1428,
+    "cacheCreation": 5112,
+    "cacheRead": 783,
+    "fresh": 6542,
+    "total": 7325
+  },
+  "at": "2026-11-05T08:42:19.819Z"
+}

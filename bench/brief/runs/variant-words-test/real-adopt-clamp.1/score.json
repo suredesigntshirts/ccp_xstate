@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.1",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 4 hold. Check 1 tests that clamp is exported and returns the clamped value, including at the boundaries, and those values follow from \"x limited to the range lo to hi\". Check 2 tests RangeError when lo > hi. Check 4 tests only that `npm test` exits 0. The mutation test and the test-file and message-quality notes are correctly under Advisory.\n\nCheck 3 breaks the criterion. Its PASS condition says the printed export list \"must include at least add, subtract, multiply and clamp\". The line \"README.md documents every function math.js exports\" only requires that whatever math.js exports is documented. It does not require add, subtract or multiply to stay exported, and no other expect line does either. So a PR that dropped one of them and documented the rest would meet the words but fail this check. That stricter rule belongs under Advisory, not in PASS.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both briefs. I checked every command. `npm test` matches the package.json script \"node --test\". math.js, README.md and test/math.test.js all exist at this commit. `npm install` is optional, and the verifier brief notes there are no dependencies. Each `node -e` script sits inside double quotes and has no `$` or backticks. The only `!` is in `!==` (Check 1), and bash does not history-expand a `!` followed by `=`. The JavaScript is valid in all three: `if(...){...} const r=...` parses, as do `for (const a of [...]) { try {...} catch(e) {...} }` and `Object.keys(m).filter(...).join(' ')`. The expected array [0,100,50,0,100,3,-10,2.5] matches correct clamp behaviour. The builder's `assert.throws(() => clamp(5, 10, 0), RangeError)` is valid node:assert usage. No step depends on a missing file or tool.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and each one is handled. Item 1: builder step 2 says to add a \"### subtract(a, b)\" entry (\"it is exported but currently undocumented\") as well as a clamp entry, and requires that \"Every name in math.js's module.exports must have its own heading\". Item 2: verifier check 3 prints the exported functions at the PR head with Object.keys, says the list \"must include at least add, subtract, multiply and clamp\", and FAILs if \"any exported function, including subtract\", has no README documentation. Item 3: verifier check 2 calls clamp with lo > hi ([5,10,0], [0,1,0], [50,100,-100]). It prints RANGEERROR only when `e instanceof RangeError`, and it FAILs on OTHER (any other kind of error) or NOTHROW. I found nothing in either brief that breaks any of these items.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against the verifier brief, and neither is broken. Item 1: Check 3 lists every exported function at runtime and fails if \"any exported function, including subtract (undocumented before this change), has no documentation in README.md\". A README that documents clamp but not subtract therefore fails. Item 2: Check 1 tests only behaviour (the clamped results) and never looks at clamp.length. Check 2 tests only `instanceof RangeError`; the message is in the advisory notes, not in PASS/FAIL. Check 3 accepts any documentation (\"e.g. a heading or entry naming the function with an explanation\"), so it does not require a specific layout. The builder's heading format is guidance, not a verifier condition. Check 4 requires only exit status 0. One borderline point: the note \"must include at least add, subtract, multiply and clamp\" in Check 3 is stricter than the line's literal wording. I judged it acceptable because it stops the line being met by un-exporting functions, not by adding a format or detail requirement.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief's probes, and some probes appear in both. In step 2 the builder brief suggests README examples \"clamp(140, 0, 100) // 100 and clamp(-5, 0, 100) // 0\". Those are the same inputs and expected outputs as Check 1's c(140,0,100) and c(-5,0,100), whose PASS array expects 100 and 0. In step 3 it tells the builder to write \"assert.throws(() => clamp(5, 10, 0), RangeError)\", which is the [5,10,0] case that Check 2 tests for RANGEERROR. Step 3's boundary cases (x === lo, x === hi, lo === hi) also match Check 1's c(0,0,100), c(100,0,100) and c(7,3,3). Repeating the expect lines and asking the builder to write tests is allowed. Handing it the verifier's specific inputs and expected outputs is not, so the builder gets part of the checker.",
+      "cached": true
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "e5da9c434bd8e50825d1bccbe7b2492e5a44243e3484443c6ebe07fafc22e876",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. They name only files that exist: index.js, README.md, package.json and test/strutil.test.js. `npm test` maps to the \"test\" script, `node --test`. The builder's `node -e \"import('./index.js').then(m=>console.log(Object.keys(m)))\"` is valid CommonJS eval with a dynamic import, which resolves from the current directory. Each verifier `node --input-type=module -e \"...\"` uses valid ESM import syntax. Their double-quoted shell strings contain only single quotes, with no `$`, backticks or `!` that would break them. JSON.stringify, Object.keys and the filter calls are well-formed JavaScript. `grep -n '^#' README.md` is valid. The builder steps edit only existing files and run `npm test` after the edits, so nothing depends on a file that has not been made yet. I found no command that would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 8539,
+  "tokens": {
+    "input": 2,
+    "output": 763,
+    "cacheCreation": 3236,
+    "cacheRead": 783,
+    "fresh": 4001,
+    "total": 4784
+  },
+  "at": "2026-11-05T08:39:36.807Z"
+}

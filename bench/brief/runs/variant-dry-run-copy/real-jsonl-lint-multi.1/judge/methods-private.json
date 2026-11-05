@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "b1701f93b6fd4dd0914699b24e228aa9ea053c2a233a4009a340337e26f60c4e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every check in the verifier brief. None of the verifier's probes appear in the builder brief. That covers its mktemp fixtures with specific inputs (e.g. '{\"b\":2}\\n{oops}\\n'), the piped `printf | node ... -` runs, the `git diff --exit-code` merge-base command, the README grep patterns and the gh api check-runs query. The builder brief also has no PASS/FAIL wording. It gives the bar: the six quoted expect lines plus implementation steps such as \"If `-` appears more than once: usage error ... exit 2\". Step 5 lists the cases and the expected behaviour for tests the builder writes itself, which the criterion allows. Step 7 tells it to run `npm test`, also allowed. Some lines overlap with verifier advisories (\"byte-for-byte as before\", \"do not hang\"). Those only restate requirements from expect line 1 and the usage-error rule. They are not checks or probes, and the advisories are not pass/fail anyway.",
+  "model": "claude-opus-5-5",
+  "ms": 11670,
+  "tokens": {
+    "input": 2,
+    "output": 816,
+    "cacheCreation": 5467,
+    "cacheRead": 783,
+    "fresh": 6285,
+    "total": 7068
+  },
+  "at": "2026-11-05T08:59:18.473Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "ae9e28142b6dfc41a2e779c644a206b1e919dcc6de242c0c6eee40738a505e1e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Checks 1, 2, 3 and 5 stay close to the words. Check 6 goes past them. Its PASS condition says the check runs include the `test` workflow job with conclusion success \"(and none failed)\". That fails the PR if any other, unrelated check run fails, but the expect line only asks that \"npm test and the test workflow are green\". It also requires the PR to be open (`state=open`), so a merged PR would fail even though the words say only \"one PR\". Check 4 also requires \"ws test exit=0 with 0 failing tests\", but expect line 4 only asks that the tests exist. Passing tests are line 6's requirement. These stricter tests should sit under Advisory, not in PASS/FAIL, so the criterion does not hold.",
+  "model": "claude-opus-5-5",
+  "ms": 12267,
+  "tokens": {
+    "input": 2,
+    "output": 1040,
+    "cacheCreation": 6606,
+    "cacheRead": 783,
+    "fresh": 7648,
+    "total": 8431
+  },
+  "at": "2026-11-05T08:42:13.244Z"
+}

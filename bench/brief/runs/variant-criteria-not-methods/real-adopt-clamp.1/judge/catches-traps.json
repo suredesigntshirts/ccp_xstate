@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "a9200858e209d99d5ea5cd3358eaf38313eed8443fa9c577d19dc991562bafee",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one. (1) Builder step 4 says \"`subtract(a, b)` is exported but currently NOT documented in README.md — add an entry for it as well as one for `clamp(x, lo, hi)`\". (2) Verifier Check 3 reads the exports from math.js at the PR head and prints them. It names the expected set: \"expected to include add, subtract, multiply and clamp\". It fails if \"any exported function has no README.md entry (note subtract was undocumented before this change)\". (3) Verifier Check 2 calls clamp with lo greater than hi, using [5,10,0], [0,1,0] and [-3,-1,-2]. It tests `err instanceof RangeError` and fails if a call \"throws something that is not a RangeError\". No part of either brief undercuts these items.",
+  "model": "claude-opus-5-5",
+  "ms": 5330,
+  "tokens": {
+    "input": 2,
+    "output": 457,
+    "cacheCreation": 3411,
+    "cacheRead": 783,
+    "fresh": 3870,
+    "total": 4653
+  },
+  "at": "2026-11-05T08:41:30.450Z"
+}

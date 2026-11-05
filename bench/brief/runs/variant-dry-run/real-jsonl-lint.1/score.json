@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.1",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Checks 1, 2, 3 and 5 stay close to the words. Check 6 goes past them. Its PASS condition says the check runs include the `test` workflow job with conclusion success \"(and none failed)\". That fails the PR if any other, unrelated check run fails, but the expect line only asks that \"npm test and the test workflow are green\". It also requires the PR to be open (`state=open`), so a merged PR would fail even though the words say only \"one PR\". Check 4 also requires \"ws test exit=0 with 0 failing tests\", but expect line 4 only asks that the tests exist. Passing tests are line 6's requirement. These stricter tests should sit under Advisory, not in PASS/FAIL, so the criterion does not hold.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs. Builder: `chmod +x`, `npm install`, `npm ci && npm test` and the `gh api .../check-runs --jq` call all run as written. The files they use are created in earlier steps, or are tracked: package-lock.json, the root README and the workflow. Verifier: the `printf` setup has no stray `%`. The `grep -E \"^$d/bad.jsonl:...\"` and `sed \"s|...|\\1|\"` lines quote correctly. In check 3, `node --input-type=module -e \"... lint('{\\\"a\\\":1}\\n...')\"` reaches JS as valid code, with `\\n` kept as escapes, and the expected lines 3 and 5 are correct. Check 4's `node -e \"require(...)\"` is valid CommonJS. `npm test -w packages/jsonl-lint` is a valid npm call, since the root script's `--workspaces` shows workspaces are configured. Check 6's `gh api` calls with quoted URLs and `//` in jq are valid. `node --test` will find `test/*.test.js`. I found no syntax errors, missing files or bad arguments.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each of the four must_catch items against the briefs, and all four are handled.\n1. Builder step 7 says to run `npm install` so `package-lock.json` gets the new workspace entry, notes that \"CI uses `npm ci`, which fails if the lockfile is out of sync\", and says to commit the lockfile.\n2. Builder step 6 says to \"replace the 'No tools yet' bullet\" with a jsonl-lint bullet, rather than just adding a line.\n3. Verifier Check 6 runs the root `npm ci && npm test` and passes only with \"`root exit=0` with the jsonl-lint tests run and passing\". Check 4 also requires that the workspace tests do not \"not run\". This is the weakest of the four: it asks the verifier to see the tests running in the output but doesn't name a method. That still makes the verifier confirm the tests weren't skipped.\n4. Check 6 queries GitHub for the PR whose body contains the Closes line, requires its head sha to equal the checked-out HEAD, and reads the check-runs at that sha. The `test` workflow must show completed/success.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every verifier PASS/FAIL condition against its expect line. None is stricter than its line. Check 1 runs the CLI and passes only on exit codes and the `<file>:<line>: <error>` lines for 3 and 6, with no exact error wording. It merges stderr into stdout, so stdout-only output is just advisory. Check 2 needs exit 2 and non-empty stderr. Check 3 runs `lint` itself. Check 4 reads package.json fields, accepts \"`node --test` (optionally followed by arguments)\", and runs the workspace tests. Checks 5 and 6 check files, the PR body, check runs and `npm test`, with no branch-name rule, file-touch limit or mutation test. Check 6 asks for \"exactly one open PR\", which fits \"one PR\" at its head. Every behaviour line is checked by running the program, not by reading the diff. The builder brief's detailed steps are instructions, not PASS/FAIL conditions.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The criterion fails because the builder brief reuses probes from the verifier brief. Builder step 8 gives the verifier's exact Check 1 fixture and its expected result: a file containing `{\"a\":1}`, an empty line, `{bad`, `[1,2]`, an empty line and an unterminated `{\"x\":` \"must print exactly two lines, for lines 3 and 6, and exit 1\". This is the verifier's `bad.jsonl` with the same expected output (\"3 6\", exit 1). Builder step 10 also repeats the verifier's Check 6 command almost word for word: `gh api repos/.../commits/<head-sha>/check-runs --jq '[.check_runs[] | {name, status, conclusion}]'`. Neither the issue nor its expect lines name that command. Telling the builder to run `npm ci && npm test` and to write its own tests is allowed. Sharing a set of inputs with expected outputs is not.",
+      "cached": true
+    }
+  }
+}

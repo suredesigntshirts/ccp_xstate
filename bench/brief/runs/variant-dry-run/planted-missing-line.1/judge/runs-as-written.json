@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "75d71955eb69b9a43e5ea8a60b5210172c178c28ef0631a01d7851adda006833",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the package.json scripts. `npm test` maps to `node --test`, which finds test/csv.test.js. Each `node bin/csv2json.js` call points at a tracked file. In the mktemp/printf/cmp one-liner, the files are written to \"$d\" before they are read, the quoting is valid and the `&&` / `||` chains are correct. In the verifier, `echo \"exit=$?\"` comes right after the `--tsv` run, so it reports that run's exit code. `grep -n -- '--tsv' README.md` uses `--` so grep doesn't read the pattern as an option, and README.md exists. The JS fragments are valid: `process.argv.slice(2)`, `parse(input, '\\t')` and the escaped test strings. The `parse(text, sep = ',')` signature is stated as a fact about the repo. I couldn't confirm it from the file list, but it doesn't break any command. Commit and PR are ordinary steps. I found no command that would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 9843,
+  "tokens": {
+    "input": 2,
+    "output": 640,
+    "cacheCreation": 3089,
+    "cacheRead": 783,
+    "fresh": 3731,
+    "total": 4514
+  },
+  "at": "2026-11-05T08:40:08.899Z"
+}

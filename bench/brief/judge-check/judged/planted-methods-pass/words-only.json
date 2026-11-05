@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "27ee955cb403e4019c095b14f3d28d47c7591be38159b6c2bc94e780b981910f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the verifier brief's items against the issue's expect lines. It has no Advisory heading, so the stricter checks sit directly inside items 1–6:\n- Item 4 asks the verifier to \"mutate lint() mentally or briefly, e.g. break line numbering, and confirm a test would fail\". That is a mutation test, and the words \"node:test tests for...\" don't require it.\n- Item 6 checks that the \"branch name matches CLAUDE.md convention (<type>/<issue>-<slug>, no claude/ prefix, under 60 chars)\" and that the \"diff is limited to this tool plus README/lock changes\". Expect line 6 asks for neither the branch rule nor the file-scope rule.\n- Item 2 asks for \"nothing on stdout\", and item 1 adds CRLF and empty-file cases. Expect lines 1 and 2 don't require either.\n- Item 4 also requires package-lock consistency, which expect line 4 doesn't state.\nAll of these count toward pass/fail rather than sitting under an Advisory heading, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 5923,
+  "tokens": {
+    "input": 2,
+    "output": 530,
+    "cacheCreation": 3697,
+    "cacheRead": 783,
+    "fresh": 4229,
+    "total": 5012
+  },
+  "at": "2026-11-05T08:24:56.770Z"
+}

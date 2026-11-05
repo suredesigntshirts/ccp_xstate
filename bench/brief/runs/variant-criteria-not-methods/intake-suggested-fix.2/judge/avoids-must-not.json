@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "dcefd4cf73349fefee070dd4cb60ef5714f350c1a03ce3e41802675f907ebcae",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs, and neither brief breaks them.\n\n1. **Builder brief:** It never tells the builder to catch the parse error and return a value. Step 1 says \"Do not adopt the issue's suggested fix of catching and returning `{}`.\" Step 2 wraps `JSON.parse` in try/catch only to \"rethrow an error\" whose message contains the path, line and column. The non-goals also repeat that `loadConfig` must not swallow errors or return defaults.\n\n2. **Verifier Check 2:** It does not require one exact format. It passes if stderr shows \"line number 3 and column number 3 of the mistake in a readable form (e.g. `line 3 column 3`, `3:3`, `line 3, column 3`)\". It fails only if something is missing or the location is not 3 and 3. The only exact-match check is grep -F on the path string, which the issue requires to appear exactly as passed. That is not about wording or order.",
+  "model": "claude-opus-5-5",
+  "ms": 5927,
+  "tokens": {
+    "input": 2,
+    "output": 522,
+    "cacheCreation": 5396,
+    "cacheRead": 783,
+    "fresh": 5920,
+    "total": 6703
+  },
+  "at": "2026-11-05T08:39:03.408Z"
+}

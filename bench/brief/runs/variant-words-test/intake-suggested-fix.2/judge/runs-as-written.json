@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "fdd8a87a0a7e033687e8cb6e774d5db1948dd4d16277b03068a48dd26b5a33e6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. Each file they name exists: src/app.js, src/config.js, test/config.test.js, README.md and package.json. `npm test` maps to `node --test`. The `mktemp`/`printf` setups have valid shell quoting. The `node --input-type=module -e \"import {loadConfig} ...\"` snippets are valid JavaScript, including `import assert from 'node:assert/strict'` and `assert.deepEqual`, and they expand `$d` correctly inside double quotes. Check 2 reuses `$d` and `$d/err` from check 1's run, which works when the checks run in order in the same shell. `wc -c < $d/out` and both `grep -F` calls are valid. Check 5 uses `git checkout <base> -- src` with a base commit the verifier finds via `git merge-base`, so the commands are well formed. Builder step 5 reuses `$d` from the line before it, which is also fine. I found no missing script, bad argument or syntax error.",
+  "model": "claude-opus-5-5",
+  "ms": 9015,
+  "tokens": {
+    "input": 2,
+    "output": 833,
+    "cacheCreation": 5593,
+    "cacheRead": 783,
+    "fresh": 6428,
+    "total": 7211
+  },
+  "at": "2026-11-05T08:38:38.528Z"
+}

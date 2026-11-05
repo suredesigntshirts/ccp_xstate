@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "d2505983b40e9d31d15e949041feb844919ed8964a86e3c597e269ef7fe5fa49",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's instructions with the verifier brief's checks. Builder step 2 tells it to write a test that feeds `--tsv` the input 'a\\tb\\n1\\t2\\n' and asserts the output matches the CSV output for 'a,b\\n1,2\\n', namely '[{\"a\":\"1\",\"b\":\"2\"}]\\n'. The verifier's Check 1 uses that exact pair as one of its probes: \"Also run the same pair with a two-column table, for example 'a\\tb\\n1\\t2\\n' and 'a,b\\n1,2\\n'.\" So the builder brief contains a set of inputs with expected outputs that also appears in the verifier brief, which the criterion forbids. Telling the builder to write its own tests is allowed, but handing it the verifier's specific probe is not. The other builder instructions (run `npm test`, document the flag in the README) are fine.",
+  "model": "claude-opus-5-5",
+  "ms": 7210,
+  "tokens": {
+    "input": 2,
+    "output": 469,
+    "cacheCreation": 2744,
+    "cacheRead": 783,
+    "fresh": 3215,
+    "total": 3998
+  },
+  "at": "2026-11-05T08:57:18.151Z"
+}

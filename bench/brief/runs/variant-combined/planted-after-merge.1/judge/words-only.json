@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "f1d17ebf09ab0a201378e36ecc62e79b961b1309804d191acf51beaf93f9c802",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Check 1 only asks for the upper-cased greeting. Exact `HELLO, ADA!\\n`, exit 0 and the flag-after-name case are under Advisory. Check 2 compares head output to the merge base without --shout, which is what \"unchanged\" means. Check 3 asks that docs/index.md mention --shout and say what it does, which \"documents\" requires. Check 4 can't fetch the live page before merge, so it checks the source of that page: the workflow still publishes docs/ on push to main, and docs/index.md lists --shout. It also reports that the live result waits for merge. This is a borderline call: a PR that moved publishing to another folder that also lists --shout would fail check 4 even though the expect line could still hold. I treat it as a stand-in for \"after merge … lists --shout\" rather than an extra rule. Usage exit 2, `npm test` passing and test coverage are all under Advisory. No PASS or FAIL condition requires exact wording, a mutation test, or a branch or file-scope rule.",
+  "model": "claude-opus-5-5",
+  "ms": 14483,
+  "tokens": {
+    "input": 2,
+    "output": 1278,
+    "cacheCreation": 3005,
+    "cacheRead": 783,
+    "fresh": 4285,
+    "total": 5068
+  },
+  "at": "2026-11-05T08:55:16.913Z"
+}

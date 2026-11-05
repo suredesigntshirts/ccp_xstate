@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "a5f6a3c6027ab0df14b126c8f5312fec0139240485cca176233a017b7f6ef90f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier's probes. Builder step 2 gives \"padLeft('42', 5, '0') === '00042'; padLeft('42', 5) === '   42'\". Verifier Check 1 tests these same calls, p('42',5,'0') and p('42',5), and expects the same results, \"00042\" and \"   42\". Step 4 repeats \"('42', 5, '0' -> '00042')\" as a test case to write. So the builder brief contains inputs with expected outputs that are also in the verifier brief. The builder's other example, ('12345',3,'0'), isn't a verifier input, but the two shared pairs are enough to break the criterion. Running npm test and writing its own tests are allowed, but these shared probe pairs are not.",
+  "model": "claude-opus-5-5",
+  "ms": 13256,
+  "tokens": {
+    "input": 2,
+    "output": 802,
+    "cacheCreation": 3047,
+    "cacheRead": 783,
+    "fresh": 3851,
+    "total": 4634
+  },
+  "at": "2026-11-05T08:40:28.762Z"
+}

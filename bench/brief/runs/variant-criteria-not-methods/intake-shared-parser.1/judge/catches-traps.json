@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "36610d4674cf6feeeecdda0fd45941aefe9f8a2b37481f84ef9949b6d8c839bc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items, and both are handled. Item 1: the builder brief protects the CSV path. It tells the builder to edit \"test/csv.test.js (keep the existing node --test setup and existing tests)\" and to confirm `npm test` exits 0. It also says \"otherwise call parse(text) exactly as today\" and \"Leave src/parse.js unchanged unless you find a real need.\" Together these name test/csv.test.js and its existing CSV tests as things that must keep passing. The brief never says outright that parse() is shared with the CSV path, but the criterion accepts either one. Item 2: verifier Check 6 runs \"`npm test; echo \\\"exit=$?\\\"`\", as expect line 6 says. It does not use proof 6's undefined `npm run test:cli`. So both traps are caught.",
+  "model": "claude-opus-5-5",
+  "ms": 10079,
+  "tokens": {
+    "input": 2,
+    "output": 612,
+    "cacheCreation": 5737,
+    "cacheRead": 783,
+    "fresh": 6351,
+    "total": 7134
+  },
+  "at": "2026-11-05T08:44:12.647Z"
+}

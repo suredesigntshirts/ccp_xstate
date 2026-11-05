@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "9d26ba40d746052bc5f6378cf23deb4e3fa5217a8ba2def0165aafb17e698d2c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked Check 4 of the verifier brief against both must_not items. It does fetch the live page (`curl -sSL https://o.github.io/greet-cli/`), but it only gives PASS or FAIL once the PR is merged, and FAIL also needs \"the pages deploy has finished\". Before merge it says to report the line \"as not verifiable before merge (not PASS)\". It also says the result depends on the merge and on pages.yml, and asks for what the current page shows. So it never grades the PR at its head on what the page shows today (item 1). It never passes silently without evidence (item 2). The builder brief agrees: the PR description must say this line can't be confirmed before merge and must \"not claim it is already met\". Checks 1–3 don't involve line 4. Neither brief does anything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 10407,
+  "tokens": {
+    "input": 2,
+    "output": 838,
+    "cacheCreation": 3188,
+    "cacheRead": 783,
+    "fresh": 4028,
+    "total": 4811
+  },
+  "at": "2026-11-05T08:39:08.614Z"
+}

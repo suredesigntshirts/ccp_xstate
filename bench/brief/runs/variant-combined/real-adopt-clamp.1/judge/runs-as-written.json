@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "e47503fec461d38a948feb77a99ef391f969405fc94c39ea8d8d74543b2a9511",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. `npm test` maps to the existing script \"node --test\", and node --test picks up test/math.test.js. Both briefs name only files that exist at this commit: math.js, README.md, test/math.test.js and package.json. The Check 1 and Check 2 `node -e` lines are valid JavaScript inside double quotes. They contain no `$`, backtick or `!` that bash would expand, the spread `clamp(...a)` and the try/catch are valid, and `require('./math.js')` resolves from the repository root. In Check 1 the expected output `function 0 100 42 0 100 3 -2.5` matches the specified behaviour, including clamp(7,3,3) giving 3 and clamp(-2.5,-10,-1) giving -2.5. The Check 3 `Object.keys` command is valid. The builder's steps use only existing tools.",
+  "model": "claude-opus-5-5",
+  "ms": 8062,
+  "tokens": {
+    "input": 2,
+    "output": 597,
+    "cacheCreation": 3032,
+    "cacheRead": 783,
+    "fresh": 3631,
+    "total": 4414
+  },
+  "at": "2026-11-05T08:57:49.136Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "39fe2b328b061cb882e7bc1654390cb0379af81c6d6d5addda968dd454b9853b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 2 is fine. Its PASS asks that README.md say --tsv reads tab-separated input, which is a fair reading of \"documents --tsv\", and its other conditions are grep results. Check 1 goes beyond its expect line. The line asks only that the --tsv output equal what plain `node bin/csv2json.js` prints for the same table as CSV. But PASS also requires \"the CSV output is the JSON array [{\"name\":\"Ada\",\"age\":\"36\",\"city\":\"London\"},...]\", which pins the exact content of the existing CSV output. The words don't force that. Suppose a correct PR's CSV path prints the same table in a different form, such as numbers as numbers. The two outputs would still match and the expect line would hold, yet this check would FAIL. That exact-output test belongs under Advisory, not in a PASS condition.",
+  "model": "claude-opus-5-5",
+  "ms": 10036,
+  "tokens": {
+    "input": 2,
+    "output": 677,
+    "cacheCreation": 2798,
+    "cacheRead": 783,
+    "fresh": 3477,
+    "total": 4260
+  },
+  "at": "2026-11-05T08:57:12.414Z"
+}

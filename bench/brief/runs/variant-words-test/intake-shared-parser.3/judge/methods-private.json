@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "fae7b4ac261b3c257bc0a798f586d5f25345bb5280f61572343ebd720fdb7afa",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief, looking for PASS/FAIL conditions or probes that appear in both. None of the verifier's own methods appear in the builder brief. These are the `cmp` and `<(printf …)` byte comparisons, `od -c`, `grep -rn -- '--tsv' test/`, the advisory mutation check (\"temporarily make bin/csv2json.js ignore --tsv\") and the flag-position probe. Step 4 of the builder brief lists only the commands the expect lines and proofs name, for example `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \"exit=$?\"`, plus `npm test`. These are allowed. Step 2 has the builder write its own tests using the expect-line inputs and outputs, which is also allowed. The builder brief contains no \"PASS:\" or \"FAIL:\" wording. The acceptance lines repeat the issue's expect lines, so they set the bar rather than describe how it will be checked.",
+  "model": "claude-opus-5-5",
+  "ms": 8615,
+  "tokens": {
+    "input": 2,
+    "output": 778,
+    "cacheCreation": 6196,
+    "cacheRead": 783,
+    "fresh": 6976,
+    "total": 7759
+  },
+  "at": "2026-11-05T08:38:27.504Z"
+}

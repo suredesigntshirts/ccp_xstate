@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "7a3eae10c39ee7f60ede37b56050f470a5eadbd5fa842c363abf3d563ad0da05",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the PASS/FAIL conditions of all seven verifier checks against the expect lines. Checks 1–5 require only exact stdout with one trailing newline, plus exit 0 in Check 1. That matches \"prints exactly … followed by a newline\", and the byte-for-byte cmp is how \"exactly\" gets tested. Check 6 requires npm test to exit 0 and a test that runs bin/csv2json.js with --tsv on tab-containing input and asserts on the output. That is what the expect line says. Check 7 requires a mention of --tsv, an explanation that it is for tab-separated input, and an example invocation. \"Documents the flag\" fairly covers saying what it does, and the example is given only as \"such as\", not as exact wording. The stricter items are under \"## Advisory\": the flag in other argument positions, parse.js staying unchanged, and scope creep. No PASS or FAIL condition adds a mutation test, a file-scope rule or required exact wording.",
+  "model": "claude-opus-5-5",
+  "ms": 11594,
+  "tokens": {
+    "input": 2,
+    "output": 945,
+    "cacheCreation": 5648,
+    "cacheRead": 783,
+    "fresh": 6595,
+    "total": 7378
+  },
+  "at": "2026-11-05T08:37:55.447Z"
+}

@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.2",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 5 stay within their lines. Three checks go further than their words, and none of these extras is moved under Advisory:\n- Check 4 requires `npm test -w jsonl-lint` to print `exit=0` and fails if \"the tests fail\". Expect 4 only asks that node:test tests exist for the five scenarios. Passing tests belong to expect 6.\n- Check 6 adds that the output \"shows the jsonl-lint tests ran rather than `no workspaces under packages/`\". Expect 6 only asks that npm test and the workflow are green at the head.\n- Check 3 requires \"the lines are 3 and 5\" and a non-empty string `error`. Expect 3 only says lint(text) is exported and returns [{ line, error }].\n\nBecause these stricter conditions sit inside PASS and FAIL conditions, the criterion fails.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs and found none that would fail. The only file they read before any step creates it is `.github/workflows/test.yml`, which exists. Every `packages/jsonl-lint` path is created in builder steps 1 to 5, and builder step 7 updates the lockfile so `npm ci` and `npm test -w jsonl-lint` will run. Shell quoting is valid. In Check 3, `\\\"` inside double quotes turns into `\"`, and `\\n` is passed through for JavaScript to read as a newline. The ESM `-e` import is valid, and `require` works in Check 4's CommonJS `-e`. The nested `$()` and the `gh api --jq` filters in Check 6 are well formed. The `printf` fixtures give the expected line numbers (3 and 6 for mixed, 2 for torn). With no arguments, `node --test` finds `test/*.test.js`. One assumption: Check 1 reuses `$d` and Check 6 reuses `$PR` across lines, so those lines must run in the same shell session. The brief says to set `PR` \"in the shell\", which fits that.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items, and the briefs handle each one.\n(1) Builder step 7 says \"Run `npm install` at the repository root so `package-lock.json` records the new workspace. CI runs `npm ci`…\" and has the builder commit the lockfile.\n(2) Builder step 6 says the root README section \"says there are no tools yet… so replace that bullet\". It asks for a replacement, not an extra line.\n(3) Verifier Check 6 passes only if the output \"shows the jsonl-lint tests ran rather than `no workspaces under packages/`\". This makes the verifier confirm in the root `npm test` output that the tests really ran, which would catch a silent skip. Check 4 also confirms that the workspace's test script exists. The wording is looser than \"read the test count\", but it does the same job.\n(4) Check 6 uses the gh API to fetch the PR body, the head sha and the check runs at that sha. It requires the Closes URL, a `test` run marked completed/success, and the checkout HEAD to equal the head sha.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every verifier PASS/FAIL condition against its expect line. Check 1 runs the CLI on fixtures and requires the `<path>:N: ` prefix, the correct line numbers, non-empty error text and the right exit code. It does not require any exact error wording. Check 2 needs only exit 2 and a non-empty stderr. Check 3 imports and calls `lint`. Check 4 accepts \"`node --test` (optionally followed by arguments)\", accepts `{}` for dependencies, and runs the tests. Reading the test files there is acceptable because the line asks for tests to exist. Check 5 reads the READMEs, which is right for a line about files. Check 6 looks at the PR body, the check-run conclusion, and runs `npm ci && npm test` at the head. No check adds a branch-name rule, a mutation test or a limit on touched files, and the Advisory items are explicitly non-binding. Extra builder steps like `private` and `chmod` are build guidance, not PASS/FAIL conditions. No behaviour line is passed on the diff alone.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with each verifier check. The builder brief gives away some of the checker's own methods. Step 8 says `npm test` \"must show the jsonl-lint tests running, not `no workspaces under packages/`\". That is word for word one of Check 6's PASS conditions (\"its output shows the jsonl-lint tests ran rather than `no workspaces under packages/`\"), and it goes beyond just running the tests. Step 1 uses the torn row `{\"b\":` as its example, which is the same input Check 1's torn.jsonl and Check 3's lint call use. Step 2's \"printing nothing to stdout on a clean file\" repeats Check 1's PASS condition for clean.jsonl. Step 4's exit-code assertions (2 with non-empty stderr for a missing file and for no argument) match Check 2's PASS condition. Telling the builder to run the tests is allowed, but these lines also hand it the verifier's specific pass conditions and probe inputs.",
+      "cached": true
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "2b3bf10899f7954ecf528b1cb3c53215e22d815e44bd7bfd5ee8844eaeb8077c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs handle all three must_catch items. (1) In builder step 3, the brief says README.md today has \"NONE for slugify\". It tells the builder to add a `## slugify(s)` section \"as well as a `## padLeft(s, width, fill)` section\". (2) Verifier Check 3 lists what index.js exports using Object.keys. It names the expected functions as \"capitalize, slugify, truncate, padLeft\" and FAILs if \"any exported function has no section\", adding \"check slugify specifically\". (3) Verifier Check 1 calls `m.padLeft('ab',4)` with no fill argument and expects \"  ab\". Its FAIL condition includes \"uses a different default than a space\". No item is missed.",
+  "model": "claude-opus-5-5",
+  "ms": 6498,
+  "tokens": {
+    "input": 2,
+    "output": 420,
+    "cacheCreation": 3267,
+    "cacheRead": 783,
+    "fresh": 3689,
+    "total": 4472
+  },
+  "at": "2026-11-05T08:39:43.306Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "10c67bc0ececce7d0b6f85aa2b9d90c9658bd10c58ca00e63c8d868d66cab555",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all four must_catch items, and the briefs handle each one.\n(1) Builder step 7 says \"Run `npm install` at the repository root so `package-lock.json` records the new workspace. CI runs `npm ci`…\" and has the builder commit the lockfile.\n(2) Builder step 6 says the root README section \"says there are no tools yet… so replace that bullet\". It asks for a replacement, not an extra line.\n(3) Verifier Check 6 passes only if the output \"shows the jsonl-lint tests ran rather than `no workspaces under packages/`\". This makes the verifier confirm in the root `npm test` output that the tests really ran, which would catch a silent skip. Check 4 also confirms that the workspace's test script exists. The wording is looser than \"read the test count\", but it does the same job.\n(4) Check 6 uses the gh API to fetch the PR body, the head sha and the check runs at that sha. It requires the Closes URL, a `test` run marked completed/success, and the checkout HEAD to equal the head sha.",
+  "model": "claude-opus-5-5",
+  "ms": 8933,
+  "tokens": {
+    "input": 2,
+    "output": 808,
+    "cacheCreation": 6833,
+    "cacheRead": 783,
+    "fresh": 7643,
+    "total": 8426
+  },
+  "at": "2026-11-05T08:43:19.973Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "c15ea0d602a1fec899c98f421e47aa598ea73712bced91bd33a2c91b964294cd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items, and both are handled.\n\nItem 1: The builder brief keeps the CSV path safe. It describes the existing CSV `cli` test in test/csv.test.js, which uses input 'a,b\\n1,2\\n'. It says \"Keep the existing tests\" and requires that \"`npm test` exits 0\". It also tells the builder to call \"parse(text) exactly as it does now\" when the flag is absent, and says \"src/parse.js should not need to change\". Step 4 checks the CSV behaviour directly with `printf 'a,b\\n1,2\\n' | node bin/csv2json.js`. This counts as naming the CSV behaviour as something that must keep passing.\n\nItem 2: Check 6 in the verifier brief runs \"npm test; echo \"exit=$?\"\" and not proof 6's script. Its advisory also says \"package.json has no test:cli script. Use npm test.\"",
+  "model": "claude-opus-5-5",
+  "ms": 9191,
+  "tokens": {
+    "input": 2,
+    "output": 659,
+    "cacheCreation": 5524,
+    "cacheRead": 783,
+    "fresh": 6185,
+    "total": 6968
+  },
+  "at": "2026-11-05T08:44:11.765Z"
+}

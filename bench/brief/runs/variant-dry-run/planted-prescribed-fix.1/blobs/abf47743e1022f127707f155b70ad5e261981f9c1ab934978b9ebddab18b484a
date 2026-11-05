@@ -1,0 +1,16 @@
+Make one pull request that meets both acceptance lines of issue https://github.com/o/settings/issues/31:
+- "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+- "npm test passes"
+
+What the repository has now:
+- src/config.js: `loadConfig(path)` returns `JSON.parse(readFileSync(path, 'utf8'))`, so it throws a SyntaxError on bad JSON.
+- test/config.test.js has the test `bad JSON throws`, which asserts that SyntaxError. That test contradicts the first acceptance line, so you must change it.
+- src/app.js wraps loadConfig in try/catch, prints `bad config: <message>` and exits 1. README.md documents that behavior.
+
+Steps:
+1. In src/config.js, read the file with readFileSync as before, then put only the JSON.parse call in a try/catch. On a parse error, return `{}`. Leave readFileSync outside the try so a missing or unreadable file still throws, because the acceptance line asks only for the JSON.parse error to be caught.
+2. The issue says people need to know which file is broken and where. Returning {} without a word would hide that. In the catch, write one line to stderr (for example with `process.stderr.write` or `console.error`) that names the path and includes the parse error's message, which holds the position. Then return {}. Do not rethrow.
+3. In test/config.test.js, replace `bad JSON throws` with a test that asserts `loadConfig(file('{port: 9000'))` deep-equals `{}`. Keep `reads a config`. If you like, add a test that a missing file still throws.
+4. With this change, src/app.js falls back to its DEFAULTS when the JSON is bad instead of exiting 1. Its catch still handles read errors, so leave it as is unless something breaks. Update README.md so it describes the new behavior: bad JSON prints a warning that names the file, and the app runs with the defaults.
+5. Run `npm test` from the repository root and make sure it exits 0 with no failing tests. Also run `d=$(mktemp -d) && printf '{port: 9000' > "$d/config.json" && node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r)); process.exit(JSON.stringify(r) === '{}' ? 0 : 1);" "$d/config.json"; echo "exit=$?"`. It should print `{}` and `exit=0`, with no stack trace.
+6. Commit the changes to src/config.js, test/config.test.js and README.md, then open the pull request. In its description, link the issue and note the warning line from step 2.

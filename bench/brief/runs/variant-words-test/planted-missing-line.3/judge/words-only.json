@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "4bdd4b252dc0a7e44a11d88130c0f6ac72ba7cfa3edddb4fc2e304b17977f79e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both checks. Check 1's PASS requires the --tsv output to be \"a JSON array\" that is \"deep-equal to the JSON array that the CSV command prints for the same table\". Its FAIL covers an error, a non-array, or a differing array. Each of these follows from the words \"prints the same JSON array\". Running two sample tables is just how the check gets its evidence; it adds no stricter rule. Check 2's PASS requires README.md to mention --tsv and present it as the flag for reading tab-separated input. Its FAIL is \"mentions it without saying what it is for\". \"Documents\" reasonably means explaining what the flag does, so this is not stricter than the words. The stricter checks are all under \"Advisory (not part of PASS or FAIL)\": npm test, test coverage, unchanged no-flag output and byte-for-byte identity. No branch, file-scope, mutation or exact-wording rule appears in any PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 7283,
+  "tokens": {
+    "input": 2,
+    "output": 631,
+    "cacheCreation": 2718,
+    "cacheRead": 783,
+    "fresh": 3351,
+    "total": 4134
+  },
+  "at": "2026-11-05T08:40:05.972Z"
+}

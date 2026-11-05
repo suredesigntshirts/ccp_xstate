@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "32a915ae6a8cd2a4360c956cbe089f1fcfc7fed9119451a097892c63aa6faee1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the 6 tracked files and package.json. All of them run as written. The briefs use `npm test`, which maps to \"node --test\". The printf | node bin/csv2json.js pipelines have valid shell syntax and name a file that exists. `grep -n -- '--tsv' test/*.js` is valid and test/csv.test.js exists. The `od -c` and `> /tmp/o1; echo \"exit=$?\"` steps also work, and `npm install` is only run if package.json has dependencies. The verifier correctly skips the proof's nonexistent `npm run test:cli` and points that out. The JS expression `JSON.stringify([{ 'a\\tb': '1\\t2' }]) + '\\n'` is valid. One expected-output fragment in builder step 3 is garbled: `[{\"a\\\\tb\":\"1\\\\tb\"...`. It is not a command, though, and the next line replaces it with valid JS. `node bin/csv2json.js --tsv < table.tsv` is an example for the README, not a command to run here.",
+  "model": "claude-opus-5-5",
+  "ms": 8428,
+  "tokens": {
+    "input": 2,
+    "output": 806,
+    "cacheCreation": 5696,
+    "cacheRead": 783,
+    "fresh": 6504,
+    "total": 7287
+  },
+  "at": "2026-11-05T08:38:02.106Z"
+}

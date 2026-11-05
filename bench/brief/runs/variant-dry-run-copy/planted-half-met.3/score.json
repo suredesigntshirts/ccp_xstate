@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.3",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1 and 2 test only behaviour the expect lines require: left-padding, the default space fill, and returning s unchanged when it is already long enough. Check 3 goes further than its words. \"A section for every function\" doesn't say what the heading must look like, but the regex only counts a heading at level ## or deeper that starts with the function name. A section titled \"# padLeft\" or \"## Function: padLeft\" would fail even though the line's words are met. Check 4 also goes further. \"npm test passes\" only needs exit code 0, but PASS also needs the summary to show the exact text '# fail 0'. That depends on which reporter is used: Node's default spec reporter prints \"ℹ fail 0\". These format and exact-wording rules sit inside PASS conditions rather than under Advisory.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs. `npm test` works, since package.json has the test script. The Check 1 and Check 2 one-liners are valid shell and ES-module JavaScript, and the files they read exist. Check 3 breaks. Its JavaScript sits inside a double-quoted shell string, and bash turns `\\\\s` and `\\\\b` into `\\s` and `\\b` before Node sees them. Inside a JavaScript string literal, `'\\s'` becomes a plain `s` and `'\\b'` becomes a backspace character. So the pattern `'^#{2,}\\\\s+\\`?'+f+'\\\\b'` reaches the regex as `^#{2,}s+`?name<backspace>`. That can never match a real `## slugify(s)` heading. The command runs but always reports every export as missing and prints FAIL, even on a correct PR. Because of these layered escapes, it does not work as written in this repository.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items. Item 1 holds: the builder brief's step 3 says README.md has no `slugify` section and tells the builder to \"also add a `## slugify(s)` section\". It also requires headings for capitalize, slugify, truncate and padLeft. Item 2 holds: verifier Check 3 reads the exports from index.js at the PR head, prints them (\"exports:\"), and prints FAIL if any is missing. It also says slugify is reported missing before the change. Item 3 holds: Check 1 calls `p('42',5)` with no fill and expects `'   42'`. One flaw falls outside this criterion: Check 3's regex escapes look wrong after shell and JS quoting. `\\\\s` and `\\\\b` probably reach the regex as a plain `s` and a backspace character, so the check may fail even when the README is correct. That flaw doesn't affect whether the traps are covered.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Must_not item 1 is avoided. The verifier's Check 3 script goes through every exported function, so a README with a padLeft section but no slugify section prints FAIL.\n\nMust_not item 2 is broken. Check 1 adds a signature requirement: \"confirm that padLeft is an exported function whose parameters are (s, width, fill), in that order\", and it fails if \"the exported signature is not padLeft(s, width, fill)\". Line 1 is about behaviour: padding on the left, with a space as the default fill. A correct padLeft(str, len, ch) would fail this check, and must_not names parameter checks as stricter than the line.\n\nCheck 3 also requires a README layout. Its regex only accepts a heading at level ## or deeper that starts with the function name, so a real section such as \"### The slugify function\" would be listed as missing.\n\nChecks 2 and 4 match their lines. The multi-character fill note is advisory only.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief shares test cases with the verifier brief. Builder step 2 gives \"padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42'\", and step 4 tells the builder to test the same cases. Verifier Check 1's script checks exactly these inputs and outputs: [p('42',5,'0'),'00042'],[p('42',5),'   42']. That is a probe (inputs with expected outputs) that appears in both briefs, which the criterion forbids. Builder step 3 also says \"README.md must have a `## name(...)` heading for each of capitalize, slugify, truncate and padLeft\", which mirrors Check 3's heading regex. Telling the builder to run npm test and write its own tests is allowed, but here those tests reuse the verifier's cases.",
+      "cached": false
+    }
+  }
+}

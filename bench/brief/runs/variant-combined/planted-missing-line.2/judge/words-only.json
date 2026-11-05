@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "7e399d66e4a43f624bb7106706e04afbac025f0f755929de4136b4bae7a9bd23",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both verifier checks against their expect lines. Check 1's PASS condition says the two outputs must be \"deep-equal arrays\" after both are parsed as JSON. That matches \"prints the same JSON array\" and doesn't require byte-identical output. Its FAIL condition covers only a command error, output that isn't a JSON array, or arrays that differ. Running several tables is fine because the words say \"the same table\", which means any table. Check 2 passes if README.md \"mentions the --tsv flag and says what it does\". That's a fair reading of \"documents --tsv\", since documenting a flag means explaining it, and it asks for no exact wording. The stricter tests are all listed under \"Advisory (not pass/fail conditions)\": running npm test, whether a --tsv test was added, byte-identical diff output including the trailing newline, and unchanged plain CSV behaviour. No PASS or FAIL condition asks for more than its expect line's words.",
+  "model": "claude-opus-5-5",
+  "ms": 7161,
+  "tokens": {
+    "input": 2,
+    "output": 619,
+    "cacheCreation": 2764,
+    "cacheRead": 783,
+    "fresh": 3385,
+    "total": 4168
+  },
+  "at": "2026-11-05T08:56:41.297Z"
+}

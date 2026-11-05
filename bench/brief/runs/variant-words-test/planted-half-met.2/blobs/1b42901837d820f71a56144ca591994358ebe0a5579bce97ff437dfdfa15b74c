@@ -1,0 +1,30 @@
+Check out the PR head and run `npm install` if needed (there are no dependencies). Run one check per acceptance line, in this order.
+
+Check 1 — "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run from the repository root:
+`node --input-type=module -e "import * as m from './index.js'; const p=m.padLeft; console.log(JSON.stringify([typeof p, p('42',5,'0'), p('7',3), p('ab',4,'*')]))"`
+PASS: it prints ["function","00042","  7","**ab"], meaning padLeft is exported, pads on the left with the given fill to width characters, and uses a space when fill is not given.
+FAIL: the import errors, padLeft is not a function, or any value differs (wrong side, wrong length, or a non-space default fill).
+
+Check 2 — "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+`node --input-type=module -e "import {padLeft} from './index.js'; console.log(JSON.stringify([padLeft('12345',5,'0'), padLeft('123456',5,'0'), padLeft('abc',2), padLeft('abc',3)]))"`
+PASS: it prints ["12345","123456","abc","abc"].
+FAIL: any value differs from its input (padded, cut short or otherwise changed), or the command errors.
+
+Check 3 — "README.md has a section for every function index.js exports"
+List the exported functions at runtime:
+`node --input-type=module -e "import * as m from './index.js'; console.log(Object.keys(m).filter(k=>typeof m[k]==='function').join('\n'))"`
+Then read README.md and, for each name listed, look for a section (a markdown heading) for that function.
+PASS: every exported function name (expected to include at least capitalize, slugify, truncate and padLeft) has its own section in README.md.
+FAIL: any exported function has no section. Note: on the base branch slugify has no README section, so a PR that adds only a padLeft section fails this check.
+
+Check 4 — "npm test passes"
+Run `npm test`.
+PASS: the test run completes with no failing tests.
+FAIL: any test fails, or the run errors.
+
+Advisory (does not affect PASS or FAIL):
+- Ideally `npm test` exits with status 0 and the test file includes padLeft tests covering both the padding case and the unchanged case.
+- Headings in the existing style (`## name(args)`) would be nice; any section heading naming the function is enough for check 3.
+- Behaviour with multi-character fill strings is not specified by the issue.

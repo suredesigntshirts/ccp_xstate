@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.1",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4 not quoted word for word in the builder brief: \"node bin/greet.js --shout <name> prints the greeting in upper case\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Check 1's expect line names only the order \"--shout <name>\". Its PASS and FAIL still require `node bin/greet.js Ada --shout` to work too: \"FAIL: either --shout run exits non-zero…\". The Advisory confirms this: \"both are covered in Check 1\". The words don't require that second order. Check 2's expect line only says output without --shout is unchanged. Its PASS also requires \"`npm test` passes\" and its FAIL includes \"or `npm test` fails\". That test-suite requirement goes beyond the words and belongs under Advisory. Checks 3 and 4 stay within their lines: docs mention --shout and say what it does, and the workflow still publishes docs/. Checks 1 and 2 add stricter conditions to PASS/FAIL, so the criterion is not met.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Most commands would run as written. `node bin/greet.js --shout Ada`, `node bin/greet.js Ada --shout`, `node bin/greet.js; echo \"exit=$?\"` and `npm test` (which runs \"node --test\") all use files that exist at this commit: bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml.\n\nCheck 2 of the verifier brief breaks the criterion. It says \"e.g. `git stash`-free: `git worktree add /tmp/greet-base <merge-base of the PR>`\". Run as written, the shell reads `<merge-base` as input redirection from a file that doesn't exist, so the command fails. The placeholder is never turned into a real command such as `$(git merge-base HEAD main)`. The other option, \"`git show <merge-base>:bin/greet.js` with its src\", has the same placeholder problem. It also only prints one file's contents, so it can't run the base code to compare outputs. This comparison step is not runnable as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the verifier brief against both must_catch items, and it handles both. Item 1 (line 4): Check 4 says \"The live page can only be seen after merge; do not fetch it.\" It then reads .github/workflows/pages.yml and docs/index.md at the PR head. To pass, the workflow must still publish docs/ on push to main and docs/index.md must list --shout. Item 2 (line 2): Check 2 runs the program without --shout at the head. It then gets the same outputs from the code before the change (\"git worktree add /tmp/greet-base <merge-base of the PR>\" or the base bin/greet.js) and compares them. It fails if \"any output or exit code differs from the base when --shout is not given.\" This goes further than comparing against a hand-written string. Both items are covered.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked Check 4 of the verifier brief against both must_not items. Item 1 is avoided: the brief says \"The live page can only be seen after merge; do not fetch it.\" So it never judges line 4 by what the live page shows today. Item 2 is avoided: the PASS is not silent and rests on evidence. The verifier must read .github/workflows/pages.yml and docs/index.md at the head. It passes only if the workflow still runs on push to main and deploys `docs`, and docs/index.md lists --shout. The brief also says outright that this checks what will produce the page, not the page itself. The builder brief adds no check of its own for line 4. It only asks the PR to note that the page updates after merge. Neither forbidden behaviour appears anywhere in the output.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked the builder brief for verifier probes and conditions, and it carries several. Builder step 1 says \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline\", and step 4 asks for a test expecting \"`HELLO, ADA!\\n`\". Those are Check 1's input (Ada) and expected output. Step 2 states Check 2's PASS condition: \"`node bin/greet.js Ada` prints `Hello, Ada!\\n`\" and the no-name run writes usage to stderr and exits 2. Step 3's \"do not change .github/workflows/pages.yml\" repeats Check 4's FAIL condition. Running the command the expect line names would be allowed. But the brief hands the builder the checker's exact inputs and expected outputs, so it gives the builder the checker's methods and not just the bar.",
+      "cached": true
+    }
+  }
+}

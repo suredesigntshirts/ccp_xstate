@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "cbc9e35d65ad878e01efabcb19baf973043a6f427bedd7a15c12f0335babc563",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each check's PASS and FAIL conditions against its expect line. Checks 1, 2, 3, 5 and 6 stay within their words. Ordering, `-` naming, the exit codes, the error on stderr, the case list and \"green at its head\" all trace back to the lines. Check 4 breaks the criterion. Line 4 only says \"lint(text) in src/index.js is unchanged\", which a code diff settles. But the PASS condition also asks for a runtime comparison: \"the two outputs are identical\", taken from running lint on one sample input at the base commit and at the head. FAIL adds \"or the outputs differ.\" That behavioural test is something the words don't require, and it can fail even when lint's code is identical (for example, if a helper changed). It belongs under Advisory, not in the PASS or FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 12176,
+  "tokens": {
+    "input": 2,
+    "output": 1165,
+    "cacheCreation": 5491,
+    "cacheRead": 783,
+    "fresh": 6658,
+    "total": 7441
+  },
+  "at": "2026-11-05T08:41:39.424Z"
+}

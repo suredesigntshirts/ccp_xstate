@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "3c689b324570d1a1794d80be7adb0ea79f361296ae1bff6d4cb8a1c61b2531ba",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one.\n1. Neither note is a PASS or FAIL condition. Builder step 4 says the app \"starts with its defaults\" now that loadConfig no longer throws, which replaces the old `bad config: <message>` exit. Step 6 has the builder say in the PR description that \"returning {} hides the parse error: the user is not told which file is broken or where.\" The verifier's Advisory section repeats this: \"Without one, the user still can't tell which file is broken.\" Neither brief says outright that the issue body asks for the broken file to be shown, but the conflict is clearly flagged.\n2. Builder step 3 replaces the existing 'bad JSON throws' test in test/config.test.js with one where invalid JSON deep-equals {}. Step 5 then runs npm test.\n3. Verifier Check 1 writes `{port: 9000` to a file and calls loadConfig on it. It PASSes when nothing throws and the output is `{}`.",
+  "model": "claude-opus-5-5",
+  "ms": 10111,
+  "tokens": {
+    "input": 2,
+    "output": 824,
+    "cacheCreation": 2738,
+    "cacheRead": 783,
+    "fresh": 3564,
+    "total": 4347
+  },
+  "at": "2026-11-05T08:40:47.877Z"
+}

@@ -1,0 +1,107 @@
+{
+  "1": {
+    "result": {
+      "builder": "Add an `f2c` (Fahrenheit to Celsius) command to the units CLI. Make one pull request that meets every acceptance line below.\n\nCurrent state: `bin/units.js` handles only `c2f`. Any other command prints `unknown command: <cmd>` to stderr and exits 2. `src/convert.js` exports only `cToF`. `test/convert.test.js` tests `cToF`. `npm test` runs `node --test`. `README.md` has a `## c2f` section with an example.\n\nAcceptance lines (all must hold):\n1. `node bin/units.js f2c 212` prints `100` followed by a newline.\n2. `node bin/units.js f2c 98.6` prints `37` followed by a newline.\n3. `node bin/units.js c2f 100` still prints `212` followed by a newline.\n4. `npm test` exits 0, and test/ contains at least one test of the Fahrenheit to Celsius conversion.\n5. README.md documents f2c with an example invocation.\n\nSteps:\n1. In `src/convert.js`, add `fToC(f)` and export it next to `cToF`. Compute it as `(f - 32) * 5 / 9`. Do not use `(f - 32) / 1.8`: in Node it gives `36.99999999999999` for 98.6, which breaks line 2. `(98.6 - 32) * 5 / 9` gives exactly `37`.\n2. In `bin/units.js`, add an `f2c` branch that prints `String(fToC(n))` with `console.log`, the same way `c2f` prints. Print plain numbers with no unit suffix. Leave the `c2f` branch, its output format, and the unknown-command message and exit status 2 unchanged.\n3. In `test/convert.test.js`, or a new `*.test.js` file in `test/`, add tests for `fToC`. Assert at least that `fToC(212) === 100` and `fToC(98.6) === 37`. Keep the existing `cToF` test.\n4. In `README.md`, add a `## f2c` section after `## c2f` with an example invocation in the same style, e.g. `    node bin/units.js f2c 212    # prints 100`.\n5. From the repo root, run `node bin/units.js f2c 212`, `node bin/units.js f2c 98.6`, `node bin/units.js c2f 100` and `npm test`. Confirm the outputs are `100`, `37` and `212`, and that `npm test` exits 0.\n\nOut of scope: Kelvin or any other unit, and any change to c2f output or to unknown-command behaviour.",
+      "verifier": "Check the pull request for issue https://github.com/o/units/issues/3 (add an `f2c` command). Run every command from the repository root at the PR head. Do one check per acceptance line, in this order.\n\nCheck 1. Line: \"`node bin/units.js f2c 212` prints `100` followed by a newline.\"\nRun: `node bin/units.js f2c 212 | od -c` (or capture stdout another way that shows the trailing newline).\nPASS: stdout is exactly `100` followed by a newline.\nFAIL: stdout is anything else (e.g. `100.00000000000001`, `100 C`, no trailing newline, empty output), or the command errors.\n\nCheck 2. Line: \"`node bin/units.js f2c 98.6` prints `37` followed by a newline.\"\nRun: `node bin/units.js f2c 98.6 | od -c`.\nPASS: stdout is exactly `37` followed by a newline.\nFAIL: stdout is anything else (e.g. `36.99999999999999`), or the command errors.\n\nCheck 3. Line: \"`node bin/units.js c2f 100` still prints `212` followed by a newline.\"\nRun: `node bin/units.js c2f 100 | od -c`.\nPASS: stdout is exactly `212` followed by a newline.\nFAIL: stdout is anything else, or the command errors.\n\nCheck 4. Line: \"`npm test` exits 0, and test/ contains at least one test of the Fahrenheit to Celsius conversion.\"\nRun: `npm test; echo \"exit=$?\"`. Then read the files under `test/`.\nPASS: the exit status is 0, and at least one test in `test/` exercises Fahrenheit to Celsius conversion, either through the conversion function (e.g. `fToC`) or by running `bin/units.js f2c`.\nFAIL: `npm test` exits non-zero, or no test in `test/` covers Fahrenheit to Celsius conversion.\n\nCheck 5. Line: \"README.md documents f2c with an example invocation.\"\nRun: read `README.md` at the head.\nPASS: README.md describes the `f2c` command and includes at least one example invocation of it (e.g. `node bin/units.js f2c 212`).\nFAIL: README.md does not mention `f2c`, or mentions it with no example invocation.\n\nAdvisory (does not affect PASS/FAIL):\n- The issue's proof for line 4 suggests `node --test test/*.spec.js`. The repo's existing test file is `test/convert.test.js`, so that glob may match nothing. Judge line 4 by `npm test` and by reading `test/`.\n- Useful extra checks, to report but not to grade on: the f2c test asserts 212 -> 100 and 98.6 -> 37; `node bin/units.js k2c 1` still prints `unknown command: k2c` to stderr and exits 2; the README example output matches the real output; there is no Kelvin or other new unit."
+    },
+    "bench": {
+      "model": "claude-opus-5-5",
+      "workflow": {
+        "id": "quick-fix@cb8645f40db0d2d76fa69227eb78f07668175817e6a2a2a7b5b5eb83d06bbda0",
+        "sha256": "cb8645f40db0d2d76fa69227eb78f07668175817e6a2a2a7b5b5eb83d06bbda0",
+        "source": "workflows/quick-fix.json and workflows/quick-fix/"
+      },
+      "at": "2026-11-05T09:19:04.301Z",
+      "ms": 32842,
+      "tokens": {
+        "input": 12,
+        "output": 3048,
+        "cacheCreation": 11142,
+        "cacheRead": 111882,
+        "fresh": 14202,
+        "total": 126084
+      },
+      "claude": {
+        "version": "2.1.318",
+        "session": "722a6de7-84fb-4054-a1f1-09725884212a",
+        "stop": "completed"
+      },
+      "returns": [
+        {
+          "call": 1,
+          "accepted": true
+        }
+      ]
+    }
+  },
+  "2": {
+    "result": {
+      "builder": "Goal: add an `f2c` command to the units CLI so Fahrenheit converts to Celsius, and leave `c2f` working exactly as it does now. Make one pull request that meets every line below.\n\nCurrent state: `bin/units.js` handles only `c2f`. It calls `cToF` from `src/convert.js` and prints `String(result)` with `console.log`. Any other command prints `unknown command: <cmd>` to stderr and exits 2. `src/convert.js` exports only `cToF`. The tests are in `test/convert.test.js` and use `node:test`. `npm test` runs `node --test`.\n\nSteps:\n1. In `src/convert.js`, add and export `fToC(f)`, keeping `cToF` exported unchanged. Use `(f - 32) * 5 / 9`. Floating point depends on the order of operations: `(98.6 - 32) * 5 / 9` gives exactly 37, but `(98.6 - 32) / 1.8` gives 36.99999999999999. Whatever formula you choose, the CLI output for 98.6 must be exactly `37`. If you add rounding, apply it only to f2c so c2f output does not change.\n2. In `bin/units.js`, add an `f2c` branch that prints `String(fToC(n))` with `console.log`, the same way c2f prints. Do not change the c2f branch, the unknown-command message or exit status 2. Do not add a unit suffix.\n3. In `test/convert.test.js`, or a new test file under `test/`, add at least one test of the Fahrenheit-to-Celsius conversion, for example `fToC(212) === 100` and `fToC(98.6) === 37`. Keep the existing cToF test.\n4. In `README.md`, add an `f2c` section next to the c2f one, with an example invocation such as `node bin/units.js f2c 212    # prints 100`.\n5. From the repo root, check each of these:\n   - `node bin/units.js f2c 212` prints `100` and a newline.\n   - `node bin/units.js f2c 98.6` prints `37` and a newline.\n   - `node bin/units.js c2f 100` prints `212` and a newline.\n   - `npm test` exits 0.\n\nThe pull request must meet these acceptance lines:\n- `node bin/units.js f2c 212` prints `100` followed by a newline.\n- `node bin/units.js f2c 98.6` prints `37` followed by a newline.\n- `node bin/units.js c2f 100` still prints `212` followed by a newline.\n- `npm test` exits 0, and test/ contains at least one test of the Fahrenheit to Celsius conversion.\n- README.md documents f2c with an example invocation.\n\nOut of scope: Kelvin or any other unit, and any change to c2f output or to the unknown-command exit status.",
+      "verifier": "Run every check at the pull request head, from the repository root. Run `npm install` first only if package.json has gained dependencies.\n\nCheck 1. Expect line: \"`node bin/units.js f2c 212` prints `100` followed by a newline.\"\nRun: `node bin/units.js f2c 212 | od -c`, or capture stdout another way that shows trailing characters.\nPASS: stdout is `100` followed by a newline.\nFAIL: stdout is anything else, for example `100.00000000000001`, `100 C`, no trailing newline or nothing at all.\n\nCheck 2. Expect line: \"`node bin/units.js f2c 98.6` prints `37` followed by a newline.\"\nRun: `node bin/units.js f2c 98.6 | od -c`.\nPASS: stdout is `37` followed by a newline.\nFAIL: stdout is anything else, for example `36.99999999999999`, `37.00000000000001`, `37.0`, a unit suffix or no trailing newline.\n\nCheck 3. Expect line: \"`node bin/units.js c2f 100` still prints `212` followed by a newline.\"\nRun: `node bin/units.js c2f 100 | od -c`.\nPASS: stdout is `212` followed by a newline.\nFAIL: stdout is anything else.\n\nCheck 4. Expect line: \"`npm test` exits 0, and test/ contains at least one test of the Fahrenheit to Celsius conversion.\"\nRun: `npm test; echo \"exit=$?\"`. Then read the files under `test/` and find a test that exercises Fahrenheit-to-Celsius conversion. It may call the conversion function directly, for example `fToC`, or run the CLI with `f2c`.\nPASS: the run prints `exit=0`, and at least one test under `test/` checks a Fahrenheit-to-Celsius result.\nFAIL: the exit status is not 0, or no test under `test/` covers Fahrenheit-to-Celsius conversion.\n\nCheck 5. Expect line: \"README.md documents f2c with an example invocation.\"\nRead `README.md` at the head.\nPASS: it documents the `f2c` command and includes an example command that invokes f2c, such as `node bin/units.js f2c 212`.\nFAIL: f2c is not mentioned, or it is mentioned without any example invocation.\n\nAdvisory (none of these affect PASS or FAIL):\n- The issue's proof for line 4 suggests running `node --test test/*.spec.js`. The repo's test file is `test/convert.test.js`, so that glob may match nothing and fail even when the suite is fine. Judge line 4 by `npm test` only. You may also run `node --test` or `node --test test/*.spec.js` and report their results.\n- Non-goals the PR should respect: the unknown-command exit status should still be 2 (try `node bin/units.js k2c 1; echo $?`), and no Kelvin or other units should be added. Report any deviation as a note.\n- Extra values to try: `f2c 32` should give `0` and `f2c -40` should give `-40`."
+    },
+    "bench": {
+      "model": "claude-opus-5-5",
+      "workflow": {
+        "id": "quick-fix@cb8645f40db0d2d76fa69227eb78f07668175817e6a2a2a7b5b5eb83d06bbda0",
+        "sha256": "cb8645f40db0d2d76fa69227eb78f07668175817e6a2a2a7b5b5eb83d06bbda0",
+        "source": "workflows/quick-fix.json and workflows/quick-fix/"
+      },
+      "at": "2026-11-05T09:19:04.306Z",
+      "ms": 40374,
+      "tokens": {
+        "input": 12,
+        "output": 3158,
+        "cacheCreation": 11327,
+        "cacheRead": 112019,
+        "fresh": 14497,
+        "total": 126516
+      },
+      "claude": {
+        "version": "2.1.318",
+        "session": "87289077-2dab-4349-8abc-42cfa8222d69",
+        "stop": "completed"
+      },
+      "returns": [
+        {
+          "call": 1,
+          "accepted": true
+        }
+      ]
+    }
+  },
+  "3": {
+    "result": {
+      "builder": "Goal: add an `f2c` command to the units CLI so Fahrenheit converts to Celsius, and leave `c2f` working exactly as it does now.\n\nCurrent state: bin/units.js handles only `c2f`. Any other command prints `unknown command: <cmd>` to stderr and exits 2. src/convert.js exports only `cToF`. test/convert.test.js has one node:test case for cToF. package.json has `\"test\": \"node --test\"`. README.md has one `## c2f` section.\n\nSteps:\n1. In src/convert.js add `fToC(f)` and export it next to `cToF`. Compute it as `(f - 32) * 5 / 9`. Keep that operation order: in Node it gives exactly 37 for 98.6, but `(f - 32) / 1.8` gives 36.99999999999999. Leave `cToF` unchanged.\n2. In bin/units.js add an `f2c` branch that prints `String(fToC(n))` with console.log, the same way `c2f` prints. Leave the `c2f` branch, its output format and the unknown-command branch (message and exit 2) unchanged. Add no unit suffix.\n3. In test/convert.test.js, or a new file under test/ that `node --test` picks up (for example test/f2c.test.js), add tests for fToC. Assert at least that fToC(212) === 100 and fToC(98.6) === 37. You may also add a test that runs bin/units.js f2c with child_process and checks the output.\n4. In README.md add an `## f2c` section like the c2f one, with an example invocation such as `node bin/units.js f2c 212    # prints 100`.\n5. Check from the repo root:\n   - `node bin/units.js f2c 212` prints exactly `100\\n`.\n   - `node bin/units.js f2c 98.6` prints exactly `37\\n`.\n   - `node bin/units.js c2f 100` prints exactly `212\\n`.\n   - `npm test` exits 0.\n6. Do not add Kelvin or any other unit. Do not change the c2f output format or the unknown-command exit status. Open one pull request with these changes.",
+      "verifier": "Check out the pull request's head and run every command from the repository root. Run each check below and report PASS or FAIL for each, with the output you saw.\n\nCheck 1. Expect line: \"`node bin/units.js f2c 212` prints `100` followed by a newline.\"\nRun: `node bin/units.js f2c 212 | od -c` (also `node bin/units.js f2c 212` on its own).\nPASS: stdout is `100` followed by a newline.\nFAIL: stdout is anything else (for example `100.00000000000001`, `100 C`, or nothing), or there is no newline after it.\n\nCheck 2. Expect line: \"`node bin/units.js f2c 98.6` prints `37` followed by a newline.\"\nRun: `node bin/units.js f2c 98.6 | od -c`.\nPASS: stdout is `37` followed by a newline.\nFAIL: stdout is anything else (for example `36.99999999999999` or `37.0`), or there is no newline after it.\n\nCheck 3. Expect line: \"`node bin/units.js c2f 100` still prints `212` followed by a newline.\"\nRun: `node bin/units.js c2f 100 | od -c`.\nPASS: stdout is `212` followed by a newline.\nFAIL: stdout is anything else, or there is no newline after it.\n\nCheck 4. Expect line: \"`npm test` exits 0, and test/ contains at least one test of the Fahrenheit to Celsius conversion.\"\nRun: `npm test; echo \"exit=$?\"`. Then list test/ and read its files at the head.\nPASS: you see `exit=0`, and at least one test under test/ exercises Fahrenheit to Celsius conversion. That can be a call to a conversion function such as fToC, or a run of `bin/units.js f2c`, with an assertion on the result.\nFAIL: the exit status is not 0, or no test under test/ exercises Fahrenheit to Celsius conversion.\n\nCheck 5. Expect line: \"README.md documents f2c with an example invocation.\"\nRun: read README.md at the head (for example `cat README.md`).\nPASS: README.md documents the f2c command and includes an example command line that invokes f2c (for example `node bin/units.js f2c 212`).\nFAIL: README.md does not mention f2c, or mentions it with no example invocation.\n\nAdvisory (does not affect PASS or FAIL):\n- The issue's proof text suggests `node --test test/*.spec.js`. The existing test file is test/convert.test.js, so that glob may match nothing. Check 4 uses `npm test` as its expect line says.\n- Optionally confirm the non-goals: `node bin/units.js foo 1; echo $?` should still print `unknown command: foo` to stderr and exit 2, and no Kelvin or other unit should be added. Report any regression as a note only.\n- Optionally run the README's f2c example and confirm the output it shows matches what the program prints."
+    },
+    "bench": {
+      "model": "claude-opus-5-5",
+      "workflow": {
+        "id": "quick-fix@cb8645f40db0d2d76fa69227eb78f07668175817e6a2a2a7b5b5eb83d06bbda0",
+        "sha256": "cb8645f40db0d2d76fa69227eb78f07668175817e6a2a2a7b5b5eb83d06bbda0",
+        "source": "workflows/quick-fix.json and workflows/quick-fix/"
+      },
+      "at": "2026-11-05T09:19:04.310Z",
+      "ms": 29595,
+      "tokens": {
+        "input": 12,
+        "output": 2807,
+        "cacheCreation": 10984,
+        "cacheRead": 111910,
+        "fresh": 13803,
+        "total": 125713
+      },
+      "claude": {
+        "version": "2.1.318",
+        "session": "72df9049-4d29-4144-9e6a-17c3d7e1f163",
+        "stop": "completed"
+      },
+      "returns": [
+        {
+          "call": 1,
+          "accepted": true
+        }
+      ]
+    }
+  }
+}

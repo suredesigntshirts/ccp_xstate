@@ -1,0 +1,43 @@
+Check the pull request for https://github.com/suredesigntshirts/ccp_machine_test/issues/102 at its head commit. Check out the PR head in your worktree. Find the PR number (for example with `gh api 'repos/suredesigntshirts/ccp_machine_test/pulls?state=all&per_page=50' --jq '.[] | [.number, .head.ref, .head.sha, .state] | @tsv'`) and set it as `PR=<number>` in the shell. Run `npm ci` once at the repository root before the checks. Run every command from the repository root. There is exactly one check per expect line, in order. Judge each check only on its stated PASS and FAIL conditions.
+
+Check 1. Expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for every row that is not valid JSON (1-based lines, blank lines skipped, an unterminated last line checked) and exits 1 if any, 0 if none"
+Run:
+`d=$(mktemp -d); printf '{"a":1}\n\n{bad\n[1,2]\n\n{"b":2' > "$d/mixed.jsonl"; node packages/jsonl-lint/bin/jsonl-lint.js "$d/mixed.jsonl"; echo "exit=$?"`
+`printf '{"a":1}\n{"b":' > "$d/torn.jsonl"; node packages/jsonl-lint/bin/jsonl-lint.js "$d/torn.jsonl"; echo "exit=$?"`
+`printf '{"a":1}\n\n[2]\n"s"\n' > "$d/clean.jsonl"; node packages/jsonl-lint/bin/jsonl-lint.js "$d/clean.jsonl"; echo "exit=$?"`
+`printf '{"a":1}\n{"b":2}' > "$d/clean2.jsonl"; node packages/jsonl-lint/bin/jsonl-lint.js "$d/clean2.jsonl"; echo "exit=$?"`
+PASS if all of these hold. mixed.jsonl prints exactly two stdout lines, one starting with `<path>:3: ` and one with `<path>:6: `, where `<path>` is the path exactly as passed, and each line has non-empty error text after the prefix; it reports no other line (in particular not the blank lines 2 and 5) and exits 1. torn.jsonl prints exactly one line starting with `<path>:2: ` followed by non-empty error text, and exits 1. clean.jsonl and clean2.jsonl print nothing to stdout and exit 0. FAIL if any of these differ: a missing or extra reported line, a wrong line number (0-based, or blank lines not counted), a blank line reported, the unterminated last row not reported, a different prefix format, or a wrong exit code.
+
+Check 2. Expect: "A missing file or no argument prints to stderr and exits 2"
+Run:
+`node packages/jsonl-lint/bin/jsonl-lint.js > /tmp/jl-out1 2> /tmp/jl-err1; echo "exit=$?"; wc -c < /tmp/jl-err1`
+`node packages/jsonl-lint/bin/jsonl-lint.js /nonexistent/nope.jsonl > /tmp/jl-out2 2> /tmp/jl-err2; echo "exit=$?"; wc -c < /tmp/jl-err2`
+PASS if both commands print `exit=2` and both stderr files are non-empty (the byte count is greater than 0). FAIL if either exit code is not 2 or either stderr file is empty.
+
+Check 3. Expect: "packages/jsonl-lint/src/index.js exports lint(text) returning [{ line, error }]"
+Run:
+`node --input-type=module -e "import { lint } from './packages/jsonl-lint/src/index.js'; const r = lint('{\"a\":1}\n\n{bad\n[1]\n{\"b\":'); console.log(JSON.stringify(r)); console.log(JSON.stringify(lint('{\"a\":1}\n\n[2]\n')));"; echo "exit=$?"`
+PASS if the import works, the first printed value is an array of exactly two objects, each with a numeric `line` and a non-empty string `error`, the lines are 3 and 5, the second printed value is `[]`, and the command prints `exit=0`. FAIL if `lint` is not a named export, the import fails, the return value is not an array of `{ line, error }` objects, or the line numbers or the empty result differ.
+
+Check 4. Expect: "The workspace has its own package.json (jsonl-lint, type module, test script node --test), no runtime dependencies, and node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes"
+Run:
+`node -e "const p=require('./packages/jsonl-lint/package.json'); console.log(p.name, p.type, JSON.stringify(p.scripts&&p.scripts.test), JSON.stringify(p.dependencies||{}))"`
+`npm test -w jsonl-lint; echo "exit=$?"`
+Then read the test files under `packages/jsonl-lint/` (`ls -R packages/jsonl-lint`).
+PASS if all of these hold. The first command prints name `jsonl-lint`, type `module`, a test script that is `node --test` (optionally followed by arguments), and `{}` for dependencies. The workspace tests run under `node:test` and print `exit=0`. The test files import from `node:test` and contain tests that actually exercise each of: a clean file, a bad middle row, a torn (unterminated) last row, blank lines, and the CLI exit codes. FAIL if `package.json` is missing or any field differs, there are runtime dependencies, the tests fail or do not run, or any of the five scenarios has no test.
+
+Check 5. Expect: "packages/jsonl-lint/README.md exists and the root README lists the tool"
+Run: `test -s packages/jsonl-lint/README.md; echo "exists=$?"; grep -n 'jsonl-lint' README.md; echo "grep=$?"`
+PASS if the output shows `exists=0` and `grep=0`, and the matching root README line presents jsonl-lint as a tool in the repo. FAIL if the workspace README is missing or empty, or the root README does not mention jsonl-lint.
+
+Check 6. Expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, and npm test and the test workflow are green at its head"
+Run:
+`gh api "repos/suredesigntshirts/ccp_machine_test/pulls/$PR" --jq '.body, .head.sha, .state'`
+`gh api "repos/suredesigntshirts/ccp_machine_test/commits/$(gh api "repos/suredesigntshirts/ccp_machine_test/pulls/$PR" --jq .head.sha)/check-runs" --jq '.check_runs[] | [.name, .status, .conclusion] | @tsv'`
+`git rev-parse HEAD; npm ci && npm test; echo "exit=$?"`
+PASS if all of these hold. The change is in a single PR on suredesigntshirts/ccp_machine_test. Its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102`. The `test` check run for the head SHA is `completed` with conclusion `success`. Your checked-out `HEAD` equals that head SHA. `npm ci && npm test` prints `exit=0`, and its output shows the jsonl-lint tests ran rather than `no workspaces under packages/`. FAIL if the change is spread over several PRs or is in no PR, the Closes line is missing or names a different URL, the test workflow is missing, still pending or failed at the head, or `npm test` fails at the head.
+
+Advisory (does not affect PASS or FAIL):
+- Check whether whitespace-only lines and CRLF line endings are treated as blank and valid respectively. Note what you find, but do not fail on it.
+- Check that `package-lock.json` was updated for the new workspace, since `npm ci` depends on it.
+- Check that the CLI sets `process.exitCode` rather than calling `process.exit()` before stdout is flushed (piping the output of a large bad file through `wc -l` is a quick test).

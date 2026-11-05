@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "1512b3796c3723217dcbae69bd29f627a5c7b1e022e8a8d40301da43ea0d982a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository: src/app.js, src/config.js, test/config.test.js, and the `npm test` script (`node --test`). The builder's step 6 commands are valid shell. `mktemp -d`, the printf escapes and `node src/app.js $d/c.json` are fine, and `$d` is reused within the same session. In the verifier brief, checks 1–4 use valid shell. The `node --input-type=module -e` snippets have valid ESM syntax: the `{loadConfig}` named import is the same one the issue's own proofs use, and `import assert from 'node:assert/strict'` is a real module. `wc -c < $d/out` and the grep -F calls are valid. Check 5 uses `git merge-base HEAD <the PR's target ref>`, a placeholder the verifier fills in. After that, `git checkout B -- src && npm test; git checkout HEAD -- src` restores the tree. The spawnSync/process.execPath suggestion is a real Node API. I found no command that names a missing file or tool, or has bad syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 11040,
+  "tokens": {
+    "input": 2,
+    "output": 763,
+    "cacheCreation": 5730,
+    "cacheRead": 783,
+    "fresh": 6495,
+    "total": 7278
+  },
+  "at": "2026-11-05T08:38:46.032Z"
+}

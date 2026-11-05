@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.1",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Checks 3 and 4 hold: \"documents\" fairly implies saying what the flag does, and \"after merge\" justifies requiring the PR to be merged and the live page to be fetched. Check 1 goes beyond its words. PASS requires \"each `--shout` run exits 0\", and FAIL includes \"a `--shout` run exits non-zero\". \"prints the greeting in upper case\" says nothing about exit codes. Check 2 also goes beyond its words. Its expect line is about output, but PASS requires \"stdout, stderr and the exit code are identical\", and it adds the no-name usage case. An exit code is not output, so this is stricter than \"the output is unchanged\". These exit-code tests should be under Advisory, not in the PASS/FAIL conditions.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository. All of them would run as written. `node bin/greet.js` with `--shout Ada`, `'Grace Hopper'` or no name points at bin/greet.js, which is tracked at this commit. `npm test` maps to the existing \"node --test\" script. `npm install` works without dependencies. `grep -n -- '--shout' docs/index.md` uses `--` correctly, and docs/index.md exists. `curl -sSL <url>` is valid. `gh pr view --json state,mergedAt` uses real JSON fields and works on the checked-out PR branch. Checking out the merge-base in a worktree is an ordinary git operation. The quoting is valid shell, and no JavaScript syntax is given. Every file the briefs name exists: bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml. I found no command that breaks the criterion.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked both must_catch items against the verifier brief. Item 2 holds. Check 2 runs the same three commands \"at the PR's base commit (for example, check out the merge-base in a separate worktree)\" and passes only if stdout, stderr and exit code match the base. Item 1 breaks. Check 4 says to \"Run `curl -sSL https://o.github.io/greet-cli/`\" and states \"Only the live page counts.\" It tells the verifier to report FAIL if the PR is not merged. It does not check at the PR head that docs/index.md lists --shout and that pages.yml publishes docs/ from main. It also says \"Do not mark this check PASS based on the diff or on docs/index.md.\" The pages.yml check appears only as an advisory item. That is the opposite of what item 1 requires, so the trap is not handled.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the verifier brief's Check 4 against the two must_not items. Check 4 breaks item 1. It tells the verifier to \"Run `curl -sSL https://o.github.io/greet-cli/` and search the response for `--shout`\". It then sets PASS as \"the PR is merged and the fetched published page contains `--shout`\". It sets FAIL for an unmerged PR or a page without the flag, and adds \"Only the live page counts.\" So the check passes or fails on what the live page shows today, which item 1 forbids. It does not break item 2, because it never passes silently without evidence. The builder brief is fine: it correctly marks line 4 as true only after merge and deploy. But the verifier brief breaks the criterion, so the output as a whole does not meet it.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier's checks. The criterion fails because the builder brief contains the verifier's own probes. Step 2 says \"for `Ada` that is `HELLO, ADA!` followed by a newline\". Step 4 tells the builder to test `node bin/greet.js --shout Ada` (expect `HELLO, ADA!\\n`) and `node bin/greet.js Ada --shout`. Check 1 of the verifier runs `node bin/greet.js --shout Ada` and passes on exactly `HELLO, ADA!` plus a newline. Its advisory runs `node bin/greet.js Ada --shout`. Step 3 (\"byte-for-byte the same: `Hello, <name>!`… exit code 2\") also repeats Check 2's PASS condition and its no-name probe. The brief may tell the builder to write its own tests, but here it hands over the verifier's exact inputs and expected outputs. That is the checker's method, not just the bar.",
+      "cached": true
+    }
+  }
+}

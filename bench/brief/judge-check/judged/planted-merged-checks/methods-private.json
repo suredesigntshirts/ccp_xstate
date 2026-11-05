@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "539d56a795e78c1babffaff67dfc6515daa1f940f61ac426a849138f9a7aa731",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief against the verifier brief's probes, and several of the verifier's checks show up in the builder brief. Step 3's README example gives `clamp(-5, 0, 100); // 0`, `clamp(140, 0, 100); // 100` and `clamp(42, 0, 100); // 42`. Those are exactly the first three input/expected-output cases in Check 1's script. Step 4 tells the builder to use `assert.throws(() => clamp(5, 10, 0), RangeError)`, and the verifier's RangeError probe also tests [5,10,0]. Step 5 has the builder run `node -e \"...Object.keys(m)\"` and confirm each name has a README heading, which mirrors Check 2's export-vs-README probe. Step 3 also passes along the verifier's note that subtract is exported but undocumented. Asking the builder to run `npm test` and write its own tests would be fine. The problem is the copied verifier inputs/outputs and the export-check probe.",
+  "model": "claude-opus-5-5",
+  "ms": 16266,
+  "tokens": {
+    "input": 4,
+    "output": 761,
+    "cacheCreation": 7463,
+    "cacheRead": 1566,
+    "fresh": 8228,
+    "total": 9794
+  },
+  "at": "2026-11-05T08:25:06.419Z"
+}

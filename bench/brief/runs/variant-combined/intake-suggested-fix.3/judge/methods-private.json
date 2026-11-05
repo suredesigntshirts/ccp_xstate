@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "ed29557b413730ab297c2a7f49ca023ad9f4c9a224d34acb0b90574d97b144cd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with each verifier check. The builder's step 5 hand check (`printf '{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n' > $d/c.json; node src/app.js $d/c.json`, plus the ok.json run) repeats commands from the issue's proofs 1 and 4, which the criterion allows. Its expected results (\"exit 1 with empty stdout\", \"`bad config:`, `$d/c.json`, line 3 and column 3\") restate the expect lines, so they are the bar, not verifier PASS/FAIL wording. The builder brief leaves out the verifier's other probes: the Check 3 inline `node --input-type=module` script, the Check 4 loadConfig one-liner, and the Check 5 step that runs the tests against the base `src/` (`git checkout <base> -- src`). The test-writing instructions are allowed. Telling the builder to run `npm test` is also allowed. The builder brief does not carry any of the verifier's checks.",
+  "model": "claude-opus-5-5",
+  "ms": 9041,
+  "tokens": {
+    "input": 2,
+    "output": 664,
+    "cacheCreation": 5555,
+    "cacheRead": 783,
+    "fresh": 6221,
+    "total": 7004
+  },
+  "at": "2026-11-05T08:55:49.000Z"
+}

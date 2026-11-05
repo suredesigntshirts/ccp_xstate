@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "e1f9313ae97eacfbac5911454221d748feac26abd7c69470fbff56f76ce8a683",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. Most of them are fine. `npm test` maps to `node --test`. The builder's `node -e \"...Object.keys(m)...\"` is valid, and verifier checks 1 and 2 are valid JS inside double quotes.\n\nVerifier check 3 fails. Its script sits inside double quotes and builds `new RegExp('\\\\b'+n+'\\\\s*\\\\(')`. In bash double quotes, `\\\\` becomes `\\`, so node receives `'\\b'+n+'\\s*\\('`. In JS, `'\\b'` is a backspace character, `'\\s'` is just `s`, and `'\\('` is just `(`. The pattern therefore becomes `<backspace>adds*(`. That pattern has an unterminated group, so `new RegExp` throws a SyntaxError on the first export. The check errors out whatever README.md contains, which means this command does not run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 10517,
+  "tokens": {
+    "input": 2,
+    "output": 877,
+    "cacheCreation": 3360,
+    "cacheRead": 783,
+    "fresh": 4239,
+    "total": 5022
+  },
+  "at": "2026-11-05T08:41:29.230Z"
+}

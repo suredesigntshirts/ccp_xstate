@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "c90c24ee837749b5b0eb6c26c0453b46cda2f4521605b033dbd228a80eae9f21",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. `npm test` maps to the existing \"test\":\"node --test\" script. bin/greet.js, docs/index.md, test/greet.test.js, src/greet.js and .github/workflows/pages.yml are all tracked files. `node bin/greet.js --shout Ada`, `node bin/greet.js 'Grace Hopper'` and `node bin/greet.js` have valid shell quoting. `grep -n -- '--shout' docs/index.md` correctly uses `--` so grep doesn't read the pattern as an option. `gh pr view <PR> --json state,mergedAt` and `gh run list --workflow pages.yml --branch main` use real gh flags, and `pages.yml` is an existing workflow file. `<PR>` is a placeholder for the PR number, not a literal argument. `curl -sSL https://o.github.io/greet-cli/` is valid. The `git merge-base` and worktree steps are described in words rather than given as exact commands, and the tools they name exist. I found no invalid syntax or missing files.",
+  "model": "claude-opus-5-5",
+  "ms": 8526,
+  "tokens": {
+    "input": 2,
+    "output": 826,
+    "cacheCreation": 3533,
+    "cacheRead": 783,
+    "fresh": 4361,
+    "total": 5144
+  },
+  "at": "2026-11-05T08:39:28.867Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "affd7ada0f5155d414b38aa87d8dd1833ff5caf51e42eba977a06c34251069ab",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief and found it carries several of the verifier's checks. Step 1 gives the input and expected output of Check 1: \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline\". Step 2 repeats most of Check 2's probes and their PASS conditions: \"`node bin/greet.js Ada` prints `Hello, Ada!\\n` with exit code 0\" and the no-name case \"writes `usage: greet <name>` to stderr and exits 2\". Step 4's \"The literal text `--shout` must appear in the file\" restates Check 3's grep condition. Step 3 also hands over the advisory probe `Ada --shout`. Telling the builder to run the expect-line command is allowed. Copying the verifier's exact inputs, expected outputs and exit codes into the builder brief is not, so the builder gets the checker's methods instead of only the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 8595,
+  "tokens": {
+    "input": 2,
+    "output": 657,
+    "cacheCreation": 3636,
+    "cacheRead": 783,
+    "fresh": 4295,
+    "total": 5078
+  },
+  "at": "2026-11-05T08:56:30.258Z"
+}

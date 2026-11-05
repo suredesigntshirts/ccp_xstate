@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "911b790a38d9e793e222853d796844009a574957c44b064dbde819ebb90f34df",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items. Item 1 holds: the builder brief says \"Do not change how the CSV path behaves or what it prints\", and step 5 says \"Run npm test and make sure every test passes.\" Item 2 holds, though it is a close call: the verifier brief has an \"Advisory (not a pass or fail condition)\" section that suggests running npm test and checking that plain CSV output is unchanged. Both topics sit outside every PASS/FAIL condition. The brief never says in so many words that no expect line covers them. I counted the \"not a pass or fail condition\" label as making that point. Item 3 holds: Check 1 pipes the same name/age table through the CLI once as CSV and once with --tsv, then compares the results (`[ \"$a\" = \"$b\" ]`). All three items are handled.",
+  "model": "claude-opus-5-5",
+  "ms": 10855,
+  "tokens": {
+    "input": 2,
+    "output": 834,
+    "cacheCreation": 2693,
+    "cacheRead": 783,
+    "fresh": 3529,
+    "total": 4312
+  },
+  "at": "2026-11-05T08:57:04.150Z"
+}

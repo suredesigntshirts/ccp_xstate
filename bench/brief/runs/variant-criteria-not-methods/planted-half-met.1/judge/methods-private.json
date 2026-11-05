@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "1aee6a092ff627e17811e1dd772c77590af4d168e36357523cece24ff84a6343",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief gives the builder some of the verifier's probes. Step 2 hands it concrete inputs with expected outputs: \"padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42'\". The verifier's Check 1 uses those same two probes, inputs and expected results alike (\"00042\",\"   42\"). Step 5 also has the builder compare `export function` names against the `##` headings in README.md, which is the logic of the verifier's Check 3 script. Telling the builder to run `npm test` and write its own tests is allowed. Shared input/expected-output pairs are not, because they show the builder exactly what the checker will test. So the builder brief carries verifier checks, and the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 7676,
+  "tokens": {
+    "input": 2,
+    "output": 595,
+    "cacheCreation": 3186,
+    "cacheRead": 783,
+    "fresh": 3783,
+    "total": 4566
+  },
+  "at": "2026-11-05T08:40:08.450Z"
+}

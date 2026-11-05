@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "65e0ec9ef9aa40ae1df45fac025dc76c8d68c2a7f7f96018435737c2ea817e42",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared each builder step with the verifier's three checks. The builder brief doesn't include the verifier's printf inputs ('a,b\\n1,2\\n3,4\\n' and its TSV twin), its diff/echo SAME probe, its `grep -n -- '--tsv' README.md`, or any PASS/FAIL wording. Step 3 asks the builder to \"Add a test in test/csv.test.js that pipes the same table as CSV and as TSV\". That is the builder writing its own test, which is allowed. Step 5 says to \"Run `npm test` and keep every existing test passing\". That runs the repository's own tests, which is also allowed, even though verifier Check 3 runs the same command. Step 4 describes what to put in the README without the verifier's grep. The builder brief also quotes the expect lines, which is allowed. It sets the bar and leaves out the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 8338,
+  "tokens": {
+    "input": 2,
+    "output": 581,
+    "cacheCreation": 2205,
+    "cacheRead": 783,
+    "fresh": 2788,
+    "total": 3571
+  },
+  "at": "2026-11-05T08:24:50.846Z"
+}

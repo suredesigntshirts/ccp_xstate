@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "c57e5c6d2cd4153b98e615776a7498a31b323466610ac869804d2fee0c1de7be",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the PASS and FAIL conditions of all seven verifier checks against the words of their expect lines. Checks 1–5 test only the exact output and the trailing newline, plus exit 0 in Check 1. \"Followed by one \\n and nothing else\" just restates \"exactly … followed by a newline\". Check 6 passes on npm test exiting 0 plus a test that runs bin/csv2json.js with --tsv on input containing tabs and asserts on its output, which is what the line says. Check 7 needs only a mention of --tsv and an example invocation; \"e.g. node bin/csv2json.js --tsv < table.tsv\" is an example, not a required wording. The stricter items sit under the Advisory heading and are kept out of PASS/FAIL. They are: the proof's note that README must say the flag means tab-separated input, flag placement among other arguments, and the test:cli script. No check adds a mutation, branch or exact-wording rule.",
+  "model": "claude-opus-5-5",
+  "ms": 10814,
+  "tokens": {
+    "input": 2,
+    "output": 628,
+    "cacheCreation": 5462,
+    "cacheRead": 783,
+    "fresh": 6092,
+    "total": 6875
+  },
+  "at": "2026-11-05T08:37:54.671Z"
+}

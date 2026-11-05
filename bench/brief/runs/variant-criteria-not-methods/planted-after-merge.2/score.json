@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.2",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": false,
+      "why": "builder names a PR base: \"PR is merged to main\""
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS/FAIL conditions against the words of its expect line. Check 1's expect line is \"node bin/greet.js --shout <name> prints the greeting in upper case\". That fixes the order: flag first, then name. Its PASS condition also requires `node bin/greet.js Ada --shout` to work, and its FAIL condition triggers if \"either command exits non-zero\". The reversed order and the exit-code test are stricter than the words. They belong under Advisory. Check 2 (\"without --shout the output is unchanged\") also compares exit codes between head and base. An exit code is not output, so this goes further than the words. Checks 3 and 4 stay within their expect lines, and the Advisory section is used correctly for the other extras. Check 1 breaks the criterion, so it does not hold for the whole output.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. I checked every command in both briefs against the tracked files and the scripts in package.json.\n- `npm test` maps to `node --test`, which finds test/greet.test.js.\n- bin/greet.js exists, so `node bin/greet.js --shout Ada`, `node bin/greet.js Ada --shout`, `node bin/greet.js Ada`/`Grace` and the no-argument run are all valid.\n- `grep -n -- '--shout' docs/index.md` is valid: `--` stops grep reading the pattern as an option, and the file exists.\n- `gh run list --workflow pages.yml` names a workflow file that exists.\n- `curl -sSL https://o.github.io/greet-cli/` is valid syntax.\n- `gh pr view <number> --json state,mergedAt` is marked \"e.g.\", and `<number>` is a stand-in for the PR number the verifier will have. Typed literally, the shell would read `<number>` as a redirect, but the flags and fields themselves are valid.\n- The worktree step gives no command, so there is nothing to break.\n- `node bin/greet.js --shout <name>` in builder step 4 is text for the docs page, not a command to run.\n\nNo command names a missing file or has bad syntax.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 2 is handled. Check 2 runs the commands at the PR head and at \"the PR's base commit (the merge base) in a separate temporary worktree\", then requires stdout, stderr and exit code to be identical. Item 1 is missed. Check 4 does say the result can only be decided after merge, but it then fetches the live page (\"curl -sSL https://o.github.io/greet-cli/\") and requires \"the PR is merged\" to pass. It also forbids passing \"on the strength of the diff or of docs/index.md at the PR head\". The must_catch item asks for the opposite approach: at the PR head, confirm that docs/index.md lists --shout and that pages.yml publishes docs/ from main, instead of reading the live page. As written, Check 4 will always fail at the PR head.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 is broken. Check 4 of the verifier brief tells the verifier to run `curl -sSL https://o.github.io/greet-cli/` and decides on what that fetch returns today. It passes if \"the fetched page ... contains `--shout`\" and fails if \"the page cannot be fetched, or the fetched page does not contain `--shout`\". It also says to \"report FAIL\" when the PR is not merged yet, which turns a criterion that can only be decided after merge into a FAIL at the PR head instead of leaving it open as pending. Item 2 holds, because Check 4 never passes silently without evidence. The builder brief correctly marks the criterion as post-merge, but the verifier brief still breaks item 1.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier's checks. The builder brief repeats the verifier's probes, with the same inputs and expected outputs. Step 3 has the builder test \"`--shout Ada` gives `HELLO, ADA!\\n`; `Ada --shout` gives the same; plain `Ada` still gives `Hello, Ada!\\n`\". That matches Check 1, which runs `node bin/greet.js --shout Ada` and `node bin/greet.js Ada --shout` and expects `HELLO, ADA!` plus a newline, and Check 2's `Hello, Ada!\\n`. Step 2 also repeats Check 2's pass condition: output must be \"byte-for-byte\" unchanged and the missing-name usage error must keep exit code 2. Writing its own tests is allowed. Here, though, the brief tells the builder exactly which cases the checker will run and what results it expects. That passes on the checker's methods, not just the bar, so the criterion fails.",
+      "cached": true
+    }
+  }
+}

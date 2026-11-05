@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "e667501f037d3fd76282e11a2051e16881b972277e7ad627fba76b6b560fb668",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for input/expected-output pairs that appear in both. Builder step 2 gives the example \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\" and requires plain `Hello, Ada!` plus newline, with a missing name still exiting 2. Verifier Check 1 runs `node bin/greet.js --shout Ada` and expects `HELLO, ADA!`. Check 2 expects `Hello, Ada!` with exit 0 and the usage message with exit 2. Builder step 3 also tells the builder to test `Ada --shout` → `HELLO, ADA!`, which is the same as the verifier's advisory probe. Telling the builder to write tests is allowed, but these specific inputs and expected outputs are the verifier's own probes repeated in the builder brief. So the builder brief does contain the checker's methods, and the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 7672,
+  "tokens": {
+    "input": 2,
+    "output": 664,
+    "cacheCreation": 3147,
+    "cacheRead": 783,
+    "fresh": 3813,
+    "total": 4596
+  },
+  "at": "2026-11-05T08:39:16.911Z"
+}

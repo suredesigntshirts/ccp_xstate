@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.3",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier PASS and FAIL condition against the words of its expect line. Checks 1, 2, 5 and 6 stay within what their lines require. Check 3 breaks the criterion. Its PASS requires exit 2 for `good1.jsonl missing.jsonl bad.jsonl`, a run that has both an unreadable file and a bad row. The expect line says both \"1 if any row in any file is bad\" and \"2 if … any file can't be read\", so its words don't settle which code wins when both happen. The brief's own Advisory section lists this exact case (\"a missing file mixed with bad files still exits 2 (not 1)\") as advisory, yet Check 3 makes it pass/fail, which is stricter than the words. Check 4 also adds a requirement the words don't force: that lint.test.js passes. So the criterion doesn't hold for the whole output.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Most commands are fine. `npm test`, `npm ci` (package-lock.json is tracked), `node --test`, `git merge-base`, `gh pr view` and `gh pr checks` all fit this repository. The builder's step-5 example is valid shell and is only an illustration.\n\nThe verifier brief breaks the criterion. It says \"Use a scratch temp directory for fixture files\" and sets \"BIN=packages/jsonl-lint/bin/jsonl-lint.js\", which is relative to the repo root. Its commands then pass bare fixture names, like `node $BIN good1.jsonl bad.jsonl good2.jsonl`. Run from the repo root, good1.jsonl and the other fixtures don't exist there, so they would be reported as unreadable. Run from the temp directory, `$BIN` doesn't resolve. Either way, Checks 1–3 can't run as written and would give wrong results. Neither brief creates these files where the commands look for them.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items against the briefs, and each one is handled. (1) Check 3 runs `node $BIN good1.jsonl missing.jsonl bad.jsonl` and requires exit 2. Its PASS condition also requires that \"the bad rows of bad.jsonl (listed after the missing file) are still printed on stdout\", so the missing file and the bad row are tested in the same run. (2) Check 4 runs `git diff <PR base commit>..HEAD -- packages/jsonl-lint/src/index.js` against the merge base and needs an empty diff, so \"unchanged\" is judged from the diff. (3) Builder step 4 says \"Update packages/jsonl-lint/README.md\" and lists the multi-file usage, `-` for stdin and the new exit codes. (4) Check 6 reads GitHub with `gh pr view ... --json body,headRefOid` and `gh pr checks`. It requires the body to contain the Closes line for issue 104 and the `test` workflow check for the head commit to have succeeded.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs avoid both must_not items. Item 1: no verifier PASS/FAIL condition is stricter than its expect line. Check 3 only requires \"an error message is on stderr\", not exact wording. Check 4 fails only if \"the PR changes lint(text)\", so the PR is not barred from touching other files. Check 6 sets no branch-name rule, and there is no mutation test anywhere. The extra points (missing file plus bad rows still exits 2, the stderr message names the file, the usage text) sit under \"Advisory (not pass/fail)\". The builder brief's suggested stderr message and its \"do not edit src/index.js\" are build instructions, not acceptance conditions; its acceptance lines are the issue lines word for word. Item 2: checks 1–3 (the behaviour lines) all run `node $BIN` on fixtures and stdin and look at the output and exit status. None of them passes by reading the diff alone. Reading code happens only in checks 4 and 5, which are not behaviour lines.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the builder brief for any verifier PASS/FAIL condition or probe. It gives the six expect lines, which are the bar. It then gives implementation steps, such as \"do this check before reading anything\" and \"\\r?\\n replaced by a space\", and a list of node:test cases for the builder to write. The criterion allows the builder to write its own tests, and each case comes from expect lines 3 and 5. It also says to run `npm test`, which is allowed. The one hand-run command, `printf '{x}\\n' | node ... a.jsonl - missing.jsonl`, differs from every verifier command. None of the verifier's fixtures appear in the builder brief: good1/good2/bad.jsonl and their contents, the `bad2.jsonl` copy, the `git diff`/merge-base check, or the `gh pr checks` command. No PASS or FAIL wording appears either. Some implementation hints overlap the verifier's Advisory notes, but those are labelled \"not pass/fail\", so they are not checks under this criterion.",
+      "cached": false
+    }
+  }
+}

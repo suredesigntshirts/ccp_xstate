@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "9fe419d574a233eef8130e4522c46987babb3eadbef0f190c39f3eca66e08fb0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 only requires that clamp is exported and returns x limited to [lo, hi]. Its cases, including lo===hi, the bounds and negative or float values, all follow from those words. Check 2 only requires a RangeError when lo>hi. Check 3 asks that every exported function has a README entry that \"describes it\". \"Documents\" means at least that much, and the heading-only script is overridden by \"judge by reading\", so the heading format is not a hard condition. Check 4 asks for \"EXIT=0 and … zero failing tests\", which is what \"npm test passes\" means. The stricter items are all under \"Advisory (not part of PASS/FAIL)\": test coverage, the README mentioning RangeError, and changes to add, subtract or multiply. No PASS/FAIL condition adds a mutation test, a branch or scope rule, or exact wording.",
+  "model": "claude-opus-5-5",
+  "ms": 7219,
+  "tokens": {
+    "input": 2,
+    "output": 647,
+    "cacheCreation": 3067,
+    "cacheRead": 783,
+    "fresh": 3716,
+    "total": 4499
+  },
+  "at": "2026-11-05T08:41:42.873Z"
+}

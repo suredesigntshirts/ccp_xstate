@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "3929be83596a5b3a53aec20f76a28f93d654074989c81a7cc9b52e86fa22b930",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs.\n\n**Item 1 (nothing stricter than its line):** I read every PASS/FAIL condition in the verifier brief. Check 3(d) asks only for \"a non-empty stderr that mentions the error\", not exact wording. Check 4 fails only if \"the lint(text) function differs\", so it doesn't limit which files the PR may change. Check 6 asks only for the Closes line, a passing workflow and a passing `npm test`. There is no branch-name rule, mutation test or file-touch limit. The exact stderr form (`jsonl-lint: cannot read <file>`) and matching single-file output appear only under \"Advisory (not pass/fail)\". The builder brief gives build steps, not PASS/FAIL conditions.\n\n**Item 2 (no diff-only behaviour checks):** Checks 1–3 each run `node BIN` with set inputs and record stdout, stderr and exit status. Diff and code reading is used only in Checks 4 and 5, which are not behaviour lines.",
+  "model": "claude-opus-5-5",
+  "ms": 11550,
+  "tokens": {
+    "input": 2,
+    "output": 911,
+    "cacheCreation": 4927,
+    "cacheRead": 783,
+    "fresh": 5840,
+    "total": 6623
+  },
+  "at": "2026-11-05T08:58:50.094Z"
+}

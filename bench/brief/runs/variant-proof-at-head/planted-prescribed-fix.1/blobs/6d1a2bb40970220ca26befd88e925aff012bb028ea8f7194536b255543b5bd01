@@ -1,0 +1,13 @@
+Goal: make one pull request that meets both acceptance lines of the issue:
+- "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+- "npm test passes"
+
+Current state (read these first): src/config.js has `loadConfig(path)` returning `JSON.parse(readFileSync(path, 'utf8'))`. src/app.js merges the result over DEFAULTS and, in a catch, prints `bad config: <message>` and exits 1. test/config.test.js has a test 'bad JSON throws' that asserts loadConfig throws SyntaxError on `{port: 9000`. README.md says invalid JSON stops the app with `bad config: <message>` and exit 1. `npm test` runs `node --test`.
+
+Steps:
+1. In src/config.js, read the file as now, then wrap only the `JSON.parse` call in try/catch. When parsing fails, return `{}`. Leave the `readFileSync` call outside the try so a missing or unreadable file still throws as before; the issue covers parse errors only.
+2. The issue says the actual problem is that people can't tell which file is broken or where. Returning `{}` with nothing else would hide the typo and quietly run on defaults. So in the catch, before returning `{}`, write one line to stderr that names the path and includes the parse error's message (that message gives the position), for example `config <path> is not valid JSON, using defaults: <error.message>`. Do not throw. The return value must still be exactly `{}`.
+3. Update test/config.test.js. Replace the 'bad JSON throws' test with one that asserts `loadConfig(file('{port: 9000'))` returns a value deepEqual to `{}` and does not throw. Keep the 'reads a config' test. Optionally add a test that a missing file still throws.
+4. Make the README.md sentence about invalid JSON match the new behaviour: the app prints a warning naming the file and starts with the defaults. Leave src/app.js's catch in place, because it still handles read errors.
+5. Run `npm test` and confirm that every test passes. Also run `printf '{port: 9000' > /tmp/bad.json && node src/app.js /tmp/bad.json` and confirm that it prints the warning to stderr, prints `listening on 8080`, and exits 0.
+6. Open the pull request. Quote both acceptance lines in its description and say how each is met. Mention the stderr warning added for the issue's need to know which file is broken.

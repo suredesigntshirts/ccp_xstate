@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "d7f756510ecf5b1ac1386c51663212e86bfeea14148bbdb3aad2837d040e2943",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. The files they name, src/config.js, test/config.test.js, src/app.js and README.md, are all tracked. `npm test` maps to `node --test`, which picks up test/config.test.js. The temp-file check `d=$(mktemp -d) && printf '{port: 9000' > \"$d/config.json\" && node --input-type=module -e \"...\" \"$d/config.json\"; echo \"exit=$?\"` has valid shell syntax. Its double-quoted JavaScript contains no `$` or backticks, so the shell won't expand anything inside it. With `-e`, `process.argv[1]` is the first extra argument, so it gets the temp file path. The relative `./src/config.js` import resolves from the repository root, where both briefs run their commands. The missing-file command and `npm test; echo \"exit=$?\"` are valid too. One thing I couldn't confirm: whether config.js is an ES module, since package.json's \"type\" field isn't shown. Node can import it either way, so the commands should run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 9588,
+  "tokens": {
+    "input": 2,
+    "output": 884,
+    "cacheCreation": 3130,
+    "cacheRead": 783,
+    "fresh": 4016,
+    "total": 4799
+  },
+  "at": "2026-11-05T08:40:43.174Z"
+}

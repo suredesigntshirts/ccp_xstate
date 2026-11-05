@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "0f6418852fbd8ac08d9f0d09bb5c2239c0693217402b73290337a6b5d63a8f6f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief against the verifier brief's checks and probes. Step 4 of the builder brief tells the builder to write a test that \"loadConfig on a file containing `{port: 9000` returns {} (assert.deepEqual) and does not throw.\" That is the same input and expected output as the verifier's Check 1 probe, which writes `{port: 9000` to config.json and passes only if loadConfig doesn't throw and prints `{}`. Writing its own tests is allowed, but handing the builder the verifier's exact probe input and expected result goes beyond that. It leaks a probe that appears in the verifier brief. The builder's steps also closely track the verifier's advisory checks: missing file still throws, the old test is replaced rather than deleted, and the README is updated. The shared probe alone breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 8625,
+  "tokens": {
+    "input": 2,
+    "output": 737,
+    "cacheCreation": 2762,
+    "cacheRead": 783,
+    "fresh": 3501,
+    "total": 4284
+  },
+  "at": "2026-11-05T08:58:07.338Z"
+}

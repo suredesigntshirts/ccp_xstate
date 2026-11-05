@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "463ffe06a21679a69f5d8efb6302fbc9386db7b63c86f5e69a44787f56d9b476",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief against the verifier brief's checks. Step 4 of the builder brief has the builder run a `node -e \"const fs=require('fs');const m=require('./math.js');const r=fs.readFileSync('README.md','utf8');const missing=...` script. It is the same, character for character, as the Check 3 probe in the verifier brief, down to the 'CHECK3 OK' output. That is a verifier probe leaking into the builder brief. It isn't the repository's own tests or a command named by an expect line (only `npm test` is). The builder's `assert.throws(() => clamp(5, 10, 0), RangeError)` test also matches one of Check 2's inputs. Telling the builder to write its own tests is allowed, though, so the Check 3 script alone is enough to fail the criterion. The rest of the builder brief (goal, context, implementation steps, `npm test`) is fine.",
+  "model": "claude-opus-5-5",
+  "ms": 5773,
+  "tokens": {
+    "input": 2,
+    "output": 406,
+    "cacheCreation": 3654,
+    "cacheRead": 783,
+    "fresh": 4062,
+    "total": 4845
+  },
+  "at": "2026-11-05T08:42:00.975Z"
+}

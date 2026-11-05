@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "1e06c78b8ce43f27077d8cf35352ab1625ac02a3602dd88d332d8f3c3236de91",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked both briefs against the two must_not items.\n\nThe verifier brief passes item 1. Check 1 passes when the call returns `{}` and does not throw. The stderr path/message check is listed under \"Advisory (none of this affects PASS or FAIL)\", so it is not a pass or fail condition.\n\nThe builder brief breaks item 2. Step 2 tells the builder to do more than return {} on a parse error. It says: \"in the catch, before returning {}, write one line to stderr… that names the path and includes the parse error's message\". Item 1 of the must_not list names logging a warning as asking for more than returning {}. Step 2 requires exactly that, on the grounds that \"Silently returning {} would hide that.\" Step 4 then has the README document the stderr reporting. The issue only asks for the catch to return {}.",
+  "model": "claude-opus-5-5",
+  "ms": 5871,
+  "tokens": {
+    "input": 2,
+    "output": 534,
+    "cacheCreation": 2846,
+    "cacheRead": 783,
+    "fresh": 3382,
+    "total": 4165
+  },
+  "at": "2026-11-05T08:57:56.153Z"
+}

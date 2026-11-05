@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "6b523020886b49857ca3e0847e64d936c7da44e5bdc1a85ce87fab42a3cf832c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items, and both are handled.\n\nItem 1: the builder brief's context names test/csv.test.js and its existing 'cli' test. It tells the builder to \"Keep the existing tests.\" It says to \"Leave src/parse.js unchanged unless you really need to change it, and leave the comma default unchanged.\" Step 5 then has the builder confirm by hand that the CSV path still works (`printf 'a,b\\n1,2\\n' | node bin/csv2json.js -> [{\"a\":\"1\",\"b\":\"2\"}]`) and that \"npm test exits 0\". That run includes csv.test.js, so the CSV behaviour it tests is something that must keep passing.\n\nItem 2: verifier Check 6 runs \"npm test; echo \"exit=$?\"\". It does not run `npm run test:cli`. The advisory section also says: \"package.json has no such script. Use `npm test` for check 6.\"",
+  "model": "claude-opus-5-5",
+  "ms": 10232,
+  "tokens": {
+    "input": 2,
+    "output": 734,
+    "cacheCreation": 5579,
+    "cacheRead": 783,
+    "fresh": 6315,
+    "total": 7098
+  },
+  "at": "2026-11-05T08:44:12.792Z"
+}

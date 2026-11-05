@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "090517b2bbb02976784cbbfb38dae016ea167f39e5ff7128bc8535e44f8f8ee2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Every file they name exists at this commit: `src/app.js` and `src/config.js` exist, and `npm test` maps to `node --test`. `$d/c.json`, `out`, `err`, `b.json` and `ok.json` are all created in the same command line or in an earlier check. Check 2 reuses `$d` from Check 1, and the brief says so. The quoting in the `printf` and `node --input-type=module -e \"... '$d/b.json' ...\"` commands is valid, and the JS in them parses. The commands match the issue's own proofs. The git steps (`git merge-base HEAD <the PR's target branch>`, `git checkout <base> -- src`, `git checkout HEAD -- src`) use valid arguments. Their angle-bracket placeholders clearly have to be filled in, as in the issue's proof 5, so they are not literal shell redirects. The builder's claim that position 20 gives line 3, column 3 is also correct for that file text. I found no command that would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 10046,
+  "tokens": {
+    "input": 2,
+    "output": 927,
+    "cacheCreation": 5421,
+    "cacheRead": 783,
+    "fresh": 6350,
+    "total": 7133
+  },
+  "at": "2026-11-05T08:55:13.678Z"
+}

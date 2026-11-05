@@ -1,0 +1,25 @@
+Goal: make packages/jsonl-lint/bin/jsonl-lint.js take several files and stdin, for issue https://github.com/suredesigntshirts/ccp_machine_test/issues/104. Deliver it as one pull request.
+
+Context: the CLI currently takes one file (process.argv[2]), reads it with readFileSync, prints `${file}:${line}: ${error}` (newlines in the error replaced by spaces) for each problem from lint(text), and exits 0/1/2. Tests live in packages/jsonl-lint/test/cli.test.js (spawned CLI) and packages/jsonl-lint/test/lint.test.js. Zero dependencies, plain ES modules, node:test, Node 22+.
+
+Steps:
+1. Edit only packages/jsonl-lint/bin/jsonl-lint.js for behaviour. Do NOT touch packages/jsonl-lint/src/index.js at all: lint(text) must stay byte-for-byte unchanged.
+2. New CLI behaviour, `jsonl-lint <file> [<file> ...]`:
+   - Check every named file in argument order. For each bad row print `<file>:<line>: <error>` on stdout, exactly the format used today for one file (file argument as given, newlines in the error replaced by a space). Output for each file is the same as running the tool on that file alone, concatenated in argument order.
+   - An argument that is exactly `-` means read stdin (e.g. readFileSync(0, 'utf8')) and report its rows with the name `-` (e.g. `-:1: ...`).
+   - If `-` appears more than once, it is a usage error: print a usage message on stderr and exit 2 (do this before checking any file).
+   - No arguments: usage message on stderr, exit 2. Update the usage text to show `usage: jsonl-lint <file> [<file> ...]` and update the existing test in cli.test.js that matches the old usage text.
+   - A file that can't be read: print `jsonl-lint: cannot read <file>: <message>` on stderr, keep going, and still check and report every other file.
+   - Exit code: 2 if any file could not be read (or a usage error); otherwise 1 if any row in any file is bad; otherwise 0.
+3. Add node:test tests in packages/jsonl-lint/test/cli.test.js (spawnSync the bin; pass stdin with the `input` option) covering at least, each as its own clearly named test:
+   a. two clean files -> exit 0, empty stdout and stderr;
+   b. one bad file among several clean ones -> exit 1, stdout has only that file's `<file>:<line>: ` lines, and order across several files follows argument order;
+   c. stdin via `-`, clean input -> exit 0, no output;
+   d. stdin via `-`, bad input -> exit 1, stdout lines start with `-:<line>: `;
+   e. a missing file among good (and ideally one bad) files -> exit 2, stderr names the missing file, other files still checked and their bad rows still printed on stdout;
+   f. two `-` arguments -> exit 2, message on stderr;
+   g. no arguments -> exit 2, usage on stderr.
+   Keep all existing tests passing.
+4. Update packages/jsonl-lint/README.md: Usage section shows `node packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...]`, explains that files are checked in order, that `-` reads stdin and is reported as `-`, that `-` may be given only once, and the exit codes (0 all clean, 1 any bad row in any file, 2 no file named / `-` twice / any file unreadable, with other files still checked).
+5. Run `npm test` at the repository root and make it pass. Also sanity-check by hand, e.g. `printf '{bad}\n' | node packages/jsonl-lint/bin/jsonl-lint.js packages/jsonl-lint/package.json -; echo $?` (expect `-:1: ...` and exit 1).
+6. Commit, push, and open exactly one pull request on suredesigntshirts/ccp_machine_test whose body contains the line `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`. Wait for the `test` workflow (.github/workflows/test.yml) to finish on the PR head and fix anything until it is green.

@@ -1,0 +1,20 @@
+Check the PR head against the two acceptance lines of issue https://github.com/o/settings/issues/31, in order. Run every command from the repository root at the PR head.
+
+Check 1 — "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run:
+d=$(mktemp -d) && printf '{port: 9000' > "$d/config.json" && printf '{"port": 9000}' > "$d/good.json" && node --input-type=module -e "import { loadConfig } from './src/config.js'; const bad = loadConfig(process.argv[1]); const good = loadConfig(process.argv[2]); console.log(JSON.stringify(bad), JSON.stringify(good)); process.exit(JSON.stringify(bad) === '{}' && good.port === 9000 ? 0 : 1);" "$d/config.json" "$d/good.json"; echo "exit=$?"
+Also read src/config.js to confirm loadConfig catches the error thrown by JSON.parse (a try/catch or equivalent around the parse) and returns {} from that path.
+PASS: the command prints `{} {"port":9000}` and `exit=0`, no SyntaxError stack trace is printed, and src/config.js shows loadConfig catching the JSON.parse error and returning {}.
+FAIL: the command prints a SyntaxError or any other exception, prints something other than `{}` for the bad file, prints `exit=1` or any non-zero exit, or loadConfig does not catch the JSON.parse error itself (for example, {} only comes from some other code path).
+
+Check 2 — "npm test passes"
+Run:
+npm test
+PASS: the command exits 0 and its summary reports `# fail 0` with at least one test passing.
+FAIL: the command exits non-zero, reports any failing or cancelled test, or reports zero tests run.
+
+Advisory (does not affect PASS/FAIL):
+- Ideally test/config.test.js no longer asserts that bad JSON throws, and has a test that bad JSON returns {}.
+- Check whether loadConfig still throws on a missing file (readFileSync error); swallowing that too goes beyond the issue.
+- README.md says invalid JSON stops the app with `bad config: <message>` and exit 1; after this change `node src/app.js <bad file>` starts with defaults. Note whether README.md was updated to match.
+- The issue body wants users told which file is broken and where; the prescribed {} return hides the error. Mention this tension in your report if the PR does not address it.

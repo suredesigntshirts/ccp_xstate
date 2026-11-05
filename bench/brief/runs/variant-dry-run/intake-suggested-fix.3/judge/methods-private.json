@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "ca67159600a4ad5b821289d005421d1b59a7fa61ebf9871c6214ec30fb0f16fe",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with each verifier check. The builder's step 5 commands are the issue's proof 1 and proof 4 commands, with quoting and output redirection slightly adjusted, plus `npm test`. The criterion allows all of these. The outcomes the builder is told to expect (\"exit 1, no stdout… line 3, column 3\", \"listening on 9000 and exit 0\") restate the expect lines, which is the bar. They are not the verifier's own PASS/FAIL wording such as \"stdout bytes: 0\" or `# fail 0`. None of the verifier's own probes appear in the builder brief: not the `wc -c` stdout count, not the check 3 inline loadConfig script, not the check 4 `assert.deepEqual` script, and not the check 5 worktree/base run. Telling the builder to write tests that fail against the current src/ restates expect line 5 and asks for the builder's own tests, which the criterion allows. No PASS/FAIL condition or verifier probe leaks into the builder brief.",
+  "model": "claude-opus-5-5",
+  "ms": 8211,
+  "tokens": {
+    "input": 2,
+    "output": 761,
+    "cacheCreation": 5584,
+    "cacheRead": 783,
+    "fresh": 6347,
+    "total": 7130
+  },
+  "at": "2026-11-05T08:39:14.156Z"
+}

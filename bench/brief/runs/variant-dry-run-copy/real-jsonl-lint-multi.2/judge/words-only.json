@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "6f0b71d6f2b55b20034dc2ed02c3d11dbaefb4191373d350e941156a676b9c86",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 5 stay within what their lines say, but three checks ask for more:\n\n- **Check 4:** The expect line says only that \"lint(text) in src/index.js is unchanged\". The PASS condition instead requires the whole file to be identical, via a fixed sha256 hash and `git diff --exit-code` against a base commit. That is a file-scope rule the words don't force.\n- **Check 3 (D and E):** The words say only \"error on stderr\". PASS also requires that \"the stderr line names missing.jsonl\", which is stricter.\n- **Check 6:** The words say \"one PR\". PASS requires \"exactly one open PR\", but the expect line doesn't mention the PR's state.\n\nEach of these extra requirements should have gone under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 10837,
+  "tokens": {
+    "input": 2,
+    "output": 939,
+    "cacheCreation": 6219,
+    "cacheRead": 783,
+    "fresh": 7160,
+    "total": 7943
+  },
+  "at": "2026-11-05T08:58:56.709Z"
+}

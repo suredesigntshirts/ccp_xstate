@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "f4c7c338b6e1c423c182aadf4f8d00b8dbcf5fc4100b22bfa3409c1f92866f72",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1–4 and 6 stay within their words. Check 4 is limited to the lint function rather than the whole file, and the stricter items are correctly under Advisory. Check 5 adds a requirement its expect line doesn't force. That line only says node:test tests \"cover\" the listed cases and that the README \"documents the usage\". Yet Check 5's PASS requires \"there are node:test tests for each of these cases, and they pass\", and its FAIL includes \"a test fails\". Tests can cover a case without passing, so requiring them to pass goes beyond Check 5's words. Passing belongs to line 6, which already asks for npm test to be green. The README condition also adds \"including `-`\", which is a smaller extra on \"documents the usage\". Because Check 5 holds tests to more than its words require, the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 14026,
+  "tokens": {
+    "input": 2,
+    "output": 1075,
+    "cacheCreation": 4887,
+    "cacheRead": 783,
+    "fresh": 5964,
+    "total": 6747
+  },
+  "at": "2026-11-05T08:58:21.365Z"
+}

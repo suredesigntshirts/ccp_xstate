@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "8ff9f5d1a328e30d780117cfcda3eea3b766bdfd8a62b1a96bd21a50577aa9f7",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Verifier Check 3 would not run as written. The regex `'^#+\\\\s*'+n+'\\\\s*\\\\('` sits inside a double-quoted `node -e \"...\"`. Bash turns `\\\\` into `\\`, so JS receives `'\\s*'` and `'\\('`, which become plain `s*` and `(`. The pattern `^#+s*adds*(` has an unclosed group, so `new RegExp` throws \"Invalid regular expression\" and the check errors even when the README is correct. The other commands look runnable: Checks 1 and 2 (`node -e`) and `npm test`, whose script is `node --test`. The named files math.js, README.md and test/math.test.js exist. The `!=` in Check 1 is safe from history expansion, and the `!(` in Check 2 only matters in an interactive shell.",
+  "model": "claude-opus-5-5",
+  "ms": 16263,
+  "tokens": {
+    "input": 2,
+    "output": 1431,
+    "cacheCreation": 3311,
+    "cacheRead": 783,
+    "fresh": 4744,
+    "total": 5527
+  },
+  "at": "2026-11-05T08:41:30.742Z"
+}

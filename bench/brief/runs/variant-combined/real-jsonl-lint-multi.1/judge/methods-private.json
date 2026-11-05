@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "553b58a5e990afde2ed5eaee5ecc6d8062b03a7c2ca64f04f87617c3010ff55b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most of the builder brief states the bar without handing over the checker's methods. It doesn't use the verifier's fixtures (a.jsonl, b.jsonl, bad.jsonl), its command lines or its PASS/FAIL wording. Telling the builder to run `npm test`, wait for the `test` workflow and write node:test tests is allowed. One place breaks the criterion. Step 2 says \"`git diff` of that file against the base must be empty\", which hands the builder a probe plus a pass condition. Verifier Check 4 uses that same probe: `git diff <merge-base>..HEAD -- packages/jsonl-lint/src/index.js`. No expect line or issue proof names git diff, so the exception for allowed commands doesn't cover it. Because the builder gets a probe that also appears in the verifier brief, the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 8773,
+  "tokens": {
+    "input": 2,
+    "output": 701,
+    "cacheCreation": 4839,
+    "cacheRead": 783,
+    "fresh": 5542,
+    "total": 6325
+  },
+  "at": "2026-11-05T08:59:03.129Z"
+}

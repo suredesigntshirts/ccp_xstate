@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "0c1b30f8479f9015bd2c954d4f61f3eefa84debbb321d2bc73dc70a4811012f8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief to see whether any check, PASS/FAIL condition or probe appears in both. None does. The verifier's setup (the scratch directory $D with a.jsonl, b.jsonl and bad.jsonl and their exact contents), its `node $BIN ...` and `printf | node $BIN` commands, the `git diff` against the merge base and the `gh pr checks` calls are not in the builder brief. The builder brief has no PASS or FAIL wording. Its step 3 tells the builder to write its own node:test tests, which is allowed, and it lists the cases from expect line 5. The expected results it gives (\"two clean files: exit 0\", \"two `-` arguments: exit 2\") only restate the issue's exit-code rules from expect line 3. They are the bar, not copies of the verifier's concrete probes. It also tells the builder to run `npm test` and check the workflow, which is allowed. The note \"Doing this before checking any file\" matches a verifier advisory, but that advisory is not a pass/fail check.",
+  "model": "claude-opus-5-5",
+  "ms": 12478,
+  "tokens": {
+    "input": 2,
+    "output": 1070,
+    "cacheCreation": 4860,
+    "cacheRead": 783,
+    "fresh": 5932,
+    "total": 6715
+  },
+  "at": "2026-11-05T08:42:49.068Z"
+}

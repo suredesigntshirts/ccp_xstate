@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "83a214e8ef9098851ab23a234976a4ddd254a7d3d758dc1cb4dd996627718665",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared the builder brief with the verifier brief's checks. The builder brief has none of the verifier's specific probes: no `wc -c < $d/out`, no `grep -F 'bad config:'` or `grep -F \"$d/c.json\"`, and no inline `node --input-type=module -e \"...includes(...) ? 'OK' : 'NO PATH'\"` script. It also has no PASS/FAIL wording. Step 3 does run `node src/app.js $d/c.json` and states exit 1, empty stdout, the path, and line 3 / column 3. But that only restates expect lines 1–2, which is the bar, using a command the expect line names. Step 6 (\"put the original `src/config.js` back temporarily, run `npm test`\") is the issue's own proof 5, so it is an allowed command. The rest tells the builder to run `npm test` and write its own tests, which the criterion also allows.",
+  "model": "claude-opus-5-5",
+  "ms": 9229,
+  "tokens": {
+    "input": 2,
+    "output": 868,
+    "cacheCreation": 5673,
+    "cacheRead": 783,
+    "fresh": 6543,
+    "total": 7326
+  },
+  "at": "2026-11-05T08:39:09.727Z"
+}

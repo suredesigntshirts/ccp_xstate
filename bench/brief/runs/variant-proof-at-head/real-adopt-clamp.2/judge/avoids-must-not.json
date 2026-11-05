@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "3b468c0ae42ade4836d92afe125f539d0cd721f5838b8e11d29674c6b8ffde7b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is avoided. Check 3 reads the export list from math.js and requires a README match for each function, and its FAIL condition names subtract. A README that documents clamp but not subtract therefore fails. Checks 1, 2 and 4 stay within their lines: there is no exact error message, no parameter count, and boundary or float cases are still covered by \"limited to the range\". Item 2 breaks in Check 3. Its PASS needs \"the script reports nothing missing\", and the script matches each name only with the regex `\\bname\\s*\\(`, so the name must be followed by an opening parenthesis. A README that documents subtract in another valid form, such as a table row \"| `subtract` | returns a minus b |\" or \"`subtract` — subtracts b from a\", would FAIL. That makes the check depend on a specific README format, which is stricter than \"README.md documents every function math.js exports\".",
+  "model": "claude-opus-5-5",
+  "ms": 13729,
+  "tokens": {
+    "input": 2,
+    "output": 956,
+    "cacheCreation": 3327,
+    "cacheRead": 783,
+    "fresh": 4285,
+    "total": 5068
+  },
+  "at": "2026-11-05T08:41:54.365Z"
+}

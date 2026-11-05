@@ -1,0 +1,30 @@
+## Criteria the build must meet (the issue's expect lines, word for word)
+1. packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before
+2. A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)
+3. Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)
+4. lint(text) in src/index.js is unchanged
+5. node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage
+6. The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head
+
+## Steps
+1. Read packages/jsonl-lint/bin/jsonl-lint.js, packages/jsonl-lint/src/index.js, packages/jsonl-lint/test/cli.test.js, packages/jsonl-lint/test/lint.test.js and packages/jsonl-lint/README.md. The CLI today takes one file; keep its per-row output format (`${file}:${line}: ${error}` with newlines in the error replaced by a space) exactly as it is.
+2. Do not touch packages/jsonl-lint/src/index.js at all; `lint(text)` must stay byte-for-byte the same. All changes go in the bin script, tests and README.
+3. Rewrite the bin script to take every argument from process.argv.slice(2):
+   - No arguments: print a usage line (e.g. `usage: jsonl-lint <file> [<file> ...]`, mentioning `-` for stdin) to stderr and exit 2.
+   - More than one `-` argument: print a usage error to stderr and exit 2 (check this up front, before reading anything, so nothing is read twice from stdin).
+   - Otherwise process the files in the order given. For `-`, read all of stdin (e.g. `readFileSync(0, 'utf8')`) and use `-` as the name in the output prefix. For any other name, read the file; if it can't be read, write `jsonl-lint: cannot read <file>: <message>` to stderr, remember the failure, and carry on with the next file.
+   - For each readable file, run `lint(text)` and print one `<file>:<line>: <error>` line per problem to stdout, using the argument exactly as given.
+   - Exit code: 2 if any file couldn't be read; else 1 if any row in any file was bad; else 0. Set process.exitCode (or exit after all output is written) so stdout isn't truncated.
+4. Extend packages/jsonl-lint/test/cli.test.js with node:test cases (spawn the bin with process.execPath as the existing tests do; pass stdin via spawnSync's `input` option):
+   - two clean files: exit 0, empty stdout and stderr;
+   - one bad file among several (e.g. clean, bad, clean): exit 1, stdout holds only the bad file's lines, prefixed with its path, matching `lint()` of its text;
+   - several bad files: output appears in argument order;
+   - stdin via `-`, clean: exit 0, no output; bad: exit 1, lines prefixed `-:`;
+   - `-` mixed with a named file;
+   - a missing file among good ones (put it in the middle, and also a case with a bad file alongside it): exit 2, stderr names the missing file, the other files are still checked and their bad rows printed;
+   - two `-` arguments: exit 2, stderr non-empty;
+   - no arguments: exit 2, usage on stderr.
+   Keep existing tests passing (update only ones whose single-file expectations, such as the usage text, really changed).
+5. Update packages/jsonl-lint/README.md: usage `node packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...]`, that files are checked in order, that `-` reads stdin and is reported as `-` (only once), and the exit codes 0/1/2 with the multi-file rules (2 wins over 1; unreadable files reported on stderr while the rest are still checked).
+6. Run `npm test` at the repository root and make sure it passes; also try the CLI by hand with a few files and stdin.
+7. Commit, push and open one PR on suredesigntshirts/ccp_machine_test whose body contains the line `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`. Wait for the `test` workflow on the PR head to finish and make sure it is green; fix and push again if it isn't.

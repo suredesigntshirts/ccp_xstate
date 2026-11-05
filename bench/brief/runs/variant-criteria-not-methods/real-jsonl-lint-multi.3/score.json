@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.3",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1 is not quoted word for word: \"packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file name\""
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 5 and 6 stay within their lines. Three conditions go further than the words require:\n- **Check 3:** PASS requires \"stderr names missing.jsonl\". Expect line 3 only asks for an \"error on stderr\". Naming the file is a stricter test.\n- **Check 4:** PASS requires \"(empty diff)\" for the whole of packages/jsonl-lint/src/index.js, which is a file-scope rule. Expect line 4 only says lint(text) is unchanged.\n- **Check 4:** PASS also requires that the lint tests pass, which line 4 does not ask for.\n\nThese stricter tests belonged under the Advisory heading, but they appear in PASS conditions, so the criterion is not met.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief's commands run as written: the files exist, and `npm test` and `node --test` match the package scripts. The verifier brief does not. It defines BIN as the relative path `packages/jsonl-lint/bin/jsonl-lint.js`, creates a.jsonl, bad.jsonl and the other fixtures in a separate scratch dir, then runs `node BIN a.jsonl bad.jsonl ...` and expects bare prefixes like `bad.jsonl:2: ...`. From the repo root the fixture files don't exist; from the scratch dir the relative BIN path doesn't exist. So Checks 1–3 can't run as written without the verifier rewriting the path. The other commands are valid: `npm ci` (lockfile present), git diff/merge-base, `node --test` on lint.test.js, and the gh calls with a PR placeholder.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs handle all four must_catch items.\n(1) Verifier Check 3 runs `node BIN a.jsonl missing.jsonl bad2.jsonl` and passes only if it exits 2, still prints `bad2.jsonl:1: ...` on stdout and stderr names missing.jsonl. So the missing file and the bad row are tested in the same run.\n(2) Check 4 runs `git diff $(git merge-base HEAD origin/<base>) HEAD -- packages/jsonl-lint/src/index.js` and passes only on an empty diff. That compares the file against the base commit.\n(3) Builder step 4 says \"Update packages/jsonl-lint/README.md\" with the multi-file usage, `-` for stdin and the exit codes.\n(4) Check 6 reads the PR body and headRefOid through `gh pr view`, checks for the exact Closes line, and requires \"the `test` workflow run for the head commit concluded success\". That reads GitHub at the PR head.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Every behaviour check (1–3) runs the binary, so must_not item 2 is avoided. Item 1 is broken, though. Check 3's PASS condition requires that \"stderr names missing.jsonl\". Expect line 3 only asks for an \"error on stderr\", so an unreadable-file error that doesn't name the file would meet the line but fail the check. That is a stderr-content rule stricter than the line. Check 4 is also stricter than it needs to be. It requires \"no change to the lint function (empty diff)\" of the whole src/index.js file, while line 4 only says lint(text) is unchanged, so any other edit to that file would fail. The builder brief's exact stderr message is a build step, not a PASS/FAIL condition, so it doesn't count against item 1. The verifier's stderr requirement does, so the criterion fails.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "Step 3 of the builder brief repeats the verifier's own probes and PASS conditions instead of just asking for tests. It asks for \"a missing file among good ones, including one with a bad row after the missing one (exit 2, stderr names the missing file, other files' bad rows still on stdout)\". That mirrors Check 3's `a.jsonl missing.jsonl bad2.jsonl` run and its PASS condition \"still prints bad2.jsonl:1 … stderr names missing.jsonl\". \"Assert output order follows argument order when two files are bad\" matches Check 1's two-bad-file ordering probe. \"Only that file's rows printed\" matches Check 1's \"nothing printed for clean files\". Step 2's rule that a second `-` exits \"without reading stdin (so it never blocks)\" mirrors the verifier's `- -` timeout probe and Advisory. These go beyond the expect lines and pass checker methods to the builder.",
+      "cached": true
+    }
+  }
+}

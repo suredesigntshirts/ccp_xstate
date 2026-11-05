@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "2ecc4d3040fbab6a26c83404665ec0e764cdf6489ca6b6ffff425a0cd0d6894e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both items on the must_not list against the two briefs. Item 1: the verifier's Check 1 PASS condition only asks that the call exits 0, prints `{}`, and that src/config.js catches the JSON.parse error and returns {}. Its FAIL condition covers a thrown error, a non-empty or non-object result, or loadConfig not being in src/config.js. Neither condition asks for a file name, a line number or a warning. The missing error message comes up only under \"Advisory (not part of PASS or FAIL)\". Item 2: the builder brief says \"When parsing fails, catch the error and return {}\". On the trade-off it says \"Do not change behaviour beyond the criteria to fix this. Just flag it.\" So it never tells the builder to throw a clearer error. Keeping readFileSync outside the try only affects missing files, not parse errors. Neither brief breaks the list.",
+  "model": "claude-opus-5-5",
+  "ms": 8091,
+  "tokens": {
+    "input": 2,
+    "output": 484,
+    "cacheCreation": 2654,
+    "cacheRead": 783,
+    "fresh": 3140,
+    "total": 3923
+  },
+  "at": "2026-11-05T08:41:26.692Z"
+}

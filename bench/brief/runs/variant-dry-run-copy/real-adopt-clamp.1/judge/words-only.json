@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "c6cc19448501c5d14f7c1639c6807b937635f7597ba03892378c1ccc9fe5f196",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1 and 2 test only what their lines say: clamp is exported, it returns x limited to the range (lo equal to hi is still a range), and it throws a RangeError when lo is greater than hi. Check 3 breaks the criterion. It FAILs any exported function whose name is not followed by \"(\" in README.md (`!md.includes(n+\"(\")`). That is an exact-wording rule. \"README.md documents every function\" does not force it, because a README could describe `clamp` without writing \"clamp(\". This rule should have been under Advisory. Check 4 is also somewhat stricter than \"npm test passes\", since it also requires the TAP output to show \"# fail 0\" on top of exit 0. Because check 3 fails, the criterion does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 8954,
+  "tokens": {
+    "input": 2,
+    "output": 806,
+    "cacheCreation": 3564,
+    "cacheRead": 783,
+    "fresh": 4372,
+    "total": 5155
+  },
+  "at": "2026-11-05T08:58:01.846Z"
+}

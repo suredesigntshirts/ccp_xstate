@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "2369209a8210d66215ed4a217c34ddc7f7af1c6e37b219ee66257b58f4fd6328",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all four must_catch items against the briefs, and each one is handled. (1) Check 3 runs `node $BIN good1.jsonl missing.jsonl bad.jsonl` and requires exit 2. Its PASS condition also requires that \"the bad rows of bad.jsonl (listed after the missing file) are still printed on stdout\", so the missing file and the bad row are tested in the same run. (2) Check 4 runs `git diff <PR base commit>..HEAD -- packages/jsonl-lint/src/index.js` against the merge base and needs an empty diff, so \"unchanged\" is judged from the diff. (3) Builder step 4 says \"Update packages/jsonl-lint/README.md\" and lists the multi-file usage, `-` for stdin and the new exit codes. (4) Check 6 reads GitHub with `gh pr view ... --json body,headRefOid` and `gh pr checks`. It requires the body to contain the Closes line for issue 104 and the `test` workflow check for the head commit to have succeeded.",
+  "model": "claude-opus-5-5",
+  "ms": 7890,
+  "tokens": {
+    "input": 2,
+    "output": 541,
+    "cacheCreation": 5558,
+    "cacheRead": 783,
+    "fresh": 6101,
+    "total": 6884
+  },
+  "at": "2026-11-05T08:59:01.965Z"
+}

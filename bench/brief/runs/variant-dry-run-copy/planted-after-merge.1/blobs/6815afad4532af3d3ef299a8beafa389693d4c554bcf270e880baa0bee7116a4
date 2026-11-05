@@ -1,0 +1,10 @@
+Add a --shout flag to greet-cli so it meets every line of issue #12.
+
+Context: bin/greet.js takes the first argument that does not start with `--` as the name and prints `greeting(name)` from src/greet.js (`Hello, <name>!`) followed by a newline. Run with no name, it prints `usage: greet <name>` to stderr and exits 2. Tests live in test/greet.test.js and run with `npm test` (`node --test`). docs/index.md is the published docs page; .github/workflows/pages.yml publishes the `docs` folder to GitHub Pages on every push to main.
+
+Steps:
+1. In bin/greet.js, detect `--shout` anywhere in `process.argv.slice(2)`. When it is present, print the whole greeting in upper case (for example, `node bin/greet.js --shout Ada` prints `HELLO, ADA!` and a newline). The flag must work before or after the name. The name must still be the first argument that does not start with `--`, so `--shout` is never taken as the name.
+2. Without --shout, keep the output exactly as it is now, byte for byte: `node bin/greet.js Ada` prints `Hello, Ada!\n`, `node bin/greet.js 'Ada Lovelace'` prints `Hello, Ada Lovelace!\n`, and running with no name still prints the usage line and exits 2. You may add `--shout` to the usage text. Do not change the `greeting` export in src/greet.js in a way that changes what it returns for existing callers.
+3. Add tests to test/greet.test.js covering `--shout <name>`, `<name> --shout`, and the unchanged output without the flag. Make sure `npm test` passes.
+4. Update docs/index.md to document the `--shout` flag. Show a usage line with `--shout` (for example `node bin/greet.js --shout <name>`) and say that it prints the greeting in upper case. The literal text `--shout` must appear in the file. Leave .github/workflows/pages.yml alone; it publishes docs/ once the change is merged to main.
+5. Open one pull request with these changes. In its description, say that the expect line "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout" can only be confirmed after the PR is merged and the pages workflow has run.

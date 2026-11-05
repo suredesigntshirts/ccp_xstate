@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "26952acd834a1d43cb79a6f84c80c4ad70ec2df737236fd013dee57318100209",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the verifier brief against both must_catch items, and it misses both. Item 1: Check 4 reads the live page (\"curl ... https://o.github.io/greet-cli/ | grep -c -- '--shout'\") and marks it FAIL before merge. It does not check at the PR head what will publish the page, meaning docs/index.md listing --shout and pages.yml publishing docs/ from main. The pages.yml check appears only under \"Advisory (not part of any PASS/FAIL)\". Item 2: Check 2 compares the output only to a hand-written string (\"test \\\"$(node bin/greet.js Ada)\\\" = \\\"Hello, Ada!\\\"\") plus the existing npm test. It says \"as before the change\" but never runs the base commit's bin/greet.js to compare against the real earlier output.",
+  "model": "claude-opus-5-5",
+  "ms": 5201,
+  "tokens": {
+    "input": 2,
+    "output": 466,
+    "cacheCreation": 3501,
+    "cacheRead": 783,
+    "fresh": 3969,
+    "total": 4752
+  },
+  "at": "2026-11-05T08:38:58.624Z"
+}

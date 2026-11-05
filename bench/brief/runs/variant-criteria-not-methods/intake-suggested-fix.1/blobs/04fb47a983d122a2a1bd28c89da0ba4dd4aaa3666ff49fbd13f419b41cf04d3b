@@ -1,0 +1,32 @@
+Work at the PR head, from the repository root, using Node v22. Run each check below in order. Report PASS or FAIL for each one, with the output it was based on.
+
+## Check 1 — malformed config exits 1 with empty stdout
+Run: `d=$(mktemp -d); printf '{\n  "port": 9000,\n  greeting: "x"\n}\n' > $d/c.json; node src/app.js $d/c.json >$d/out 2>$d/err; echo "exit $?"; wc -c < $d/out; cat $d/out`
+- PASS: it prints `exit 1` and $d/out is empty (0 bytes).
+- FAIL: any other exit code, or anything on stdout (including a `listening on` line).
+
+## Check 2 — stderr names the path, line 3 and column 3
+Using the same run as Check 1 (same $d), run `cat $d/err`.
+- PASS: stderr contains `bad config:`, the exact string "$d/c.json" as passed on the command line, and gives line 3 and column 3 of the mistake in a recognisable form (e.g. `line 3 column 3`, `3:3`, `line 3, column 3`).
+- FAIL: any of `bad config:`, the exact path, line 3 or column 3 is missing, or a different line or column is reported.
+
+## Check 3 — loadConfig throws with the path in the message
+Run: `d=$(mktemp -d); printf '{port: 9000' > $d/b.json; node --input-type=module -e "import {loadConfig} from './src/config.js'; try { const v = loadConfig('$d/b.json'); console.log('RETURNED', JSON.stringify(v)); process.exit(2) } catch (e) { console.log(e.message.includes('$d/b.json') ? 'OK' : 'NO PATH: ' + e.message) }"`
+- PASS: it prints `OK`.
+- FAIL: it prints `RETURNED ...` (exit 2), prints `NO PATH: ...`, or crashes some other way.
+
+## Check 4 — valid config still works
+Run: `d=$(mktemp -d); printf '{"port": 9000}' > $d/ok.json; node src/app.js $d/ok.json; echo "exit $?"; node --input-type=module -e "import {loadConfig} from './src/config.js'; console.log(JSON.stringify(loadConfig('$d/ok.json')))"`
+- PASS: stdout shows `listening on 9000`, then `exit 0`, and the second command prints `{"port":9000}`.
+- FAIL: any other output, a nonzero exit, or a different returned value.
+
+## Check 5 — npm test passes and a new path test fails at base
+1. Run `npm test` at the PR head. It must pass.
+2. Find the PR's base commit (the merge-base with the target branch). In a scratch copy or worktree of the PR head, restore the base `src/` with `git checkout <base> -- src` and keep the PR's `test/` files. Run `npm test` there. Then restore the head `src/`.
+- PASS: `npm test` passes at head, AND at least one test fails on base `src/`, where that test asserts that the error from malformed config JSON includes the file path. Read the failing test's source to confirm it makes that assertion.
+- FAIL: `npm test` fails at head, or no test fails on base `src/`, or none of the failing tests checks for the file path in the malformed-JSON error.
+
+## Advisory
+- Read `src/config.js` and check that line and column are computed from the parse position (or handled when Node gives only a position), not just copied from Node's message. Note it if they are not.
+- Check that a missing file (`node src/app.js /nonexistent.json`) still exits 1 with a `bad config:` line.
+- Check that `loadConfig` does not return `{}` or defaults on a parse error, and that no JSON5 or comment support was added.

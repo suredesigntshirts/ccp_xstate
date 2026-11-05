@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "65bc4ffbf7568f4d4b6cec9e6f01df9465b1c2a3bf43e12907d779375c4657f5",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands would run as written. `node bin/greet.js --shout Ada`, `node bin/greet.js Ada --shout`, `node bin/greet.js; echo \"exit=$?\"` and `npm test` (which runs \"node --test\") all use files that exist at this commit: bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml.\n\nCheck 2 of the verifier brief breaks the criterion. It says \"e.g. `git stash`-free: `git worktree add /tmp/greet-base <merge-base of the PR>`\". Run as written, the shell reads `<merge-base` as input redirection from a file that doesn't exist, so the command fails. The placeholder is never turned into a real command such as `$(git merge-base HEAD main)`. The other option, \"`git show <merge-base>:bin/greet.js` with its src\", has the same placeholder problem. It also only prints one file's contents, so it can't run the base code to compare outputs. This comparison step is not runnable as written.",
+  "model": "claude-opus-5-5",
+  "ms": 10885,
+  "tokens": {
+    "input": 2,
+    "output": 1014,
+    "cacheCreation": 3275,
+    "cacheRead": 783,
+    "fresh": 4291,
+    "total": 5074
+  },
+  "at": "2026-11-05T08:38:50.593Z"
+}

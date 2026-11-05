@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "4aa615497f7b326d92ba9b8598fa73b81976b2d4105c28e21a537239d25aaf29",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check against the words of its expect line. Check 1 compares the output to \"HELLO, ADA!\", which is just the defined greeting `Hello, Ada!` in upper case, so it asks for nothing extra. Check 2 compares the output without the flag to the output from before the change, which is what \"unchanged\" means. Check 3 needs `--shout` in docs/index.md plus some explanation of it, which \"documents\" requires. Check 4 needs HTTP 200 and a line containing `--shout` on the published page, which is what \"lists --shout\" means. It also says a pre-merge FAIL depends on merge and deploy, which follows the line's \"after merge\". The stricter checks are all under \"Advisory (not part of any PASS or FAIL condition)\": npm test counts, the flag after the name, the usage line and exit code, and diff file scope. No PASS or FAIL condition demands more than its expect line's words.",
+  "model": "claude-opus-5-5",
+  "ms": 13980,
+  "tokens": {
+    "input": 2,
+    "output": 964,
+    "cacheCreation": 3212,
+    "cacheRead": 783,
+    "fresh": 4178,
+    "total": 4961
+  },
+  "at": "2026-11-05T08:55:15.382Z"
+}

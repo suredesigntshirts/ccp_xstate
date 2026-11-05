@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "a85266bba987747860d37acc1d6b46e31c4d0c7d38d73835a2048e118d56210c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The verifier brief avoids must_not 1. Check 1's PASS and FAIL conditions ask only that loadConfig returns an empty plain object and that the `{}` comes from a catch around JSON.parse. The stderr warning appears only under \"Advisory (does not decide PASS or FAIL)\".\n\nThe builder brief breaks must_not 2. Step 2 tells the builder to do more than return {} on a parse error: \"in the catch, before returning `{}`, write one line to stderr that names the path and includes the parse error's message\". It doesn't ask for a throw, but it adds a warning and file reporting on the parse-error path. Must_not 1 names exactly that (\"reporting the file name or line, or logging a warning\") as going beyond returning {}. Steps 4 and 6 build on the same warning. So the briefs do not avoid everything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 6801,
+  "tokens": {
+    "input": 2,
+    "output": 600,
+    "cacheCreation": 3028,
+    "cacheRead": 783,
+    "fresh": 3630,
+    "total": 4413
+  },
+  "at": "2026-11-05T08:41:00.912Z"
+}

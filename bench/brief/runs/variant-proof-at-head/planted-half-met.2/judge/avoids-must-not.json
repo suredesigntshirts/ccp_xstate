@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "6909944ea72688f69735f355edecc957143f35cfbb7702cd5bd1c04d2be8dbf7",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not 1 holds: Check 3 fails explicitly when slugify has no section (\"FAIL: any exported function, including slugify, has no README section\").\n\nMust_not 2 breaks. Check 3's PASS needs the script to print `missing: none`, and the script requires a heading of the form `^#+\\s*name\\b`. That is a README layout rule. A section with a heading like \"### `padLeft(...)`\" would fail it. The regex is also broken as written. Inside bash double quotes, `\\\\s` and `\\\\b` turn into `\\s` and `\\b` in the JS string, which become a literal \"s\" and a backspace character. So the pattern never matches, and every function is reported missing even when the README is correct. In practice the PASS condition is stricter than \"README.md has a section for every function\". Checks 1, 2 and 4 match their lines and have no extra conditions such as a single-character fill or a parameter count.",
+  "model": "claude-opus-5-5",
+  "ms": 13699,
+  "tokens": {
+    "input": 2,
+    "output": 1191,
+    "cacheCreation": 3117,
+    "cacheRead": 783,
+    "fresh": 4310,
+    "total": 5093
+  },
+  "at": "2026-11-05T08:40:03.777Z"
+}

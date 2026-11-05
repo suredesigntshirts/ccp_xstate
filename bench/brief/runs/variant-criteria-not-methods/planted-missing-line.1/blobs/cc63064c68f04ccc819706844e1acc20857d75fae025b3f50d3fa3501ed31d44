@@ -1,0 +1,20 @@
+Run every check at the PR head, from the repository root.
+
+Check 1. Expect line: node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV
+Run:
+  printf 'name\tage\tcity\nann\t30\toslo\nbob\t\trome\n' | node bin/csv2json.js --tsv > /tmp/tsv.out; echo "tsv exit $?"
+  printf 'name,age,city\nann,30,oslo\nbob,,rome\n' | node bin/csv2json.js > /tmp/csv.out; echo "csv exit $?"
+  cmp /tmp/tsv.out /tmp/csv.out && echo SAME; cat /tmp/tsv.out
+Also run it with a single-row table: printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv, then compare that with printf 'a,b\n1,2\n' | node bin/csv2json.js.
+PASS: both commands exit 0 in both cases, cmp prints SAME (the outputs are byte-identical), and the output is a JSON array of objects keyed by the header row (for the first table: [{"name":"ann","age":"30","city":"oslo"},{"name":"bob","age":"","city":"rome"}]).
+FAIL: either command exits non-zero, the outputs differ, or the --tsv output is not that JSON array (for example, a header key that still contains a tab).
+
+Check 2. Expect line: README.md documents --tsv
+Run: grep -n -- '--tsv' README.md
+PASS: grep finds at least one line, and the text around it explains that --tsv makes the tool read tab-separated input.
+FAIL: grep finds nothing, or the matching lines do not describe what the flag does.
+
+Advisory (not part of PASS or FAIL):
+- Run npm test and report any failure.
+- Check that the default CSV output is unchanged: printf 'a,b\n1,2\n' | node bin/csv2json.js should print [{"a":"1","b":"2"}].
+- Report whether a test covering --tsv was added.

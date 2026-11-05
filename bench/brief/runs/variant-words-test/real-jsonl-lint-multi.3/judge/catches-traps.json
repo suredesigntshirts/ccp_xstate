@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "dadfb9ee1999b5b014251f314b2cef3c6604165402f874c37f8e45eae9ed9f86",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs handle all four must_catch items.\n1. Verifier Check 3 runs `node BIN b.jsonl missing.jsonl a.jsonl`, expects exit 2, and requires that the run \"still prints `a.jsonl:2: ...` on stdout\". That puts a missing file and a bad row in the same run.\n2. Verifier Check 4 runs `git diff <merge-base with main>..HEAD -- packages/jsonl-lint/src/index.js`, so it compares the head with the base through the diff. Its pass wording (\"the lint function is unchanged\") is a bit looser than \"diff is empty\", but it still decides from the diff. The builder brief also says the diff must be empty.\n3. Builder step 4 says \"Update packages/jsonl-lint/README.md\" with the multi-file usage, `-`, and the exit codes.\n4. Verifier Check 6 uses `gh pr view ... --json body,headRefOid` to confirm the Closes line is in the body. It uses `gh pr checks` to require that \"the `test` workflow run for the head commit succeeded\".",
+  "model": "claude-opus-5-5",
+  "ms": 8991,
+  "tokens": {
+    "input": 2,
+    "output": 828,
+    "cacheCreation": 4885,
+    "cacheRead": 783,
+    "fresh": 5715,
+    "total": 6498
+  },
+  "at": "2026-11-05T08:42:03.749Z"
+}

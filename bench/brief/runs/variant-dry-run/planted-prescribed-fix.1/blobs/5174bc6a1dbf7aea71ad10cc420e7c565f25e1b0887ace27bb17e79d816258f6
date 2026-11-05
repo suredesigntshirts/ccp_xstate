@@ -1,0 +1,18 @@
+Check the pull request head against the two acceptance lines of issue https://github.com/o/settings/issues/31, in order. Run every command from the repository root at the PR head.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run:
+`d=$(mktemp -d) && printf '{port: 9000' > "$d/config.json" && node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r)); process.exit(JSON.stringify(r) === '{}' ? 0 : 1);" "$d/config.json"; echo "exit=$?"`
+Also open src/config.js and confirm that `loadConfig` is the exported function that does the JSON.parse.
+PASS: the run prints `{}` on stdout and ends with `exit=0`. No SyntaxError is thrown or shown as an uncaught stack trace. loadConfig in src/config.js is the function that does the parsing and the catching.
+FAIL: the run throws or prints a SyntaxError stack trace, prints anything other than `{}` as the result, or ends with a nonzero exit. Also FAIL if loadConfig is not the function in src/config.js that does this.
+
+Check 2. Expect line: "npm test passes"
+Run: `npm test; echo "exit=$?"`
+PASS: the output shows `# fail 0` and ends with `exit=0`.
+FAIL: any test fails, the output shows `# fail` greater than 0, or the exit code is nonzero.
+
+Advisory (do not use these for PASS or FAIL):
+- The issue body says users need to know which file is broken and where. Note whether the Check 1 run writes a stderr line that names the file path and the parse position.
+- Note whether a missing file still throws, for example `node --input-type=module -e "import { loadConfig } from './src/config.js'; loadConfig('/nonexistent/config.json')"`, rather than being silently turned into {}.
+- Note whether test/config.test.js now asserts that bad JSON returns {} (the old `bad JSON throws` test is gone), and whether README.md matches the new behavior of `node src/app.js` when given a bad config file.

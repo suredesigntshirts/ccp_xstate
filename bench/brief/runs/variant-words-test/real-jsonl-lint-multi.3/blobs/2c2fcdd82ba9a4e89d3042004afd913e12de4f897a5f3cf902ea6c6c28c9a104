@@ -1,0 +1,32 @@
+Check out the PR head, run `npm ci` (or `npm install`) at the repository root, and then run these checks in order. Each check is PASS or FAIL. Make temporary files in a scratch directory outside the repo. In the commands below, BIN is packages/jsonl-lint/bin/jsonl-lint.js.
+
+Check 1. Expect line: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before".
+Make a.jsonl = `{"a":1}\n{bad}\n`, b.jsonl = `{"b":2}\n`, c.jsonl = `{x}\n{"c":3}\n{y\n`. Run `node BIN a.jsonl b.jsonl c.jsonl` and also `node BIN c.jsonl a.jsonl`.
+PASS: stdout has one line per bad row, each in the form `<file>:<line>: <error>`, using the file name exactly as given. That means a.jsonl:2, then c.jsonl:1 and c.jsonl:3 in the first run. In the second run the c.jsonl lines come before the a.jsonl line. For a single file, `node BIN a.jsonl` still prints `a.jsonl:2: <error>` as before.
+FAIL: a file is skipped, the order doesn't follow the argument order, a bad row is missing, or the line format is different.
+
+Check 2. Expect line: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)".
+Run `printf '{bad}\n' | node BIN -` and `printf '{bad}\n' | node BIN b.jsonl -`. Then run `printf '{}\n' | node BIN - -`, and note its exit status.
+PASS: the stdin rows are checked and reported with `-:1: ...`, and the `- -` run exits 2.
+FAIL: stdin isn't read, it is reported under another name, or `- -` exits with anything other than 2.
+
+Check 3. Expect line: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)".
+Run and note exit statuses for: `node BIN b.jsonl b.jsonl` (expect 0), `node BIN b.jsonl a.jsonl` (expect 1), `node BIN` (expect 2), and `node BIN b.jsonl missing.jsonl a.jsonl` (expect 2).
+PASS: every status matches. The no-argument run and the missing-file run write something to stderr. The missing-file run still prints `a.jsonl:2: ...` on stdout.
+FAIL: any status is different, stderr is empty in those two runs, or the files after the missing one aren't checked and reported.
+
+Check 4. Expect line: "lint(text) in src/index.js is unchanged".
+Run `git diff <merge-base with main>..HEAD -- packages/jsonl-lint/src/index.js`.
+PASS: the lint function is unchanged. FAIL: the lint function's code or behaviour is changed.
+
+Check 5. Expect line: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage".
+Run `npm test` in packages/jsonl-lint and read the test files under packages/jsonl-lint/test/. Then read packages/jsonl-lint/README.md.
+PASS: there are node:test tests for each of the seven listed cases (two clean files; one bad among several; stdin via - clean; stdin via - bad; a missing file among good ones; two - arguments; no arguments), and they pass. The README documents the multi-file usage, including `-`.
+FAIL: any case has no test, the tests fail, or the README doesn't document the new usage.
+
+Check 6. Expect line: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head".
+Run `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state` and `gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test`. Then run `npm test` at the repo root on the head.
+PASS: there is one PR, its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`, `npm test` passes locally, and the `test` workflow run for the head commit succeeded.
+FAIL: the line is missing from the body, the changes are split across more than one PR, `npm test` fails, or the workflow is failing or missing at the head.
+
+Advisory (not pass/fail): it is nice if the second `-` is rejected before any input is read, if the usage message mentions `<file> [<file> ...]`, and if the unreadable-file message follows `jsonl-lint: cannot read <file>: ...`.

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "f92095c0f5e735b2ca0eac18778e075aae19869ca10dd74bf75f57dfbc2a64be",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Check 1 tests only for exit 1 and empty stdout. Check 2 tests for `bad config:`, the exact path string (a changed path or basename only counts as FAIL, which is what \"exactly as passed\" means) and line 3 and column 3. Its remark about Node's own message is a note, not a condition. Check 3 tests that the call throws and the message contains the path. Check 4 tests for `listening on 9000`, exit 0 and a deepEqual to `{ port: 9000 }`. Reading \"output is\" as exactly that line is a little tight, but it matches the expect line and its proof. Check 5 tests that `npm test` passes at the head and that some test asserting the path fails against the base src/. The stricter items are all under \"Advisory\": computing line and column from the text, no `{}` fallback, ENOENT handling, no absolute path, and keeping the SyntaxError type.",
+  "model": "claude-opus-5-5",
+  "ms": 12331,
+  "tokens": {
+    "input": 2,
+    "output": 953,
+    "cacheCreation": 5602,
+    "cacheRead": 783,
+    "fresh": 6557,
+    "total": 7340
+  },
+  "at": "2026-11-05T08:54:28.631Z"
+}

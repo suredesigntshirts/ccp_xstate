@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "7209723829149bf9daa3cf6bcdf18627dc8b35109a6e9be6fe41099abdf6ea87",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the `node --test` script. Every file they name exists: `src/app.js`, `src/config.js`, `test/config.test.js` and the README. `npm test` matches the package.json script. The builder's step-5 commands and the verifier's Checks 1–4 are copied from the issue's proofs. Their `printf` escapes, redirections, `echo \"exit $?\"` and `wc -c < $d/out` are valid shell. The quoting in the `node --input-type=module -e \"import {loadConfig} from './src/config.js'; ...\"` snippets is sound: single quotes nest correctly inside double quotes. Check 5 uses `git merge-base HEAD <the PR's target ref>`, `git checkout <base-sha> -- src` and `git checkout HEAD -- src`, which are valid git commands with placeholders that are clearly marked. One small soft spot: the builder's second step-5 bullet reuses `$d` from the first bullet. That works when both run in one shell, which the brief implies. I found no invalid syntax and no missing files or tools.",
+  "model": "claude-opus-5-5",
+  "ms": 11444,
+  "tokens": {
+    "input": 2,
+    "output": 873,
+    "cacheCreation": 5545,
+    "cacheRead": 783,
+    "fresh": 6420,
+    "total": 7203
+  },
+  "at": "2026-11-05T08:38:52.487Z"
+}

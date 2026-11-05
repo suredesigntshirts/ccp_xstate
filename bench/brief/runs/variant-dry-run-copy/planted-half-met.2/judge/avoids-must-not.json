@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c28da9526256863bdb8e3826fe30453dcf7d1e65f8581acd8a06a2615bfa6b9e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most of the briefs are fine. The builder adds a slugify section. Checks 1, 2 and 4 match their lines, and check 1 uses single-character fills without demanding that fill must be one character. Check 3 is broken, though. Its node script sits inside a double-quoted bash string, so bash turns `'^#+\\\\s.*\\\\b'` into `'^#+\\s.*\\b'`. In a JS string literal, `\\s` becomes plain `s` and `\\b` becomes a backspace character. The regex then needs a line like \"#s\" followed by a backspace, which no README heading can match. Every exported function is reported missing and the check exits 1 even when README.md is fully correct. That FAIL condition is stricter than line 3, which must_not item 2 forbids. Check 3 also asks for describing text under each heading. That is a smaller extra demand, but it adds to the same problem.",
+  "model": "claude-opus-5-5",
+  "ms": 15831,
+  "tokens": {
+    "input": 2,
+    "output": 1259,
+    "cacheCreation": 3192,
+    "cacheRead": 783,
+    "fresh": 4453,
+    "total": 5236
+  },
+  "at": "2026-11-05T08:56:46.977Z"
+}

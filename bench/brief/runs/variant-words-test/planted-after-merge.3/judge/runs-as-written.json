@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "7015bb5066ddd500b3d6deeb9642d25940e3686e6880484f9640a2a37ff99b23",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the tracked files and the scripts in package.json. The files they name all exist: bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml. `npm test` maps to `node --test`. The node calls (`node bin/greet.js --shout ada`, `'Bob Smith'`, no name) are valid. `grep -n -- '--shout' docs/index.md` is valid because `--` ends the options. `curl -sSL … | grep -n -- '--shout'`, `gh run list --workflow pages.yml` and `gh pr view <number> --json state,mergedAt` all use real flags. The `<number>` and `<base>` placeholders stand for values that can't be known when the brief is written. They are clearly meant to be filled in, so I don't count them as broken syntax. The comparison with the base commit offers `git worktree add` or `git show <base>:path` as ways to do it, and both are valid git usage. I found no command that names a missing file, uses invalid flags or has broken syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 9394,
+  "tokens": {
+    "input": 2,
+    "output": 875,
+    "cacheCreation": 3379,
+    "cacheRead": 783,
+    "fresh": 4256,
+    "total": 5039
+  },
+  "at": "2026-11-05T08:39:20.490Z"
+}

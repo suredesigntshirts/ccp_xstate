@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "intake-suggested-fix.1",
+  "case": "intake-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 5 lines quoted in order, checks numbered 1 to 5"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5 not quoted word for word in the builder brief: \"Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Check 1 only needs exit 1 and empty stdout. Check 2 needs `bad config:`, the exact path and line 3 / column 3. It accepts several formats, and its rule on \"resolved differently or shortened\" follows from \"exactly as passed\". Check 3 needs `OK`, meaning it threw and the message contains the path. Check 4 needs exit 0, `listening on 9000` and `{\"port\":9000}`. Check 5 needs `npm test` to pass and at least one test that checks the path and fails against the base `src/`. That is what \"fails at the current base commit\" requires; it is not an extra mutation test. The stricter items sit under \"Advisory (not part of PASS/FAIL)\": not relying only on Node's message, the missing-file (ENOENT) case, and never returning `{}`. No PASS or FAIL condition requires exact wording, a branch rule or a file-scope rule.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the six tracked files. Everything they name exists at this commit: `src/app.js`, `src/config.js`, `test/config.test.js` and `npm test` (which runs `node --test`). The verifier's shell lines are valid as written: `mktemp -d`, the `printf` with `\\n` escapes, the redirects, `wc -c < $d/out` and `grep -F \"$d/c.json\"`. Its `node --input-type=module -e \"import {loadConfig} from './src/config.js'; ...\"` commands are copied from the issue's own proofs, and their JavaScript parses. The git steps (`git merge-base HEAD <target>`, `git checkout <base> -- src`, `git checkout HEAD -- src`) only leave refs to fill in, and their syntax is correct. The builder's regex `/position (\\d+)/` is valid JavaScript. Its worked example is also right: position 20 in the four-line file is line 3, column 3. Nothing in either brief would fail to run because of a missing file or bad syntax.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the builder brief, and both are handled.\n\nItem 1 (the non-goal): the builder brief tells the builder to rethrow on a parse error (\"throw a new error\"). It also says \"Never return `{}` or defaults for a malformed file.\" So loadConfig must still throw, which rules out swallowing the error. This covers the non-goal.\n\nItem 2 (the existing test): the builder brief names `test/config.test.js` and says \"One of them asserts that bad JSON throws a `SyntaxError`.\" In Step 1 it adds \"keeping it a `SyntaxError` is simplest, since the existing test expects one.\" That warns the builder that wrapping the error in a different type would change that test's outcome. It also says to keep the existing tests passing.\n\nSince the brief covers both items, the criterion holds.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Item 1: the builder brief does have the builder catch the parse error, but only to throw again. It says \"Wrap only the `JSON.parse` call in try/catch. On a parse error, throw a new error\" and \"Never return `{}` or defaults for a malformed file.\" It never tells the builder to return a value. Item 2: verifier Check 2 does not require one exact format. Its PASS condition accepts line 3 and column 3 \"in a form such as `line 3 column 3`, `3:3` or `line 3, column 3`\", and adds that \"`<path>:3:3` also counts\". These are given as examples, not a fixed list. FAIL applies only when something is missing, the path is altered, or the numbers are not 3. It does not fail a run over wording or order. Neither must_not item appears in either brief.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "The builder brief does not copy any of the verifier's probes. It has none of the verifier's inline scripts: no `node --input-type=module -e \"...includes('$d/b.json')...\"` check, no `wc -c` or `grep -F` of stderr, and no `git merge-base` / `git checkout <base> -- src` procedure. It also gives no PASS/FAIL wording. Step 7 has the builder run `node src/app.js <tmp>/c.json` and `ok.json`. Both commands are named by the expect lines and proofs, which the criterion allows. The outcomes it gives (exit 1, empty stdout, line 3 column 3, `listening on 9000`) only restate the expect lines, which is the bar the builder must meet. The four-line file and the \"position 20 → line 3, column 3\" example in step 2 come from the issue's own proof input. Step 5 asks the builder to write its own tests, which is allowed. The verifier's advisory about computing the location from the position comes from issue proof 2, and it is not a PASS/FAIL check.",
+      "cached": true
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "593ffb209824dfa85df92e524ae1a611137dc1c827b58668f0c5b2f2f766043c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier's checks. Running npm test (step 5) is allowed, because an expect line names it. Step 3 is the problem. It tells the builder to assert that \"loadConfig on a file containing `{port: 9000` returns a value deepEqual to {} and does not throw\". That is the same input and expected output as the verifier's Check 1 probe, which writes `{port: 9000` and expects `{} true` with no throw. Step 2's \"a new empty plain object\" also hints at the verifier's prototype check. Steps 2–4 repeat the verifier's advisory probes too: valid JSON still loads unchanged, a missing file still throws, the test no longer asserts SyntaxError, and the README is updated. Telling the builder to write tests is allowed, but handing it the verifier's exact probe gives the builder the checker's method, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 9541,
+  "tokens": {
+    "input": 2,
+    "output": 845,
+    "cacheCreation": 2844,
+    "cacheRead": 783,
+    "fresh": 3691,
+    "total": 4474
+  },
+  "at": "2026-11-05T08:29:19.915Z"
+}

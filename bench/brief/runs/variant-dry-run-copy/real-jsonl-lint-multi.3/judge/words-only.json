@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "6b35c16030161626555ecc768aaa7b858cf71eaa1f40b9bbd7929f24ab877f09",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 3 breaks the criterion. Its expect line gives exit 1 for a bad row and exit 2 for an unreadable file, but doesn't say which wins when both happen. Check 3's PASS still requires exit=2 for \"c1 missing b1\" in both commands, ranking a read error above bad rows. The brief's own Advisory lists \"A read error should win over bad rows for the exit code (2)\", so it treats the rule as advisory yet grades on it. Check 4 is also arguably too strict: its PASS needs one exact lint output string whose error text depends on the Node version, which \"unchanged\" doesn't require. Check 5 is borderline: it requires the README to document the exit codes, but the expect line only says \"documents the usage\". Checks 1, 2 and 6 stay within their expect lines.",
+  "model": "claude-opus-5-5",
+  "ms": 14611,
+  "tokens": {
+    "input": 2,
+    "output": 1156,
+    "cacheCreation": 6714,
+    "cacheRead": 783,
+    "fresh": 7872,
+    "total": 8655
+  },
+  "at": "2026-11-05T08:59:12.918Z"
+}

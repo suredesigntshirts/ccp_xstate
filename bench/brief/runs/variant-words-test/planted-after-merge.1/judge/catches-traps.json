@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "6d25af7b85e6db33d5a0e414cfafef49ad2cdfe57bc44cbf401bad988b131003",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 2 is handled. Check 2 runs `node bin/greet.js Ada` at the PR head and \"the same commands at the PR's base commit\" and then compares the outputs, so it does not rely only on a hand-written string.\n\nItem 1 is not handled. Check 4 reads the live page: \"fetch the page (`curl -sSL https://o.github.io/greet-cli/`) and search it for `--shout`\". If the PR isn't merged, it says to report \"FAIL\". It never says that at the PR head the check should confirm that docs/index.md lists --shout and that pages.yml publishes docs/ from main. pages.yml comes up only in an advisory note (\"If the PR changes that, line 4 is at risk\"), which isn't a pass/fail check. So the check for line 4 still points at the live page instead of checking at the head what will publish it.",
+  "model": "claude-opus-5-5",
+  "ms": 5576,
+  "tokens": {
+    "input": 2,
+    "output": 416,
+    "cacheCreation": 3311,
+    "cacheRead": 783,
+    "fresh": 3729,
+    "total": 4512
+  },
+  "at": "2026-11-05T08:38:53.099Z"
+}

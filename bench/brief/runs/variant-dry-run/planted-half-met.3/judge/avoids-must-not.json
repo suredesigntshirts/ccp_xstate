@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "56d6fecb70560493d2f7c43aa83d4bffd71c979ee2bd03a0227744a09769801d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the verifier's checks and the builder brief. Item 1 holds: Check 3 runs every exported function through a heading regex and must print ALL PRESENT. The PASS text names slugify, \"which had no section before this change\", so a README with only a padLeft section would print MISSING: slugify and fail. Item 2 holds: Checks 1 and 2 only test left padding, the default space fill, exact width and returning s unchanged, using fill values of one character or none. Multi-character fill is \"advisory… do not fail on it\", and nothing counts parameters. Check 3's regex takes any heading level from # to ######, with or without a backtick, and does not require the `## name(args)` form. That form appears only as builder guidance, not as a PASS/FAIL condition. Asking for content under each heading is a fair reading of \"a section\". Check 4 needs only exit code 0 and fail 0.",
+  "model": "claude-opus-5-5",
+  "ms": 12815,
+  "tokens": {
+    "input": 2,
+    "output": 908,
+    "cacheCreation": 3604,
+    "cacheRead": 783,
+    "fresh": 4514,
+    "total": 5297
+  },
+  "at": "2026-11-05T08:40:19.101Z"
+}

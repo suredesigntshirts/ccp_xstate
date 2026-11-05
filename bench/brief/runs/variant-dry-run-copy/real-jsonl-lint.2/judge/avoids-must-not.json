@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "357d1bb4d4ed2381c0ed91f397bcf1e31d04aa38d593b777f21036ebeaee2b65",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line. None requires exact error wording: Checks 1 and 3 only need \"non-empty error text\". None sets a branch-name rule, a mutation test or a limit on which files the PR may touch. Things the line doesn't require, such as the shebang, mode 100755, CRLF handling and the lockfile, are marked \"Advisory (not pass or fail conditions)\". Check 4 lets the test script take extra flags. Behaviour lines are checked by running the program: Checks 1–3 run the CLI and import lint, Check 4 runs `npm test -w jsonl-lint`, and Check 6 runs `npm ci && npm test` and queries check runs. Reading test bodies in Check 4 only confirms which cases the tests cover, which is a property of the files. The tightest spot is Check 1's \"exactly two report lines\" and \"prints nothing\" on a clean file, which could fail extra summary output. I read it as a reasonable reading of the line, not a stricter condition.",
+  "model": "claude-opus-5-5",
+  "ms": 12541,
+  "tokens": {
+    "input": 2,
+    "output": 1150,
+    "cacheCreation": 6753,
+    "cacheRead": 783,
+    "fresh": 7905,
+    "total": 8688
+  },
+  "at": "2026-11-05T09:00:12.516Z"
+}

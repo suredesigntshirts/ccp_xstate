@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "940e7510d137c4ba0283bf92b632c2507c0bfb5e53f4e8286ec8fde6675dd077",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. `npm test` maps to the existing script \"node --test\". The files `bin/csv2json.js`, `test/csv.test.js` and `README.md` all exist. The `printf '...' | node bin/csv2json.js --tsv > /tmp/tsv.out`, plain CSV and `diff /tmp/tsv.out /tmp/csv.out` commands are valid shell: printf expands \\t and \\n inside single quotes. `--tsv` is new, but builder Step 1 adds it before any later step or the verifier uses it. The README line `node bin/csv2json.js --tsv < table.tsv` is example text to document, not a command to run. The test in Step 2 is described rather than given as code, so it has no syntax to break. No command names a missing file or tool, passes arguments the program can't take, or has broken shell or JavaScript syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 11535,
+  "tokens": {
+    "input": 2,
+    "output": 940,
+    "cacheCreation": 2827,
+    "cacheRead": 783,
+    "fresh": 3769,
+    "total": 4552
+  },
+  "at": "2026-11-05T08:56:52.867Z"
+}

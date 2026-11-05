@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "b9d6480fbc3a7755ec9a6a4382ed8940596f2348a73f4af098b7674e92c6f2ee",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Check 1 tests export, left padding to width with the given fill (\"**ab\", \"00042\") and a default space (\"  7\"). The line's words require all of these. Check 2 tests that s comes back unchanged at exactly width and at more than width, as \"width characters or longer\" says. Check 3 needs every exported function to have a section, read as a markdown heading. The names listed are only \"expected\", and the slugify note just warns about the base branch, so neither adds a test. Check 4 fails only on failing tests or a run error. The stricter items are under \"Advisory\": exit status 0, padLeft tests in the test file, the `## name(args)` heading style and multi-character fill. No PASS or FAIL condition goes beyond the words of its line.",
+  "model": "claude-opus-5-5",
+  "ms": 13897,
+  "tokens": {
+    "input": 2,
+    "output": 1010,
+    "cacheCreation": 3041,
+    "cacheRead": 783,
+    "fresh": 4053,
+    "total": 4836
+  },
+  "at": "2026-11-05T08:39:30.682Z"
+}

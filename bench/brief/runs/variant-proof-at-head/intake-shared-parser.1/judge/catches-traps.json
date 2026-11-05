@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "af5d975c777442cc549b18686852a968c511cc1f498ba75d074b58ec82fa1b77",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the two briefs.\n\nItem 1 holds. The builder brief describes test/csv.test.js and its existing 'cli' test under \"Current state\". Step 3 then says the CSV cli test must keep passing: \"the existing CSV cli test still passes\". Step 5 also requires `npm test` to exit 0, and the brief says not to change src/parse.js unless really needed. So the CSV path is protected.\n\nItem 2 holds. Verifier Check 6 runs `npm test; echo \"exit=$?\"`, not `npm run test:cli`. The Advisory section says plainly that the proof's `npm run test:cli` doesn't exist, since package.json defines only a `test` script, and that the check therefore uses npm test.\n\nBoth items are handled, so the criterion is met.",
+  "model": "claude-opus-5-5",
+  "ms": 11389,
+  "tokens": {
+    "input": 2,
+    "output": 557,
+    "cacheCreation": 6307,
+    "cacheRead": 783,
+    "fresh": 6866,
+    "total": 7649
+  },
+  "at": "2026-11-05T08:44:13.964Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9ce0074b7c88b660d5755a9c569f8f77f5d677aaadd89bdd45ca1536a9bae989",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one. (1) Builder step 2 adds the missing \"### subtract(a, b)\" entry next to clamp, \"so README.md documents every function math.js exports: add, subtract, multiply and clamp.\" (2) Verifier Check 3 lists the exports at the head with Object.keys, naming \"at least add, subtract, multiply and clamp\". It FAILs if \"any exported function is not documented\" and says subtract \"must now be documented too.\" (3) Verifier Check 2 calls clamp with lo > hi on three inputs and prints `e instanceof RangeError ? 'RangeError' : 'other: '+e`. It PASSes only if all three print RangeError and FAILs on \"no throw\" or \"other\", so a throw of any other error type fails.",
+  "model": "claude-opus-5-5",
+  "ms": 4372,
+  "tokens": {
+    "input": 2,
+    "output": 331,
+    "cacheCreation": 3108,
+    "cacheRead": 783,
+    "fresh": 3441,
+    "total": 4224
+  },
+  "at": "2026-11-05T08:57:53.509Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "4ee66f7971b16bdd2027725e5e45ed0e8165e94b38973e11913baa917793de7e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The builder brief contains none of the verifier's checks. Its \"Acceptance lines\" are the issue's four expect lines word for word, which is the bar the builder should get. It does not copy any of the verifier's three node -e scripts. Its examples, `clamp(-1, 0, 10); // 0` and `clamp(12, 0, 10); // 10`, are not among the verifier's inputs ([-5,0,100,0], [7,3,3,3], [5,10,0], etc.). Its test guidance names kinds of cases (below, above, inside, at a bound, lo equal to hi, throws), not the verifier's input-output sets. The README step asks for a `### name(...)` heading for each export. It does not repeat the verifier's `readme.includes` probe or its PASS or FAIL wording. Telling the builder to document subtract is a fact about the repository and part of the requirement, not the verifier's FAIL note. Telling the builder to run `npm test` is explicitly allowed. The criterion holds across the whole builder brief.",
+  "model": "claude-opus-5-5",
+  "ms": 10551,
+  "tokens": {
+    "input": 2,
+    "output": 916,
+    "cacheCreation": 3687,
+    "cacheRead": 783,
+    "fresh": 4605,
+    "total": 5388
+  },
+  "at": "2026-11-05T08:27:38.597Z"
+}

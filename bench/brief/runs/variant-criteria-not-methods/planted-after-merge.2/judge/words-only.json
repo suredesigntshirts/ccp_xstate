@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "7729f58132464d15b868d3b16bcb674f040af84bf18700b15b3c4919f22f3c1b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS/FAIL conditions against the words of its expect line. Check 1's expect line is \"node bin/greet.js --shout <name> prints the greeting in upper case\". That fixes the order: flag first, then name. Its PASS condition also requires `node bin/greet.js Ada --shout` to work, and its FAIL condition triggers if \"either command exits non-zero\". The reversed order and the exit-code test are stricter than the words. They belong under Advisory. Check 2 (\"without --shout the output is unchanged\") also compares exit codes between head and base. An exit code is not output, so this goes further than the words. Checks 3 and 4 stay within their expect lines, and the Advisory section is used correctly for the other extras. Check 1 breaks the criterion, so it does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 7688,
+  "tokens": {
+    "input": 2,
+    "output": 633,
+    "cacheCreation": 3355,
+    "cacheRead": 783,
+    "fresh": 3990,
+    "total": 4773
+  },
+  "at": "2026-11-05T08:38:48.029Z"
+}

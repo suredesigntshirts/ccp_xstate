@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "83405344676758478f003deb7ffcb3c021498011f7b9a347fb75fd8bf27cb03f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Checks 2, 3 and 5 match their lines, and the extra tests (CRLF, shebang, mutation) are correctly under Advisory. Three checks add conditions their lines don't force:\n- **Check 4:** PASS needs `npm test -w packages/jsonl-lint` to exit 0 with no failing tests, and FAIL includes \"the tests fail\". Line 4 only requires that node:test tests exist for the five cases, not that they pass.\n- **Check 6:** PASS needs \"the jsonl-lint tests among those run\" and that \"that PR contains the whole change\". Line 6 only requires one PR with the Closes line and green `npm test` and workflow.\n- **Check 1:** PASS needs stdout to be \"exactly two lines\". Line 1 only requires a `<file>:<line>: <error>` line for each invalid row, so it doesn't rule out other output.\nThese belong under Advisory, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 9881,
+  "tokens": {
+    "input": 2,
+    "output": 965,
+    "cacheCreation": 6457,
+    "cacheRead": 783,
+    "fresh": 7424,
+    "total": 8207
+  },
+  "at": "2026-11-05T08:59:56.946Z"
+}

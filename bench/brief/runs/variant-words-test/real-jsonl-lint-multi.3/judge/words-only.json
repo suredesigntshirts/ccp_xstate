@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "dbbfa7a06d793b21c3c76a59f792afb4a7a236d312f03ff264b2485bbcb8c88b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1–4 and 6 stay within their expect lines. Check 1's single-file case comes from \"as for one file before\". Check 3 requiring output on stderr comes from \"error on stderr\". The extras (rejecting `-` early, the wording of the usage and cannot-read messages) are correctly placed under Advisory. Check 5 goes beyond its line. Expect line 5 only says the tests \"cover\" seven cases and that \"the package README documents the usage\". Check 5's FAIL condition adds \"the tests fail\" (\"and they pass\"), which line 5's words don't require. That requirement belongs to line 6, and it is already checked in Check 6. Check 5 also asks that the README cover \"the multi-file usage, including `-`\", which is narrower than \"documents the usage\". So Check 5's PASS and FAIL conditions test more than its expect line's words require.",
+  "model": "claude-opus-5-5",
+  "ms": 16097,
+  "tokens": {
+    "input": 2,
+    "output": 1257,
+    "cacheCreation": 4703,
+    "cacheRead": 783,
+    "fresh": 5962,
+    "total": 6745
+  },
+  "at": "2026-11-05T08:41:45.071Z"
+}

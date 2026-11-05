@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "9a4af6b5fb3c5a19d3e5fa886f731d8d2aa6c2c067a50130557b9f1344ec5ada",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 5 test only what their lines say. Check 4 breaks the criterion: its PASS list requires \"`npm test -w jsonl-lint` reports all tests passing with `exit=0`\", and line 4 never asks for passing tests. It only asks for a package.json with certain fields, no runtime dependencies, and node:test tests for the five cases. Whether tests pass belongs to line 6. Check 3 also adds things the words don't force: it requires `error` to be a \"non-empty string\" and `line` to be a number, but the expect line only says `[{ line, error }]`. Check 6 adds a condition too: \"output shows the jsonl-lint tests ran\" goes beyond \"npm test … green\". None of these stricter conditions are under Advisory, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 16318,
+  "tokens": {
+    "input": 2,
+    "output": 1067,
+    "cacheCreation": 6717,
+    "cacheRead": 783,
+    "fresh": 7786,
+    "total": 8569
+  },
+  "at": "2026-11-05T08:59:34.792Z"
+}

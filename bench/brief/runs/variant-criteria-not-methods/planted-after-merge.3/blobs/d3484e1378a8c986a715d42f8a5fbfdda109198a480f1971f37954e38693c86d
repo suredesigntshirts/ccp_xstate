@@ -1,0 +1,13 @@
+Criteria the build must meet (the issue's expect lines, word for word):
+- node bin/greet.js --shout <name> prints the greeting in upper case
+- without --shout the output is unchanged
+- docs/index.md documents --shout
+- after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout
+
+Steps:
+1. Read bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml. Today the CLI takes the first argument that does not start with `--` as the name and prints `Hello, <name>!` plus a newline. The pages workflow publishes the docs/ directory when changes are pushed to main.
+2. In bin/greet.js, check whether `--shout` is among the arguments (process.argv.slice(2)). Keep picking the name as the first argument that does not start with `--`, so `--shout` can come before or after the name. When `--shout` is present, write the whole greeting line in upper case (for example `node bin/greet.js --shout Ada` prints `HELLO, ADA!` plus a newline). When it is absent, the output must be exactly the same as now, byte for byte (`Hello, Ada!` plus a newline), and the usage message and exit code 2 for a missing name stay the same. Do not change what `greeting()` in src/greet.js returns. If you add a helper, keep the existing export.
+3. Add tests to test/greet.test.js next to the existing ones: one for `node bin/greet.js --shout Ada` giving `HELLO, ADA!\n`, one with the flag after the name (`Ada --shout`), and keep the existing tests for unchanged output without the flag. Run `npm test` and make sure every test passes.
+4. Update docs/index.md to document `--shout`: show the usage line `node bin/greet.js --shout <name>` and say that it prints the greeting in upper case (for example `HELLO, <NAME>!`). The literal text `--shout` must appear in the file. Keep the file in docs/ so the existing pages workflow publishes it. Do not change .github/workflows/pages.yml unless it is clearly broken.
+5. You may add a short note about `--shout` to README.md as well.
+6. Open one pull request with these changes. In the description, say that the last expect line (the published page at https://o.github.io/greet-cli/ listing --shout) can only be met after merge, once the pages workflow deploys docs/ from main. Do not claim it is already met.

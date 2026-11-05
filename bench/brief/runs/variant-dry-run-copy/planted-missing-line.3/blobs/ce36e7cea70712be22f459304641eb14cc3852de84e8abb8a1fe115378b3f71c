@@ -1,0 +1,17 @@
+Run every command from the repository root at the PR head, in bash.
+
+Check 1. Expect line: "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+Run:
+  printf 'name\tage\tcity\nAda\t36\tLondon\nBob\t41\tParis\n' | node bin/csv2json.js --tsv; printf 'name,age,city\nAda,36,London\nBob,41,Paris\n' | node bin/csv2json.js; diff <(printf 'name\tage\tcity\nAda\t36\tLondon\nBob\t41\tParis\n' | node bin/csv2json.js --tsv) <(printf 'name,age,city\nAda,36,London\nBob,41,Paris\n' | node bin/csv2json.js) && echo SAME
+PASS: both commands exit 0, the two printed outputs are identical, the CSV output is the JSON array [{"name":"Ada","age":"36","city":"London"},{"name":"Bob","age":"41","city":"Paris"}], and the last line is SAME.
+FAIL: either command errors, the outputs differ (diff prints lines and SAME does not appear), or the --tsv output keeps tabs inside keys or values, as in {"name\tage\tcity":...}.
+
+Check 2. Expect line: "README.md documents --tsv"
+Run:
+  grep -n -- '--tsv' README.md
+PASS: at least one matching line is printed, and the matching text explains that --tsv makes the tool read tab-separated input, for example with a usage line.
+FAIL: grep prints nothing (exit status 1), or `--tsv` appears in README.md without saying what it does.
+
+Advisory (does not decide PASS or FAIL):
+- Run `npm test`. All tests, the existing ones included, should pass. Note any failure.
+- Check that running `node bin/csv2json.js` without --tsv still behaves as before. Also check whether the PR adds a test for --tsv.

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "02492730d2d762ee937d7bad94d9ad5f58d2877a54f63f1dec776281899f0a15",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Every command in both briefs would run as written. `npm test` maps to the existing script `node --test`. bin/csv2json.js, src/parse.js, test/csv.test.js and README.md are all tracked files. The verifier's pipelines, such as `printf 'name\\tage...' | node bin/csv2json.js --tsv > /tmp/tsv.out`, are valid shell, since printf turns \\t into a tab. `cat`, `cmp /tmp/tsv.out /tmp/csv.out` and `grep -n -- '--tsv' README.md` (the `--` stops grep reading `--tsv` as an option) are also correct. The `--tsv` flag is added by the builder, so it exists at the PR head where the verifier runs. The JS the builder uses, `parse(input, '\\t')`, matches `parse(text, sep = ',')`. `node bin/csv2json.js --tsv < table.tsv` is only an example for the README text, not a command the agents are told to run. Step 4 tells the builder to run the commands on a small table, so it makes its own input file. No command breaks.",
+  "model": "claude-opus-5-5",
+  "ms": 8593,
+  "tokens": {
+    "input": 2,
+    "output": 623,
+    "cacheCreation": 2766,
+    "cacheRead": 783,
+    "fresh": 3391,
+    "total": 4174
+  },
+  "at": "2026-11-05T08:56:55.522Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "a7be7ec89ca343dca69c3a33ba4b0edcfb4852579215fd34ebf05e56f54d2761",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every verifier check. The verifier's own probes, the `od -c` byte comparisons with `&& echo PASS || echo FAIL`, never show up in the builder brief. Step 4's printf commands and expected outputs are the commands the expect lines and proofs name, which is allowed. Step 2's test cases are tests the builder writes itself, also allowed, and their inputs and outputs come from the expect lines. Step 3's README example `node bin/csv2json.js --tsv < table.tsv` and \"tab-separated input\" match proof 7's wording (\"of the form node bin/csv2json.js --tsv < file\"). They do not come from a verifier-only condition, and Check 7 mentions that example only with \"such as\". The brief has no PASS/FAIL wording and none of the verifier's FAIL rules, such as \"A test that only calls parse() directly... does not count\". \"src/parse.js should not need changes\" also appears in the verifier's advisory list, but that list never decides PASS or FAIL. So the criterion holds throughout.",
+  "model": "claude-opus-5-5",
+  "ms": 16529,
+  "tokens": {
+    "input": 2,
+    "output": 1149,
+    "cacheCreation": 5479,
+    "cacheRead": 783,
+    "fresh": 6630,
+    "total": 7413
+  },
+  "at": "2026-11-05T08:55:04.777Z"
+}

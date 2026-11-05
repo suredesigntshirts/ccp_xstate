@@ -1,0 +1,11 @@
+Make one pull request that meets both acceptance lines of issue https://github.com/o/settings/issues/31:
+1. "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+2. "npm test passes"
+
+Steps:
+1. Read src/config.js, src/app.js, test/config.test.js and README.md. Right now loadConfig is `return JSON.parse(readFileSync(path, 'utf8'));`, and test/config.test.js has a test 'bad JSON throws' that expects a SyntaxError.
+2. In src/config.js, change loadConfig(path) so the JSON.parse call sits inside a try/catch. When JSON.parse throws, return {} instead of throwing. Leave the readFileSync call outside the try, so a missing or unreadable file still throws as it does today. Only the parse error should be caught. Keep the export name and signature `loadConfig(path)` as they are.
+3. Update test/config.test.js. The existing 'bad JSON throws' test conflicts with line 1, so replace it with a test that `loadConfig(file('{port: 9000'))` deep-equals {}. Keep the 'reads a config' test. Also add a test that loadConfig on a path that does not exist still throws.
+4. README.md currently says invalid JSON stops the app with `bad config: <message>` and exit 1. After this change, src/app.js will start with DEFAULTS when the JSON is invalid. Update that README sentence to match the new behaviour. Do not change src/app.js unless you have to.
+5. Run `npm test` from the repository root and confirm every test passes with exit code 0.
+6. In the PR description, note that the fix asked for in the acceptance lines silently falls back to {}. The issue body says people need to know which file is broken and where, and this change does not report that. A follow-up may be needed.

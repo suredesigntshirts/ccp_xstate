@@ -1,0 +1,40 @@
+Check out the PR head and run every command below from the repository root. Each check is for one expect line of https://github.com/suredesigntshirts/ccp_machine_test/issues/104, in order. Commands create their own temp files; $T in outputs is the temp dir.
+
+Check 1 — expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before"
+Run:
+T=$(mktemp -d) && printf '{"a":1}\n{"b":2}\n' > "$T/good1.jsonl" && printf '[1]\n' > "$T/good2.jsonl" && printf '{"a":1}\n{oops}\n\n{"c":\n' > "$T/bad.jsonl" && printf '{bad\n' > "$T/bad2.jsonl" && B=packages/jsonl-lint/bin/jsonl-lint.js && node "$B" "$T/good1.jsonl" "$T/bad.jsonl" "$T/good2.jsonl" "$T/bad2.jsonl" > "$T/multi.out"; echo "exit=$?"; for f in good1 bad good2 bad2; do node "$B" "$T/$f.jsonl"; done > "$T/single.out"; cat "$T/multi.out"; diff "$T/single.out" "$T/multi.out" && echo SAME
+PASS: stdout shows exactly three lines in this order: `$T/bad.jsonl:2: <error>`, `$T/bad.jsonl:4: <error>`, `$T/bad2.jsonl:1: <error>` (each <error> non-empty), and the run ends with `SAME` (multi-file output equals the concatenation of single-file runs). FAIL: any of those lines missing, out of order, extra lines, wrong prefix, or no `SAME`.
+
+Check 2 — expect: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)"
+Run:
+T=$(mktemp -d) && printf '{"a":1}\n{"b":2}\n' > "$T/good1.jsonl" && printf '[1]\n' > "$T/good2.jsonl" && printf '{"a":1}\n{oops}\n\n{"c":\n' > "$T/bad.jsonl" && printf '{bad\n' > "$T/bad2.jsonl" && B=packages/jsonl-lint/bin/jsonl-lint.js && echo '--- A: bad via stdin'; node "$B" - < "$T/bad.jsonl"; echo "exit=$?"; echo '--- B: clean stdin with a file'; node "$B" "$T/good2.jsonl" - < "$T/good1.jsonl"; echo "exit=$?"; echo '--- C: stdin between files'; node "$B" "$T/bad2.jsonl" - "$T/good1.jsonl" < "$T/bad.jsonl"; echo "exit=$?"; echo '--- D: two dashes'; node "$B" - - < "$T/good1.jsonl"; echo "exit=$?"; echo '--- E: two dashes with a file'; node "$B" "$T/good1.jsonl" - - < "$T/good1.jsonl"; echo "exit=$?"
+PASS: A prints `-:2: <error>` and `-:4: <error>` and exit=1; B prints nothing on stdout and exit=0; C prints `$T/bad2.jsonl:1: ...` then `-:2: ...` and `-:4: ...` and exit=1; D and E each print a message on stderr and exit=2. FAIL: stdin not read (e.g. `cannot read -`), prefix other than `-` for stdin rows, or D/E not exiting 2.
+
+Check 3 — expect: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)"
+Run:
+T=$(mktemp -d) && printf '{"a":1}\n{"b":2}\n' > "$T/good1.jsonl" && printf '[1]\n' > "$T/good2.jsonl" && printf '{"a":1}\n{oops}\n\n{"c":\n' > "$T/bad.jsonl" && printf '{bad\n' > "$T/bad2.jsonl" && B=packages/jsonl-lint/bin/jsonl-lint.js && echo '--- A: two clean'; node "$B" "$T/good1.jsonl" "$T/good2.jsonl"; echo "exit=$?"; echo '--- B: one bad among clean'; node "$B" "$T/good1.jsonl" "$T/bad2.jsonl" "$T/good2.jsonl"; echo "exit=$?"; echo '--- C: no args'; node "$B"; echo "exit=$?"; echo '--- D: missing first, then bad and clean'; node "$B" "$T/missing.jsonl" "$T/bad.jsonl" "$T/good1.jsonl" 2> "$T/err"; echo "exit=$?"; echo "stderr: $(cat "$T/err")"; echo '--- E: missing among clean'; node "$B" "$T/good1.jsonl" "$T/missing.jsonl" "$T/good2.jsonl"; echo "exit=$?"
+PASS: A no output, exit=0; B prints only `$T/bad2.jsonl:1: ...`, exit=1; C a message on stderr, exit=2; D stdout still shows `$T/bad.jsonl:2: ...` and `$T/bad.jsonl:4: ...`, the stderr line names missing.jsonl, exit=2; E stderr names missing.jsonl, exit=2. FAIL: any other exit code, an unreadable file not reported on stderr, or later files not checked after the missing one (no bad.jsonl lines in D).
+
+Check 4 — expect: "lint(text) in src/index.js is unchanged"
+Run:
+sha256sum packages/jsonl-lint/src/index.js; git diff --exit-code b74bddb3b7f22287c00594ba1a9561398b675121 HEAD -- packages/jsonl-lint/src/index.js && echo UNCHANGED
+PASS: hash is 7d43ab5104585408da4f6c0c230613b849084cf3b738717b385123017529c1e8 and `UNCHANGED` is printed. FAIL: different hash or a diff is shown.
+
+Check 5 — expect: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage"
+Run:
+npm test 2>&1 | tail -12
+then read the test files under packages/jsonl-lint/test/ and run:
+grep -n -e '\[<file>' -e 'stdin' packages/jsonl-lint/README.md
+PASS: npm test shows `# fail 0`; the node:test tests (spawning the bin) include a test for each of: two clean files, one bad file among several, `-` with clean stdin, `-` with bad stdin, a missing file among good ones, two `-` arguments, no arguments; and the README shows the multi-file usage (`<file> [<file> ...]`) and says `-` reads stdin. FAIL: any of the seven cases has no test, a test fails, or the README does not document multi-file / `-` usage.
+
+Check 6 — expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head"
+Run:
+gh api 'repos/suredesigntshirts/ccp_machine_test/pulls?state=all&per_page=100' --jq '.[] | select((.body // "") | contains("Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104")) | "\(.number) \(.state) \(.head.sha) \(.base.ref)"'
+then, with <sha> the head sha it printed:
+gh api 'repos/suredesigntshirts/ccp_machine_test/commits/<sha>/check-runs' --jq '.check_runs[] | "\(.name) \(.status) \(.conclusion)"'
+and `npm test` at that head.
+PASS: exactly one open PR is listed, its head sha is the commit you are checking, the `test` check run is `completed success`, and npm test ends with `# fail 0`. FAIL: no PR or more than one, body lacks that exact Closes line, the test check run is missing, pending or not success, or npm test fails.
+
+Advisory
+- Checks 1-3 assume Node 22+. The temp files are not cleaned up; that is fine.
+- Worth a look but not a pass condition: that `- -` is rejected before stdin is read, and that the usage message mentions `[<file> ...]`.

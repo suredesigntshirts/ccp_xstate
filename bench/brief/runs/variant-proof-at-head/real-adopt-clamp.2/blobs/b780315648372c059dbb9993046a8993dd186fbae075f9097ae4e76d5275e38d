@@ -1,0 +1,16 @@
+Make one pull request that meets every acceptance line below.
+
+Acceptance lines:
+1. math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+2. clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+3. README.md documents every function math.js exports
+4. npm test passes
+
+Current state: math.js defines add, subtract and multiply and exports them via `module.exports = { add, subtract, multiply };`. README.md has an `## API` section with `### add(a, b)` and `### multiply(a, b)` entries only (subtract is exported but NOT documented). Tests live in test/math.test.js and run with `npm test` (`node --test`).
+
+Steps:
+1. In math.js add a function `clamp(x, lo, hi)` with a short doc comment, in the same style as the others. If `lo > hi`, throw `new RangeError(...)` with a clear message. Otherwise return `lo` when `x < lo`, `hi` when `x > hi`, and `x` otherwise (so clamp(-5, 0, 100) === 0, clamp(140, 0, 100) === 100, clamp(50, 0, 100) === 50, and lo === hi is allowed). Add `clamp` to the `module.exports` object, keeping add, subtract and multiply exported.
+2. In README.md, under `## API`, add a `### subtract(a, b)` entry (returns `a` minus `b`, with a short example) and a `### clamp(x, lo, hi)` entry (returns `x` limited to the range `lo` to `hi`; throws a `RangeError` when `lo` is greater than `hi`; short example such as clamping a discount percentage). Use the same heading form `### name(args)` as the existing entries so every exported function has its own heading.
+3. In test/math.test.js, import clamp and add tests: below range returns lo, above range returns hi, inside range returns x, boundary values, lo === hi, and `assert.throws(() => clamp(1, 10, 0), RangeError)`.
+4. Run `npm test` and confirm it exits 0 with all tests passing. Then run `node -e "const m=require('./math.js'); console.log(Object.keys(m))"` and confirm every listed name has a `### name(` heading in README.md.
+5. Commit the changes to math.js, README.md and test/math.test.js and open the pull request referencing https://github.com/o/r/issues/23.

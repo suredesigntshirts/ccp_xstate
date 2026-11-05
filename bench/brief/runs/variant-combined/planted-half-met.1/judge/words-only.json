@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "42f340a6ea1f0fcabe73d843e6163834fc0936317561cc2bf7e4a1994403460c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the PASS and FAIL conditions of all four verifier checks against the words of their expect lines. Check 1 tests export, left padding, the default space fill and reaching width ('00042', '  ab', '**7'). The line's words require all of these, and the extra '*' example is still padding with fill. Check 2 tests only that s comes back unchanged when s.length >= width, including ('', 0). Check 3 asks for \"a heading that names that function with text under it\", which is a fair reading of \"a section\". Its slugify note follows from the repository facts and is not a stricter rule. Check 4 is just exit status 0 with no failing test. The stricter items (test coverage of padLeft, README wording, existing functions left as they were) appear only under \"Advisory (not part of PASS or FAIL)\". No PASS or FAIL condition includes a mutation test, a branch or file-scope rule, or exact wording.",
+  "model": "claude-opus-5-5",
+  "ms": 6951,
+  "tokens": {
+    "input": 2,
+    "output": 574,
+    "cacheCreation": 3106,
+    "cacheRead": 783,
+    "fresh": 3682,
+    "total": 4465
+  },
+  "at": "2026-11-05T08:55:54.503Z"
+}

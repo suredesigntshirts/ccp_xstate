@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "631d8a1cbd98fa2c87e4b6c94851446fd8e06967ce053b248dd201804dc6824e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I went through each verifier PASS/FAIL condition looking for anything stricter than its expect line and for checks that only read the diff. Check 1 runs the CLI on clean, bad-middle, mixed blank/torn and blank-only files and checks exit codes, line numbers and the `<file>:<line>: <error>` shape. It doesn't require any exact message text, only \"a non-empty message\". Check 2 only needs exit 2 and non-empty stderr. Check 3 imports and calls `lint`. Check 4 reads the package.json fields, runs `npm test` and reads the test files for coverage, and it allows extra args on the `node --test` script. Check 5 only needs to read files, and the line asks for nothing more. Check 6 asks for exactly one PR, the Closes line, a green workflow and a passing local `npm test`, all taken from the line. The mutation check is marked advisory, \"not a pass/fail condition\". There is no branch-name rule and no limit on which files the PR touches. The builder brief's extras (shebang, engines) are build steps, not pass/fail conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 9953,
+  "tokens": {
+    "input": 2,
+    "output": 854,
+    "cacheCreation": 6159,
+    "cacheRead": 783,
+    "fresh": 7015,
+    "total": 7798
+  },
+  "at": "2026-11-05T08:43:15.829Z"
+}

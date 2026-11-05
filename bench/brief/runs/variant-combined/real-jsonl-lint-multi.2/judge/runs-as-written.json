@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "5b5aba466ee2feccb2be247603a4ed2a7779c912138e7a14372adcfc287a5052",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most of the commands work in this repo. `npm ci` has a lockfile to use, the workspace has a test script, the bin path exists, and `gh pr view`/`gh pr checks` are valid. The builder brief's commands also run as written. The verifier brief breaks the criterion. It sets \"BIN = packages/jsonl-lint/bin/jsonl-lint.js\" as plain prose, not a shell variable, then gives commands like `node BIN a.jsonl bad.jsonl b.jsonl`. Run as written, `node BIN` looks for a file called `BIN` and fails, because there is no `$BIN` assignment. The paths also clash. BIN is relative to the repository root, but a.jsonl, b.jsonl and bad.jsonl are in a temporary directory. From either directory, one of the two relative paths won't resolve. So the CLI checks in Checks 1–3 would not run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 9445,
+  "tokens": {
+    "input": 2,
+    "output": 840,
+    "cacheCreation": 5195,
+    "cacheRead": 783,
+    "fresh": 6037,
+    "total": 6820
+  },
+  "at": "2026-11-05T08:58:30.811Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "c7560647c09b014e35ad9b688926454afb5b8f07e1fbf4e3b006b97bd86385bd",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief against the verifier's checks and probes, and the builder brief shares one of them. Step 2 gives an input with its expected output, \"`node bin/greet.js --shout ada` prints `HELLO, ADA!`\". Verifier Check 1 uses the same pair: it runs `node bin/greet.js --shout ada` and its PASS condition cites \"for example `HELLO, ADA!`\". Step 7 tells the builder to run exactly that probe and \"confirm the outputs\". Running a command the expect line names is allowed, but handing over the verifier's concrete input and expected output is not. Other parts of the builder brief also mirror verifier probes. Step 3 covers the no-name case (\"usage message and exit status 2\"), which matches Check 2's `node bin/greet.js` invocation. Step 2 says the flag must work \"before or after the name\", which matches the advisory `node bin/greet.js ada --shout`. It also requires that `greeting(name)` stays unchanged, which matches the advisory note on src/greet.js. So the builder brief does not keep the verifier's methods private.",
+  "model": "claude-opus-5-5",
+  "ms": 10212,
+  "tokens": {
+    "input": 2,
+    "output": 810,
+    "cacheCreation": 3338,
+    "cacheRead": 783,
+    "fresh": 4150,
+    "total": 4933
+  },
+  "at": "2026-11-05T08:39:43.636Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "8e8b0df7ef0a834f102a687713f9fd5e9bbcfa3cd01cf96757fbfaa2d4924924",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS/FAIL conditions against the words of its expect line. Checks 1 and 2 only test concrete cases of the stated behaviour (for example '42',5,'0'→'00042' and '12345',5→unchanged), so they are fine. Check 3's demand for \"text describing it\" under each heading is borderline but defensible as part of having a section. Check 4 breaks the criterion. \"npm test passes\" only needs a zero exit, but the PASS condition also requires that \"the summary shows `# fail 0`\". That is an exact-wording requirement on the output. It depends on the TAP reporter: newer Node versions' spec reporter prints \"ℹ fail 0\" instead. So a passing test run could still be marked FAIL. This stricter condition belongs under Advisory, not in the PASS condition.",
+  "model": "claude-opus-5-5",
+  "ms": 11174,
+  "tokens": {
+    "input": 2,
+    "output": 1001,
+    "cacheCreation": 3172,
+    "cacheRead": 783,
+    "fresh": 4175,
+    "total": 4958
+  },
+  "at": "2026-11-05T08:56:05.016Z"
+}

@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.2",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 5 stay within what their lines say, but three checks ask for more:\n\n- **Check 4:** The expect line says only that \"lint(text) in src/index.js is unchanged\". The PASS condition instead requires the whole file to be identical, via a fixed sha256 hash and `git diff --exit-code` against a base commit. That is a file-scope rule the words don't force.\n- **Check 3 (D and E):** The words say only \"error on stderr\". PASS also requires that \"the stderr line names missing.jsonl\", which is stricter.\n- **Check 6:** The words say \"one PR\". PASS requires \"exactly one open PR\", but the expect line doesn't mention the PR's state.\n\nEach of these extra requirements should have gone under Advisory.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repo's file list and against shell and jq syntax. Every file they name exists in the repo: packages/jsonl-lint/bin/jsonl-lint.js, src/index.js, test/cli.test.js, README.md and .github/workflows/test.yml. Root `npm test` runs `node --test` in each workspace, so it works. In Checks 1–3, each `T=$(mktemp -d) && printf ... && B=...; node \"$B\" ...; echo \"exit=$?\"` chain has valid quoting, redirections and `for` loops. Nested quotes such as `\"stderr: $(cat \"$T/err\")\"` are also valid. In Check 4, `git diff --exit-code <sha> HEAD -- path` and `sha256sum` are valid. I couldn't confirm that the fixed sha b74bddb… exists in the repo. It is presumably the base commit. In Check 6, the `gh api` jq filters are valid (`select((.body // \"\") | contains(...))`, string interpolation). The `<sha>` placeholder is explained in the text before it. The JavaScript the builder brief suggests, `readFileSync(0, 'utf8')`, is valid.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items and the briefs handle each one. (1) Verifier Check 3 case D runs `\"$T/missing.jsonl\" \"$T/bad.jsonl\" \"$T/good1.jsonl\"` together and passes only if the output still shows the `$T/bad.jsonl:2`/`:4` lines, stderr names missing.jsonl, and exit=2. (2) Check 4 runs `git diff --exit-code b74bddb… HEAD -- packages/jsonl-lint/src/index.js` and expects `UNCHANGED`, so it compares against the base commit. (3) Builder step 5 says \"Update packages/jsonl-lint/README.md\" with the multi-file usage, how `-` works and the exit codes. (4) Check 6 uses gh api to find the PR whose body contains the exact Closes line. It requires that PR's head sha to be the commit under check, reads that sha's check-runs, and requires `test` to be `completed success`.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Must_not item 2 holds: Checks 1–3 all run the bin with real files and stdin, so no behaviour line is passed just by reading the code. Item 1 fails. Line 4 only says \"lint(text) in src/index.js is unchanged\", but Check 4 asks for the whole file to match a fixed sha256 hash and to show no `git diff` at all. So any edit elsewhere in src/index.js fails the check even if lint stays the same, which in effect limits which files the PR may touch. The builder brief says the same thing: \"do not touch ... src/index.js at all (not even whitespace)\". Check 6 is also stricter than line 6: it requires \"exactly one open PR\", so a merged PR would fail, and the line asks only for one PR. Check 3 also requires that stderr names missing.jsonl, which the line does not ask for.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief's PASS/FAIL conditions and probes. Two of the verifier's specific conditions show up in the builder brief. First, step 3 says \"so output for several files equals the concatenation of single-file runs\". That is Check 1's PASS condition (\"multi-file output equals the concatenation of single-file runs\", tested with diff → SAME), not just the expect line's \"as for one file before\". Second, step 4's missing-file test asks that \"a bad file named after the missing one is still reported on stdout\" and that \"stderr names the missing file\". This copies Check 3 D's probe and PASS condition (missing file first, then bad.jsonl lines still on stdout, stderr names missing.jsonl). The rest of the builder brief stays within what's allowed: restating the expect lines, running npm test, and writing its own tests. But these overlaps give the builder the checker's methods, so the criterion fails.",
+      "cached": false
+    }
+  }
+}

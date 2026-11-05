@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "988757c5961d3f98be70457d930ff8e4916a9ab9ff00c22f77b4d9e52982e8cc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every check in the verifier brief. Verifier Check 1 uses a name/age/city table, runs it as both TSV and CSV, and compares the two outputs with cmp. None of that data or that cmp step is in the builder brief. The builder's own test pipes 'a\\tb\\n1\\t2\\n' through --tsv, which is a different probe from the verifier's advisory one (CSV 'a,b\\n1,2\\n' with no flag). It is also a test the builder writes itself, which is allowed. The builder brief never gives the verifier's grep command. Its line \"The literal text --tsv must appear\" only restates the expect line \"README.md documents --tsv\", so it sets the bar rather than handing over a check. \"Run npm test\" is allowed. The builder brief has no PASS or FAIL wording, and none of its probes appear in the verifier brief.",
+  "model": "claude-opus-5-5",
+  "ms": 9196,
+  "tokens": {
+    "input": 2,
+    "output": 768,
+    "cacheCreation": 2586,
+    "cacheRead": 783,
+    "fresh": 3356,
+    "total": 4139
+  },
+  "at": "2026-11-05T08:41:09.193Z"
+}

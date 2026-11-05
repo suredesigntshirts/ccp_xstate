@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.3",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1, 2 and 4 stay within their expect lines. Check 1's cases are plain left-padding, Check 2's inputs are all already width or longer, and Check 4 is just exit code 0 with fail 0. Check 3 breaks the criterion. Its FAIL condition uses a regex, `\"^#{1,6}\\\\s+`?\" + k + \"\\\\b\"`, that only matches a markdown heading starting with the function's name. The expect line says only \"a section for every function\", so a section headed \"## The padLeft helper\" or \"## Function: padLeft\" would meet the words but fail the check. That exact heading-form rule is stricter than the words and should be under Advisory, not in PASS/FAIL. PASS also requires \"its own heading with a description beneath it\" and FAIL on \"no describing content\". That is arguably part of what a section is, but it is still a judgment the words don't strictly force. So the criterion does not hold for the whole output.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs: `npm test`, the two padLeft behaviour checks run with `node --input-type=module -e`, and the README-section script that appears in both briefs. index.js, README.md and test/strutil.test.js exist at this commit, and `npm test` maps to \"node --test\". padLeft is added by an earlier builder step. Each -e program is in single quotes and contains only double quotes and backticks, so \"\\\\s\" and \"\\\\b\" reach JavaScript as the regex escapes \\s and \\b. The JavaScript is valid: ES module imports, a default import of node:fs, Object.keys on the module namespace, and destructuring for...of loops. Calls such as padLeft(\"hello\", 3) pass undefined, so the default fill applies. I saw only the scripts field of package.json, so \"type\": \"module\" is unconfirmed, but current Node detects ES module syntax anyway. No command breaks.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "All three must_catch items are handled. (1) Builder step 2: \"Also add the missing `## slugify(s)` section\", next to the padLeft section; Context notes README has \"NO section for slugify\". (2) Verifier check 3 runs a script that reads the module's exports at the PR head, prints \"exports: …\" and reports \"MISSING\" for any export without a README heading. PASS needs every exported function to have a described section, \"including slugify… and padLeft\". FAIL triggers on MISSING for any name. (3) Verifier check 1 calls padLeft(\"42\", 5) with no fill and expects \"   42\", so space padding is checked.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against the verifier's checks and the builder brief. Item 1 holds: Check 3 runs every exported function through a heading regex and must print ALL PRESENT. The PASS text names slugify, \"which had no section before this change\", so a README with only a padLeft section would print MISSING: slugify and fail. Item 2 holds: Checks 1 and 2 only test left padding, the default space fill, exact width and returning s unchanged, using fill values of one character or none. Multi-character fill is \"advisory… do not fail on it\", and nothing counts parameters. Check 3's regex takes any heading level from # to ######, with or without a backtick, and does not require the `## name(args)` form. That form appears only as builder guidance, not as a PASS/FAIL condition. Asking for content under each heading is a fair reading of \"a section\". Check 4 needs only exit code 0 and fail 0.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The criterion is not met because the builder brief carries the verifier's probes. Builder step 5 copies verifier Check 3's inline script character for character: `node --input-type=module -e 'import * as m from \"./index.js\"; ... console.log(miss.length ? \"MISSING: \" ... : \"ALL PRESENT\");'`. It also gives the same pass condition: it \"must print ALL PRESENT\". No expect line or issue proof names this command; expect line 4 names only `npm test`, so the exception does not cover it. The builder's examples also repeat verifier test cases with their expected outputs: padLeft('42', 5, '0') === '00042' and padLeft('42', 5) === '   42' are in Check 1, and padLeft('123456', 5, '0') === '123456' is in Check 2. Telling the builder to run `npm test` and write its own tests is allowed. But the shared script and the shared input/output pairs break the rule.",
+      "cached": true
+    }
+  }
+}

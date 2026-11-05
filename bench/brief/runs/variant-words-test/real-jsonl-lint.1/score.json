@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.1",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for e\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 3, 5 and 6 test only what their lines require. Check 1's two-bad-rows test follows from \"every row\". Check 3's \"line 2 for the bad row\" follows from the line numbering. The stricter items (mutation test, shebang/executable bit, CRLF, the lockfile) are under Advisory, as they should be.\n\nCheck 4 breaks the criterion. Its PASS condition includes \"npm test passes\" (run as `cd packages/jsonl-lint && npm test`), and its FAIL condition includes \"tests fail\". Expect line 4 only says the workspace has a package.json with the listed fields, no runtime dependencies, and node:test tests covering five cases. It says nothing about those tests passing inside the workspace. Passing tests are required only by line 6, and only for npm test at the PR head. So Check 4 adds a pass/fail test that line 4's words do not force, and it should have gone under Advisory.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs, and each one would run as written. The files they name either exist (README.md, package-lock.json, .github/workflows/test.yml) or are created in an earlier builder step (packages/jsonl-lint/bin/jsonl-lint.js, src/index.js, test/*.test.js). The commands use valid arguments: `git update-index --chmod=+x`, `npm install`/`npm ci`/`npm test` (the root script runs workspaces), `cd packages/jsonl-lint && npm test`, `test -f`, `grep -n jsonl-lint README.md`, and `gh pr view <pr> --repo ... --json body,headRefOid,state` and `gh pr checks`. Shell quoting in Check 3 is valid: `\\n` stays literal inside bash double quotes, so JS reads it as a newline. The relative import `./packages/...` resolves from the current directory under `--input-type=module -e`, and the JS syntax is valid. `spawnSync(process.execPath, [binPath, ...])` is valid. `node --test`'s default discovery finds `test/**/*.test.js`. The `<pr>` and `<path>` placeholders are meant to be filled in.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Items 1, 2 and 4 are met. Item 1: builder step 7 says \"Run npm install at the repo root so package-lock.json includes the new workspace\". Item 2: builder step 6 says \"replace the 'No tools yet' bullet\". Item 4: Check 6 uses gh pr view (body, headRefOid) and requires the workflow at the head commit to be successful. Item 3 is not met. The verifier's only check that the root npm test really runs the jsonl-lint tests, plus the mutation test, sit under \"Advisory (not pass/fail conditions)\". Check 6 passes as long as the root npm test passes, which would still happen if --if-present skipped the tests. Check 4 runs npm test inside the workspace, not at the root. So no pass/fail check would catch the tests being skipped under the root npm test.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every verifier PASS/FAIL condition against its line. None is stricter than the line. Check 1 asks only for the `<path>:N:` prefix followed by some error text, not exact wording. Its two-bad-rows probe follows from \"every row\". Check 2 asks for any non-empty stderr and exit 2. Check 3 checks the shape of `[{ line, error }]`. Check 4 requires only the fields the line lists, plus test coverage. Check 6 has no branch-name rule and no limit on which files the PR may touch. The mutation test, the shebang check and the CRLF check sit under \"Advisory (not pass/fail conditions)\", so they don't count as conditions. Every behaviour line is checked by running the program: Checks 1 and 2 run the bin on temp files, Check 3 imports and calls `lint`, and Checks 4 and 6 run npm test. Only Check 5 relies on file reads and grep, and its line is about files existing. The builder brief contains no checks.",
+      "cached": true
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with every PASS/FAIL condition and probe in the verifier brief. The builder brief has none of the verifier's probes. It doesn't include the scratch files (clean.jsonl, badmid.jsonl, torn.jsonl, blanks.jsonl) or their expected outputs like \"<path>:2:\". It also leaves out the `node --input-type=module -e` lint script, the \"two bad rows\" case, the grep/test -f commands and the mutation test. What it asks for are behaviour specs restated from the expect lines (1-based lines, blank lines skipped, torn last row checked, exit codes 0/1/2, package.json fields). It also tells the builder to write its own node:test tests for the five cases the expect line names, which is allowed. The commands it mentions (npm ci, npm test, waiting for the test workflow) are the repository's own tests or come from the expect lines, so those are allowed too. \"Strip a trailing \\r\" is a coding instruction, not a probe. The criterion holds.",
+      "cached": true
+    }
+  }
+}

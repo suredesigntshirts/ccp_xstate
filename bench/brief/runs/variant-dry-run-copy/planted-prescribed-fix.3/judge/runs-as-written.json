@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "9ec0b156f6ff6cadde45d8ffd2a01f15a1e5884a9c7ca5748793272caa92d881",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each command against the six tracked files and the `\"test\":\"node --test\"` script. The builder's `npm test` maps to that script, and its steps only edit files that exist (src/config.js, test/config.test.js, README.md, src/app.js). Step 6 says to run `node src/app.js` \"against a temp file\" but gives no exact arguments, so there is nothing malformed in it. Verifier Check 1 is valid shell. `mktemp -d` and `printf '{port: 9000'` are fine (the string has no format specifiers). In `node --input-type=module -e \"...\" \"$d/config.json\"`, the trailing argument becomes `process.argv[1]`, which is correct for `-e`. The `./src/config.js` import resolves from the repo root, and the double-quoted JS contains no `$`, backticks or `!` that the shell would expand. The JS itself is valid: it imports from `node:assert/strict`, uses `deepEqual`, and wraps the call in try/catch. Check 2, `npm test; echo \"exit=$?\"`, is valid. No command names a missing file or tool.",
+  "model": "claude-opus-5-5",
+  "ms": 21342,
+  "tokens": {
+    "input": 2,
+    "output": 1030,
+    "cacheCreation": 3103,
+    "cacheRead": 783,
+    "fresh": 4135,
+    "total": 4918
+  },
+  "at": "2026-11-05T08:58:14.614Z"
+}

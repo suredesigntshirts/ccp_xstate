@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "793d1ffd21ef733f45479d286600d30beb21562ff794a1fb7c81039d1ab37ecd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items. Item 1 holds: there are exactly two numbered checks, \"Check 1\" and \"Check 2\", one for each expect line in the right order. npm test and the plain-CSV behaviour do appear, but only in a section headed \"Advisory (does not change PASS or FAIL)\". The brief also says the npm test result \"is used only under Advisory\", so neither becomes a third check that affects the verdict. Item 2 holds: Check 1 PASS/FAIL depends only on the exit codes, the cmp of the TSV and CSV outputs, and the expected JSON array. Check 2 depends only on README.md mentioning and explaining --tsv. Neither condition requires npm test or the CSV tests to pass. The builder brief asks for npm test, but that is not a verifier condition. This is a judgement call: a stricter reading could count the advisory npm test run as an extra check.",
+  "model": "claude-opus-5-5",
+  "ms": 11113,
+  "tokens": {
+    "input": 2,
+    "output": 668,
+    "cacheCreation": 2715,
+    "cacheRead": 783,
+    "fresh": 3385,
+    "total": 4168
+  },
+  "at": "2026-11-05T08:40:53.033Z"
+}
