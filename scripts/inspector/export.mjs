@@ -722,7 +722,7 @@ function labelOf(seq, event, edge, toLeaves) {
   const words = eventWords(type);
   const cap = words.charAt(0).toUpperCase() + words.slice(1);
   if (type === 'xstate.init') return `The item starts in ${to}`;
-  const why = edge?.guard ? `, and its guard ${edge.guard} held` : '';
+  const why = edge?.guard ? `, and the guard "${edge.guard}" held` : '';
   const where = edge?.stays ? `the item stays in ${to}` : `the item moves to ${to}`;
   return `${cap}${why}; ${where}`;
 }
