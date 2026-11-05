@@ -51,3 +51,11 @@ fired is `queued_at`, and the content is the message the session wrote plus plat
 The capture is the transcript's record of the tool result. A PostToolUse hook's `tool_response` for a built-in tool
 is that same object as far as this project has seen, but no hook capture of ReadNotifications exists. If it differs,
 reminders are dropped as today (fails closed); the thread-wake proof feeds the transcript's record.
+
+## Outcome
+
+Built in PR #89 (merged b3fc935). A separate verifier session marked all five Expect lines MET at dfd2a8e
+(`verify/fix-reminder-wake/verdict.json`, commit b509e4d); in its own thread a raw send_later reminder, fed unedited
+from ReadNotifications to `bin/host.js wake`, fired the checkBack timer with no hand wrapping. No harness release:
+`bin/host.js` runs from the repo checkout and is not in what the setup script copies (`RELEASED` in
+`scripts/release/release.mjs`), so the release script found nothing to release since harness-v0.1.21.

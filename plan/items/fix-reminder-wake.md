@@ -4,7 +4,7 @@
   "title": "Fire the waiting item's timer when its reminder arrives",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A send_later reminder the host scheduled for a waiting item, arriving in the session as it really does (a scheduled-trigger notification read by ReadNotifications), fires that item's timer through bin/host.js wake with no hand wrapping.",
   "why": "fix-waiting-wake schedules a wake for every asking state, but its verifier found the reminder arrives as a notification, not a <wake> prompt, and bin/host.js keeps only github_webhook notifications. So in a real thread the timer fires only if the session wraps the reminder itself, and C-waiting-does-not-stall holds in the stubbed world but not end to end. How the reminder is read is decided in plan/decisions/2026-11-04-reminder-wake.md.",
   "serves": [
