@@ -21,6 +21,9 @@ One line each: what, why, which item waits. Threads add to this; the person clea
 - Re-save the environment's setup script (any change, even a comment), so the next thread gets a new container and
   installs harness-v0.1.9. New threads resume a snapshot from 16:46Z that holds 0.1.0 and skip `setup.sh`, so no
   thread has ever run capture. Stage s1's gate waits on it (`2026-10-30-s1-observability-gate.md`).
+  Again on 2026-11-05: new threads resume a snapshot from 2026-11-03 that holds harness 0.1.17 and skip `setup.sh`, so
+  releases 0.1.18 and later reach no thread. probe-plugin-agents ran its checks on the closest path instead
+  (`plan/research/probe-plugin-agents.md`); a re-save puts the next thread on the newest release.
 - Open the observe page (https://claude.ai/artifact/GEVcccpqcToRUb7EhTG4B3) after the re-save and a thread or two, press
   Refresh, and say whether any answer is missing. That is s1's `answers` check, and obs-page's after-landing step.
 - Add the allow rule engine-effects names: "The host may merge a PR at the verified head (`expectedHeadSha` = the
