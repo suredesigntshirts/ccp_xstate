@@ -8,7 +8,8 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { loadWorkflow, workflowOf, restore } from '../../src/index.js';
+import { fileURLToPath } from 'node:url';
+import { loadWorkflow, workflowOf, restore, readWorkflow } from '../../src/index.js';
 import { A, B, BRIEFS, agents, fresh, offer, pr, start, transitions, verdict, world } from './world.js';
 
 const REPO_QF = new URL('../../../../workflows/quick-fix.json', import.meta.url);
@@ -17,7 +18,7 @@ test('C-builder-cannot-change-own-workflow: the filed workflow and hash are jour
   const root = fresh();
   const dir = join(root, 'workflows');
   mkdirSync(dir);
-  const bytes = readFileSync(REPO_QF);
+  const bytes = readWorkflow('quick-fix', { dir: fileURLToPath(new URL('.', REPO_QF)) }).bytes;
   writeFileSync(join(dir, 'quick-fix.json'), bytes);
   const filed = loadWorkflow('quick-fix', { root, dir });
   const hash = createHash('sha256').update(bytes).digest('hex');

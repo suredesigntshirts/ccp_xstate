@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { render } from '../../../packages/engine/src/stages.js';
+import { loadWorkflow } from '../../../packages/engine/src/index.js';
 import { exportRun } from '../../inspector/export.mjs';
 import { REPO, ambientOf, casesOf, readJson, stageInput, specOf, workflowVersion } from '../lib.mjs';
 import { benchRun, promptOnly } from '../run.mjs';
@@ -131,11 +132,13 @@ test('compare: two versions, per case and criterion, with the rule that changed 
   const [c] = casesOf('brief', 'planted-half-met');
   const a = join(dir, 'a');
   const b = join(dir, 'b');
-  const variant = join(dir, 'quick-fix.json');
-  const qf = JSON.parse(readFileSync(join(REPO, 'workflows/quick-fix.json'), 'utf8'));
-  const was = qf.meta.actors.brief.rules[4];
-  qf.meta.actors.brief.rules[4] = `${was} (variant)`;
-  writeFileSync(variant, JSON.stringify(qf, null, 2));
+  // The variant: a copy of workflows/ with brief rule 4 changed in its stage file.
+  const wf = join(dir, 'workflows');
+  cpSync(join(REPO, 'workflows'), wf, { recursive: true });
+  const variant = join(wf, 'quick-fix.json');
+  const was = loadWorkflow('quick-fix').meta.actors.brief.rules[4];
+  const stageFile = join(wf, 'quick-fix/brief.md');
+  writeFileSync(stageFile, readFileSync(stageFile, 'utf8').replace(`- ${was}\n`, `- ${was} (variant)\n`));
   await benchRun({ c, k: 1, stage: 'brief', version: workflowVersion(), out: a });
   await benchRun({ c, k: 1, stage: 'brief', version: workflowVersion({ workflow: variant }), out: b });
   for (const d of [a, b]) await scoreRuns({ stage: 'brief', dir: d, model: 'fake-judge' });

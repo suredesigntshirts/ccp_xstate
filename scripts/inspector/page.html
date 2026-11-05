@@ -888,8 +888,10 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
   const SRC_TAG = { frame: 'harness frame', workflow: 'workflow JSON', input: 'input' };
   function pieceSource(src) {
     if (src.kind === 'frame') return '<span class="srctag frame">harness frame</span><code>' + esc(src.name) + '</code>: ' + (src.filled ? 'an engine template, filled in with this run\'s ' + Object.keys(src.filled).map((k) => '<code>' + esc(k) + '</code>').join(', ') : src.fixed ? 'fixed text in the engine, the same for every stage' : 'engine text');
+    if (src.kind === 'workflow' && src.file) return '<span class="srctag workflow">stage file</span><code>' + esc(src.file + ':' + src.line) + '</code>, filled in at ' + ptr(src.at);
     if (src.kind === 'workflow') return '<span class="srctag workflow">workflow JSON</span>' + ptr(src.at) + (src.inlined ? ', with ' + ptr(src.inlined) + ' inlined' : '');
-    if (src.kind === 'input') return '<span class="srctag input">input</span><b>' + esc(src.input) + '</b>' + (src.from ? ', read from <code>' + esc(src.from) + '</code>' : '') + '; produced by ' + producerHtml(src.producer);
+    if (src.kind === 'input') return '<span class="srctag input">input</span><b>' + esc(src.input) + '</b>' + (src.from ? ', read from <code>' + esc(src.from) + '</code>' : '') + '; produced by ' + producerHtml(src.producer) +
+      (src.file ? '; its text is <code>' + esc(src.file + ':' + src.line) + '</code>' : '') + (src.meaningFile ? '; its meaning is <code>' + esc(src.meaningFile + ':' + src.meaningLine) + '</code>' : '');
     return esc(src.label || 'unknown');
   }
   function stageHtml(a) {

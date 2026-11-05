@@ -202,6 +202,15 @@ function applyActions(eng, context, event, actions) {
 
 // ---- Loading an engine checkout (main's or a lane's), and xstate as that checkout resolves it
 
+// A workflow of the engine checkout as its own engine reads it (with its stage files), or null when that engine has no
+// stage files (packages/engine/src/prompts.js, from stage-prompt-files on).
+export async function composedIn(checkout, name) {
+  const at = join(checkout, 'packages/engine/src/prompts.js');
+  if (!existsSync(at)) return null;
+  const { readWorkflow } = await import(pathToFileURL(at).href);
+  return readWorkflow(name, { dir: join(checkout, 'workflows') });
+}
+
 async function loadEngine(checkout) {
   const specPath = join(checkout, 'packages/engine/src/spec.js');
   if (!existsSync(specPath)) return { ok: false, error: `no packages/engine/src/spec.js under ${checkout}` };
@@ -537,7 +546,12 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
   if (!spec && wfName) {
     const p = join(engine, 'workflows', `${(pin ? pin[1] : wfName)}.json`);
     const text = readText(p);
-    if (text) { spec = JSON.parse(text); wf = { ...wf, source: "the engine checkout's workflows/ folder", path: p, sha256: sha256(text) }; }
+    if (text) {
+      // A workflow that names stage files is read as the engine reads it: filled in from them, hashed as it is pinned.
+      const read = await composedIn(engine, pin ? pin[1] : wfName);
+      spec = read ? read.spec : JSON.parse(text);
+      wf = { ...wf, source: "the engine checkout's workflows/ folder", path: p, sha256: read ? sha256(read.bytes) : sha256(text) };
+    }
   }
   if (!spec) throw new Error(`cannot find the workflow ${wfName} for ${item}`);
   if (pin && wf.sha256 && wf.sha256 !== pin[2]) wf.note = `The journal pins ${pin[2].slice(0, 12)}, and this file hashes to ${wf.sha256.slice(0, 12)}: the run used other bytes.`;
@@ -1137,10 +1151,13 @@ function sourceRef(src, byName, ctx) {
   if (!src || typeof src !== 'object') return { kind: 'unknown', label: 'not recorded' };
   if (src.frame != null) return { kind: 'frame', name: src.frame, label: `harness frame: ${src.frame}`, fixed: !!src.fixed, filled: src.filled ?? null,
     detail: src.filled ? `an engine template, filled in with this run's ${Object.keys(src.filled).join(', ')}` : src.fixed ? 'fixed text in the engine (packages/engine/src/stages.js), the same for every stage' : 'engine text (the record does not say whether it is fixed or filled in)' };
-  if (src.workflow != null) return { kind: 'workflow', at: src.workflow, inlined: src.inlined ?? null, label: 'workflow JSON', detail: src.inlined ? `with ${src.inlined} inlined` : null };
+  // A piece whose words came from a stage file (plan item stage-prompt-files) is labelled by that file and line.
+  if (src.workflow != null) return { kind: 'workflow', at: src.workflow, inlined: src.inlined ?? null, file: src.file ?? null, line: src.line ?? null,
+    label: src.file ? `${src.file}:${src.line}` : 'workflow JSON', detail: src.inlined ? `with ${src.inlined} inlined` : null };
   if (src.input != null) {
     const inp = byName[src.input];
     return { kind: 'input', input: src.input, meaningAt: src.meaningAt ?? null, from: src.from ?? inp?.from ?? null, label: `input ${src.input}`,
+      file: src.file ?? null, line: src.line ?? null, meaningFile: src.meaningFile ?? null, meaningLine: src.meaningLine ?? null,
       producer: inp?.producer ?? producerRef(src.producer, ctx) };
   }
   return { kind: 'unknown', label: JSON.stringify(src) };

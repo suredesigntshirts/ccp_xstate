@@ -1,14 +1,15 @@
 // Shared by the contract tests P2-P6 (tournament 2026-11-04-stage-contract, lane S, round 2): the prompt of every
 // model-stage run in quick-fix, research and feature, read from the run folder the real run handler wrote (brief.md is
-// the Agent prompt), and the three workflows parsed straight from workflows/*.json. A stage is a meta.actors entry
+// the Agent prompt), and the three workflows as the engine reads them from workflows/ (each JSON with its stage files filled in, prompts.js). A stage is a meta.actors entry
 // with the parts rules and inputs; its input named task fills the Task part (stage-contract cleanup, item A).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadRun, runDir } from '../../src/actors.js';
+import { readWorkflow } from '../../src/prompts.js';
 import { makeWorld, ISSUE, builds } from './world.js';
 
 export const WORKFLOWS = Object.fromEntries(['quick-fix', 'research', 'feature'].map((n) =>
-  [n, JSON.parse(readFileSync(new URL(`../../../../workflows/${n}.json`, import.meta.url), 'utf8'))]));
+  [n, readWorkflow(n, { dir: new URL('../../../../workflows/', import.meta.url).pathname }).spec]));
 
 export const PAGE = 'https://example.org/p';
 export const BRIEFS = { builder: 'MARK-B do x', verifier: 'MARK-V check y' };
