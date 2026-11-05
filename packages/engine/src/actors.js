@@ -430,7 +430,7 @@ export function differences(given, input, path, inPath) {
 
 /** The refusals of a result that count toward a run's cap, and the cap (fix-refusal-hints). */
 export const RESULT_RULES = Object.freeze(['schema', 'reserved', 'restated', 'covers', 'ref']);
-export const REFUSAL_CAP = 8;
+export const REFUSAL_CAP = 10;
 
 // How to fix a refusal: `<field>: <description>` for each top-level output field the reason names, once each, in the
 // schema's order. Only top-level fields carry descriptions (prompts.js puts each ## Output line there).
