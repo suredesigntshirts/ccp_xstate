@@ -27,4 +27,4 @@ Write the two briefs for issue. builder: the steps to make one pull request that
 Schema: {"type":"object","required":["builder","verifier"],"properties":{"builder":{"type":"string","minLength":1},"verifier":{"type":"string","minLength":1}}}
 
 ## Return
-Return through the harness return tool (its name ends in harness__return; load it with ToolSearch if it is deferred): call it with { "run": "verify-agents-1:0.brief", "result": <your result> }, the result matching the Schema under Output. Only that call counts: a text reply is not read, and the run stays open until the tool accepts a result. If the tool refuses, fix what it names and call it again.
+Return through the harness return tool (its name ends in harness__return; load it with ToolSearch if it is deferred): call it with { "run": "verify2-agents-1:0.brief", "result": <your result> }, the result matching the Schema under Output. Only that call counts: a text reply is not read, and the run stays open until the tool accepts a result. If the tool refuses, fix what it names and call it again.

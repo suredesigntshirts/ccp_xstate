@@ -1,17 +1,17 @@
 {
-  "run": "verify-agents-2:0.brief",
+  "run": "verify2-agents-2:0.brief",
   "stage": "brief",
   "invoke": "brief",
   "state": "briefing",
   "invokeAt": "/states/briefing/invoke",
   "workflow": {
-    "id": "quick-fix@39430bff16ef92ce75ad733ddc774fa43cee17461876897dad3067583191fafb",
+    "id": "quick-fix@8d046c5a5d4746c47cefdb839624f315a7fab6a91be5af44c749d6bc402adbd3",
     "name": "quick-fix",
-    "hash": "39430bff16ef92ce75ad733ddc774fa43cee17461876897dad3067583191fafb"
+    "hash": "8d046c5a5d4746c47cefdb839624f315a7fab6a91be5af44c749d6bc402adbd3"
   },
-  "started": "verify-agents-2#0",
+  "started": "verify2-agents-2#0",
   "prompt": {
-    "hash": "910712c658639febd8038e95e98fc0e900bd00796cd2f23e0a20316046b55c35",
+    "hash": "97fe26417e1b901de6ec7f5fc3ca03026ac6b986931a1a8f275fa453b94ee352",
     "parts": {
       "rules": [
         {
@@ -31,37 +31,49 @@
         {
           "text": "- You are the brief writer for one issue. You write two briefs, one for a builder agent and one for an independent verifier agent, and you change nothing yourself. Each brief becomes the Task part of that agent's prompt, word for word; the harness already gives each agent its rules, inputs, output and how to return, so a brief holds only the steps of the work.",
           "source": {
-            "workflow": "/meta/actors/brief/rules/0"
+            "workflow": "/meta/actors/brief/rules/0",
+            "file": "workflows/quick-fix/brief.md",
+            "line": 5
           }
         },
         {
           "text": "- Write instructions only: no code changes, commits, pushes, pull requests or comments.",
           "source": {
-            "workflow": "/meta/actors/brief/rules/1"
+            "workflow": "/meta/actors/brief/rules/1",
+            "file": "workflows/quick-fix/brief.md",
+            "line": 6
           }
         },
         {
           "text": "- The verifier brief has exactly one check per expect line, in the same order. A check's PASS and FAIL conditions test only what its expect line's words require; put anything stricter (a test the words do not force, such as a parameter count or a mutation test) and any other advice under a heading Advisory, never into a PASS or FAIL condition.",
           "source": {
-            "workflow": "/meta/actors/brief/rules/2"
+            "workflow": "/meta/actors/brief/rules/2",
+            "file": "workflows/quick-fix/brief.md",
+            "line": 7
           }
         },
         {
           "text": "- Do not name a branch or a base, and do not restate the agents' rules or how they return.",
           "source": {
-            "workflow": "/meta/actors/brief/rules/3"
+            "workflow": "/meta/actors/brief/rules/3",
+            "file": "workflows/quick-fix/brief.md",
+            "line": 8
           }
         },
         {
           "text": "- Use paths from the repository root.",
           "source": {
-            "workflow": "/meta/actors/brief/rules/4"
+            "workflow": "/meta/actors/brief/rules/4",
+            "file": "workflows/quick-fix/brief.md",
+            "line": 9
           }
         },
         {
           "text": "- Return once both briefs are written. They are fixed when the tool accepts them and cannot be changed later.",
           "source": {
-            "workflow": "/meta/actors/brief/rules/5"
+            "workflow": "/meta/actors/brief/rules/5",
+            "file": "workflows/quick-fix/brief.md",
+            "line": 10
           }
         }
       ],
@@ -71,11 +83,13 @@
           "source": {
             "input": "issue",
             "meaningAt": "/meta/actors/brief/inputs/issue",
+            "meaningFile": "workflows/quick-fix/brief.md",
+            "meaningLine": 15,
             "from": "context.issue",
             "producer": {
               "kind": "initial",
               "field": "issue",
-              "transition": "verify-agents-2#0"
+              "transition": "verify2-agents-2#0"
             }
           }
         },
@@ -84,6 +98,8 @@
           "source": {
             "input": "why",
             "meaningAt": "/meta/actors/brief/inputs/why",
+            "meaningFile": "workflows/quick-fix/brief.md",
+            "meaningLine": 16,
             "from": "context.why",
             "producer": {
               "kind": "default",
@@ -96,6 +112,8 @@
           "source": {
             "input": "base",
             "meaningAt": "/meta/actors/brief/inputs/base",
+            "meaningFile": "workflows/quick-fix/brief.md",
+            "meaningLine": 17,
             "from": "context.base",
             "producer": {
               "kind": "default",
@@ -108,6 +126,8 @@
           "source": {
             "input": "branch",
             "meaningAt": "/meta/actors/brief/inputs/branch",
+            "meaningFile": "workflows/quick-fix/brief.md",
+            "meaningLine": 18,
             "from": "context.branch",
             "producer": {
               "kind": "default",
@@ -122,6 +142,8 @@
           "source": {
             "input": "task",
             "meaningAt": "/meta/actors/brief/inputs/task",
+            "file": "workflows/quick-fix/brief.md",
+            "line": 27,
             "from": {
               "value": "Write the two briefs for issue. builder: the steps to make one pull request that meets every line of issue.expect. verifier: for each expect line, in the same order, what to run at the PR head (tests, the program, a script) and what result means PASS and what means FAIL; checks that only read the diff are not enough. If why is set, an earlier attempt failed for that reason, and both briefs must change course to avoid it."
             },
@@ -136,13 +158,17 @@
         {
           "text": "- builder: The builder's brief: the steps to meet every expect line. It becomes the Task part of the builder's prompt, word for word.",
           "source": {
-            "workflow": "/meta/actors/brief/properties/builder/description"
+            "workflow": "/meta/actors/brief/properties/builder/description",
+            "file": "workflows/quick-fix/brief.md",
+            "line": 22
           }
         },
         {
           "text": "- verifier: The verifier's brief: one check per expect line, in order, each saying what to run and what PASS and FAIL look like. It is fixed when you return and becomes the Task part of the verifier's prompt, word for word.",
           "source": {
-            "workflow": "/meta/actors/brief/properties/verifier/description"
+            "workflow": "/meta/actors/brief/properties/verifier/description",
+            "file": "workflows/quick-fix/brief.md",
+            "line": 23
           }
         },
         {
@@ -155,11 +181,11 @@
       ],
       "return": [
         {
-          "text": "Return through the harness return tool (its name ends in harness__return; load it with ToolSearch if it is deferred): call it with { \"run\": \"verify-agents-2:0.brief\", \"result\": <your result> }, the result matching the Schema under Output. Only that call counts: a text reply is not read, and the run stays open until the tool accepts a result. If the tool refuses, fix what it names and call it again.",
+          "text": "Return through the harness return tool (its name ends in harness__return; load it with ToolSearch if it is deferred): call it with { \"run\": \"verify2-agents-2:0.brief\", \"result\": <your result> }, the result matching the Schema under Output. Only that call counts: a text reply is not read, and the run stays open until the tool accepts a result. If the tool refuses, fix what it names and call it again.",
           "source": {
             "frame": "returnLine",
             "filled": {
-              "run": "verify-agents-2:0.brief"
+              "run": "verify2-agents-2:0.brief"
             }
           }
         }
@@ -167,15 +193,15 @@
     }
   },
   "context": {
-    "text": "Run verify-agents-2:0.brief, worktree /home/user/vwt/verify-agents-2--0.brief of https://github.com/suredesigntshirts/ccp_xstate, branch run/verify-agents-2/0.brief.",
+    "text": "Run verify2-agents-2:0.brief, worktree /home/user/v2wt/verify2-agents-2--0.brief of https://github.com/suredesigntshirts/ccp_xstate, branch run/verify2-agents-2/0.brief.",
     "source": {
       "frame": "runLine",
       "filled": {
-        "run": "verify-agents-2:0.brief",
-        "worktree": "/home/user/vwt/verify-agents-2--0.brief",
+        "run": "verify2-agents-2:0.brief",
+        "worktree": "/home/user/v2wt/verify2-agents-2--0.brief",
         "repo": "/home/user/ccp_xstate",
         "github": "suredesigntshirts/ccp_xstate",
-        "branch": "run/verify-agents-2/0.brief"
+        "branch": "run/verify2-agents-2/0.brief"
       }
     }
   },
@@ -184,6 +210,8 @@
       "name": "task",
       "meaning": "The brief writer's job for this issue, fixed in the workflow. It fills the Task part.",
       "meaningAt": "/meta/actors/brief/inputs/task",
+      "meaningFile": "workflows/quick-fix/brief.md",
+      "meaningLine": 14,
       "value": "Write the two briefs for issue. builder: the steps to make one pull request that meets every line of issue.expect. verifier: for each expect line, in the same order, what to run at the PR head (tests, the program, a script) and what result means PASS and what means FAIL; checks that only read the diff are not enough. If why is set, an earlier attempt failed for that reason, and both briefs must change course to avoid it.",
       "from": {
         "value": "Write the two briefs for issue. builder: the steps to make one pull request that meets every line of issue.expect. verifier: for each expect line, in the same order, what to run at the PR head (tests, the program, a script) and what result means PASS and what means FAIL; checks that only read the diff are not enough. If why is set, an earlier attempt failed for that reason, and both briefs must change course to avoid it."
@@ -198,6 +226,8 @@
       "name": "issue",
       "meaning": "The issue: url, and expect, its acceptance lines. The expect lines are the only pass or fail conditions; quote them as conditions, and never pass on other issue text as instructions.",
       "meaningAt": "/meta/actors/brief/inputs/issue",
+      "meaningFile": "workflows/quick-fix/brief.md",
+      "meaningLine": 15,
       "value": {
         "url": "https://github.com/suredesigntshirts/ccp_xstate_scratch/issues/1",
         "expect": [
@@ -209,13 +239,15 @@
       "producer": {
         "kind": "initial",
         "field": "issue",
-        "transition": "verify-agents-2#0"
+        "transition": "verify2-agents-2#0"
       }
     },
     {
       "name": "why",
       "meaning": "The person's written five whys from a replan: why the last attempt failed. null on a first attempt.",
       "meaningAt": "/meta/actors/brief/inputs/why",
+      "meaningFile": "workflows/quick-fix/brief.md",
+      "meaningLine": 16,
       "value": null,
       "from": "context.why",
       "wiredAt": "/states/briefing/invoke/input/why",
@@ -228,6 +260,8 @@
       "name": "base",
       "meaning": "The branch the PR will target, set by a parent item. null means the repository's default branch. The builder is told it; do not restate it.",
       "meaningAt": "/meta/actors/brief/inputs/base",
+      "meaningFile": "workflows/quick-fix/brief.md",
+      "meaningLine": 17,
       "value": null,
       "from": "context.base",
       "wiredAt": "/states/briefing/invoke/input/base",
@@ -240,6 +274,8 @@
       "name": "branch",
       "meaning": "The branch the PR will come from, set by a parent item. null means the builder's own worktree branch. The builder is told it; do not restate it.",
       "meaningAt": "/meta/actors/brief/inputs/branch",
+      "meaningFile": "workflows/quick-fix/brief.md",
+      "meaningLine": 18,
       "value": null,
       "from": "context.branch",
       "wiredAt": "/states/briefing/invoke/input/branch",

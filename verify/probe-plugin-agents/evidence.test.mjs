@@ -76,7 +76,7 @@ for (const [who, root] of Object.entries(sets)) {
     assert.ok(!prompt.includes(MARKER), 'the task prompt does not give the marker');
     assert.ok(!text(rows.find((r) => r.type === 'user').message.content).includes(MARKER));
     assert.match(handback(rows), new RegExp(`^${MARKER}`, 'm'));
-    assert.match(handback(rows), /no (file-writing|Write) tool|no Write/i);
+    assert.match(handback(rows), /no (file-?writ\w*|Write) tool/i);
     const usage = session(join(root, 'run1')).result.modelUsage;
     assert.ok(usage['claude-haiku-5-5'], 'the session bills haiku for the agent');
   });
@@ -117,7 +117,7 @@ for (const [who, root] of Object.entries(sets)) {
 
 test('verifier: the install was the PR head, with the agent file in it', () => {
   const release = JSON.parse(readFileSync(join(sets.verifier, 'installed-release.json'), 'utf8'));
-  assert.equal(release.commit, '4d11a546c8174518b6a25b77417524e733d42046');
+  assert.equal(release.commit, '52036075ec9081c126681f03b3e4c9ffc18824c4');
   assert.equal(release.tag, null, 'no release ships the agent yet: this is the build commit');
   assert.ok(release.files.includes('agents/probe-reader.md'));
 });
