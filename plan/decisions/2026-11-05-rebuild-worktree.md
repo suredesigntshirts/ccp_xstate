@@ -28,3 +28,12 @@ other branch name. In trial-fail-path the agent reset its worktree to the old br
 5. **Fails closed.** With `previous` set but no stamped branch, or `previous.at` not found after the fetch, the run
    fails with a reason, and the item steps back as any failed run does. A fresh-branch fallback was set aside: it is
    the bug this item fixes, and a fork PR cannot be pushed to anyway.
+6. **Built without changing `workflows/quick-fix.json`** (decided while building). Its rule already reads right once
+   the worktree is on the PR's branch: the run line names that branch, and "push to that PR" and "use no other branch
+   name" now agree. The trial-fail-path verifier's test replays the trial journals on this head's quick-fix and pins
+   its hash, so a wording change would break committed evidence for no change in behaviour. A builder that sets
+   `pr.branch` is refused with rule `reserved`, which names the field.
+7. **`branch` is reserved but shown** (replan while building). Hiding it like key, gates, green and checkout broke the
+   engine-stage-contract verifier's stage-record checker, which recomputes each prompt input with its own list of
+   hidden fields. Showing it costs nothing (it is GitHub's own name for the PR's branch, and on a rebuild it tells the
+   builder where it is), so the item's head now says branch is shown; the agent still may not set it.
