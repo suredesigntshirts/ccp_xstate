@@ -41,3 +41,15 @@ challenge run (8 different bad results) and then expecting the good one accepted
 That test is a fair picture of a careful agent's worst case, and the replan's count of existing tests had missed it,
 so the cap is 10, not the test changed: still a bound on a looping agent, with room above every refusal sequence the
 repo's own tests make.
+
+## After the build
+
+Build PR #123 merged at 785b9a6 with the verifier's verdict, all 6 Expect lines MET at 2b0df32 (verdict commit
+bc582c2), and was released as harness-v0.1.25. In the real-agent run, a real build agent got the pr hint with
+`Refusal 1 of 10.` and fixed a short `pr.at` on its next return. A second agent was failed at the tenth refusal, and
+its item went to replanning through building's onError.
+
+The verifier also found something outside this item. After the hook accepts a result that carries a PR ref, the
+return-tool server answers "not accepted: no harness check passed this result". The stored hash covers the stamped
+result (the host adds key, branch, checkout and green), but return-tool.mjs hashes the result the agent sent, so the
+agent retries into already-returned. Main does the same thing. This is drafted as fix-return-tool-answer.
