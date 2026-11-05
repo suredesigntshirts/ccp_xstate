@@ -319,6 +319,24 @@ export function handedBack(text) {
     e.message.content.some((c) => c.type === 'tool_use' && c.name === 'SubagentHandback' && c.id === result.tool_use_id));
 }
 
+const isMessage = (e) => e?.type === 'user' || e?.type === 'assistant';
+
+/**
+ * How long a subagent ran: from its brief (the transcript's first line, a user row) to its last user or assistant row.
+ * Other rows (attachments, system rows) don't count, and nor does any row stamped before the brief: one can carry the
+ * time a relayed message was written, days before the run (plan/decisions/2026-11-05-agent-finish-ms.md). The first
+ * line is read from offset 0, since `entries` is the file's tail. Null when no message has a time.
+ */
+function runMs(path, entries, read) {
+  const head = path && read(path, { from: 0, cap: 1024 * 1024 });
+  const opening = head ? lines(head.text.split('\n')[0])[0] : null;
+  const times = entries.filter(isMessage).map((e) => Date.parse(e.timestamp)).filter(Number.isFinite);
+  const brief = opening?.type === 'user' ? Date.parse(opening.timestamp) : NaN;
+  const start = Number.isFinite(brief) ? brief : times.length ? Math.min(...times) : NaN;
+  const after = times.filter((t) => t >= start);
+  return after.length ? Math.max(...after) - start : null;
+}
+
 // SubagentStop: time, tokens and answer come from the agent's own transcript.
 function finish(input, { read, refused, newId }) {
   const agentId = input.agent_id;
@@ -326,7 +344,6 @@ function finish(input, { read, refused, newId }) {
   const path = input.agent_transcript_path ?? agentFile(input, '.jsonl');
   const got = path && read(path, { from: null, cap: READ_CAP });
   const entries = got ? lines(got.text) : [];
-  const times = entries.map((e) => Date.parse(e.timestamp)).filter(Number.isFinite);
   const { tokens: t, models } = tokens(entries);
   const text = answer(entries, input);
   const rows = [];
@@ -344,7 +361,7 @@ function finish(input, { read, refused, newId }) {
       agentId,
       type: input.agent_type ?? m.agentType ?? null,
       model: models.at(-1) ?? null,
-      ms: times.length ? Math.max(...times) - Math.min(...times) : null,
+      ms: runMs(path, entries, read),
       tokens: t,
       resultHash: blobs[0]?.hash ?? null,
     },
