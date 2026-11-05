@@ -4,7 +4,7 @@
   "title": "Let a blocked build retry once the person clears the block",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "When a quick-fix build returns blocked, the item stops at a card of its own that says what stopped the build and offers retry, besides replan and drop; picking retry (a person's tap or a stand-in's answer, never on its own) runs the build again with the same briefs and the block as its failure input, with no five whys and no new brief, and counts as the attempt's second build; and a real-model run of that route on main's engine, with the agents bound and captured by the harness plugin, is committed with its sessions/ capture, so the Inspector shows each agent's tool calls, time and tokens.",
   "why": "In the trial-fail-path blocked trial a build was refused a push because its token lacked the workflow scope. The builder returned blocked and named the fix (grant the scope or push the commit), but quick-fix sent it to replanning, whose only choices are a replan with a written five whys, which throws the briefs away and starts over, or drop. Neither fits a block the person can clear in a minute. The same review of the real runs in the Workflow Inspector (5 Nov) found that no real-model run has used main's code since fix-rebuild-worktree, and that the trial journals kept no live capture, so no agent's tool calls, time or tokens can be shown; this item's real run closes both.",
   "serves": [
