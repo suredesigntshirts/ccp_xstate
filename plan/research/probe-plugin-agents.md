@@ -82,3 +82,35 @@ was `plugins/harness/agents/probe-reader.md`). `setup.sh` installed that release
 session there with no `--plugin-dir` (session `3119065a-c41b-41bb-bf06-6ed3a1786c82`) loaded `ccp-harness@skills-dir`
 version 0.1.24 and listed `ccp-harness:probe-reader`. The verifier's evidence is in `verify/probe-plugin-agents/`. The
 Projects-thread step waits for a setup-script re-save, as draft item `probe-plugin-agents-thread`.
+
+## In a real Projects thread (probe-plugin-agents-thread)
+
+The person re-saved the setup script at 07:15Z on 5 Nov. The next thread, "Check plugin agents in a real thread"
+(session `cse_01KfkB5FmDxfpGGozgmjnWGN`, local transcript `3a5752f4-e169-53c2-93c9-b76f24d5aa4f`, Claude Code
+2.1.318), started at 07:16Z on harness-v0.1.24, the release that ships `agents/probe-reader.md`. From its own session
+it made one Agent call with `subagent_type: "ccp-harness:probe-reader"` (tool use `toolu_01R8dcCA6pJMxQA5VMoTsx5a`),
+asking it to read `README.md`, write a file and run `whoami`. Evidence is in `plan/research/probe-plugin-agents-thread/`,
+and the thread's capture journal is `/mnt/project-files/harness/journal/sessions/session_01KfkB5FmDxfpGGozgmjnWGN.jsonl`
+(rows copied to `journal-extract.jsonl`).
+
+| Expect | Result | Evidence |
+| --- | --- | --- |
+| thread-listed: release | **Held.** SessionStart: `ccp-harness 0.1.24 (harness-v0.1.24): self-check passed (7 of 7 checks)`. The journal's `session.fingerprint` row has release 0.1.24, tag `harness-v0.1.24`, commit `e9b6ae3`, root `/root/.claude/skills/ccp-harness` | `thread-transcript-extract.jsonl` lines 5–6 of the transcript; `journal-extract.jsonl` |
+| thread-listed: listed and starts | **Held.** The thread's agent listing names `ccp-harness:probe-reader` with "(Tools: Read, Glob)". The call started it: `meta.json` has `agentType: "ccp-harness:probe-reader"`, `isBuiltIn: false`, `finished: true`; the journal has `agent.spawn` with that type from SubagentStart | `thread-transcript-extract.jsonl` (the `agent_listing_delta` attachment, the Agent tool_use and its result); `agent-a399d257145231f6c.meta.json`; `journal-extract.jsonl` |
+| thread-holds: model | **Held.** All 3 assistant messages in the subagent transcript are `claude-haiku-5-5`, the `prefix.json` model is haiku, and the journal's `agent.finish` row has model `claude-haiku-5-5`, while the thread runs opus. `meta.json`'s `pickedEffortModel` again names the main model | `agent-a399d257145231f6c.jsonl`, `.prefix.json`, `journal-extract.jsonl` |
+| thread-holds: tools | **Held.** `prefix.json` `toolNames` is `Read, Glob, SubagentHandback`. The agent called only Read and Glob, and reported the write and `whoami` not done: "I have no Write or Edit tool", "I have no Bash or shell tool" | `agent-a399d257145231f6c.prefix.json`, `.jsonl` |
+| thread-holds: marker | **Held.** Its handback opens with `QUILLMARROW`; the task prompt (first user message of the subagent transcript, and the Agent tool_use input) does not contain it | `agent-a399d257145231f6c.jsonl`, `thread-transcript-extract.jsonl` |
+
+The read itself failed because the repo has no root `README.md`; the agent said so and listed what Glob found, which
+is the honest behaviour its body asks for. It does not bear on any check.
+
+The subagent transcript is committed with its `attachment` rows removed (session context, environment and MCP
+instructions the platform injects); its `user` and `assistant` rows are unchanged. The thread transcript is committed
+as an extract only (`plan/decisions/2026-11-05-probe-plugin-agents-thread-ready.md`).
+
+Side fact: in a thread, the capture hooks record named agents with no extra code: `agent.spawn` carries the agent type
+and `agent.finish` the model the agent actually ran on, so the journal alone shows a role ran on its frontmatter model.
+`prefix.json` does list the subagent's tool names.
+
+So the plugin-agent path holds in a real Projects thread on a release, and the verdict above stands: stage roles can
+live in the plugin, under the two conditions in "What a stage role needs".
