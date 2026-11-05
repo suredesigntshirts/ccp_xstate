@@ -151,3 +151,12 @@ often gives the verifier a script that fails on its own, where the combined vers
 
 Next targets for the brief: builder-criteria and methods-private, the two new criteria no variant improved without
 losses, and catches-traps on planted-missing-line (1 of 3 and 0 of 3).
+
+## Done (5 Nov)
+
+Built in PR #120 and checked by a separate verifier session. Round 1 (at aa275c1) found 5 of 6 MET. `variants` was NOT
+MET because the decision and the PR did not say that traps-named, the conditional fifth candidate, was never run.
+That line was added (aacf88d). The re-verify found all 6 MET at aacf88d (verdict c1d1f1f). On its own case, the
+verifier's 3 real runs caught the trap 3 of 3, and every command ran as written. One of the 3 restated the expect
+lines instead of quoting them, which is the builder-criteria trade accepted above. No release was needed, because
+nothing under `plugins/harness`, `packages/journal` or `packages/engine/src` changed.
