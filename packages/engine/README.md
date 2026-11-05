@@ -44,7 +44,10 @@ command.
 `handlers({ github, hearth, clock })` builds them. `github` (`src/effects/github.js`) reaches api.github.com through
 the session's proxy itself. A command can't reach the thread or schedule a wake, so in `bin/host.js` posts stay
 pending (and printed), and a timer effect ends at once with its due time while the open timer stays listed under
-`pending.timers`: the session schedules a wake for that time (send_later), and any wake past it fires the timer. Every
+`pending.timers`: the session schedules a wake for that time (send_later), and any wake past it fires the timer. The
+reminder arrives as a ReadNotifications notification with origin `trigger_fire`; the session feeds that result to
+`wake` as a PostToolUse hook input, and the host reads it as a wake with no body at the time it fired, never reading
+its text (plan item fix-reminder-wake). Every
 state that asks the person sets one: a one-hour `checkBack` that moves nothing, so a quiet thread comes back to the
 waiting item, and the load check refuses an asking state without a timer (plan item fix-waiting-wake). Its cards go through `src/effects/relay.js` (plan item engine-toy-run): the session that
 has the thread's tools posts the card `show` lists and records its id with `card`, which then finishes the card

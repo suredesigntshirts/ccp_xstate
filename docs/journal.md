@@ -325,7 +325,9 @@ actor), `timer` and `due` (a timer's), `outcome` (what the handler reported, suc
 the verified head it merged at and GitHub's merge sha. A card's is `{ ref, choices }`, a post's `{ ref }` and a
 timer's `{ ref, due }` (plan item engine-effects); in `bin/host.js`, which has no clock, the ref is `due <time>`, and a
 cancel's outcome is `{}`. A fired timer is an `engine.transition` row with source `timer` and the timer effect id;
-a waiting state's `checkBack` timer is applied though it changes nothing (plan item fix-waiting-wake). A stop carries its run's `actor`; its `done` outcome is
+a waiting state's `checkBack` timer is applied though it changes nothing (plan item fix-waiting-wake), and the
+send_later reminder that fires it, a `trigger_fire` notification, is read by `bin/host.js wake` as a bare wake at the
+time it fired (plan item fix-reminder-wake). A stop carries its run's `actor`; its `done` outcome is
 `{ closed: <card id> }` when it closed an ask's card, and `{ closed: null }` when there was nothing in front of the
 person (plan item fix-finish-closes-waits). An effect that has ended is never run again. One that started and never ended
 (the host stopped mid-effect) is looked up with its handler's `find()`, or journalled `unknown` and left alone.

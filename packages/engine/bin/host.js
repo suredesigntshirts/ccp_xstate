@@ -10,7 +10,8 @@
 //   start and wake also take [--repo <git clone>] [--worktrees <dir>] for the actors' worktrees.
 //
 // wake reads a Claude Code hook's input on stdin: UserPromptSubmit (the wake is its prompt) or PostToolUse of
-// ReadNotifications, where only notifications GitHub's webhook delivered are read. Any other tool's output is
+// ReadNotifications, where only notifications GitHub's webhook delivered and fired reminders (origin trigger_fire, read
+// as a bare wake at the time they fired; fix-reminder-wake) are read. Any other tool's output is
 // ignored, whatever it contains. The session is the hook input's session_id. Nothing on the command line can name an
 // event or its source: those come only from the wake text. What this cannot stop: an agent with a shell can run this
 // command with stdin it typed, as it can append rows by hand (ledger L-same-account-everywhere); the decision says so.
@@ -62,17 +63,29 @@ const { positionals: [command], values: opts } = parseArgs({
 const manifestRelease = () =>
   JSON.parse(readFileSync(new URL('../../../plugins/harness/.claude-plugin/plugin.json', import.meta.url), 'utf8')).version;
 
-// The wake text a hook input carries: a UserPromptSubmit's prompt, or the bodies of the GitHub notifications in a
-// ReadNotifications result. Nothing else.
+// The wake text a hook input carries: a UserPromptSubmit's prompt, or from a ReadNotifications result the bodies of
+// the GitHub notifications and, for each scheduled trigger that fired (a send_later reminder, origin trigger_fire), a
+// wake with no body at the time it fired. A reminder's content is never read: the session or any agent wrote it, and
+// a bare wake can only fire timers already due by the host's clock (plan item fix-reminder-wake). Nothing else.
 const wakeTextOf = (hook) => {
   if (hook.hook_event_name === 'UserPromptSubmit') return typeof hook.prompt === 'string' ? hook.prompt : '';
   if (hook.hook_event_name !== 'PostToolUse' || hook.tool_name !== 'ReadNotifications') return '';
   const notifications = hook.tool_response?.notifications;
   if (!Array.isArray(notifications)) return '';
   return notifications
-    .filter((n) => n?.origin === 'github_webhook' && typeof n.content === 'string')
-    .map((n) => n.content)
+    .map((n) => {
+      if (n?.origin === 'github_webhook' && typeof n.content === 'string') return n.content;
+      if (n?.origin === 'trigger_fire') return reminderWake(n);
+      return null;
+    })
+    .filter((text) => text !== null)
     .join('\n');
+};
+
+// A fired reminder as a wake: reason scheduled, current-time the time it fired (queued_at, else arrived_at), no body.
+const reminderWake = (n) => {
+  const fired = [n.queued_at, n.arrived_at].find((t) => typeof t === 'string' && !Number.isNaN(Date.parse(t)));
+  return fired ? `<wake reason="scheduled" current-time="${new Date(Date.parse(fired)).toISOString()}"></wake>` : null;
 };
 
 const fail = (message) => {
