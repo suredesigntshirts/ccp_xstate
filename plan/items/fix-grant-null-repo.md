@@ -4,7 +4,7 @@
   "title": "Refuse a stand-in answer on a card with no repository, whatever the grant lists",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A stand-in's answer on a card whose repository can't be read (no pr, and no github.com issue) is refused under every grant, including one whose repos list holds null, so a grant only ever covers repositories it names.",
   "why": "fix-blocked-card-grant's verifier (plan/decisions/2026-11-05-handback-after-return.md, decision 3): standinInput asks g.repos.includes(repo) with repo null when the card has no repository, so a grants file with null in repos covers every such card. main has the same gap.",
   "serves": [

@@ -40,3 +40,12 @@ agent (`trial:0.brief`) loaded the tool and returned first, so it has no row.
    lets a stand-in answer for the person. Grants are written by the person, so it needs a malformed grants file to
    bite, but the fix is one condition. A card with no repository is refused under every grant, with the same refusal
    text as today's no-repo refusal.
+
+## After the build
+
+Build PR #147 merged at fc167db. The verifier thread (session_01KfkB5JHer8pjQ1QEofMrJv) found all 3 Expect lines MET
+at 8806126 (verdict commit 73ef077), answering the blocked card through `bin/host.js answer` under grants listing
+`[null]` and `[null, "o/r"]`; its null-repo tests are red on main. Released as harness-v0.1.32 (by release.yml on the
+merge). The verifier noted, outside the Expect lines, that packages/engine/test/standin.test.js runs `bin/host.js`
+with no `--repo`, so its build runs add `run/it-1/*` branches and worktrees to the repository the tests run in; two
+`npm test` runs at once in a checkout and its worktree collide. It predates this item and is left as a note.
