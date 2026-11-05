@@ -123,3 +123,14 @@ Decisions made while building, as the person's stand-in:
   version): shape 3 cases to 3 with 1 even, challenge 3 to 2 with 2 even. They are no reason to keep a variant; the
   scores are. Next to target: challenge's over-strict lines (avoids-must-not), and fixed committer dates
   for seed repos so their hashes are stable.
+
+## Done (5 Nov)
+
+Built in PR #117 and verified by a separate session. Round 1 found `real` NOT MET: the bench prepared a later stage
+(challenge) outside the chart, so its run folder had no transitions and the Workflow Inspector could not show it.
+Now every bench stage runs through the real host from the item's start, and a later stage is reached by giving each
+earlier stage its output from the case, held to that stage's schema (`earlierOutput` in `scripts/bench/lib.mjs`).
+The re-verify found all 7 Expect lines MET at a1eb7c4. No release was needed: nothing under `plugins/harness`,
+`packages/journal` or `packages/engine/src` changed. The committed challenge runs from before the fix do not replay
+(`docs/prompts.md` says so), and `runs/hosted` does. The Inspector counts a stage that a case fed as a model run, though
+no model ran it. That is cosmetic and left for the Inspector.
