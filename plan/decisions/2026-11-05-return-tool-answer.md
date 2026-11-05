@@ -33,3 +33,12 @@ sending the stamped result itself is not accepted.
 
 A result whose PR refs the host stamped then gets "accepted" for the same call the hook let through. A different
 result for that run still gets "not accepted", and so does a call no hook saw.
+
+## After the build
+
+Build PR #130 merged at 34b2d61 with the verifier's verdict, all 6 Expect lines MET at 2c2e31e, and was released as
+harness-v0.1.27. Through the real hook and server, a stamped PR-ref result is answered accepted at the head and not
+accepted at main. In a real `claude -p` session, a build agent made one return, got accepted, and its item has one
+result.stored and no refusal. The verdict was re-stamped once (9a31ab7) because the verifier's committed main
+evidence held shas of commits signed by the container's global git config, which CI does not sign; its test helpers
+now commit with no global git config. Nothing new was drafted.
