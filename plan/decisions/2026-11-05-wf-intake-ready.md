@@ -98,3 +98,26 @@ module per stage under `scripts/bench/stages/`, so brief scores and compares exa
   line gates.
 - If real items show the person wanting to answer goal questions before the build, the card moves earlier, with a
   coverage-safe way to decide on it (a host check of `assumptions`, not the model's word).
+
+## After the build (5 Nov)
+
+Decisions made while building, as the person's stand-in:
+
+- **Rubrics approved.** `bench/shape/rubric.json` and `bench/challenge/rubric.json` are approved by the building
+  thread as stand-in, recorded here. Challenge's verdicts are scored mechanically against each case's planted lines;
+  everything else is judged.
+- **Revision cap wiring.** A guard is checked against the context as its actions leave it (spec.js bindTransition),
+  so the cap is three host flags shifted once per FAIL (`failed1..3`). The third FAIL sets `failed3`, and the card
+  follows. The guard is `failed3` still null.
+- **Cases corrected, not the challenger.** In the first challenge baseline, the challenger found real holes in two
+  of the "clean" cases and in planted-ambiguous. Those cases were fixed and run again
+  (`bench/challenge/reports/baseline.md`).
+- **The judge sees file contents for claims about code.** For shape's `grounded` and challenge's evidence criteria,
+  a file list made the judge fail true claims as unverified. Brief's judge is unchanged, so its kept verdicts stand.
+- **Trades accepted.** The kept shape variant (observable lines) is better on states-problem and catches-traps.
+  It loses one grounded run, on a seed-repo commit hash the judge cannot see. The kept challenge variant (good-faith
+  wrong builds) is better on verdict-right, passes-sound, evidence-grounded and catches-traps, and holds every
+  planted hole. It loses two avoids-must-not runs, each a sound line failed for a test its words do not ask for. Both
+  trades are accepted here. The procedure allows a worse criterion only with a written acceptance. Both blind reads
+  preferred the variant. Next to target: challenge's over-strict lines (avoids-must-not), and fixed committer dates
+  for seed repos so their hashes are stable.
