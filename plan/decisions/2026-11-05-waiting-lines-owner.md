@@ -32,3 +32,18 @@ went ready.
 
 The order in the PreToolUse hook stays cannotStart, then spawn. The refusal text starts with its rule, as every hook
 refusal does, so capture's refusal rows and derive's views pick it up as they do the other spawn denials.
+
+## After the first build round
+
+Decision 2 is withdrawn before any build PR opened. With spawn() refusing wrong-session through the hook, 13 tests
+that pass on main went red: eight in verify/engine-actor-returns (a done item's frozen verifier suite) and five in
+plugins/harness/test/actors.test.mjs. Both start items as session `s` and drive the hook as `sess`, so every
+`ccp-run` there came from a session that doesn't own the item. The item's own `unchanged` line requires those to
+pass, and a done item's verifier tests are not this item's to rewrite. The refusal also wasn't what the verifier
+saw: the real failure was a model following the line it was given. So the item is narrowed to the lines filter, and
+spawn() is unchanged. A refusal can come back as its own item once the done suites' fixtures own their items, if a
+real run shows a copied id being started.
+
+One plugin test asserts the bug itself: plugins/harness/test/actors.test.mjs drives PostToolUse as `sess` and
+expects the next run of an item `s` owns. The `unchanged` line names that one assertion as the exception; the builder
+changes it to expect no line for `sess` and main's line for `s`.
