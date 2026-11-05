@@ -1,0 +1,162 @@
+{
+  "run": "trial:5.verify",
+  "item": "trial",
+  "name": "5.verify",
+  "invoke": "verify",
+  "actor": "verify",
+  "workflow": "quick-fix@6a0b9dfd27e783ce29b1cb1e9a911c57862760f7586d2638ce672ae50d9e9d8d",
+  "root": "/home/user/ccp_xstate/tournaments/2026-11-04-stage-contract/trials/blocked-retry/journal",
+  "session": "owner",
+  "release": "0.1.0",
+  "state": "\"verifying\"",
+  "input": {
+    "issue": {
+      "url": "https://github.com/o/r/issues/12",
+      "title": "Run the tests on Node 22 as well as Node 20",
+      "body": "The invoice service is moving to Node 22 next month. mathlib's CI only runs on Node 20, so we would not see a break until after the move. Please run the test job on both Node 20 and Node 22.\n\nExpect:\n- .github/workflows/test.yml runs npm test on Node 20 and on Node 22 (a matrix over node-version)\n- npm test passes",
+      "expect": [
+        ".github/workflows/test.yml runs npm test on Node 20 and on Node 22 (a matrix over node-version)",
+        "npm test passes"
+      ]
+    },
+    "task": "Run every check at the pull request head.\n\nCheck 1: \".github/workflows/test.yml runs npm test on Node 20 and on Node 22 (a matrix over node-version)\"\nRun: parse .github/workflows/test.yml as YAML (for example `ruby -ryaml -e 'p YAML.load_file(\".github/workflows/test.yml\")'` or `python3 -I -c` with yaml, or `node` with a YAML parser if present). Inspect the parsed structure, and also read the CI check results for the head if available.\nPASS: the file parses, a job that runs `npm test` has strategy.matrix.node-version containing both 20 and 22 (any notation, such as 20, \"20\", 20.x), and the job's setup-node step takes its node version from matrix.node-version.\nFAIL: the file does not parse, the matrix is missing, either 20 or 22 is absent, the setup-node step does not use the matrix value, or no step runs `npm test`.\n\nCheck 2: \"npm test passes\"\nRun: `npm ci` (if the repo has a lockfile, else `npm install`) then `npm test` at the head.\nPASS: `npm test` finishes successfully.\nFAIL: `npm test` fails or cannot run.\n\nAdvisory (not part of PASS or FAIL):\n- If Node 22 is available, also run `npm test` under it and report the result.\n- Check that the PR's CI shows both a Node 20 and a Node 22 leg of the test job, and that both are green.\n- Check that the exact `npm test` exit status is 0, that triggers in the workflow are unchanged, and that the diff touches nothing unrelated.\n- The live Actions run on the matrix can only be fully seen after merge; do not read it as a requirement.",
+    "target": {
+      "url": "https://github.com/o/r/pull/1",
+      "at": "d2aadd7fd73db03ad7b16a598c5b31dcfa6d071c",
+      "key": "o/r#1",
+      "branch": "b",
+      "checkout": "git fetch origin pull/1/head && git checkout --detach d2aadd7fd73db03ad7b16a598c5b31dcfa6d071c",
+      "gates": [
+        ".github/workflows/test.yml"
+      ],
+      "green": true
+    },
+    "checkout": "git fetch origin pull/1/head && git checkout --detach d2aadd7fd73db03ad7b16a598c5b31dcfa6d071c"
+  },
+  "schema": {
+    "rules": [
+      "You are the independent verifier. You try to disprove each expect line at one commit by running things, not only by reading the diff. Your result tells the person approving the merge, or the builder on a FAIL, which lines hold.",
+      "Test at target.at: run checkout first. If its fetch fails the commit may already be present: run its git checkout part alone.",
+      "Grade only issue.expect, by what each line's words require. A condition in the brief stricter than its line, or anything under Advisory, is advisory: report it in evidence, never as a FAIL.",
+      "Do not take the builder's word: the PR's description and comments are claims, not evidence.",
+      "Be read-only on GitHub: no push, comment, review or merge. Fix nothing yourself, and undo any local change you made for a spot check before you return.",
+      "Return once every expect line has an entry. If you cannot check out target.at at all, mark every line FAIL with that reason as its evidence and return."
+    ],
+    "inputs": {
+      "task": "The brief agent's checks, one per expect line, fixed before any build started. It fills the Task part.",
+      "issue": "The issue as it was when the item started: url and expect. Grade exactly these expect lines, never the issue's current text on GitHub.",
+      "target": "The PR under test as { url, at }: at is the head commit the host saw green on CI. Your verdict counts only for url at that commit.",
+      "checkout": "The exact shell commands that put target.at in your worktree: a fetch of the PR's head, then a detached checkout of at. The host writes them from target."
+    },
+    "type": "object",
+    "required": [
+      "result",
+      "pr",
+      "issue",
+      "lines"
+    ],
+    "properties": {
+      "result": {
+        "enum": [
+          "PASS",
+          "FAIL"
+        ],
+        "description": "PASS only if every entry in lines is PASS; otherwise FAIL."
+      },
+      "pr": {
+        "$ref": "#prRef",
+        "description": "Exactly target as { url, at }, with nothing added. The host checks that your worktree HEAD and GitHub's head of that PR both equal at."
+      },
+      "issue": {
+        "$ref": "#issue",
+        "description": "Your input's issue: url and expect copied exactly (every expect line, in order). You may leave out title, body and any other key; a key you include must equal the input's exactly. The host compares what you send with your input."
+      },
+      "lines": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "$ref": "#line"
+        },
+        "covers": "issue.expect",
+        "description": "One entry per expect line, in order: { line: the expect line copied exactly, result: PASS or FAIL, evidence: what you ran and what you saw }. PASS means a check you ran at target.at held; FAIL means it did not, or that you could not test it, with the reason as evidence. The host refuses a result that misses an expect line, adds another, puts them out of order, or whose result disagrees with these entries."
+      }
+    }
+  },
+  "defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "prRef": {
+      "type": "object",
+      "required": [
+        "url",
+        "at"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^https://github\\.com/[\\w.-]+/[\\w.-]+/pull/[0-9]+/?$"
+        },
+        "at": {
+          "type": "string",
+          "minLength": 40,
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "required": [
+        "url",
+        "expect"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expect": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "line": {
+      "type": "object",
+      "required": [
+        "line",
+        "result",
+        "evidence"
+      ],
+      "properties": {
+        "line": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "repo": "/home/user/trial-blocked-retry/world/repo",
+  "github": "o/r",
+  "worktrees": "/home/user/trial-blocked-retry/world/wt",
+  "worktree": "/home/user/trial-blocked-retry/world/wt/trial--5.verify",
+  "branch": "run/trial/5.verify",
+  "briefHash": "6830e4924706bf401691a652ff2c00321d97e1b55c5614d49221ffd1410c4732",
+  "context": "Run trial:5.verify, worktree /home/user/trial-blocked-retry/world/wt/trial--5.verify of https://github.com/o/r, branch run/trial/5.verify."
+}

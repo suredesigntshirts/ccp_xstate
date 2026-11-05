@@ -1,0 +1,5 @@
+The PR is open at https://github.com/o/r/pull/1, head d2aadd7fd73db03ad7b16a598c5b31dcfa6d071c on branch run/trial/3.build. The harness return tool accepted the result as stored (989b2c7d1e07).
+
+- **Change:** only `.github/workflows/test.yml` changed. The job now has `strategy.matrix.node-version: [20, 22]`, and `setup-node` uses `${{ matrix.node-version }}`. Triggers and the `npm test` step are unchanged.
+- **Push:** it went through this time. The earlier rejection about the missing `workflow` scope did not recur.
+- **Checks:** the file parses as YAML, and `npm test` passes 3/3 on local Node 22.23.4. I did not run it on Node 20 locally or see CI run. No test or source edits were needed.

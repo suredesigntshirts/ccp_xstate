@@ -1,0 +1,39 @@
+{
+  "prs": {
+    "1": {
+      "head": "d2aadd7fd73db03ad7b16a598c5b31dcfa6d071c",
+      "base": "main",
+      "branch": "run/trial/3.build",
+      "files": [
+        ".github/workflows/test.yml"
+      ],
+      "merged": true,
+      "mergeSha": "0101010101010101010101010101010101010101",
+      "title": "Run the tests on Node 20 and Node 22",
+      "body": "The invoice service is moving to Node 22, so the test job now runs on both versions (closes #12).\n\n- .github/workflows/test.yml: strategy.matrix.node-version [20, 22]; setup-node uses ${{ matrix.node-version }}. Triggers and other steps unchanged.\n- npm test passes (3/3) locally on Node 22.23.4. No test or source changes were needed. YAML parses.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)",
+      "draft": false
+    }
+  },
+  "suites": {
+    "d2aadd7fd73db03ad7b16a598c5b31dcfa6d071c": [
+      {
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "merges": [
+    {
+      "number": 1,
+      "sha": "d2aadd7fd73db03ad7b16a598c5b31dcfa6d071c",
+      "base": "main"
+    }
+  ],
+  "pushes": [
+    {
+      "at": "2026-11-05T14:55:23.880Z",
+      "branch": "run/trial/3.build",
+      "sha": "d2aadd7fd73db03ad7b16a598c5b31dcfa6d071c"
+    }
+  ]
+}
