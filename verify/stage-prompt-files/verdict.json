@@ -1,0 +1,46 @@
+{
+  "item": "stage-prompt-files",
+  "verified_sha": "40ae1b646f41897376fb9e931020f8eda747355e",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5HTh4ZnfS2YvSz1cew",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "files",
+      "status": "MET",
+      "command": "clean clone at 40ae1b6, npm ci; node --test verify/stage-prompt-files/files.test.mjs (my own section reader, not prompts.js parseStageFile; compared with the base c130689's workflows/*.json from git)",
+      "excerpt": "16 pass. Base and head both have exactly the 8 model stages (quick-fix brief/build/verify, research brief/researcher/write/verify, feature brief). Each workflows/<wf>/<stage>.md has title '# <stage>', sections Rules, Inputs, Output (+ Task for the 3 brief stages only), and its '- ' lines equal the base JSON's rules, '- name: meaning' inputs and '- prop: description' outputs in order; Task text equals the base invoke's task literal. No meta.actors entry in head workflows/*.json has rules, inputs or a top-level property description; stage entries are {prompt: '<wf>/<stage>.md'} plus a schema identical to the base's minus those words; every invoke task input is {prompt: 'task'}, no task literal. No other .md in the stage folders."
+    },
+    {
+      "id": "same-prompt",
+      "status": "MET",
+      "command": "node --test verify/stage-prompt-files/same-prompt.test.mjs: render() (packages/engine/src/stages.js, unchanged by the PR) on the base commit's workflows/ (git archive c130689) vs the head's loaded from its stage files, same inputs; then render() on each committed run folder's pinned blob vs its brief.md",
+      "excerpt": "12 pass. All 8 stages byte-identical for a made-up input (nested objects, quotes, backslashes) and for a task-only input with every other input null; recorded inputs from the committed run folders also identical: quick-fix brief 27, build 4, verify 3 (research and feature have no recorded runs, made-up only). Every committed run folder whose journal pins a blob: 'rendered 34 committed run folders from 3 pinned blobs', each equal to its committed brief.md byte for byte."
+    },
+    {
+      "id": "pin",
+      "status": "MET",
+      "command": "node --test verify/stage-prompt-files/pin.test.mjs (scratch copy of workflows/): edit one line per kind of stage-file text and compare loadWorkflow ids; start item v-pin through the real host (bench prepareRun) + one more applied transition (xstate.done.actor.brief), then edit a brief rule, delete every stage folder, and load/replay/render from the blob; the test runs test/journals-replay.test.mjs as a child",
+      "excerpt": "3 pass. One appended phrase on a rule (brief.md), an input meaning (build.md), an output description (verify.md), the task (brief.md), a research researcher rule and a feature brief rule each gave a new name@sha256 (identical files give the identical id). Item v-pin: 2 applied transitions on the composed pin, blob stored at pin time; after the edit (new id) and with workflows/{quick-fix,research,feature}/ deleted, the plain name fails to load (cannot read its stage file), but loadWorkflow(pin) and workflowOf(root,item) load the blob, restore() replays seq 2 to the same state, and render() on the blob equals the run's brief.md (the edited spec renders differently); the blob holds the rule and task words. journals-replay: pass 53, fail 0."
+    },
+    {
+      "id": "load-check",
+      "status": "NOT MET",
+      "command": "node --test verify/stage-prompt-files/load-check.test.mjs: 14 malformed scratch copies loaded with loadWorkflow (failing cases are todo tests so npm test stays green; they report as 'not ok # TODO')",
+      "excerpt": "Two cases fail the Expect. (1) Missing section: quick-fix/brief.md with its whole ## Output section deleted LOADS (prompts.js only requires Rules and Inputs); the builder/verifier output descriptions then drop out of the rendered prompt silently (3071 -> 2713 chars). (2) Input name that is not one of the stage's inputs: an extra '- earlier:' or a misspelt '- previus:' under build.md ## Inputs is refused, but only by checkStages with 'quick-fix@<sha>: stage build invoke build inputs differ', which names neither the file nor the line. Met cases: unknown '## Notes' -> build.md:13; '### More' -> its line; missing Rules / Inputs -> file:<last line>; output name not a property -> verify.md:<line>; output out of schema order -> its line; ## Task in quick-fix build and in research researcher -> file:line; missing file -> 'cannot read its stage file workflows/quick-fix/build.md: ENOENT' (no line, none exists). Minor: missing ## Task in brief.md names the file but no line ('workflows/quick-fix/brief.md has no ## Task section'). Fix suggestion: require ## Output whenever the schema has properties, and check Inputs names against the invoke's input keys in compose(), erroring at the item's line."
+    },
+    {
+      "id": "traced",
+      "status": "MET",
+      "command": "clean clone at 40ae1b6: node scripts/bench/run.mjs --stage brief --case planted-half-met --k 1 --out <scratch>/traced --model claude-opus-5-5; read runs/0.brief/stage.json; node scripts/inspector/build.mjs --config <one source: that run folder> --out <scratch>/insp; Playwright read of index.html. Evidence in verify/stage-prompt-files/evidence/",
+      "excerpt": "'planted-half-met.1: accepted in 38s, 13158 fresh tokens'; bench.json workflow source 'workflows/quick-fix.json and workflows/quick-fix/', id quick-fix@8d046c5a…, sentIsBriefMd true. stage.json: all 6 workflow rules pieces name workflows/quick-fix/brief.md lines 5-10, output descriptions builder/verifier lines 22/23, task piece file brief.md line 27 (input meanings 15-18 as meaningFile/meaningLine); I checked each line in the file holds that text. Frame pieces (DATA_RULE, WORKTREE_RULE, return, Schema) correctly have no file. Inspector page text: 'stage file workflows/quick-fix/brief.md:5, filled in at /meta/actors/brief/rules/0' … :10, :22, :23, and for task '…its text is workflows/quick-fix/brief.md:27'. Cosmetic: the task line also says 'read from [object Object]; produced by a literal in the workflow JSON at /states/briefing/invoke/input/task/value'."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub MCP pull_request_read get_check_runs, PR #107",
+      "excerpt": "Head 40ae1b6: check run 'test' (workflow ci) completed, conclusion success (06:16:37-06:18:46Z). 'gates' (verdict) failure before this verdict existed."
+    }
+  ]
+}
