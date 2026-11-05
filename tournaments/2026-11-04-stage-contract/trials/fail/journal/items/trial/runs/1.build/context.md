@@ -1,0 +1,1 @@
+Run trial:1.build, worktree /home/user/trial-fail/world/wt/trial--1.build of https://github.com/o/r, branch run/trial/1.build.
