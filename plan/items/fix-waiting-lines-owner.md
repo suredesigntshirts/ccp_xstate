@@ -56,7 +56,7 @@
     },
     {
       "id": "unchanged",
-      "check": "No prompt or workflow changes: render() of every stage of every workflow is byte for byte main's and every workflow hash is main's; spawn() returns what main's does for the same inputs, through the hook too; every engine, plugin and verify test that passes on main passes",
+      "check": "No prompt or workflow changes: render() of every stage of every workflow is byte for byte main's and every workflow hash is main's; spawn() returns what main's does for the same inputs, through the hook too; every engine, plugin and verify test that passes on main passes, except plugins/harness/test/actors.test.mjs's assertion that session `sess` is named the next run of an item `s` owns, which is the behaviour this item reverses; the builder changes it to assert that `sess` gets no line and `s` gets the same line as main",
       "how": "node --test over packages/, plugins/ and verify/, and the diff against main",
       "proof": "verifier"
     },

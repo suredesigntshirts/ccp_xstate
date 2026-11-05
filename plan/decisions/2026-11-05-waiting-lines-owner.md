@@ -43,3 +43,7 @@ pass, and a done item's verifier tests are not this item's to rewrite. The refus
 saw: the real failure was a model following the line it was given. So the item is narrowed to the lines filter, and
 spawn() is unchanged. A refusal can come back as its own item once the done suites' fixtures own their items, if a
 real run shows a copied id being started.
+
+One plugin test asserts the bug itself: plugins/harness/test/actors.test.mjs drives PostToolUse as `sess` and
+expects the next run of an item `s` owns. The `unchanged` line names that one assertion as the exception; the builder
+changes it to expect no line for `sess` and main's line for `s`.
