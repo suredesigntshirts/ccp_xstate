@@ -226,7 +226,7 @@ Claude-Session; the thread journals it. From `.github/workflows/release.yml`, `s
 
 `packages/journal/src/derive/` holds pure functions over rows (plan items obs-person-attention and
 obs-time-and-rework). Each reads rows and writes nothing, counts a row read twice once, and names the rows (or PRs) each
-output came from. `packages/journal/bin/derive.js time|rework|overhead` runs them from the command line. What each
+output came from. `packages/journal/bin/derive.js time|rework|overhead|stalls` runs them from the command line. What each
 counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
 
 - **`time.js`**: per session, working time (a turn from its wake to its Stop row, a tool call or hook run for its
@@ -241,6 +241,11 @@ counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
 - **`overhead.js`**: tokens (`turn.usage` and `agent.finish`) on harness work against product work. A session's
   tokens split by the share of changed lines, over the PRs its commits name it on, in the paths
   `packages/journal/harness-paths.json` lists (`<owner>/<repo>/<glob>`). A session with no PR is unattributed.
+
+- **`stalls.js`** (plan item fix-waiting-run-stall): how often a session ended a turn with one of its runs prepared
+  and no agent. `prepared` (runs with a `brief.stored` row), `blocked` (runs with a `stall` row), `blocks`,
+  `startedAfterBlock` (blocked runs whose `agent.spawn` row is at or after their first block), `failedAtCap`
+  (`stall-cap`), `cannotStart` and `rate` (blocked over prepared), with one entry per run the guard touched.
 
 ### PR check rows
 
@@ -376,6 +381,7 @@ with `stopped: true`, no output and an empty `wrote`.
 | A run is prepared (its brief), or a `brief` actor's result is accepted (each brief it returned, fixed before any build starts) | `brief.stored` | `run`, `actor`, `role` (the actor, or `builder`/`verifier` for returned briefs), `hash`, `bytes`; a prepared run also has `contextHash` and `worktree` |
 | The harness binds an agent to the run its Agent call started | `agent.spawn` | `agentId`, `type`, `run`, `actor`, `briefHash`, `worktree`, `via` (`start`: found at SubagentStart; `meta`: from the agent's meta.json at its first call), `hookSession` |
 | A return or bind the actor hook refused | `refusal` | `source` `hook`, `rule` (`wrong-caller`, `schema`, `github-fact`, `already-returned`, `already-failed`, `unknown-run`; `no-return` when an actor ended again after being sent back to return, or stopped after a handback, `tool` `SubagentHandback` or `SubagentStop`), `reason` (names the missing field or fact), `run`, `actor`, `caller`, `tool`, `textHash`, `outcome` `denied`; for a refusal of the result (`schema`, `reserved`, `restated`, `covers`, `ref`) also `hint` (`<field>: <its Output line>` for each output field the reason names), `count` (this run's result refusals so far, this one included) and `cap` (10). The one whose count reaches the cap is followed by a row with rule `refusal-cap`, `outcome` `failed`, and `reason` listing every refusal, when the run fails (fix-refusal-hints) |
+| The stall guard blocked a main-session stop, or failed a run that had no agent (fix-waiting-run-stall) | `refusal` | `source` `hook`, `rule` `stall` (`outcome` `blocked`, `tool` `Stop`, `count`: this run's blocks so far, this one included, `cap` 2, `reason` the block text word for word), `stall-cap` (`outcome` `failed`, `tool` `Stop`: the stop after the cap failed the run) or `cannot-start` (`outcome` `failed`, `tool` `Agent`: the owning session's `ccp-cannot-start <run>: <why>`), with `run`, `actor`, `caller` null, `textHash` and `hookSession`. A run failed either way has `failed.json` with `agentId` null and `why` starting `stalled:` or `cannot-start:` |
 | A return passed every check | `result.stored` | `run`, `actor`, `agentId`, `hash`, `bytes`, `toolUseId` |
 
 The completion an accepted result makes is an `engine.transition` whose source is `harness` and `return <tool use id>`.

@@ -279,6 +279,7 @@ export function spawn({ root, prompt, toolUseId, session = null }) {
   const run = loadRun(root, m[1]);
   if (!run) return { deny: `unknown-run: no prepared run ${m[1]}` };
   const dir = runDir(root, run.run);
+  if (existsSync(join(dir, 'failed.json'))) return { deny: `already-failed: run ${run.run} has failed; its item took the error` };
   if (existsSync(join(dir, 'agent.json'))) return { deny: `already-started: run ${run.run} already has its agent` };
   if (!writeOnce(join(dir, 'spawn.json'), { toolUseId, session, at: new Date().toISOString() })) {
     return { deny: `already-started: run ${run.run} was already started by another Agent call` };
@@ -743,19 +744,126 @@ export async function deliver({ root, run: runId, github = null, workflow = null
   }
 }
 
-/** The runs of an item prepared and not yet started: { run, prompt } for the session's Agent call. */
-export function waiting(root, item) {
+// The run records of an item prepared, not started and not failed.
+function waitingRecords(root, item) {
   const dir = join(root, 'items', safe(item), 'runs');
   let names = [];
   try {
-    names = readdirSync(dir);
+    names = readdirSync(dir).sort();
   } catch {
     return [];
   }
   return names
     .map((name) => join(dir, name))
-    .filter((d) => existsSync(join(d, 'run.json')) && !existsSync(join(d, 'spawn.json')))
+    .filter((d) => existsSync(join(d, 'run.json')) && !existsSync(join(d, 'spawn.json')) && !existsSync(join(d, 'failed.json')))
     .map((d) => readJson(join(d, 'run.json')))
-    .filter(Boolean)
-    .map((run) => ({ run: run.run, actor: run.actor, prompt: spawnPrompt(run.run) }));
+    .filter(Boolean);
+}
+
+/** The runs of an item prepared and not yet started (a failed run is not): { run, prompt } for the session's Agent call. */
+export function waiting(root, item) {
+  return waitingRecords(root, item).map((run) => ({ run: run.run, actor: run.actor, prompt: spawnPrompt(run.run) }));
+}
+
+// ---- The stall guard (plan item fix-waiting-run-stall)
+//
+// A Stop of the session that owns an item, with one of the item's runs prepared and no agent, is blocked with the
+// exact Agent call to make. Claude Code's stop_hook_active only marks a stop that follows a block, so the guard keeps
+// its own count: the stall rows for the run in the item's file. STALL_CAP blocks per run; the stop after that fails
+// the run, so the item takes the invoke's error (in quick-fix, replanning, where a card is in front of the person).
+// A session that cannot start a run says why with the Agent prompt `ccp-cannot-start <run>: <why>`, which fails it.
+// plan/decisions/2026-11-05-waiting-run-stall.md.
+
+export const STALL_CAP = 2;
+export const CANNOT_START = /^\s*ccp-cannot-start\s+(\S+:\d+\.[\w-]+):\s*(\S[\s\S]*?)\s*$/;
+export const cannotStartPrompt = (run, why = '<why>') => `ccp-cannot-start ${run}: ${why}`;
+
+// The runs, across all items, prepared, not started and not failed, whose owner is one of `sessions`.
+function ownedWaiting(root, sessions) {
+  const owners = new Set(sessions.filter(Boolean));
+  let items = [];
+  try {
+    items = readdirSync(join(root, 'items'), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort();
+  } catch {
+    return [];
+  }
+  return items.flatMap((item) => waitingRecords(root, item)).filter((run) => owners.has(run.session));
+}
+
+const stallRows = (root, run) => itemRows(root, run.item).filter((r) => r.kind === 'refusal' && r.payload?.run === run.run && r.payload?.rule === 'stall');
+const stateOf = (run) => {
+  try {
+    return JSON.stringify(JSON.parse(run.state));
+  } catch {
+    return String(run.state);
+  }
+};
+
+// Fails a run that has no agent: failed.json, then a refusal row with the rule. False when it had already failed.
+function failUnstarted(root, run, rule, why, tool, session) {
+  if (!writeOnce(join(runDir(root, run.run), 'failed.json'), { agentId: null, why, at: new Date().toISOString() })) return false;
+  journal(root, run, {
+    kind: 'refusal',
+    source: { system: 'hook', ref: `${tool} ${run.run}` },
+    payload: { source: 'hook', rule, reason: why, run: run.run, actor: run.actor, caller: null, tool, textHash: sha256(`${rule}: ${why}`), outcome: 'failed', hookSession: session }
+  });
+  return true;
+}
+
+/** The block reason for a waiting run: what is waiting, the exact call, which block this is, and the way out. */
+export function stallText(run, count) {
+  return [
+    `ccp-harness: item ${run.item} (state ${stateOf(run)}) has run ${run.run} prepared for its ${run.actor} agent, and nothing has started it.`,
+    `Start it now: call the Agent tool with the prompt exactly "${spawnPrompt(run.run)}", then end your turn as you normally would.`,
+    `If you cannot make that call, call the Agent tool with the prompt "${cannotStartPrompt(run.run)}", saying why, and the run fails so the item takes its error path.`,
+    `Block ${count} of ${STALL_CAP}.`
+  ].join('\n');
+}
+
+/**
+ * A Stop of the main session. `sessions` are the names the session may own items under (its session_id and its
+ * sessionName). Null with no run of its own waiting; else { block, failed }: runs already blocked STALL_CAP times
+ * fail now (failed), and the first run blocked fewer times is blocked (block, its reason; null when none is left).
+ */
+export function stall({ root, sessions, session = null }) {
+  const runs = ownedWaiting(root, sessions);
+  if (!runs.length) return null;
+  const failed = [];
+  let block = null;
+  for (const run of runs) {
+    const count = stallRows(root, run).length;
+    if (count >= STALL_CAP) {
+      const why = `stalled: the session ended ${STALL_CAP + 1} turns with run ${run.run} waiting for its agent, and was blocked ${STALL_CAP} times`;
+      if (failUnstarted(root, run, 'stall-cap', why, 'Stop', session)) failed.push(run.run);
+      continue;
+    }
+    if (block) continue;
+    block = stallText(run, count + 1);
+    journal(root, run, {
+      kind: 'refusal',
+      source: { system: 'hook', ref: `Stop ${run.run}` },
+      payload: { source: 'hook', rule: 'stall', reason: block, count: count + 1, cap: STALL_CAP, run: run.run, actor: run.actor, caller: null, tool: 'Stop', textHash: sha256(block), outcome: 'blocked', hookSession: session }
+    });
+  }
+  return { block, failed };
+}
+
+/**
+ * PreToolUse of the Agent tool with the prompt `ccp-cannot-start <run>: <why>`. Null for any other prompt; else
+ * { deny } (the call never starts an agent), with failed: the run when it was failed now. Only a session the run's
+ * item is owned by may fail it.
+ */
+export function cannotStart({ root, prompt, sessions, session = null }) {
+  if (!/^\s*ccp-cannot-start\b/.test(String(prompt ?? ''))) return null;
+  const m = String(prompt).match(CANNOT_START);
+  if (!m || m[2] === '<why>') return { deny: `no-reason: the prompt is "${cannotStartPrompt('<run>')}", with the run id and, in place of <why>, why you cannot start it` };
+  const [, id, why] = m;
+  const run = loadRun(root, id);
+  if (!run) return { deny: `unknown-run: no prepared run ${id}` };
+  if (!sessions.filter(Boolean).includes(run.session)) return { deny: `wrong-session: run ${run.run}'s item is owned by ${run.session}; only that session may fail it` };
+  const dir = runDir(root, run.run);
+  if (existsSync(join(dir, 'failed.json'))) return { deny: `already-failed: run ${run.run} has failed already` };
+  if (existsSync(join(dir, 'spawn.json'))) return { deny: `already-started: run ${run.run} already has its Agent call; it can't be failed from here` };
+  if (!failUnstarted(root, run, 'cannot-start', `cannot-start: ${why}`, 'Agent', session)) return { deny: `already-failed: run ${run.run} has failed already` };
+  return { deny: `cannot-start: run ${run.run} has failed with your reason, and its item takes its error path. No agent was started.`, failed: run.run };
 }

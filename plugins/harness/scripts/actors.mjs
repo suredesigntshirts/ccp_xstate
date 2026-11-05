@@ -13,6 +13,10 @@
 //   SubagentHandback, or SubagentStop, of a bound agent whose run has no result: send it back once to call the return
 //     tool; the next time it ends, fail the run, so the item gets the actor's error instead of waiting (plan item
 //     engine-actor-returns). A stop after a handback fails at once: a block doesn't bring that agent back.
+//   PreToolUse of Agent with the prompt `ccp-cannot-start <run>: <why>`: refuse the call and fail the run with the
+//     session's reason, so its item takes the error path (plan item fix-waiting-run-stall).
+//   Stop of the main session with a run of an item it owns prepared and no agent: block with the exact Agent call,
+//     at most twice per run by the stall rows in the journal; the stop after that fails the run.
 //   PostToolUse of Agent in the main session, and UserPromptSubmit (a wake, such as a background agent finishing):
 //     say which runs are prepared and waiting for their agent.
 //
@@ -63,7 +67,15 @@ async function main() {
   const event = input.hook_event_name;
   const tool = input.tool_name;
 
+  // The names this session may own items under: its id, and the cloud URL form (start --session may take either).
+  const owners = [input.session_id, session];
   if (event === 'PreToolUse' && tool === 'Agent') {
+    const no = A.cannotStart({ root, prompt: input.tool_input?.prompt, sessions: owners, session });
+    if (no) {
+      deny(no.deny);
+      if (no.failed) await deliverFailed(A, root, no.failed);
+      return;
+    }
     const r = A.spawn({ root, prompt: input.tool_input?.prompt, toolUseId: input.tool_use_id, session: input.session_id ?? null });
     if (!r) return;
     if (r.deny) return deny(r.deny);
@@ -104,6 +116,15 @@ async function main() {
     const r = A.stopped({ root, agentId: input.agent_id, again: input.stop_hook_active === true, handedBack: handedBack(tail), session });
     if (r?.block) return process.stdout.write(JSON.stringify({ decision: 'block', reason: r.block }));
     if (r?.failed) await deliverFailed(A, root, r.failed);
+    return;
+  }
+  // The main session ends a turn with a run of its own items waiting for its agent: block, at most STALL_CAP times
+  // per run, then fail the run so its item takes the error path (plan item fix-waiting-run-stall).
+  if (event === 'Stop') {
+    const r = A.stall({ root, sessions: owners, session });
+    if (!r) return;
+    for (const run of r.failed) await deliverFailed(A, root, run);
+    if (r.block) process.stdout.write(JSON.stringify({ decision: 'block', reason: r.block }));
     return;
   }
   if (event === 'SubagentStart') {

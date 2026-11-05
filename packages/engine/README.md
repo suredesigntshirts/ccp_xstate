@@ -111,5 +111,11 @@ no stamped branch, or the head nowhere, the run fails and its item steps back. T
    (`failed.json`, a `no-return` refusal row) and the item gets the actor's error event, so it steps back instead of
    waiting. A stop right after a handback fails at once, because a block does not bring that agent back (plan item
    engine-actor-returns).
+5. If the session that owns the item ends a turn with the run prepared and no Agent call made, its Stop is blocked
+   with the exact call (`stall`), at most twice per run by the run's `stall` rows; the stop after that fails the run
+   (`failed.json` why `stalled: ...`, a `stall-cap` row) and the item gets the actor's error event. A session that
+   cannot start the run calls the Agent tool with `ccp-cannot-start <run>: <why>` (`cannotStart`), which fails it with
+   that reason. A failed run is not `waiting`, and `ccp-run` of it is refused. `derive.js stalls` counts how often
+   this happens (plan item fix-waiting-run-stall).
 
 Rows: `docs/journal.md`, "Actor rows". Why: `plan/decisions/2026-10-30-engine-actors.md`.
