@@ -213,6 +213,19 @@ test('an item whose issue is not a GitHub issue URL has no repository on a card 
     /repo \(none\) not granted \(the card has no pr/);
 });
 
+// Plan item fix-grant-null-repo: "no repository" matches no grant, even one whose repos list holds null.
+test('a grant listing null in repos does not cover a card with no repository, and still covers the repos it names', async () => {
+  const at = '2026-11-05T16:00:00Z';
+  const g = { ...GRANT, id: 'g-null', choices: ['retry'], repos: [null, 'o/r'] };
+  const none = await toBlocked({ issue: { ...ISSUE, url: 'plan/items/some-item.md' } });
+  for (const repos of [[null], [null, 'o/r']]) {
+    assert.throws(() => standinInput(none.host, { effect: none.ask.id, choice: 'retry', by: 's', grants: [{ ...g, repos }], at }),
+      /g-null: repo \(none\) not granted \(the card has no pr/);
+  }
+  const named = await toBlocked();
+  assert.equal(standinInput(named.host, { effect: named.ask.id, choice: 'retry', by: 's', grants: [g], at }).event.output.grant, 'g-null');
+});
+
 test('a card with a PR is still checked against the PR\'s repository, not the issue\'s', async () => {
   const { host } = await toAwaitingMerge();
   const ask = askRun(host);
