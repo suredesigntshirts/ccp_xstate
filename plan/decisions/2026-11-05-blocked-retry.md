@@ -94,4 +94,5 @@ Two findings, drafted as items:
   answers it, although the outcome names a stand-in's answer as a way in.
 - **fix-handback-after-return.** In the real run, three of the four agents (both builds and the verify agent) had
   their final `SubagentHandback` refused `no-return`, after their `return` had already been accepted. The handback
-  check doesn't see a result accepted earlier in the same turn, and the journal gains a false refusal per agent.
+  check doesn't see a result accepted earlier in the same turn, and the journal gains a false refusal per agent. (Later found a misreading: each refused handback came before the return, so the rows are true;
+  plan/decisions/2026-11-05-handback-after-return.md.)
