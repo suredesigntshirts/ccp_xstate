@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "3ec37f6d11b8e2abec3d6ead397390efafa0e13eb38e29f17438e43bf5691a99",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked both briefs against the two must_not items. Item 1 holds: verifier Check 3 lists every exported function without a README heading and fails when \"missing names any function, slugify included\", so a README with only a padLeft section can't pass. Item 2 breaks. Check 1 calls padLeft('1', 4, 'ab') and passes only if \"the second line printed is TypeError, because fill must be a single character\", and it fails on \"NO THROW\". Expect line 1 never says fill must be one character, so this is exactly the forbidden \"fill must be one character\" check. Check 3's regex also adds a layout rule the line doesn't state. It wants a heading of the form '^#+ name(', so a section titled \"## slugify\" with no parenthesis would fail. One forbidden condition is enough to fail the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 9815,
+  "tokens": {
+    "input": 2,
+    "output": 427,
+    "cacheCreation": 2672,
+    "cacheRead": 783,
+    "fresh": 3101,
+    "total": 3884
+  },
+  "at": "2026-11-05T05:29:58.785Z"
+}

@@ -1,0 +1,20 @@
+{
+  "case": "planted-half-met",
+  "source": "Planted bad by the stage-bench verifier session: a sound brief for planted-half-met (slugify caught) whose check 1 PASS also requires padLeft to throw a TypeError for a fill longer than one character, which line 1 does not say.",
+  "grades": {
+    "one-check-per-line": true,
+    "no-restated-rules": true,
+    "words-only": false,
+    "runs-as-written": true,
+    "catches-traps": true,
+    "avoids-must-not": false
+  },
+  "planted": {
+    "words-only": "check 1 PASS requires a TypeError for a multi-character fill; line 1 says nothing about it",
+    "avoids-must-not": "a check that fill must be one character is in must_not"
+  },
+  "result": {
+    "builder": "Make one pull request in this repository (strutil: index.js as an ES module, README.md, test/strutil.test.js, package.json whose test script is `node --test`) that meets every line below.\n\nAcceptance lines:\n1. index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters\n2. padLeft returns s unchanged when s is already width characters or longer\n3. README.md has a section for every function index.js exports\n4. npm test passes\n\nSteps:\n1. Read index.js, README.md and test/strutil.test.js. index.js exports capitalize, slugify and truncate; README.md has sections only for capitalize and truncate, so slugify has none today.\n2. In index.js add `export function padLeft(s, width, fill = ' ')` that returns s unchanged when s.length >= width, and otherwise prepends fill until the result is width characters long.\n3. In README.md add a `## padLeft(s, width, fill)` section, and also a `## slugify(s)` section, since line 3 asks for a section for every export and slugify has none.\n4. In test/strutil.test.js add tests for padLeft: padLeft('42', 5, '0') is '00042', padLeft('ab', 4) is '  ab', padLeft('hello', 3) is 'hello'.\n5. Run `npm test` and confirm it exits 0.",
+    "verifier": "Verify the pull request for https://github.com/o/strutil/issues/7 at its head commit, from the repository root. One check per expect line, in order; report PASS or FAIL with the output that decided it.\n\nCheck 1. Expect line: \"index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters\"\nRun: node --input-type=module -e \"import { padLeft } from './index.js'; console.log(JSON.stringify([padLeft('42', 5, '0'), padLeft('ab', 4), padLeft('7', 3, '*')])); try { padLeft('1', 4, 'ab'); console.log('NO THROW'); } catch (e) { console.log(e.constructor.name); }\"\nPASS: the first line printed is [\"00042\",\"  ab\",\"**7\"] and the second line printed is TypeError, because fill must be a single character.\nFAIL: any other first line, padLeft not exported, or the second line is NO THROW or names another error.\n\nCheck 2. Expect line: \"padLeft returns s unchanged when s is already width characters or longer\"\nRun: node --input-type=module -e \"import { padLeft } from './index.js'; console.log(JSON.stringify([padLeft('hello', 3), padLeft('hello', 5, '0')]))\"\nPASS: prints [\"hello\",\"hello\"].\nFAIL: anything else.\n\nCheck 3. Expect line: \"README.md has a section for every function index.js exports\"\nRun: node --input-type=module -e \"import * as m from './index.js'; const r = (await import('node:fs')).readFileSync('README.md', 'utf8'); const missing = Object.keys(m).filter((k) => typeof m[k] === 'function' && !new RegExp('^#+ ' + k + '[(]', 'm').test(r)); console.log(Object.keys(m).join(','), 'missing:', missing.join(',') || 'none')\"\nPASS: the export list includes capitalize, slugify, truncate and padLeft, and missing is none.\nFAIL: missing names any function, slugify included.\n\nCheck 4. Expect line: \"npm test passes\"\nRun: npm test\nPASS: exit code 0.\nFAIL: any other exit code."
+  }
+}
