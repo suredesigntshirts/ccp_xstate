@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "b82d0fd2d88d7bac6f425afd8d820fa04d6ac5c1fb8e1a7193fbd8cd487621c6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every claim against the repository files and they all hold. bin/greet.js picks the first argument that doesn't start with `--`, so \"Any argument starting with `--` is silently dropped\" is true, and `--shout Bob` prints `Hello, Bob!` and exits 0. The usage message goes to stderr with exit 2, as the no-name case says. docs/index.md documents only `node bin/greet.js <name>`. pages.yml publishes `docs` on every push to main, and the README gives the URL https://o.github.io/greet-cli/. src/greet.js exports `greeting(name)`, test/ exists and package.json defines `npm test`. The --shout option is new, which is what the issue asks for. The outcome writes \"greet --shout <name>\" even though package.json has no bin entry. That is just shorthand: the CLI's own usage text says `greet <name>`, and every testable line uses `node bin/greet.js`. Nothing in the issue invents a file, function or behavior.",
+  "model": "claude-opus-5-5",
+  "ms": 10070,
+  "tokens": {
+    "input": 2,
+    "output": 644,
+    "cacheCreation": 3979,
+    "cacheRead": 783,
+    "fresh": 4625,
+    "total": 5408
+  },
+  "at": "2026-11-05T07:29:31.328Z"
+}

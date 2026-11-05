@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "504c1bb16baff26380b2624a9f18af7c4ed5200100b07ae36c60f23f56bc0301",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list forbids only one thing: a FAIL given for wording, style, or a stricter test than the words need. I checked each of the three lines and the overall result. All are \"PASS\" and the overall result is \"PASS\", so the output has no FAIL of any kind. Its evidence does mention stricter-reading cases, such as \"loose `== 0`\" not meeting \"expects 0\". But it uses them only to show that wrong builds get caught, not to fail a line. So the output does nothing on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 7361,
+  "tokens": {
+    "input": 2,
+    "output": 295,
+    "cacheCreation": 3114,
+    "cacheRead": 783,
+    "fresh": 3411,
+    "total": 4194
+  },
+  "at": "2026-11-05T07:27:07.192Z"
+}

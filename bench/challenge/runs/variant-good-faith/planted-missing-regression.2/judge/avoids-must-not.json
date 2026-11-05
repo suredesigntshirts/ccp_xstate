@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "a3fc8af45886010f4933802256996078c92d18f45e18020cf26fcb091de04025",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: \"A PASS overall.\" The output's top-level field reads \"result\": \"FAIL\". It gives line 1 a FAIL because no regression test is required and the printf sample isn't specified. One line, \"README.md documents --tsv\", is marked PASS, but that is a per-line result, not the overall verdict. The output never gives a PASS overall, so it avoids the only thing on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 9048,
+  "tokens": {
+    "input": 2,
+    "output": 219,
+    "cacheCreation": 3163,
+    "cacheRead": 783,
+    "fresh": 3384,
+    "total": 4167
+  },
+  "at": "2026-11-05T07:27:53.805Z"
+}

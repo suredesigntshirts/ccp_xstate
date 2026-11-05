@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-shared-parser.3",
+  "case": "planted-shared-parser",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "6 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all six expect lines and the problem field, and none of them prescribes a fix. The expect lines describe what can be observed: the output of `--tsv` with exact strings, unchanged CSV behaviour without the flag, `npm test` passing with a `--tsv` test, and the README documenting the flag. The line about parse() is the closest call. It requires that the exported parse() keep its comma default and still accept '\\t', which checks existing behaviour of a shared export rather than telling the builder how to wire the CLI. The problem field says what is wrong: the CLI \"ignores all arguments\" and turns TSV into `[{\"a\\tb\":\"1\"}]`. It notes that parse already accepts a separator \"but the CLI never passes one\", which states a fact rather than giving an instruction. The assumptions leave the implementation open: \"how the CLI passes the tab separator is left to the builder.\"",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all six expect lines and their proofs. Each one can be checked at the PR head with local tools. Lines 1–4 are exact-output `run` commands: `printf ... | node bin/csv2json.js [--tsv]` and an inline `node --input-type=module` import of src/parse.js. Each gives one precise answer, and the stated default-mode outputs match the current behaviour described in the problem. Line 5 needs `npm test` to exit 0 plus `grep -- '--tsv' test/*.js` and a read of the matching test. That is all in the repo, though \"asserts its JSON output\" needs a little judgement when reading it. Line 6 is a `read` of README.md for a --tsv usage example, which a reader can confirm in the branch. No line depends on a release, deploy, published page or npm publish, and publishing is listed as a non-goal.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "Every named file exists in the tracked tree: bin/csv2json.js, src/parse.js, README.md, test/ (csv.test.js) and package.json's `npm test` script (`node --test`). The issue names one function, parse(text, sep = ','), and it matches src/parse.js exactly. The problem's claims are accurate. The CLI calls `parse(readFileSync(0,'utf8'))` and never reads argv, so it \"ignores all arguments\". I traced `printf 'a\\tb\\n1,5\\tx\\n'` by hand: the header becomes [\"a\\tb\"] and the first row [\"1\",\"5\\tx\"], which gives `[{\"a\\tb\":\"1\"}]` as stated. The no-flag tab case gives `[{\"a\\tb\":\"1\\t2\"}]`, which also checks out. The README does show only CSV usage. The --tsv flag and the README and test additions are things the issue asks to create. No named file, command or function is invented.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the expect list, and the output handles each one. Item 1 (CSV unchanged): expect line 3 says \"Without the flag, CSV behaviour is unchanged\" and pins the exact output of `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` as `[{\"a\":\"1\",\"b\":\"2\"}]`. Expect line 5 also requires `npm test` to exit 0. Item 2 (--tsv gives the same JSON as CSV): expect line 1 pins `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv` to exactly `[{\"a\":\"1\",\"b\":\"2\"}]`. That is the same JSON line 3 pins for the same table in CSV form. Expect line 4 makes the same match at the parse() level, comparing the comma result with the tab result. The outcome also states that --tsv \"prints the same JSON array... it prints for CSV\".",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked whether a build that breaks plain CSV input could still pass every line of the issue. It could not. The third expect line requires \"`printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints exactly `[{\\\"a\\\":\\\"1\\\",\\\"b\\\":\\\"2\\\"}]`\", and its proof runs that command, so broken CSV would fail it. The fourth line checks that the exported parse() still uses a comma by default (`parse('a,b\\n1,2\\n')`), which guards CSV a second time. The `npm test` exits 0 line would also catch a break through any CSV tests already in the suite. The output does nothing on the must_not list.",
+      "cached": true
+    }
+  }
+}

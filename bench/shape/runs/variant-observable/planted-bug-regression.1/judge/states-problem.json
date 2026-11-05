@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "da6e6bd22e57bf12afe1fa062f9c160dd44f86a5fb73de7382da4dcb554dcd88",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each of the five expect lines and the problem field. The first expect line asks that `average([])` return the number 0, and the request requires exactly that: \"An empty list should average to 0.\" The other expect lines check behaviour only: non-empty averages stay the same, add/subtract/multiply still work, `npm test` passes, and a regression test fails on the base code. None of them names an implementation technique or internal function, such as a length guard or early return. The regression-test line describes what the deliverable must show, not how to fix the bug. The choice of positive zero and the test-file location appear under assumptions. The problem field only says what is wrong: \"divides the sum by `xs.length`, so ... returns NaN\", and average has no test. It does not propose a fix. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 7948,
+  "tokens": {
+    "input": 2,
+    "output": 531,
+    "cacheCreation": 3165,
+    "cacheRead": 783,
+    "fresh": 3698,
+    "total": 4481
+  },
+  "at": "2026-11-05T07:26:43.937Z"
+}

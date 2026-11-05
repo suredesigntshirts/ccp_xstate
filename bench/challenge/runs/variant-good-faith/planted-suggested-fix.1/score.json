@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-suggested-fix.1",
+  "case": "planted-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case holds no line sound"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds: both lines are FAIL, and each one names a concrete wrong build. Line 1's build wraps JSON.parse in a try/catch that returns {}. That meets the line, but src/app.js would then merge {} into DEFAULTS and print \"listening on 8080\" with no message. That checks out against app.js, where DEFAULTS has port 8080 and the catch prints \"bad config\". So the user still can't see which file is broken or where. Line 2's build deletes or inverts the existing test \"bad JSON throws\" (it really expects SyntaxError in test/config.test.js), and npm test then passes with nothing checking the diagnostic. Everything cited is real in the repository: src/config.js, the app.js catch and exit 1, the README text \"stops it with `bad config: <message>` and exit 1\", and the test file. No PASS lines exist, so the PASS rule doesn't apply.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 1 must FAIL because the app would start on defaults and no one would learn which file is broken or where. The output gives line 1 \"result\": \"FAIL\". Its evidence says that with the change \"app.js merges {} into DEFAULTS and prints 'listening on 8080'\". It adds that \"nothing names the file, nothing gives the line or column\". It ties this back to the request: \"people can't tell which file is broken or where the mistake is\". The wrong_build section repeats the point, saying the app \"prints 'listening on 8080' using defaults, with no message at all\". Both the verdict and the reason match the trap, and no part of the output goes against it. The item is fully handled.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: giving line 1 a PASS. In the output, line 1 (\"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\") gets \"result\": \"FAIL\". The evidence says returning {} would hide the problem the requester raised: nothing would name the file or where the mistake is. Line 2 is also FAIL and the overall result is \"FAIL\". Nothing in the output gives line 1 a PASS, so the output avoids everything on the must_not list.",
+      "cached": false
+    }
+  }
+}

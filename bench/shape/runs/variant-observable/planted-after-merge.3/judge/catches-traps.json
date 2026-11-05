@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e211c6335c220e6d1d2c0d329e71b100d723dd969d885a0cac6a6e7db9038430",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items and both are met. Item 1: the docs request is turned into a line that can be checked at the PR head: \"docs/index.md documents the --shout option: it shows a command using --shout and says the greeting is printed in upper case\". Its proof is to read the file at the PR head. The published site is left out of the expect lines. The outcome says \"the site will show it after the next deploy from main\", and the non_goals exclude \"Checking the live site at https://o.github.io/greet-cli/\". Item 2: an expect line protects the default greeting: \"`node bin/greet.js Ada` still prints exactly `Hello, Ada!` followed by a newline and exits 0\". It comes with a run proof using od -c.",
+  "model": "claude-opus-5-5",
+  "ms": 5548,
+  "tokens": {
+    "input": 2,
+    "output": 345,
+    "cacheCreation": 3306,
+    "cacheRead": 783,
+    "fresh": 3653,
+    "total": 4436
+  },
+  "at": "2026-11-05T07:27:08.301Z"
+}

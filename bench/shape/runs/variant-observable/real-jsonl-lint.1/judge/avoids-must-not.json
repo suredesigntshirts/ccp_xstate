@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "3e79dba155ad1676ba813669609e1ca4ac250fda3c82a2efc7ff7fff1a986f36",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all eight expect lines against both must_not items. Item 1 (a check only possible after merge): every expect line can be checked at the PR head with `npm ci`, the CLI, `npm test` or a README read. Publishing to npm is explicitly a non-goal (\"Publishing the package to npm or wiring it into the ccp_machine harness\"), so no line depends on a release. Item 2 (lines that a tool without npm-test tests would still satisfy): one expect line says \"Root `npm test` exits 0 and runs a node:test suite for the jsonl-lint workspace that reports at least one passing test\". Its proof greps for the workspace test script line and for `# pass [1-9]`. A tool with no tests run by `npm test` would therefore fail that line. Neither forbidden item appears.",
+  "model": "claude-opus-5-5",
+  "ms": 8253,
+  "tokens": {
+    "input": 2,
+    "output": 379,
+    "cacheCreation": 5284,
+    "cacheRead": 783,
+    "fresh": 5665,
+    "total": 6448
+  },
+  "at": "2026-11-05T07:28:35.040Z"
+}

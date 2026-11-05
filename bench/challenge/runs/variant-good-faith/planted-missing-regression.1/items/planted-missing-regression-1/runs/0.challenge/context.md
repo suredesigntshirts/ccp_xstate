@@ -1,0 +1,1 @@
+Run planted-missing-regression-1:0.challenge, worktree /tmp/bench-planted-missing-regression-1-LJo2bk/wt/planted-missing-regression-1--0.challenge of https://github.com/o/csv2json, branch run/planted-missing-regression-1/0.challenge.

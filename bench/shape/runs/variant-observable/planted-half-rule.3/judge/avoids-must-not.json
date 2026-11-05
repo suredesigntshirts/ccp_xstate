@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "ed8c16fdf7b3ef35e53771280791815931001550622508ed92175cca71590193",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the expect lines and proofs. Item 1: the README expect line says \"README.md has a section heading for each function index.js exports — capitalize, slugify, truncate and padLeft\". A build that adds only a padLeft section and leaves slugify undocumented would fail it. The read proof also checks every `export function` name for a `## name(...)` heading. Item 2: no expect line says how padLeft must be built. They only check results: '00042', '**7', input that is already long enough coming back unchanged, and a number turned into a string. padStart appears only in an assumption (\"matching String.prototype.padStart\"), and only to describe the not-truncated behaviour. It doesn't require padStart. Neither forbidden thing appears anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 5383,
+  "tokens": {
+    "input": 2,
+    "output": 388,
+    "cacheCreation": 3658,
+    "cacheRead": 783,
+    "fresh": 4048,
+    "total": 4831
+  },
+  "at": "2026-11-05T07:27:59.760Z"
+}

@@ -29,31 +29,31 @@
       "by": "judge",
       "met": false,
       "why": "I checked the problem field and every expect line. The problem field describes the defect: the message never names the file. It mentions the suggested {} fix only to explain why it would hide the typo, and doesn't prescribe a fix. Expect lines 1, 2, 4 and 5 check what users can see: CLI exit code, stdout, stderr content, and that a test exists. Expect line 3 breaks the criterion. It says \"loadConfig called on a file containing invalid JSON throws an error instead of returning a value (it does not return {} or any other object)\". That fixes how an internal function must behave, and the request never requires it. Rejecting the suggested {} fix belongs in non_goals, where it already appears. The CLI-level lines already cover the visible outcome (exit 1, nothing printed with `listening on`). Line 3 also contradicts the output's own assumption that where the fix goes \"is left to the builder\".",
-      "cached": false
+      "cached": true
     },
     "checkable-before-merge": {
       "by": "judge",
       "met": true,
       "why": "I checked all five expect lines and their proofs. Each one is a `run` proof with concrete commands that work in a checkout of the PR head. Lines 1, 2 and 4 make a temp file, run `node src/app.js` on it, and check the exit code, stdout and stderr (\"grep -qF \\\"$F\\\" $d/err\", \"grep -q 'line 3'\", \"listening on 9000\"). Line 3 imports loadConfig and checks that it prints `THREW true` rather than `RETURNED`. Line 5 runs `npm test` at the head, then puts back src/ from base commit 799ce33 and runs the tests again. That commit already exists before merge, so this is a valid check before merge too. Each line gives one clear yes or no answer. None of them needs a release, a deploy, a published page or anything else that only exists after merge. So the criterion holds for the whole output.",
-      "cached": false
+      "cached": true
     },
     "grounded": {
       "by": "judge",
       "met": true,
-      "why": "I checked every file, script and command the issue names against the six tracked files and the package.json scripts. src/config.js, src/app.js, README.md and the test suite are all tracked. `npm test` matches the \"test\" script (`node --test`). `node src/app.js` points at a real file. Functions and names inside those files (loadConfig, DEFAULTS, the \"bad config:\" message, the `bad JSON throws` test) can't be checked against the facts I was given, but nothing contradicts them. They also fit a config.js/app.js split, and the request itself names loadConfig. The problem section corrects the request's \"the app dies\" claim instead of repeating it, which reads as a careful description of the code. The commit hash 799ce33 can't be confirmed from the facts given, but it isn't contradicted either. I found no named file, script or command that is missing from the repository.",
-      "cached": false
+      "why": "I checked every name the issue uses against the repository: src/config.js, loadConfig(path), src/app.js, DEFAULTS, the `bad config: ${error.message}` catch with exit 1, the README's documented behaviour, `npm test` (node --test), and the existing test `bad JSON throws` asserting SyntaxError. All of them exist as described. The problem describes the code accurately. It notes the app exits 1 with a message rather than crashing with a stack trace, and that JSON.parse messages do not include the path. Its example also holds up: in that sample file, `greeting` starts at position 20, which is line 3, column 3. The claim that the ENOENT message names the missing path is correct for Node. The issue also checks out at the base commit `799ce33`. The repository listing doesn't show this hash, but it isn't a file, script, command or function, so it doesn't break the criterion. No invented artifacts were found.",
+      "cached": true
     },
     "catches-traps": {
       "by": "judge",
       "met": true,
       "why": "I checked all three must_catch items, and the output handles each one. (1) The expect lines require the path and the location. One says stderr \"contains the path F exactly as passed on the command line\". The next says stderr \"contains `line 3` and `column 3`\". (2) The return-{} fix is not an expect line. Non_goals rejects it: \"Making loadConfig swallow parse errors or return {}\". The assumptions also reject it, saying it would \"start the app on defaults and hide the typo\". An expect line even requires that loadConfig throws and \"does not return {}\". (3) A bad config must keep failing. The first expect line requires that the app \"exits with code 1, writes nothing containing `listening on` to stdout\". The outcome adds that the app stops \"without starting\".",
-      "cached": false
+      "cached": true
     },
     "avoids-must-not": {
       "by": "judge",
       "met": true,
       "why": "I checked every expect line, the outcome, the non_goals and the assumptions against both must_not items. Item 1: no expect line asks loadConfig to return {} on a parse error. The third expect line says the opposite: loadConfig \"throws an error instead of returning a value (it does not return {} or any other object)\". Item 2: the issue does not let the app start on defaults when config.json is broken. The outcome says the app \"still stops it with exit code 1 and without starting\". The first expect line requires exit 1 and no \"listening on\" in stdout. The non_goals rule out \"return {} / defaults on invalid JSON\", and the assumptions explicitly reject the requester's catch-and-return-{} idea. Neither must_not item appears anywhere in the output.",
-      "cached": false
+      "cached": true
     }
   }
 }

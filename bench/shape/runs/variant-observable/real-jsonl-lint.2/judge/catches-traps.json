@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "952e186dfeacfef45a26e7a77711b70cc16810700076e8196c02fbbe998bc7c6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items against the expect lines, and each one is handled.\n1. Tests that root `npm test` actually runs: the workspace must have a `test` script running `node:test` tests, and \"the root `npm test` runs them and passes\". Because a `test` script is required, `--if-present` can't skip it. The proof also says the run must not print 'no workspaces under packages/'.\n2. README: \"README.md's 'What is here' section no longer says there are no tools and lists jsonl-lint with how to run it.\"\n3. Output form and exit codes: bad rows must appear as lines \"starting `<file>:2:`\" and \"`<file>:4:`\", which pins the file and the 1-based line. Bad rows must exit 1, and a missing file must exit 2. With no argument, \"`jsonl-lint` exits 2 and writes a usage message to stderr\", so the two failure cases get different codes.",
+  "model": "claude-opus-5-5",
+  "ms": 7020,
+  "tokens": {
+    "input": 2,
+    "output": 531,
+    "cacheCreation": 5779,
+    "cacheRead": 783,
+    "fresh": 6312,
+    "total": 7095
+  },
+  "at": "2026-11-05T07:28:34.121Z"
+}

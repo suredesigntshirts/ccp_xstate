@@ -45,13 +45,17 @@
     "blocked-right": true,
     "states-problem": false,
     "checkable-before-merge": true,
-    "grounded": true,
+    "grounded": false,
     "catches-traps": false,
     "avoids-must-not": false
   },
   "planted": {
     "states-problem": "line 1 prescribes the fix (catch and return {})",
     "catches-traps": "no line asks for the file and location in the error",
-    "avoids-must-not": "requires loadConfig to return {}"
-  }
+    "avoids-must-not": "requires loadConfig to return {}",
+    "grounded": "the planted problem says the parse error \"crashes the app\", but src/app.js catches it and exits 1 with \"bad config: <message>\""
+  },
+  "notes": [
+    "Hand grade corrected after the judge check with file contents: the planted problem text misdescribes src/app.js (a handled exit, not a crash). The judge was right; the plant was wider than meant."
+  ]
 }

@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-bug-regression.3",
+  "case": "planted-bug-regression",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "5 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I read all five expect lines and the problem field. None of them prescribes a technique, an internal function or how the code should be written. Each expect line checks behaviour you can observe: `Object.is(r,0)` prints true, non-empty averages print `2 5 0 1.5`, the export list is unchanged, `npm test` passes with a test on average([]), and the suite fails if the old `xs.reduce(...)/xs.length` body comes back. That last line names the current code only to check for a regression; it doesn't say how to write the fix. The return value 0 is something the request itself requires (\"An empty list should average to 0\"), so it's allowed. The problem field only says what is wrong: average([]) computes 0/0, prints NaN, and has no test. It doesn't suggest a fix. Choices the request leaves open, like returning 0 instead of throwing, are listed under assumptions.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all five expect lines and their proofs. Each one can be checked at the PR head before merge and has a single clear answer. Lines 1–3 are `node -e` commands with exact outputs (`true`, `2 5 0 1.5`, `add,average,multiply,subtract`), and their \"run\" proofs say to run them from the repo root at PR head. Line 4 is checked by `npm test; echo $?` plus a grep of test/ for an assertion that `average([])` equals 0. Line 5, the regression check, is also local: `git checkout c82b37b -- math.js && npm test`, then a restore. I'm assuming c82b37b is the base commit, since the repository facts I was given don't show it. No line needs a release, deploy, published page or anything else that exists only after merge, and \"Publishing a new package release\" is listed as a non-goal. The criterion holds for the whole output.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "Most of the issue matches the repository. math.js exists and exports add, subtract, multiply and average. average's body really is `xs.reduce(...)/xs.length`. test/math.test.js really covers only add, subtract and multiply. `npm test` maps to `node --test` in package.json. The node -e commands use real exports. The break is in the regression proof, which runs `git checkout c82b37b -- math.js`. Nothing in the repository facts gives a commit hash, so `c82b37b` looks made up. If that hash isn't the real base commit, the command fails and the check can't be run. That proof relies on a repository fact that isn't shown and was probably invented, so the issue doesn't fully match the repository as it is.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the expect lines, and both are met. Item 1 (a regression test that calls average([]) and expects 0): one expect line reads \"`npm test` exits 0, and the suite has a test that calls average([]) and asserts the result is 0\". A separate regression line also requires `npm test` to fail if the old average body is restored. Item 2 (non-empty averages stay correct): one expect line requires `average([1,2,3]), average([5]), average([-2,2]), average([1,2])` to print `2 5 0 1.5`, \"so non-empty averages are unchanged\". It doesn't use the [2,4] example, but the list says \"for example\", so these values qualify.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The only must_not item is an issue that has no regression test line for the empty-list bug. I checked the expect list and found two such lines. One says \"`npm test` exits 0, and the suite has a test that calls average([]) and asserts the result is 0\". The other is the \"Regression check\" line: with average reverted to the current body and the PR's tests kept, `npm test` must exit non-zero. Each line has a matching proof that can be run: grep the tests for the assertion, then use git checkout c82b37b to bring back the old math.js and run the tests. Nothing in the output does what the must_not list forbids.",
+      "cached": true
+    }
+  }
+}

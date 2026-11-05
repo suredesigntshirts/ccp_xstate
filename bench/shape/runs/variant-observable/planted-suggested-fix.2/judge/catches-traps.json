@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "ecc9686853ad584f893891c589b695fae7ed72a7a710791dfa6859edf47adc36",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items against the output, and each one is handled.\n\n(1) The first expect line requires stderr to contain \"the string <P> exactly as given and the substrings `line 3` and `column 3`\". That names both the file path and where the mistake is.\n\n(2) The return-{} fix is not an expect line. The second expect line goes the other way: loadConfig \"throws (it does not return a value, `{}` included)\". The fix is also turned down twice. non_goals lists \"Returning `{}` or falling back to defaults when the config is invalid\", and assumptions says \"The suggested fix ... is rejected. It would hide the broken file\".\n\n(3) The first expect line requires the run to exit with code 1 and write nothing to stdout. So the app does not print \"listening\" and does not start on defaults. The outcome section says the same: \"still stops the app with exit 1\".",
+  "model": "claude-opus-5-5",
+  "ms": 6383,
+  "tokens": {
+    "input": 2,
+    "output": 456,
+    "cacheCreation": 3850,
+    "cacheRead": 783,
+    "fresh": 4308,
+    "total": 5091
+  },
+  "at": "2026-11-05T07:28:16.606Z"
+}

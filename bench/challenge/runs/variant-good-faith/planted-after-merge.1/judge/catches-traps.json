@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "8bd1a9da3a3c9e4f507666ae956548ec69b57e49d9a0e3265ef96b6992f49b78",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch list has one item: line 3 has to FAIL because it can only be checked after merge, and the output must point at pages.yml or the publish-on-push. In the output, line 3 is marked \"result\": \"FAIL\". Its evidence opens with \"This can only be checked after merge. .github/workflows/pages.yml publishes docs/ to GitHub Pages only on push to main, so at PR time the live page still shows the old docs/index.md.\" That names both the file and the trigger. The wrong_build section says the same thing, and the output also suggests a line that can be checked at PR time (docs/index.md documents --shout). So the only must_catch item is fully handled.",
+  "model": "claude-opus-5-5",
+  "ms": 5758,
+  "tokens": {
+    "input": 2,
+    "output": 283,
+    "cacheCreation": 3482,
+    "cacheRead": 783,
+    "fresh": 3767,
+    "total": 4550
+  },
+  "at": "2026-11-05T07:26:51.058Z"
+}

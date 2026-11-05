@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "12b5036809e25e144f78eb09689e2cf000facf9180edc15f096e1be6611aa63a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch list has one item: the stage has to answer blocked and say the request is a question with no change asked. The output is a \"blocked\" object and only that. Its reason says \"The request (issue #11) is a question, not a change\". It also says \"It asks for no change to the repository\", with examples (migrating to ESM, dual exports, documenting the decision), and adds that no expect line could be written. Nothing in the output works against the block, such as a draft issue. Any follow-up change is pointed to a separate request. The one item is handled, so the criterion holds.",
+  "model": "claude-opus-5-5",
+  "ms": 7840,
+  "tokens": {
+    "input": 2,
+    "output": 243,
+    "cacheCreation": 1553,
+    "cacheRead": 783,
+    "fresh": 1798,
+    "total": 2581
+  },
+  "at": "2026-11-05T07:27:44.939Z"
+}

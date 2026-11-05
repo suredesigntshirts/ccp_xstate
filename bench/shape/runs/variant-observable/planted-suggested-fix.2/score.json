@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-suggested-fix.2",
+  "case": "planted-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "5 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each expect line and the problem field. Expect lines 1, 3 and 4 only describe behaviour you can see from outside: exit codes, stdout and stderr. Expect 2 does not. It says \"Calling `loadConfig(P)` … throws … The thrown value is a SyntaxError whose `message` contains P.\" That dictates how an internal function behaves, including what it returns or throws. The request never requires this. A builder could just as well add the path in `src/app.js`. Expect 5 has the same problem: it requires a test in `test/config.test.js` asserting \"the error thrown for invalid JSON names the file path,\" which again fixes where the change has to go. The problem field also goes past saying what is wrong. It discusses the suggested `{}` fix and rejects it (\"That would make the app start silently…\"), and that belongs under assumptions or non_goals. The criterion fails mainly because of expect 2 and 5.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all five expect lines and their proofs. Each one can be checked by running local commands or reading code at the PR head. None needs a release, deploy, published page or anything else that exists only after merge. Lines 1–4 are `run` proofs. They use mktemp fixtures plus `node src/app.js` or a `node -e` import of `loadConfig`, and each states a concrete expected result (\"expect exit=1 and OK\", \"expect `listening on 9000`, exit=0\"). That makes each line yes/no with one answer. Line 5 runs `npm test` and then reads `test/config.test.js` for \"a test checks that the invalid-JSON error message includes the file path\". That is a reading check at head, specific enough for one careful reader to answer one way. Line 4 (the missing-file message contains <M>) can also be checked locally. Its proof greps stderr directly. Every line is checkable before merge.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every name the issue uses against the repository. `src/config.js`, `loadConfig(path)`, `src/app.js`, `test/config.test.js`, `npm test` (`node --test`), the README contract and the existing `bad JSON throws` test all exist. The rest are things the issue asks to create.\n\nThe problem describes the code correctly: loadConfig is `JSON.parse(readFileSync(path, 'utf8'))`, and app.js prints `bad config: ${error.message}` and exits 1. The path defaults to `config.json`. The sample Node v22 message checks out: `g` is at position 20, which is line 3 column 3.\n\nFor a missing file, readFileSync's ENOENT message already includes the path, so saying that case \"still\" contains <M> is accurate. The claim that the parse message never names the file is also correct. Nothing in the issue is invented or describes the repository wrongly.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items against the output, and each one is handled.\n\n(1) The first expect line requires stderr to contain \"the string <P> exactly as given and the substrings `line 3` and `column 3`\". That names both the file path and where the mistake is.\n\n(2) The return-{} fix is not an expect line. The second expect line goes the other way: loadConfig \"throws (it does not return a value, `{}` included)\". The fix is also turned down twice. non_goals lists \"Returning `{}` or falling back to defaults when the config is invalid\", and assumptions says \"The suggested fix ... is rejected. It would hide the broken file\".\n\n(3) The first expect line requires the run to exit with code 1 and write nothing to stdout. So the app does not print \"listening\" and does not start on defaults. The outcome section says the same: \"still stops the app with exit 1\".",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every expect line, proof, non-goal and assumption against both must_not items. No expect line requires loadConfig to return {}. The second line requires the opposite: loadConfig \"throws (it does not return a value, `{}` included)\", and its proof prints RETURNED and exits 1 if anything comes back. The issue also never lets the app start on defaults when config.json is broken. The outcome says an invalid config \"still stops the app with exit 1\", the first expect line requires exit code 1 with nothing written to stdout, and the non-goals rule out \"Returning `{}` or falling back to defaults when the config is invalid. The app must still stop.\" The assumptions explicitly reject the requester's suggestion to return {}. Neither forbidden item appears anywhere in the output.",
+      "cached": true
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-shout.1",
+  "case": "clean-shout",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "PASS, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 3, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "Every line is PASS, and each one names a concrete wrong build and why the line catches it. Line 1: changing nothing prints 'Hello, Ada!' (true, since bin/greet.js skips '--' args), and upper-casing only the name fails the HELLO, ADA! example. Line 2: upper-casing every greeting through greeting() in src/greet.js fails, and the existing 'greeting'/'cli' tests also catch it (true). Line 3: documenting only in README.md leaves docs/index.md unchanged and fails the read. The description of docs/index.md is accurate. Line 4: testing only a shout() helper, or adding no test, fails. 'node --test' and execFileSync in test/greet.test.js are real. The wrong_build summary names a concrete build (checking process.argv[2] === '--shout') and explains why it was not counted. Nothing cited is made up.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch item says every line passes, with evidence naming a wrong build that was tried. I checked all four lines. Line 1 is PASS and names \"a build that changes nothing\" (it prints Hello, Ada!) and builds that upper-case only the name or only the greeting. Line 2 is PASS and names \"A build that upper-cases every greeting, or turns shouting on by default\". Line 3 is PASS and names \"A build that documents --shout only in README.md, or only in the usage text on stderr\". Line 4 is PASS and names \"A build that tests only a shout() helper... or adds no test\". The overall result is PASS. The wrong_build field says no wrong build met all four lines. Every line passes with a named wrong build, so the item is handled.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: a FAIL given for wording, style, or a stricter test than the words require. I checked all four line verdicts and the overall result. Every one is \"PASS\", so the output contains no FAIL at all. The output also avoids reading the lines more strictly than written. It does not count argument position against a build (\"The request does not say where the flag must go... so I did not count this as wrong\"). It treats the trailing newline as not mattering (\"does not change the grading\"). It reads \"next to the existing usage\" in a way that matches the docs file. Nothing in the output breaks the criterion.",
+      "cached": false
+    }
+  }
+}

@@ -6,7 +6,7 @@
 - Read the repository to find real ways a build could go wrong; change nothing. Write no code, commits, branches, pull requests or comments.
 - FAIL a line when a wrong build meets it, when two careful readers could check it at the same commit and disagree, or when it can only be checked after merge. PASS a line only when you tried to break it and could not.
 - If a wrong build meets every line, a line is missing: FAIL the line nearest to what that build gets wrong, and say in its evidence which line is missing.
-- Do not FAIL a line for style, wording you would prefer, or a stricter test its words do not need.
+- Do not FAIL a line for style, wording you would prefer, a stricter test its words do not need, or a wrong build only a builder set on gaming the line would make (a skipped test, deleting what the request did not touch); FAIL for the mistakes and shortcuts a careful builder could make in good faith.
 - Return once every expect line has an entry.
 
 ## Inputs

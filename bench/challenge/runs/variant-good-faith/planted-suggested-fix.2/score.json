@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-suggested-fix.2",
+  "case": "planted-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case holds no line sound"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both lines. Both are FAILs, and each names a concrete wrong build. Line 1's build \"wraps JSON.parse in try/catch and returns {}\". It meets the line, but because src/app.js spreads the result over DEFAULTS, the app starts silently and no message names the file or where the mistake is. That is exactly what the request asked to fix. Line 2's build deletes the 'bad JSON throws' test and adds nothing. npm test still passes, yet nothing checks that a typo produces a message naming the file and position. Everything cited is real: the catch block in src/app.js printing 'bad config: <message>' with exit 1, the README's matching description, and test/config.test.js's 'bad JSON throws' test using assert.throws with SyntaxError. The overall wrong_build is just as concrete and accurate. The output has no PASS lines, so the PASS clause doesn't apply.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 1 must FAIL because the app would start on defaults and nobody would learn which file is broken or where the mistake is. The output marks line 1 \"FAIL\". Its evidence says that since src/app.js spreads the result over DEFAULTS, \"a typo in config.json now starts the app silently on port 8080 / greeting 'hi'\". It also says \"no message at all says which file is wrong or where\", which it ties back to the requester's complaint. The wrong_build section makes the same point again: \"prints 'listening on 8080' using defaults... can't tell which file is broken or where the typo is.\" Both parts of the trap are covered: the app starts on defaults, and the user learns neither the file nor the location, which goes against what the request asked for.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list has one item: giving line 1 a PASS. I checked the output's first entry, the line \"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\". It has \"result\": \"FAIL\". Its evidence argues that returning {} hides the error and goes against the request. The overall result is also \"FAIL\", and the wrong_build section says a build meeting line 1 is still wrong. Nowhere does the output give line 1 a PASS, so the criterion holds for the whole output.",
+      "cached": false
+    }
+  }
+}

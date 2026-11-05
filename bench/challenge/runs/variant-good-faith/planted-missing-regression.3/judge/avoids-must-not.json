@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "0b7758f7548d84182a61411217cf47d3c71e1672eac3f2f14f0a0ffd99f52ee7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: \"A PASS overall.\" I checked the output's top-level result. It is \"result\": \"FAIL\", so it does not give a PASS overall. One line (\"README.md documents --tsv\") is graded PASS, but that is a single line's result, not the overall verdict. The overall FAIL also fits the evidence the output gives: a wrong build that always splits on '\\t' meets both expect lines but breaks CSV parsing and the existing tests, and there are no expect lines for npm test passing or for CSV input without --tsv. Nothing in the output does what the must_not list forbids.",
+  "model": "claude-opus-5-5",
+  "ms": 9432,
+  "tokens": {
+    "input": 2,
+    "output": 286,
+    "cacheCreation": 3231,
+    "cacheRead": 783,
+    "fresh": 3519,
+    "total": 4302
+  },
+  "at": "2026-11-05T07:27:54.581Z"
+}

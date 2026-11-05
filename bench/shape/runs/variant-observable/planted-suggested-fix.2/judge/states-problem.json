@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "a693a676172d68a60109aa6663a8899bc5f22437c3d2298e2849626815f74936",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each expect line and the problem field. Expect lines 1, 3 and 4 only describe behaviour you can see from outside: exit codes, stdout and stderr. Expect 2 does not. It says \"Calling `loadConfig(P)` … throws … The thrown value is a SyntaxError whose `message` contains P.\" That dictates how an internal function behaves, including what it returns or throws. The request never requires this. A builder could just as well add the path in `src/app.js`. Expect 5 has the same problem: it requires a test in `test/config.test.js` asserting \"the error thrown for invalid JSON names the file path,\" which again fixes where the change has to go. The problem field also goes past saying what is wrong. It discusses the suggested `{}` fix and rejects it (\"That would make the app start silently…\"), and that belongs under assumptions or non_goals. The criterion fails mainly because of expect 2 and 5.",
+  "model": "claude-opus-5-5",
+  "ms": 9351,
+  "tokens": {
+    "input": 2,
+    "output": 675,
+    "cacheCreation": 3789,
+    "cacheRead": 783,
+    "fresh": 4466,
+    "total": 5249
+  },
+  "at": "2026-11-05T07:27:51.666Z"
+}

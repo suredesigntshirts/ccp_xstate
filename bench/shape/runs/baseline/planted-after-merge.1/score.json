@@ -29,31 +29,31 @@
       "by": "judge",
       "met": true,
       "why": "The criterion is met. I checked all six expect lines and the problem field. Each expect line describes behaviour that can be observed from outside: exact stdout, exit codes, stderr usage, `npm test` passing with a `--shout` test, and docs/index.md covering the option. None of them names a technique, an internal function or a return value. The documentation line comes straight from the request (\"shows up on the published docs site\"). docs/index.md is just where that site is built from, not a way of fixing the code. The problem field only describes what is wrong: the CLI ignores every `--` argument, so `--shout Ada` prints `Hello, Ada!`, and the docs have no louder form. Quoting the line that drops the flags explains the bug without proposing a fix. The possible ways to build it (\"adding an option to `greeting` in src/greet.js or uppercasing in bin/greet.js\") appear only under assumptions, as the builder's choice.",
-      "cached": false
+      "cached": true
     },
     "checkable-before-merge": {
       "by": "judge",
       "met": true,
       "why": "I checked all six expect lines and their proofs. Every one can be checked at the PR head. Four are CLI runs whose exit codes and exact output are confirmed with `od -c` and PIPESTATUS. One is `npm test` plus a grep and read of test/greet.test.js. The last is a read of docs/index.md \"at the PR head\". Each line has a clear pass or fail answer, such as exactly `HELLO, ADA!\\n` with exit 0, or exit 2 with `usage: greet` on stderr. The only post-merge piece is the live docs site, and it is kept out of the expect lines. The non-goals say so directly: \"Checking that the live site ... shows the change. That happens only after merge\". The docs line asks only that docs/index.md contain the usage and say the output is uppercase. The outcome mentions the next deploy, but no expect line depends on a deploy or a published page.",
-      "cached": false
+      "cached": true
     },
     "grounded": {
       "by": "judge",
       "met": true,
-      "why": "The criterion holds as far as the given facts can show. Every file the issue names is in the tracked list: bin/greet.js, src/greet.js, docs/index.md, test/greet.test.js and .github/workflows/pages.yml. `npm test` matches the package.json script \"node --test\". The issue's picture of the repo is plausible and nothing given contradicts it: pages.yml publishes docs/, and the CLI is invoked as `node bin/greet.js <name>`. Some claims about file contents can't be checked from a file list alone, so I couldn't verify them: the quoted `process.argv.slice(2).find(...)` line, the usage message with exit status 2, and the `greeting` function in src/greet.js. Also, `greet --shout <name>` in the outcome uses a `greet` command, but only the package.json scripts are given, so whether a `greet` bin entry exists isn't shown either way. All the proofs call `node bin/greet.js`, so they don't depend on it. No named script or file is missing.",
-      "cached": false
+      "why": "I checked every name the issue uses against the repository. bin/greet.js, src/greet.js and its `greeting` function, docs/index.md, .github/workflows/pages.yml, test/greet.test.js and `npm test` (package.json has \"test\": \"node --test\") all exist. The quoted argv line matches bin/greet.js exactly. The problem statement is accurate: flags starting with `--` are dropped, so `--shout Ada` prints `Hello, Ada!`. pages.yml publishes docs/ on pushes to main. The URL comes from the README. docs/index.md only shows `node bin/greet.js <name>`. Running with no name prints `usage: greet <name>` and exits with status 2, as the expectation says. The bare `greet --shout <name>` in the outcome has no package.json bin entry behind it. I accepted it as the CLI's own name, since the usage string uses it, not as a claim about an installed command. Every file, command and function the issue names is grounded.",
+      "cached": true
     },
     "catches-traps": {
       "by": "judge",
       "met": true,
       "why": "I checked both must_catch items, and the output handles each one. Item 1: the docs request becomes something the verifier can check at the head. One expect line reads \"docs/index.md documents the `--shout` option: its usage ... and that it prints the greeting in uppercase\", and its proof is a read of docs/index.md at the PR head. The published page goes to the non_goals (\"Checking that the live site at https://o.github.io/greet-cli/ shows the change. That happens only after merge\") and to the outcome (\"the published site will show it after the next deploy from main\"). Item 2: the expect line \"`node bin/greet.js Ada` still exits 0 and prints exactly `Hello, Ada!` followed by a newline\" protects the default greeting. A run proof backs it, and the outcome says \"Running greet without --shout works as it does now.\"",
-      "cached": false
+      "cached": true
     },
     "avoids-must-not": {
       "by": "judge",
       "met": true,
       "why": "I checked all six expect lines against the must_not item: an expect line that can only be checked on the published page or after merge. Five are CLI runs or `npm test` at the PR head, such as \"`node bin/greet.js --shout Ada` exits 0 and prints exactly `HELLO, ADA!`\". The sixth only needs docs/index.md to document --shout, and its proof is \"Read docs/index.md at the PR head\", so it can be checked before merge. The live site comes up in only three places, and none is an expect line. The outcome says the site \"will show it after the next deploy\". A non_goal rules out \"Checking that the live site... shows the change\". An assumption says the live site can only be checked after merge. No expect line depends on the published page or on merge, so the criterion holds.",
-      "cached": false
+      "cached": true
     }
   }
 }

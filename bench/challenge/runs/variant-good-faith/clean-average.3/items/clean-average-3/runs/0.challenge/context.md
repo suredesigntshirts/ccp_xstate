@@ -1,0 +1,1 @@
+Run clean-average-3:0.challenge, worktree /tmp/bench-clean-average-3-PljiZj/wt/clean-average-3--0.challenge of https://github.com/o/mathlib, branch run/clean-average-3/0.challenge.

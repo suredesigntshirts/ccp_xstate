@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "e4f09ef0a7b143efae7e5a8fde7d7019ca0a1f0cc0fcda5564636831161a2bb1",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all six expect lines and the problem field, and none of them prescribes a fix. The expect lines describe what can be observed: the output of `--tsv` with exact strings, unchanged CSV behaviour without the flag, `npm test` passing with a `--tsv` test, and the README documenting the flag. The line about parse() is the closest call. It requires that the exported parse() keep its comma default and still accept '\\t', which checks existing behaviour of a shared export rather than telling the builder how to wire the CLI. The problem field says what is wrong: the CLI \"ignores all arguments\" and turns TSV into `[{\"a\\tb\":\"1\"}]`. It notes that parse already accepts a separator \"but the CLI never passes one\", which states a fact rather than giving an instruction. The assumptions leave the implementation open: \"how the CLI passes the tab separator is left to the builder.\"",
+  "model": "claude-opus-5-5",
+  "ms": 7603,
+  "tokens": {
+    "input": 2,
+    "output": 591,
+    "cacheCreation": 3786,
+    "cacheRead": 783,
+    "fresh": 4379,
+    "total": 5162
+  },
+  "at": "2026-11-05T07:27:35.545Z"
+}

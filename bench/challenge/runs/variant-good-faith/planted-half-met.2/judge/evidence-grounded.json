@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "dfbc887aa0dd3908d3676c6970f6cb21033bd33af570f2f2d9c685c0ecc51619",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each line's evidence against the repository. Line 1 PASS names wrong builds (a hard-coded '0' fill, ignoring width) and says why they fail: padLeft('42',5,'0') and the default-space call padLeft('42',5) catch them. Line 2 PASS names a build that cuts to width \"like truncate does\", which padLeft('123456',5,'0') catches. Line 3 FAIL names a concrete wrong build: it adds only a padLeft section, so it meets the line, but the README stays incomplete. That is real: index.js exports slugify and README.md has only capitalize and truncate sections. Line 4 PASS names a build that rewrites truncate, which test/strutil.test.js catches. That suite really does cover capitalize, slugify and truncate under \"node --test\". The cited files, functions and scripts all exist. The only claim I couldn't check is \"Node v22.23 here can require() ESM\", which is about the environment, not the repository.",
+  "model": "claude-opus-5-5",
+  "ms": 12119,
+  "tokens": {
+    "input": 2,
+    "output": 781,
+    "cacheCreation": 3548,
+    "cacheRead": 783,
+    "fresh": 4331,
+    "total": 5114
+  },
+  "at": "2026-11-05T07:27:18.878Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "1a6d697db57f14bba0381b30dc8c51ec4bb2ad5580d72be75457d17829b1e56b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against all 10 expect lines. Item 1: every line can be checked at the pull request's head. Most use local `run` proofs. One reads README.md. The CI line asks for the `test` check \"on the pull request\", which runs before merge. Publishing to npm is listed as a non-goal, not an expect line. Item 2: a tool with no tests would fail the expect line saying \"`packages/jsonl-lint` has node:test tests covering the all-valid, invalid-rows, blank-line and missing-file cases. `npm ci && npm test` at the repo root runs them and exits 0.\" Its proof asks the verifier to see jsonl-lint tests in the npm test output and to read the test files. The package.json line also requires a `test` script that runs `node --test`. So a tool without tests run by npm test can't meet these lines. Neither forbidden thing appears.",
+  "model": "claude-opus-5-5",
+  "ms": 5546,
+  "tokens": {
+    "input": 2,
+    "output": 466,
+    "cacheCreation": 5338,
+    "cacheRead": 783,
+    "fresh": 5806,
+    "total": 6589
+  },
+  "at": "2026-11-05T07:28:48.578Z"
+}

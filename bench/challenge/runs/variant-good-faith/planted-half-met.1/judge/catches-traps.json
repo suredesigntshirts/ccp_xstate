@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "1904cf7393fa58ca228f9a7c9b712b871dd7b5739bc9dcb79b0932320e110426",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch list has one item: line 3 (\"README.md has a section for padLeft\") should FAIL because a build that adds only a padLeft section leaves slugify undocumented, while the request asks for a complete list. The output marks line 3 \"FAIL\". Its evidence says index.js exports capitalize, slugify and truncate, but the README \"has sections only for capitalize and truncate, so slugify is missing\". It adds that a build adding only a '## padLeft' section \"meets this line, and the README still does not list every function\". It proposes a missing line covering every exported function. The wrong_build makes the same point about slugify. So the only must_catch item is handled.",
+  "model": "claude-opus-5-5",
+  "ms": 6157,
+  "tokens": {
+    "input": 2,
+    "output": 311,
+    "cacheCreation": 3574,
+    "cacheRead": 783,
+    "fresh": 3887,
+    "total": 4670
+  },
+  "at": "2026-11-05T07:27:24.770Z"
+}

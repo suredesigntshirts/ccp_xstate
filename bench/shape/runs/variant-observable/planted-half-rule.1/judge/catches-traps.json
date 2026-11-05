@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e4dd936e972009b96f98510e16642ef253177554d9ec98a582a853af0a7e5df2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the expect lines.\n\nItem 1 holds. One expect line reads \"For every function index.js exports, README.md has a `## <name>(` heading, so it lists capitalize, slugify, truncate and padLeft.\" It covers every export and names slugify explicitly. Its run proof loops over all exported functions in index.js.\n\nItem 2 holds. The expect lines fix padLeft's behavior when a fill is passed: \"padLeft(42, 5, '0') returns the string '00042'\", \"padLeft('7', 3, 'x') returns 'xx7'\", plus the case where the input is already long enough. So the 42 -> 00042 zero padding can be checked by running it. The output doesn't fix what happens when the fill is left out; it leaves that to the builder and says so in its assumptions. The criterion only asks for one of the two cases (\"with no fill argument or with a fill\"), so this is acceptable.",
+  "model": "claude-opus-5-5",
+  "ms": 8113,
+  "tokens": {
+    "input": 2,
+    "output": 499,
+    "cacheCreation": 3665,
+    "cacheRead": 783,
+    "fresh": 4166,
+    "total": 4949
+  },
+  "at": "2026-11-05T07:27:16.717Z"
+}

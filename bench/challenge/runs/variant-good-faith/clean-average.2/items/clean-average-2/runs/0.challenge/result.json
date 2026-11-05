@@ -1,0 +1,27 @@
+{
+  "result": {
+    "result": "PASS",
+    "lines": [
+      {
+        "line": "average([]) returns 0",
+        "result": "PASS",
+        "evidence": "Base math.js computes reduce(...,0)/xs.length, so [] gives 0/0 = NaN. I tried builds that hide the symptom without fixing it: leaving it alone, or returning undefined, null or the string '0'. A node -e check that average([]) === 0 rejects all of them. One near miss: a build returning -0 would pass === 0, but no good-faith fix produces -0, and line 3's assert/strict equal (Object.is) would reject it anyway."
+      },
+      {
+        "line": "average of a non-empty list returns what the current math.js returns for it, NaN included: average([2, 4]) is 3, average([5]) is 5 and average([NaN, 1]) is NaN",
+        "result": "PASS",
+        "evidence": "Strongest wrong build: `return (sum / xs.length) || 0`. It makes average([]) 0, but it also turns average([NaN, 1]) into 0 and quietly removes NaN. The NaN example catches it. Filtering NaN out before averaging gives 1 for [NaN, 1], and that is caught too. Using `xs.length || 1` or an early return for length 0 leaves non-empty results exactly as before. The three examples fix what 'current' means at the base commit, so reviewers would not grade this differently."
+      },
+      {
+        "line": "test/math.test.js has a test that calls average([]) and expects 0, and npm test passes",
+        "result": "PASS",
+        "evidence": "The current test file does not import or test average at all. I tried a build that fixes math.js without adding a test: it fails this line. I tried a test in a different file: also fails, because the line names test/math.test.js. A test that only checks the result is not NaN does not 'expect 0', so it fails as well. npm test runs node --test, which can be run on the PR branch before merge. A test asserting equal(average([]), 0) under assert/strict also rejects -0."
+      }
+    ],
+    "wrong_build": "None found. Closest: `return (xs.reduce(...) / xs.length) || 0`. It meets lines 1 and 3 but changes average([NaN, 1]) from NaN to 0, and the NaN example in line 2 stops it. Builds that change non-empty results only through floating-point rounding (for example a running mean) could pass the three examples, but nothing in the request would lead a careful builder to that change."
+  },
+  "hash": "fd24f3ab9cc0e7fc42f497b6b04b70c3fdc2ec2dbce1f1ed9d0f2ad99d128708",
+  "caller": "bench-clean-average-2",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:24:02.610Z"
+}

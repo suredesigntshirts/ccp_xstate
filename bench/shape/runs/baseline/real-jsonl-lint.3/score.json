@@ -29,31 +29,31 @@
       "by": "judge",
       "met": false,
       "why": "The problem field is fine. It says what is missing (\"there is nothing that finds a torn or hand-edited row in a JSONL file\") and proposes no fix. Most expect lines describe behaviour the user can see: exit codes, line numbers 2 and 4 reported, and an error naming the missing path. One expect line prescribes implementation technique the request never asks for: \"The new workspace's package.json declares no `dependencies` (zero runtime dependencies) and the tool is plain ES modules with no build step.\" The request only asks for a tool that reports invalid rows by line number and treats a missing file as an error. It says nothing about dependencies, module format or build steps. Even if a repo convention (such as CLAUDE.md) suggests this, the request doesn't make it a requirement, so it belongs under assumptions, not expect. The required \"`node:test` tests\" are also a prescribed technique. The criterion therefore breaks.",
-      "cached": false
+      "cached": true
     },
     "checkable-before-merge": {
       "by": "judge",
       "met": true,
       "why": "I checked all eight expect lines and their proofs. Each one can be checked at the PR head before merge. Lines 1–5 use `run` proofs: local commands like `npm ci`, `npx --no-install jsonl-lint` on temp files made with printf, and `npm test`. Each states its expected exit code and output, so one reader gets one answer. Line 6 (no `dependencies`, plain ES modules, no build step) uses a `read` of the workspace package.json. Line 7 uses a `ci` proof of the `test` workflow check \"on the PR head\", and that check runs before merge. Line 8 is a `read` of README.md \"at the PR head\". No line needs a release, deploy, npm publish or anything else that only exists after merge. Publishing to npm is listed as a non-goal. The \"no other line number as invalid\" wording is clear enough to give one answer.",
-      "cached": false
+      "cached": true
     },
     "grounded": {
       "by": "judge",
       "met": true,
-      "why": "I checked every path and command the issue names against the 9 tracked files and the package.json scripts. These all exist: README.md, CLAUDE.md, package-lock.json, .github/workflows/test.yml and the root `npm test` script. That script's \"no workspaces under packages/\" branch matches the issue's claim that `packages/` does not exist yet. No tracked file sits under packages/, so that claim is accurate. The `jsonl-lint` workspace, its bin and its tests are new things the request asks to create. The issue mentions suredesigntshirts/ccp_machine only as a non-goal, so it does not claim anything about this repo. I could not check the quoted README text (\"No tools yet: `packages/` is empty…\") or the \"What is here\" section, because the README's contents weren't provided. The quote does agree with the repo's real state and with the test script's behaviour. I found no invented files, scripts or functions, and the problem statement describes the repo correctly.",
-      "cached": false
+      "why": "The criterion holds. Every existing thing the issue names is present at this commit: README.md, CLAUDE.md, package.json, package-lock.json, `.github/workflows/test.yml` (whose job is named `test` and runs npm ci + npm test), the root `npm test` script, and `node:test`. The only new names are `jsonl-lint` and `packages/jsonl-lint`, which the request asks to create. The problem statement also matches the repo. No tracked file sits under `packages/`, so \"`packages/` does not exist yet\" is accurate. Its README quote (\"No tools yet: `packages/` is empty, and `npm test` says so and passes\") is word for word. The issue also says the \"What is here\" section currently claims there are no tools, which is true. Nothing in the issue invents a file, script or command or misdescribes one.",
+      "cached": true
     },
     "catches-traps": {
       "by": "judge",
       "met": false,
       "why": "Items 1 and 2 are met. Item 1: one expect line says \"`npm ci && npm test` at the repo root runs them and exits 0\", and its proof requires the jsonl-lint tests to appear in the output. Item 2: one expect line says README's \"What is here\" section \"no longer says there are no tools and lists jsonl-lint\". Item 3 is not met. The expect lines ask only for a \"non-zero status\" for bad rows and the same \"non-zero status\" for a missing file, so they don't require distinct exit codes. No expect line covers calling the tool with no argument; that case appears only under assumptions. No expect line fixes the output form as file plus 1-based line per bad row. The assumptions say \"The exact output format is left to the builder\", and the expect lines only require that lines 2 and 4 be reported.",
-      "cached": false
+      "cached": true
     },
     "avoids-must-not": {
       "by": "judge",
       "met": true,
       "why": "I checked both must_not items against all 8 expect lines and their proofs. Item 1: every line can be checked at the PR head. The CI line says \"passes on the pull request\", which is a check on the PR, not something that only exists after merge. Publishing to npm is listed as a non-goal. No line depends on a release or a published package. Item 2: one expect line requires \"`node:test` tests covering an invalid-row file, a valid file and a missing file, and `npm ci && npm test` at the repo root runs them\". Its proof checks that the tests are listed in the npm test output and that the test files import node:test and cover the three cases. A tool without tests run by npm test would fail that line, so it can't meet the issue's lines. The output breaks neither item.",
-      "cached": false
+      "cached": true
     }
   }
 }

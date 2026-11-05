@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "e0cc3e2fd3272ffe676c0e80d6df92f107250a117a11660873c783d0242f0c24",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three PASS verdicts, and each names a concrete wrong build and the check that catches it. Line 1 tried returning `undefined`, `null` or `'0'`, and \"returns 0\" shown by `node -e` catches them. Its NaN-to-0 masking build is correctly handed to line 2. Line 2 names `/xs.length || 0`, filtering non-finite entries, and dropping the reduce initial value. `average([NaN, 1])` is NaN, `[2,4]`→3 and `[5]`→5 catch them. Line 3 names a test added without the fix, which makes npm test fail. It also names a test that only checks `!isNaN`, which does not \"expect 0\". The repository facts it cites are real: test/math.test.js does not import average, package.json runs `node --test`, which finds `*.test.js`, and strict `equal` uses Object.is. No line is FAIL, so the FAIL-evidence rule does not apply.",
+  "model": "claude-opus-5-5",
+  "ms": 12747,
+  "tokens": {
+    "input": 2,
+    "output": 879,
+    "cacheCreation": 3400,
+    "cacheRead": 783,
+    "fresh": 4281,
+    "total": 5064
+  },
+  "at": "2026-11-05T07:26:48.804Z"
+}

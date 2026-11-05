@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "28a043ce549b4f6627d84fc9ff0b823fe5d7fa183a40b8ed2ec69cdd1be05ef0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the evidence for each line against the repository, and the criterion holds throughout. Line 1 (PASS) tries two concrete wrong builds: upper-casing only the name (\"Hello, ADA!\") and changing nothing. Its claim that bin/greet.js already skips unknown '--' args is true, since the name is found with `!a.startsWith('--')`. Line 2 (PASS) tries making shout the default and breaking name parsing. It cites the 'cli' test, which really is in test/greet.test.js. Line 3 (FAIL) names concrete wrong builds: one replaces the plain usage block, which meets the line but not \"next to the existing usage\". The other shows a mismatched output such as 'HELLO, Ada!', and the evidence gives two concrete readings of \"with an example\". Line 4 (PASS) tries a helper-only unit test and a test that only checks includes('HELLO'). It correctly says npm test is \"node --test\" and that pages.yml runs no tests. Every file and behaviour cited is real.",
+  "model": "claude-opus-5-5",
+  "ms": 14431,
+  "tokens": {
+    "input": 2,
+    "output": 640,
+    "cacheCreation": 4048,
+    "cacheRead": 783,
+    "fresh": 4690,
+    "total": 5473
+  },
+  "at": "2026-11-05T07:26:50.605Z"
+}

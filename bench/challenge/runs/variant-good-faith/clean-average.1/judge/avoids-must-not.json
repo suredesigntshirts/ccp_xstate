@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "fe5b93e190357bfff061604fb04ee15f88fb41a7da9f245d1f2ebb2b3ec0377a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I looked through every line in the output for a FAIL result. All three expect lines are marked PASS, and the overall result is PASS. Since nothing is marked FAIL, there can't be a FAIL for wording, style, or a stricter test than the words need. The evidence also stays within what each line says. Line 1 rejects undefined/null/'0' only because the line says \"returns 0\". Line 3 relies on assert/strict's Object.is, which matches \"expects 0\". The wrong_build section is \"None found\" and lists close candidates without turning them into FAILs. So the only item on the must_not list is not broken anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 10443,
+  "tokens": {
+    "input": 2,
+    "output": 301,
+    "cacheCreation": 3344,
+    "cacheRead": 783,
+    "fresh": 3647,
+    "total": 4430
+  },
+  "at": "2026-11-05T07:27:04.634Z"
+}

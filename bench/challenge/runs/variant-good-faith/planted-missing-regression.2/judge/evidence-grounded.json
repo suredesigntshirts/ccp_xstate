@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "cf27da0d2bec73a35ef15ebbace3e5f2d5085cfea4372e5a658ee3cfe837d125",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion fails on the PASS line. The FAIL evidence on the --tsv line holds up. It names a concrete wrong build, splitting on /[\\t,]/ under --tsv, which breaks TSV fields that contain commas but gets past the unspecified `printf ...` sample. It also shows two graders could pick different samples. The files it cites are real: test/csv.test.js, `npm test` running `node --test`, and parse(text, sep), which takes a regex because it calls split. The PASS evidence on \"README.md documents --tsv\" does not say why the line catches its wrong build. The build it tried, \"a README that only says the flag exists without showing how to use it\", is not caught: the output says it meets the line and calls that acceptable. The only build it says fails is \"A README with no --tsv mention\", which ignores the line outright rather than being a good-faith wrong build. So that PASS does not name a tried wrong build that the line rejects.",
+  "model": "claude-opus-5-5",
+  "ms": 11491,
+  "tokens": {
+    "input": 2,
+    "output": 761,
+    "cacheCreation": 3233,
+    "cacheRead": 783,
+    "fresh": 3996,
+    "total": 4779
+  },
+  "at": "2026-11-05T07:27:31.989Z"
+}

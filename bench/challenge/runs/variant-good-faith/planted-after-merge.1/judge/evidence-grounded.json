@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "fb82dc2e97fea575b5eb0e5931993693c3450bb8eb99ad9ffe5d6369d3b8b7b2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each line's evidence. Line 1 PASS names wrong builds it tried, \"only documents the flag or doesn't wire it in\" and one that \"uppercases only the name (`Hello, ADA!`)\", and says the HELLO, ADA! example catches them. Line 2 PASS names a build that \"makes shouting the default or always uppercases\" and says running `node bin/greet.js Ada` catches it. Line 3 FAIL gives the concrete reason the line only shows after merge: pages.yml publishes docs/ \"only on push to main\". It also names a wrong build that leaves docs/index.md unchanged. The cited facts match the repository. bin/greet.js does drop `--` arguments through `find((a) => !a.startsWith('--'))`. test/greet.test.js has a `cli` test expecting `Hello, Ada!\\n`. pages.yml triggers on push to main with path docs. docs/index.md has no --shout. Nothing cited is invented.",
+  "model": "claude-opus-5-5",
+  "ms": 9009,
+  "tokens": {
+    "input": 2,
+    "output": 597,
+    "cacheCreation": 3525,
+    "cacheRead": 783,
+    "fresh": 4124,
+    "total": 4907
+  },
+  "at": "2026-11-05T07:26:45.297Z"
+}

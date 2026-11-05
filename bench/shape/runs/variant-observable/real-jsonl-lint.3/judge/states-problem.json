@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "8fe0770d77f0f1a74f46325d9309e25118e5ff303c0b6f581e257114eebe1cc4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the problem field and all ten expect lines. The problem field says what is wrong: the repo has no tools and \"nothing in the repo checks a JSONL file\", so a torn or edited row goes unnoticed until a reader fails. It proposes no fix. The expect lines describe what the tool visibly does: exit codes, stdout lines that start with the line number, stderr messages, how blank and CRLF lines are handled. They name no parsing technique and no internal function or its return value. The method (JSON.parse on each trimmed line), the report format and the choice of exit code 2 appear only under assumptions, each with a reason. The package.json line (bin entry, a `node --test` script, no dependencies) and the node:test line come closest to dictating implementation. I counted them as packaging and checkability rules that follow the repo's conventions rather than a prescribed fix, though a stricter reading could fault them.",
+  "model": "claude-opus-5-5",
+  "ms": 14137,
+  "tokens": {
+    "input": 2,
+    "output": 891,
+    "cacheCreation": 5346,
+    "cacheRead": 783,
+    "fresh": 6239,
+    "total": 7022
+  },
+  "at": "2026-11-05T07:28:15.625Z"
+}

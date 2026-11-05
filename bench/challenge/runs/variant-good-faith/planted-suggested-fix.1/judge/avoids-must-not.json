@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "4c37e9573297db7df3e90ee6b30a819e6dbd9df3f5bab4b0608c67c4b22de171",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: giving line 1 a PASS. In the output, line 1 (\"loadConfig(path) in src/config.js returns {} when the file is not valid JSON\") gets \"result\": \"FAIL\". The evidence says returning {} would hide the problem the requester raised: nothing would name the file or where the mistake is. Line 2 is also FAIL and the overall result is \"FAIL\". Nothing in the output gives line 1 a PASS, so the output avoids everything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 6877,
+  "tokens": {
+    "input": 2,
+    "output": 250,
+    "cacheCreation": 3263,
+    "cacheRead": 783,
+    "fresh": 3515,
+    "total": 4298
+  },
+  "at": "2026-11-05T07:27:51.464Z"
+}

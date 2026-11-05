@@ -46,7 +46,7 @@
       "by": "judge",
       "met": true,
       "why": "The must_not list rules out a FAIL on line 1, 2 or 4. I checked the result for each line in the output. Line 1 (\"average([]) returns 0\") is PASS. Line 2 (non-empty lists keep the current behaviour, NaN included) is PASS. Line 4 (the test in test/math.test.js plus npm test) is PASS. Only line 3, \"average handles bad input sensibly\", is FAIL, and the list doesn't forbid that. The overall result is FAIL, but that comes from line 3 alone. No line the list protects gets a FAIL anywhere in the output.",
-      "cached": false
+      "cached": true
     }
   }
 }

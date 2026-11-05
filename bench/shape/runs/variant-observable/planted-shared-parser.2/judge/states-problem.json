@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "7ebd5e5b7d8729813fff1b232538cdb94211fe116a320a9826d4e6140cad11ef",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all eight expect lines. Each one states behaviour you can observe: the exact CLI output for --tsv input, comma-in-field input, CRLF input and no-flag input; `npm test` passing with a --tsv CLI test; and README documentation. None of them requires a technique or an internal call path. The parse() line only guards against regressions in an exported function's current results. It doesn't say how to build the flag. The suggestion to reuse parse()'s separator parameter appears under assumptions: \"Reusing the existing separator parameter of parse() is a likely implementation, but the issue does not require it.\" The problem field describes the defect: the CLI \"ignores its command-line arguments\", so --tsv input comes out as \"one key holding the whole line\". Its note that \"nothing in the CLI passes one\" diagnoses the cause. It doesn't prescribe a fix.",
+  "model": "claude-opus-5-5",
+  "ms": 8433,
+  "tokens": {
+    "input": 2,
+    "output": 607,
+    "cacheCreation": 4361,
+    "cacheRead": 783,
+    "fresh": 4970,
+    "total": 5753
+  },
+  "at": "2026-11-05T07:27:30.255Z"
+}

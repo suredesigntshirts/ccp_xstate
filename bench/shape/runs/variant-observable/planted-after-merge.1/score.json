@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-after-merge.1",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "6 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every expect line and the problem field. The expect lines describe behaviour you can observe: exact stdout such as `HELLO, ANN!`, exit codes, docs/index.md content, and `npm test` passing with a --shout test. None of them names a technique, an internal function or a return value. The test-file line asks for a check to exist, not for a way of building the feature. The guesses a builder would otherwise have to make are all listed under assumptions: that upper case means \"louder\", that the flag can come before or after the name, and that docs/index.md is the published source. The output also says outright that \"The request does not say how to implement it... The builder decides.\" The problem field only describes what is wrong: greet ignores --shout and still prints `Hello, Ann!`, and the docs never mention the flag. It proposes no fix. The criterion holds for the whole output.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for all six expect lines. Four are CLI runs at the PR head (`--shout Ann`, `Ann --shout`, plain `Ann`, `--shout` with no name). Each has a \"run\" proof that gives exact output and an exit code, using od -c with PIPESTATUS, or a command substitution followed by $?. Each run has one clear answer. The docs line checks docs/index.md in the repo with a \"read\" proof (\"Read docs/index.md at the PR head\"), not the live site. The test line uses `npm test` plus grep and a read of test/greet.test.js, all available before merge. Checking the published site is moved into non_goals (\"happens after merge\"), so no expect line depends on a deploy, a release or a published page. The upper-case checks are specific enough that one careful reader would reach one answer.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every named file and claim against the repository, and they all hold. bin/greet.js uses the first argument that doesn't start with \"--\" as the name and ignores flags, so \"`node bin/greet.js --shout Ann` prints `Hello, Ann!` and exits 0\" is accurate. A missing name prints a usage message to stderr and exits 2, as the issue says. docs/index.md shows only `node bin/greet.js <name>`. .github/workflows/pages.yml uploads docs/ on every push to main. The site URL comes from README.md. test/greet.test.js and src/greet.js exist, and `npm test` is defined in package.json. The issue says \"greet --shout <name>\" in places, but package.json has no bin entry. That shorthand matches the CLI's own usage text, and every expect line uses the real path, bin/greet.js. Nothing the issue names is missing, and the problem statement describes the code as it is.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_catch items against the output, and both hold.\n(1) The docs ask is a line the verifier can check at the head: \"docs/index.md documents the --shout option: it shows how to use it with a name and says that it prints the greeting in upper case\", and its proof is a read of the file. The published page is left to the outcome (\"once the PR is merged to main the existing pages workflow publishes it\") and to non_goals (\"Deploying or checking the live docs site ... happens after merge\").\n(2) An expect line protects the default greeting: \"`node bin/greet.js Ann` without --shout still writes exactly `Hello, Ann!` plus a newline to stdout and exits 0\". It comes with a run proof that uses od -c.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all six expect lines against the must_not item, which bans any expect line that can only be checked on the published page or after merge. Five of them are CLI behaviors or `npm test` runs that work at the PR head. The docs line says \"docs/index.md documents the --shout option\", and its proof is \"Read docs/index.md at the PR head\", so it doesn't need the live site either. The output mentions publishing after merge only in the outcome and assumptions. The non_goals also exclude \"checking the live docs site\", so none of the expect lines depends on merge or the published page.",
+      "cached": true
+    }
+  }
+}

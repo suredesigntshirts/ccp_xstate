@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "0185a4361319bf5fefa29e0a40b76d06f0bdda14e4e530fdc58e239aa5bead25",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all eight expect lines and their proofs. Seven are `run` proofs: they run `npm ci` and then call `node_modules/.bin/jsonl-lint` on small files made with `printf` in a fresh `mktemp -d` folder. The other run checks are the package.json check, the empty file and root `npm test`. Each states exact expected results, such as \"grep output exactly `torn.jsonl:2:`\", \"exit=0, count 0, empty_exit=0\" and \"`# pass N` line with N ≥ 1\". The README line is a `read` proof of README.md \"at the PR head\", with clear conditions: it must not say `packages/` is empty, and it must name `jsonl-lint` and how to run it. Nothing needs a release, a deploy, npm publishing or a harness hookup. Publishing to npm and wiring into the harness are listed as non-goals. The mention of the `test` CI check also happens before merge. Every line can be checked at the PR head and gives one answer.",
+  "model": "claude-opus-5-5",
+  "ms": 8618,
+  "tokens": {
+    "input": 2,
+    "output": 688,
+    "cacheCreation": 5295,
+    "cacheRead": 783,
+    "fresh": 5985,
+    "total": 6768
+  },
+  "at": "2026-11-05T07:28:09.808Z"
+}

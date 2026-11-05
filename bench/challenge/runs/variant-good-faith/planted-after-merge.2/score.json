@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-after-merge.2",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": false,
+      "why": "line 1 not PASS: \"Wrong build: bin/greet.js adds `if (process.argv.includes('--shout')) out = out.toUpperCase()` and changes nothing else. It passes the one-off run proof (`node \""
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each line's evidence against the repo. Line 3's FAIL holds up: pages.yml really does deploy docs/ only on push to main, so the line can only be checked after merge. Line 2's PASS holds up too: it names a build that always uppercases, and both the run proof and the existing 'cli' test in test/greet.test.js would catch it. Line 1's FAIL breaks the criterion. Its wrong build (`argv.includes('--shout')` then toUpperCase) prints \"HELLO, ADA!\", so it does what the request asks. The only gap it names is a missing regression test: \"No line requires a regression test for --shout\". The request never asked for a test, so this is a new requirement, not a build that meets the line yet misses the request. The evidence also offers no two readings and no after-merge reason for this line.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: line 3 must FAIL as checkable only after merge, pointing at pages.yml or the publish-on-push. The output marks line 3 \"FAIL\". Its evidence says \".github/workflows/pages.yml only deploys docs/ to GitHub Pages on push to main, so the published page cannot change until after the PR merges\" and \"can only be checked after merge.\" It then gives a form that can be checked before merge: docs/index.md. The wrong_build section repeats the point: \"the Pages deploy runs only on push to main.\" The item is fully handled. The FAIL on line 1 for a missing regression test may be questionable, but it doesn't affect this criterion, which only asks whether the must_catch items are caught.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "The must_not list forbids a FAIL on line 1 or line 2. Line 2 is PASS, so that part holds. Line 1 is marked \"result\": \"FAIL\". The evidence for it even admits that the wrong build passes the run proof (`node bin/greet.js --shout Ada` prints HELLO, ADA!). The only reason it gives is that no regression test was added, and it says \"No line requires a regression test for --shout\". So it fails line 1 for a requirement the line doesn't contain. Because line 1 is a FAIL, the output does something on the must_not list, and the criterion is not met.",
+      "cached": false
+    }
+  }
+}

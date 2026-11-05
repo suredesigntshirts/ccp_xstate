@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "2dcdd08106a96f2903c3f2b7f681eb96d05ff3de1659352b6509717d68d42c48",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every expect line against both must_not items.\n\n1. **README coverage:** The README line says \"For every function index.js exports, README.md has a `## <name>(` heading, so it lists capitalize, slugify, truncate and padLeft\". Its proof loops over every exported function and also checks those four names. A build that adds only a padLeft section, with slugify still missing, would fail this line.\n\n2. **No dictated implementation:** The padLeft lines only check results, for example \"padLeft(42, 5, '0') returns the string '00042'\". None of them requires padStart or any other approach. padStart comes up once, in an assumption that suggests a space as the default pad character. That is a suggestion outside the expect lines, not a requirement.\n\nNeither must_not item is broken anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 5102,
+  "tokens": {
+    "input": 2,
+    "output": 395,
+    "cacheCreation": 3648,
+    "cacheRead": 783,
+    "fresh": 4045,
+    "total": 4828
+  },
+  "at": "2026-11-05T07:27:21.821Z"
+}

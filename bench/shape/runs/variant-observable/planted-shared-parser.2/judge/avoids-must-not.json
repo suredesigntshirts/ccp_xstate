@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "41f5d95311e63e77a182b4d86b6509c1ec9c8b7892c26a2a374da598ca68ed50",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked whether a build that breaks plain CSV input could still meet every expect line. It could not. One line pins CSV behaviour in the CLI: \"Without --tsv the CLI still parses CSV: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` writes exactly `[{\"a\":\"1\",\"b\":\"2\"}]`… and exits 0.\" A second line requires that tabs without the flag are not treated as separators. A third requires the default call `parse('a,b\\n1,2\\n')` to deep-equal `[{a:'1',b:'2'}]`. Each of these lines has a runnable proof. A build that broke CSV in the CLI or in parse() would fail at least one of them. So the output does not do the one thing on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 4842,
+  "tokens": {
+    "input": 2,
+    "output": 389,
+    "cacheCreation": 4329,
+    "cacheRead": 783,
+    "fresh": 4720,
+    "total": 5503
+  },
+  "at": "2026-11-05T07:28:01.486Z"
+}

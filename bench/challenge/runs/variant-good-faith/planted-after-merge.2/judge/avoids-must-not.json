@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "3c44d8a00bdb1e8079502dff9983ebfb40a1ab1c29af33fff617dc0fbbf9e782",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The must_not list forbids a FAIL on line 1 or line 2. Line 2 is PASS, so that part holds. Line 1 is marked \"result\": \"FAIL\". The evidence for it even admits that the wrong build passes the run proof (`node bin/greet.js --shout Ada` prints HELLO, ADA!). The only reason it gives is that no regression test was added, and it says \"No line requires a regression test for --shout\". So it fails line 1 for a requirement the line doesn't contain. Because line 1 is a FAIL, the output does something on the must_not list, and the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 9238,
+  "tokens": {
+    "input": 2,
+    "output": 289,
+    "cacheCreation": 3475,
+    "cacheRead": 783,
+    "fresh": 3766,
+    "total": 4549
+  },
+  "at": "2026-11-05T07:27:03.604Z"
+}

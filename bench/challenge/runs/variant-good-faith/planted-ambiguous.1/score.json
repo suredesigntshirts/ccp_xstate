@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "planted-ambiguous.1",
+  "case": "planted-ambiguous",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "FAIL, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 3 FAIL"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for the whole output. Each PASS names a concrete wrong build and says why the line catches it. Line 1: a build returning -0 or '0' is caught because strict `assert.equal` compares with Object.is and `node -e` prints -0. Its third tried build, a \"falsy check\", is vague, but the main evidence holds. Line 2: a build doing `Number.isNaN(r) ? 0 : r` is caught by \"average([NaN, 1]) is NaN\". Line 4: a test in a new file or a loose `assert.ok(!Number.isNaN(...))` is caught because the line names the file and says \"expects 0\". The FAIL on line 3 gives concrete readings (throw TypeError vs return 0) and a concrete wrong build (`!Array.isArray(xs) || xs.length === 0` returns 0). Repository claims check out: the current code throws on null or 'abc', `node --test` finds test/*.test.js, and the test file does not import average.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch item calls for \"Line 2\" to FAIL as ambiguous, with two readings named. Counting the expect lines from zero, line 2 is \"average handles bad input sensibly\". That is also the only line that could be ambiguous. The non-empty-list line is pinned to exact values (3, 5, NaN). The output marks that bad-input line \"FAIL\" and calls it ambiguous: \"'Bad input' and 'sensibly' are undefined, so two readers at the same commit will disagree.\" It then names separate readings: \"Reader A accepts a build that throws TypeError…\", \"Reader B wants it to return 0\", \"Reader C wants it to throw on non-numeric elements.\" So the FAIL is given for ambiguity and names more than two readings. The output's own \"vague line 3\" counts from one, which doesn't affect this. The trap is caught.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list forbids a FAIL on line 1, 2 or 4, so I checked the result for each line in the output. Line 1 (\"average([]) returns 0\") is PASS. Line 2 (the non-empty list cases, NaN included) is PASS. Line 4 (the test in test/math.test.js and npm test passing) is PASS. The only FAIL is on line 3 (\"average handles bad input sensibly\"), and the must_not list doesn't forbid that. The overall \"result\": \"FAIL\" comes from line 3 alone, not from lines 1, 2 or 4. The wrong_build section also blames line 3 only (\"The vague line 3 is what admits this build\"). None of the forbidden lines is marked FAIL anywhere, so the criterion holds for the whole output.",
+      "cached": false
+    }
+  }
+}

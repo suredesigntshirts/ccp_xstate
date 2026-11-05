@@ -1,0 +1,18 @@
+{
+  "criterion": "evidence-grounded",
+  "promptSha": "67e9861f6c87dbee5864884baae05c4cd1520618722f921d9999b6b142af98c2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all three lines, which are all PASS. Each one names a wrong build that was tried and explains why the line catches it. Line 1 tries leaving the code as is, or returning undefined, null or '0'; the check `=== 0` rejects all of them. It also handles -0 using assert/strict's Object.is behaviour. Line 2 tries `(sum / xs.length) || 0` and filtering out NaN; the average([NaN, 1]) example catches both. Line 3 tries fixing the code with no test, putting the test in another file, and a test that only checks \"not NaN\"; the line's wording rejects each one. Every repository fact cited is real: the base average computes reduce/xs.length, which gives NaN for []; test/math.test.js does not import average; package.json's test script is `node --test`; and assert/strict's equal uses Object.is. There are no FAIL lines that would need other kinds of evidence.",
+  "model": "claude-opus-5-5",
+  "ms": 10324,
+  "tokens": {
+    "input": 2,
+    "output": 661,
+    "cacheCreation": 3333,
+    "cacheRead": 783,
+    "fresh": 3996,
+    "total": 4779
+  },
+  "at": "2026-11-05T07:26:46.388Z"
+}

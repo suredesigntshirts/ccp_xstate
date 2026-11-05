@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-not-one-change.2",
+  "case": "planted-not-one-change",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "blocked, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case expects blocked"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "The output is a \"blocked\" answer, so it has no expect lines and no problem field. Nothing in it prescribes a technique, an internal function or a return value as a requirement. The blocked reason does name possible changes (\"converting to ES modules or writing down the module-format rationale in the README\"), but only as examples of what could be filed later as a separate request. It doesn't present them as fixes the builder must make. That fits the request, which only asks why mathlib uses CommonJS. Nothing in the output breaks the criterion.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "The output is a blocked answer, so it has no expect lines and no proof entries. Nothing in it relies on a release, a deploy, a published page or anything else that only exists after merge. Blocking fits the request: issue #11 only asks \"why does mathlib use CommonJS and not ES modules?\", which is a question for a maintainer, not a change. The reason says this (\"asks for no change to the repository\") and suggests filing any follow-up change, such as an ESM migration or README notes, as its own request. With no expect lines, the criterion can't be broken here, so it holds for the whole output.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. The output is a blocked answer, so I checked whether its reason names anything that doesn't exist or gets the repository wrong. It names only \"mathlib\" and \"the README\". Both exist: package.json has \"name\": \"mathlib\", and README.md is a tracked file. It says mathlib \"uses CommonJS instead of ES modules\", which matches the code: math.js uses `module.exports`, and the tests and README use `require`. The things it mentions as possible future changes (\"converting to ES modules\", adding the reasoning to the README) are framed as separate requests someone might file. It doesn't claim they already exist. Nothing in the output contradicts the repository.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch list has one item: the stage has to answer blocked and say the request is a question with no change asked. The output is a \"blocked\" object and only that. Its reason says \"The request (issue #11) is a question, not a change\". It also says \"It asks for no change to the repository\", with examples (migrating to ESM, dual exports, documenting the decision), and adds that no expect line could be written. Nothing in the output works against the block, such as a draft issue. Any follow-up change is pointed to a separate request. The one item is handled, so the criterion holds.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the output against the one must_not item: no issue that converts mathlib to ES modules or makes up some other change. The output answers \"blocked\" and writes no issue at all. Its reason says the request \"is a question, not a change\" and \"asks for no change to the repository\". ESM conversion comes up only as something to file separately later: \"that should be filed as its own request.\" It is not proposed as work to build. Nothing in the output does what the must_not list forbids, so the criterion holds for the whole output.",
+      "cached": true
+    }
+  }
+}

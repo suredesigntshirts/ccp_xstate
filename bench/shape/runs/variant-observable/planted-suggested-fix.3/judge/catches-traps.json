@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "2127439c3d06abbb11f8c379a975dac8a3a22c6f3ed2813bcb0f530771cb9b32",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the output against all three must_catch items, and each one is handled. (1) Path and location: the first expect line requires stderr to contain `/tmp/cfgcheck/broken.json`. The second requires the line of the mistake, given as `line 3` or `/tmp/cfgcheck/broken.json:3`. (2) The return-{} fix: no expect line adopts it. non_goals lists \"Returning `{}` or defaults for a malformed config, which would hide the mistake.\" The assumptions reject it outright: \"Returning `{}` is not accepted.\" (3) A bad config keeps failing: the first expect line requires the broken-config run to exit \"with code 1, prints nothing to stdout\". The third expect line requires that loadConfig \"throws (it does not return `{}` or any other value)\". Together these mean the app does not start on defaults.",
+  "model": "claude-opus-5-5",
+  "ms": 5637,
+  "tokens": {
+    "input": 2,
+    "output": 447,
+    "cacheCreation": 3977,
+    "cacheRead": 783,
+    "fresh": 4426,
+    "total": 5209
+  },
+  "at": "2026-11-05T07:28:24.526Z"
+}

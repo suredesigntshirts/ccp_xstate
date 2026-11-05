@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "2cf2fee49f902a361938330b6626b2f2217b8b2584a55219d509bafc76e44bc4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the problem field and all six expect lines. The problem field only describes what is wrong (\"Any argument starting with `--` is silently dropped\", docs/index.md \"mentions no options\") and proposes no fix. Every expect line checks visible behaviour: stdout like `HELLO, ADA!`, exit codes, the stderr usage line and what the docs say. None prescribes a technique, an internal function or a return value. Reading \"louder\" as upper case is recorded under assumptions. Naming docs/index.md follows from the request's requirement to appear on the published docs site, and that file is what the site publishes. The test line is a check on the change, not a way of building it. A parsing library and a `-s` alias are listed under non_goals.",
+  "model": "claude-opus-5-5",
+  "ms": 17516,
+  "tokens": {
+    "input": 2,
+    "output": 821,
+    "cacheCreation": 3324,
+    "cacheRead": 783,
+    "fresh": 4147,
+    "total": 4930
+  },
+  "at": "2026-11-05T07:26:53.498Z"
+}

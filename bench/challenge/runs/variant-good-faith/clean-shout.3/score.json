@@ -1,0 +1,52 @@
+{
+  "stage": "challenge",
+  "run": "clean-shout.3",
+  "case": "clean-shout",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "9b505dfde8b518f3ad5edffa797c58c7ace086b651906e9158249d6e4f37ca37",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "verdict-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "PASS, as the case expects"
+    },
+    "fails-planted": {
+      "by": "mechanical",
+      "met": null,
+      "why": "the case plants no broken line"
+    },
+    "passes-sound": {
+      "by": "mechanical",
+      "met": true,
+      "why": "line 1, 2, 3, 4 PASS"
+    },
+    "evidence-grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "All four lines are PASS. Each one names a concrete wrong build and explains how the line catches it:\n- Line 1: a build that only edits the docs, or one that prints \"HELLO, ADA!!!\" or \"HELLO ADA\". Running `--shout Ada` catches both because the line gives the exact output.\n- Line 2: a build that \"upper-cases every greeting\". `node bin/greet.js Ada` would then print the wrong text.\n- Line 3: a build that documents the flag \"only in README.md, or only in the usage string\". Reading docs/index.md catches it.\n- Line 4: a build that \"tests only a shout() helper\" and never runs the CLI. The line requires a test that runs the CLI.\n\nEverything the output cites matches the repository. bin/greet.js does skip arguments that start with `--`. test/greet.test.js has a cli test that checks 'Hello, Ada!'. package.json runs `node --test`, which picks up *.test.js files. pages.yml and the stderr usage text 'usage: greet <name>' are both real. No FAIL entries exist, so the FAIL part of the criterion doesn't apply.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_catch item asks for every line to PASS, with evidence that names a wrong build tried against it. I checked all four lines and each one is marked PASS with a named wrong build:\n- Line 1 (--shout output) tries \"a build that only edits the docs and adds no real logic\" and alternate shouts like \"HELLO, ADA!!!\".\n- Line 2 (default output) tries \"a build that upper-cases every greeting, or flips the default to shout\".\n- Line 3 (docs) tries \"a build that documents the flag only in README.md, or only in the usage string\".\n- Line 4 (npm test) tries \"a build that tests only a shout() helper in src/greet.js and never runs the CLI\".\nThe overall result is also PASS, and the wrong_build section names its closest attempt (the argv[2] position check). The criterion holds for the whole output.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The must_not list bans a FAIL given for wording, style, or a stricter test than the words need. I checked every line verdict and the overall result. All four lines and the top-level result are PASS, so the output contains no FAIL of any kind. It also turns down stricter readings: on the argument-order build it says \"I don't count it as a FAIL\", and it calls the stderr usage text \"outside what was asked\". The remark that a doc without an example \"fails the line's wording\" describes a wrong build the line would catch. It is not a FAIL handed to the issue. Nothing in the output breaks the criterion.",
+      "cached": false
+    }
+  }
+}

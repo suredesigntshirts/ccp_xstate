@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "c7c472c17734959c5f8775d85bdf34a5be5015b1d79ac7819b9bd4ecd451b6e5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list has one item: an overall PASS. I checked the output's top-level result, and it is \"FAIL\", not PASS. The second line did get a PASS (\"README.md documents --tsv\"), but that is a per-line verdict, and the item forbids only a PASS overall. The first line is FAIL, which fits: the output shows a wrong build that still meets the line, such as always splitting on '\\t' or splitting on /[,\\t]/, while CSV without the flag breaks. So the output does nothing on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 6154,
+  "tokens": {
+    "input": 2,
+    "output": 238,
+    "cacheCreation": 3285,
+    "cacheRead": 783,
+    "fresh": 3525,
+    "total": 4308
+  },
+  "at": "2026-11-05T07:27:32.675Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "4ddfe9f8f2af2854496c8dae768669093d90e02aa14c743b9714219f7dbc68fc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the problem field and every expect line for a prescribed fix. The problem field only says what is wrong: \"nothing pads a value on the left\" and the README \"has no section for slugify\". It suggests no fix. The request itself asks for a function named padLeft and gives 42 -> 00042, so expect lines that call padLeft and check outputs like '00042' describe the requested behaviour, not how to build it. No expect line names a technique such as padStart or an internal helper. The interface details the request doesn't spell out (the fill parameter, number input returning a string, longer input left unchanged and the padStart comparison) are all written down under assumptions. The README line asks for a section for each exported function. That is the request's own \"keep the list complete\", and the heading style is listed as an assumption. Non_goals leave out the extra helpers.",
+  "model": "claude-opus-5-5",
+  "ms": 11025,
+  "tokens": {
+    "input": 2,
+    "output": 760,
+    "cacheCreation": 3648,
+    "cacheRead": 783,
+    "fresh": 4410,
+    "total": 5193
+  },
+  "at": "2026-11-05T07:27:26.029Z"
+}

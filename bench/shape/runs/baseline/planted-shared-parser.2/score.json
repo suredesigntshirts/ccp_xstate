@@ -29,31 +29,31 @@
       "by": "judge",
       "met": true,
       "why": "I checked all six expect lines. Each states behaviour you can observe: CLI output with and without --tsv, parse()'s comma default when called with no separator, a new test plus `npm test` passing, and README documentation. The parse() line checks that existing behaviour doesn't regress. It doesn't say how to build the flag. No line names a technique, an internal change or a return value. The problem field says what is wrong: the CLI \"ignores its arguments\", splits on ',' and users must run sed. It mentions the existing sep parameter only as a fact about the code (\"nothing in the CLI exposes it\"). Reusing parse()'s sep appears only under assumptions, with \"the builder may implement it another way\".",
-      "cached": false
+      "cached": true
     },
     "checkable-before-merge": {
       "by": "judge",
       "met": true,
       "why": "I checked all six expect lines and their proofs. Five are \"run\" proofs, all done from the repo root at the PR head: the two `--tsv` printf pipelines, the two runs without the flag, the `node -e` import of src/parse.js and `npm test`. Each has one fixed expected output or result, so a single reader gets a single answer. The new-test line can also be settled at head, by reading test/ for a test that runs `--tsv` and asserts on its output. The README line is a \"read\" proof against README.md in the branch. No line depends on a release, deploy, published page or anything else that only exists after merge, and \"Publishing a release\" is listed as a non-goal. One small gap: the proof for line 3 only says \"compare the output\" and doesn't say to check the trailing newline. It still checks the line at head, so the criterion holds.",
-      "cached": false
+      "cached": true
     },
     "grounded": {
       "by": "judge",
       "met": true,
-      "why": "Every named artifact exists in the tracked files: bin/csv2json.js, src/parse.js, README.md, test/ (test/csv.test.js) and `npm test` (package.json \"test\":\"node --test\"). The --tsv flag and the new test are things the issue asks to create. Some claims depend on file contents: \"parse(text, sep = ',')\", the CLI \"ignores its arguments\" and existing 'parse' and 'cli' tests. File contents weren't provided, so these couldn't be confirmed, but nothing given contradicts them. The problem names no missing file or script and invents no command.",
-      "cached": false
+      "why": "I checked every name the issue mentions against the repo. bin/csv2json.js, src/parse.js, README.md, test/ and `npm test` (the script is \"node --test\") all exist. `parse(text, sep = ',')` matches src/parse.js exactly, and the 'parse' and 'cli' tests are in test/csv.test.js. The problem statement matches the code. The CLI really does ignore its arguments and calls `parse(readFileSync(0, 'utf8'))`, so it splits on commas only. A tab-separated line really would become one column keyed by the tab-joined header. The expected no-flag output `[{\"a\\tb\":\"1\\tb\"}]` is correct, because JSON.stringify writes a tab as \\t. The `--tsv` flag and the new test are things the issue asks the builder to create. One small slip: an assumption says the request \"suggests reusing parse()'s existing sep parameter\", which the request never says. But that sep parameter does exist, so nothing named is missing and nothing about the repo is misdescribed.",
+      "cached": true
     },
     "catches-traps": {
       "by": "judge",
       "met": true,
       "why": "I checked both must_catch items against the expect lines.\n\nItem 1 (CSV unchanged) is covered. Expect line 3 pins the CSV CLI output exactly: `printf 'a,b\\n1,2\\n' | node bin/csv2json.js` prints `[{\"a\":\"1\",\"b\":\"2\"}]`. Expect line 4 keeps parse()'s comma default. Expect line 5 requires `npm test` to pass \"the existing 'parse' and 'cli' tests included\".\n\nItem 2 (--tsv gives the same JSON as CSV) is covered. Expect line 1 runs the same a/b, 1/2 table as TSV with --tsv and requires the exact string `[{\"a\":\"1\",\"b\":\"2\"}]` plus a newline. That is the same exact string line 3 requires for the CSV version of the table. The two paths are never compared directly, but pinning both to one literal pins TSV output to the CSV result.\n\nBoth items are handled, and every line has a runnable proof.",
-      "cached": false
+      "cached": true
     },
     "avoids-must-not": {
       "by": "judge",
       "met": true,
       "why": "The must_not item is an issue whose lines a build that breaks plain CSV would still meet. I checked whether any expect line catches that kind of build. Several do. Line 3 runs the CLI with no flag, `printf 'a,b\\n1,2\\n' | node bin/csv2json.js`, and it must print exactly `[{\"a\":\"1\",\"b\":\"2\"}]` plus a newline. The same line also says tab input without the flag must stay one column. Line 4 says parse() with no separator argument must still split on commas. Line 5 says the existing 'parse' and 'cli' tests must pass. A build that broke plain CSV through the CLI, through parse()'s default, or by always splitting on tabs would fail line 3 or 4. So the issue does not fall into the must_not case.",
-      "cached": false
+      "cached": true
     }
   }
 }

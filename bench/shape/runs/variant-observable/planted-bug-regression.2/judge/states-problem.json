@@ -1,0 +1,18 @@
+{
+  "criterion": "states-problem",
+  "promptSha": "71f4f514d87c47bca2803811b707445026e797a211ece3acead5d46a3b1b36ae",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for every expect line and for the problem field. The one return value the output specifies, `average([]) ... v === 0`, comes straight from the request (\"An empty list should average to 0\"), so it is a requirement and not a prescribed fix. The other expect lines only check observable behaviour: the mean on non-empty arrays, the other exports unchanged, `npm test` passing, and a regression test that fails on the base math.js. The test lines say how the change is verified, not how to fix it. No line names a technique such as an early return or a length guard, and none names an internal function. The problem field only describes what is wrong: \"average(xs) returns the sum divided by xs.length. For an empty array that is 0/0\", that this reached an invoice total, and that the tests never cover average. It does not propose a fix.",
+  "model": "claude-opus-5-5",
+  "ms": 35602,
+  "tokens": {
+    "input": 2,
+    "output": 495,
+    "cacheCreation": 3048,
+    "cacheRead": 783,
+    "fresh": 3545,
+    "total": 4328
+  },
+  "at": "2026-11-05T07:27:11.596Z"
+}

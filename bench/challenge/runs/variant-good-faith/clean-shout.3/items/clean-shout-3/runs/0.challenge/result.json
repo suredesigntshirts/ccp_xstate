@@ -1,0 +1,32 @@
+{
+  "result": {
+    "result": "PASS",
+    "lines": [
+      {
+        "line": "node bin/greet.js --shout <name> prints Hello, <name>! in upper case, for example HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "Today bin/greet.js already skips any argument that starts with '--', so before the change `--shout Ada` prints 'Hello, Ada!'. A build that only edits the docs and adds no real logic fails this run. A build that shouts in some other way, such as 'HELLO, ADA!!!' or 'HELLO ADA', fails too, because the line gives the exact output. A build that hardcodes the output for Ada only would be deliberate gaming, not a good-faith mistake. Argument order such as `Ada --shout` is not stated, but the existing name lookup already accepts flags in any position, so a careful builder who checks argv.includes('--shout') handles both orders. I could not break this line."
+      },
+      {
+        "line": "node bin/greet.js <name> without --shout still prints Hello, <name>!",
+        "result": "PASS",
+        "evidence": "I tried a build that upper-cases every greeting, or flips the default to shout. Running `node bin/greet.js Ada` prints 'HELLO, ADA!' under that build, so this line catches it. The existing cli test in test/greet.test.js also checks this output."
+      },
+      {
+        "line": "docs/index.md documents the --shout option with an example",
+        "result": "PASS",
+        "evidence": "I tried a build that documents the flag only in README.md, or only in the usage string, and leaves docs/index.md alone. Reading docs/index.md at the PR commit catches it. Today that file holds only the plain usage, so any --shout example there must be new. The check can be done before merge: the file is read in the PR, and how it is published (pages.yml) is a non-goal. A doc that mentions --shout with no example also fails the line's wording."
+      },
+      {
+        "line": "npm test passes and includes a test that runs node bin/greet.js --shout Ada and asserts it prints HELLO, ADA!",
+        "result": "PASS",
+        "evidence": "I tried a build that tests only a shout() helper in src/greet.js and never runs the CLI. That build would miss broken argument parsing in bin/greet.js, but this line requires a test that runs the CLI and checks its output, so it catches the build. A test that only checks that the output contains 'ADA' does not assert 'HELLO, ADA!'. npm test runs `node --test`, which picks up test/*.test.js, so running it and reading the test gives the proof before merge."
+      }
+    ],
+    "wrong_build": "Closest I came: a build that sets shout = process.argv[2] === '--shout'. It meets every line, but `node bin/greet.js Ada --shout` would print the plain greeting. The request does not say where the flag goes, and the existing parser accepts flags in any position, so a careful builder is unlikely to make this mistake. I don't count it as a FAIL. Leaving the stderr usage text ('usage: greet <name>') without --shout is also outside what was asked, which was the docs. I found no wrong build that meets all four lines."
+  },
+  "hash": "33770f48ca766666a399a2eff92ad86816f34c2c380f40eecf27d2925e2b646f",
+  "caller": "bench-clean-shout-3",
+  "toolUseId": "bench-return-1",
+  "at": "2026-11-05T07:24:24.207Z"
+}

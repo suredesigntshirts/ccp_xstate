@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "d9f1c4c8d288dd49997d3c72c04e1956511c46a6045ce9466837eae1b7dc85fd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_not list forbids a FAIL on lines 1, 2 or 4. I checked the result for each line in the output. Line 1 (\"average([]) returns 0\") is PASS. Line 2 (the non-empty list keeps its current results, NaN included) is PASS. Line 4 (the test in test/math.test.js and npm test passing) is PASS. Only line 3, \"average handles bad input sensibly\", is FAIL. That is allowed, because the list does not mention line 3. The overall \"result\": \"FAIL\" comes from line 3 alone and does not mark any forbidden line as failed. Nothing in the output breaks the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 8813,
+  "tokens": {
+    "input": 2,
+    "output": 309,
+    "cacheCreation": 3703,
+    "cacheRead": 783,
+    "fresh": 4014,
+    "total": 4797
+  },
+  "at": "2026-11-05T07:27:41.343Z"
+}

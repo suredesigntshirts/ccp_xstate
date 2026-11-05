@@ -1,0 +1,59 @@
+{
+  "stage": "shape",
+  "run": "planted-half-rule.2",
+  "case": "planted-half-rule",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "84e903f0dedc377d2da79ed3e01456b33494525c08e3bd9e372ea9b91b639440",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "blocked-right": {
+      "by": "mechanical",
+      "met": true,
+      "why": "wrote an issue, as the case expects"
+    },
+    "proofs-match": {
+      "by": "mechanical",
+      "met": true,
+      "why": "8 proofs, each quoting its line in order"
+    },
+    "states-problem": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the problem field and every expect line. The problem field only says what is wrong: index.js exports capitalize, slugify and truncate, none of them pads, and the README \"has a section for capitalize(s) and one for truncate(s, n), but none for slugify\". It names no fix. The expect lines describe behaviour you can observe from outside. The request itself requires the padLeft name and the 42 -> 00042 example. The other lines set results for number input, inputs already at the width, the space default, the README headings and npm test. None of them names an implementation technique or an internal helper. The fix choices go under assumptions instead: modelling the signature on String.prototype.padStart, converting input with String() and the `## name(...)` section format. The space default is a design choice the request doesn't make, but it sets the public behaviour, not how to build it.",
+      "cached": true
+    },
+    "checkable-before-merge": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for all eight expect lines. Each one can be checked at the PR head, and its proof works there:\n- Lines 1–5 are concrete value checks, each run with a `node --input-type=module -e` assert script against `./index.js`. Each gives one answer.\n- Line 5's \"behave as before\" is pinned to specific values such as \"truncate('abcdef', 4) === 'abc…'\", so it doesn't depend on a comparison with history.\n- The README heading line uses a script that compares the exported functions with the README headings matching `^## name(`. That is checkable and gives one answer.\n- The padLeft README section is a \"read\" proof with three concrete items: the parameters, the space default and the 42 -> 00042 example. One careful reader would reach one answer.\n- The npm test line runs `npm test; echo exit=$?; grep`, which can be done at the head.\n\nNo line needs a release, an npm publish or a deploy; publishing is explicitly a non-goal.",
+      "cached": true
+    },
+    "grounded": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every file, command and function the issue names against the repository, and all of them match. index.js exports capitalize, slugify and truncate, as the issue says. README.md has `## capitalize(s)` and `## truncate(s, n)` but no slugify section, which matches \"none for slugify\". test/strutil.test.js tests exactly those three functions. In package.json, `npm test` runs `node --test`, as stated. The only name that doesn't exist yet is padLeft, and that is the function the issue asks to build. The proofs only use README.md, index.js, test/strutil.test.js and npm test, which all exist. The README's \"## Tests\" heading has no \"(\" after the name, so the heading check won't count it as a function. The claim that \"every caller currently writes its own padding\" can't be checked here, but it gives the reason for the change rather than describing the repository. The problem statement describes the repository as it really is.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "Item 1: one expect line asks for a README heading for every function index.js exports: \"Every function exported by index.js has its own `## name(` heading... capitalize, slugify, truncate and padLeft\". It names slugify, so the README check covers more than padLeft. Its proof script compares the exports against the README headings. Item 2: the expect lines pin what padLeft does both with and without a fill character. With a fill: \"padLeft('42', 5, '0') returns '00042'\" and \"padLeft(42, 5, '0')... returns the string '00042'\". With no fill: \"padLeft('42', 5) returns '   42'\". So the 42 -> 00042 padding can be checked, and each of these lines has a run proof. Both items are handled.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The output avoids both must_not items. For item 1, the README expect line says \"Every function exported by index.js has its own `## name(` heading... capitalize, slugify, truncate and padLeft\". Its run proof compares the README headings against the exports with deepEqual. A build that adds only a padLeft section and leaves slugify undocumented would fail this check. The separate padLeft-section line is an extra check, not a substitute for it. For item 2, every padLeft expect line checks what the function returns, such as padLeft('42',5,'0') giving '00042', number input, space default and no truncation. None of them says how padLeft must be built. padStart appears only once, under assumptions, where \"modelled on String.prototype.padStart\" describes the signature. It is not an expect line and does not require padStart to be used.",
+      "cached": true
+    }
+  }
+}

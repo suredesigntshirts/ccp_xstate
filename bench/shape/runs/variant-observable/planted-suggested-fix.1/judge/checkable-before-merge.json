@@ -1,0 +1,18 @@
+{
+  "criterion": "checkable-before-merge",
+  "promptSha": "b2d1ed9b0274b96c8771f231d21c24a41eec143bcbe12cee9fccb78399641ccf",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all five expect lines and their proofs. Every one can be checked at the PR head with local commands (mktemp, node, npm test, git checkout <base> -- src). None needs a release, a deploy or a published page. Line 2 fails the \"one answer\" part. It asks for stderr to show \"line number `3` and the column number `3`\". Its proof adds \"also confirm the location does not depend only on Node's own message by reading src/config.js / src/app.js\". The assumptions say the opposite: \"A PR may get these from Node's message or compute them itself\". Take a PR that just adds the path to Node's v22 message. One careful reader would pass it because the assumption allows it. Another would fail it because the proof forbids it. That conflict means this line has no single answer, so the criterion isn't met for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 9920,
+  "tokens": {
+    "input": 2,
+    "output": 737,
+    "cacheCreation": 3787,
+    "cacheRead": 783,
+    "fresh": 4526,
+    "total": 5309
+  },
+  "at": "2026-11-05T07:27:59.133Z"
+}

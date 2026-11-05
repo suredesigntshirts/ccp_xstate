@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "de088aa51a7d9d467f03b31700eb69a7a768a6dc7a6dd55c4ac0b3767ef8dddf",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The must_catch item calls for \"Line 2\" to FAIL as ambiguous, with two readings named. Counting the expect lines from zero, line 2 is \"average handles bad input sensibly\". That is also the only line that could be ambiguous. The non-empty-list line is pinned to exact values (3, 5, NaN). The output marks that bad-input line \"FAIL\" and calls it ambiguous: \"'Bad input' and 'sensibly' are undefined, so two readers at the same commit will disagree.\" It then names separate readings: \"Reader A accepts a build that throws TypeError…\", \"Reader B wants it to return 0\", \"Reader C wants it to throw on non-numeric elements.\" So the FAIL is given for ambiguity and names more than two readings. The output's own \"vague line 3\" counts from one, which doesn't affect this. The trap is caught.",
+  "model": "claude-opus-5-5",
+  "ms": 7669,
+  "tokens": {
+    "input": 2,
+    "output": 615,
+    "cacheCreation": 3765,
+    "cacheRead": 783,
+    "fresh": 4382,
+    "total": 5165
+  },
+  "at": "2026-11-05T07:27:20.302Z"
+}

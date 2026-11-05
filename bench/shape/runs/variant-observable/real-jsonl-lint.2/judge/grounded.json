@@ -1,0 +1,18 @@
+{
+  "criterion": "grounded",
+  "promptSha": "22ccc54b8c2bc05ac79b4f912a0fe61f9a4a994f94d2404c0f5d4ddf2966f325",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every name and claim in the issue against the repository. The problem says there is no packages/ directory and quotes the README as \"No tools yet: packages/ is empty\". No file under packages/ is tracked, and README.md has that bullet in its \"What is here\" section. It says the root `npm test` prints 'no workspaces under packages/', which matches the test script in package.json. The other existing names are real: package-lock.json, README.md, the \"What is here\" section, `npm ci`, `npm test`, node:test (named in CLAUDE.md) and the CI `test` workflow. The new names are ones the issue asks to create: packages/jsonl-lint, its package.json, the `jsonl-lint` bin and the test files. Paths like /tmp/*.jsonl and /nonexistent/journal.jsonl are fixtures the proofs make themselves, or a path meant not to exist. The issue invents no other repo files or functions, and it describes the repository accurately.",
+  "model": "claude-opus-5-5",
+  "ms": 11425,
+  "tokens": {
+    "input": 2,
+    "output": 535,
+    "cacheCreation": 12630,
+    "cacheRead": 783,
+    "fresh": 13167,
+    "total": 13950
+  },
+  "at": "2026-11-05T07:29:54.911Z"
+}
