@@ -23,8 +23,10 @@ export function load(name, { replay = true } = {}) {
   const dir = join(TRIALS, name);
   const root = join(dir, 'journal');
   const rows = lines(join(root, 'items', 'trial.jsonl'));
-  // loadWorkflow stores the workflow blob in root when it is missing, so it is only called on journals that pin it.
-  const spec = replay ? loadWorkflow('quick-fix', { root }) : null;
+  // The item replays on the workflow blob its journal pinned (plan item stage-bench: a later edit of
+  // workflows/quick-fix.json must not change what a finished item replays on). The pin is the seq-0 row's workflow.
+  const pin = rows.find((r) => r.kind === 'engine.transition' && r.payload.seq === 0)?.payload.workflow;
+  const spec = replay ? loadWorkflow(pin, { root }) : null;
   const host = replay ? restore({ root, item: 'trial', spec, session: 'verifier', release: 'verifier' }) : null;
   const applied = rows.filter((r) => r.kind === 'engine.transition' && r.payload.outcome === 'applied').sort((a, b) => a.payload.seq - b.payload.seq);
   const runsDir = join(root, 'items', 'trial', 'runs');
@@ -39,7 +41,9 @@ export function load(name, { replay = true } = {}) {
   const answers = Object.fromEntries(readdirSync(answersDir).map((f) => [f, readFileSync(join(answersDir, f), 'utf8')]));
   return {
     dir, root, rows, spec, host, applied, runs, pending, answers,
-    workflowHash: sha256(readFileSync(join(REPO, 'workflows/quick-fix.json'))),
+    pin,
+    // The hash of the pinned bytes as committed under the journal's blobs/ (loadWorkflow also checks it).
+    workflowHash: sha256(readFileSync(join(root, 'blobs', String(pin).split('@')[1]))),
     states: applied.map((r) => JSON.parse(r.state)),
     log: lines(join(dir, 'run', 'driver-log.jsonl')),
     shim: lines(join(dir, 'run', 'shim-calls.jsonl')),

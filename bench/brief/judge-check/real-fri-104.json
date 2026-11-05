@@ -1,0 +1,23 @@
+{
+  "case": "real-jsonl-lint-multi",
+  "source": "Real: the first real issue's brief for ccp_machine_test #104 (pre-contract prompt), /mnt/project-files/first-real-issue/harness/journal/items/fri-jsonl-lint-2/runs/0.brief/result.json.",
+  "result": {
+    "builder": "Implement https://github.com/suredesigntshirts/ccp_machine_test/issues/104 in your worktree. Branch name must follow CLAUDE.md (e.g. feat/104-jsonl-lint-multi-file; never a claude/ prefix). Files: packages/jsonl-lint/bin/jsonl-lint.js, test/cli.test.js, README.md. Do NOT touch src/index.js (lint(text) must be byte-identical). Behaviour: argv is one or more files, checked in order; for each bad row print `<file>:<line>: <error>` on stdout (arg exactly as given, error newlines collapsed to spaces as today). A file named `-` is read from stdin (fs.readFileSync(0)) and reported with the name `-`; a second `-` is a usage error: exit 2 with a message on stderr, and check nothing (validate argv before reading anything). No args: usage on stderr (keep text `usage: jsonl-lint <file> [<file> ...]`; update the existing test regex accordingly), exit 2. Unreadable/missing file: error on stderr `jsonl-lint: cannot read <file>: ...`, keep checking and reporting the other files. Exit code: 2 if any file unreadable (or usage error), else 1 if any bad row in any file, else 0 (2 takes precedence over 1). Keep existing single-file behaviour and tests passing. Add node:test tests (spawnSync, pass stdin via `input`) for: two clean files (exit 0, no output); one bad among several (exit 1, only that file's lines, order preserved); stdin `-` clean (0) and bad (1, prefix `-:N: `); a missing file among good/bad ones (exit 2, stderr names it, other files' results still on stdout); two `-` args (exit 2, stderr); no args (exit 2, usage). Update the README usage, output format, exit codes and stdin sections accordingly. Zero deps, plain ES modules. Run `npm test` at the repo root until green, commit (end message with the Co-Authored-By trailer from the system reminder), push, open a PR to main whose body says `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104` and ends with the Claude Code attribution line, then wait for the `test` workflow to be green at the PR head and report the PR URL and head sha.",
+    "verifier": "Verify the PR for https://github.com/suredesigntshirts/ccp_machine_test/issues/104 against each expectation, by running things, not by reading the diff alone. Check out the PR head and: (1) `git diff main -- packages/jsonl-lint/src/index.js` is empty; (2) run `node packages/jsonl-lint/bin/jsonl-lint.js` with two clean files (exit 0, no output), one bad among several clean ones (exit 1, lines `<file>:<line>: <error>` only for the bad file, order of args preserved), `-` via stdin clean and bad (reported as `-:N: ...`), a missing file among good and bad files (exit 2, stderr names the file, the other files are still checked and reported on stdout; also confirm exit is 2 not 1 when a missing file and a bad row coexist), `- -` (exit 2, stderr message, even with stdin provided), and no args (exit 2, usage on stderr); single-file behaviour is unchanged; (3) the new node:test tests cover each of: two clean files, one bad among several, stdin clean and bad, missing among good, two `-`, no args, and they would fail if the feature were broken (spot-check by mutating the bin); (4) packages/jsonl-lint/README.md documents multi-file usage, `-` stdin, and the exit codes; (5) `npm ci && npm test` at the repo root passes, and `gh pr checks` shows the `test` workflow green at the PR head sha (confirm the sha matches the PR head); (6) the PR targets main, the branch name follows CLAUDE.md (no claude/ prefix, lowercase, under 60 chars), the body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`, and the PR touches only packages/jsonl-lint. Report pass/fail per expectation with evidence; do not fix anything yourself."
+  },
+  "grades": {
+    "one-check-per-line": false,
+    "no-restated-rules": false,
+    "words-only": false,
+    "runs-as-written": true,
+    "catches-traps": true,
+    "avoids-must-not": false
+  },
+  "notes": {
+    "one-check-per-line": "Items (1) to (6) do not map one to one onto the lines (item 2 covers lines 1 to 3), and no line is quoted.",
+    "no-restated-rules": "Names a branch-name rule.",
+    "words-only": "Mutation spot-check, branch-name rule and 'touches only packages/jsonl-lint' are conditions.",
+    "catches-traps": "Missing plus bad coexisting exit 2, git diff against main for line 4, README update, gh pr checks.",
+    "avoids-must-not": "Branch-name rule and mutation test inside items."
+  }
+}

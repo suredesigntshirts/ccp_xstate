@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "1b1a40755412dce2eb2a90d50eebe6011fc6c13c4a4ac6e3faf3eaa58af6d52a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs against the repository facts. Builder step 5 says to run `npm run lint && npm run test:unit`, but package.json defines only one script, `{\"test\":\"node --test\"}`. There are no `lint` or `test:unit` scripts and no step adds them, so `npm run lint` fails with a missing-script error. Because of the `&&`, the tests never run either, so the command can't run as written. The other commands are fine: the builder's `node -e` call, the verifier's three `node -e` checks (their JavaScript syntax is valid) and the verifier's `npm test` would all run. The single broken builder command is enough to fail the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 4625,
+  "tokens": {
+    "input": 2,
+    "output": 333,
+    "cacheCreation": 3788,
+    "cacheRead": 783,
+    "fresh": 4123,
+    "total": 4906
+  },
+  "at": "2026-11-05T04:59:08.611Z"
+}

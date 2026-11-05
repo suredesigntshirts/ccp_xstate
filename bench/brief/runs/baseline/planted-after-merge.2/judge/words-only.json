@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "777afaa4716cde979511c6bc66fc1b362c74cde7d8120a64e1cbecd64492a163",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS/FAIL conditions against the words of its expect line. Checks 3 and 4 stick to the words: Check 3 asks that docs/index.md contain `--shout` and say what it does, and Check 4 asks that the PR be merged and the live page show `--shout`. Checks 1 and 2 add exit-code tests that the words don't require. Check 1's PASS says \"each exits 0\", and its FAIL includes \"exits non-zero\". The line only says the command \"prints the greeting in upper case\", so a correct upper-case greeting with a non-zero exit would still meet it. Check 2's PASS requires \"stdout, stderr and exit code\" to match the base, and its FAIL covers \"any difference in output or exit code\". The line only says the \"output is unchanged\", and an exit code is not output. These stricter tests belong under Advisory, not in PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 10040,
+  "tokens": {
+    "input": 2,
+    "output": 829,
+    "cacheCreation": 3327,
+    "cacheRead": 783,
+    "fresh": 4158,
+    "total": 4941
+  },
+  "at": "2026-11-05T05:05:08.719Z"
+}

@@ -1,0 +1,14 @@
+Make one pull request that adds a --shout flag to greet-cli and meets every expect line of issue #12:
+- node bin/greet.js --shout <name> prints the greeting in upper case
+- without --shout the output is unchanged
+- docs/index.md documents --shout
+- after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout
+
+Steps:
+1. Read bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md, README.md and .github/workflows/pages.yml.
+2. In bin/greet.js, detect `--shout` among the arguments (in any position relative to the name). When present, write the upper-cased greeting, so `node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline. The name must still be the first argument that does not start with `--`, so `--shout` is never taken as the name. If you put the logic in src/greet.js, keep `greeting(name)` returning exactly `Hello, <name>!` when shouting is not asked for.
+3. Without --shout, keep output byte-for-byte the same: `node bin/greet.js Ada` still prints `Hello, Ada!\n`, and the usage message and exit code 2 for a missing name stay the same.
+4. Add tests in test/greet.test.js for the CLI with --shout (e.g. `['bin/greet.js', '--shout', 'Ada']` gives `HELLO, ADA!\n`, and `['bin/greet.js', 'Ada', '--shout']` gives the same). Keep the existing tests unchanged and passing.
+5. Update docs/index.md to document the `--shout` flag: show the usage `node bin/greet.js --shout <name>` and say it prints the greeting in upper case (for example `HELLO, <NAME>!`). The literal text `--shout` must appear in the file.
+6. The last expect line is met when the PR is merged: .github/workflows/pages.yml publishes the `docs/` directory to https://o.github.io/greet-cli/ on every push to main. Do not change that workflow and do not move the docs out of `docs/`. Keep the --shout documentation in docs/index.md so that it is published. In the PR description, say that the published-page line can only be confirmed after merge, once the pages workflow has run.
+7. Run `npm test` and make sure it passes, then open the pull request.

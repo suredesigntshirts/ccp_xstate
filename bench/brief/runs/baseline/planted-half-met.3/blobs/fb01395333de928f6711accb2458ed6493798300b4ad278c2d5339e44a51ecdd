@@ -1,0 +1,20 @@
+Make one pull request that meets all four acceptance lines of issue https://github.com/o/strutil/issues/7 (padLeft for invoice numbers).
+
+Repository state you start from: index.js is an ES module (package.json has "type": "module") that exports capitalize, slugify and truncate. README.md has sections `## capitalize(s)` and `## truncate(s, n)` but NO section for slugify. The tests live in test/strutil.test.js and run with `npm test` (`node --test`).
+
+Steps:
+1. In index.js add and export `padLeft(s, width, fill)`, with a short doc comment like the other functions. Behaviour:
+   - pads s on the left with fill until it is width characters long;
+   - when fill is not given (undefined), pad with a single space ' ';
+   - when s.length is already >= width, return s unchanged (the same string).
+   Example: padLeft('42', 5, '0') === '00042'; padLeft('42', 5) === '   42'; padLeft('12345', 3, '0') === '12345'. `String.prototype.padStart(width, fill ?? ' ')` is fine.
+2. In README.md add a `## padLeft(s, width, fill)` section describing it (fill defaults to a space; s is returned unchanged when already width characters or longer). ALSO add the missing `## slugify(s)` section (lower case, words joined by dashes), because the acceptance line requires a README section for EVERY function index.js exports, not only the new one. Keep the existing sections. Put the function sections before the `## Tests` section.
+3. In test/strutil.test.js import padLeft and add tests: zero padding ('42', 5, '0' -> '00042'), default space fill ('42', 5 -> '   42'), exact width unchanged ('12345', 5, '0' -> '12345'), longer than width unchanged ('123456', 3, '0' -> '123456').
+4. Run `npm test` and make sure it exits 0 with no failing tests.
+5. Before opening the PR, list every `export` in index.js and confirm each name has its own `##` heading in README.md.
+
+Acceptance lines (all must hold):
+- index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+- padLeft returns s unchanged when s is already width characters or longer
+- README.md has a section for every function index.js exports
+- npm test passes

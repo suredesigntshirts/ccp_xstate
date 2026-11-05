@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "276b89bb8a534855df6830a644cc01aa765e765de1fefcdea58bd65d47e835c7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs cover all three must_catch items.\n1. Builder step 3 points out that README.md has no slugify section and says to \"Add a `## slugify(s)` section as well\", along with the padLeft section.\n2. Verifier Check 3 prints the exports at the PR head. It names \"capitalize, slugify, truncate and padLeft\" and fails if \"any exported function is listed as missing (note that slugify had no README section before this change)\".\n3. Verifier Check 1 calls `p('42',5)` with no fill and expects `\"   42\"`, which tests that the default is a space.\n\nOne flaw that doesn't affect this criterion: in Check 3, the shell turns `'\\\\b'` into `'\\b'` before Node reads it. JavaScript treats that as a backspace character, not a word boundary, so the command would likely list every function as missing even when the README is correct. Still, the check does list the exports and fails when slugify has no section, as item 2 asks.",
+  "model": "claude-opus-5-5",
+  "ms": 12765,
+  "tokens": {
+    "input": 2,
+    "output": 854,
+    "cacheCreation": 3260,
+    "cacheRead": 783,
+    "fresh": 4116,
+    "total": 4899
+  },
+  "at": "2026-11-05T05:05:44.017Z"
+}

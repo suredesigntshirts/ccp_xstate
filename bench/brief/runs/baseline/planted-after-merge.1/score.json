@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.1",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 3 and 4 stay close to their lines: Check 3 needs `--shout` plus text saying what it does, and Check 4 needs the live page to contain `--shout`. Check 1 adds an \"exits 0\" requirement that the line doesn't clearly require. Check 2 breaks the criterion clearly. Its line says only \"without --shout the output is unchanged\", but its PASS condition also requires \"`npm test` passes\", and its FAIL condition includes \"failing `npm test`\". A passing test suite isn't something those words force. Check 2 also compares exit codes, which goes beyond \"output\". These stricter tests belong under Advisory, but they sit inside the PASS/FAIL conditions.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository. `npm test` maps to `node --test`, which finds test/greet.test.js. bin/greet.js and docs/index.md exist. The `node bin/greet.js --shout Ada` / `'Grace Hopper'` runs only depend on the flag the builder adds in step 1. `grep -n -- '--shout' docs/index.md` uses `--` correctly so the pattern isn't read as an option. `gh run list --workflow pages.yml --branch main` names the existing .github/workflows/pages.yml and uses valid flags. `curl -sSL ... | grep -n -- '--shout'` is valid shell. `git worktree add` of the base commit is described in prose, not as a broken literal command. `gh pr view <pr> --json state,mergedAt,mergeCommit` uses fields gh accepts. `<pr>` is a placeholder for a PR number that can't be known when the brief is written, not a syntax error. I found no missing files, wrong arguments or invalid syntax.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 2 is handled. Check 2 runs the same commands \"at the PR's merge base\" and needs the stdout and exit code to be \"identical to the merge base\", so it compares against the old output, not only a hand-written string. Item 1 is not handled. Check 4 runs `curl -sSL https://o.github.io/greet-cli/ | grep`, and PASS is \"the fetched live page contains `--shout`\". It also says \"do not mark it PASS based on docs/index.md\". So the check reads the live page instead of confirming at the PR head that docs/index.md lists --shout and that pages.yml publishes docs/ from main. It also never inspects pages.yml at the head. Only the builder brief mentions that publishing setup, not the verifier.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked both briefs against the two must_not items. The builder brief is fine: it says line 4 \"can only be confirmed after merge\". The verifier's Check 4 breaks item 1. It says \"run `curl -sSL https://o.github.io/greet-cli/ | grep -n -- '--shout'`\", then \"PASS: the fetched live page contains `--shout`\" and \"FAIL: the page cannot be fetched, or it does not contain `--shout`\". That is a check that fetches the live page and passes or fails on what it shows today. Checking merge state and the pages run first doesn't change this: the verdict still comes from the live page. Before merge, the check also gives a hard FAIL instead of marking line 4 as only confirmable after merge. It does avoid item 2, since it never passes without evidence. Item 1 is still broken.",
+      "cached": true
+    }
+  }
+}

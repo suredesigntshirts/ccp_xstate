@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "6ef6674a24d294154861d7cb58031eb9d3729e744a60b2f86a4220866e35852e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. `npm test` matches the package.json script `node --test`. The Check 1 and Check 2 one-liners are valid shell and valid JavaScript. Check 3 breaks. Its code sits inside bash double quotes, and bash turns each `\\\\` into a single `\\`. Node therefore receives `new RegExp('^#+\\s*'+f+'\\s*\\(','m')`. In a JavaScript string, `'\\s'` is just `s` and `'\\('` is just `(`. The pattern becomes `^#+s*adds*(`, which has an unclosed group. `new RegExp` throws a SyntaxError before any check runs, so the command exits non-zero even when README.md is correct. Check 3 does not run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 13086,
+  "tokens": {
+    "input": 2,
+    "output": 931,
+    "cacheCreation": 3261,
+    "cacheRead": 783,
+    "fresh": 4194,
+    "total": 4977
+  },
+  "at": "2026-11-05T05:06:36.525Z"
+}

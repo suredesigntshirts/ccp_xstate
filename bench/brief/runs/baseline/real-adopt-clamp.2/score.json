@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.2",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2 and 4 hold. Check 1's cases (bounds, lo===hi, negatives) and check 2's RangeError cases follow from what their lines say. Check 4 only needs exit code 0 and no failing tests. Check 3 breaks the criterion. The expect line asks only that README.md \"documents every function math.js exports\". The check's script fails unless there is a markdown heading matching `^#+\\s*name\\s*\\(`, and its FAIL condition says \"any exported function has no heading or no description\". A README could document a function in a list, a table or a paragraph without a heading. Requiring a heading is a format rule the words don't force, so it belonged under Advisory, not in the PASS/FAIL condition.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs. `npm test` matches the package.json script `node --test`. The Check 1 and Check 2 one-liners are valid shell and valid JavaScript. Check 3 breaks. Its code sits inside bash double quotes, and bash turns each `\\\\` into a single `\\`. Node therefore receives `new RegExp('^#+\\s*'+f+'\\s*\\(','m')`. In a JavaScript string, `'\\s'` is just `s` and `'\\('` is just `(`. The pattern becomes `^#+s*adds*(`, which has an unclosed group. `new RegExp` throws a SyntaxError before any check runs, so the command exits non-zero even when README.md is correct. Check 3 does not run as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and each one holds. (1) Builder step 2 has the builder add a \"### subtract(a, b)\" entry to README.md next to the clamp entry. It explains why: \"subtract is exported and NOT documented, so line 3 fails today.\" (2) Verifier check 3 reads math.js's exports at the PR head, prints them (\"exports:\") and exits 1 if any has no README heading. It then says to confirm that the list \"must include add, subtract, multiply and clamp\". It FAILs if \"any exported function has no heading or no description\" and notes that subtract must be documented now. (3) Verifier check 2 calls clamp with lo > hi in three cases and throws unless `e instanceof RangeError`. Its FAIL condition covers any call that \"threw something that is not a RangeError\".",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Must_not item 1 holds. Check 3's script fails when subtract has no heading, and the brief says plainly that \"subtract was undocumented before this PR, so it must be documented now.\"\n\nItem 2 breaks in Check 3. Its regex `'^#+\\\\s*'+f+'\\\\s*\\\\('` only accepts a function as documented if it has a Markdown heading of the form \"# name(\". The FAIL condition also says \"any exported function has no heading or no description.\" Line 3 only requires that README.md documents every exported function. A README that documented subtract and clamp in a table, a list or prose would meet line 3 but fail this check. That is a PASS condition tied to a specific README layout, which is stricter than its line.\n\nChecks 1, 2 and 4 stay within their lines. Check 2 only tests for `instanceof RangeError` and does not require a particular error message.",
+      "cached": true
+    }
+  }
+}

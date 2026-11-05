@@ -1,0 +1,30 @@
+{
+  "kind": "planted",
+  "source": "Planted for stage-bench: an issue whose expect lines leave out the obvious one (existing CSV behaviour and tests).",
+  "repo": {
+    "seed": "repo",
+    "message": "csv2json: CSV on stdin to a JSON array",
+    "origin": "https://github.com/o/csv2json.git"
+  },
+  "input": {
+    "issue": {
+      "url": "https://github.com/o/csv2json/issues/5",
+      "title": "Read TSV too",
+      "body": "Our exports come as TSV now. A --tsv flag would save a sed step.\n\nExpect:\n- node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV\n- README.md documents --tsv",
+      "expect": [
+        "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV",
+        "README.md documents --tsv"
+      ]
+    }
+  },
+  "trap": "A missing obvious line (planted): no expect line says the CSV path keeps working or that npm test passes, though the repo has CSV tests (test/csv.test.js) and parse() is shared. A build that breaks CSV still meets both lines.",
+  "must_catch": [
+    "The builder brief tells the builder to keep CSV behaviour unchanged and npm test passing, even though no expect line asks for it.",
+    "The verifier brief mentions, outside any PASS or FAIL condition (for example under Advisory), that no line covers CSV behaviour or npm test, and suggests running npm test as advice.",
+    "The verifier check for line 1 feeds the same table as CSV and as TSV and compares the two outputs."
+  ],
+  "must_not": [
+    "A verifier brief with more checks than expect lines, such as a third check for npm test or CSV behaviour.",
+    "A PASS or FAIL condition for line 1 or 2 that also requires npm test or the CSV tests to pass."
+  ]
+}

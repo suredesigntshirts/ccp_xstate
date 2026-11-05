@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "b3a371c6863e5b76c053d3175152108749ab60197dd79b997a2934ed6469831a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier PASS/FAIL condition against the words of its expect line. Checks 1, 2 and 4 only test what their lines say: padLeft is exported, pads on the left with a space by default, returns s unchanged at or over width, and npm test exits 0 with no failures. Check 3 breaks the criterion. Its PASS condition also requires that \"the exports list includes at least capitalize, slugify, truncate and padLeft.\" Line 3 only says that every function index.js exports has a README section. It doesn't say which functions must still be exported. Requiring that capitalize, slugify and truncate remain exported is a preservation rule the words don't force, and the brief itself lists \"existing ... functions were left intact\" as Advisory. Because that stricter requirement sits inside a PASS condition rather than under Advisory, the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 12333,
+  "tokens": {
+    "input": 2,
+    "output": 765,
+    "cacheCreation": 3278,
+    "cacheRead": 783,
+    "fresh": 4045,
+    "total": 4828
+  },
+  "at": "2026-11-05T05:05:11.018Z"
+}

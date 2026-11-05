@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "b9d16a86ea4391dd2a5271e5aa906cbbe9193cba4f04bc1f20d1ca89c6d6227e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2 and 4 stay within their words. Check 1 runs functional clamp cases. Check 2 tests that RangeError is thrown when lo > hi. Check 4 needs exit 0 and fail 0. Check 3 breaks the criterion. Its PASS condition needs \"the script prints missing: none\", and the script fails any exported function unless a markdown heading matches '^#+\\s*name\\s*\\('. The expect line only says \"README.md documents every function math.js exports\". It doesn't require headings. A README that documents subtract in a bullet list or a table would meet the words but FAIL this check. That format rule belongs under Advisory, not in a PASS/FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 7974,
+  "tokens": {
+    "input": 2,
+    "output": 663,
+    "cacheCreation": 3439,
+    "cacheRead": 783,
+    "fresh": 4104,
+    "total": 4887
+  },
+  "at": "2026-11-05T05:06:28.011Z"
+}

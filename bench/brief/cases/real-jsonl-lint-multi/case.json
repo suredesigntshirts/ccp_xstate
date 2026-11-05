@@ -1,0 +1,33 @@
+{
+  "kind": "real",
+  "source": "The first real issue's second item (31 Oct): ccp_machine_test issue #104, item fri-jsonl-lint-2, brief run 0.brief in /mnt/project-files/first-real-issue/harness/journal (pre-contract prompt). The input is that run's input; the repo is ccp_machine_test at b74bddb, main when the item started.",
+  "repo": {
+    "git": "https://github.com/suredesigntshirts/ccp_machine_test",
+    "commit": "b74bddb3b7f22287c00594ba1a9561398b675121",
+    "origin": "https://github.com/suredesigntshirts/ccp_machine_test.git"
+  },
+  "input": {
+    "issue": {
+      "url": "https://github.com/suredesigntshirts/ccp_machine_test/issues/104",
+      "expect": [
+        "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before",
+        "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)",
+        "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)",
+        "lint(text) in src/index.js is unchanged",
+        "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage",
+        "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head"
+      ]
+    }
+  },
+  "trap": "Real repo facts: bin/jsonl-lint.js reads one file and exits 2 on a read error at once; line 3 makes exit 2 win over 1 when one file is missing and another has bad rows, while the other files are still checked and reported. packages/jsonl-lint/README.md documents only 'jsonl-lint <file>'. Line 4 is checked against the base commit.",
+  "must_catch": [
+    "The verifier check for line 3 runs a missing file together with a file that has a bad row and requires exit 2 and the bad row still reported, not only each case alone.",
+    "The verifier check for line 4 compares packages/jsonl-lint/src/index.js at the PR head with the base commit (for example git diff against the base is empty), since 'unchanged' is a fact about the diff.",
+    "The builder brief has the builder update packages/jsonl-lint/README.md, which documents only the one-file usage today.",
+    "The verifier check for line 6 reads GitHub at the PR head: the PR body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and the test workflow's run is green at that sha."
+  ],
+  "must_not": [
+    "A PASS or FAIL condition stricter than its line, such as exact stderr wording, a branch-name rule, a mutation test, or a limit on which files the PR may touch.",
+    "A check that passes a behaviour line (lines 1 to 3) by reading the diff or the code only, without running the program."
+  ]
+}

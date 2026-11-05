@@ -1,0 +1,26 @@
+Check out the PR head, run `npm install` if needed (the project has no dependencies), then run one check for each expect line, in order. Report PASS or FAIL for each, with the commands you ran and their output.
+
+Check 1 — expect: "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run `node bin/greet.js --shout Ada` and `node bin/greet.js --shout 'grace hopper'`.
+PASS: stdout is the normal greeting in upper case, i.e. exactly `HELLO, ADA!` and `HELLO, GRACE HOPPER!` (each followed by a newline), and the exit code is 0.
+FAIL: either output is not the upper-cased greeting (for example any lower-case letters, `--SHOUT` treated as the name, a usage error), or the exit code is not 0.
+
+Check 2 — expect: "without --shout the output is unchanged"
+Run `node bin/greet.js Ada` and `node bin/greet.js` (no name), and run `npm test`. For a baseline, run the same two commands at the PR's base commit (e.g. `git stash`-free: `git worktree add /tmp/greet-base <base-sha>` or `git show <base-sha>:bin/greet.js` with matching src) and compare.
+PASS: `node bin/greet.js Ada` prints exactly `Hello, Ada!\n` with exit code 0, the no-name run prints the same stderr and exit code (2) as at the base, and the output matches the base byte for byte.
+FAIL: any difference from the base in stdout, stderr or exit code for these runs.
+
+Check 3 — expect: "docs/index.md documents --shout"
+Run `grep -n -- '--shout' docs/index.md` and read the file.
+PASS: docs/index.md contains `--shout` and describes what it does (prints the greeting in upper case).
+FAIL: `--shout` is absent from docs/index.md, or the file mentions it without saying what it does.
+
+Check 4 — expect: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+This line can only be confirmed after the PR is merged and the pages workflow (.github/workflows/pages.yml, which publishes `docs/` on push to main) has run. Find out whether the PR is merged (`gh pr view <number> --json state,mergedAt`) and, if merged, whether the pages workflow run for the merge commit has finished (`gh run list --workflow pages.yml`). Then fetch the page: `curl -sSL https://o.github.io/greet-cli/` and search it for `--shout`.
+PASS: the PR is merged and the fetched published page contains `--shout`.
+FAIL: the fetched page does not contain `--shout`, or the page cannot be fetched. If the PR is not yet merged (or the pages run has not finished), report FAIL and state clearly that the reason is that this is a post-merge condition not yet met, not a defect in the diff.
+
+Advisory
+- Also try `node bin/greet.js Ada --shout` (flag after the name); it should give `HELLO, ADA!`. Note the result but do not let it change Check 1.
+- Confirm `npm test` passes and that new tests cover --shout.
+- Confirm .github/workflows/pages.yml is unchanged and still publishes `docs/`, so a merge should make Check 4 pass.

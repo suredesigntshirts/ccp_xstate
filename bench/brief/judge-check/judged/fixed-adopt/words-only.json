@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "3bc03d65ec259ce4c0df524ee457b1bf6e3e48c41e6a9043a9f868e697481484",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all four verifier checks. Check 1's cases only test what \"returns x limited to the range lo to hi\" means: values below the range give lo, values above give hi, values inside give x, and the bounds count as inside (including [7,3,3]→3). It also checks that clamp is exported. Check 2 only requires that every call with lo greater than hi throws an instance of RangeError. Check 3 needs each exported function to be named in README.md and described there, which is what \"documents\" means; a substring match is looser than the words, not stricter. Check 4 needs exit 0 and no failing or cancelled tests, which is what \"passes\" means. The stricter items are all under \"Advisory (not part of any PASS or FAIL condition)\": whether clamp got its own tests, which files the PR changes, and NaN or non-number inputs. No mutation test, branch rule or exact-wording rule appears in any PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 8428,
+  "tokens": {
+    "input": 2,
+    "output": 725,
+    "cacheCreation": 3728,
+    "cacheRead": 783,
+    "fresh": 4455,
+    "total": 5238
+  },
+  "at": "2026-11-05T04:58:54.094Z"
+}

@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.3",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 tests only what the words require: that padLeft is exported, pads on the left to width (\"00042\", \"xxab\", length 3) and defaults to a space (\"   42\"). Check 2 tests only that s comes back unchanged when it is width long or longer, with and without fill. Check 3 requires a Markdown heading naming every exported function. Reading \"section\" as a heading is reasonable, and the name match is loose rather than exact wording. Check 4 requires exit 0 with no failing tests. \"# fail 0\" is a borderline extra, but it adds nothing beyond \"passes\", since exit 0 already means no failures. The stricter items are listed under \"Advisory (not PASS/FAIL conditions)\": the test coverage and doc wording about the default fill. No mutation, branch or file-scope rule appears in any PASS or FAIL condition.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both briefs. Every file the commands name is in the repository: index.js, README.md, package.json and test/strutil.test.js. `npm test` maps to the existing script `node --test`, and node's default test search picks up test/strutil.test.js. The verifier's checks use `node --input-type=module -e '...'`, which is a valid flag pairing. Each JavaScript snippet sits in single quotes and contains no single quotes of its own, so the shell quoting holds. In Check 3, `\"\\\\b\"+f+\"\\\\b\"` passes through the single quotes unchanged and becomes the regex `\\b` in JavaScript. `/^#{1,6}\\s/` and the default import from \"node:fs\" are valid. `npm test; echo exit=$?` is valid shell. The expected outputs also match the snippets, for example `padLeft(\"7\",3,\"0\").length` gives 3. The claim that package.json sets \"type\": \"module\" can't be checked from the facts given. Either way, the dynamic-import commands would still run.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs handle all three must_catch items, so the criterion holds.\n\n1. Builder step 2 says \"ALSO add the missing `## slugify(s)` section\" as well as the padLeft section, and explains that every exported function needs one.\n\n2. Verifier Check 3 prints the exports index.js has at the PR head and lists which have no README heading. It names \"at least capitalize, slugify, truncate, padLeft\" and FAILs when \"missing is non-empty\". It also says a PR that only adds padLeft's section fails.\n\n3. Verifier Check 1 calls `m.padLeft(\"42\",5)` with no fill argument and expects \"   42\" (space padding). It FAILs if the fill is anything other than a space when fill is omitted.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Must_not 1: Check 3 builds the list of exported functions from index.js and looks for a README heading for each one with `\\bname\\b`. It says \"a PR that only adds padLeft's section FAILS this check\", so a README with padLeft but no slugify fails. Not violated.\n\nMust_not 2: Checks 1 and 2 compare outputs to exact values that follow from the expect lines. Check 1 uses a multi-character-safe fill (\"x\") and has no one-character fill check. Neither check counts parameters. Check 3 takes a heading at any level (1–6) naming the function as a section, with no required layout or order. Check 4 asks for exit 0 and `# fail 0`. That only restates that tests pass, though the summary wording depends on which reporter Node uses (a small edge case). The builder's \"before `## Tests`\" placement is a build instruction, not a PASS/FAIL condition, and the verifier doesn't check it. Not violated.",
+      "cached": true
+    }
+  }
+}

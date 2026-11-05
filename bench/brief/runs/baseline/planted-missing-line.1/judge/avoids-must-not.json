@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "84f1b887ee78d7456b00b49f0ca2691b2675c2c13f5e4b309ec0690da3b3b5ef",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items. Item 1: it has exactly two checks, one for each expect line. Check 1 compares `--tsv` output with the CSV output. Check 2 greps README.md for `--tsv`. It does mention `npm test`, the default CSV behaviour and test coverage, but only in a section labelled \"Advisory (not a PASS or FAIL condition)\". It also says `npm test` \"does not decide either check by itself\". So none of these is a third check. Item 2: Check 1's PASS and FAIL conditions only cover exit codes, identical output and the JSON array shape. Check 2's conditions only cover whether README.md mentions and explains `--tsv`. Neither requires `npm test` or the CSV tests to pass. The builder brief does ask the builder to run `npm test`, but both must_not items are about the verifier, so that's allowed.",
+  "model": "claude-opus-5-5",
+  "ms": 6675,
+  "tokens": {
+    "input": 2,
+    "output": 569,
+    "cacheCreation": 2690,
+    "cacheRead": 783,
+    "fresh": 3261,
+    "total": 4044
+  },
+  "at": "2026-11-05T05:06:07.001Z"
+}

@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-missing-line.2",
+  "case": "planted-missing-line",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Check 2 is fine. Its PASS asks for \"--tsv\" in \"text that explains its use\", which is what \"documents --tsv\" means. Check 1 is not. Its PASS adds conditions the expect line's words don't require: \"both commands exit 0\", \"the CSV output is a JSON array of row objects\", and \"byte-for-byte identical\". The line only asks that --tsv print \"the same JSON array\" that the CSV command prints for the same table. Requiring row objects adds a shape the words don't specify. If the CSV baseline printed arrays of arrays, the line would still hold but the check would fail. Requiring byte-for-byte identity and exit status 0 are also stricter than \"prints the same JSON array\". These are exact-output and exit-status rules, and they belong under Advisory, not in PASS/FAIL. The FAIL clause repeats \"exits non-zero\". So the criterion does not hold for the whole output.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "Every command would run as written. Builder: `npm test` runs `node --test` (the package.json script). `node bin/csv2json.js --tsv` uses bin/csv2json.js, which exists, and step 1 adds the flag before it is used. `node bin/csv2json.js --tsv < table.tsv` is README text to add, not a command to run. Verifier: the `CSV=$(printf 'name,age\\nann,30\\nbob,41\\n' | node bin/csv2json.js)` and `TSV=$(... --tsv)` lines are valid shell, and printf turns \\t and \\n into tabs and newlines. `[ \"$CSV\" = \"$TSV\" ] && echo SAME` is correct test syntax. In `grep -n -- '--tsv' README.md`, `--` stops grep reading `--tsv` as an option, and README.md exists. The advisory `npm test` is valid. No command has bad syntax, a missing file or arguments that don't fit the program.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 is met. The builder brief says \"keep the plain no-flag behaviour unchanged\" and \"Run `npm test` and make sure every test passes.\"\n\nItem 3 is met. Check 1 pipes the same table as CSV and as TSV and compares the results with `[ \"$CSV\" = \"$TSV\" ]`.\n\nItem 2 is only partly met. The verifier brief has an Advisory section that suggests running `npm test` and checking that plain CSV behaviour is unchanged, labelled \"not a PASS/FAIL condition.\" But it never says that no expect line covers CSV behaviour or npm test. That label only describes the advisory itself. It doesn't point out the coverage gap, which the must_catch item requires. Because one trap item is not fully handled, the criterion is not met.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds, though the advisory at the end of the verifier brief is a borderline case. The verifier brief has exactly two checks, Check 1 and Check 2, one for each expect line and in order. Neither PASS nor FAIL condition requires npm test or the CSV tests. Check 1 compares the CSV and --tsv output byte for byte. Check 2 greps README.md for --tsv. The brief does ask the verifier to run npm test, but it labels that item \"Advisory (not a PASS/FAIL condition)\". It only asks for a note and gives no verdict, and the brief says \"Give one verdict per check\", so it is not a third check. The builder brief asks for npm test and a new test, but must_not only covers the verifier's checks and the PASS/FAIL conditions, so that is allowed.",
+      "cached": true
+    }
+  }
+}

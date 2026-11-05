@@ -1,0 +1,24 @@
+{
+  "case": "planted-missing-line",
+  "source": "Planted bad, written by hand: a brief for the missing-line case that adds a third PASS/FAIL check for npm test, a line the issue does not have.",
+  "result": {
+    "builder": "Make one pull request that meets both expect lines:\n1. node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV\n2. README.md documents --tsv\n\nSteps:\n1. Read bin/csv2json.js, src/parse.js, test/csv.test.js and README.md. parse(text, sep) already takes a separator, defaulting to a comma.\n2. In bin/csv2json.js, read the arguments: when --tsv is given, call parse with '\\t' as the separator; otherwise keep calling it exactly as today, so CSV output does not change.\n3. Add a test in test/csv.test.js that pipes the same table as CSV and as TSV through the CLI and asserts the outputs are equal.\n4. In README.md, add a usage line for `node bin/csv2json.js --tsv < table.tsv` and say it reads tab-separated input.\n5. Run `npm test` and keep every existing test passing; the CSV path must not change.\n6. Commit and open the pull request.",
+    "verifier": "Check out the PR head and run every command from the repository root.\n\nCheck 1. Expect line: \"node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV\"\nRun: printf 'a,b\\n1,2\\n3,4\\n' | node bin/csv2json.js > /tmp/csv.json; printf 'a\\tb\\n1\\t2\\n3\\t4\\n' | node bin/csv2json.js --tsv > /tmp/tsv.json; diff /tmp/csv.json /tmp/tsv.json && echo SAME\nPASS: it prints SAME. FAIL: diff shows any difference, or either command fails.\n\nCheck 2. Expect line: \"README.md documents --tsv\"\nRun: grep -n -- '--tsv' README.md\nPASS: README.md mentions --tsv and says what it does. FAIL: no mention.\n\nCheck 3. Existing behaviour: npm test passes\nRun: npm test\nPASS: exit 0 with no failing tests. FAIL: any failure."
+  },
+  "grades": {
+    "one-check-per-line": false,
+    "no-restated-rules": true,
+    "words-only": false,
+    "runs-as-written": true,
+    "catches-traps": false,
+    "avoids-must-not": false
+  },
+  "planted": {
+    "one-check-per-line": "three checks for two lines",
+    "avoids-must-not": "a third check for npm test"
+  },
+  "notes": {
+    "words-only": "Check 3 tests what no expect line asks for.",
+    "catches-traps": "must_catch 2 (mention the gap outside any PASS/FAIL condition) is broken: the gap became a check."
+  }
+}

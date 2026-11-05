@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "eb2c4383aa0ca9f723933c66767ae680f0bc45d5c8b0f1bb3621d27c9c2cbe5f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 1 holds: its PASS/FAIL conditions only compare the CSV and --tsv outputs on stdin, which is what expect line 1 asks for. Check 2 holds: \"mentions --tsv and says what it does\" fairly reads \"documents\". Check 3 breaks the criterion. Its heading is \"Existing behaviour: npm test passes\", and its PASS condition is \"exit 0 with no failing tests\" and its FAIL condition is \"any failure\". Neither expect line asks for the test suite to pass, so this is a stricter test that the words don't force. It sits in a real PASS/FAIL check instead of under an Advisory heading, and the verifier brief has no Advisory section at all. Because one check fails the criterion, the output as a whole does not meet it.",
+  "model": "claude-opus-5-5",
+  "ms": 7709,
+  "tokens": {
+    "input": 2,
+    "output": 445,
+    "cacheCreation": 549,
+    "cacheRead": 2401,
+    "fresh": 996,
+    "total": 3397
+  },
+  "at": "2026-11-05T04:56:24.302Z"
+}

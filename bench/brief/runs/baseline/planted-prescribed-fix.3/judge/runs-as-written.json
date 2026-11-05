@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "bd8a8ac9ef43bb3c031f34e75646b123b96ac997208f90bb05efd4492a909b52",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. The builder's `npm test` maps to the existing script `node --test`. Verifier Check 1 is valid shell: `mktemp -d`, then `printf '{port: 9000' > \"$d/config.json\"`, then `node --input-type=module -e \"...\" \"$d/config.json\"`. With `-e`, `process.argv[1]` is the first extra argument, so the file path reaches `loadConfig`. The import `'./src/config.js'` resolves from the repository root, and that file exists. The JavaScript parses, and `console.log(JSON.stringify(r), …, …)` would print `{} true 0` as the brief expects. Check 2 is `npm test; echo exit=$?`, which is valid. The advisory step `node src/app.js \"$d/config.json\"` uses a file that exists and reuses `$d` from Check 1, so it works when run in the same shell, which the brief implies. I found no missing files, wrong arguments or syntax errors.",
+  "model": "claude-opus-5-5",
+  "ms": 10945,
+  "tokens": {
+    "input": 2,
+    "output": 981,
+    "cacheCreation": 2812,
+    "cacheRead": 783,
+    "fresh": 3795,
+    "total": 4578
+  },
+  "at": "2026-11-05T05:06:14.083Z"
+}

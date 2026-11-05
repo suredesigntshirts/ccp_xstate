@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.2",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Several conditions ask for more than the words require:\n- **Check 3:** PASS needs \"an error naming missing.jsonl on stderr\". Expect line 3 only says \"error on stderr\" and never requires the file to be named.\n- **Check 4:** PASS adds \"and the lint tests pass\". Line 4 only requires lint(text) to be unchanged, so this is an extra test the words don't force.\n- **Check 5:** PASS needs \"the tests pass\". Line 5 only requires the tests to cover the listed cases and the README to document the usage. Tests passing belongs to line 6.\n\nThese extra requirements should sit under the Advisory heading. Instead they are part of PASS conditions, so the criterion is not met.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief's commands are fine: `npm test` at the root and the files it names all exist. The verifier brief has commands that won't run as written. Every Check uses `$D` (e.g. `node $CLI $D/bad.jsonl`), but `D` is never set. The brief only says \"Make a scratch directory outside the repo (mktemp -d)\", while `CLI=` is set explicitly. bad2.jsonl is used in Check 1 but missing from the list of files to create. The step \"git show <merge-base>:... > /tmp/old.js, copy it next to the src folder\" is vague, and `/tmp/old.js` can't import `../src/index.js` from where it is. Check 5 runs `node --test packages/jsonl-lint/test/`. On Node 22+, positional arguments are glob patterns, and a bare directory likely won't find the test files. So some commands in the output don't run as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items against the two briefs, and the briefs cover each one.\n1. Verifier Check 3 runs `node $CLI $D/clean1.jsonl $D/missing.jsonl $D/bad.jsonl`. It expects exit 2 and also requires \"stdout still contains `$D/bad.jsonl:2: ...`\", so the missing file and the bad row are tested in the same run.\n2. Verifier Check 4 runs `git diff <merge-base>..HEAD -- packages/jsonl-lint/src/index.js`, which compares the file at the PR head with the base commit. The pass test reads \"no change to the lint function\" rather than \"the diff is empty\", which is a bit loose, but the comparison is against the diff.\n3. Builder step 4 says \"Update packages/jsonl-lint/README.md\" and spells out the new usage, stdin and exit codes.\n4. Verifier Check 6 uses `gh pr view` to read the body and headRefOid, requires the Closes line, and runs `gh run list --commit <headRefOid>`, which must show the workflow \"finished with conclusion success\".",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every verifier PASS/FAIL condition against its expect line. Check 1 asks for output identical to the old CLI, and the line itself says \"as for one file before\". Check 2 asks for exit 2 with an error on stderr, which the line's \"usage error (exit 2)\" implies. Check 3 matches its line, as does check 4: FAIL only if \"the lint function's body or signature changed\". Check 6's \"exactly one PR\" comes from \"one PR\". None of them requires exact stderr wording, a branch-name rule, a mutation test or a limit on which files the PR touches. The stricter ideas, like rejecting a second `-` before anything goes to stdout, sit under \"Advisory (not pass/fail)\". The builder's \"Do not modify src/index.js\" is an instruction to the builder, not a PASS/FAIL condition. Checks 1–3 all run `node $CLI` with real files and stdin, so no behaviour line passes on reading the code alone.",
+      "cached": true
+    }
+  }
+}

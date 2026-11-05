@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.1",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier PASS/FAIL condition against the words of its expect line. Checks 1, 2 and 4 only test what their lines say: padLeft is exported, pads on the left with a space by default, returns s unchanged at or over width, and npm test exits 0 with no failures. Check 3 breaks the criterion. Its PASS condition also requires that \"the exports list includes at least capitalize, slugify, truncate and padLeft.\" Line 3 only says that every function index.js exports has a README section. It doesn't say which functions must still be exported. Requiring that capitalize, slugify and truncate remain exported is a preservation rule the words don't force, and the brief itself lists \"existing ... functions were left intact\" as Advisory. Because that stricter requirement sits inside a PASS condition rather than under Advisory, the criterion fails.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs. `npm test` maps to `node --test`, which exists in package.json, and the commands for Checks 1, 2 and 4 are valid. Check 3 breaks the criterion. It is wrapped in double quotes in bash, where `\\\\` becomes a single `\\`. So the JavaScript receives `new RegExp('\\b'+f+'\\b')`, and in a JS string `'\\b'` is a backspace character (U+0008), not a regex word boundary. No README heading contains a backspace, so the check prints every export under \"missing:\" no matter what README.md says. Run as written, it fails even a correct PR. A minor extra issue: `!heads` inside double quotes can trigger bash history expansion in an interactive shell. The builder brief's claim that the package is `\"type\": \"module\"` also can't be confirmed from the package.json facts given. Because Check 3 doesn't work as written, the criterion is not met.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds: the briefs cover all three must_catch items.\n\n1. In step 3, the builder brief says \"README.md currently has sections for capitalize and truncate but none for slugify, so add a section for slugify(s) as well as one for padLeft\".\n2. Verifier check 3 lists the exported functions and prints any that are missing. It passes only if the output says \"missing: none\" and the exports include \"at least capitalize, slugify, truncate and padLeft\". It fails if any exported function has no heading, \"note slugify had no section before this issue; it must have one now\".\n3. Verifier check 1 calls padLeft('ab',4) with no fill argument and expects \"  ab\". A wrong default fill counts as a failure.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against the verifier brief and found neither.\n\nItem 1: Check 3 reads every function index.js exports and requires a README heading naming each one. It says \"missing: none\" for PASS and adds \"note slugify had no section before this issue; it must have one now\". So a README with a padLeft section but no slugify section fails.\n\nItem 2: Check 1 tests \"x\" with \"*\" and an empty s, and no check counts parameters. Multi-character fill sits under \"Advisory (not part of any PASS/FAIL condition)\", so nothing requires fill to be one character. Any heading level that names the function counts, so no exact README layout is enforced.\n\nTwo conditions are borderline but read as reasonable readings of \"section\": a bare heading counts as FAIL, and capitalize, slugify, truncate and padLeft must appear in the exports list. The second goes slightly beyond the line's wording, but it only stops the check from passing on an empty export list.",
+      "cached": true
+    }
+  }
+}

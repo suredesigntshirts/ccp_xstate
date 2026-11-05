@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "baeb6726da36056a64bea456a55f4458578aa2ac0f774a1735075f9d905b506a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 2 is met. Check 2 runs the same commands at the base commit (\"git worktree add /tmp/greet-base <base-sha>\") and requires a match \"byte for byte\". Item 1 is missed. Check 4 says the line can only be confirmed after merge, but its check reads the live page (\"curl -sSL https://o.github.io/greet-cli/ and search it for --shout\"). It passes only when the PR is merged and the page contains --shout, and reports FAIL when the PR is not merged. It does not check at the PR head that docs/index.md lists --shout and that pages.yml publishes docs/ from main. Checking that pages.yml still publishes docs/ appears only under Advisory, not in the check.",
+  "model": "claude-opus-5-5",
+  "ms": 10127,
+  "tokens": {
+    "input": 2,
+    "output": 718,
+    "cacheCreation": 3439,
+    "cacheRead": 783,
+    "fresh": 4159,
+    "total": 4942
+  },
+  "at": "2026-11-05T05:05:27.854Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "752b664c2f03c08e56514496c1a008d7e9431fbf6c9dad548069fffd0c9e234e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "All three must_catch items are handled. (1) Builder step 2 says to add a \"### subtract(a, b)\" entry as well as clamp, and the current-state note says \"subtract is NOT documented yet\". (2) Verifier Check 3 gets the function exports from math.js at the PR head, prints them, and exits 1 if any has no heading. It also says to confirm that each entry, \"this should include add, subtract, multiply and clamp\", describes the function, and it FAILs if any exported function has no heading or description. (3) Check 2 calls clamp with lo>hi in several cases and FAILs unless `e instanceof RangeError`, so throwing some other error is not enough. One side issue: inside shell double quotes, the `\\\\s` and `\\\\(` escapes in Check 3's regex may reach JavaScript as an invalid regex. That would cause a false FAIL, never a false PASS, so the intent of the check still holds.",
+  "model": "claude-opus-5-5",
+  "ms": 13065,
+  "tokens": {
+    "input": 2,
+    "output": 938,
+    "cacheCreation": 3409,
+    "cacheRead": 783,
+    "fresh": 4349,
+    "total": 5132
+  },
+  "at": "2026-11-05T05:06:48.041Z"
+}

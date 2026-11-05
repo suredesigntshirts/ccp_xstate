@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "a584495f2f8af4fc3427db7bc0d752213cc14f3bc4627aa90484c2778c8ecbe9",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Must_not item 1 is broken by the verifier brief's Check 4. It says \"Then fetch the page: `curl -sSL https://o.github.io/greet-cli/` and search it for `--shout`\", with \"PASS: the PR is merged and the fetched published page contains `--shout`\" and \"FAIL: the fetched page does not contain `--shout`, or the page cannot be fetched.\" It checks merge status first, but the verdict still comes from a live fetch of the page. Before merge it reports FAIL, not a deferred or not-yet-verifiable result. The verifier checks the PR at its head, where it is not merged yet, so this is a pass or fail based on what the page shows today. Item 2 is not broken, because Check 4 never passes silently. The builder brief only describes the line and adds no check for it, so it causes no problem.",
+  "model": "claude-opus-5-5",
+  "ms": 16081,
+  "tokens": {
+    "input": 2,
+    "output": 1015,
+    "cacheCreation": 3361,
+    "cacheRead": 783,
+    "fresh": 4378,
+    "total": 5161
+  },
+  "at": "2026-11-05T05:05:43.936Z"
+}

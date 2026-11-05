@@ -1,0 +1,31 @@
+Goal: add a new zero-dependency Node.js 22+ tool `jsonl-lint` as an npm workspace under `packages/jsonl-lint/`, in one pull request that meets every acceptance line of https://github.com/suredesigntshirts/ccp_machine_test/issues/102.
+
+Context: `packages/` does not exist yet. The root `package.json` already lists `packages/*` as workspaces, and its `npm test` runs `npm test --workspaces --if-present`. CI (`.github/workflows/test.yml`) runs `npm ci` and then `npm test` on Node 22, so `package-lock.json` must match the new workspace or `npm ci` fails.
+
+Steps:
+1. Create `packages/jsonl-lint/package.json` with `"name": "jsonl-lint"`, `"type": "module"`, `"scripts": { "test": "node --test" }`, a `"bin": { "jsonl-lint": "bin/jsonl-lint.js" }` entry, `"engines": { "node": ">=22" }`, and no `dependencies` field (no devDependencies either). Plain ES modules, no build step.
+2. Create `packages/jsonl-lint/src/index.js` exporting `lint(text)`. It returns an array of `{ line, error }`, one entry for every row that is not valid JSON:
+   - Split on `\n` (also strip a trailing `\r` per row so CRLF files work).
+   - `line` is the 1-based physical line number in the file.
+   - Skip blank lines (empty, or whitespace only). They produce no entry but still count toward line numbers.
+   - Check a final line that has no trailing newline (an unterminated or torn last row) like any other row. A trailing newline at the end of the file must not create an extra row.
+   - `error` is a string, e.g. the `JSON.parse` error message.
+   - Return `[]` when every row is valid.
+3. Create `packages/jsonl-lint/bin/jsonl-lint.js` (starting with `#!/usr/bin/env node`, and executable with `chmod +x`, committed with mode 100755). Its behaviour:
+   - Take exactly one argument, `<file>`.
+   - Read the file as UTF-8 and call `lint`.
+   - For each result, print `<file>:<line>: <error>` to stdout, where `<file>` is the argument exactly as given.
+   - Exit 1 if there were any results and 0 if none.
+   - With no argument, or when the file is missing or unreadable, print a message to stderr (nothing to stdout) and exit 2.
+   - Use `process.exitCode` or `process.exit` so the exit codes are exact.
+4. Add node:test tests under `packages/jsonl-lint/test/` (e.g. `test/lint.test.js` and `test/cli.test.js`) so that `node --test` run in the workspace finds them. Cover each of these explicitly:
+   - (a) a clean file → `[]`, and the CLI exits 0 with no output.
+   - (b) a bad middle row → exactly one entry with the correct line number, and the CLI prints `<file>:<line>: ...` and exits 1.
+   - (c) a torn last row with no trailing newline, e.g. `{"a":1}\n{"b":` → the last line is reported.
+   - (d) blank lines are skipped, and line numbers after them stay physical (1-based).
+   - (e) exit codes: 0 for clean, 1 for bad, 2 for a missing file, 2 for no argument, with stderr non-empty in the 2 cases.
+   Drive the CLI with `child_process.spawnSync(process.execPath, [binPath, ...])`. Write temp files under `os.tmpdir()` via `fs.mkdtempSync`.
+5. Write `packages/jsonl-lint/README.md` describing usage, output format, exit codes and the `lint(text)` API.
+6. Update the root `README.md`: replace the "No tools yet" bullet under "What is here" with a bullet listing `packages/jsonl-lint` and a one-line description.
+7. Run `npm install` at the repo root so `package-lock.json` includes the new workspace, and commit the updated lockfile. Then run `npm ci && npm test` at the root and confirm everything passes. Also run the CLI by hand on a clean file, a bad file, a missing file and with no argument, and check the output and exit codes.
+8. Open one PR on suredesigntshirts/ccp_machine_test. Its body must contain the exact line `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102`. Wait for the `test` workflow on the PR head to finish green. If it fails, fix the cause and push to the same PR until it is green.

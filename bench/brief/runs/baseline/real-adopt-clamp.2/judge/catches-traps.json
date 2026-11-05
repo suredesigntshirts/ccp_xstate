@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "470d44641b4757c8dc5f4a6e687a2d1570a67b24ff0bc614ae59ecea4f65fa9f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and each one holds. (1) Builder step 2 has the builder add a \"### subtract(a, b)\" entry to README.md next to the clamp entry. It explains why: \"subtract is exported and NOT documented, so line 3 fails today.\" (2) Verifier check 3 reads math.js's exports at the PR head, prints them (\"exports:\") and exits 1 if any has no README heading. It then says to confirm that the list \"must include add, subtract, multiply and clamp\". It FAILs if \"any exported function has no heading or no description\" and notes that subtract must be documented now. (3) Verifier check 2 calls clamp with lo > hi in three cases and throws unless `e instanceof RangeError`. Its FAIL condition covers any call that \"threw something that is not a RangeError\".",
+  "model": "claude-opus-5-5",
+  "ms": 6757,
+  "tokens": {
+    "input": 2,
+    "output": 422,
+    "cacheCreation": 3340,
+    "cacheRead": 783,
+    "fresh": 3764,
+    "total": 4547
+  },
+  "at": "2026-11-05T05:06:43.284Z"
+}

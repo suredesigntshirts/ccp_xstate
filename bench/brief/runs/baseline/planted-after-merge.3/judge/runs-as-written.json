@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "446efa4285e5b813f541772c888d18be7bee0e12c9610a0d1bad31a0659b2eba",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the tracked files and the npm scripts. The builder's commands all work here: `node bin/greet.js --shout Ada` uses bin/greet.js, which exists, and `npm test` maps to `node --test`. The test arrays (`['bin/greet.js', '--shout', 'Ada']`) are valid JavaScript. The verifier's commands also work: `npm install` (no dependencies), `grep -n -- '--shout' docs/index.md` (the `--` keeps grep from reading the pattern as an option), `git worktree add /tmp/greet-base <base-sha>`, `gh pr view <number> --json state,mergedAt`, `gh run list --workflow pages.yml` (the workflow file exists) and `curl -sSL https://o.github.io/greet-cli/`. Every file named is tracked at this commit, and the arguments and shell syntax are valid. The `<base-sha>` and `<number>` placeholders stand for values only known at run time. The `git show` baseline option is loosely worded but still valid syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 7967,
+  "tokens": {
+    "input": 2,
+    "output": 755,
+    "cacheCreation": 3445,
+    "cacheRead": 783,
+    "fresh": 4202,
+    "total": 4985
+  },
+  "at": "2026-11-05T05:05:17.726Z"
+}

@@ -1,0 +1,16 @@
+Run every check at the PR head from the repository root. Give one verdict per check, in this order.
+
+Check 1. Expect line: "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+Run the following for at least two tables. One should be `name,age` / `ann,30` / `bob,41`. The other should have three columns and an empty cell, for example `a,b,c` / `1,,3`.
+  CSV=$(printf 'name,age\nann,30\nbob,41\n' | node bin/csv2json.js)
+  TSV=$(printf 'name\tage\nann\t30\nbob\t41\n' | node bin/csv2json.js --tsv)
+  echo "$CSV"; echo "$TSV"; [ "$CSV" = "$TSV" ] && echo SAME
+PASS: for every table, both commands exit 0, the CSV output is a JSON array of row objects, and the --tsv output is byte-for-byte identical to it.
+FAIL: for any table, the --tsv command errors or exits non-zero, its output differs from the CSV output, or it does not split the input on tabs (for example, it returns a single key containing a tab).
+
+Check 2. Expect line: "README.md documents --tsv"
+Run: grep -n -- '--tsv' README.md, then read the lines around each match.
+PASS: README.md contains the string --tsv in text that explains its use, such as a usage example or a description of tab-separated input.
+FAIL: README.md has no --tsv, or the string appears only in a way that does not document the flag.
+
+Advisory (not a PASS/FAIL condition): run `npm test` and note whether it passes, whether a --tsv test was added, and whether plain CSV behaviour without the flag is unchanged.

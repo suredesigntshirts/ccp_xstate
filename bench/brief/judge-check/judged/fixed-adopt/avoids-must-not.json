@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "d180373b8b4c269d98b30c700f5f3d462b1cd50d0548e548293921538bf6cddc",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the two briefs, and the criterion holds.\n\nItem 1: Check 3 can't pass a README that documents clamp but not subtract. Its command fails when an exported function's name is missing from README.md. A substring match on \"subtract\" alone isn't enough to pass, because the check also requires README.md to say \"what each listed function does\". It says outright that \"a build that documents only clamp FAILs here.\"\n\nItem 2: none of the PASS or FAIL conditions is stricter than its line.\n- Check 1 tests clamped values. Inclusive bounds follow from \"limited to the range lo to hi\".\n- Check 2 only tests `instanceof RangeError`, not the error message.\n- Check 3 asks for no particular layout.\n- Check 4 asks for exit 0 and zero failing tests.\n\nThe builder's `### name(...)` heading and message suggestions are build steps, not pass/fail conditions. Test-file and NaN observations are marked advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 9697,
+  "tokens": {
+    "input": 2,
+    "output": 778,
+    "cacheCreation": 3745,
+    "cacheRead": 783,
+    "fresh": 4525,
+    "total": 5308
+  },
+  "at": "2026-11-05T04:59:23.312Z"
+}

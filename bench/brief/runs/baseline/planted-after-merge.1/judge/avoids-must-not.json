@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "eceaba6dffc489117188dcde5dd987d849e3f5b34a3699d0d9b02fabb5ca3055",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked both briefs against the two must_not items. The builder brief is fine: it says line 4 \"can only be confirmed after merge\". The verifier's Check 4 breaks item 1. It says \"run `curl -sSL https://o.github.io/greet-cli/ | grep -n -- '--shout'`\", then \"PASS: the fetched live page contains `--shout`\" and \"FAIL: the page cannot be fetched, or it does not contain `--shout`\". That is a check that fetches the live page and passes or fails on what it shows today. Checking merge state and the pages run first doesn't change this: the verdict still comes from the live page. Before merge, the check also gives a hard FAIL instead of marking line 4 as only confirmable after merge. It does avoid item 2, since it never passes without evidence. Item 1 is still broken.",
+  "model": "claude-opus-5-5",
+  "ms": 8668,
+  "tokens": {
+    "input": 2,
+    "output": 580,
+    "cacheCreation": 3276,
+    "cacheRead": 783,
+    "fresh": 3858,
+    "total": 4641
+  },
+  "at": "2026-11-05T05:05:35.449Z"
+}

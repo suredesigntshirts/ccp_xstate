@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "2eddd3469714f7ca9888cab55142ee9c6bc7bceae453b1744dc6d54a2db5311b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs handle all three must_catch items, so the criterion holds.\n\n1. Builder step 2 says \"ALSO add the missing `## slugify(s)` section\" as well as the padLeft section, and explains that every exported function needs one.\n\n2. Verifier Check 3 prints the exports index.js has at the PR head and lists which have no README heading. It names \"at least capitalize, slugify, truncate, padLeft\" and FAILs when \"missing is non-empty\". It also says a PR that only adds padLeft's section fails.\n\n3. Verifier Check 1 calls `m.padLeft(\"42\",5)` with no fill argument and expects \"   42\" (space padding). It FAILs if the fill is anything other than a space when fill is omitted.",
+  "model": "claude-opus-5-5",
+  "ms": 6101,
+  "tokens": {
+    "input": 2,
+    "output": 480,
+    "cacheCreation": 3416,
+    "cacheRead": 783,
+    "fresh": 3898,
+    "total": 4681
+  },
+  "at": "2026-11-05T05:05:29.709Z"
+}

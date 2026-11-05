@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "6cc1695bb67f07b2e6442a67696aad0a9c476c51683323a8d26acb1438e10965",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line. Check 1 asks for output identical to the old CLI, and the line itself says \"as for one file before\". Check 2 asks for exit 2 with an error on stderr, which the line's \"usage error (exit 2)\" implies. Check 3 matches its line, as does check 4: FAIL only if \"the lint function's body or signature changed\". Check 6's \"exactly one PR\" comes from \"one PR\". None of them requires exact stderr wording, a branch-name rule, a mutation test or a limit on which files the PR touches. The stricter ideas, like rejecting a second `-` before anything goes to stdout, sit under \"Advisory (not pass/fail)\". The builder's \"Do not modify src/index.js\" is an instruction to the builder, not a PASS/FAIL condition. Checks 1–3 all run `node $CLI` with real files and stdin, so no behaviour line passes on reading the code alone.",
+  "model": "claude-opus-5-5",
+  "ms": 14386,
+  "tokens": {
+    "input": 2,
+    "output": 1035,
+    "cacheCreation": 5466,
+    "cacheRead": 783,
+    "fresh": 6503,
+    "total": 7286
+  },
+  "at": "2026-11-05T05:07:14.968Z"
+}

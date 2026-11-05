@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "90c3a7123ce42fd5ea315586b439fb60b90a7053ba6bf64280c1f28533e47e76",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 only tests that clamp is exported and returns values inside lo to hi. Its cases with inclusive bounds, lo equal to hi, negative numbers and decimals all follow from \"returns x limited to the range lo to hi\". Check 2 only tests that calls where lo is greater than hi throw a RangeError instance. Check 3 tests that every exported function is named in README.md and that README.md says what it does, which is what \"documents\" requires. It sets no wording or heading-format rule. Check 4 tests that npm test exits 0 with no failing or cancelled tests, which is what \"passes\" means. The stricter items are all under \"Advisory (not part of any PASS or FAIL condition)\": whether clamp got tests, whether files beyond the three expected ones changed, and how clamp handles NaN. Branch names and commit scope appear only in the builder brief, not in any verifier condition.",
+  "model": "claude-opus-5-5",
+  "ms": 13752,
+  "tokens": {
+    "input": 2,
+    "output": 753,
+    "cacheCreation": 3772,
+    "cacheRead": 783,
+    "fresh": 4527,
+    "total": 5310
+  },
+  "at": "2026-11-05T04:58:59.427Z"
+}

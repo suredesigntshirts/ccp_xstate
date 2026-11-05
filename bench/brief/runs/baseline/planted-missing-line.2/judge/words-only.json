@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "75b49570fb53bb0bc1fe3111f6dd4ace56b533d56ba13525e68d5af991eb1cc1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 2 is fine. Its PASS asks for \"--tsv\" in \"text that explains its use\", which is what \"documents --tsv\" means. Check 1 is not. Its PASS adds conditions the expect line's words don't require: \"both commands exit 0\", \"the CSV output is a JSON array of row objects\", and \"byte-for-byte identical\". The line only asks that --tsv print \"the same JSON array\" that the CSV command prints for the same table. Requiring row objects adds a shape the words don't specify. If the CSV baseline printed arrays of arrays, the line would still hold but the check would fail. Requiring byte-for-byte identity and exit status 0 are also stricter than \"prints the same JSON array\". These are exact-output and exit-status rules, and they belong under Advisory, not in PASS/FAIL. The FAIL clause repeats \"exits non-zero\". So the criterion does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 14363,
+  "tokens": {
+    "input": 2,
+    "output": 1040,
+    "cacheCreation": 2592,
+    "cacheRead": 783,
+    "fresh": 3634,
+    "total": 4417
+  },
+  "at": "2026-11-05T05:05:49.815Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "71a154035ffc4aac37850d8c72134cbc165b0f60f04e9355127303ab4225034c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked both briefs against must_not item 1, which bars PASS/FAIL conditions stricter than the issue's lines. The verifier brief breaks it in three places. Item 6 makes the verdict depend on a branch-name rule (\"branch name matches CLAUDE.md convention (<type>/<issue>-<slug>, no claude/ prefix, under 60 chars)\"). It also limits which files the PR may touch (\"the diff is limited to this tool plus README/lock changes\"). Item 4 adds a mutation test (\"mutate lint() ... break line numbering, and confirm a test would fail\"). None of these is in expect lines 4 or 6. The builder brief also says \"Branch name must match <type>/<issue>-<slug>\", so the same stricter rule appears there too. On item 2, the behaviour checks hold up: the verifier runs the CLI on real files instead of only reading the diff. Even so, the extra conditions break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 7183,
+  "tokens": {
+    "input": 2,
+    "output": 447,
+    "cacheCreation": 3515,
+    "cacheRead": 783,
+    "fresh": 3964,
+    "total": 4747
+  },
+  "at": "2026-11-05T04:58:12.761Z"
+}

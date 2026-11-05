@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.3",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2 and 4 stay within their words. Check 1 runs functional clamp cases. Check 2 tests that RangeError is thrown when lo > hi. Check 4 needs exit 0 and fail 0. Check 3 breaks the criterion. Its PASS condition needs \"the script prints missing: none\", and the script fails any exported function unless a markdown heading matches '^#+\\s*name\\s*\\('. The expect line only says \"README.md documents every function math.js exports\". It doesn't require headings. A README that documents subtract in a bullet list or a table would meet the words but FAIL this check. That format rule belongs under Advisory, not in a PASS/FAIL condition.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief's commands work: `npm test` maps to \"node --test\", and math.js, README.md and test/math.test.js all exist. Verifier Checks 1, 2 and 4 are valid shell and JavaScript. Check 3 is not. Its script sits inside bash double quotes, where `\\\\` becomes `\\`. So the JavaScript gets the string literals '^#+\\s*' and '\\s*\\(', and in a JS string `\\s` is just `s` and `\\(` is just `(`. The regex built is therefore \"^#+s*adds*(\". That has an unterminated group, so `new RegExp` throws a SyntaxError. The check crashes instead of testing README headings, which means it does not run as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one. (1) Builder step 3 tells the builder to add a \"### subtract(a, b)\" entry \"(it is currently missing)\" as well as a \"### clamp(x, lo, hi)\" entry, and to make sure every name in module.exports has a heading. (2) Verifier Check 3 reads the function list from math.js's exports at the PR head. It then has the verifier confirm \"at least add, subtract, multiply, clamp\" each have a README entry. It FAILs if any exported function lacks one, and notes that \"subtract was previously undocumented\". (3) Verifier Check 2 calls clamp with lo > hi in four cases. It FAILs on \"!(e instanceof RangeError)\" or if the call returns normally, so a generic error does not pass.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check against the two must_not items. Item 1 holds: Check 3 lists every exported function, and its FAIL condition names subtract, so a README that documents clamp but not subtract fails. Checks 1, 2 and 4 hold too: Check 1 tests values, Check 2 only needs `instanceof RangeError` with no message match, and Check 4 needs exit 0 with no failing tests. Item 2 is broken in Check 3. Its script only counts a function as documented if README.md has a markdown heading matching `'^#+\\\\s*'+n+'\\\\s*\\\\('`, and PASS needs \"missing: none\". A README that documents every export some other way, such as in a table, a bullet list or prose, would FAIL. The expect line only says README.md \"documents every function math.js exports\", so this condition requires a specific README layout and is stricter than its line.",
+      "cached": true
+    }
+  }
+}

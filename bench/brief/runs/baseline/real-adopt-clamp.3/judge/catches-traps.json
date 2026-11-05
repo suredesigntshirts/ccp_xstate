@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "9c1e54bd4ece4c6c934b19b10c6e5e016f43c3570bdaa28b44d415f03d82d379",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one. (1) Builder step 3 tells the builder to add a \"### subtract(a, b)\" entry \"(it is currently missing)\" as well as a \"### clamp(x, lo, hi)\" entry, and to make sure every name in module.exports has a heading. (2) Verifier Check 3 reads the function list from math.js's exports at the PR head. It then has the verifier confirm \"at least add, subtract, multiply, clamp\" each have a README entry. It FAILs if any exported function lacks one, and notes that \"subtract was previously undocumented\". (3) Verifier Check 2 calls clamp with lo > hi in four cases. It FAILs on \"!(e instanceof RangeError)\" or if the call returns normally, so a generic error does not pass.",
+  "model": "claude-opus-5-5",
+  "ms": 8272,
+  "tokens": {
+    "input": 2,
+    "output": 450,
+    "cacheCreation": 3570,
+    "cacheRead": 783,
+    "fresh": 4022,
+    "total": 4805
+  },
+  "at": "2026-11-05T05:06:45.739Z"
+}

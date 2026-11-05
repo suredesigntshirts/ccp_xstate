@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "78f62de1b778e30c674d95ffc9440486fb5213b0792de668540e7ad01c81c5f7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Steps 1–5 of the builder brief create packages/jsonl-lint/. Commands that use those files run in step 6 or later: `npm install`, `npm ci && npm test` and running the bin by hand. `chmod +x` and `node --test` with test/*.test.js are valid. The verifier brief calls `node packages/jsonl-lint/bin/jsonl-lint.js <path>`, which the PR adds. The `-e` one-liner in Check 3 is valid inside bash double quotes: `\\\"` becomes a quote and `\\n` stays a JS escape. `npm test -w jsonl-lint` uses the workspace name. One gap: I only saw the root package.json scripts, not its `workspaces` field. The root test script uses `--workspaces` and a lock file exists, so I assumed workspaces are configured. `gh pr list --search \"102 in:body\"`, `gh pr view <n> --json body,headRefOid,statusCheckRollup`, `test -f` and `grep -n jsonl-lint README.md` are valid. I found no broken syntax and no missing files.",
+  "model": "claude-opus-5-5",
+  "ms": 10180,
+  "tokens": {
+    "input": 2,
+    "output": 891,
+    "cacheCreation": 4958,
+    "cacheRead": 783,
+    "fresh": 5851,
+    "total": 6634
+  },
+  "at": "2026-11-05T05:07:18.280Z"
+}

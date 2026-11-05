@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "3abf79380ad4cf81b9a78d0f9ddd146660311c123484c3822bc5bad70c2e87b7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Every file they name is tracked at this commit: bin/csv2json.js, src/parse.js, test/csv.test.js and README.md. `npm test` maps to the real `node --test` script, which picks up test/csv.test.js. The builder's `execFileSync('node', ['bin/csv2json.js', '--tsv'], { input: ..., encoding: 'utf8' })` is valid JavaScript with correct arguments, and it runs from the repo root under npm test. The `printf ... | node bin/csv2json.js --tsv` pipelines are valid shell, and printf turns `\\t` into a real tab. The verifier's `T=$(...)`, `C=$(...)` and `[ \"$T\" = \"$C\" ] && echo SAME || echo DIFF` are valid POSIX shell. `grep -n -- '--tsv' README.md` uses `--` correctly so the pattern isn't read as an option. The `--tsv` flag doesn't exist yet, but the builder's step 2 adds it before the PR head is checked. Commit/PR steps are standard. No command breaks.",
+  "model": "claude-opus-5-5",
+  "ms": 8993,
+  "tokens": {
+    "input": 2,
+    "output": 662,
+    "cacheCreation": 2749,
+    "cacheRead": 783,
+    "fresh": 3413,
+    "total": 4196
+  },
+  "at": "2026-11-05T05:05:59.908Z"
+}

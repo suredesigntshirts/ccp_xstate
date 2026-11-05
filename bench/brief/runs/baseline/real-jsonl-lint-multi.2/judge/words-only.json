@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "effa6c94a7deda87517933fd5dfd6c4aefc2176ae1db6a47a8bba866f58b9692",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Several conditions ask for more than the words require:\n- **Check 3:** PASS needs \"an error naming missing.jsonl on stderr\". Expect line 3 only says \"error on stderr\" and never requires the file to be named.\n- **Check 4:** PASS adds \"and the lint tests pass\". Line 4 only requires lint(text) to be unchanged, so this is an extra test the words don't force.\n- **Check 5:** PASS needs \"the tests pass\". Line 5 only requires the tests to cover the listed cases and the README to document the usage. Tests passing belongs to line 6.\n\nThese extra requirements should sit under the Advisory heading. Instead they are part of PASS conditions, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 10460,
+  "tokens": {
+    "input": 2,
+    "output": 907,
+    "cacheCreation": 5425,
+    "cacheRead": 783,
+    "fresh": 6334,
+    "total": 7117
+  },
+  "at": "2026-11-05T05:06:37.188Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "5f1188a2bf0f0863faf0a0f2de3111f19e8b94bcc44943460cb77f41eabc0c9e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Check 1's line only asks that the command \"prints the greeting in upper case\". Its PASS also requires \"the exit code is 0\", and its FAIL triggers when \"the exit code is not 0\". The words don't ask for an exit code, so that is a stricter test inside a PASS/FAIL condition. Check 2's line says \"the output is unchanged\", but its FAIL condition also covers any difference in \"exit code\", and its PASS needs the same \"exit code (2)\" as the base. An exit code isn't output, so this is stricter than the words too. Checks 3 and 4 stay within their lines, and the flag-after-name test is correctly put under Advisory. The exit-code conditions in Checks 1 and 2 belong under Advisory, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 11076,
+  "tokens": {
+    "input": 2,
+    "output": 668,
+    "cacheCreation": 3363,
+    "cacheRead": 783,
+    "fresh": 4033,
+    "total": 4816
+  },
+  "at": "2026-11-05T05:05:09.757Z"
+}

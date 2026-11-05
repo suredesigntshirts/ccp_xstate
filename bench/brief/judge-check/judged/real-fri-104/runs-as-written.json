@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "0ad4e34a7060c2636d8d8ab0f04de1c5196e8319dafb9920a14d5b5ddf0b63ff",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I checked every command in both briefs against the 15 tracked files and the scripts.\n- `npm test` at the root runs the workspace script, which reaches packages/jsonl-lint's `node --test`.\n- `node packages/jsonl-lint/bin/jsonl-lint.js` names a file that exists.\n- `git diff main -- packages/jsonl-lint/src/index.js` names an existing file and uses valid git syntax.\n- `npm ci` works because package-lock.json is tracked.\n- `gh pr checks` is a valid gh command, and the `test` workflow file exists at .github/workflows/test.yml.\n- The JavaScript the builder is told to use is valid: `fs.readFileSync(0)` for stdin and spawnSync with an `input` option.\n- No command uses a script or tool that is missing.\n\nOne minor point: the builder writes \"test/cli.test.js, README.md\" as paths relative to the package. That is a list of files, not a command, and both files exist under packages/jsonl-lint.",
+  "model": "claude-opus-5-5",
+  "ms": 9101,
+  "tokens": {
+    "input": 2,
+    "output": 721,
+    "cacheCreation": 3414,
+    "cacheRead": 783,
+    "fresh": 4137,
+    "total": 4920
+  },
+  "at": "2026-11-05T04:57:54.164Z"
+}

@@ -1,0 +1,28 @@
+Check the pull request at its head commit for issue https://github.com/o/strutil/issues/7. Run each check below from the repository root, in order, one per acceptance line. Run `npm install` first only if package.json has dependencies (it currently has none). index.js is an ES module, so use `node --input-type=module -e '...'` with `import { ... } from "./index.js"`.
+
+Check 1 — expect: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+node --input-type=module -e 'import * as m from "./index.js"; const a=[typeof m.padLeft, m.padLeft("42",5,"0"), m.padLeft("42",5), m.padLeft("ab",4,"x"), m.padLeft("7",3,"0").length]; console.log(JSON.stringify(a));'
+PASS: output is exactly ["function","00042","   42","xxab",3].
+FAIL: padLeft is not exported (import error or typeof not "function"), or any value differs (e.g. padding on the right, wrong length, a fill other than a space when fill is omitted).
+
+Check 2 — expect: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+node --input-type=module -e 'import { padLeft } from "./index.js"; console.log(JSON.stringify([padLeft("12345",5,"0"), padLeft("123456",3,"0"), padLeft("abc",3), padLeft("abcdef",2)]));'
+PASS: output is exactly ["12345","123456","abc","abcdef"].
+FAIL: any value differs from its input s (padded, truncated or otherwise changed), or the command throws.
+
+Check 3 — expect: "README.md has a section for every function index.js exports"
+Run:
+node --input-type=module -e 'import * as m from "./index.js"; import fs from "node:fs"; const r=fs.readFileSync("README.md","utf8"); const heads=r.split("\n").filter(l=>/^#{1,6}\s/.test(l)); const fns=Object.keys(m).filter(k=>typeof m[k]==="function"); const missing=fns.filter(f=>!heads.some(h=>new RegExp("\\b"+f+"\\b").test(h))); console.log("exports:",fns.join(",")); console.log("missing:",JSON.stringify(missing));'
+PASS: missing is [] — every exported function (at least capitalize, slugify, truncate, padLeft) has a Markdown heading in README.md naming it.
+FAIL: missing is non-empty. Note the base README lacked a slugify section, so a PR that only adds padLeft's section FAILS this check.
+
+Check 4 — expect: "npm test passes"
+Run: `npm test; echo exit=$?`
+PASS: exit=0 and the TAP summary shows `# fail 0`.
+FAIL: non-zero exit or any failing/cancelled test.
+
+Advisory (not PASS/FAIL conditions):
+- Look whether test/strutil.test.js gained padLeft tests covering zero padding, default space fill and the unchanged case.
+- Note whether padLeft's doc and README section mention that fill defaults to a space.

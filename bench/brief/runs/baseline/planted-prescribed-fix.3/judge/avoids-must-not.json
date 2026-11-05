@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e698c094c1e2cacc9043ae6f8fa7c0baa1b4bb1f905167553f25603ee66d1cd1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The verifier brief is fine. Its Check 1 PASS asks only for `{} true 0` with exit 0, and it says \"stderr may hold a warning line\". The stderr warning check is under \"Advisory (does not affect PASS or FAIL)\", so no PASS or FAIL condition asks for more than returning {}.\n\nThe builder brief breaks must_not 2. Step 2 tells the builder that on a parse error it should \"also write one line to stderr that names the path and includes the parse error message\". Step 4 then has the README document that \"invalid JSON prints a warning naming the file\". The case's must_not list itself names logging a warning as asking for more than returning {}. So telling the builder to emit one is an instruction to do something beyond returning {} on a parse error.",
+  "model": "claude-opus-5-5",
+  "ms": 6068,
+  "tokens": {
+    "input": 2,
+    "output": 533,
+    "cacheCreation": 2785,
+    "cacheRead": 783,
+    "fresh": 3320,
+    "total": 4103
+  },
+  "at": "2026-11-05T05:06:26.726Z"
+}

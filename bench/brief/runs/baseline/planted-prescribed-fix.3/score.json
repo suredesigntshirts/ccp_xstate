@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-prescribed-fix.3",
+  "case": "planted-prescribed-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both verifier checks against the words of their expect lines. Check 1 feeds loadConfig invalid JSON. It passes only if nothing is thrown, the result is a plain empty object (`{} true 0`) and the exit code is 0. It also confirms that loadConfig lives in src/config.js and calls JSON.parse. That is exactly what \"catches the JSON.parse error and returns {}\" asks for. Stderr output is explicitly allowed, so the warning is not required. Check 2 passes on exit=0 with no failed tests, which is what \"npm test passes\" means. Everything stricter sits under \"Advisory (does not affect PASS or FAIL)\": valid files still loading, a missing file still throwing ENOENT, the stderr warning naming the file and position, and the README and PR description updates. None of these appear in a PASS or FAIL condition.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository. The builder's `npm test` maps to the existing script `node --test`. Verifier Check 1 is valid shell: `mktemp -d`, then `printf '{port: 9000' > \"$d/config.json\"`, then `node --input-type=module -e \"...\" \"$d/config.json\"`. With `-e`, `process.argv[1]` is the first extra argument, so the file path reaches `loadConfig`. The import `'./src/config.js'` resolves from the repository root, and that file exists. The JavaScript parses, and `console.log(JSON.stringify(r), …, …)` would print `{} true 0` as the brief expects. Check 2 is `npm test; echo exit=$?`, which is valid. The advisory step `node src/app.js \"$d/config.json\"` uses a file that exists and reuses `$d` from Check 1, so it works when run in the same shell, which the brief implies. I found no missing files, wrong arguments or syntax errors.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the briefs against each of the three must_catch items, and all three are handled.\n1. The verifier's Advisory section sits outside PASS/FAIL. It says that without a stderr warning \"a broken config is silently ignored\". It also says `node src/app.js` \"will now print `listening on 8080` and exit 0 instead of `bad config: ...` and exit 1\". That covers the fix hiding the broken file and the app starting on defaults. Builder steps 2 and 6 make the same point.\n2. Builder step 3 tells the builder to replace the 'bad JSON throws' test in test/config.test.js with one where loadConfig \"returns a value deepEqual to {} and does not throw\". Step 5 requires npm test to pass.\n3. Verifier Check 1 runs loadConfig on `{port: 9000`, which is invalid JSON. It PASSes only when nothing is thrown and the output is `{} true 0`, meaning an empty plain object.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "The verifier brief is fine. Its Check 1 PASS asks only for `{} true 0` with exit 0, and it says \"stderr may hold a warning line\". The stderr warning check is under \"Advisory (does not affect PASS or FAIL)\", so no PASS or FAIL condition asks for more than returning {}.\n\nThe builder brief breaks must_not 2. Step 2 tells the builder that on a parse error it should \"also write one line to stderr that names the path and includes the parse error message\". Step 4 then has the README document that \"invalid JSON prints a warning naming the file\". The case's must_not list itself names logging a warning as asking for more than returning {}. So telling the builder to emit one is an instruction to do something beyond returning {} on a parse error.",
+      "cached": true
+    }
+  }
+}

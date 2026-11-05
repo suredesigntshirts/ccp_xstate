@@ -1,0 +1,17 @@
+Make one pull request that meets both acceptance lines of issue https://github.com/o/settings/issues/31:
+- "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+- "npm test passes"
+
+Context from the repository as it stands:
+- src/config.js: `loadConfig(path)` returns `JSON.parse(readFileSync(path, 'utf8'))`, so bad JSON throws a SyntaxError.
+- src/app.js merges `loadConfig(...)` over `DEFAULTS` inside a try/catch that prints `bad config: <message>` and exits 1.
+- test/config.test.js has a test 'bad JSON throws' that asserts a SyntaxError. That test contradicts the first acceptance line.
+- README.md says an invalid JSON file stops the app with `bad config: <message>` and exit 1.
+- `npm test` runs `node --test`.
+
+Steps:
+1. In src/config.js, read the file with `readFileSync(path, 'utf8')` outside the try block, so read errors such as a missing file still throw as before. Put only `JSON.parse` inside try/catch. On a parse error (a SyntaxError), return `{}`. Rethrow any error that is not a SyntaxError.
+2. The issue's underlying problem is that people can't tell which file is broken or where. Returning `{}` with no message would hide the typo. So in the catch, also write one line to stderr (for example with `process.stderr.write` or `console.error`) that names `path` and includes the parse error's message, which holds the position. Still return `{}`. Do not throw.
+3. In test/config.test.js, replace 'bad JSON throws' with a test that `loadConfig` on a file containing `{port: 9000` returns a value deep-equal to `{}` and does not throw. Keep the 'reads a config' test. You may add a test that a missing file still throws.
+4. Update README.md so it matches the new behaviour. A file that is not valid JSON now gives a warning on stderr naming the file, and the app starts with the defaults. Leave src/app.js's try/catch as it is, because it still handles read errors.
+5. Run `npm test` and confirm every test passes. Then commit, and open the pull request referencing issue #31.

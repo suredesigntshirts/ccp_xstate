@@ -1,0 +1,99 @@
+{
+  "bench": 1,
+  "stage": "brief",
+  "case": "planted-missing-line",
+  "k": 3,
+  "item": "planted-missing-line-3",
+  "run": "planted-missing-line-3:0.brief",
+  "runFolder": "items/planted-missing-line-3/runs/0.brief",
+  "workflow": {
+    "id": "quick-fix@39430bff16ef92ce75ad733ddc774fa43cee17461876897dad3067583191fafb",
+    "sha256": "39430bff16ef92ce75ad733ddc774fa43cee17461876897dad3067583191fafb",
+    "source": "workflows/quick-fix.json"
+  },
+  "prompt": {
+    "sha256": "69b8f6c7ccba93d70e1507281fc6c1a5ca69b67f3cad97d223e6bfc4c4bc413f",
+    "bytes": 4044,
+    "sentIsBriefMd": true,
+    "context": "appended to the system prompt (--append-system-prompt)"
+  },
+  "model": "claude-opus-5-5",
+  "claude": {
+    "bin": "claude",
+    "version": "2.1.318",
+    "session": "2bfb8e09-0d9e-45d3-bfe7-648150002193",
+    "exit": 0,
+    "signal": null,
+    "error": false,
+    "stop": "completed"
+  },
+  "at": "2026-11-05T05:01:38.119Z",
+  "ms": 27769,
+  "apiMs": 23888,
+  "turns": 5,
+  "tokens": {
+    "input": 12,
+    "output": 2168,
+    "cacheCreation": 9791,
+    "cacheRead": 108621,
+    "fresh": 11971,
+    "total": 120592
+  },
+  "costUsd": 0.14346019999999998,
+  "ambient": {
+    "recorded": true,
+    "reached": true,
+    "marks": [
+      "attribution",
+      "userContext",
+      "skills"
+    ],
+    "attachments": [
+      "environment",
+      "model",
+      "deferred_tools_delta",
+      "agent_listing_delta",
+      "skill_listing",
+      "session_context",
+      "date",
+      "credential_org",
+      "remote_session_change",
+      "prompt_snapshot",
+      "deferred_tools_record"
+    ],
+    "systemPrompt": {
+      "sha256": "5b10c352ed3c0df902f21edf9f6c123444e8dc051a679be55a815c783c81cb69",
+      "bytes": 6992,
+      "file": "../system-prompts/5b10c352ed3c0df902f21edf9f6c123444e8dc051a679be55a815c783c81cb69.txt"
+    }
+  },
+  "conditions": {
+    "tools": [
+      "Bash",
+      "Read",
+      "Glob",
+      "Grep",
+      "LS",
+      "Write",
+      "Edit",
+      "ToolSearch",
+      "mcp__harness__return"
+    ],
+    "mcp": [
+      "harness (scripts/bench/return-server.mjs)"
+    ],
+    "settingSources": "project,local",
+    "env": "CLAUDE_CODE_DISABLE_AUTO_MEMORY=1; extra CLAUDE.md folders and memory path unset",
+    "confine": "not enforced: no harness hooks run; the session starts in its worktree, a temp folder outside this repo",
+    "github": "none"
+  },
+  "returns": [
+    {
+      "call": 1,
+      "accepted": true
+    }
+  ],
+  "accepted": true,
+  "firstReturnAccepted": true,
+  "changed": []
+}

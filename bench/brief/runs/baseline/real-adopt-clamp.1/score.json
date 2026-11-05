@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.1",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2 and 4 hold. Check 1 tests clamping, including the boundaries. Check 2 tests that a RangeError is thrown when lo > hi. Check 4 needs exit code 0 and no failing tests. Check 3 breaks the criterion. Its PASS needs the script to exit 0, and the script only accepts a markdown heading that matches '^#+\\s*name\\s*\\('. Its FAIL also includes \"any exported function has no heading\". The expect line only says README.md \"documents every function math.js exports\". A README that documents a function in a bullet list, a table or plain prose would meet those words but fail the check. Requiring a heading in a set format is stricter than the words. It should be under Advisory, not in the PASS/FAIL conditions.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs. `npm test`, the builder's `node -e` line that lists exports, and verifier Checks 1, 2 and 4 are valid as written. Check 3 breaks. Its `node -e` argument is in double quotes and contains `new RegExp('^#+\\\\s*'+n+'\\\\s*\\\\(','m')`. Bash turns each `\\\\` into `\\`, so Node gets `'\\s*\\('`. In a JavaScript string literal, `\\s` becomes `s` and `\\(` becomes `(`. The pattern becomes `^#+s*adds*(`, which has an unclosed `(`, so `new RegExp` throws a SyntaxError on every run. The check can never report \"missing: none\", and even with that fixed, `#+s*` would not match a heading like \"### add(a, b)\". So one of the briefs' commands does not run as written.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "All three must_catch items are handled. (1) Builder step 2 says to add a \"### subtract(a, b)\" entry as well as clamp, and the current-state note says \"subtract is NOT documented yet\". (2) Verifier Check 3 gets the function exports from math.js at the PR head, prints them, and exits 1 if any has no heading. It also says to confirm that each entry, \"this should include add, subtract, multiply and clamp\", describes the function, and it FAILs if any exported function has no heading or description. (3) Check 2 calls clamp with lo>hi in several cases and FAILs unless `e instanceof RangeError`, so throwing some other error is not enough. One side issue: inside shell double quotes, the `\\\\s` and `\\\\(` escapes in Check 3's regex may reach JavaScript as an invalid regex. That would cause a false FAIL, never a false PASS, so the intent of the check still holds.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 is avoided. Check 3 lists every exported function, subtract included, so a README that documents clamp but not subtract fails. Item 2 is broken by Check 3. Its script passes a function only if a Markdown heading matches `'^#+\\\\s*'+n+'\\\\s*\\\\('`. Its FAIL condition is \"any exported function has no heading\". So the README must use one layout: a heading per function, written as `name(`. The expect line only asks that README.md \"documents every function math.js exports\". A README that documents subtract in a table, a bullet list or prose would meet that line but fail this check. That is a PASS/FAIL condition stricter than its line. Checks 1, 2 and 4 match their lines: Check 2 asks only for a RangeError instance, with no exact message.",
+      "cached": true
+    }
+  }
+}

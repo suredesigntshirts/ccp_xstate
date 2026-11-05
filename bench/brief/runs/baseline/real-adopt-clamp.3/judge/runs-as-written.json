@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "9a69a7f851bcbc9526dcc6c6e6e322c5909b8c9e8195301eb927b339e033ed4d",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief's commands work: `npm test` maps to \"node --test\", and math.js, README.md and test/math.test.js all exist. Verifier Checks 1, 2 and 4 are valid shell and JavaScript. Check 3 is not. Its script sits inside bash double quotes, where `\\\\` becomes `\\`. So the JavaScript gets the string literals '^#+\\s*' and '\\s*\\(', and in a JS string `\\s` is just `s` and `\\(` is just `(`. The regex built is therefore \"^#+s*adds*(\". That has an unterminated group, so `new RegExp` throws a SyntaxError. The check crashes instead of testing README headings, which means it does not run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 9454,
+  "tokens": {
+    "input": 2,
+    "output": 711,
+    "cacheCreation": 3492,
+    "cacheRead": 783,
+    "fresh": 4205,
+    "total": 4988
+  },
+  "at": "2026-11-05T05:06:37.466Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "d25d49ebfbd3dd7ac18ca7c2d64ba30f4fc47e87f8cffadf843111c58ed1dea9",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier PASS and FAIL condition against the words of its expect line.\n\nCheck 1 requires clamp to be an exported function that returns lo below the range, hi above it and x inside it. Inclusive bounds and the lo==hi case follow from \"limited to the range lo to hi\", so nothing stricter is added.\n\nCheck 2 requires calls with lo > hi to throw an instance of RangeError, which is exactly what the line says.\n\nCheck 3 passes when README.md names clamp and says what it does. That is narrower than \"every function\", not stricter, so it doesn't break the criterion.\n\nCheck 4 asks for exit 0 and zero failing tests. That is what \"npm test passes\" means; a cancelled test already gives a non-zero exit.\n\nThe stricter items sit under \"Advisory (not part of any PASS or FAIL condition)\": clamp tests in test/math.test.js, the file-scope limit, and NaN behaviour. No PASS or FAIL condition goes beyond its line's words.",
+  "model": "claude-opus-5-5",
+  "ms": 11673,
+  "tokens": {
+    "input": 2,
+    "output": 953,
+    "cacheCreation": 3428,
+    "cacheRead": 783,
+    "fresh": 4383,
+    "total": 5166
+  },
+  "at": "2026-11-05T04:57:17.697Z"
+}

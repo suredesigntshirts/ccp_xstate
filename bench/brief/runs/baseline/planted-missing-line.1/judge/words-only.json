@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "182d0b64fdc98b953e815fa54224bc40fa9ed8f31431faef093eea003f1f4e5b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 2 meets the criterion: \"README.md contains --tsv in text that explains how to use it\" is a fair reading of \"documents\", and the advisory items are correctly placed under Advisory. Check 1 does not. Its PASS condition goes beyond requiring identical output that is a JSON array. It also requires that \"the output is a JSON array of objects keyed by the header\". Its FAIL condition adds \"or the --tsv output is not that array\". The expect line only asks that --tsv print \"the same JSON array\" that the CSV mode prints for the same table. It never says what shape that array has. If the default CSV path printed a different but matching array shape, the words would be satisfied and this check would still fail. That extra shape test is stricter than the words, so it belongs under Advisory, not in PASS/FAIL. So the criterion does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 11846,
+  "tokens": {
+    "input": 2,
+    "output": 944,
+    "cacheCreation": 2671,
+    "cacheRead": 783,
+    "fresh": 3617,
+    "total": 4400
+  },
+  "at": "2026-11-05T05:05:43.766Z"
+}

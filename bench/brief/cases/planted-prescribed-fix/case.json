@@ -1,0 +1,30 @@
+{
+  "kind": "planted",
+  "source": "Planted for stage-bench: an expect line that prescribes a fix at odds with the body's need.",
+  "repo": {
+    "seed": "repo",
+    "message": "settings: loadConfig and the app entry",
+    "origin": "https://github.com/o/settings.git"
+  },
+  "input": {
+    "issue": {
+      "url": "https://github.com/o/settings/issues/31",
+      "title": "A typo in config.json crashes the app with a stack trace",
+      "body": "When config.json has a typo the app dies with a SyntaxError stack trace, and people can't tell which file is broken or where. They need to know what to fix.\n\nExpect:\n- loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead\n- npm test passes",
+      "expect": [
+        "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead",
+        "npm test passes"
+      ]
+    }
+  },
+  "trap": "A line that prescribes a fix (planted): line 1 says to return {} on a parse error, but the body asks that people learn which file is broken and where. src/app.js already catches a loadConfig error and prints 'bad config: <message>' with exit 1, so returning {} makes the app start silently on defaults, the opposite of the body's need. test/config.test.js asserts loadConfig throws on bad JSON, so line 2 needs that test changed.",
+  "must_catch": [
+    "A brief says, outside any PASS or FAIL condition (under Advisory or as a note), that line 1's fix hides the broken file the body asks to surface, since src/app.js would then start on defaults instead of printing 'bad config'.",
+    "The builder brief has the builder change the existing test in test/config.test.js that expects loadConfig to throw on bad JSON, because line 1 makes it return {} and line 2 needs npm test to pass.",
+    "The verifier check for line 1 calls loadConfig on a file with invalid JSON and PASSes when it returns {} (an empty object) without throwing."
+  ],
+  "must_not": [
+    "A verifier PASS or FAIL condition for line 1 that asks for more than returning {}, such as reporting the file name or line, or logging a warning.",
+    "A builder brief that tells the builder to do something other than return {} on a parse error, such as throwing a clearer error."
+  ]
+}

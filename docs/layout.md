@@ -9,6 +9,8 @@ verify/<item>/      the verifier's own tests for an item, and its verdict.json
 scripts/gates/      the PR gates verdict.yml runs, with their tests
 scripts/tournament/ the generic design-tournament kit: runner, args builder, measure, CI template (docs/tournaments.md)
 scripts/inspector/  the Workflow Inspector: exporter, build and page that show any run step by step (docs/inspector.md)
+scripts/bench/      the stage bench: run one model stage alone, score it per rubric criterion, compare versions (docs/prompts.md)
+bench/<stage>/      one stage's bench: rubric, cases (with seed repos), judge check, run sets and reports
 tournaments/<id>/   one design tournament: pack, config, measure, result, scores; indexed in tournaments/README.md
 test/               repo-wide tests
 vendor/<name>/      third-party code copied in verbatim, not a workspace; vendor/README.md names each source and sha

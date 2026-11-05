@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "64d957d1f812145f9d911500fafeebe42ca703c37c073003751471fd49d5eb8c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2 and 4 hold. Check 1 tests clamping, including the boundaries. Check 2 tests that a RangeError is thrown when lo > hi. Check 4 needs exit code 0 and no failing tests. Check 3 breaks the criterion. Its PASS needs the script to exit 0, and the script only accepts a markdown heading that matches '^#+\\s*name\\s*\\('. Its FAIL also includes \"any exported function has no heading\". The expect line only says README.md \"documents every function math.js exports\". A README that documents a function in a bullet list, a table or plain prose would meet those words but fail the check. Requiring a heading in a set format is stricter than the words. It should be under Advisory, not in the PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 7475,
+  "tokens": {
+    "input": 2,
+    "output": 638,
+    "cacheCreation": 3281,
+    "cacheRead": 783,
+    "fresh": 3921,
+    "total": 4704
+  },
+  "at": "2026-11-05T05:06:14.478Z"
+}

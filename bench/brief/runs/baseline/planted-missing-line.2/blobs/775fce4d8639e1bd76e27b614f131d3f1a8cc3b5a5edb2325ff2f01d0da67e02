@@ -1,0 +1,11 @@
+Goal: add a --tsv flag to the CLI so the PR meets both acceptance lines:
+1. "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+2. "README.md documents --tsv"
+
+Context: bin/csv2json.js reads stdin and prints JSON.stringify(parse(text)) followed by a newline. src/parse.js already exports parse(text, sep = ','), so it takes a separator. test/csv.test.js holds the node:test tests (run them with `npm test`).
+
+Steps:
+1. In bin/csv2json.js, check whether process.argv.slice(2) includes '--tsv'. If it does, call parse(input, '\t'); if not, call parse(input) as it does now. Keep the output format the same (JSON array plus a trailing newline) and keep the plain no-flag behaviour unchanged.
+2. In test/csv.test.js, add a CLI test that runs `node bin/csv2json.js --tsv` with input 'a\tb\n1\t2\n' and asserts the output is exactly '[{"a":"1","b":"2"}]\n'. That is the same output the CSV test expects for 'a,b\n1,2\n'. Keep the existing tests.
+3. In README.md, document --tsv: add a usage example such as `node bin/csv2json.js --tsv < table.tsv` and one sentence saying it reads tab-separated input and prints the same JSON as for CSV.
+4. Run `npm test` and make sure every test passes. Then open one pull request containing these changes.

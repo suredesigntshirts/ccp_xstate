@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "8813ba73e72348d0cea78be0b7eedf7d588b0db837bb4289769cdb5f37637dab",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each command in both briefs. The builder's `npm install` and `npm ci && npm test` run from the root, and package.json and package-lock.json are both tracked. The root test script is defined and handles a missing packages/ directory. The verifier's `node packages/jsonl-lint/bin/jsonl-lint.js <file>` names a file the builder creates in an earlier step, and `<file>` is a placeholder for the verifier's own sample files. `jsonl-lint <file>` in the builder brief describes how the CLI is used and is not meant to run as typed. `gh pr checks` takes a PR, and the gh CLI is available. .github/workflows/test.yml exists. Every path the briefs name either exists at this commit or is made by the builder first. No command has bad shell or JavaScript syntax or arguments that don't fit the program.",
+  "model": "claude-opus-5-5",
+  "ms": 10267,
+  "tokens": {
+    "input": 2,
+    "output": 578,
+    "cacheCreation": 3648,
+    "cacheRead": 783,
+    "fresh": 4228,
+    "total": 5011
+  },
+  "at": "2026-11-05T04:57:57.480Z"
+}

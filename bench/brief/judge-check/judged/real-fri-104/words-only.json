@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "6c39f3db9dc066c0094828c40480ff48e0f2741c3280600ff391c3f1d6ade7c5",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the verifier brief's checks with the words of each expect line. Several pass conditions are stricter than those words, and the brief has no Advisory heading for them. Check (3) requires the tests to \"fail if the feature were broken (spot-check by mutating the bin)\". That is a mutation test, but expect line 5 only asks that the tests cover the listed cases. Check (6) requires \"the branch name follows CLAUDE.md (no claude/ prefix, lowercase, under 60 chars)\" and \"the PR touches only packages/jsonl-lint\". Expect line 6 asks only for one PR whose body says Closes the issue, with tests and the workflow green. Check (2)'s \"`- -` ... even with stdin provided\" and check (5)'s `npm ci` also go further than the expect lines. All of these sit inside required checks rather than under an Advisory heading, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 6933,
+  "tokens": {
+    "input": 2,
+    "output": 427,
+    "cacheCreation": 548,
+    "cacheRead": 3340,
+    "fresh": 977,
+    "total": 4317
+  },
+  "at": "2026-11-05T04:57:45.018Z"
+}

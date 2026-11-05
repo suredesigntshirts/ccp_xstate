@@ -1,0 +1,48 @@
+Check out the PR head for issue https://github.com/suredesigntshirts/ccp_machine_test/issues/102 and run `npm ci` at the repo root first. Create fixtures in a temp directory (`mktemp -d`), e.g.:
+- `clean.jsonl` = `{"a":1}\n{"b":2}\n`
+- `mid.jsonl` = `{"a":1}\n{bad\n{"c":3}\n`
+- `torn.jsonl` = `{"a":1}\n{"b":` (printf, no trailing newline)
+- `blank.jsonl` = `{"a":1}\n\n   \n{oops\n`
+
+Check 1. Expect line: "packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for every row that is not valid JSON (1-based lines, blank lines skipped, an unterminated last line checked) and exits 1 if any, 0 if none".
+Run `node packages/jsonl-lint/bin/jsonl-lint.js <fixture>; echo $?` for each fixture.
+PASS when all of these hold:
+- clean prints no error lines and exits 0.
+- mid prints exactly one line that starts with `<fixture path as given>:2: ` followed by a non-empty error, and exits 1.
+- torn prints a line starting `<path>:2: ` and exits 1.
+- blank prints exactly one line starting `<path>:4: ` (no lines for 2 or 3) and exits 1.
+- A file with two bad rows (e.g. `x\n{}\ny\n`) prints lines for 1 and 3 and exits 1.
+FAIL if any line number, prefix or exit code differs, a blank line is reported, or the torn last row is missed.
+
+Check 2. Expect line: "A missing file or no argument prints to stderr and exits 2".
+Run `node packages/jsonl-lint/bin/jsonl-lint.js /nonexistent/x.jsonl` and `node packages/jsonl-lint/bin/jsonl-lint.js` (no argument), capturing stdout, stderr and the exit code separately.
+PASS if both exit 2 with non-empty stderr. FAIL otherwise, including a crash with a different code.
+
+Check 3. Expect line: "packages/jsonl-lint/src/index.js exports lint(text) returning [{ line, error }]".
+Run `node --input-type=module -e "import {lint} from './packages/jsonl-lint/src/index.js'; console.log(JSON.stringify(lint('{}\n{bad\n'))); console.log(JSON.stringify(lint('{}\n')))"`.
+PASS if `lint` is a named export, the first call returns an array with one object whose `line` is 2 and which has an `error` property, and the second returns `[]`. FAIL if the import fails, the export is missing, or the shape differs.
+
+Check 4. Expect line: "The workspace has its own package.json (jsonl-lint, type module, test script node --test), no runtime dependencies, and node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes".
+Read `packages/jsonl-lint/package.json` with `node -e` and check `name === 'jsonl-lint'`, `type === 'module'`, `scripts.test === 'node --test'`, and that `dependencies` is absent or empty. Then run `npm test -w jsonl-lint` and inspect the test files.
+PASS if:
+- every package.json condition holds,
+- the tests run with node:test and pass, and
+- there are test cases covering each of: a clean file, a bad middle row, a torn last row, blank lines, and the exit codes.
+FAIL if any field is wrong, there is any runtime dependency, any of the five scenarios has no test, or the tests fail.
+
+Check 5. Expect line: "packages/jsonl-lint/README.md exists and the root README lists the tool".
+Run `test -s packages/jsonl-lint/README.md` and `grep -n jsonl-lint README.md`.
+PASS if the package README exists and is non-empty, and the root README mentions jsonl-lint as a tool. FAIL otherwise.
+
+Check 6. Expect line: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, and npm test and the test workflow are green at its head".
+Run `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state`, `gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test`, and at the checked-out head `npm ci && npm test; echo $?`.
+PASS if:
+- the PR exists on that repo,
+- its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102`,
+- local `npm test` exits 0 at the head commit, and
+- the `test` workflow run for the head SHA concluded success.
+FAIL if the body line is missing, local tests fail, the workflow failed or did not run for the head SHA, or the change is split across several PRs.
+
+Advisory:
+- Also check that `bin/jsonl-lint.js` has a node shebang and is executable, that CRLF input works, and that the root `README.md` no longer says there are no tools.
+- These are not pass/fail conditions.

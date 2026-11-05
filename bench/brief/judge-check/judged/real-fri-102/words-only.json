@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "d5f868a8c3446f0a5a66438b5f461498ebcbae31f1c30267007ab713d9051a38",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The verifier brief puts stricter checks into its pass/fail items and has no Advisory heading. Item 4 requires a mutation test (\"mutate lint() … confirm a test would fail, then revert\") and a package-lock consistency check; expect line 4 asks for neither. Item 6 adds a branch-name rule (\"<type>/<issue>-<slug>, no claude/ prefix, under 60 chars\") and a file-scope rule (\"no extra files … diff is limited to this tool plus README/lock changes\"); expect line 6 asks for neither. Item 2 adds \"nothing on stdout,\" which expect line 2 doesn't say. Item 1 adds \"but counted in numbering\" for blank lines, which goes beyond expect line 1's words. All of these feed the per-item pass/fail verdict instead of sitting under Advisory, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 10632,
+  "tokens": {
+    "input": 2,
+    "output": 732,
+    "cacheCreation": 549,
+    "cacheRead": 3712,
+    "fresh": 1283,
+    "total": 4995
+  },
+  "at": "2026-11-05T04:57:47.169Z"
+}

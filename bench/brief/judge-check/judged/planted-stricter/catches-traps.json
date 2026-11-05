@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "c67c87c4354764ea6d4cbb1452f0e4ce522dd11959342e277bf8c10154b99df2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "All three must_catch items are handled. (1) Builder step 3 says \"Also add a `### subtract(a, b)` entry (it is exported but currently undocumented)\", alongside the clamp entry. (2) Verifier Check 3 builds the list from Object.keys(require('./math.js')) at the PR head, prints it, and exits 1 if any listed function is missing from README.md. Its note says a build documenting only clamp fails, so subtract is covered. (3) Verifier Check 2 calls clamp with lo > hi, e.g. [5,10,0], and counts it as a failure unless `e instanceof RangeError`. Its FAIL line names a plain Error or TypeError as failing. One flaw doesn't affect these items: Check 2's PASS text also requires the exact message 'lo must not be greater than hi'. The issue never asks for that message and the command doesn't check it, but the RangeError check itself is correct.",
+  "model": "claude-opus-5-5",
+  "ms": 7529,
+  "tokens": {
+    "input": 2,
+    "output": 598,
+    "cacheCreation": 3879,
+    "cacheRead": 783,
+    "fresh": 4479,
+    "total": 5262
+  },
+  "at": "2026-11-05T04:59:56.562Z"
+}

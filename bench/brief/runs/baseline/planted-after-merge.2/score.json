@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.2",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS/FAIL conditions against the words of its expect line. Checks 3 and 4 stick to the words: Check 3 asks that docs/index.md contain `--shout` and say what it does, and Check 4 asks that the PR be merged and the live page show `--shout`. Checks 1 and 2 add exit-code tests that the words don't require. Check 1's PASS says \"each exits 0\", and its FAIL includes \"exits non-zero\". The line only says the command \"prints the greeting in upper case\", so a correct upper-case greeting with a non-zero exit would still meet it. Check 2's PASS requires \"stdout, stderr and exit code\" to match the base, and its FAIL covers \"any difference in output or exit code\". The line only says the \"output is unchanged\", and an exit code is not output. These stricter tests belong under Advisory, not in PASS/FAIL conditions.",
+      "cached": true
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the 8 tracked files and the package.json scripts, and they all run as written. `npm test` runs `node --test`, which is defined. `node bin/greet.js --shout Ada`, `'Grace Hopper'`, `Ada --shout` and the no-argument call all target bin/greet.js, which is tracked. `grep -n -- '--shout' docs/index.md` is valid: the `--` stops the pattern being read as an option, and the file exists. `curl -sSL https://o.github.io/greet-cli/` is valid. `gh pr view <PR> --json state,mergedAt` uses real JSON fields. `<PR>` is a placeholder for the PR number the verifier will have, not a literal argument; typed literally, the shell would read `<PR>` as a redirect. `git worktree add` is only an \"e.g.\" hint, not a full command. In the builder brief, `node bin/greet.js --shout <name>` is text to put in the docs, not a command to run. All files named exist (bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md, .github/workflows/pages.yml). No JavaScript syntax is given.",
+      "cached": true
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 2 is handled: Check 2 runs the commands \"at the PR head and at the PR's base commit\" and needs stdout, stderr and exit code to be \"identical to those at the base\". Item 1 is missed: Check 4 has the verifier \"fetch the live page: `curl -sSL https://o.github.io/greet-cli/`\", says \"Do not pass this check from the contents of docs/index.md or the diff alone\", and reports an unmerged PR as FAIL. It never checks at the PR head that docs/index.md lists --shout and that pages.yml publishes docs/ from main. Checking pages.yml is only an advisory note, not part of the pass/fail check. So the verifier reads the live page, which item 1 forbids.",
+      "cached": true
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked the verifier's Check 4 against must_not item 1, and it breaks it. Check 4 says to \"fetch the live page: `curl -sSL https://o.github.io/greet-cli/`\". It then gives PASS when \"the PR is merged and the fetched published page contains `--shout`\". It gives FAIL when the page lacks `--shout` or \"cannot be fetched\", and also when the PR isn't merged yet (\"report it as FAIL… include what the live page currently shows\"). So the check passes or fails on what the live page shows today, which item 1 forbids. It does not pass silently without evidence (item 2): it rules out passing \"from the contents of docs/index.md or the diff alone\". The builder brief stays clear of both items. Because Check 4 does what item 1 forbids, the criterion fails.",
+      "cached": true
+    }
+  }
+}

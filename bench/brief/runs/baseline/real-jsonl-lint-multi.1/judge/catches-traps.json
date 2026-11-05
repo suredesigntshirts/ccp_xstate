@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "d3faab20619286934fd3bfb5772cb1d2917bc0295229bff8b5192e3f41947f64",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all four must_catch items, and the briefs handle each one.\n1. Verifier Check 3 runs `node $B $T/a.jsonl $T/missing.jsonl $T/bad.jsonl`, which mixes a missing file with a bad one. It requires exit 2 and says stdout must \"still hold the `$T/bad.jsonl:2:` and `$T/bad.jsonl:4:` lines\".\n2. Verifier Check 4 runs `git diff $(gh pr view --json baseRefOid ...)...HEAD -- packages/jsonl-lint/src/index.js`. It passes only if that diff is empty, so it compares the PR head with the base.\n3. Builder step 5 says \"Update packages/jsonl-lint/README.md\". It covers the multi-file usage, `-` for stdin and the exit codes.\n4. Verifier Check 6 reads GitHub with `gh pr view ... --json body,headRefOid`. It requires the body to contain the Closes line for issue 104 and the `test` workflow run for the head commit to have succeeded, checked with `gh run list --workflow test.yml --commit <headRefOid>` or `gh pr checks`.",
+  "model": "claude-opus-5-5",
+  "ms": 6793,
+  "tokens": {
+    "input": 2,
+    "output": 652,
+    "cacheCreation": 6134,
+    "cacheRead": 783,
+    "fresh": 6788,
+    "total": 7571
+  },
+  "at": "2026-11-05T05:06:52.812Z"
+}

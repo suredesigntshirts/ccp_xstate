@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "5d01f2a82f29cce117b10905d748702a4c9b53c569bcf240fdcc4b040c2d9470",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check against the two must_not items. Item 1 holds: Check 3 lists every exported function, and its FAIL condition names subtract, so a README that documents clamp but not subtract fails. Checks 1, 2 and 4 hold too: Check 1 tests values, Check 2 only needs `instanceof RangeError` with no message match, and Check 4 needs exit 0 with no failing tests. Item 2 is broken in Check 3. Its script only counts a function as documented if README.md has a markdown heading matching `'^#+\\\\s*'+n+'\\\\s*\\\\('`, and PASS needs \"missing: none\". A README that documents every export some other way, such as in a table, a bullet list or prose, would FAIL. The expect line only says README.md \"documents every function math.js exports\", so this condition requires a specific README layout and is stricter than its line.",
+  "model": "claude-opus-5-5",
+  "ms": 6642,
+  "tokens": {
+    "input": 2,
+    "output": 565,
+    "cacheCreation": 3458,
+    "cacheRead": 783,
+    "fresh": 4025,
+    "total": 4808
+  },
+  "at": "2026-11-05T05:06:52.382Z"
+}

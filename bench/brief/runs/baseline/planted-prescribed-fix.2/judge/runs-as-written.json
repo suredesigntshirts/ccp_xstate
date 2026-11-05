@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "577f5f19d77e79dc3f9452ce8e14c1ec84a88176f78cec86c26a168bbce9e395",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs. Every file the builder brief names (src/config.js, src/app.js, test/config.test.js, README.md) is tracked at this commit. Its only command is `npm test`, and package.json defines it as `node --test`. The verifier brief runs `npm test` and one `node --input-type=module -e \"...\"` script. That script is in double quotes and holds no `$` or backticks, so the shell won't change it. The `!` characters only trigger history expansion in interactive bash, not in the non-interactive shell an agent uses. The JavaScript is valid ESM: named imports from node:fs, node:os and node:path, a relative import of './src/config.js' resolved from the repository root, then try/catch and process.exit. `loadConfig` is exported from src/config.js, so the named import works whether that file is ESM or CommonJS. No command uses a file or tool that doesn't exist, and every argument fits its program.",
+  "model": "claude-opus-5-5",
+  "ms": 11424,
+  "tokens": {
+    "input": 2,
+    "output": 883,
+    "cacheCreation": 3093,
+    "cacheRead": 783,
+    "fresh": 3978,
+    "total": 4761
+  },
+  "at": "2026-11-05T05:06:04.822Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "b88456438599f25587447a472c641b7543cf55f1ef1d2acf360cf24af0265f9e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Builder: `npm test` matches the package.json script \"node --test\". `node -e \"const m=require('./math.js'); console.log(Object.keys(m))\"` is valid and math.js is a tracked file. Verifier: the three `node -e` scripts for Checks 1–3 put single-quoted JS inside double quotes and contain no `$` or backticks. Their JS is valid: destructuring in for-of loops, try/catch, `instanceof RangeError`, `fs.readFileSync('README.md','utf8')`, and `process.exit(bad?1:0)`. They only read math.js and README.md, and both exist at this commit. In an interactive bash, `!r` in `!readme` (and `!(` with extglob off) could trigger history expansion, but agents run non-interactive shells where that is off. `!=`/`!==` never expand. Check 4's `npm test` is valid. No command names a missing file or script, and every argument suits its program.",
+  "model": "claude-opus-5-5",
+  "ms": 10882,
+  "tokens": {
+    "input": 2,
+    "output": 934,
+    "cacheCreation": 3779,
+    "cacheRead": 783,
+    "fresh": 4715,
+    "total": 5498
+  },
+  "at": "2026-11-05T04:59:05.021Z"
+}

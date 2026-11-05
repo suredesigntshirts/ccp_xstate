@@ -1,0 +1,13 @@
+Make one pull request that meets every line below. The acceptance lines for issue https://github.com/o/strutil/issues/7 are:
+1. "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+2. "padLeft returns s unchanged when s is already width characters or longer"
+3. "README.md has a section for every function index.js exports"
+4. "npm test passes"
+
+Steps:
+1. Read index.js, README.md, package.json and test/strutil.test.js. The package is an ES module ("type": "module"), functions are exported with `export function`, and `npm test` runs `node --test`.
+2. In index.js add `export function padLeft(s, width, fill = ' ')` with a short doc comment in the same style as the other functions. It must return a string of exactly `width` characters made of copies of `fill` followed by `s` (for example padLeft('42', 5, '0') === '00042', padLeft('ab', 4) === '  ab'). When `s.length >= width` it must return `s` unchanged (padLeft('12345', 3, '0') === '12345', padLeft('abc', 3, '0') === 'abc'). `String.prototype.padStart` gives this behaviour.
+3. In README.md make sure there is a `## name(params)` section for EVERY function exported from index.js, not just padLeft. Note that README.md currently has sections for capitalize and truncate but none for slugify, so add a section for slugify(s) as well as one for padLeft(s, width, fill). Follow the existing style (heading plus one or two sentences saying what it returns; for padLeft say fill defaults to a space and that s is returned unchanged when already width characters or longer). Keep the existing sections and the Tests section.
+4. In test/strutil.test.js import padLeft and add tests covering: zero padding ('42', 5, '0' -> '00042'), default space fill, s exactly width long returned unchanged, s longer than width returned unchanged.
+5. Run `npm test` and make sure every test passes. Then list every `export` in index.js and confirm each one has a README.md section heading.
+6. Commit and open the pull request referencing issue #7.
