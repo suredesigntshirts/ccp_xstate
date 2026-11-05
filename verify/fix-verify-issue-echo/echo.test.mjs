@@ -8,6 +8,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { makeWorld, BRIEFS, builds, suiteWake } from '../../packages/engine/test/tourney/world.js';
+import { readWorkflow } from '../../packages/engine/src/prompts.js';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const ISSUE = {
@@ -119,7 +120,8 @@ test('prompt-agrees: quick-fix verify brief.md and stage.json, and research veri
     assert.doesNotMatch(stage, /same keys in the same order/);
     assert.match(stage, /url and expect copied exactly/);
     assert.match(stage, /may leave out title, body/);
-    const research = JSON.parse(readFileSync(join(REPO, 'workflows/research.json'), 'utf8'));
+    // research.json with its stage files filled in, as the engine reads it (plan item stage-prompt-files).
+    const research = readWorkflow('research', { dir: join(REPO, 'workflows') }).spec;
     const desc = JSON.stringify(research).match(/"issue":\{"\$ref":"#issue","description":"([^"]*)"/)?.[1];
     assert.ok(desc, 'research verify issue description');
     assert.doesNotMatch(desc, /same order/);

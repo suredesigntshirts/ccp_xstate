@@ -6,6 +6,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { restore } from '../../src/host.js';
 import { replay } from '../../src/spec.js';
+import { readWorkflow } from '../../src/prompts.js';
 import { makeWorld, fresh, ISSUE, BRIEFS, builds, verifies, tapWake, loadWorkflow, workflowOf, RELEASE } from './world.js';
 
 const REPO_QF = new URL('../../../../workflows/quick-fix.json', import.meta.url);
@@ -13,7 +14,7 @@ const REPO_QF = new URL('../../../../workflows/quick-fix.json', import.meta.url)
 test('Q8: an item pinned to v1 finishes on v1 after the file becomes v2, and its journal replays', async () => {
   const dir = fresh('workflows');
   mkdirSync(dir, { recursive: true });
-  const v1 = JSON.parse(readFileSync(REPO_QF, 'utf8'));
+  const v1 = structuredClone(readWorkflow('quick-fix', { dir: new URL('.', REPO_QF).pathname }).spec);
   writeFileSync(join(dir, 'quick-fix.json'), JSON.stringify(v1, null, 2));
   const w = await makeWorld({ dir });
   try {

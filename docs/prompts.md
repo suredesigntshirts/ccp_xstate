@@ -1,22 +1,36 @@
 # Stage prompts: where they come from, how to inspect them, how to refine them
 
 A model stage's prompt is assembled in one place, `packages/engine/src/stages.js` (`sections()` and `render()`), from
-the stage's entry in the workflow JSON and the run's input. Nothing else writes a prompt. The stage bench
+the stage's file, its entry in the workflow JSON and the run's input. Nothing else writes a prompt. The stage bench
 (`scripts/bench/`, plan item stage-bench) runs one stage alone on fixed cases with that exact prompt, scores its
-output per rubric criterion, and compares two workflow versions. Changing a prompt is a PR to `workflows/*.json`,
+output per rubric criterion, and compares two workflow versions. Changing a prompt is a PR to the stage's file,
 backed by a bench report. Why it is done this way: `plan/decisions/2026-11-05-prompt-refinement.md` and
 `plan/decisions/2026-11-05-stage-bench.md`.
+
+## Stage files
+
+Each model stage's words live in one markdown file beside its workflow, `workflows/<workflow>/<stage>.md`, named by its
+entry in the workflow JSON (`"prompt": "quick-fix/brief.md"`). The JSON keeps the wiring and the output schema. A stage
+file is a `# <stage>` title, then `## Rules`, `## Inputs`, `## Output`, and `## Task` for a stage whose invoke takes a
+fixed task. Rules are `- <rule>` items; Inputs and Output are `- <name>: <text>` items, Output in the schema's property
+order. Each item is one line: do not wrap it. The Task is the lines under its heading, as written. Anything else in the
+file is refused at load with its file and line (`packages/engine/src/prompts.js`).
+
+The engine fills the files into the workflow (`readWorkflow()`) and pins those filled-in bytes, so editing a stage file
+changes the pin, a finished item replays on its blob alone, and each run's `stage.json` names the file and line of
+every piece that came from one; the Inspector shows them. Claude Code's own agent definitions (`.claude/agents/`,
+`~/.claude/agents/`, a plugin's `agents/`) are not used for stages: `plan/decisions/2026-11-05-stage-prompt-files-ready.md`.
 
 ## Where each part of a prompt comes from
 
 | Part | Text | Where it lives |
 |---|---|---|
 | Rules | The data rule and the worktree rule | Constants in `packages/engine/src/stages.js` (`DATA_RULE`, `WORKTREE_RULE`), the same for every stage |
-| Rules | Who the stage is, what it must not do, when to return | `meta.actors.<stage>.rules` in the workflow, for example `workflows/quick-fix.json` |
-| Inputs | Each input's name and meaning | `meta.actors.<stage>.inputs` |
+| Rules | Who the stage is, what it must not do, when to return | `## Rules` of the stage file, for example `workflows/quick-fix/brief.md` |
+| Inputs | Each input's name and meaning | `## Inputs` of the stage file |
 | Inputs | Each input's value | The run's input, wired by the state's `invoke.input`: a context path (written by an earlier stage or the item's start) or a literal |
-| Task | The stage's job | The input named `task`. For brief, a literal in `states.briefing.invoke.input.task`. For build and verify, the briefs the brief stage wrote |
-| Output | One line per described field, then the schema | The `description` of each output property and the schema itself, in `meta.actors.<stage>` |
+| Task | The stage's job | The input named `task`. For brief, `## Task` of its stage file, wired as `{ "prompt": "task" }` in `states.briefing.invoke.input.task`. For build and verify, the briefs the brief stage wrote |
+| Output | One line per described field, then the schema | `## Output` of the stage file (one line per field), then the schema in `meta.actors.<stage>` of the workflow JSON |
 | Return | How to call the return tool | `returnLine()` in `stages.js`, filled with the run id |
 
 Not in the prompt: the run's context (its run id, worktree, repository and branch, from `contextOf()`), which the
@@ -111,8 +125,9 @@ Make a one-rule variant of the workflow, run it on one case three times, score i
 sessions per run), and compare it with the baseline:
 
 ```
-node -e "const f=require('fs');const w=JSON.parse(f.readFileSync('workflows/quick-fix.json','utf8'));w.meta.actors.brief.rules[4]='Use paths from the repository root, and check that every command you give runs as written in this repository before you return.';f.writeFileSync('/tmp/qf-variant.json',JSON.stringify(w,null,2)+'\n')"
-node scripts/bench/run.mjs --stage brief --case planted-half-met --k 3 --workflow /tmp/qf-variant.json --out /tmp/bench-variant --model claude-opus-5-5
+rm -rf /tmp/qf-variant && cp -r workflows /tmp/qf-variant
+sed -i 's/^- Use paths from the repository root\.$/- Use paths from the repository root, and check that every command you give runs as written in this repository before you return./' /tmp/qf-variant/quick-fix/brief.md
+node scripts/bench/run.mjs --stage brief --case planted-half-met --k 3 --workflow /tmp/qf-variant/quick-fix.json --out /tmp/bench-variant --model claude-opus-5-5
 node scripts/bench/score.mjs --stage brief --runs /tmp/bench-variant --report /tmp/bench-variant.md
 node scripts/bench/compare.mjs --stage brief --a bench/brief/runs/baseline --b /tmp/bench-variant --out /tmp/bench-compare.md --blind /tmp/bench-blind
 ```
@@ -139,10 +154,11 @@ A thread that refines a stage's prompt follows these steps, in order, and links 
    `notes`. Scores are not trusted until this passes.
 4. **Baseline.** Run today's prompt, at least 3 runs per case, score it, and write `bench/<stage>/reports/<name>.md`
    with `score.mjs --report`. Commit the run folders with the report.
-5. **Proposal.** Pick one criterion the baseline fails. Change the workflow JSON so it addresses that criterion,
+5. **Proposal.** Pick one criterion the baseline fails. Change the stage file so it addresses that criterion,
    and nothing else: one rule, one input meaning, one field description or the task. Write down which criterion it
    targets and why the change should help.
-6. **Rerun.** Run the variant on the same cases with the same k, model and conditions, with `--workflow <variant>`,
+6. **Rerun.** Run the variant on the same cases with the same k, model and conditions, with `--workflow <variant>`
+   (the variant's `<workflow>.json` in a copy of `workflows/`, its stage files beside it),
    and score it.
 7. **Compare.** `compare.mjs --a <baseline> --b <variant>`. Keep the change only if the targeted criterion improves
    and no criterion is worse, or the person accepts the trade in writing. Compare only sets run under the same
@@ -150,7 +166,7 @@ A thread that refines a stage's prompt follows these steps, in order, and links 
 8. **Blind read.** Hand `packet.md` from `compare.mjs --blind` to a fresh session that has seen neither workflow
    (a new thread, or `claude -p` from an empty folder). A model tends to prefer its own text, so the builder of the
    change never does this read. Record its answer and the key in the PR.
-9. **PR.** One PR changes the workflow JSON and adds the variant's run folders and the compare report, through the
+9. **PR.** One PR changes the stage file and adds the variant's run folders and the compare report, through the
    usual gates (`docs/gates.md`). Finished items keep replaying on the workflow they pinned (`test/journals-replay.test.mjs`),
    so the edit leaves their tests green; only tests that assert the workflow file's current contents need updating.
 

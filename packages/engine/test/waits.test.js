@@ -7,12 +7,12 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { loadWorkflow } from '../src/index.js';
+import { loadWorkflow, readWorkflow } from '../src/index.js';
 import { checkStages } from '../src/stages.js';
 
 const WORKFLOWS = new URL('../../../workflows/', import.meta.url).pathname;
 const names = readdirSync(WORKFLOWS).filter((f) => f.endsWith('.json')).map((f) => f.replace(/\.json$/, ''));
-const read = (name) => JSON.parse(readFileSync(join(WORKFLOWS, `${name}.json`), 'utf8'));
+const read = (name) => structuredClone(readWorkflow(name, { dir: WORKFLOWS }).spec);
 const asking = (spec) => Object.entries(spec.states).filter(([, s]) => s.invoke?.src === 'ask').map(([n]) => n);
 
 test('every workflow in workflows/ loads, and each asking state has its checkBack timer', () => {
