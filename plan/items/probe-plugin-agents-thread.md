@@ -41,13 +41,13 @@
     {
       "id": "thread-listed",
       "check": "A Projects thread whose SessionStart line names harness-v0.1.24 or later (a release that ships plugins/harness/agents/probe-reader.md) lists ccp-harness:probe-reader among its agent types, and an Agent call with that subagent_type starts it",
-      "how": "The thread's transcript extract and the thread's capture journal on the shared mount (session.fingerprint release and plugin root, the Agent tool.call row), and the subagent's meta.json agentType",
+      "how": "The thread's transcript extract and the thread's capture journal on the shared mount (session.fingerprint release and plugin root, the agent.spawn row's type), and the subagent's meta.json agentType",
       "proof": "world"
     },
     {
       "id": "thread-holds",
       "check": "The started agent runs on haiku, has only Read and Glob (a Write or Bash request is reported unavailable), and opens its reply with QUILLMARROW, which the task prompt does not give it",
-      "how": "The subagent transcript: model on each assistant message, its tool calls, the prompt and the reply",
+      "how": "The subagent transcript (model on each assistant message, its tool calls, the prompt and the reply) and the capture journal's agent.finish row (type and model)",
       "proof": "world"
     },
     {
@@ -91,12 +91,12 @@ You are a separate Projects thread, so you started on a release yourself. First 
 
 1. Read `plan/research/probe-plugin-agents-thread/` and the builder thread's capture journal,
    `/mnt/project-files/harness/journal/sessions/<builder session>.jsonl` (the session the report names). Confirm the
-   `session.fingerprint` row's release and plugin root, and the `tool.call` row for the Agent call with
-   `subagent_type` `ccp-harness:probe-reader`.
+   `session.fingerprint` row's release and plugin root, the `agent.spawn` row with type `ccp-harness:probe-reader`,
+   and its `agent.finish` row's model.
 2. Read the subagent transcript and meta.json extracts for thread-holds: model, tools used and refused, the marker,
    and that the task prompt lacks the marker.
 3. If your own thread is on harness-v0.1.24 or later, repeat the call yourself (an Agent call with `subagent_type:
-   "ccp-harness:probe-reader"` and a prompt that asks it to read `README.md` and to write a file), and read your own
+   "ccp-harness:probe-reader"` and a prompt that asks it to read `CLAUDE.md`, to write a file and to run a shell command), and read your own
    subagent files under `~/.claude/projects/`. This is your independent world check; commit your extracts under
    `verify/probe-plugin-agents-thread/evidence/`.
 4. Read the report section against all of it for thread-report.
