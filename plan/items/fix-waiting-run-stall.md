@@ -19,6 +19,14 @@
 
 ## What this is
 
-Draft. A replan to ready settles how the hook finds the thread's own waiting runs (not another item's), what happens
+Draft. From the person's 5 Nov questions: do not rely on Claude Code's stop_hook_active alone, because it only stops
+an immediate loop within one stop. Keep our own guard: count blocks per run in the journal, block at most twice per
+run, then write a stall row and put up a card. The block reason states the item, its state, the waiting run and the
+exact Agent call, plus an exit: if the call cannot be made, say why, so the run is failed instead of left waiting.
+The parts mostly exist already: the journal and run folders hold the state, the UserPromptSubmit and PostToolUse
+hooks already name the waiting runs, and a Stop hook is registered for capture. What is new is the Stop check, the
+counter, and the thread's fail exit.
+
+A replan to ready settles how the hook finds the thread's own waiting runs (not another item's), what happens
 in a Projects thread whose turn ends through a hearthbot tool, and how the real-run check proves a block led to a
 spawn.
