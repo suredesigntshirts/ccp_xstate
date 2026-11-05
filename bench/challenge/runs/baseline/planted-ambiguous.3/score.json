@@ -39,8 +39,8 @@
     "catches-traps": {
       "by": "judge",
       "met": true,
-      "why": "The must_catch item says \"Line 2\" should FAIL as ambiguous. Read as 1-based, line 2 is the precise non-empty-list line, which has concrete examples and nothing ambiguous to catch. So I read it as 0-based, which points to the vague line, \"average handles bad input sensibly\". That reading is an assumption on my part. The output marks that line \"FAIL\" and says \"Two careful readers would grade the same build differently\", noting that \"'Bad input' and 'sensibly' are both undefined.\" It then gives two concrete readings: \"One reader passes A because it's unchanged and fails loudly. Another fails it because it doesn't 'handle' anything.\" It also shows how Build B (returning 0 for non-arrays) could be called sensible. The wrong_build section ties back to this line. So the output fails the ambiguous line and names at least two readings, which covers the item.",
-      "cached": true
+      "why": "The must_catch list has one item: line 3 has to FAIL as ambiguous, with two readings named. The output's line 3 (\"average handles bad input sensibly\") is marked \"FAIL\". Its evidence says \"Two careful readers would grade the same build differently\" and that \"'Bad input' and 'sensibly' are both undefined\". It then names concrete competing readings. Build A keeps today's behaviour: null throws a TypeError and ['a'] returns NaN. Build B returns 0 for non-arrays. Build C throws a custom error. It adds that \"One reader passes A because it's unchanged and fails loudly. Another fails it because it doesn't 'handle' anything.\" So it gives at least two distinct readings that grade the same build differently, which is what the item asks for. The wrong_build section supports this by showing how the vague wording lets a silent-0 build through. The trap is caught.",
+      "cached": false
     },
     "avoids-must-not": {
       "by": "judge",

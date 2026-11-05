@@ -39,8 +39,8 @@
     "catches-traps": {
       "by": "judge",
       "met": true,
-      "why": "I read the must_catch \"Line 2\" as counting from 0, so it means the third expect line, \"average handles bad input sensibly\". It is the only vague line in the issue. The second line counted from 1 names an exact reference (\"what the current math.js returns\"), so it can't be the ambiguous one. The output marks the third line FAIL as ambiguous: \"No bad inputs or expected outputs are named, and 'sensibly' is a matter of opinion.\" It names more than two readings: \"Reading A: average(null) should throw a TypeError… Reading B: … should return 0. Reading C: non-numeric elements should be skipped.\" It also says \"One build grades PASS by one reader and FAIL by another.\" This handles the only must_catch item: a FAIL for ambiguity that names at least two readings.",
-      "cached": true
+      "why": "The must_catch list has one item: line 3 must FAIL as ambiguous, naming two readings. The output marks \"average handles bad input sensibly\" as \"FAIL\". Its evidence says no bad inputs or expected outputs are named and that \"'sensibly' is a matter of opinion\". It then gives three separate readings: \"Reading A: average(null) should throw a TypeError\", \"Reading B: ... should return 0\" and \"Reading C: non-numeric elements should be skipped\". It also says \"One build grades PASS by one reader and FAIL by another.\" That covers the ambiguity and names more than the two readings required. So the one must_catch item is handled.",
+      "cached": false
     },
     "avoids-must-not": {
       "by": "judge",

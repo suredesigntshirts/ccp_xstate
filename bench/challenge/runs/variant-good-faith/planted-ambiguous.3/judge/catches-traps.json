@@ -1,18 +1,18 @@
 {
   "criterion": "catches-traps",
-  "promptSha": "52d3399e19d0f5a98d6eab2a865a34e23b85fd84fb60192edb27d89c6971ec22",
+  "promptSha": "2ccb051bc7e2b96d90e9df623049c9608bd1e45ee53fae96c23dda7854bffeac",
   "asked": "claude-opus-5-5",
   "met": true,
-  "why": "The must_catch item says \"Line 2\" should FAIL as ambiguous, with two readings named. Counting from 0, line 2 is \"average handles bad input sensibly\". That is the only vague line. The second line, read 1-based, gives exact inputs and outputs and can't be read as ambiguous, so I took the item to mean the bad-input line. The output marks that line \"FAIL\". It says the words fix neither which inputs count as bad nor what \"sensibly\" means. It names two readings: \"Build A throws TypeError on average(null)\" and \"Build B returns 0 for null\", and says \"Two careful readers will disagree.\" The wrong_build section makes the same point: the opposite build \"also 'meets' line 3 for another reader.\" So the trap is caught. If \"Line 2\" was meant 1-based, this would be false, because the output passes that line.",
+  "why": "The must_catch list has one item: line 3 must FAIL as ambiguous and name two readings. The output marks \"average handles bad input sensibly\" as FAIL. Its evidence says \"Two careful readers will disagree\" and gives two readings: \"Build A throws TypeError on average(null)\" and \"Build B returns 0 for null\". It also lists the open questions about which inputs count as bad and what 'sensibly' means. The wrong_build section says it again: \"Line 3 cannot tell the two apart.\" The item is fully handled.",
   "model": "claude-opus-5-5",
-  "ms": 8922,
+  "ms": 9870,
   "tokens": {
     "input": 2,
-    "output": 727,
-    "cacheCreation": 3708,
+    "output": 287,
+    "cacheCreation": 3707,
     "cacheRead": 783,
-    "fresh": 4437,
-    "total": 5220
+    "fresh": 3996,
+    "total": 4779
   },
-  "at": "2026-11-05T07:27:32.529Z"
+  "at": "2026-11-05T08:09:03.858Z"
 }
