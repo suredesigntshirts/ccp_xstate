@@ -1,0 +1,50 @@
+{
+  "item": "fix-blocked-retry",
+  "verified_sha": "e4fd1c0192954bf9c458b908c11b0ee4753f5ac6",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5Fss4RHv8crv6ez4m7",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "retry-route",
+      "status": "MET",
+      "command": "npm ci; node --test verify/fix-blocked-retry/retry.test.mjs (lib.mjs: real restore/offer/pump, real handlers and agent run handler, spawn/bind/accept/resultsOf; local bare origin, stub GitHub REST with merge, a card recorder for hearth; cards answered by decision-chosen tap wakes through inputsOfWake). Same file copied into a worktree of main de32091: red there",
+      "excerpt": "Head: a first build returning { blocked: { reason } } reaches state blocked; error event { error: 'build blocked: <reason>' (main's text), blocked: <reason> }; the card's choices are [retry, replan, drop] and its inputs.failure is the block's text. Tapping retry: state building, briefs and why (null) unchanged, failure = the block, built true, one brief run in total; the new build run's input.task equals the first build's and its input.failure (also in run.json) names the block; the answer row's output is { choice: 'retry', by: 'user_person' }. The retried build's PR goes verifying -> PASS -> awaitingMerge -> tap -> done, merged once at PR 1. With no answer (drive, and a wake at 2999) the item stays blocked with one build run; drop on the blocked card ends dropped. Note: a stand-in grant cannot answer this card (standinInput refuses 'repo (none) not granted', the card carries no pr); the item's Expect allows tap or stand-in, and the builder's report records the same gap.",
+      "mutation": "workflows/quick-fix.json: the retry transition's set of built true removed (so the retried build counts as a first build)",
+      "red_test": "verify/fix-blocked-retry/retry.test.mjs: 'retry-route: a blocked first build reaches blocked...' red, plus no-second-retry 'retried build blocked again', 'retried build whose verify FAILs' and 'a replan resets the count' red"
+    },
+    {
+      "id": "no-second-retry",
+      "status": "MET",
+      "command": "node --test verify/fix-blocked-retry/retry.test.mjs, the four no-second-retry tests plus the replan-reset test",
+      "excerpt": "Retry then a second block: replanning, card [replan, drop], failure 'build blocked: blocked again'. Verify FAIL -> rebuild -> blocked: replanning [replan, drop]. Red check -> rebuild -> blocked: replanning [replan, drop]. Retry -> PR -> verify FAIL: replanning [replan, drop], two build runs, no third. After a replan (why given) the new attempt's first blocked build reaches blocked again. Mutating blockedBuild to ['event.blocked'] (dropping context.built null) turns 4 of these red.",
+      "mutation": "workflows/quick-fix.json guards.blockedBuild reduced to [\"event.blocked\"]",
+      "red_test": "verify/fix-blocked-retry/retry.test.mjs: 'a retried build blocked again', 'a rebuild after a verify FAIL that is blocked', 'a rebuild after a red check that is blocked', 'a replan resets the count' red"
+    },
+    {
+      "id": "not-blocked-unchanged",
+      "status": "MET",
+      "command": "node verify/fix-blocked-retry/scenarios.mjs in a worktree of main de32091 (node_modules linked; package files unchanged by the PR) gave evidence/main-scenarios.json; at the head the test compares live output; npm test at head e4fd1c0 and at main de32091; for decision 9: each of the 5 changed evidence files equals main's with only the quick-fix id cb8645f4... -> 6a0b9dfd... and the 'quick-fix build' render e1e654ab... -> 7062c76f... substituted (cmp), node verify/fix-refusal-hints/prompts.mjs . reproduces the head file byte for byte and on main reproduces main's",
+      "excerpt": "verify-fail (briefing, building, verifying, building, verifying, replanning), red-check (… checking, building, checking, replanning), build-stopped (failed.json: replanning), brief-error (briefing -> replanning): states, card question/choices/inputs and error texts equal main's. A block's error text equals main's ('build blocked: <reason>'); only its state differs (main replanning, head blocked). npm test head: 1561 tests, 1548 pass, 12 skipped, 1 fail; main: 1542, 1529 pass, 12 skipped, 1 fail; the one failure on both is test/setup.test.mjs copy-not-link (the clone holds real release tags). Decision 9 judged justified: the other items' snapshots record main's renders and hashes at their verification, every changed line is the new hash or the build.md render, load-check gains only 'blocked' in quick-fix's asking list, and no assertion changed.",
+      "mutation": "none needed beyond the two above: these lines compare head with main's recorded output",
+      "red_test": "verify/fix-blocked-retry/retry.test.mjs 'not-blocked-unchanged' is red when run on main (head-only blocked state)"
+    },
+    {
+      "id": "real-run-captured",
+      "status": "MET",
+      "command": "read tournaments/2026-11-04-stage-contract/trials/blocked-retry/: journal/items/trial.jsonl transitions, blobs/, runs/*/agent.json, result.json, run.json, journal/sessions/*.jsonl, report.md; git diff 679f4da e4fd1c0 -- packages/engine/src workflows plugins/harness (empty); git merge-base --is-ancestor b62d5b3 679f4da; node scripts/inspector/build.mjs --out <tmp> and read data.js",
+      "excerpt": "First row pins quick-fix@6a0b9dfd27e7…, which is loadWorkflow('quick-fix').id at the head (composed bytes), and blobs/6a0b9dfd… hashes to its name. Report names engine commit 679f4da; its base has fix-rebuild-worktree b62d5b3; no engine/workflow/plugin change after it. Transitions: init briefing; brief done building; build error with blocked -> blocked; ask done 'retry' (hearth tap) -> building; build done -> checking; check_suite -> verifying; verify PASS -> awaitingGates; ask 'approve CI change' -> merging; merge -> done. 1.build result.json is { blocked: { reason } } naming the workflow-scope refusal; 3.build run.json input.failure is the block, task equal to 1.build's. Four agent.json (via start) bind a8354f6799cae4c65, a881402ae55225be1, a184fbab1f9acfa9c, adc9f58e1f22c14a2; sessions/ rows hold for each 3/7/7/5 tool.call rows and one agent.finish (ms 13173/38501/40312/25252, output tokens 1394/2352/1960/1847). Inspector: run 'Blocked build, cleared and retried, 5 Nov' replays ok (no mismatch), final done, all 4 model steps carry agentId, ms, tokens and an l5 trace (7/12/12/11 rows, 3/8/8/7 tool calls)."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 141 at e4fd1c0",
+      "excerpt": "Check run 'test' (id 127331598083) completed success at e4fd1c0. 'gates' (127331598238) failed only because no verdict existed yet at that sha."
+    }
+  ],
+  "notes": [
+    "For the done replan: the blocked card has no pr input, so bin/host.js answer (stand-in grant) cannot retry it; a grant names repos and repoOf reads the card's pr. The item's outcome names a stand-in's answer as a way in; today only a tap works.",
+    "Per the report: SubagentHandback after an accepted return is refused no-return (one refusal row per agent)."
+  ]
+}
