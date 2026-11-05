@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "7658585ccadd1079433388064e9f310ba39fffee864ce49cdbb95cdef0a28cc7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. The builder's `npm test` maps to the existing script `node --test`. The files it names (index.js, README.md, test/strutil.test.js) are all tracked. The verifier's checks 1 and 2 are `node --input-type=module -e \"...\"` with single-quoted JS strings inside a double-quoted shell argument. Their imports from './index.js' and 'node:assert/strict' are valid, and `; echo exit=$?` sits outside the quotes. In check 3, bash turns `\\\\\\\\` into `\\\\` and `` \\` `` into a backtick. So JS receives `'^#{2,}\\\\s+`?'` and `'\\\\b'`, which make the regex `^#{2,}\\s+`?name\\b`. The `/^#{2,}\\s/` literal and `'\\n'` pass through unchanged. The `!` inside double quotes only matters in interactive shells with history expansion on, not in scripts. Check 4's `npm test; echo exit=$?` is valid. The repository facts don't show whether package.json has \"type\": \"module\", but the ESM commands work either way because `--input-type=module` sets the mode.",
+  "model": "claude-opus-5-5",
+  "ms": 12809,
+  "tokens": {
+    "input": 2,
+    "output": 1152,
+    "cacheCreation": 3284,
+    "cacheRead": 783,
+    "fresh": 4438,
+    "total": 5221
+  },
+  "at": "2026-11-05T05:12:56.450Z"
+}

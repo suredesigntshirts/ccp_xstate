@@ -133,14 +133,15 @@ test('compare: two versions, per case and criterion, with the rule that changed 
   const b = join(dir, 'b');
   const variant = join(dir, 'quick-fix.json');
   const qf = JSON.parse(readFileSync(join(REPO, 'workflows/quick-fix.json'), 'utf8'));
-  qf.meta.actors.brief.rules[4] = 'Use paths from the repository root, never absolute paths.';
+  const was = qf.meta.actors.brief.rules[4];
+  qf.meta.actors.brief.rules[4] = `${was} (variant)`;
   writeFileSync(variant, JSON.stringify(qf, null, 2));
   await benchRun({ c, k: 1, stage: 'brief', version: workflowVersion(), out: a });
   await benchRun({ c, k: 1, stage: 'brief', version: workflowVersion({ workflow: variant }), out: b });
   for (const d of [a, b]) await scoreRuns({ stage: 'brief', dir: d, model: 'fake-judge' });
   const A = scoredSet(a);
   const B = scoredSet(b);
-  assert.deepEqual(entryDiff(stageEntry(A, 'brief'), stageEntry(B, 'brief')), ['- rule removed: Use paths from the repository root.', '+ rule added: Use paths from the repository root, never absolute paths.']);
+  assert.deepEqual(entryDiff(stageEntry(A, 'brief'), stageEntry(B, 'brief')), [`- rule removed: ${was}`, `+ rule added: ${was} (variant)`]);
   const { md, worse } = compareReport({ stage: 'brief', a: A, b: B, aDir: a, bDir: b });
   assert.match(md, /\| words-only \| 1\/1 \| 1\/1 \| same \|/);
   assert.deepEqual(worse, []);

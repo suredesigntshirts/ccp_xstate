@@ -150,7 +150,9 @@ test('real-agents: the injected build 1 diff, applied to the driver\'s seed repo
   const drv = join(tree, 'tournaments/2026-11-04-stage-contract/trials/fail/driver');
   mkdirSync(drv, { recursive: true });
   cpSync(join(TRIALS, 'fail/driver'), drv, { recursive: true });
-  symlinkSync(join(REPO, 'packages'), join(tree, 'packages'));
+  // A copy, not a link: the engine finds workflows/ beside its own real path, so a linked engine would read this
+  // checkout's workflows/ and not the pinned bytes written below.
+  cpSync(join(REPO, 'packages'), join(tree, 'packages'), { recursive: true, filter: (src) => !src.includes('node_modules') });
   symlinkSync(join(REPO, 'node_modules'), join(tree, 'node_modules'));
   // The driver loads workflows/quick-fix.json: give it the bytes the committed journal pinned, so the re-run starts
   // on the same workflow whatever the file says today (plan item stage-bench).

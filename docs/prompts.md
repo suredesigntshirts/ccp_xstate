@@ -98,7 +98,10 @@ Recompute the baseline's scores and report from its run folders and kept verdict
 node scripts/bench/score.mjs --stage brief --runs bench/brief/runs/baseline --no-judge --report /tmp/bench-baseline.md
 ```
 
-Run one case once (one model session, about 30,000 fresh tokens):
+The committed `bench/brief/reports/baseline.md` was written by the same command with `--title` and `--notes <file>`,
+which add its title and its hand-written "What the baseline shows" section; every table is the same.
+
+Run one case once (one model session, about 15,000 to 30,000 fresh tokens):
 
 ```
 node scripts/bench/run.mjs --stage brief --case planted-half-met --k 1 --out /tmp/bench-try --model claude-opus-5-5
@@ -114,7 +117,9 @@ node scripts/bench/score.mjs --stage brief --runs /tmp/bench-variant --report /t
 node scripts/bench/compare.mjs --stage brief --a bench/brief/runs/baseline --b /tmp/bench-variant --out /tmp/bench-compare.md --blind /tmp/bench-blind
 ```
 
-`compare.mjs` compares the cases both sets have. `/tmp/bench-blind/packet.md` is the blind read's packet;
+`compare.mjs` compares only the cases both sets ran, and names the ones it left out. `bench/brief/reports/example-variant-compare.md` is these four commands' output from 5 Nov, with the variant's runs in
+`bench/brief/runs/example-variant/`: one case and 3 runs, too few to decide anything, kept as a worked example (it
+shows a trade: runs-as-written 1/3 to 2/3, words-only 2/3 to 1/3). `/tmp/bench-blind/packet.md` is the blind read's packet;
 `key.json` beside it says which output is which and is not shown to the reader.
 
 ## The refinement procedure

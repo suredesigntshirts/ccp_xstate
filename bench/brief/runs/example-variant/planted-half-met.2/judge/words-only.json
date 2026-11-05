@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "6898e24b5d1d7c96e1b4a7771b198050865c98eb4946620aac64b73412f3e7d1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1, 2 and 4 test only what their expect lines say. Check 1 covers the export, left padding with an explicit fill and the default space fill. Check 2 covers input that is exactly width long or longer coming back unchanged. Check 4 needs exit 0 with no failing tests. The advisories are kept out of every PASS/FAIL condition. Check 3 breaks the criterion. Its PASS needs \"prints ALL DOCUMENTED\", and the regex `'^#{1,6}\\\\s+\\`?'+k+'\\\\b'` only matches a heading whose first word is the exact, case-sensitive function name. The words \"a section for every function index.js exports\" don't require that heading format. A real section such as \"## Padding with padLeft\" or \"## `strutil.padLeft`\" would print MISSING and FAIL. That is a heading-format rule stricter than the expect line, and it sits inside a PASS/FAIL condition instead of under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 13233,
+  "tokens": {
+    "input": 2,
+    "output": 1131,
+    "cacheCreation": 3563,
+    "cacheRead": 783,
+    "fresh": 4696,
+    "total": 5479
+  },
+  "at": "2026-11-05T05:12:47.235Z"
+}

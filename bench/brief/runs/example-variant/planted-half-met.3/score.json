@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.3",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each check's PASS/FAIL conditions with its expect line. Check 1 asserts padding with a given fill and with the default space, and that padLeft is exported as padLeft(s, width, fill). The expect line itself writes that signature, so the parameter-order check comes from its words. Check 2 only tests inputs that are equal in length or longer and come back unchanged. Check 3 requires a Markdown heading for each exported function and real section content under it, which is what \"has a section for every function\" asks. Check 4 requires exit 0 and no failing tests, which is what \"npm test passes\" means. The stricter items are tests in test/strutil.test.js and README sections in export order. Both sit under \"Advisory (does not affect PASS/FAIL)\". No PASS/FAIL condition has a mutation test, a branch or file-scope rule, or an exact-wording rule.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs. `npm test` maps to the real script `node --test`, which picks up test/strutil.test.js. All the node one-liners use `--input-type=module -e` with double-quoted bash and JS strings in single quotes, and none of them contain `$` or backticks. In the README check, bash turns `\\\\\\\\b` inside double quotes into `\\\\b`, which the JS string turns into a regex `\\b`, so the word-boundary test is valid. The imports from './index.js', 'node:fs' and 'node:assert/strict' are valid when run from the repo root. `echo exit=$?` sits outside the quotes, so it runs correctly. The only hazard is `!new` inside double quotes, which would trigger history expansion in an interactive bash, but agents run non-interactive shells where that is off. Every file named (index.js, README.md, test/strutil.test.js) exists at this commit, and the arguments fit each program.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one. (1) Builder step 3 has the builder \"also add the missing `## slugify(s)` section\" because slugify is exported and has none, and step 2 adds the padLeft section. (2) Verifier Check 3 runs a command that lists every exported function with no README heading. Its PASS condition names \"capitalize, slugify, truncate and padLeft\", and it FAILs on \"MISSING with any names (slugify especially)\". (3) Verifier Check 1 calls padLeft('ab',4) with no fill argument and asserts the result is '  ab', so the default is padding with spaces. Nothing in either brief contradicts these points.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both briefs against the two must_not items.\n\nItem 1 is avoided. Verifier Check 3 lists every exported function that has no heading naming it. It fails on \"MISSING with any names (slugify especially)\", and it requires slugify to have its own section. A README with a padLeft section but none for slugify would fail.\n\nItem 2 is avoided. Check 1 only uses fill strings that are one character long, and it never fails a fill that is longer. Checking the signature against \"padLeft(s, width, fill)\" matches the line's own wording, so it is not a parameter count. Check 3 accepts a heading at any level and only asks that each heading start a real section. It does not require a layout. Section order and test coverage are labeled \"Advisory (does not affect PASS/FAIL)\". Check 2 and Check 4 match their lines. The builder brief's single-space default for fill comes from line 1, and it does not limit fill to one character.",
+      "cached": false
+    }
+  }
+}

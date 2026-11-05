@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "e0f2e4487bb65bb43e8c3e9b3cc3c0e4c585a2d6c319f36e0d624d2388ee7d6c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each check's PASS/FAIL conditions with its expect line. Check 1 asserts padding with a given fill and with the default space, and that padLeft is exported as padLeft(s, width, fill). The expect line itself writes that signature, so the parameter-order check comes from its words. Check 2 only tests inputs that are equal in length or longer and come back unchanged. Check 3 requires a Markdown heading for each exported function and real section content under it, which is what \"has a section for every function\" asks. Check 4 requires exit 0 and no failing tests, which is what \"npm test passes\" means. The stricter items are tests in test/strutil.test.js and README sections in export order. Both sit under \"Advisory (does not affect PASS/FAIL)\". No PASS/FAIL condition has a mutation test, a branch or file-scope rule, or an exact-wording rule.",
+  "model": "claude-opus-5-5",
+  "ms": 10582,
+  "tokens": {
+    "input": 2,
+    "output": 763,
+    "cacheCreation": 3476,
+    "cacheRead": 783,
+    "fresh": 4241,
+    "total": 5024
+  },
+  "at": "2026-11-05T05:12:44.605Z"
+}

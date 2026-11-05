@@ -1,0 +1,53 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.2",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "debcb493a8dfee58f8613b5d3b640a0a60a1a80295a6fd473ce049d78c163758",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1, 2 and 4 test only what their expect lines say. Check 1 covers the export, left padding with an explicit fill and the default space fill. Check 2 covers input that is exactly width long or longer coming back unchanged. Check 4 needs exit 0 with no failing tests. The advisories are kept out of every PASS/FAIL condition. Check 3 breaks the criterion. Its PASS needs \"prints ALL DOCUMENTED\", and the regex `'^#{1,6}\\\\s+\\`?'+k+'\\\\b'` only matches a heading whose first word is the exact, case-sensitive function name. The words \"a section for every function index.js exports\" don't require that heading format. A real section such as \"## Padding with padLeft\" or \"## `strutil.padLeft`\" would print MISSING and FAIL. That is a heading-format rule stricter than the expect line, and it sits inside a PASS/FAIL condition instead of under Advisory.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1, 2 and 4 run as written: `node --input-type=module -e \"...\"` is valid, index.js and package.json exist, and the asserts are valid ESM. The README check in builder step 5 and verifier Check 3 has an escaping bug. Inside bash double quotes, `\\\\s` becomes `\\s` and `\\\\b` becomes `\\b`, so the JS source reads `new RegExp('^#{1,6}\\s+`?'+k+'\\b','m')`. In a JS string literal `\\s` is just `s`, and `\\b` is a backspace character. The regex comes out as `^#{1,6}s+`?name<BS>`, which can never match a heading like `## slugify(s)`. So the command prints \"MISSING: capitalize, slugify, truncate, padLeft\" even when the README is correct. The builder's \"must print ALL DOCUMENTED\" can't be met, and the verifier's Check 3 would always fail. The command doesn't work as written.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "All three must_catch items are handled.\n1. The builder brief says README.md has \"NO section for slugify… so you must also add a slugify section.\" Its step 3 lists `## slugify(s)` as \"currently missing\".\n2. Verifier Check 3 runs over every export at the PR head. It prints `Object.keys(m)` and reports `MISSING: <names>` for any exported function without a heading. It also notes that \"slugify must now be covered too\", and a missing heading means FAIL.\n3. Verifier Check 1 asserts `padLeft('42', 5) === '   42'`, so it calls padLeft without a fill argument and checks for space padding.\n\nOne problem outside this criterion: the shell will likely turn `\\\\b` into a JS `'\\b'`, which is a backspace character, not a word boundary. That would make the Check 3 regex fail even when every section exists. It does not change whether the traps are covered.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the verifier brief against both must_not items.\n\nItem 1: Check 3 lists every exported function and fails if any has no heading starting with its name (\"MISSING: <names>\"). It also says \"the base README lacked a slugify section, so slugify must now be covered too.\" So a README with a padLeft section but none for slugify would fail.\n\nItem 2: Checks 1 and 2 only assert padding and unchanged-output values. Nothing checks that fill is one character or counts parameters. Check 4 needs exit 0 and fail 0. Check 3's regex accepts any heading level (#1–6), an optional backtick and any text after the name, so it doesn't require the `## name(args)` layout. That style appears only in the builder brief. Asking that the heading have describing text is a fair reading of \"section\". Test coverage and README wording are marked advisory, not PASS/FAIL. I found no condition stricter than its line.",
+      "cached": false
+    }
+  }
+}
