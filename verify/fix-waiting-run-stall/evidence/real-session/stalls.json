@@ -1,0 +1,51 @@
+{
+  "prepared": 5,
+  "blocked": 2,
+  "blocks": 3,
+  "startedAfterBlock": 1,
+  "failedAtCap": 1,
+  "cannotStart": 0,
+  "rate": 0.4,
+  "runs": [
+    {
+      "run": "r1:0.brief",
+      "item": "r1",
+      "actor": "brief",
+      "blocks": 1,
+      "startedAfterBlock": true,
+      "failed": null
+    },
+    {
+      "run": "r1:1.build",
+      "item": "r1",
+      "actor": "build",
+      "blocks": 0,
+      "startedAfterBlock": false,
+      "failed": null
+    },
+    {
+      "run": "r2:0.brief",
+      "item": "r2",
+      "actor": "brief",
+      "blocks": 0,
+      "startedAfterBlock": false,
+      "failed": null
+    },
+    {
+      "run": "r2:1.build",
+      "item": "r2",
+      "actor": "build",
+      "blocks": 0,
+      "startedAfterBlock": false,
+      "failed": null
+    },
+    {
+      "run": "r3:0.brief",
+      "item": "r3",
+      "actor": "brief",
+      "blocks": 2,
+      "startedAfterBlock": false,
+      "failed": "stall-cap"
+    }
+  ]
+}

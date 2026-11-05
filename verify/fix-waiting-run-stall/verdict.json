@@ -1,0 +1,57 @@
+{
+  "item": "fix-waiting-run-stall",
+  "verified_sha": "06c5868b6859debcf719c4f463fd4cdd30410cdb",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5HoL1dFHuqTUymZWF3",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "block",
+      "status": "MET",
+      "command": "clean clone at the head, npm ci; node --test verify/fix-waiting-run-stall/block.test.mjs (items started by packages/engine/bin/host.js start --session S; plugins/harness/scripts/actors.mjs as a child process, CCP_HARNESS_DIR at a temp folder with install.json and journal/)",
+      "excerpt": "Stop from S: {decision:'block'}, reason 'ccp-harness: item a-1 (state \"briefing\") has run a-1:0.brief prepared for its brief agent... call the Agent tool with the prompt exactly \"ccp-run a-1:0.brief\"... \"ccp-cannot-start a-1:0.brief: <why>\"... Block 1 of 2.'; one refusal row rule stall, count 1, cap 2, outcome blocked. Stop from T (stop_hook_active false or true): no output, no row. After a PreToolUse of Agent with ccp-run (spawn.json written): four Stops, no output, no row. Cloud form: run.session https://claude.ai/code/session_verifyCloud1, CLAUDE_CODE_REMOTE_SESSION_ID=cse_verifyCloud1, hook session_id a local id: blocks with Block 1 of 2; the same input without the variable: nothing.",
+      "mutation": "packages/engine/src/actors.js ownedWaiting: `.filter((run) => owners.has(run.session))` replaced by `.filter((run) => true || owners.has(run.session))` (block on any session's run)",
+      "red_test": "plugins/harness/test/stall.test.mjs 'Stop: another session, a started run or no harness gives nothing and writes nothing', 'Stop: the cloud form of the session name owns the item too'; verify block.test.mjs (T and cloud tests)"
+    },
+    {
+      "id": "cap",
+      "status": "MET",
+      "command": "node --test verify/fix-waiting-run-stall/cap.test.mjs (real hook, real engine, host.js show)",
+      "excerpt": "Stop 1 (stop_hook_active false): Block 1 of 2; Stop 2 (true): Block 2 of 2; stall rows count [1, 2]. Stop 3: no output; failed.json why 'stalled: the session ended 3 turns with run a-1:0.brief waiting for its agent, and was blocked 2 times'; one stall-cap row outcome failed; host.js show state replanning; waiting() empty; PreToolUse ccp-run a-1:0.brief denied 'already-failed: ...', no spawn.json; later Stops give nothing and add no row. Two items owned by S, six Stops: [a Block 1, a Block 2, b Block 1, b Block 2, null, null]; both failed stalled:, both items replanning, each item's stall rows count [1, 2]. A run started after one block is never failed, and the other run's next block is its Block 1 of 2.",
+      "mutation": "packages/engine/src/actors.js stall(): `if (count >= STALL_CAP) {` replaced by `if (false) {` (never fail)",
+      "red_test": "plugins/harness/test/stall.test.mjs 'Stop: two blocks whatever stop_hook_active says, then the third stop fails the run and the item steps back', 'Stop: with two waiting runs it blocks on one at a time, and one run's count is its own'; verify cap.test.mjs (both), cannot-start.test.mjs (failed-at-cap case), measure.test.mjs"
+    },
+    {
+      "id": "cannot-start",
+      "status": "MET",
+      "command": "node --test verify/fix-waiting-run-stall/cannot-start.test.mjs",
+      "excerpt": "Owner S, prompt 'ccp-cannot-start a-1:0.brief: no Agent tool here': deny; failed.json why 'cannot-start: no Agent tool here'; no spawn.json; one cannot-start row; state replanning; a later Stop gives nothing and no stall row; a second cannot-start is refused already-failed and the why is kept. From T: refused 'wrong-session: ...', no failed.json, no row, still briefing, and S's Stop still blocks. Unknown run (a-1:7.brief, zz-9:0.brief): unknown-run. Started run (spawn.json): already-started, nothing changes. Run failed at the cap: already-failed, why stays 'stalled:...'."
+    },
+    {
+      "id": "measure",
+      "status": "MET",
+      "command": "node --test verify/fix-waiting-run-stall/measure.test.mjs: four quick-fix items owned by S driven by the real hook (a started first, never blocked; b blocked once then started via ccp-run + bind; c blocked twice then failed at the cap; d failed by ccp-cannot-start), then packages/journal/bin/derive.js stalls --journal <root>",
+      "excerpt": "Round 2 at 06c5868 (stalls.js now seeds an entry from each brief.stored row): prepared 4, blocked 2, blocks 3, startedAfterBlock 1, failedAtCap 1, cannotStart 1, rate 0.5, and runs has 4 entries: a-1:0.brief blocks 0 failed null; b-1:0.brief blocks 1 startedAfterBlock true; c-1:0.brief blocks 2 failed stall-cap; d-1:0.brief blocks 0 failed cannot-start. One item file alone: prepared 1, blocked 1, blocks 2, failedAtCap 1, rate 1. Round 1 at 5fa8ddc was NOT MET: the never-blocked run had no per-run entry."
+    },
+    {
+      "id": "unchanged",
+      "status": "MET",
+      "command": "node --test verify/fix-waiting-run-stall/unchanged.test.mjs (verify/fix-refusal-hints/prompts.mjs: every stage of every workflow rendered by each checkout's own engine; evidence/main-prompts.json from main 3f8815c); npm test at the head and at main 3f8815c in this container; git diff 3f8815c HEAD -- '*test*' and -- workflows/ stages.js prompts.js",
+      "excerpt": "All stages of feature, intake, quick-fix and research render byte for byte main's and the four workflow hashes equal main's (quick-fix@cb8645f4...). The PR touches nothing under workflows/, stages.js or prompts.js. npm test head: 1478 tests, 1460 pass, 4 fail: copy-not-link (fails on main too, local release tags), verify/self-update-by-version/no-self-edit.test.mjs (hangs on main too in this container; killed), cheap hook timing (load from the parallel runs; passes alone), and my measure test (the NOT MET above). Main: 1455 tests, 2 fail, the same copy-not-link and no-self-edit. The PR changes no existing test: its only test files are new (packages/journal/test/derive-stalls.test.js, plugins/harness/test/stall.test.mjs). Round 2 at 06c5868 (diff from 5fa8ddc: stalls.js seeding, its new test line, docs/journal.md): npm test 1481 tests, 1466 pass, 4 fail, all known for this container's clone and none in this item: clean-room catches x2 (notice-behind, fingerprint; clone-only), copy-not-link, no-self-edit (hangs, killed). verify/fix-waiting-run-stall 16/16 pass; renders and hashes still equal main's."
+    },
+    {
+      "id": "real-session",
+      "status": "MET",
+      "command": "fresh HOME, CCP_HARNESS_DIR with install.json and journal/sessions/, CLAUDE_CODE_REMOTE_SESSION_ID unset; host.js start quick-fix r1 --session <s1 uuid>, r3 --session <s2 uuid>; claude -p 'Reply with the single word ok and end your turn. Do not do anything else.' --plugin-dir plugins/harness --session-id <uuid> --output-format stream-json --verbose, s1 with --allowedTools Agent,ToolSearch,Read,mcp__plugin_ccp-harness_harness__return, s2 with --allowedTools ToolSearch,Read --disallowedTools Agent; node --test verify/fix-waiting-run-stall/real-session.test.mjs over evidence/real-session/",
+      "excerpt": "Claude Code 2.1.318, ccp-harness@inline loaded from the head. s1: model answered 'ok' with no tool call; Stop hook answered block 'item r1 ... Block 1 of 2'; the model's next tool call was Agent {prompt: 'ccp-run r1:0.brief'}; r1.jsonl has refusal stall count 1 hookSession s1 at 11:26:17, then agent.spawn r1:0.brief at 11:26:23; the brief agent returned and r1 went on to building. s2 (init tools without Agent): 'ok', block 1, model ToolSearch'd for Agent and said it cannot make either call, block 2, then the third stop went through; r3.jsonl has stall 1, stall 2, stall-cap; failed.json why 'stalled: ...'; host.js show r3 state replanning. derive.js stalls over that journal: blocked 2, blocks 3, startedAfterBlock 1, failedAtCap 1 (r1 blocks 1 started after block; r3 blocks 2 failed stall-cap). At 06c5868 derive.js stalls over the same journal (evidence/real-session/stalls.json regenerated): prepared 5, blocked 2, blocks 3, startedAfterBlock 1, failedAtCap 1, with every prepared run listed.",
+      "advisory": "Not this item's: s1 also started r2:0.brief, a run of an item owned by a different session id, because the PostToolUse/UserPromptSubmit lines list every waiting run, not the session's own (a non-goal here). In s2 the model noted the ccp-cannot-start exit also needs the Agent tool, so a session without it can only wait out the cap, as the decision says."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 127 at 06c5868",
+      "excerpt": "Check run 'test' (ci.yml, id 127221868855) completed success at head 06c5868; clean-room success. 'gates' failed only because no verdict at that sha existed yet. Round 1: test green at 5fa8ddc."
+    }
+  ]
+}

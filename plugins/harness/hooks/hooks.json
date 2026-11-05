@@ -1,5 +1,5 @@
 {
-  "description": "SessionStart: in a project that installed the harness, journal a fingerprint row and a self-check row and say in one line whether the check passed. UserPromptSubmit: at most every 30 minutes, say when a newer release is out. Capture (UserPromptSubmit, PostToolUse, PostToolUseFailure, PermissionDenied, SubagentStart, SubagentStop, Stop): journal a row per wake, tool call, refusal, subagent start and finish and turn, silently; on tool calls and subagent stops it runs in the background (async), so nothing waits for it. Elsewhere, or with CCP_HARNESS_DISABLED=1, nothing. Actors (PreToolUse, SubagentStart, UserPromptSubmit, PostToolUse of Agent): start an invoked actor's agent with its brief, bind it to its run, keep it in its worktree and check what it returns through the return tool.",
+  "description": "SessionStart: in a project that installed the harness, journal a fingerprint row and a self-check row and say in one line whether the check passed. UserPromptSubmit: at most every 30 minutes, say when a newer release is out. Capture (UserPromptSubmit, PostToolUse, PostToolUseFailure, PermissionDenied, SubagentStart, SubagentStop, Stop): journal a row per wake, tool call, refusal, subagent start and finish and turn, silently; on tool calls and subagent stops it runs in the background (async), so nothing waits for it. Elsewhere, or with CCP_HARNESS_DISABLED=1, nothing. Actors (PreToolUse, SubagentStart, SubagentStop, UserPromptSubmit, PostToolUse of Agent, Stop): start an invoked actor's agent with its brief, bind it to its run, keep it in its worktree and check what it returns through the return tool; block a main-session stop, at most twice per run, while a run of an item the session owns waits for its agent, then fail the run.",
   "hooks": {
     "SessionStart": [
       {
@@ -129,6 +129,11 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/capture.mjs\"",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/actors.mjs\"",
+            "timeout": 30
           }
         ]
       }

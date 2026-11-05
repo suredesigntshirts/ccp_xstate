@@ -100,7 +100,9 @@ uncommitted change is what they test.
 ## Actors
 
 `scripts/actors.mjs` (plan item engine-actors) starts, binds, confines and checks the agents a workflow invokes, on
-PreToolUse, SubagentStart, UserPromptSubmit and PostToolUse of Agent; the logic is `packages/engine/src/actors.js`
+PreToolUse, SubagentStart, SubagentStop, UserPromptSubmit, PostToolUse of Agent and Stop; on Stop it blocks the main
+session, at most twice per run, while a run of an item that session owns waits for its agent, then fails the run
+(plan item fix-waiting-run-stall); the logic is `packages/engine/src/actors.js`
 (`packages/engine/README.md`, "Actors"). `.mcp.json` registers one MCP server, `harness`
 (`scripts/return-tool.mjs`), with one tool, `return`. The hook checks every call before it reaches the server; the
 server only answers whether the hook stored that result, so a return with the hook absent is never accepted.

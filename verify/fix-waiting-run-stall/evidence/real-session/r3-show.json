@@ -1,0 +1,55 @@
+{
+  "item": "r3",
+  "owner": "76c13624-0add-4203-b626-6222b174e46e",
+  "state": "replanning",
+  "results": [],
+  "pending": {
+    "effects": [
+      {
+        "id": "r3:1.ask",
+        "type": "run",
+        "invoke": "ask",
+        "actor": "ask",
+        "input": {
+          "question": "This item stalled. Replan it with a written five whys, or drop it?",
+          "choices": [
+            "replan",
+            "drop"
+          ],
+          "verdict": null,
+          "failure": "stalled: the session ended 3 turns with run r3:0.brief waiting for its agent, and was blocked 2 times"
+        },
+        "transition": "r3#1"
+      }
+    ],
+    "runs": [
+      {
+        "id": "r3:1.ask",
+        "type": "run",
+        "invoke": "ask",
+        "actor": "ask",
+        "input": {
+          "question": "This item stalled. Replan it with a written five whys, or drop it?",
+          "choices": [
+            "replan",
+            "drop"
+          ],
+          "verdict": null,
+          "failure": "stalled: the session ended 3 turns with run r3:0.brief waiting for its agent, and was blocked 2 times"
+        }
+      }
+    ],
+    "timers": [
+      {
+        "id": "r3:1.xstate.after.checkBack.quick-fix@cb8645f40db0d2d76fa69227eb78f07668175817e6a2a2a7b5b5eb83d06bbda0.replanning",
+        "type": "timer",
+        "timer": "xstate.after.checkBack.quick-fix@cb8645f40db0d2d76fa69227eb78f07668175817e6a2a2a7b5b5eb83d06bbda0.replanning",
+        "event": {
+          "type": "xstate.after.checkBack.quick-fix@cb8645f40db0d2d76fa69227eb78f07668175817e6a2a2a7b5b5eb83d06bbda0.replanning"
+        },
+        "due": "2026-11-05T12:28:48.082Z"
+      }
+    ]
+  },
+  "waiting": []
+}

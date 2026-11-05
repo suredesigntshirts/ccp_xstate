@@ -4,6 +4,7 @@
 //   derive.js rework --repo <owner/repo> --pr <n> [--pr <n> ...] [--facts <file>] [--save-facts <file>]
 //                    [--plan <items dir>] [--checks a,b] [--append <journal file> --session <id> --release <x.y.z>]
 //   derive.js overhead --journal <file|root> --facts <file> [--config <harness-paths.json>]
+//   derive.js stalls --journal <file|root>
 // rework reads PR facts from GitHub REST (repo-scoped reads need no token; set NODE_USE_ENV_PROXY=1 behind a proxy),
 // or from --facts, a file an earlier --save-facts wrote. With --append it appends the ci.result rows the journal
 // lacks and any new tripwire rows. Every command prints its view as JSON. Exit 0, or 2 on a usage or read error.
@@ -13,6 +14,7 @@ import { append, readAll, readFile } from '../src/index.js';
 import { time } from '../src/derive/time.js';
 import { ciRows, rework, tripwires, DEFAULT_LIMIT } from '../src/derive/rework.js';
 import { overhead } from '../src/derive/overhead.js';
+import { stalls } from '../src/derive/stalls.js';
 
 const [command, ...rest] = process.argv.slice(2);
 const opts = {};
@@ -105,7 +107,11 @@ async function main() {
     const config = JSON.parse(readFileSync(opts.config ?? new URL('../harness-paths.json', import.meta.url), 'utf8'));
     return overhead(journal(opts.journal), JSON.parse(readFileSync(opts.facts, 'utf8')), config);
   }
-  fail('usage: derive.js time|rework|overhead ... (see the head of this file)');
+  if (command === 'stalls') {
+    if (!opts.journal) fail('stalls needs --journal');
+    return stalls(journal(opts.journal));
+  }
+  fail('usage: derive.js time|rework|overhead|stalls ... (see the head of this file)');
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
