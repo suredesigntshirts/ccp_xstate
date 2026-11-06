@@ -93,7 +93,7 @@ test('S4: the quick-fix happy path leaves a complete stage record per run, each 
       // The run facts are the run's context, told once beside the prompt (trial fixes item 8): context.md, recorded
       // with the same kind of source as a prompt piece, and in no prompt part.
       assert.equal(readFileSync(join(dir, 'context.md'), 'utf8'), rec.context.text, `${actor}: context.md is the recorded context`);
-      assert.deepEqual(rec.context.source, { frame: 'runLine', filled: { run, worktree: runJson.worktree, repo: runJson.repo, github: runJson.github, branch: runJson.branch } });
+      assert.deepEqual(rec.context.source, { frame: 'runLine', entry: 'run-line', filled: { run, worktree: runJson.worktree, repo: runJson.repo, github: runJson.github, branch: runJson.branch } });
       assert.equal(rec.context.text, runLine(rec.context.source.filled));
       assert.equal(rec.context.text, runLine(runJson));
       assert.ok(!prompt.includes(rec.context.text), `${actor}: the prompt does not repeat the run line`);

@@ -72,7 +72,7 @@ function literals(src) {
   return out;
 }
 
-test('P2: the frame is only headings, the data rule, the worktree limit and the return mechanics; stages.js has no other wording', () => {
+test('P2: the frame is only headings, the data rule, the worktree limit and the return mechanics; stages.js has no other wording', async () => {
   const frame = [...Object.values(HEADINGS), '(none)', runLine({ run: 'r', worktree: 'w', repo: 'x', branch: 'b' })];
   for (const f of frame) assert.ok(words(f) < 5, `${f} is under five words`);
   assert.ok(words(DATA_RULE) >= 5 && words(WORKTREE_RULE) >= 5 && words(returnLine('r')) >= 5);
@@ -82,11 +82,14 @@ test('P2: the frame is only headings, the data rule, the worktree limit and the 
   assert.deepEqual([...src.matchAll(/\b(?:const|let|var|function)\s+(bad|fail)\b/g)].map((m) => m[1]), ['bad', 'fail']);
   assert.equal([...src.matchAll(/const (?:bad|fail) = \([^)]*\) => \{ throw new Error\(`[^`]*`\); \};/g)].length, 2);
   assert.equal((src.match(/new Error\(/g) ?? []).length, (src.match(/throw new Error\(/g) ?? []).length);
+  // Since prompt-catalogue the three live in the message catalogue (packages/engine/messages.md), and stages.js holds
+  // no wording at all.
   const prose = literals(src).filter((s) => words(s) >= 5);
-  assert.equal(prose.length, 3, `five-plus-word literals in stages.js: ${JSON.stringify(prose)}`);
-  assert.equal(prose[0], DATA_RULE);
-  assert.equal(prose[1], WORKTREE_RULE);
-  assert.equal(prose[2], returnLine(''), 'the last is the return line');
+  assert.deepEqual(prose, [], `five-plus-word literals in stages.js: ${JSON.stringify(prose)}`);
+  const { entries } = await import('../../src/messages.js');
+  assert.equal(entries().get('data-rule').template, DATA_RULE);
+  assert.equal(entries().get('worktree-rule').template, WORKTREE_RULE);
+  assert.equal(entries().get('return-line').template.replace('{{run}}', ''), returnLine(''), 'the return line');
 });
 
 test('P2: the rules printed are the JSON\'s', async () => {

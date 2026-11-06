@@ -28,9 +28,17 @@ of its own to be covered by CI.
 
 ## Dependencies
 
-No runtime dependency except `xstate` and sibling workspaces. `test/workspaces.test.mjs` fails a
-`package.json` that adds one. Dev tooling stays at what Node ships. `xstate` is pinned to an exact version in each `package.json` and in
-`package-lock.json`; CI installs it with `npm ci`.
+A runtime dependency is allowed when a file in `plan/decisions/` names it, on a line of its own:
+``Runtime dependency: `<name>` `` (plan item prompt-catalogue, `plan/decisions/2026-11-06-prompt-catalogue.md`).
+Each one runs inside every thread's hooks, so it is chosen on purpose, not by drift. Named so far: `xstate` and
+`mustache` (`plan/decisions/2026-11-06-prompt-catalogue-build.md`). Sibling workspaces need no record.
+`test/workspaces.test.mjs` fails a `package.json` whose runtime dependency no decision names. Dev tooling stays at
+what Node ships. Each dependency is pinned to an exact version in its `package.json` and in `package-lock.json`; CI
+installs it with `npm ci`.
+
+The installed plugin has no `node_modules`, so engine code the hooks load imports a dependency from a verbatim copy
+beside it: `packages/engine/src/vendor/mustache.mjs` is the `mustache` package's `mustache.mjs`, and
+`packages/engine/test/messages.test.js` fails when the copy and the installed package differ.
 
 `vendor/` is outside that rule: it holds tools sessions use (such as the documentation-downloader skill), not
 harness code, and it is neither a workspace nor covered by `npm test`. Its packages install their own dependencies

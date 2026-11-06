@@ -9,7 +9,7 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { gate, pluginRoot, release, repoDir, sessionFile, sessionName, stdin } from './host.mjs';
+import { gate, messages, pluginRoot, release, repoDir, sessionFile, sessionName, stdin } from './host.mjs';
 import { byVersion, latestRelease } from './fingerprint.mjs';
 
 const INTERVAL_MS = 30 * 60 * 1000;
@@ -41,7 +41,8 @@ try {
   const mine = release(pluginRoot());
   const latest = await latestRelease(repoDir(), 2000);
   if (latest.state !== 'found' || byVersion(mine.version, latest.version) >= 0) say(null);
-  say(`ccp-harness: this session runs release ${mine.version}, but ${latest.version} (${latest.tag}) is out. Plugins load only when a session starts, so this session keeps ${mine.version}; finish or hand off the current step, then a new thread runs ${latest.version}.`);
+  const { render } = await messages();
+  say(render('notice-behind', { mine: String(mine.version), latest: String(latest.version), tag: String(latest.tag) }));
 } catch {
   say(null);
 }

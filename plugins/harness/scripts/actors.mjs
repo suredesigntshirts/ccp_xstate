@@ -87,7 +87,7 @@ async function main() {
     const late = A.bindLate({ root, agentId: input.agent_id, metaToolUseId: spawningToolUse(input), agentType: input.agent_type ?? null, session });
     if (late?.deny) return deny(late.deny);
     // Bound only now (SubagentStart couldn't tell which run): this call doesn't run, so the agent reads its run first.
-    if (late?.bound) return deny(`bound: you are an invoked actor; this call did not run. Read this, then make it again.\n${late.bound.context}`);
+    if (late?.bound) return deny(A.boundText(late.bound.context));
     const bound = A.boundRun(root, input.agent_id);
     if (!bound) return;
     if (tool === 'SubagentHandback') {
@@ -128,8 +128,7 @@ async function main() {
   if ((event === 'PostToolUse' && tool === 'Agent' && !input.agent_id) || event === 'UserPromptSubmit') {
     const runs = A.ownedWaiting(root, owners);
     if (!runs.length) return;
-    const lines = runs.map((r) => `- ${r.actor} for ${r.run}: Agent tool with prompt exactly "${r.prompt}"`);
-    out({ hookEventName: event, additionalContext: `ccp-harness: actor runs prepared and waiting for their agent:\n${lines.join('\n')}` });
+    out({ hookEventName: event, additionalContext: A.waitingText(runs) });
   }
 }
 

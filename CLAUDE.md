@@ -29,7 +29,7 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 |---|---|
 | `plan/` | The plan: items, stages, ledger, cases, decisions. Start at `plan/README.md` |
 | `plan/check.mjs` | Checks the plan; `--order` prints build order |
-| `packages/` | npm workspaces for the harness libraries; `packages/journal/` is the record format, `packages/engine/` loads and hosts workflows and runs their effects |
+| `packages/` | npm workspaces for the harness libraries; `packages/journal/` is the record format, `packages/engine/` loads and hosts workflows and runs their effects; `packages/engine/messages.md` is every text the harness hands a model |
 | `workflows/` | Workflow files as XState JSON; `workflows/quick-fix.json` is the first |
 | `plugins/` | npm workspaces for the Claude Code plugins |
 | `verify/<item>/` | The verifier's tests and `verdict.json` for each item |
@@ -50,4 +50,4 @@ npm test                 # node:test over test/, scripts/, packages/, plugins/ a
 node plan/check.mjs      # the plan check; CI runs both on every PR
 ```
 
-Node 22 or later. Zero runtime dependencies except `xstate`.
+Node 22 or later. A runtime dependency needs a `plan/decisions/` file naming it (`docs/layout.md`, Dependencies).
