@@ -886,7 +886,10 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     return '<div class="vprev">' + linkify(s.slice(0, 90)) + '… <details><summary>show the whole value (' + s.length.toLocaleString() + ' chars)</summary>' + pre(v, null, label) + '</details></div>';
   };
   const SRC_TAG = { frame: 'harness frame', workflow: 'workflow JSON', input: 'input' };
-  function pieceSource(src) {
+  // The message catalogue entry a piece was rendered from (plan item prompt-catalogue), when its record names one.
+  const entryNote = (src) => (src.entry ? '; message catalogue entry <code>' + esc(src.entry) + '</code> (packages/engine/messages.md)' : '');
+  function pieceSource(src) { return pieceWhere(src) + (src.kind === 'frame' || src.kind === 'workflow' || src.kind === 'input' ? entryNote(src) : ''); }
+  function pieceWhere(src) {
     if (src.kind === 'frame') return '<span class="srctag frame">harness frame</span><code>' + esc(src.name) + '</code>: ' + (src.filled ? 'an engine template, filled in with this run\'s ' + Object.keys(src.filled).map((k) => '<code>' + esc(k) + '</code>').join(', ') : src.fixed ? 'fixed text in the engine, the same for every stage' : 'engine text');
     if (src.kind === 'workflow' && src.file) return '<span class="srctag workflow">stage file</span><code>' + esc(src.file + ':' + src.line) + '</code>, filled in at ' + ptr(src.at);
     if (src.kind === 'workflow') return '<span class="srctag workflow">workflow JSON</span>' + ptr(src.at) + (src.inlined ? ', with ' + ptr(src.inlined) + ' inlined' : '');
