@@ -1149,14 +1149,18 @@ const names = (p, id) => !!p && (p.run === id || (p.kind === 'copy' && names(p.o
 
 function sourceRef(src, byName, ctx) {
   if (!src || typeof src !== 'object') return { kind: 'unknown', label: 'not recorded' };
-  if (src.frame != null) return { kind: 'frame', name: src.frame, label: `harness frame: ${src.frame}`, fixed: !!src.fixed, filled: src.filled ?? null,
-    detail: src.filled ? `an engine template, filled in with this run's ${Object.keys(src.filled).join(', ')}` : src.fixed ? 'fixed text in the engine (packages/engine/src/stages.js), the same for every stage' : 'engine text (the record does not say whether it is fixed or filled in)' };
+  // Since plan item prompt-catalogue a record names the message catalogue entry each piece was rendered from
+  // (packages/engine/messages.md); older records don't, and read as before.
+  const entry = typeof src.entry === 'string' ? { entry: src.entry } : {};
+  const where = entry.entry ? `message catalogue entry ${entry.entry} (packages/engine/messages.md)` : null;
+  if (src.frame != null) return { kind: 'frame', name: src.frame, label: `harness frame: ${src.frame}`, fixed: !!src.fixed, filled: src.filled ?? null, ...entry,
+    detail: src.filled ? `${where ? `${where}, ` : 'an engine template, '}filled in with this run's ${Object.keys(src.filled).join(', ')}` : src.fixed ? `${where ?? 'fixed text in the engine (packages/engine/src/stages.js)'}, the same for every stage` : 'engine text (the record does not say whether it is fixed or filled in)' };
   // A piece whose words came from a stage file (plan item stage-prompt-files) is labelled by that file and line.
-  if (src.workflow != null) return { kind: 'workflow', at: src.workflow, inlined: src.inlined ?? null, file: src.file ?? null, line: src.line ?? null,
-    label: src.file ? `${src.file}:${src.line}` : 'workflow JSON', detail: src.inlined ? `with ${src.inlined} inlined` : null };
+  if (src.workflow != null) return { kind: 'workflow', at: src.workflow, inlined: src.inlined ?? null, file: src.file ?? null, line: src.line ?? null, ...entry,
+    label: src.file ? `${src.file}:${src.line}` : 'workflow JSON', detail: [src.inlined ? `with ${src.inlined} inlined` : null, where && `line shape: ${where}`].filter(Boolean).join('; ') || null };
   if (src.input != null) {
     const inp = byName[src.input];
-    return { kind: 'input', input: src.input, meaningAt: src.meaningAt ?? null, from: [src.from, inp?.from].find((f) => typeof f === 'string') ?? null, label: `input ${src.input}`,
+    return { kind: 'input', input: src.input, meaningAt: src.meaningAt ?? null, ...entry, from: [src.from, inp?.from].find((f) => typeof f === 'string') ?? null, label: `input ${src.input}`,
       file: src.file ?? null, line: src.line ?? null, meaningFile: src.meaningFile ?? null, meaningLine: src.meaningLine ?? null,
       producer: inp?.producer ?? producerRef(src.producer, ctx) };
   }
