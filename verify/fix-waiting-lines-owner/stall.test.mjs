@@ -7,6 +7,17 @@ import { join } from 'node:path';
 import { HERE, REPO } from './lib.mjs';
 import { stalls } from './scenarios.mjs';
 
+// prompt-catalogue: a refusal row also carries payload.message, the catalogue entry and slots its reason was rendered
+// from. The row is main's once that is checked to render the reason and set aside (plan item prompt-catalogue lets a
+// done verifier test compare the rendered entry instead of the literal).
+const { render } = await import(new URL('../../packages/engine/src/messages.js', import.meta.url));
+const asMain = (rows) => (!Array.isArray(rows) ? Object.fromEntries(Object.entries(rows).map(([k, v]) => [k, asMain(v)])) : rows.map((r) => {
+  if (r?.payload?.message === undefined) return r;
+  const { message, ...payload } = r.payload;
+  assert.equal(render(message.entry, message.slots), payload.reason, `${payload.rule} row: its entry renders its reason`);
+  return { ...r, payload };
+}));
+
 const main = JSON.parse(readFileSync(join(HERE, 'evidence', 'main-scenarios.json'), 'utf8')).stalls;
 const got = await stalls(REPO);
 
@@ -18,13 +29,13 @@ test('stall-unchanged: stall() and cannotStart() return main\'s answers', () => 
 });
 
 test('stall-unchanged: the rows and run files they leave are main\'s', () => {
-  assert.deepEqual(got.engineRows, main.engineRows);
+  assert.deepEqual(asMain(got.engineRows), main.engineRows);
   assert.deepEqual(got.engineFiles, main.engineFiles);
 });
 
 test('stall-unchanged: the Stop hook (and cannot-start through the hook) answers and journals as main does', () => {
   assert.deepEqual(got.hook, main.hook);
-  assert.deepEqual(got.hookRows, main.hookRows);
+  assert.deepEqual(asMain(got.hookRows), main.hookRows);
   assert.deepEqual(got.hookFiles, main.hookFiles);
   assert.equal(got.hook['Stop C'], null);
   assert.equal(got.hook['Stop A 1'].decision, 'block');
