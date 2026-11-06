@@ -4,7 +4,7 @@
   "title": "Show which message catalogue entry each prompt piece came from in the Workflow Inspector",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "For a run recorded since prompt-catalogue, the Workflow Inspector names, beside each prompt piece's source, the message catalogue entry (packages/engine/messages.md) that piece was rendered from, and a fixed or filled frame piece's detail names that entry instead of a stages.js constant. Runs recorded before prompt-catalogue, whose stage.json names no entry, render exactly as before.",
   "why": "prompt-catalogue (harness-v0.1.33) moved every word of the stage prompt frame into named catalogue entries and made stage.json record the entry of each piece (source.entry). The Inspector, the page the person uses to see what each stage was given, still describes a frame piece as 'fixed text in the engine (packages/engine/src/stages.js)', which is no longer where the words live, and does not show the entry at all, so a reader cannot go from a prompt line to the catalogue entry to edit. The change was first made on branch chore/inspector-catalogue-entries (b415600) and PR #152 was closed because a non-plan change needs its own item and verifier.",
   "serves": [
