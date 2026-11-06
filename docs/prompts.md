@@ -1,7 +1,8 @@
 # Stage prompts: where they come from, how to inspect them, how to refine them
 
 A model stage's prompt is assembled in one place, `packages/engine/src/stages.js` (`sections()` and `render()`), from
-the stage's file, its entry in the workflow JSON and the run's input. Nothing else writes a prompt. The stage bench
+the stage's file, its entry in the workflow JSON, the run's input and the harness's own words in the message catalogue
+(`packages/engine/messages.md`). Nothing else writes a prompt. The stage bench
 (`scripts/bench/`, plan item stage-bench) runs one stage alone on fixed cases with that exact prompt, scores its
 output per rubric criterion, and compares two workflow versions. Changing a prompt is a PR to the stage's file,
 backed by a bench report. Why it is done this way: `plan/decisions/2026-11-05-prompt-refinement.md` and
@@ -25,17 +26,40 @@ every piece that came from one; the Inspector shows them. Claude Code's own agen
 
 | Part | Text | Where it lives |
 |---|---|---|
-| Rules | The data rule and the worktree rule | Constants in `packages/engine/src/stages.js` (`DATA_RULE`, `WORKTREE_RULE`), the same for every stage |
+| Rules | The data rule and the worktree rule | Entries `data-rule` and `worktree-rule` of the message catalogue, the same for every stage |
 | Rules | Who the stage is, what it must not do, when to return | `## Rules` of the stage file, for example `workflows/quick-fix/brief.md` |
 | Inputs | Each input's name and meaning | `## Inputs` of the stage file |
 | Inputs | Each input's value | The run's input, wired by the state's `invoke.input`: a context path (written by an earlier stage or the item's start) or a literal |
 | Task | The stage's job | The input named `task`. For brief, `## Task` of its stage file, wired as `{ "prompt": "task" }` in `states.briefing.invoke.input.task`. For build and verify, the briefs the brief stage wrote |
 | Output | One line per described field, then the schema | `## Output` of the stage file (one line per field), then the schema in `meta.actors.<stage>` of the workflow JSON |
-| Return | How to call the return tool | `returnLine()` in `stages.js`, filled with the run id |
+| Return | How to call the return tool | Entry `return-line` of the message catalogue, filled with the run id |
 
-Not in the prompt: the run's context (its run id, worktree, repository and branch, from `contextOf()`), which the
-harness hands the agent at SubagentStart, and Claude Code's own system prompt with whatever this host adds to it.
+The part headings, `(none)` under Inputs, and the shape of each line (`- rule`, `- name: meaning` with `  = value`,
+`- field: description`, `Schema: ...`) are catalogue entries too; `stage.json` names the entry of every piece.
+
+Not in the prompt: the run's context (its run id, worktree, repository and branch: entry `run-line`, from
+`contextOf()`), which the harness hands the agent at SubagentStart, and Claude Code's own system prompt with whatever this host adds to it.
 The harness does not record the system prompt in real runs. The bench records it per run (see Conditions).
+
+## The message catalogue
+
+Everything else the harness says to a model is in `packages/engine/messages.md` too (plan item prompt-catalogue,
+`plan/decisions/2026-11-06-prompt-catalogue.md` and `-build.md`): the return tool's description and answers, every
+PreToolUse deny (refusals, worktree limits, the bound line), every Stop and SubagentStop block (the send-back, the
+stall), and every `additionalContext` (the waiting runs, the self-check line, the newer-release notice). One file, so a
+reader sees every sentence a model can get side by side.
+
+An entry is a `## <name>` heading, note lines saying when it is sent, and its template between two lines of three
+backticks. Slots are `{{name}}` only: two wordings are two entries, and the code picks one. To change what a model is
+told, edit the template; to add a message, add an entry and render it from the code with `render('<name>', { ... })`
+(or `said()`, when a journal row records it) from `packages/engine/src/messages.js`. The renderer refuses a missing
+or extra slot value, a value that is not text or a number, and any tag but a plain slot, naming the entry; a malformed
+file is refused at load, naming the line. `npm test` checks that every entry is used and every rendered name exists
+(`packages/engine/test/messages.test.js`).
+
+A refusal, send-back, no-return, stall or cannot-start row in the journal carries `payload.message`: the entry and slot
+values its `reason` was rendered from. Rewording an entry changes the prompts of every later run, so a wording change
+to the frame goes through the bench like a stage file change.
 
 ## Inspecting a run
 

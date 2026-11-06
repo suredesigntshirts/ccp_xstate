@@ -1,0 +1,50 @@
+{
+  "item": "prompt-catalogue",
+  "verified_sha": "b55bf1c063a8a7dd1a351750e877aafbb53241c1",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FkXHb727MsEgB7fDo",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "catalogue",
+      "status": "MET",
+      "command": "Scratch clone at b55bf1c with verify/prompt-catalogue/evidence/instrument.diff committed (messages.js logs every render; actors.js logs every assembled prompt with its parts; actors.mjs, session-start.mjs, notice-behind.mjs and return-tool.mjs log every stdout write); npm test there (1594 tests, 1578 pass, 15 skipped, 1 fail: copy-not-link, the known local failure, also red at main); then node verify/prompt-catalogue/evidence/catalogue-check.mjs <logs> (report: evidence/catalogue-report.json)",
+      "excerpt": "47746 renders of 91 entries; 261 hook outputs (PreToolUse deny 34, Stop/SubagentStop block 31, additionalContext from SubagentStart 31, SessionStart 21, UserPromptSubmit 8+7, PostToolUse 7, tools/list 1, tools/call answers 41): 183 model-facing texts, 183 equal a render of a named entry, 0 unmatched; 40 Agent prompt rewrites each equal an assembled brief; 984 assembled briefs, 17262 pieces: every piece but the task input names its entry and equals a render of it, and every prompt is the heading entries plus pieces, 0 problems. Control: a fake deny line not in the catalogue is reported unmatched. Static scan of actors.js, stages.js and plugins/harness/scripts for deny/block/context/say template literals: one left, session-start.mjs:39, said only when the catalogue itself cannot load (documented in plan/decisions/2026-11-06-prompt-catalogue-build.md)."
+    },
+    {
+      "id": "same-text",
+      "status": "MET",
+      "command": "node --test verify/prompt-catalogue/same-text.test.mjs at b55bf1c. Fixtures base-scenario.json and base-direct.json printed by scenario.mjs and direct.mjs run against a worktree of b5613ba (main before the item); literals.mjs holds b5613ba's template literals for the entries no run reaches",
+      "excerpt": "5/5 pass. render() on all 305 committed run folders (bench/brief 192, bench/challenge 53, bench/shape 42, tournaments 14, probe 4) equals brief.md, at head and at b5613ba. Scripted quick-fix runs through host.js + actors.mjs + return-tool.mjs: all 57 steps (stall blocks, waiting lines, spawn rewrites, SubagentStart context, own-folder denies, wrong-caller, schema refusals with hints, send-back, no-return, cannot-start variants, handback, accepted/not-accepted tool answers, tools/list, 10-refusal cap) plus every brief.md and context.md identical to b5613ba. accept() covers/ref refusals and refusalText/differences/stallText/confine/uncovered/runLine/returnLine identical. 48 literal comparisons (selfcheck, notice-behind, ref-*, bind-mismatch, bound, waiting, ...) equal. Together they reach all 100 entries. Mutation: changing 3 entry wordings in a scratch copy turned 4 of the 5 tests red."
+    },
+    {
+      "id": "strict",
+      "status": "MET",
+      "command": "node --test verify/prompt-catalogue/strict.test.mjs at b55bf1c",
+      "excerpt": "15/15 pass. Missing value: 'message g: no value for {{a}}'; extra value: 'message g: no slot for b'; null value refused; unknown entry named. Section, inverted section, partial, comment, {{{x}}}, {{&x}}, delimiter change and dotted name each refused naming the entry, e.g. 'm.md:5: entry s uses a section ({{#l}}); only {{name}} slots are allowed'. Duplicate: 'm.md:8: entry a is a duplicate of line 3'; empty: 'm.md:9: entry b is empty'; heading with no template refused naming it. '<b>&amp; \"q\"' renders unescaped."
+    },
+    {
+      "id": "recorded",
+      "status": "MET",
+      "command": "node --test verify/prompt-catalogue/recorded.test.mjs at b55bf1c (scenario.mjs drives six quick-fix items with the real bin/host.js and actors.mjs as child processes and reads the item journals)",
+      "excerpt": "4/4 pass. 25 refusal rows: schema 12, refusal-cap 1, stall 2, stall-cap 1, sent-back 2 (return-line, sent-back-handback), no-return 2, cannot-start 1 (cannot-start-reason), wrong-caller 2, already-returned 1, already-failed 1. Every row has payload.message {entry, slots}, and render(entry, slots) equals payload.reason byte for byte; the stall and send-back texts equal what the hook said; textHash unchanged. stage.json names data-rule, worktree-rule, input-line, output-line, output-schema, return-line and run-line."
+    },
+    {
+      "id": "deps",
+      "status": "MET",
+      "command": "node --test verify/prompt-catalogue/deps.test.mjs at b55bf1c (copies test/workspaces.test.mjs, the workspace package.json files and plan/decisions/ to a scratch folder, edits the copy, runs node --test there)",
+      "excerpt": "5/5 pass. As committed (xstate and mustache in packages/engine): exit 0. left-pad added to packages/engine or plugins/harness: exit 1 naming left-pad. A prose mention of `left-pad` in a decision: still exit 1; adding the line 'Runtime dependency: `left-pad`': exit 0. Replacing the mustache record line: exit 1 naming mustache. CLAUDE.md says 'A runtime dependency needs a `plan/decisions/` file naming it' and no longer 'Zero runtime dependencies except'; docs/layout.md states the new rule and not 'No runtime dependency except `xstate`'."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 150 at b55bf1c",
+      "excerpt": "Check run 'test' (id 128025916902) completed success; 'clean-room' (128025915519) success. 'gates' (128025915754) failed only because no verdict existed yet at that sha."
+    }
+  ],
+  "notes": [
+    "Full npm test at b55bf1c: 1594 tests, 1578 pass, 15 skipped, 1 fail (copy-not-link); at b5613ba: 1582, 1566 pass, 15 skipped, the same 1 fail. Known local failure in this container's clone.",
+    "Model-facing text not from the catalogue, by design: session-start.mjs's line when the catalogue itself cannot be loaded. 9 entries are not rendered by the suites (inputs-none, bound, refusal-counted, refusal-last, refusal-failed, ref-unreadable, self-check-cannot-load, self-check-crashed, check-release-none); same-text checks each against b5613ba (literal, scenario or direct call)."
+  ]
+}

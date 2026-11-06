@@ -88,8 +88,22 @@ export function stdin(ms) {
  * setup script bundles it, else packages/engine beside the plugin in the repo, else the repo clone's.
  */
 export async function engine(file, root = pluginRoot(), env = process.env) {
+  return import(engineFile(file, root, env));
+}
+
+// Where an engine source file is: bundled, beside the plugin in the repo, or in the repo clone.
+function engineFile(file, root, env) {
   const places = [join(root, 'lib', 'engine', 'src'), join(root, '..', '..', 'packages', 'engine', 'src'), join(repoDir(env), 'packages', 'engine', 'src')];
   const dir = places.find((p) => existsSync(join(p, file)));
   if (!dir) throw new Error(`no engine library at ${places.join(', ')}`);
-  return import(join(dir, file));
+  return join(dir, file);
+}
+
+/**
+ * The message catalogue (packages/engine/src/messages.js, plan item prompt-catalogue): every text a hook or the return
+ * tool hands a model is an entry of it. It is engine source only by where it lives; it imports nothing of the engine,
+ * so the scripts that must not run engine code (the return tool, session-start) may load it.
+ */
+export async function messages(root = pluginRoot(), env = process.env) {
+  return import(engineFile('messages.js', root, env));
 }

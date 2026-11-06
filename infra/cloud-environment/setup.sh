@@ -8,8 +8,8 @@
 #    release/harness-v<x.y.z>, whichever is newer by version; scripts/release/release.mjs), or of the clone's HEAD
 #    when there is no release yet, at ~/.claude/skills/ccp-harness, where Claude Code loads it as a plugin. It is
 #    extracted from git, never linked to the working tree, so editing plugins/ changes nothing a session runs.
-#    packages/journal is bundled at lib/journal (and packages/engine/src at lib/engine/src), and release.json says
-#    what the copy was built from.
+#    packages/journal is bundled at lib/journal (and packages/engine/src at lib/engine/src, with the message
+#    catalogue packages/engine/messages.md at lib/engine/messages.md), and release.json says what the copy was built from.
 #    The copy's plugin.json carries the release's version (the ref names the version; plan item self-update-by-version).
 #    Run from inside a Claude Code session with that session's HOME, it leaves the installed copy alone, because a
 #    session must never edit the plugin it runs (ledger L-no-self-modification); the next container gets the update.
@@ -93,6 +93,10 @@ PY
     # The actor hooks' checks (packages/engine/src, plan item engine-actors), from releases that have them.
     if git -C "$repo" archive "$commit" packages/engine/src 2>/dev/null | tar -x -C "$work" 2>/dev/null; then
       mkdir -p "$work/out/lib/engine" && cp -a "$work/packages/engine/src" "$work/out/lib/engine/src"
+    fi
+    # The message catalogue the hooks' words come from (plan item prompt-catalogue), beside src as in the repo.
+    if git -C "$repo" archive "$commit" packages/engine/messages.md 2>/dev/null | tar -x -C "$work" 2>/dev/null; then
+      cp -a "$work/packages/engine/messages.md" "$work/out/lib/engine/messages.md"
     fi
     python3 - "$work/out" "$tag" "$commit" <<'PY'
 import json, os, sys

@@ -250,7 +250,7 @@ test('S5 (8): the run line is told once, as the run\'s context; the stage record
     assert.equal(spawn({ root: w.root, prompt: `ccp-run ${runId}`, toolUseId: 'toolu_c' }).prompt, brief);
     assert.equal(bind({ root: w.root, agentId: 'ag-c', toolUseId: 'toolu_c' }).context, context);
     const rec = JSON.parse(readRun(w, runId, 'stage.json'));
-    assert.deepEqual(rec.context, { text: context, source: { frame: 'runLine', filled: { run: runId, worktree: run.worktree, repo: run.repo, github: 'o/r', branch: run.branch } } });
+    assert.deepEqual(rec.context, { text: context, source: { frame: 'runLine', entry: 'run-line', filled: { run: runId, worktree: run.worktree, repo: run.repo, github: 'o/r', branch: run.branch } } });
     assert.ok(!Object.values(rec.prompt.parts).flat().some((p) => p.source.frame === 'runLine'), 'no prompt part is the run line');
   } finally {
     await w.close();

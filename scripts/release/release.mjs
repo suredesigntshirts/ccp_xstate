@@ -25,8 +25,8 @@ import { validate, VERSION } from '../../packages/journal/src/index.js';
 export const TAG_PREFIX = 'harness-v';
 /** What setup.sh copies into a session, as git pathspecs. A change here is a plugin change. packages/engine/src is
  * the actor hooks' checks, copied to lib/engine/src since engine-actors; an engine-only merge missed a release before
- * it was listed here. */
-export const RELEASED = ['plugins/harness', 'packages/journal', 'packages/engine/src', ':(exclude)plugins/harness/test', ':(exclude)packages/journal/test'];
+ * it was listed here. packages/engine/messages.md is the hooks' message catalogue (plan item prompt-catalogue). */
+export const RELEASED = ['plugins/harness', 'packages/journal', 'packages/engine/src', 'packages/engine/messages.md', ':(exclude)plugins/harness/test', ':(exclude)packages/journal/test'];
 const MANIFEST = 'plugins/harness/.claude-plugin/plugin.json';
 const ZERO = /^0+$/;
 

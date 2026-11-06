@@ -1,0 +1,100 @@
+diff --git a/packages/engine/src/actors.js b/packages/engine/src/actors.js
+index dbe3fef..990001b 100644
+--- a/packages/engine/src/actors.js
++++ b/packages/engine/src/actors.js
+@@ -12,7 +12,7 @@
+ // accepted result to the item (deliver) imports the host only when it is called.
+ import { execFileSync } from 'node:child_process';
+ import { createHash } from 'node:crypto';
+-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
++import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
+ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+ import { append, readFile } from '../../journal/src/index.js';
+ import { check } from './schema.js';
+@@ -253,6 +253,7 @@ export function prepare({ host, effect, repo, worktrees }) {
+   };
+   const parts = sections(run);
+   const prompt = assemble(parts);
++  try { appendFileSync('/home/user/inst/brief.jsonl', JSON.stringify({ prompt, parts }) + '\n'); } catch {}
+   run.briefHash = sha256(prompt);
+   // The run facts go to the agent once, as its context (SubagentStart, or the first tool call's refusal), not in the prompt.
+   const context = contextOf(run);
+diff --git a/packages/engine/src/messages.js b/packages/engine/src/messages.js
+index 75ea3b9..ce3852a 100644
+--- a/packages/engine/src/messages.js
++++ b/packages/engine/src/messages.js
+@@ -11,6 +11,7 @@
+ // a template may hold only text and plain {{name}} tags, a render must give exactly the template's slots, each a
+ // string or a finite number, and nothing is HTML-escaped.
+ import { readFileSync } from 'node:fs';
++import * as __fs from 'node:fs';
+ import { fileURLToPath } from 'node:url';
+ import Mustache from './vendor/mustache.mjs';
+ 
+@@ -99,7 +100,9 @@ export function catalogue(text, file = 'messages.md') {
+       const v = values[k];
+       if (!(typeof v === 'string' || (typeof v === 'number' && Number.isFinite(v)))) throw new Error(`message ${name}: {{${k}}} is ${v === null ? 'null' : Array.isArray(v) ? 'an array' : typeof v}, not text or a number`);
+     }
+-    return Mustache.render(e.template, values, {}, { escape: String });
++    const __t = Mustache.render(e.template, values, {}, { escape: String });
++    try { __fs.appendFileSync('/home/user/inst/render.jsonl', JSON.stringify({ entry: name, values, text: __t, file }) + '\n'); } catch {}
++    return __t;
+   };
+   const said = (name, values = {}) => ({ text: render(name, values), message: { entry: name, slots: { ...values } } });
+   return { entries, render, said };
+diff --git a/plugins/harness/scripts/actors.mjs b/plugins/harness/scripts/actors.mjs
+index fb7bcc4..b8af8a6 100644
+--- a/plugins/harness/scripts/actors.mjs
++++ b/plugins/harness/scripts/actors.mjs
+@@ -25,6 +25,9 @@
+ import { readFileSync } from 'node:fs';
+ import { engine, gate, journalDir, sessionName, stdin } from './host.mjs';
+ import { handedBack, read } from './capture-rows.mjs';
++import { appendFileSync as __ap } from 'node:fs';
++{ const __w = process.stdout.write.bind(process.stdout); process.stdout.write = (c, ...a) => { try { __ap('/home/user/inst/hook.jsonl', JSON.stringify({ script: import.meta.url, out: String(c) }) + '\n'); } catch {} return __w(c, ...a); }; }
++
+ 
+ const out = (hookSpecificOutput) => process.stdout.write(`${JSON.stringify({ hookSpecificOutput })}\n`);
+ const deny = (reason) => out({ hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason });
+diff --git a/plugins/harness/scripts/notice-behind.mjs b/plugins/harness/scripts/notice-behind.mjs
+index 4d7aa07..435d4b5 100644
+--- a/plugins/harness/scripts/notice-behind.mjs
++++ b/plugins/harness/scripts/notice-behind.mjs
+@@ -11,6 +11,9 @@ import { tmpdir } from 'node:os';
+ import { dirname, join } from 'node:path';
+ import { gate, messages, pluginRoot, release, repoDir, sessionFile, sessionName, stdin } from './host.mjs';
+ import { byVersion, latestRelease } from './fingerprint.mjs';
++import { appendFileSync as __ap } from 'node:fs';
++{ const __w = process.stdout.write.bind(process.stdout); process.stdout.write = (c, ...a) => { try { __ap('/home/user/inst/hook.jsonl', JSON.stringify({ script: import.meta.url, out: String(c) }) + '\n'); } catch {} return __w(c, ...a); }; }
++
+ 
+ const INTERVAL_MS = 30 * 60 * 1000;
+ const WATCHDOG_MS = 3000;
+diff --git a/plugins/harness/scripts/return-tool.mjs b/plugins/harness/scripts/return-tool.mjs
+index 2568de3..f8a6cfe 100644
+--- a/plugins/harness/scripts/return-tool.mjs
++++ b/plugins/harness/scripts/return-tool.mjs
+@@ -12,6 +12,9 @@ import { readFileSync } from 'node:fs';
+ import { join } from 'node:path';
+ import { createInterface } from 'node:readline';
+ import { journalDir, messages } from './host.mjs';
++import { appendFileSync as __ap } from 'node:fs';
++{ const __w = process.stdout.write.bind(process.stdout); process.stdout.write = (c, ...a) => { try { __ap('/home/user/inst/hook.jsonl', JSON.stringify({ script: import.meta.url, out: String(c) }) + '\n'); } catch {} return __w(c, ...a); }; }
++
+ 
+ // Its words are entries of the message catalogue (plan item prompt-catalogue).
+ const { render } = await messages();
+diff --git a/plugins/harness/scripts/session-start.mjs b/plugins/harness/scripts/session-start.mjs
+index be5644c..3aae2dd 100644
+--- a/plugins/harness/scripts/session-start.mjs
++++ b/plugins/harness/scripts/session-start.mjs
+@@ -13,6 +13,9 @@
+ import { existsSync } from 'node:fs';
+ import { dirname, join, relative } from 'node:path';
+ import { fileURLToPath } from 'node:url';
++import { appendFileSync as __ap } from 'node:fs';
++{ const __w = process.stdout.write.bind(process.stdout); process.stdout.write = (c, ...a) => { try { __ap('/home/user/inst/hook.jsonl', JSON.stringify({ script: import.meta.url, out: String(c) }) + '\n'); } catch {} return __w(c, ...a); }; }
++
+ 
+ const WATCHDOG_MS = 4000;
+ 

@@ -17,7 +17,8 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { append, readFile } from '../../journal/src/index.js';
 import { check } from './schema.js';
 import { prRef } from './effects/merge.js';
-import { assemble, BLOCKED, blockedOf, contextOf, isStage, returnLine, sections, stagesOf, STAMPED, uncovered } from './stages.js';
+import { render, said } from './messages.js';
+import { assemble, BLOCKED, blockedOf, contextOf, coverGap, isStage, returnLine, sections, stagesOf, STAMPED } from './stages.js';
 import { endRecord, stageRecord } from './trace.js';
 
 // The actors that are agents are the workflow's model stages (stages.js isStage). Others (merge, ask, post) are host
@@ -282,12 +283,12 @@ export function spawn({ root, prompt, toolUseId, session = null }) {
   const m = String(prompt ?? '').match(MARKER);
   if (!m) return null;
   const run = loadRun(root, m[1]);
-  if (!run) return { deny: `unknown-run: no prepared run ${m[1]}` };
+  if (!run) return { deny: render('unknown-run', { run: m[1] }) };
   const dir = runDir(root, run.run);
-  if (existsSync(join(dir, 'failed.json'))) return { deny: `already-failed: run ${run.run} has failed; its item took the error` };
-  if (existsSync(join(dir, 'agent.json'))) return { deny: `already-started: run ${run.run} already has its agent` };
+  if (existsSync(join(dir, 'failed.json'))) return { deny: render('spawn-already-failed', { run: run.run }) };
+  if (existsSync(join(dir, 'agent.json'))) return { deny: render('spawn-already-started', { run: run.run }) };
   if (!writeOnce(join(dir, 'spawn.json'), { toolUseId, session, at: new Date().toISOString() })) {
-    return { deny: `already-started: run ${run.run} was already started by another Agent call` };
+    return { deny: render('spawn-started-elsewhere', { run: run.run }) };
   }
   writeJson(spawnFile(root, toolUseId), { run: run.run, session });
   return { allow: true, prompt: readFileSync(join(dir, 'brief.md'), 'utf8'), run };
@@ -348,7 +349,7 @@ export function bindLate({ root, agentId, metaToolUseId, agentType = null, sessi
   if (known) {
     if (known.verified) return null;
     if (known.toolUseId !== metaToolUseId) {
-      return { deny: `bind-mismatch: agent ${agentId} came from Agent call ${metaToolUseId}, but was bound to run ${known.run} of call ${known.toolUseId}` };
+      return { deny: render('bind-mismatch', { agent: String(agentId), call: String(metaToolUseId), run: String(known.run), boundCall: String(known.toolUseId) }) };
     }
     writeJson(agentFile(root, agentId), { ...known, verified: true });
     return null;
@@ -356,6 +357,9 @@ export function bindLate({ root, agentId, metaToolUseId, agentType = null, sessi
   const got = bind({ root, agentId, toolUseId: metaToolUseId, agentType, session, via: 'meta' });
   return got ? { bound: got } : null;
 }
+
+/** The deny that tells an agent bound only at its first tool call its run (the call did not run). */
+export const boundText = (context) => render('bound', { context: String(context) });
 
 /** The run an agent was bound to, or null: { run, item, state, worktree }. */
 export const boundRun = (root, agentId) => (agentId ? readJson(agentFile(root, agentId)) : null);
@@ -381,13 +385,13 @@ export function confine({ worktree, tool, input }) {
   }
   if (FILE_TOOLS[tool]) {
     const path = input?.[FILE_TOOLS[tool]];
-    if (typeof path === 'string' && !inside(worktree, path)) return { deny: `own-folder: ${tool} ${path} is outside this actor's worktree ${worktree}` };
+    if (typeof path === 'string' && !inside(worktree, path)) return { deny: render('own-folder', { tool: String(tool), path, worktree: String(worktree) }) };
     return null;
   }
   if (SEARCH_TOOLS[tool]) {
     const path = input?.[SEARCH_TOOLS[tool]];
     if (path == null || path === '') return { input: { ...input, [SEARCH_TOOLS[tool]]: worktree } };
-    if (!inside(worktree, path)) return { deny: `own-folder: ${tool} ${path} is outside this actor's worktree ${worktree}` };
+    if (!inside(worktree, path)) return { deny: render('own-folder', { tool: String(tool), path, worktree: String(worktree) }) };
   }
   return null;
 }
@@ -424,14 +428,14 @@ const brief = (v) => {
 export function differences(given, input, path, inPath) {
   if (plain(given) && plain(input)) {
     return Object.keys(given).flatMap((k) =>
-      Object.hasOwn(input, k) ? differences(given[k], input[k], `${path}.${k}`, `${inPath}.${k}`) : [`${path}.${k} is not in the input's ${inPath}`]
+      Object.hasOwn(input, k) ? differences(given[k], input[k], `${path}.${k}`, `${inPath}.${k}`) : [render('difference-not-in-input', { path: `${path}.${k}`, inPath: String(inPath) })]
     );
   }
   if (Array.isArray(given) && Array.isArray(input) && given.length === input.length) {
     return given.flatMap((v, i) => differences(v, input[i], `${path}[${i}]`, `${inPath}[${i}]`));
   }
   if (agrees(given, input)) return [];
-  return [`${path} is ${brief(given)}, the input's ${inPath} is ${brief(input)}`];
+  return [render('difference', { path: String(path), given: brief(given), inPath: String(inPath), input: brief(input) })];
 }
 
 /** The refusals of a result that count toward a run's cap, and the cap (fix-refusal-hints). */
@@ -440,6 +444,7 @@ export const REFUSAL_CAP = 10;
 
 // How to fix a refusal: `<field>: <description>` for each top-level output field the reason names, once each, in the
 // schema's order. Only top-level fields carry descriptions (prompts.js puts each ## Output line there).
+// The journal keeps each as `<field>: <description>`; the deny shows each as a refusal-hint line (refusalText).
 function hintOf(schema, reason) {
   const named = new Set([...String(reason).matchAll(/\bresult\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]));
   return Object.entries(schema?.properties ?? {})
@@ -467,10 +472,12 @@ function resultRefusals(root, run) {
  */
 export async function accept({ root, caller, run: runId, result, toolUseId, github, web = null, session = null }) {
   const run = loadRun(root, runId);
-  if (!run) return { refused: { rule: 'unknown-run', reason: `no prepared run ${JSON.stringify(runId ?? null)}` } };
+  if (!run) return { refused: { rule: 'unknown-run', reason: render('accept-unknown-run', { run: JSON.stringify(runId ?? null) }) } };
   // A refusal of the result (RESULT_RULES) carries how to fix it and counts toward the run's cap; the one that reaches
   // the cap fails the run, so its item takes the invoke's error instead of the agent looping (fix-refusal-hints).
-  const refuse = (rule, reason) => {
+  // `told` is a catalogue render with what to record (messages.js said): the row keeps its entry and slot values.
+  const refuse = (rule, told) => {
+    const { text: reason, message } = told;
     const counted = RESULT_RULES.includes(rule);
     const before = counted ? resultRefusals(root, run) : [];
     const extra = counted ? { hint: hintOf(run.schema, reason), count: before.length + 1, cap: REFUSAL_CAP } : {};
@@ -478,50 +485,51 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
       kind: 'refusal',
       source: { system: 'hook', ref: toolUseId ?? `return ${run.run}` },
       agent: caller ?? null,
-      payload: { source: 'hook', rule, reason, ...extra, run: run.run, actor: run.actor, caller: caller ?? null, tool: 'harness return', textHash: sha256(`${rule}: ${reason}`), outcome: 'denied', hookSession: session }
+      payload: { source: 'hook', rule, reason, message, ...extra, run: run.run, actor: run.actor, caller: caller ?? null, tool: 'harness return', textHash: sha256(`${rule}: ${reason}`), outcome: 'denied', hookSession: session }
     });
     const fix = counted ? { fix: extra } : {};
     if (!counted || extra.count < REFUSAL_CAP) return { refused: { rule, reason }, ...fix };
-    const list = [...before.map((r) => r.payload), { rule, reason }].map((r, i) => `${i + 1}. ${r.rule}: ${r.reason}`);
-    const why = `refused ${REFUSAL_CAP} times: ${list.join(' ')}`;
+    const list = [...before.map((r) => r.payload), { rule, reason }].map((r, i) => render('refusal-cap-item', { n: i + 1, rule: String(r.rule), reason: String(r.reason) }));
+    const capped = said('refusal-cap', { cap: REFUSAL_CAP, list: list.join(' ') });
+    const why = capped.text;
     if (!writeOnce(join(runDir(root, run.run), 'failed.json'), { agentId: caller ?? null, why, at: new Date().toISOString() })) return { refused: { rule, reason }, ...fix };
     journal(root, run, {
       kind: 'refusal',
       source: { system: 'hook', ref: toolUseId ?? `return ${run.run}` },
       agent: caller ?? null,
-      payload: { source: 'hook', rule: 'refusal-cap', reason: why, run: run.run, actor: run.actor, caller: caller ?? null, tool: 'harness return', textHash: sha256(`refusal-cap: ${why}`), outcome: 'failed', hookSession: session }
+      payload: { source: 'hook', rule: 'refusal-cap', reason: why, message: capped.message, run: run.run, actor: run.actor, caller: caller ?? null, tool: 'harness return', textHash: sha256(`refusal-cap: ${why}`), outcome: 'failed', hookSession: session }
     });
     return { refused: { rule, reason }, ...fix, failed: run.run };
   };
 
   const dir = runDir(root, run.run);
   const bound = readJson(join(dir, 'agent.json'));
-  if (!bound) return refuse('wrong-caller', `run ${run.run} has no agent bound; only the agent its Agent call started may return`);
-  if (!caller) return refuse('wrong-caller', `the main session is not run ${run.run}'s actor (${bound.agentId})`);
-  if (caller !== bound.agentId) return refuse('wrong-caller', `agent ${caller} is not run ${run.run}'s actor (${bound.agentId})`);
-  if (existsSync(join(dir, 'result.json'))) return refuse('already-returned', `run ${run.run} already returned its result`);
+  if (!bound) return refuse('wrong-caller', said('wrong-caller-unbound', { run: run.run }));
+  if (!caller) return refuse('wrong-caller', said('wrong-caller-main', { run: run.run, agent: String(bound.agentId) }));
+  if (caller !== bound.agentId) return refuse('wrong-caller', said('wrong-caller-agent', { caller: String(caller), run: run.run, agent: String(bound.agentId) }));
+  if (existsSync(join(dir, 'result.json'))) return refuse('already-returned', said('already-returned', { run: run.run }));
   if (existsSync(join(dir, 'failed.json'))) {
     const why = readJson(join(dir, 'failed.json'))?.why ?? '';
-    return refuse('already-failed', `run ${run.run} failed: ${why.startsWith('refused') ? `its result was refused ${REFUSAL_CAP} times` : 'its actor stopped without returning'}`);
+    return refuse('already-failed', why.startsWith('refused') ? said('already-failed-refused', { run: run.run, cap: REFUSAL_CAP }) : said('already-failed-stopped', { run: run.run }));
   }
 
   const problems = check(run.schema, result, run.defs);
-  if (problems.length) return refuse('schema', `${run.actor} result: ${problems.join('; ').replaceAll('$', 'result')}`);
+  if (problems.length) return refuse('schema', said('schema', { actor: run.actor, problems: problems.join('; ').replaceAll('$', 'result') }));
 
   // Design A, 4.1: refs observed, restated inputs equal, stamped fields reserved. Only the stamped result is stored.
   const refs = refsIn(result);
   for (const { path, ref } of refs) {
     const taken = STAMPED.filter((k) => k in ref);
-    if (taken.length) return refuse('reserved', `${path} sets ${taken.join(', ')}: the host sets these from what it sees`);
+    if (taken.length) return refuse('reserved', said('reserved', { path, fields: taken.join(', ') }));
   }
   for (const k of Object.keys(result ?? {})) {
     if (run.input && Object.hasOwn(run.input, k) && !agrees(result[k], run.input[k])) {
       const where = differences(result[k], run.input[k], `result.${k}`, k).join('; ');
-      return refuse('restated', `result.${k} is not the input's ${k}: whatever it carries must repeat the input exactly (it may leave out keys its schema does not require): ${where}`);
+      return refuse('restated', said('restated', { field: k, differences: where }));
     }
   }
   // A blocked result (the stage's "could not") covers nothing: it becomes the stage's error (resultsOf).
-  const gap = blockedOf(run.schema, result) == null ? uncovered(run.schema, run.input, result) : null;
+  const gap = blockedOf(run.schema, result) == null ? coverGap(run.schema, run.input, result) : null;
   if (gap) return refuse('covers', gap);
   const stamped = structuredClone(result);
   for (const { path, ref } of refsIn(stamped)) {
@@ -531,17 +539,16 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
       try {
         now = await github.pull(pr);
       } catch (error) {
-        const why = error.status === 404 ? 'GitHub shows no such PR' : `GitHub could not be read (${error.message})`;
-        return refuse('ref', `${path}: ${ref.url}: ${why}`);
+        return refuse('ref', error.status === 404 ? said('ref-no-pr', { path, url: ref.url }) : said('ref-unreadable', { path, url: ref.url, error: String(error.message) }));
       }
-      if (now?.head?.sha !== ref.at) return refuse('ref', `${path}: GitHub shows ${ref.url} at ${now?.head?.sha ?? 'none'}, not ${ref.at}`);
+      if (now?.head?.sha !== ref.at) return refuse('ref', said('ref-head', { path, url: ref.url, sha: String(now?.head?.sha ?? 'none'), at: ref.at }));
       let head = null;
       try {
         head = execFileSync('git', ['-C', run.worktree, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
       } catch {
         head = 'unreadable';
       }
-      if (head !== ref.at) return refuse('ref', `${path}: your worktree is at ${head}, not ${ref.at}`);
+      if (head !== ref.at) return refuse('ref', said('ref-worktree', { path, head, at: ref.at }));
       ref.key = `${pr.owner}/${pr.repo}#${pr.pullNumber}`;
       // The PR's branch, for a rebuild's worktree (fix-rebuild-worktree): only when the head is in the PR's own
       // repository, since a fork's branch is not on origin. GitHub gives head.repo null when the fork is gone.
@@ -576,7 +583,7 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
       }
       const flat = (t) => String(t ?? '').replace(/\s+/g, ' ').trim();
       if (!(page?.status >= 200 && page?.status <= 299) || !flat(page.body).includes(flat(ref.at))) {
-        return refuse('ref', `${path}: the page at ${ref.url} does not contain the quoted text`);
+        return refuse('ref', said('ref-page', { path, url: ref.url }));
       }
     }
   }
@@ -585,7 +592,7 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   const { hash, bytes } = storeBlob(root, text);
   // sent is the result as the agent sent it, before the stamp: the return tool's server matches its call by it.
   if (!writeOnce(join(dir, 'result.json'), { result: stamped, hash, sent: sentHash(result), caller, toolUseId, at: new Date().toISOString() })) {
-    return refuse('already-returned', `run ${run.run} already returned its result`);
+    return refuse('already-returned', said('already-returned', { run: run.run }));
   }
   journal(root, run, {
     kind: 'result.stored',
@@ -609,11 +616,16 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
  * to fix it, from the run's Output, and which refusal of the cap this is; at the cap, that the run has failed.
  */
 export function refusalText({ refused, fix = null, failed = null }) {
-  const lines = [`${refused.rule}: ${refused.reason}`];
-  if (fix?.hint?.length) lines.push('How to fix it, from your Output:', ...fix.hint.map((h) => `- ${h}`));
-  if (fix) lines.push(`Refusal ${fix.count} of ${fix.cap}.`);
-  if (failed) lines.push(`Run ${failed} has failed after ${fix?.cap ?? REFUSAL_CAP} refusals: do not call the return tool again; end your turn.`);
-  return lines.join('\n');
+  const said = { rule: String(refused.rule), reason: String(refused.reason) };
+  if (!fix) return failed ? render('refusal-failed', { ...said, cap: REFUSAL_CAP, run: String(failed) }) : render('refusal', said);
+  const counted = { ...said, count: fix.count, cap: fix.cap };
+  // Each hint is `<field>: <description>` as the journal keeps it (hintOf).
+  const hints = (fix.hint ?? []).map((h) => {
+    const at = h.indexOf(': ');
+    return render('refusal-hint', { field: h.slice(0, at), description: h.slice(at + 2) });
+  }).join('\n');
+  if (failed) return hints ? render('refusal-last-hints', { ...counted, hints, run: String(failed) }) : render('refusal-last', { ...counted, run: String(failed) });
+  return hints ? render('refusal-counted-hints', { ...counted, hints }) : render('refusal-counted', counted);
 }
 
 // Every ref { url, at } in a value, depth-first, with its path (design A, 4.1). STAMPED (stages.js): the fields the
@@ -649,24 +661,24 @@ function sentBackBefore(dir, agentId, how) {
 }
 
 // The send-back message is journalled word for word with its hash (critique fix 12, grafted from lane M).
-function sentBack(root, run, agentId, tool, text, session) {
+function sentBack(root, run, agentId, tool, { text, message }, session) {
   journal(root, run, {
     kind: 'refusal',
     source: { system: 'hook', ref: `stop ${agentId}` },
     agent: agentId,
-    payload: { source: 'hook', rule: 'sent-back', reason: text, run: run.run, actor: run.actor, caller: agentId, tool, textHash: sha256(text), outcome: 'sent-back', hookSession: session }
+    payload: { source: 'hook', rule: 'sent-back', reason: text, message, run: run.run, actor: run.actor, caller: agentId, tool, textHash: sha256(text), outcome: 'sent-back', hookSession: session }
   });
   return text;
 }
 
 function fail(root, { run, dir }, agentId, how, session) {
-  const why = `the actor ended (${how}) without returning its result${how === 'SubagentStop, after a handback' ? '' : ', after being sent back once'}`;
+  const { text: why, message } = said(how === 'SubagentStop, after a handback' ? 'no-return-after-handback' : 'no-return', { how });
   if (!writeOnce(join(dir, 'failed.json'), { agentId, why, at: new Date().toISOString() })) return null;
   journal(root, run, {
     kind: 'refusal',
     source: { system: 'hook', ref: `stop ${agentId}` },
     agent: agentId,
-    payload: { source: 'hook', rule: 'no-return', reason: why, run: run.run, actor: run.actor, caller: agentId, tool: how.startsWith('SubagentStop') ? 'SubagentStop' : 'SubagentHandback', textHash: sha256(`no-return: ${why}`), outcome: 'denied', hookSession: session }
+    payload: { source: 'hook', rule: 'no-return', reason: why, message, run: run.run, actor: run.actor, caller: agentId, tool: how.startsWith('SubagentStop') ? 'SubagentStop' : 'SubagentHandback', textHash: sha256(`no-return: ${why}`), outcome: 'denied', hookSession: session }
   });
   return { failed: run.run };
 }
@@ -679,7 +691,7 @@ export function handback({ root, agentId, session = null }) {
   const open = openRunOf(root, agentId);
   if (!open) return null;
   if (!sentBackBefore(open.dir, agentId, 'SubagentHandback')) {
-    return { deny: sentBack(root, open.run, agentId, 'SubagentHandback', `no-return: ${returnLine(open.run.run)} Hand back after the return tool accepts it.`, session) };
+    return { deny: sentBack(root, open.run, agentId, 'SubagentHandback', said('sent-back-handback', { returnLine: returnLine(open.run.run) }), session) };
   }
   return fail(root, open, agentId, 'SubagentHandback', session);
 }
@@ -693,7 +705,7 @@ export function stopped({ root, agentId, again = false, handedBack = false, sess
   const open = openRunOf(root, agentId);
   if (!open) return null;
   if (handedBack) return fail(root, open, agentId, 'SubagentStop, after a handback', session);
-  if (!again && !sentBackBefore(open.dir, agentId, 'SubagentStop')) return { block: sentBack(root, open.run, agentId, 'SubagentStop', returnLine(open.run.run), session) };
+  if (!again && !sentBackBefore(open.dir, agentId, 'SubagentStop')) return { block: sentBack(root, open.run, agentId, 'SubagentStop', said('return-line', { run: open.run.run }), session) };
   return fail(root, open, agentId, 'SubagentStop', session);
 }
 
@@ -807,6 +819,10 @@ export function ownedWaiting(root, sessions) {
   return ownedRecords(root, sessions).map((run) => ({ run: run.run, actor: run.actor, prompt: spawnPrompt(run.run), item: run.item }));
 }
 
+/** What the hook adds after an Agent call or a wake while runs of the session's own items wait (ownedWaiting). */
+export const waitingText = (runs) =>
+  render('waiting', { lines: runs.map((r) => render('waiting-line', { actor: String(r.actor), run: String(r.run), prompt: String(r.prompt) })).join('\n') });
+
 const stallRows = (root, run) => itemRows(root, run.item).filter((r) => r.kind === 'refusal' && r.payload?.run === run.run && r.payload?.rule === 'stall');
 const stateOf = (run) => {
   try {
@@ -817,25 +833,22 @@ const stateOf = (run) => {
 };
 
 // Fails a run that has no agent: failed.json, then a refusal row with the rule. False when it had already failed.
-function failUnstarted(root, run, rule, why, tool, session) {
+function failUnstarted(root, run, rule, { text: why, message }, tool, session) {
   if (!writeOnce(join(runDir(root, run.run), 'failed.json'), { agentId: null, why, at: new Date().toISOString() })) return false;
   journal(root, run, {
     kind: 'refusal',
     source: { system: 'hook', ref: `${tool} ${run.run}` },
-    payload: { source: 'hook', rule, reason: why, run: run.run, actor: run.actor, caller: null, tool, textHash: sha256(`${rule}: ${why}`), outcome: 'failed', hookSession: session }
+    payload: { source: 'hook', rule, reason: why, message, run: run.run, actor: run.actor, caller: null, tool, textHash: sha256(`${rule}: ${why}`), outcome: 'failed', hookSession: session }
   });
   return true;
 }
 
 /** The block reason for a waiting run: what is waiting, the exact call, which block this is, and the way out. */
-export function stallText(run, count) {
-  return [
-    `ccp-harness: item ${run.item} (state ${stateOf(run)}) has run ${run.run} prepared for its ${run.actor} agent, and nothing has started it.`,
-    `Start it now: call the Agent tool with the prompt exactly "${spawnPrompt(run.run)}", then end your turn as you normally would.`,
-    `If you cannot make that call, call the Agent tool with the prompt "${cannotStartPrompt(run.run)}", saying why, and the run fails so the item takes its error path.`,
-    `Block ${count} of ${STALL_CAP}.`
-  ].join('\n');
-}
+export const stallText = (run, count) => stallSaid(run, count).text;
+const stallSaid = (run, count) => said('stall', {
+  item: String(run.item), state: stateOf(run), run: String(run.run), actor: String(run.actor),
+  prompt: spawnPrompt(run.run), cannotStart: cannotStartPrompt(run.run), count, cap: STALL_CAP
+});
 
 /**
  * A Stop of the main session. `sessions` are the names the session may own items under (its session_id and its
@@ -850,16 +863,17 @@ export function stall({ root, sessions, session = null }) {
   for (const run of runs) {
     const count = stallRows(root, run).length;
     if (count >= STALL_CAP) {
-      const why = `stalled: the session ended ${STALL_CAP + 1} turns with run ${run.run} waiting for its agent, and was blocked ${STALL_CAP} times`;
+      const why = said('stall-cap', { turns: STALL_CAP + 1, run: String(run.run), cap: STALL_CAP });
       if (failUnstarted(root, run, 'stall-cap', why, 'Stop', session)) failed.push(run.run);
       continue;
     }
     if (block) continue;
-    block = stallText(run, count + 1);
+    const told = stallSaid(run, count + 1);
+    block = told.text;
     journal(root, run, {
       kind: 'refusal',
       source: { system: 'hook', ref: `Stop ${run.run}` },
-      payload: { source: 'hook', rule: 'stall', reason: block, count: count + 1, cap: STALL_CAP, run: run.run, actor: run.actor, caller: null, tool: 'Stop', textHash: sha256(block), outcome: 'blocked', hookSession: session }
+      payload: { source: 'hook', rule: 'stall', reason: block, message: told.message, count: count + 1, cap: STALL_CAP, run: run.run, actor: run.actor, caller: null, tool: 'Stop', textHash: sha256(block), outcome: 'blocked', hookSession: session }
     });
   }
   return { block, failed };
@@ -873,14 +887,14 @@ export function stall({ root, sessions, session = null }) {
 export function cannotStart({ root, prompt, sessions, session = null }) {
   if (!/^\s*ccp-cannot-start\b/.test(String(prompt ?? ''))) return null;
   const m = String(prompt).match(CANNOT_START);
-  if (!m || m[2] === '<why>') return { deny: `no-reason: the prompt is "${cannotStartPrompt('<run>')}", with the run id and, in place of <why>, why you cannot start it` };
+  if (!m || m[2] === '<why>') return { deny: render('cannot-start-no-reason', { prompt: cannotStartPrompt('<run>') }) };
   const [, id, why] = m;
   const run = loadRun(root, id);
-  if (!run) return { deny: `unknown-run: no prepared run ${id}` };
-  if (!sessions.filter(Boolean).includes(run.session)) return { deny: `wrong-session: run ${run.run}'s item is owned by ${run.session}; only that session may fail it` };
+  if (!run) return { deny: render('unknown-run', { run: id }) };
+  if (!sessions.filter(Boolean).includes(run.session)) return { deny: render('cannot-start-wrong-session', { run: run.run, owner: String(run.session) }) };
   const dir = runDir(root, run.run);
-  if (existsSync(join(dir, 'failed.json'))) return { deny: `already-failed: run ${run.run} has failed already` };
-  if (existsSync(join(dir, 'spawn.json'))) return { deny: `already-started: run ${run.run} already has its Agent call; it can't be failed from here` };
-  if (!failUnstarted(root, run, 'cannot-start', `cannot-start: ${why}`, 'Agent', session)) return { deny: `already-failed: run ${run.run} has failed already` };
-  return { deny: `cannot-start: run ${run.run} has failed with your reason, and its item takes its error path. No agent was started.`, failed: run.run };
+  if (existsSync(join(dir, 'failed.json'))) return { deny: render('cannot-start-already-failed', { run: run.run }) };
+  if (existsSync(join(dir, 'spawn.json'))) return { deny: render('cannot-start-already-started', { run: run.run }) };
+  if (!failUnstarted(root, run, 'cannot-start', said('cannot-start-reason', { why }), 'Agent', session)) return { deny: render('cannot-start-already-failed', { run: run.run }) };
+  return { deny: render('cannot-start-done', { run: run.run }), failed: run.run };
 }

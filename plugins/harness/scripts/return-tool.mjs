@@ -11,17 +11,20 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline';
-import { journalDir } from './host.mjs';
+import { journalDir, messages } from './host.mjs';
+
+// Its words are entries of the message catalogue (plan item prompt-catalogue).
+const { render } = await messages();
 
 const TOOL = {
   name: 'return',
-  description: 'Hand your result back to the ccp-harness run that started you. Only the agent a run started may call it for that run; the result must match the run\'s schema, and a claimed PR must be on GitHub at the claimed head.',
+  description: render('return-tool-description'),
   inputSchema: {
     type: 'object',
     required: ['run', 'result'],
     properties: {
-      run: { type: 'string', description: 'Your run, as the harness gave it: <item>:<seq>.<actor>' },
-      result: { type: 'object', description: 'Your result, matching the schema the harness gave you' }
+      run: { type: 'string', description: render('return-tool-run') },
+      result: { type: 'object', description: render('return-tool-result') }
     }
   }
 };
@@ -43,9 +46,9 @@ function answer({ run, result } = {}) {
   }
   const same = stored && (typeof stored.sent === 'string' ? stored.sent === sentHash(result) : stored.hash === sha256(JSON.stringify(result)));
   if (same) {
-    return { content: [{ type: 'text', text: `accepted: run ${run}'s result is stored (${stored.hash.slice(0, 12)}). You are done.` }] };
+    return { content: [{ type: 'text', text: render('return-accepted', { run: String(run), hash: String(stored.hash.slice(0, 12)) }) }] };
   }
-  return { isError: true, content: [{ type: 'text', text: `not accepted: no harness check passed this result for run ${run}. The harness hook checks every return; without it nothing is accepted.` }] };
+  return { isError: true, content: [{ type: 'text', text: render('return-not-accepted', { run: String(run) }) }] };
 }
 
 const send = (message) => process.stdout.write(`${JSON.stringify({ jsonrpc: '2.0', ...message })}\n`);
