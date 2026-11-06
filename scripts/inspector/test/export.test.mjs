@@ -591,3 +591,17 @@ test('engineOf: a string engine is relative to the repo root, a { commit } engin
     execFileSync('git', ['-C', REPO, 'worktree', 'remove', '--force', e.path], { stdio: 'ignore' });
   }
 });
+
+test('a stage record that names catalogue entries (prompt-catalogue) carries them on each piece and in the detail', async () => {
+  const { engine, journal } = stageFixture();
+  const file = join(journal, 'items', 't', 'runs', '0.plan', 'stage.json');
+  const rec = JSON.parse(readFileSync(file, 'utf8'));
+  rec.prompt.parts.rules[0].source.entry = 'data-rule';
+  rec.prompt.parts.return[0].source.entry = 'return-line';
+  writeFileSync(file, JSON.stringify(rec));
+  const b = await exportRun({ engine, journal, kind: 'scripted' });
+  const plan = b.steps.flatMap((s) => s.actors).find((a) => a.effect === 't:0.plan');
+  assert.deepEqual(plan.stage.parts[0].pieces[0].source, { kind: 'frame', name: 'DATA_RULE', label: 'harness frame: DATA_RULE', fixed: true, filled: null, entry: 'data-rule',
+    detail: 'message catalogue entry data-rule (packages/engine/messages.md), the same for every stage' });
+  assert.equal(plan.stage.parts.find((p) => p.part === 'return').pieces[0].source.detail, 'message catalogue entry return-line (packages/engine/messages.md), filled in with this run\'s run');
+});
