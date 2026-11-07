@@ -35,7 +35,7 @@ test('the challenge prompt holds the request and the issue, and nothing else of 
   assert.deepEqual(Object.keys(prepared.input).sort(), ['issue', 'request', 'task']);
   assert.deepEqual(prepared.input.request, REQUEST);
   assert.deepEqual(prepared.input.issue, { ...ISSUE(4), url: REQUEST.url });
-  const prompt = read(join(runDir(w.root, run.id), 'brief.md'));
+  const prompt = read(join(runDir(w.root, run.id), 'prompt.md'));
   const context = read(join(runDir(w.root, run.id), 'context.md'));
   assert.ok(prompt.includes(REQUEST.text), 'request text in the prompt');
   assert.ok(prompt.includes(REQUEST.url), 'request url in the prompt');
@@ -47,7 +47,7 @@ test('the challenge prompt holds the request and the issue, and nothing else of 
     assert.ok(!context.includes(secret), `context leaks ${secret}`);
   }
   // the shape run of the same round did get the answer (the marker test is not vacuous)
-  const shapePrompt = read(join(runDir(w.root, w.runs('shape').at(-1).run), 'brief.md'));
+  const shapePrompt = read(join(runDir(w.root, w.runs('shape').at(-1).run), 'prompt.md'));
   assert.ok(shapePrompt.includes(ANSWER_WORDS) && shapePrompt.includes(OLD_EVIDENCE));
 });
 

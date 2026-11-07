@@ -3,7 +3,7 @@
 // checked out at the PR head, as tourney Q1 does
 // (real restore/offer/pump, real handlers, real actors.prepare, real spawn/bind/accept, the tourney fakeGitHub and
 // platform), except that model stages are answered by real agents: the driver stops at each model run, prints the
-// prompt the agent would get (brief.md + context.md), and is resumed with `answer <run> <file>`.
+// prompt the agent would get (prompt.md + context.md), and is resumed with `answer <run> <file>`.
 //
 //   node drive.mjs init                 fresh world + start the item, drive to the first agent hand-off
 //   node drive.mjs next                 drive on (CI, cards) to the next hand-off
@@ -165,7 +165,7 @@ async function advance(w) {
     if (stage) {
       const dir = runDir(ROOT, stage.id);
       if (!existsSync(join(dir, 'result.json'))) {
-        const brief = readFileSync(join(dir, 'brief.md'), 'utf8');
+        const brief = readFileSync(join(dir, 'prompt.md'), 'utf8');
         const context = readFileSync(join(dir, 'context.md'), 'utf8');
         const prepared = loadRun(ROOT, stage.id);
         wire(prepared.worktree);

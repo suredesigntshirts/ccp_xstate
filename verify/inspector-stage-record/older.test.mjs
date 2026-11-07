@@ -71,7 +71,14 @@ test('older journals: no Stage view and no flow strip, and the page has no error
   for (const r of pages.runs) { assert.equal(r.after.pick, r.id); assert.equal(r.after.flow, false, r.id); assert.equal(r.after.stage, 0, r.id); }
 });
 
+// What the glossary renamed in these pages: the host's prompt row is checked against "the prompt", not "the brief", and
+// the capture's own rows are shown with their kinds, agent.prompt and agent.final, with no note telling them from accepts.
+const renamed = (t) => t.replaceAll('the host journaled when it wrote the brief', 'the host journaled when it wrote the prompt')
+  .replaceAll("capture saved the agent's final message (a hash, not a harness accept) (result.stored)", "capture saved the agent's final message (a hash) (agent.final)")
+  .replaceAll("capture saved the agent's prompt (a hash) (brief.stored)", "capture saved the agent's prompt (a hash) (agent.prompt)");
+
 test('older journals: each run renders as it did on main before this PR (summary, glance, map, trail, every step)', { skip }, () => {
+  for (const r of pages.runs) r.before.steps = r.before.steps.map(renamed);
   for (const r of pages.runs) {
     assert.equal(r.before.pick, r.id, `${r.id} missing from the base build`);
     for (const k of ['summary', 'glance', 'graph', 'trail']) assert.equal(r.after[k], r.before[k], `${r.id}: ${k} differs`);

@@ -21,8 +21,15 @@ const { safe } = ownNames;
 const sha256 = (text) => createHash('sha256').update(text).digest('hex');
 const readText = (path) => { try { return readFileSync(path, 'utf8'); } catch { return null; } };
 const readJson = (path) => { const t = readText(path); if (t == null) return null; try { return JSON.parse(t); } catch { return null; } };
-// Rows as the journal reads them: each upcast to the current version, so older rows carry today's kinds and fields.
-const readRows = (path) => (readText(path) ?? '').split('\n').filter(Boolean).map((l) => { try { return upcast(JSON.parse(l)); } catch { return null; } }).filter(Boolean);
+// Rows in today's kinds and fields, read through the journal's upcast. A row the upcaster changes (an older prompt or
+// capture row) keeps the row as the file holds it in `written`, which is what the page shows; every other row is kept
+// exactly as written.
+const current = (row) => {
+  const up = upcast(row);
+  if (up.kind === row.kind && JSON.stringify(up.payload) === JSON.stringify(row.payload)) return row;
+  return Object.defineProperty(up, 'written', { value: row });
+};
+const readRows = (path) => (readText(path) ?? '').split('\n').filter(Boolean).map((l) => { try { return current(JSON.parse(l)); } catch { return null; } }).filter(Boolean);
 const get = (root, path) => String(path).split('.').reduce((v, k) => v?.[k], root);
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -661,7 +668,7 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
       label: applied ? labelOf(p.seq, event, edge, toLeaves) : ignoredLabel(eventWords(event.type), prevLeaves, candidates),
       atNote: steps.length && row.at && steps.at(-1).at && row.at < steps.at(-1).at ? (kind === 'scripted' ? 'This time comes from the event itself (the test fixture), not the clock, so it is earlier than the step before.' : 'This time is earlier than the step before: the journal stamps the row with the time inside the event.') : null, edge: edge ? { id: edge.id, ids: [edge.id, ...(edge.then ? [edge.then.id] : [])], from: edge.from, to: edge.to, kind: edge.kind, guard: edge.guard, description: edge.description, then: edge.then ? { id: edge.then.id, from: edge.then.from, to: edge.then.to, kind: edge.then.kind, guard: edge.then.guard, description: edge.then.description } : null } : null,
       writes, candidates, thenCandidates, context, changed, hash: p.hash ?? null, replayHash, hashOk: p.hash && replayHash ? p.hash === replayHash : null,
-      source: p.source ?? row.source ?? null, actors, rows: related
+      source: p.source ?? row.source ?? null, actors, rows: related.map((r) => r.written ?? r)
     });
     if (applied && context) prevContext = context;
     if (applied) prevLeaves = toLeaves;
@@ -1031,7 +1038,7 @@ function layersOf({ a, step, runPath, runJson, promptPath, promptText, rows, ses
   if (stored && promptHash) checks.push({ what: `${basename(promptPath)} matches the hash the host journaled when it wrote the prompt`, ok: stored.payload.hash === promptHash });
   if (stored && added != null) checks.push({ what: 'context.md matches the hash the host journaled', ok: stored.payload.contextHash === sha256(added) });
   const live = agentId && sessionRows.find((r) => r.kind === 'agent.prompt' && (r.agent === agentId || r.payload?.agentId === agentId));
-  if (live && promptHash) checks.push({ what: `the prompt the harness's capture saw the agent start with hashes to ${basename(promptPath)}`, ok: live.payload.hash === promptHash });
+  if (live && promptHash) checks.push({ what: `the prompt the harness's SubagentStart capture saw the agent start with hashes to ${basename(promptPath)}`, ok: live.payload.hash === promptHash });
 
   // Layer 7: the host's answer to the return.
   const verdicts = rows.filter((r) => r.payload?.run === runId && ['result.stored', 'refusal', 'result.refused', 'result.accepted', 'brief.stored'].includes(r.kind))

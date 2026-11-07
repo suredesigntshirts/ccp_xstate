@@ -91,8 +91,8 @@ test('an item pinned before the edit loads, replays and renders from its blob al
   assert.equal(replayed.seq, 2);
   assert.deepEqual(replayed.snapshot.value, host.snapshot.value);
   const rj = readJson(join(prepared.dir, 'run.json'));
-  const committed = readFileSync(join(prepared.dir, 'brief.md'), 'utf8');
-  assert.equal(renderOn(back, 'brief', rj.input, rj.run), committed, 'brief.md from the blob alone');
+  const committed = readFileSync(join(prepared.dir, 'prompt.md'), 'utf8');
+  assert.equal(renderOn(back, 'brief', rj.input, rj.run), committed, 'prompt.md from the blob alone');
   assert.notEqual(renderOn(edited, 'brief', rj.input, rj.run), committed, 'the edit changes the prompt');
   // the blob holds the words themselves, not a pointer to a file
   const blob = readFileSync(join(root, 'blobs', pin.split('@')[1]), 'utf8');

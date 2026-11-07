@@ -33,7 +33,7 @@ export function load(name, { replay = true } = {}) {
   const runs = Object.fromEntries(readdirSync(runsDir).sort((a, b) => parseInt(a) - parseInt(b)).map((n) => {
     const d = join(runsDir, n);
     const f = (x) => (existsSync(join(d, x)) ? readFileSync(join(d, x), 'utf8') : null);
-    return [n, { dir: d, brief: f('brief.md'), context: f('context.md'), stage: f('stage.json') && JSON.parse(f('stage.json')), result: f('result.json') && JSON.parse(f('result.json')) }];
+    return [n, { dir: d, brief: f('prompt.md') ?? f('brief.md'), context: f('context.md'), stage: f('stage.json') && JSON.parse(f('stage.json')), result: f('result.json') && JSON.parse(f('result.json')) }];
   }));
   const pendingDir = join(dir, 'run', 'pending');
   const pending = Object.fromEntries(readdirSync(pendingDir).filter((f) => f.endsWith('.prompt.md')).map((f) => [f.replace(/^trial_/, '').replace(/\.prompt\.md$/, ''), readFileSync(join(pendingDir, f), 'utf8')]));
