@@ -4,7 +4,7 @@
   "title": "Keep run naming and the result hash in one module every process loads",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "One engine module, packages/engine/src/names.js, importing only node: built-ins, holds the run id format and its parser, the safe file-name rule, the item, run, card and agent paths under a journal root, and the canonical result hash. actors.js, host.js, effects/relay.js, plugins/harness/scripts/return-tool.mjs (through host.mjs engine()) and scripts/inspector/export.mjs import it and keep no copy, and behaviour is unchanged.",
   "why": "These are protocols two processes must agree on, not helpers: the return tool's MCP server matches the hook's stored result by a hash of the result with keys sorted, and four files each turn a run id into a folder with their own regex and safe(). A change to one copy breaks the others silently. return-tool.mjs keeps its copy because it \"may not import the engine\", but it already loads the engine's messages.js through host.mjs. Pragmatic DRY is about knowledge; research plan/research/design-books-cleanup.md, finding 3.",
   "serves": [
@@ -140,6 +140,17 @@
 Finding 3 of `plan/research/design-books-cleanup.md`. Only knowledge that two places must agree on moves: how a run id is spelled and parsed, how an
 id becomes a safe folder name, where an item's, run's, card's and agent's files are, and how a result is hashed so
 the return tool's server and the hook agree. File names and hash values stay exactly as they are.
+
+## Done
+
+Built in PR #163 (merged b251edb), verified by a separate session at 521ff00: all six Expect lines MET. Beyond the
+listed copies, `plugins/harness/scripts/capture.mjs` held the safe rule for agent bindings and now uses names.js too.
+The return tool and capture load names.js through `host.mjs` `names()`, as `messages()` loads the catalogue, so
+`verify/engine-host/plugin-tools.test.mjs` still holds that only the actor hook calls `engine()`. Released with
+harness-v0.1.35.
+
+Draft idea from the verifier, not an item yet: `startedRun` in actors.js still spells out `actors/spawns` itself instead
+of using names.js's spawn folder.
 
 ## Verifier brief
 
