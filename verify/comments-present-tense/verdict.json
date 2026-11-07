@@ -1,0 +1,45 @@
+{
+  "item": "comments-present-tense",
+  "verified_sha": "1b43a58a676479711b2d3bb8de7dbc9e9c7d4a42",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GUSC95NLKVyEdFdtg",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "no-history",
+      "status": "MET",
+      "command": "At 1b43a58: grep -rEn '<the Expect pattern>' --exclude-dir=vendor --exclude-dir=node_modules packages/engine/src packages/engine/bin packages/journal/src packages/journal/bin plugins/harness/scripts scripts/inspector scripts/bench packages/engine/README.md plugins/harness/README.md; then the same with --exclude-dir=test --exclude='*.test.*'; and the same grep at main b61a9fa",
+      "excerpt": "main: 142 matching lines. Head, non-test source and both READMEs: no output, exit 1. Head with tests included: 9 lines, all in scripts/inspector/test/export.test.mjs, all test-name or assertion strings (e.g. line 280 test('lane C Q1 verify: ...'), line 595 '... catalogue entries (prompt-catalogue) ...'); no comment matches anywhere.",
+      "reading": "Marked MET on the item's own scope, not the literal grep over test files. The outcome is about comments in the harness source; non_goals says tests are not swept and no code token changes; code-unchanged requires every changed file to be identical with comments stripped, so these 9 strings cannot change without failing code-unchanged. The gate (HISTORY in scripts/gates/lib.mjs) exempts tests for the same reason. The literal Expect wording over-reaches its own non-goals; a later replan can narrow the grep to exclude test/ if wanted."
+    },
+    {
+      "id": "code-unchanged",
+      "status": "MET",
+      "command": "node verify/comments-present-tense/compare.mjs b61a9fa 1b43a58 (own comment scanner verify/comments-present-tense/strip.mjs, tested by strip.test.mjs on strings, nested templates, regex vs division, shebang, rewrapped comments; acorn is not in node_modules); npm test --test-reporter=tap in separate clean clones at main b61a9fa and head 1b43a58, run one after the other, passing names compared with comm",
+      "excerpt": "43 files, 0 differ (evidence/compare.txt; every changed .js/.mjs outside scripts/gates/, tests included). npm test main: tests 1624, pass 1611, fail 1, skipped 12; head: tests 1637, pass 1624, fail 1, skipped 12. The one failure is the same at both: 'copy-not-link: with release tags, setup installs the newest release by version, not the HEAD' (known local-only on main). comm -23 main.pass head.pass: empty, so every test passing on main passes at the head; the head adds the builder's gate tests and this verifier's tests (evidence/*.pass)."
+    },
+    {
+      "id": "readme-complete",
+      "status": "MET",
+      "command": "node --test verify/comments-present-tense/readme.test.mjs (reads every export of packages/engine/src/index.js, including export {..} lists and export const, and the accepted-command list in bin/host.js); mutation: rename dueTimers to dueTimerz in the README and rerun",
+      "excerpt": "4 pass: exports found (>=30, incl. loadWorkflow, workflowOf, OwnedError), commands start, wake, show, card, closed, answer each shown as 'host.js <cmd>' or `<cmd>`; no README line matches the history pattern. Mutated: 'not ok 2 - the README names every export of src/index.js' with missing ['dueTimers']; restored."
+    },
+    {
+      "id": "gate-refuses",
+      "status": "MET",
+      "command": "Throwaway branches off 1b43a58 in this repo: chore/verify-history-gate-src appends '// (plan item fix-x)' to packages/engine/src/wake.js (PR #160, head 828d341); chore/verify-history-gate-plan appends it to plan/research/design-books-cleanup.md (PR #161, head b33f053). Read each gates job log, then closed both unmerged",
+      "excerpt": "#160 gates job 128505346861: 'stubs gate failed:\\n  packages/engine/src/wake.js:119 has a history reference (comments say what holds now; item ids go in commits, PRs and the plan)' (line 119 is the appended line). #161 gates job 128505364298: 'stubs gate passed'. Both gates jobs also failed the verdict step only because the throwaway PRs name no item. Both PRs closed without merging; deleting the two branches was refused by this container's git proxy (HTTP 403), so they remain on origin for someone with access to delete."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 159 at 1b43a58; gates job log; pr-gate.mjs stubs and freeze run locally at 1b43a58",
+      "excerpt": "'test' (128503194417) completed success 19:24:13Z; 'clean-room' success. 'gates' (128503194278) failed only at the verdict step: 'no verify/comments-present-tense/verdict.json at the head sha'; stubs and freeze pass ('stubs gate passed (item comments-present-tense)', 'freeze gate passed'). This verdict commit is what the gates check waits for."
+    }
+  ],
+  "notes": [
+    "scripts/inspector/page.html changes one visible sentence ('lane A and lane C' to 'the tournament lanes' tests'); HTML is outside code-unchanged's .js/.mjs scope and it is documentation text in the page, so it is in keeping with the item.",
+    "1b43a58 adds only verify/obs-page/fixtures/published-index.html (two comment lines) over 9971bc3; the comparison and grep gave the same results at both."
+  ]
+}
