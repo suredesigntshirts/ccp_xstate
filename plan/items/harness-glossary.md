@@ -4,7 +4,7 @@
   "title": "Give each harness concept one word per context",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "docs/language.md lists the plan, engine, platform and observation terms, one line each, naming the code that carries each term. In the engine, brief means only the brief stage and the per-role briefs it returns: a run's rendered prompt is prompt.md, its hash promptHash, and its row prompt.stored. The capture hook writes agent.prompt and agent.final instead of brief.stored and result.stored. The journal is at v2, with an upcaster that maps v1 rows to those kinds and fields on read, so every committed v1 journal reads as before. CLAUDE.md tells builders to use the glossary's terms and to add a line there before introducing a new one. No model-facing text changes.",
   "why": "brief, brief.stored and result.stored each carry two or three meanings today: brief is a model stage, every run's rendered prompt (brief.md, briefHash) and the per-role briefs; brief.stored is written by the engine for a prompt, by the engine for a returned brief, and by the capture hook for an Agent prompt; result.stored by the engine's accept and by the capture hook. The inspector already carries a table translating between them (scripts/inspector/export.mjs, the capture-row notes), which is DDD's translator bottleneck, and every agent session reads the code in these words. Research plan/research/design-books-cleanup.md, finding 1.",
   "serves": [
@@ -203,6 +203,22 @@ reader to sniff payload shapes. `item` and `run` stay: both already mean one thi
 are documented, not renamed: the glossary says *model stage* wherever *stage* could be read as a plan stage.
 
 The decision record is `plan/decisions/2026-11-07-harness-glossary.md`.
+
+## Done
+
+Built in PR #166 (merged 48777da). A separate session verified it at 4458b03: all nine Expect lines MET. Released
+as harness-v0.1.36, tagged by release.yml on the merge.
+
+The build touched more than the inputs named:
+- The stage-contract trial drivers under `tournaments/2026-11-04-stage-contract/trials/*/driver/drive.mjs` also read a
+  run's prompt file, so they read `prompt.md` now.
+- The inspector shows a row the upcaster changed as the file holds it (a non-enumerable `written`), so a v1 journal
+  renders as it did on main.
+- Done verify suites that compare against recorded main evidence upcast main's rows first. Evidence that drops hashes
+  tells a v1 prompt row by its role equalling its actor.
+
+The verifier checked that no committed journal holds a v1 engine prompt row without `contextHash`. The upcaster would
+leave such a row as `brief.stored`.
 
 ## Verifier brief
 
