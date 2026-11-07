@@ -1,5 +1,5 @@
 // Shared by the contract tests P2-P6 (tournament 2026-11-04-stage-contract, lane S, round 2): the prompt of every
-// model-stage run in quick-fix, research and feature, read from the run folder the real run handler wrote (brief.md is
+// model-stage run in quick-fix, research and feature, read from the run folder the real run handler wrote (prompt.md is
 // the Agent prompt), and the three workflows as the engine reads them from workflows/ (each JSON with its stage files filled in, prompts.js). A stage is a meta.actors entry
 // with the parts rules and inputs; its input named task fills the Task part (stage-contract cleanup, item A).
 import { readFileSync } from 'node:fs';
@@ -51,7 +51,7 @@ export async function promptsOf() {
   const got = {};
   const grab = (key, workflow, item, actor) => {
     const run = loadRun(w.root, w.openRun(item, actor).id);
-    got[key] = { prompt: readFileSync(join(runDir(w.root, run.run), 'brief.md'), 'utf8'), run, workflow, root: w.root, item };
+    got[key] = { prompt: readFileSync(join(runDir(w.root, run.run), 'prompt.md'), 'utf8'), run, workflow, root: w.root, item };
   };
   try {
     await w.start('q', 'quick-fix', { issue: ISSUE });

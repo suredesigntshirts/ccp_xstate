@@ -125,7 +125,7 @@ export function world({ childReal = false } = {}) {
     },
     /** Runs of `actor` prepared on `item`, in order, as run.json. */
     runs: (actor, item = ITEM) => w.rows(item)
-      .filter((r) => r.kind === 'brief.stored' && r.payload.actor === actor && r.payload.role === actor)
+      .filter((r) => r.kind === 'prompt.stored' && r.payload.actor === actor && r.payload.role === actor)
       .map((r) => loadRun(root, r.payload.run)),
     /** Child items started by `item` (effects of the quick-fix actor). */
     children: (item = ITEM) => w.rows(item)

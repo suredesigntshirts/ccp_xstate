@@ -1,0 +1,1 @@
+Run hg-1:0.brief, worktree /tmp/verify-hg-record-prompt/wt/hg-1--0.brief of /tmp/verify-hg-record-prompt/repo, branch run/hg-1/0.brief.

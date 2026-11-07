@@ -77,13 +77,13 @@ test('blobs: the brief and the answer are blobs whose hashes match the rows', ()
   const { rows, blobs } = replay();
   const spawn = rows.find((r) => r.kind === 'agent.spawn');
   const finish = rows.find((r) => r.kind === 'agent.finish');
-  const brief = blobs.find((b) => b.hash === spawn.payload.briefHash);
+  const brief = blobs.find((b) => b.hash === spawn.payload.promptHash);
   const answer = blobs.find((b) => b.hash === finish.payload.resultHash);
   assert.equal(brief.text, 'Run the bash command echo sub-one and reply with its output only.');
   assert.equal(answer.text, 'sub-one');
   for (const b of [brief, answer]) assert.equal(sha256(b.text), b.hash);
-  assert.equal(rows.find((r) => r.kind === 'brief.stored').payload.hash, brief.hash);
-  assert.equal(rows.find((r) => r.kind === 'result.stored').payload.hash, answer.hash);
+  assert.equal(rows.find((r) => r.kind === 'agent.prompt').payload.hash, brief.hash);
+  assert.equal(rows.find((r) => r.kind === 'agent.final').payload.hash, answer.hash);
 });
 
 test('the hook journals the expected rows and stores each blob once, as files named by their hash', () => {
@@ -169,14 +169,14 @@ test('hooks.json runs capture on every event it handles, in the background (asyn
 
 test('a background agent whose transcript is not written yet still gets its brief, from the Agent call', () => {
   const start = capture({ hook_event_name: 'SubagentStart', agent_id: 'bg1', agent_type: 'general-purpose', transcript_path: '/nonexistent/s.jsonl' }, { read: reader() });
-  assert.equal(start.rows[0].payload.briefHash, null);
-  assert.match(start.rows[0].placeholder, /brief.stored has it/);
+  assert.equal(start.rows[0].payload.promptHash, null);
+  assert.match(start.rows[0].placeholder, /agent.prompt has it/);
   const call = capture({
     hook_event_name: 'PostToolUse', tool_name: 'Agent', tool_use_id: 't1',
     tool_input: { prompt: 'do the thing', subagent_type: 'general-purpose', run_in_background: true },
     tool_response: { status: 'async_launched', agentId: 'bg1' },
   }, { read: reader() });
-  assert.deepEqual(call.rows.map((r) => r.kind), ['tool.call', 'brief.stored']);
+  assert.deepEqual(call.rows.map((r) => r.kind), ['tool.call', 'agent.prompt']);
   assert.equal(call.rows[1].agent, 'bg1');
   assert.equal(call.blobs[0].hash, sha256('do the thing'));
   assert.ok(!JSON.stringify(call.rows).includes('do the thing'));

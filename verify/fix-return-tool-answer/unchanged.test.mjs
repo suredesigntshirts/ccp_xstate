@@ -21,6 +21,9 @@ const asMain = (rows) => rows.map((r) => {
   return { ...r, payload };
 });
 
+// Main's rows read as journal v2 reads them (upcast), the format the head writes.
+const { upcast } = await import(new URL('../../packages/journal/src/index.js', import.meta.url));
+
 const ev = (f) => JSON.parse(readFileSync(join(HERE, 'evidence', f), 'utf8'));
 
 test('unchanged: renders and hashes of every workflow are main\'s', async () => {
@@ -35,7 +38,7 @@ test('unchanged: hook answers, refusal and result.stored rows and stored results
   assert.deepEqual(head.hook, main.hook);
   assert.deepEqual(head.rows.map((r) => `${r.kind}:${r.payload.rule ?? ''}`),
     ['result.stored:', 'refusal:wrong-caller', 'refusal:schema', 'refusal:reserved', 'refusal:ref', 'result.stored:', 'refusal:already-returned', 'result.stored:']);
-  assert.deepEqual(asMain(head.rows), main.rows);
+  assert.deepEqual(asMain(head.rows), main.rows.map((r) => upcast(r)));
   assert.deepEqual(head.results, main.results);
   assert.equal(head.server.beforeAccept, main.server.beforeAccept);
   assert.match(head.server.beforeAccept, /^not accepted: /);

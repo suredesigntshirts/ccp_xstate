@@ -2,7 +2,7 @@
 // record, runs/<n>.<actor>/stage.json: the stage and its workflow (with hash), the prompt as its parts with each
 // piece's source, every input with its meaning, value, the context path it was read from and its producer, and, once
 // the item took the result, the output, the context paths written from it and the invokes that read them. Each input's
-// producer is checked against the run that really produced it. brief.md, context.md and the journal rows stay.
+// producer is checked against the run that really produced it. prompt.md, context.md and the journal rows stay.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -51,8 +51,8 @@ test('S4: the quick-fix happy path leaves a complete stage record per run, each 
 
     for (const [actor, run] of Object.entries(runs)) {
       const dir = runDir(w.root, run);
-      for (const f of ['brief.md', 'context.md', 'run.json', 'stage.json']) assert.ok(existsSync(join(dir, f)), `${actor}: ${f}`);
-      const prompt = readFileSync(join(dir, 'brief.md'), 'utf8');
+      for (const f of ['prompt.md', 'context.md', 'run.json', 'stage.json']) assert.ok(existsSync(join(dir, f)), `${actor}: ${f}`);
+      const prompt = readFileSync(join(dir, 'prompt.md'), 'utf8');
       const rec = JSON.parse(readFileSync(join(dir, 'stage.json'), 'utf8'));
       const runJson = JSON.parse(readFileSync(join(dir, 'run.json'), 'utf8'));
 
@@ -61,7 +61,7 @@ test('S4: the quick-fix happy path leaves a complete stage record per run, each 
       assert.equal(rec.stage, actor);
       assert.deepEqual(rec.workflow, { id: `quick-fix@${sha256(BYTES)}`, name: 'quick-fix', hash: sha256(BYTES) });
       assert.equal(at(rec.invokeAt).src, actor, `${actor}: invokeAt points at its invoke`);
-      assert.ok(rows.some((r) => r.kind === 'brief.stored' && r.payload.run === run && r.payload.hash === rec.prompt.hash), `${actor}: brief.stored row kept`);
+      assert.ok(rows.some((r) => r.kind === 'prompt.stored' && r.payload.run === run && r.payload.hash === rec.prompt.hash), `${actor}: prompt.stored row kept`);
 
       // (2) The instructions: the parts assemble to the prompt exactly, and every piece names a source that holds it.
       assert.equal(assemble(rec.prompt.parts), prompt, `${actor}: the parts are the prompt`);

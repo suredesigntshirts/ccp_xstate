@@ -105,10 +105,10 @@ test('blobs: brief and answer are blobs whose sha256 match the rows, recomputed 
   const byHash = Object.fromEntries(blobs.map((b) => [b.hash, b.text]));
   assert.equal(byHash[sha(brief)], brief);
   assert.equal(byHash[sha(handback)], handback);
-  assert.equal(rows.find((r) => r.kind === 'agent.spawn').payload.briefHash, sha(brief));
-  assert.equal(rows.find((r) => r.kind === 'brief.stored').payload.hash, sha(brief));
+  assert.equal(rows.find((r) => r.kind === 'agent.spawn').payload.promptHash, sha(brief));
+  assert.equal(rows.find((r) => r.kind === 'agent.prompt').payload.hash, sha(brief));
   assert.equal(rows.find((r) => r.kind === 'agent.finish').payload.resultHash, sha(handback));
-  assert.equal(rows.find((r) => r.kind === 'result.stored').payload.hash, sha(handback));
+  assert.equal(rows.find((r) => r.kind === 'agent.final').payload.hash, sha(handback));
 });
 
 // The real hook, once per recorded event, in an installed project.
@@ -188,7 +188,7 @@ test('early settle: a tail ending in another call\'s result is not a hand-back, 
   const rows = jsonl(join(dir, 'journal', 'sessions', `${ev.session_id}.jsonl`));
   const fin = rows.find((x) => x.kind === 'agent.finish');
   const answer = JSON.parse(lines[4]).message.content.find((c) => c.name === 'SubagentHandback').input.message;
-  assert.equal(rows.find((x) => x.kind === 'result.stored')?.payload.hash, sha(answer));
+  assert.equal(rows.find((x) => x.kind === 'agent.final')?.payload.hash, sha(answer));
   assert.equal(fin.payload.resultHash, sha(answer));
   assert.ok(fin.payload.tokens.output > 0);
 });

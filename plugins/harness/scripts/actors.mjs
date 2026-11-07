@@ -3,7 +3,7 @@
 // worktree and checks what it returns. The logic is packages/engine/src/actors.js; this file reads the hook input,
 // calls it and answers Claude Code. In a project that hasn't installed the harness it does nothing.
 //
-//   PreToolUse of Agent with the prompt `ccp-run <run>`: swap in the run's brief, or refuse an unknown or started run.
+//   PreToolUse of Agent with the prompt `ccp-run <run>`: swap in the run's prompt, or refuse an unknown or started run.
 //   PreToolUse of the return tool: refuse unless the caller, the schema and GitHub check out, saying how to fix it and
 //     which refusal of the run's cap this is; then hand the result to the item, which prepares the runs its next state
 //     invokes. The refusal that reaches the cap fails the run, and its error goes to the item.

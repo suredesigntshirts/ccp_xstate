@@ -41,7 +41,7 @@ for (const route of ['first PASS', 'PASS after a revision']) {
     assert.ok(brief, 'the child prepared its brief run');
     assert.equal(JSON.stringify(brief.input.issue), JSON.stringify(frozen));
     for (const f of NEW_FIELDS) assert.deepEqual(brief.input.issue[f], frozen[f], f);
-    const prompt = read(join(runDir(w.root, brief.run), 'brief.md'));
+    const prompt = read(join(runDir(w.root, brief.run), 'prompt.md'));
     for (const v of [frozen.title, frozen.problem, frozen.reason, frozen.outcome, frozen.proofs[0].how, ...frozen.assumptions.map((a) => JSON.stringify(a).slice(1, -1))]) {
       assert.ok(prompt.includes(v), `brief prompt carries ${v}`);
     }

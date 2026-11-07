@@ -207,7 +207,7 @@ export function reportOf({ stage, dir, scored, notes = null, title = null }) {
   if (b0) {
     L.push('', '## Conditions', '');
     for (const [k, v] of Object.entries(b0.conditions)) L.push(`- ${k}: ${Array.isArray(v) ? v.join(', ') : v}`);
-    L.push(`- prompt: brief.md as the engine wrote it, sent on stdin; the run's context ${b0.prompt.context}`);
+    L.push(`- prompt: prompt.md as the engine wrote it, sent on stdin; the run's context ${b0.prompt.context}`);
     const sp = [...new Set(scored.map((s) => s.bench.ambient?.systemPrompt?.file).filter(Boolean))];
     L.push(`- system prompts recorded: ${sp.length ? sp.map((f) => `\`${basename(f)}\``).join(', ') : 'none'} (in system-prompts/)`);
   }

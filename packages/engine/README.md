@@ -48,7 +48,7 @@ tool and hooks and the inspector load this same file instead of keeping copies.
 
 **Actors** (`src/actors.js`, `src/trace.js`).
 
-- `actors({ host, repo, worktrees })` is the run handler for model stages: it prepares a run's brief, folder and
+- `actors({ host, repo, worktrees })` is the run handler for model stages: it prepares a run's prompt, folder and
   worktree.
 - `accept({ root, caller, run, result, toolUseId, github })` checks an agent's returned result.
   `deliver({ root, run })` hands an accepted result to its item and prepares the runs its next state invokes.
@@ -162,7 +162,7 @@ The person sets the file; the first one is `plan/decisions/2026-10-31-first-gran
 ## Actors
 
 A state that invokes a model stage (`brief`, `build`, `verify`) starts an agent (`src/actors.js`). The run handler
-writes the run's folder under `<root>/items/<item>/runs/<seq>.<invoke>/` and journals the brief's hash. It adds a git
+writes the run's folder under `<root>/items/<item>/runs/<seq>.<invoke>/` and journals the prompt's hash (`prompt.md`, row `prompt.stored`). It adds a git
 worktree named `<item>--<seq>.<invoke>` on branch `run/<item>/<seq>.<invoke>`, from `--repo`'s HEAD, under
 `--worktrees`.
 
@@ -175,7 +175,7 @@ The run stays open until its agent returns:
 
 1. The session calls the Agent tool with the prompt `ccp-run <run>`. `bin/host.js` prints it under `waiting`, and the
    harness hook names the waiting runs of the session's own items after each Agent call and wake (`ownedWaiting`).
-   The harness's PreToolUse hook swaps in the brief, so the agent's prompt is the brief exactly. A second start of a
+   The harness's PreToolUse hook swaps in the run's prompt, so the agent starts with `prompt.md` exactly. A second start of a
    run is refused.
 2. SubagentStart binds the agent to the run and tells it its run, worktree and result schema. Its shell commands run
    from the worktree, and file tools outside it are refused.
@@ -202,7 +202,7 @@ The run stays open until its agent returns:
 | Path | What |
 |---|---|
 | `<root>/items/<item>.jsonl` | the item's journal: every transition, effect and run row |
-| `<root>/items/<item>/runs/<seq>.<invoke>/` | one run's brief, result and failure |
+| `<root>/items/<item>/runs/<seq>.<invoke>/` | one run's prompt, context, result and failure |
 | `<root>/items/<item>/cards/` | the records of cards put up and withdrawn |
 | `<root>/blobs/<sha256>` | the pinned workflow bytes an item runs on |
 | `<root>/sessions/<session>.jsonl` | what a session was refused for an item it does not own |

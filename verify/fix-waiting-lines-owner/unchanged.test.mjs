@@ -9,7 +9,20 @@ import { HERE, REPO } from './lib.mjs';
 import { spawns } from './scenarios.mjs';
 import { prompts } from '../fix-refusal-hints/prompts.mjs';
 
-const main = JSON.parse(readFileSync(join(HERE, 'evidence', 'main-scenarios.json'), 'utf8')).spawns;
+// Main's rows as journal v2 reads them (upcast), the format the head writes. The evidence drops hashes as run-to-run
+// noise, so a prompt row (in v1 a brief.stored whose role is its own actor) is told apart here by its role.
+const { upcast } = await import(new URL('../../packages/journal/src/index.js', import.meta.url));
+const v2 = (x) => {
+  if (Array.isArray(x)) return x.map(v2);
+  if (!x || typeof x !== 'object') return x;
+  if (Number.isInteger(x.v) && typeof x.kind === 'string') {
+    const u = upcast(x);
+    return u.kind === 'brief.stored' && u.payload?.run && u.payload.role === u.payload.actor ? { ...u, kind: 'prompt.stored' } : u;
+  }
+  return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, v2(v)]));
+};
+
+const main = v2(JSON.parse(readFileSync(join(HERE, 'evidence', 'main-scenarios.json'), 'utf8')).spawns);
 
 test('unchanged: renders and hashes of every workflow are main\'s', async () => {
   const want = JSON.parse(readFileSync(join(HERE, 'evidence', 'main-prompts.json'), 'utf8'));

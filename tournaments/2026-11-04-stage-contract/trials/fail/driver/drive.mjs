@@ -2,7 +2,7 @@
 // (../../adopt/driver/drive.mjs) with a new issue and one added command, inject. It runs quick-fix on this repo's engine
 // (real restore/offer/pump, real handlers, real actors.prepare, real spawn/bind/accept, the tourney fakeGitHub and
 // platform); model stages are answered by real agents: the driver stops at each model run, writes the prompt the agent
-// gets (brief.md + context.md), and is resumed with `answer <run> <file>`. The first build is the exception: `inject`
+// gets (prompt.md + context.md), and is resumed with `answer <run> <file>`. The first build is the exception: `inject`
 // answers it with a recorded build that meets every expect line but the second (plan/decisions/2026-11-05-trial-fail-path.md).
 //
 //   node drive.mjs init                 fresh world + start the item, drive to the first agent hand-off
@@ -169,7 +169,7 @@ async function advance(w) {
     if (stage) {
       const dir = runDir(ROOT, stage.id);
       if (!existsSync(join(dir, 'result.json'))) {
-        const brief = readFileSync(join(dir, 'brief.md'), 'utf8');
+        const brief = readFileSync(join(dir, 'prompt.md'), 'utf8');
         const context = readFileSync(join(dir, 'context.md'), 'utf8');
         const prepared = loadRun(ROOT, stage.id);
         wire(prepared.worktree);

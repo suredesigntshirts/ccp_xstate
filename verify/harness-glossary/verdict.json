@@ -1,0 +1,65 @@
+{
+  "item": "harness-glossary",
+  "verified_sha": "4458b031dcb9d069224bd8b8ce83639efd73b359",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5Hcm2YvZ3fNbb52ryo",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "glossary-real",
+      "status": "MET",
+      "command": "node --test verify/harness-glossary/glossary.test.mjs (parses the ## tables of docs/language.md; resolves every backticked reference in the Carried-by column and in 'Where contexts meet': paths exist, a bare name after a .js/.mjs path is an export of that module (imported), after a .json path a key in it, a.b tokens are in KINDS, run-folder file names are named in packages/engine/src, templates exist up to their first placeholder)",
+      "excerpt": "Sections Plan, Engine, Platform, Observation and 'Where contexts meet' (with the plan stage / model stage line). All 20 listed terms have a line. checked {path:57, template:2, export:21, key:1, kind:14, file:5}, problems []. 3/3 pass."
+    },
+    {
+      "id": "brief-one-meaning",
+      "status": "MET",
+      "command": "node --test verify/harness-glossary/one-meaning.test.mjs (the Expect line's grep over packages/engine/src, packages/journal/src, plugins/harness/scripts, scripts/inspector, scripts/bench without test/, node_modules, vendor; then every kind: 'brief.stored' under packages/, plugins/, scripts/ outside tests)",
+      "excerpt": "Hits: names.js:48 (promptFile's doc comment), names.js:55 const earlier = join(dir, 'brief.md') inside promptFile; journal/src/index.js:29 (toV2's doc), :37-39 inside toV2 (UPCASTERS = { 1: toV2 }). Nothing else. One brief.stored writer: actors.js:592, inside accept, under if (run.actor === 'brief') { for (const [role, brief] of Object.entries(result)). Other mentions only list (kinds.js), upcast (index.js:34-35) or read (inspector export.mjs:1044). 2/2 pass."
+    },
+    {
+      "id": "capture-own-kinds",
+      "status": "MET",
+      "command": "node verify/harness-glossary/record.mjs <main e17dade clone> evidence/main (drives that checkout's plugins/harness/scripts/capture.mjs process once per hook input of verify/obs-live-capture/fixture/events.jsonl, into a fresh installed harness folder); node --test verify/harness-glossary/capture.test.mjs does the same at the head and compares the raw rows as written",
+      "excerpt": "Main: ...agent.finish,result.stored,...,brief.stored,... (v1). Head: ...agent.finish,agent.final,...,agent.prompt,... (v2), no brief.stored or result.stored. agent.prompt payload {agentId:'ac494d5ec29b99e44', hash:1949747328f5..., bytes:108} and agent.final {agentId, hash:0c6398a59a03..., bytes:11} equal main's brief.stored and result.stored rows (source and agent too). Every other row equal with agent.spawn's briefHash read as promptHash (same value) and hook.run ms ignored. capture-rows.mjs holds neither old kind. 3/3 pass."
+    },
+    {
+      "id": "prompt-unchanged",
+      "status": "MET",
+      "command": "record.mjs at main and node --test verify/harness-glossary/prompt.test.mjs at the head: each runs its own packages/engine/bin/host.js start for quick-fix item hg-1 with one issue, in the same fixed temp layout and a git repo committed at a fixed date; the plugin's actors.mjs PreToolUse(Agent, ccp-run <run>) and SubagentStart at the head; main's run folder (evidence/main/run, brief.md only) copied into a fresh harness and started the same way",
+      "excerpt": "Run hg-1:0.brief. Main files brief.md,context.md,run.json,stage.json; head files context.md,prompt.md,run.json,stage.json (no brief.md). prompt.md === main's brief.md (4253 chars); prompt.stored payload deep-equals main's brief.stored payload, hash 6cb3b4b5a298e506... = sha256(prompt.md) = run.promptHash. The hook hands out exactly prompt.md and agent.spawn carries promptHash. Main's folder: the hook hands out its brief.md bytes, writes no prompt.md, and agent.spawn.promptHash = main run.json's briefHash. 3/3 pass."
+    },
+    {
+      "id": "v1-reads",
+      "status": "MET",
+      "command": "node --test verify/harness-glossary/v1.test.mjs (readFile at the head over verify/engine-toy-run/evidence/item-toy-v1.jsonl and session-4a54715a....jsonl, verify/fix-agent-finish-ms/evidence/real/journal-run1.jsonl and -run2.jsonl, bench/brief/runs/baseline/real-adopt-clamp.3/items/real-adopt-clamp-3.jsonl; derive.js stalls over the toy item and the bench item; scripts/inspector/export.mjs over bench/brief/runs/baseline/real-adopt-clamp.3) against the same reads at main (evidence/main/answers.json)",
+      "excerpt": "All five v1 journals: bad [] and every row read, all at v2. Kinds match the mapping worked out from the raw rows, e.g. toy item prompt.stored 3 + brief.stored 2 (returned briefs kept); toy session agent.prompt 3, agent.final 5; agent.spawn briefHash -> promptHash with the same values (bench 13033fc3...). Stalls main = head: toy {prepared 3, blocked 0}, bench {prepared 1, blocked 0}. Inspector: real-adopt-clamp-3:0.brief l2.text === its brief.md (4460) at both; checks 2/2 ok at both (head wording 'when it wrote the prompt'); step hashOk [true] at both. 3/3 pass."
+    },
+    {
+      "id": "no-translation",
+      "status": "MET",
+      "command": "Read scripts/inspector/export.mjs at the head (old notes at main lines 756-763, 1024-1035); node --test verify/harness-glossary/notes.test.mjs (no-translation tests)",
+      "excerpt": "The comment 'The capture's own result.stored and brief.stored rows are hashes ... not the harness accepting anything' and 'a hash, not a harness accept' are gone; TRACE_WHAT names 'agent.final' and 'agent.prompt'. The host check finds r.kind === 'prompt.stored' && run, the capture check r.kind === 'agent.prompt'; no payload sniffing (contextHash / !run) on brief.stored remains. Rows are read through the journal's upcast. 2/2 pass."
+    },
+    {
+      "id": "claude-md",
+      "status": "MET",
+      "command": "Read CLAUDE.md at the head; node --test verify/harness-glossary/notes.test.mjs (claude-md) and verify/repo-skeleton/claude-md.test.mjs (the path check)",
+      "excerpt": "58 lines. Principle: '**One word per thing.** Use the terms in `docs/language.md`; add a line there before introducing a new one.' Layout row: '`docs/language.md` (the glossary)'. repo-skeleton: under 100 lines, every backticked path exists, branch convention: 3/3 pass."
+    },
+    {
+      "id": "behaviour-unchanged",
+      "status": "MET",
+      "command": "npm ci, then npm test -- --test-reporter=tap in separate clean clones at main e17dade and head 4458b03, one after the other (the head clone also held this folder's 14 tests); passing names compared with comm (evidence/*.pass); git diff e17dade 4458b03 of test files read in full",
+      "excerpt": "main: tests 1647, pass 1631, fail 1, skipped 15. head: tests 1673, pass 1657 (1643 without this folder's 14), fail 1, skipped 15. The one failure is the same at both: 'copy-not-link: with release tags, setup installs the newest release by version, not the HEAD' (fails in this container on main). Passing at main, not at head: 3 titles, each renamed (briefHash -> promptHash, brief.stored -> prompt.stored, brief.md -> prompt.md) and passing under the new title. Test diff: only the named renames (brief.md -> prompt.md, prompt brief.stored -> prompt.stored, capture kinds -> agent.prompt/agent.final, briefHash -> promptHash, v 1 -> 2 and the newer-version fixtures 2 -> 3), plus new upcast-v2.test.js and the promptFile test. See notes for the adaptations in done verify suites."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 166 at 4458b03; gates job log 128537007487; HEAD_SHA=4458b03 BASE_SHA=e17dade node scripts/gates/pr-gate.mjs stubs|freeze",
+      "excerpt": "'test' (128537006236) success 21:42:20Z; 'clean-room' (128537006733) success. 'gates' (128537007487) failed only at the verdict step: 'verdict gate failed (item harness-glossary): no verify/harness-glossary/verdict.json at the head sha'. Locally: 'stubs gate passed', 'freeze gate passed'. This verdict commit is what the gates check waits for."
+    }
+  ],
+  "notes": "Done verify suites that compare against recorded main evidence now upcast main's rows before comparing (fix-waiting-lines-owner stall/unchanged, fix-return-tool-answer, fix-agent-finish-ms, inspector-stage-record/older). Two go further than upcast: fix-waiting-lines-owner maps a v1 brief.stored whose role equals its actor to prompt.stored, because that evidence strips contextHash; and inspector-stage-record/older renames the inspector's own check and trace wording that no-translation removes. Both follow from this item's renames, so they count as rename changes. I checked every committed .jsonl for a v1 engine prompt row without contextHash (which the upcaster would leave as brief.stored): there are none. The head's inspector wording for a v1 run folder says 'brief.md ... when it wrote the prompt', which is accurate. evidence/main/ is record.mjs's output at main e17dade."
+}

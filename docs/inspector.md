@@ -76,8 +76,8 @@ even when no run of it was captured.
   or differs, the page says so and keeps showing what the journal itself holds.
 - **Step labels.** The matched transition's `description` in the JSON, else words made from the event and target.
 - **Actors.** From the journal's `engine.effect` start rows. An actor is a model agent when its run folder has a
-  `brief.md`; anything else is host code, shown with its card or outcome.
-- **Who wrote the prompt.** If the actor's input had a `brief` text equal to `brief.md`, it was passed through:
+  prompt file (`prompt.md`, or `brief.md` in folders written before journal v2); anything else is host code, shown with its card or outcome.
+- **Who wrote the prompt.** If the actor's input had a `brief` text equal to its prompt file, it was passed through:
   the page names the context path the workflow maps into `input.brief`, the step that put it there and the field of
   the result it came from, and says in turn who prompted that agent. Otherwise the engine filled its `writtenBrief()`
   template, and the page shows that code from the checkout's `actors.js`. When the template wraps a literal from the
@@ -149,6 +149,7 @@ steps as "Data flow between stages". Runs without stage.json render as before.
 - When an agent finishes more than once, each later finish took in a further message: a resume by the parent session
   (a second `agent.spawn` row with the same agent id) or a reply after a handback. Its time and token counts carry on,
   which is how the capture shows one conversation. The text of that message is not recorded, so layer 2 marks the
-  agent "resumed, message not recorded" and says brief.md is its first message, not everything it was told.
-- Live-capture rows `result.stored` and `brief.stored` are the capture hook's hashes of the agent's final message and
-  prompt, shown as by "capture": they are not the harness accepting anything. Layer 7 holds the harness's own rows.
+  agent "resumed, message not recorded" and says the prompt file is its first message, not everything it was told.
+- Live-capture rows `agent.final` and `agent.prompt` are the capture hook's hashes of the agent's final message and
+  prompt, shown as by "capture". Layer 7 holds the harness's own rows. The exporter reads rows through the journal's
+  upcast, so a v1 journal shows these kinds too.

@@ -6,8 +6,13 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { HEAD, HERE } from './lib.mjs';
 import { run } from './scenarios.mjs';
+import { upcast } from '../../packages/journal/src/index.js';
 
-const main = JSON.parse(readFileSync(join(HERE, 'evidence', 'main-scenarios.json'), 'utf8'));
+// Main's rows in today's names: journal v1 rows upcast to v2, and the capture's placeholder naming agent.prompt.
+const PLACEHOLDER = ['the brief was not yet in the subagent transcript at SubagentStart; brief.stored has it', 'the prompt was not yet in the subagent transcript at SubagentStart; agent.prompt has it'];
+const renamed = (r) => { const u = upcast(r); return u.placeholder === PLACEHOLDER[0] ? { ...u, placeholder: PLACEHOLDER[1] } : u; };
+const recorded = JSON.parse(readFileSync(join(HERE, 'evidence', 'main-scenarios.json'), 'utf8'));
+const main = Object.fromEntries(Object.entries(recorded).map(([k, s]) => [k, { ...s, rows: s.rows.map(renamed) }]));
 const head = run(HEAD);
 const withoutMs = (s) => ({ ...s, rows: s.rows.map((r) => (r.kind === 'agent.finish' ? { ...r, payload: { ...r.payload, ms: '<ms>' } } : r)) });
 const ms = (s) => s.rows.filter((r) => r.kind === 'agent.finish').map((r) => r.payload.ms);

@@ -315,7 +315,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
       <p>For each model agent there are seven layers, top to bottom:</p>
       <ol>
         <li><b>Claude Code system prompt</b>: never recorded by the harness, so it cannot be shown.</li>
-        <li><b>Prompt</b> (<code>brief.md</code>), and <b>who wrote it</b>: a person, the workflow file's author (instructions written into the workflow JSON), an earlier agent, or nobody (the engine's fill-in template around the actor's input).</li>
+        <li><b>Prompt</b> (<code>prompt.md</code>), and <b>who wrote it</b>: a person, the workflow file's author (instructions written into the workflow JSON), an earlier agent, or nobody (the engine's fill-in template around the actor's input).</li>
         <li><b>Added context</b> (<code>context.md</code>): what the harness adds beside the prompt when the agent starts.</li>
         <li><b>Output schema</b>: the shape its answer must have, as the agent was shown it.</li>
         <li><b>What it did</b>: its tool calls, when a live capture exists.</li>
@@ -340,7 +340,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
         <dt>invoke</dt><dd>A state starting an actor when the item enters it.</dd>
         <dt>replay</dt><dd>Re-running the journal's events through the engine to recover the context, which the journal stores only as a hash.</dd>
         <dt>hash check</dt><dd>A fingerprint comparison: equal hashes mean the bytes are identical.</dd>
-        <dt>brief</dt><dd>Three things share this word: the <b>brief agent</b> (the first actor, which writes instructions for the others), <code>brief.md</code> (any agent's prompt) and <code>context.briefs</code> (where the brief agent's output is kept).</dd>
+        <dt>brief</dt><dd>The <b>brief stage</b> (the first model stage, which writes instructions for the others) and the briefs it returns, kept in <code>context.briefs</code>. Any agent's prompt is <code>prompt.md</code>. <code>docs/language.md</code> has every term.</dd>
       </dl>
     </div>
   </details>
@@ -813,8 +813,8 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
       (L.l2.resumeNote ? '<span class="resumed"><b>Not the whole conversation:</b> ' + esc(L.l2.resumeNote.text) + '</span>' : '') + '</div>' + chain;
     const tmpl = pv.templateSource ? '<details class="sec"><summary>The engine code that wrote it <span class="hint">writtenBrief() in this engine\'s actors.js</span></summary><div class="inner"><pre class="text" tabindex="0">' + esc(pv.templateSource) + '</pre></div></details>' : (pv.templateNote ? '<p class="muted small">' + esc(pv.templateNote) + '</p>' : '');
     const checks = (L.l2.checks || []).length ? '<ul class="checks">' + L.l2.checks.map((c) => '<li class="' + (c.ok ? '' : 'no') + '">' + esc(c.what) + (c.ok ? '' : ': it does NOT') + ' (' + ab('hash', 'hash check') + ')</li>').join('') + '</ul>' : '';
-    out.push(sec('<span class="lnum">2</span> Prompt', who + (L.l2.text != null ? textViews(L.l2.text, L.l2.segments, 'prompt') : '<p class="muted">brief.md is missing.</p>') + checks + tmpl,
-      { cls: 'layer', open: true, hint: esc(pillWho(pv)) + (L.l2.resumeNote ? ' · <span class="pill p-warn">' + esc(L.l2.resumeNote.chip) + '</span>' : ''), note: (scripted ? 'The exact text the engine wrote as this agent\'s prompt (<code>brief.md</code> in its run folder). No model ran in this scenario: a test fixture stood in for the agent, and this is the prompt the engine would start a real agent with.' : 'The exact first message Claude Code started the agent with (<code>brief.md</code> in its run folder).') + (L.l2.resumeNote ? ' It is the first message only: this agent was resumed later with a message that was not recorded.' : '') }));
+    out.push(sec('<span class="lnum">2</span> Prompt', who + (L.l2.text != null ? textViews(L.l2.text, L.l2.segments, 'prompt') : '<p class="muted">' + esc(L.l2.file || 'prompt.md') + ' is missing.</p>') + checks + tmpl,
+      { cls: 'layer', open: true, hint: esc(pillWho(pv)) + (L.l2.resumeNote ? ' · <span class="pill p-warn">' + esc(L.l2.resumeNote.chip) + '</span>' : ''), note: (scripted ? 'The exact text the engine wrote as this agent\'s prompt (<code>' + esc(L.l2.file || 'prompt.md') + '</code> in its run folder). No model ran in this scenario: a test fixture stood in for the agent, and this is the prompt the engine would start a real agent with.' : 'The exact first message Claude Code started the agent with (<code>' + esc(L.l2.file || 'prompt.md') + '</code> in its run folder).') + (L.l2.resumeNote ? ' It is the first message only: this agent was resumed later with a message that was not recorded.' : '') }));
     const tmpl3 = L.l3.templateSource ? '<details class="sec"><summary>The engine code that writes it <span class="hint">contextOf() and the helpers it uses, from this engine\'s actors.js</span></summary><div class="inner"><pre class="text" tabindex="0">' + esc(L.l3.templateSource) + '</pre></div></details>' : '';
     const checks3 = (L.l3.checks || []).length ? '<ul class="checks">' + L.l3.checks.map((c) => '<li class="' + (c.ok ? '' : 'no') + '">' + esc(c.what) + (c.ok ? '' : ': it does NOT') + '</li>').join('') + '</ul>' : '';
     out.push(sec('<span class="lnum">3</span> Added context', (L.l3.text != null ? textViews(L.l3.text, L.l3.segments, 'added context') : '<p class="muted">context.md is missing.</p>') + checks3 + tmpl3,
@@ -1206,7 +1206,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
       return '<article class="pair" aria-label="' + esc(k) + '"><header><h3>' + esc(k) + '</h3>' +
         (x && y ? pill(pt, 'prompt') + pill(ct, 'added context') + pill(sct, 'schema') : '<span class="pill p-acc">only in ' + esc(x ? NAME_L : NAME_R) + '</span>') + '</header>' +
         '<div class="cols"><div class="col"><h4>' + esc(NAME_L) + ': who wrote the prompt</h4>' + p(x, A) + '</div><div class="col"><h4>' + esc(NAME_R) + ': who wrote the prompt</h4>' + p(y, B) + '</div></div>' +
-        proseBlock('Prompt (brief.md)', x ? x.a.layers.l2.text : null, y ? y.a.layers.l2.text : null, na, nb, true) +
+        proseBlock('Prompt (prompt.md)', x ? x.a.layers.l2.text : null, y ? y.a.layers.l2.text : null, na, nb, true) +
         proseBlock('Added context (context.md)', x ? x.a.layers.l3.text : null, y ? y.a.layers.l3.text : null, na, nb, false) +
         jsonDiff('Output schema the agent was shown', x ? x.a.layers.l4.schema : null, y ? y.a.layers.l4.schema : null, (t) => t, (t) => t) +
         jsonDiff('Input it was given', x ? x.a.input : null, y ? y.a.input : null, na, nb) + '</article>';

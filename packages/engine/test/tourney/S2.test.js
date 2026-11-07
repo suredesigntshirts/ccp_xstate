@@ -34,7 +34,7 @@ test('S2: the verify prompt carries the exact checkout commands; target shows on
     assert.equal(key, 'o/r#1'); assert.equal(green, true);
     assert.equal(checkout, `git fetch origin pull/1/head && git checkout --detach ${at}`);
     assert.equal(run.input.checkout, checkout);
-    const prompt = readFileSync(join(runDir(w.root, run.run), 'brief.md'), 'utf8');
+    const prompt = readFileSync(join(runDir(w.root, run.run), 'prompt.md'), 'utf8');
     const inputs = part(prompt, 'Inputs');
     // fix-rebuild-worktree: branch (GitHub's head.ref) is stamped but shown; key, gates, green and checkout stay hidden.
     assert.ok(inputs.includes(`  = ${JSON.stringify({ url, at, branch: 'b' })}\n`), 'target shown as { url, at, branch } only');

@@ -8,7 +8,7 @@ const GOAL = { url: 'https://github.com/o/r/issues/9', expect: ['add exists', 'm
 const SLICES = [1, 2, 3].map((i) => ({ url: `${GOAL.url}#s${i}`, expect: [GOAL.expect[i - 1]] }));
 const BRANCH = 'feature/9-math';
 const inits = (w, id) => w.rows(id).filter((r) => r.kind === 'engine.transition' && r.payload.outcome === 'applied' && r.payload.seq === 0).length;
-const briefRuns = (w, id) => w.rows(id).filter((r) => r.kind === 'brief.stored' && r.payload.actor === 'brief' && r.payload.worktree).length;
+const briefRuns = (w, id) => w.rows(id).filter((r) => r.kind === 'prompt.stored' && r.payload.actor === 'brief' && r.payload.worktree).length;
 
 async function toPlanned(w) {
   await w.start('f2', 'feature', { issue: GOAL, branch: BRANCH });

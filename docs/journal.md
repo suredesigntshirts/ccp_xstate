@@ -46,7 +46,21 @@ agent says about itself is journalled (ledger L-agents-self-report).
 `v` changes only when a row's shape changes in a way an old reader would misread. Adding a kind or an optional
 field doesn't need a bump. On a bump, add an upcaster to `UPCASTERS` in `src/index.js`, keyed by the old version,
 that turns a row of `v` n into `v` n + 1. Old rows are upcast on read and never rewritten (L-version-event-schema).
-A reader marks a row from a newer `v` as bad rather than guessing. There are no upcasters yet.
+A reader marks a row from a newer `v` as bad rather than guessing.
+
+**v1 to v2.** In v1, `brief.stored` had three writers and `result.stored` two. v2 gives each meaning its own kind,
+and the upcaster reads v1 rows that way:
+
+| v1 row | v2 row |
+|---|---|
+| `brief.stored` with a `contextHash` (the engine stored a run's prompt) | `prompt.stored`, same payload |
+| `brief.stored` with no `run` (the capture hook stored an Agent call's prompt) | `agent.prompt`, same payload |
+| `result.stored` with no `run` (the capture hook stored a subagent's final message) | `agent.final`, same payload |
+| `agent.spawn` with `briefHash` | `agent.spawn` with `promptHash` |
+| `brief.stored` with a `run` and no `contextHash` (a brief stage's returned brief), and every other row | unchanged |
+
+Run folders written before v2 hold `brief.md` where later ones hold `prompt.md`; `packages/engine/src/names.js`
+`promptFile` finds either.
 
 `release` is separate from `v`: it says which build of the harness wrote the row, so a stale checkout can't write
 after a newer one.
@@ -67,8 +81,11 @@ after a newer one.
 | `person.tap` | The person tapped a card option | `hearth`, the card's message id |
 | `card.posted` | A decision or draft card was posted | `hearth`, the card's message id |
 | `post.sent` | The session posted a message to the person in a thread | `hearth`, the message id |
-| `brief.stored` | A brief handed to a session or subagent was stored | the store, the brief's path or id |
-| `result.stored` | A session's or subagent's result was stored | the store, the result's path or id |
+| `prompt.stored` | The engine stored a run's prompt | `journal`, `blobs/<hash>` |
+| `brief.stored` | The engine stored one brief from a brief stage's result | `journal`, `blobs/<hash>` |
+| `result.stored` | The engine accepted a run's result | `journal`, `blobs/<hash>` |
+| `agent.prompt` | The capture hook stored the prompt an Agent call gave a subagent | `journal`, `blobs/<hash>` |
+| `agent.final` | The capture hook stored a subagent's final message | `journal`, `blobs/<hash>` |
 | `ci.result` | A CI run finished on a sha | `github`, the run id |
 | `page.refresh` | A page was published or refreshed | `artifact`, the page url |
 | `wake` | Something started a turn: a hearth wake, a subagent's report, a task notification or a typed prompt | `claude-code`, the prompt id |
@@ -102,23 +119,23 @@ sentence saying what is wrong and what to do. The ids: `settings`, `rules`, `dep
 The harness plugin's capture hook (plan item obs-live-capture, `plugins/harness/scripts/capture.mjs`) writes these to the
 session's file as they happen, in a project that installed the harness. Every row's `agent` is the subagent it is
 about, or null for the main session. No row holds what a tool was given or what anyone wrote: inputs are kept as a
-sha256 and a size. The only text kept is a subagent's brief and final answer, each stored once as
+sha256 and a size. The only text kept is a subagent's prompt and final answer, each stored once as
 `<journal root>/blobs/<sha256>` and linked by hash.
 
 | Hook | Kind | `payload` |
 |---|---|---|
 | PostToolUse, PostToolUseFailure | `tool.call` | `tool`, `inputHash` (sha256 of the input's JSON), `inputBytes`, `ms` (Claude Code's `duration_ms`), `ok` (false from PostToolUseFailure) |
-| SubagentStart | `agent.spawn` | `agentId`, `type`, `model` (null: the start doesn't say; `agent.finish` has the served one), `briefHash` (null with a placeholder when a background agent's transcript is not written yet), `depth` |
+| SubagentStart | `agent.spawn` | `agentId`, `type`, `model` (null: the start doesn't say; `agent.finish` has the served one), `promptHash` (null with a placeholder when a background agent's transcript is not written yet), `depth` |
 | PostToolUse of the GitHub MCP merge tool (`mcp__*github*__merge_pull_request`), when its response says merged | `pr.merge` | `repo` (`owner/name`), `number`, `sha` (the merge commit GitHub returned, or null), `tool`, `toolUseId`. These identifiers are the one exception to keeping no tool input |
-| PostToolUse of the Agent tool | `brief.stored` | `agentId` (from the call's result), `hash`, `bytes` of the prompt it was given; `source.ref` is `blobs/<hash>` |
-| SubagentStop | `agent.finish` | `agentId`, `type`, `model`, `ms` (from its brief, the first line of its transcript, to its last user or assistant row; other rows and rows stamped before the brief do not count), `tokens` (`input`, `output`, `cacheRead`, `cacheCreation`, summed over its messages), `resultHash` |
-| SubagentStop | `result.stored` | `agentId`, `hash`, `bytes`: its SubagentHandback message, else its last text |
+| PostToolUse of the Agent tool | `agent.prompt` | `agentId` (from the call's result), `hash`, `bytes` of the prompt it was given; `source.ref` is `blobs/<hash>` |
+| SubagentStop | `agent.finish` | `agentId`, `type`, `model`, `ms` (from its prompt, the first line of its transcript, to its last user or assistant row; other rows and rows stamped before the prompt do not count), `tokens` (`input`, `output`, `cacheRead`, `cacheCreation`, summed over its messages), `resultHash` |
+| SubagentStop | `agent.final` | `agentId`, `hash`, `bytes`: its SubagentHandback message, else its last text |
 | UserPromptSubmit | `wake` | `reason` (the hearth wake's reason, `agent-message`, `task-notification` or `prompt`), `source` (`hearth`, `subagent`, `claude-code` or `user`), `hash`, `bytes` |
 | Stop | `turn.usage` | `tokens` (as above, for the main transcript's messages since the last Stop), `messages`, `models`, and `cost`, `fiveHour`, `sevenDay` as null with a `placeholder`: no hook receives them |
 | each of the above | `hook.run` | `name` (`capture <event>`), `ms` (since the hook's process started; on tool calls capture runs async, so there this is not time added to the call), `timedOut` |
 
 `agent.spawn` and `agent.finish` take `source.ref` from the spawning tool use id in the subagent's `meta.json`. The
-brief is the first line of the subagent's transcript; the Agent call returns it too, which is where `brief.stored` comes from.
+prompt is the first line of the subagent's transcript; the Agent call returns it too, which is where `agent.prompt` comes from.
 
 ## Person rows
 
@@ -243,7 +260,7 @@ counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
   `packages/journal/harness-paths.json` lists (`<owner>/<repo>/<glob>`). A session with no PR is unattributed.
 
 - **`stalls.js`** (plan item fix-waiting-run-stall): how often a session ended a turn with one of its runs prepared
-  and no agent. `prepared` (runs with a `brief.stored` row), `blocked` (runs with a `stall` row), `blocks`,
+  and no agent. `prepared` (runs with a `prompt.stored` row), `blocked` (runs with a `stall` row), `blocks`,
   `startedAfterBlock` (blocked runs whose `agent.spawn` row is at or after their first block), `failedAtCap`
   (`stall-cap`), `cannotStart` and `rate` (blocked over prepared), with one entry per prepared run (and any other run the guard touched).
 
@@ -341,7 +358,7 @@ person (plan item fix-finish-closes-waits). An effect that has ended is never ru
 
 The engine's actor runs (plan item engine-actors, `packages/engine/src/actors.js`) write these to the item's own file,
 beside its engine rows, with `item` and the `state` the run was started in. A run's folder is
-`<journal root>/items/<item>/runs/<seq>.<invoke>/`: `brief.md`, `context.md`, `run.json`, `stage.json` (the stage
+`<journal root>/items/<item>/runs/<seq>.<invoke>/`: `prompt.md`, `context.md`, `run.json`, `stage.json` (the stage
 record), `spawn.json` (the Agent call that started it), `agent.json` (the agent bound to it) and `result.json` (its
 accepted result: `result` as stamped, `hash` of it, `sent`, the hash of the result as the agent sent it with object keys
 sorted at every depth, which the return tool's server matches its call by, `caller`, `toolUseId` and `at`). Brief and
@@ -380,8 +397,9 @@ with `stopped: true`, no output and an empty `wrote`.
 
 | When | Kind | `payload` |
 |---|---|---|
-| A run is prepared (its brief), or a `brief` actor's result is accepted (each brief it returned, fixed before any build starts) | `brief.stored` | `run`, `actor`, `role` (the actor, or `builder`/`verifier` for returned briefs), `hash`, `bytes`; a prepared run also has `contextHash` and `worktree` |
-| The harness binds an agent to the run its Agent call started | `agent.spawn` | `agentId`, `type`, `run`, `actor`, `briefHash`, `worktree`, `via` (`start`: found at SubagentStart; `meta`: from the agent's meta.json at its first call), `hookSession` |
+| A run is prepared (its prompt) | `prompt.stored` | `run`, `actor`, `role` (the actor), `hash`, `bytes`, `contextHash`, `worktree` |
+| A brief stage's result is accepted (each brief it returned, fixed before any build starts) | `brief.stored` | `run`, `actor`, `role` (`builder`, `verifier`, ...), `hash`, `bytes` |
+| The harness binds an agent to the run its Agent call started | `agent.spawn` | `agentId`, `type`, `run`, `actor`, `promptHash`, `worktree`, `via` (`start`: found at SubagentStart; `meta`: from the agent's meta.json at its first call), `hookSession` |
 | A return or bind the actor hook refused | `refusal` | `source` `hook`, `rule` (`wrong-caller`, `schema`, `github-fact`, `already-returned`, `already-failed`, `unknown-run`; `no-return` when an actor ended again after being sent back to return, or stopped after a handback, `tool` `SubagentHandback` or `SubagentStop`), `reason` (names the missing field or fact), `run`, `actor`, `caller`, `tool`, `textHash`, `outcome` `denied`; for a refusal of the result (`schema`, `reserved`, `restated`, `covers`, `ref`) also `hint` (`<field>: <its Output line>` for each output field the reason names), `count` (this run's result refusals so far, this one included) and `cap` (10). The one whose count reaches the cap is followed by a row with rule `refusal-cap`, `outcome` `failed`, and `reason` listing every refusal, when the run fails (fix-refusal-hints) |
 | The stall guard blocked a main-session stop, or failed a run that had no agent (fix-waiting-run-stall) | `refusal` | `source` `hook`, `rule` `stall` (`outcome` `blocked`, `tool` `Stop`, `count`: this run's blocks so far, this one included, `cap` 2, `reason` the block text word for word), `stall-cap` (`outcome` `failed`, `tool` `Stop`: the stop after the cap failed the run) or `cannot-start` (`outcome` `failed`, `tool` `Agent`: the owning session's `ccp-cannot-start <run>: <why>`), with `run`, `actor`, `caller` null, `textHash` and `hookSession`. A run failed either way has `failed.json` with `agentId` null and `why` starting `stalled:` or `cannot-start:` |
 | Any refusal row the engine writes: a refused return, `refusal-cap`, `sent-back`, `no-return`, `stall`, `stall-cap`, `cannot-start` (plan item prompt-catalogue) | `refusal` | also `message`: `{ entry, slots }`, the entry of `packages/engine/messages.md` and the slot values its `reason` was rendered from; rendering them gives `reason` byte for byte |

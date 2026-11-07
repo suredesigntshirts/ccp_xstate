@@ -5,7 +5,7 @@
 // shas normalised, plus the journal rows. The same steps run at the base commit and at the PR head (same-text), and
 // the head's rows are checked against the catalogue (recorded).
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -105,7 +105,7 @@ export async function scenario(repo) {
   const briefs = {};
   for (const item of ['a-1', 'b-1', 'c-1', 'd-1', 'e-1', 'f-1']) {
     for (const r of readdirSync(join(root, 'items', item, 'runs'))) {
-      briefs[`${item}/${r}`] = { brief: norm(readFileSync(join(root, 'items', item, 'runs', r, 'brief.md'), 'utf8')), context: norm(readFileSync(join(root, 'items', item, 'runs', r, 'context.md'), 'utf8')) };
+      briefs[`${item}/${r}`] = { brief: norm(readFileSync(join(root, 'items', item, 'runs', r, existsSync(join(root, 'items', item, 'runs', r, 'prompt.md')) ? 'prompt.md' : 'brief.md'), 'utf8')), context: norm(readFileSync(join(root, 'items', item, 'runs', r, 'context.md'), 'utf8')) };
     }
   }
   return { out, rows, briefs, base, runs: { a, b, c, d, e, f }, norm };

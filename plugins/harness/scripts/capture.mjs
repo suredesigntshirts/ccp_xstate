@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Capture's hook, registered in hooks/hooks.json on every event capture-rows.mjs handles. In a
 // project that installed the harness, it appends the rows for one hook input to this session's journal file, stores
-// any brief or answer under <journal>/blobs/<sha256> once, then appends a hook.run row with its own time.
+// any prompt or answer under <journal>/blobs/<sha256> once, then appends a hook.run row with its own time.
 // Like every hook here it does nothing elsewhere, prints nothing, swallows every failure and always exits 0. Its
 // watchdog ends it within 3 s, inside the hook's 5 s timeout, after journalling hook.run with timedOut true.
 import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';

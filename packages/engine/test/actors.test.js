@@ -63,18 +63,18 @@ function startAgent(root, run, agentId, toolUseId = `toolu_${agentId}`) {
   return s;
 }
 
-test('a state that invokes an agent actor prepares its run: brief, folder, worktree named by item and run, brief.stored', async () => {
+test('a state that invokes an agent actor prepares its run: brief, folder, worktree named by item and run, prompt.stored', async () => {
   const { root, worktrees } = await started();
   const run = loadRun(root, BRIEF_RUN);
   assert.equal(run.actor, 'brief');
   assert.equal(run.worktree, join(worktrees, 'it-1--0.brief'));
   assert.equal(run.branch, 'run/it-1/0.brief');
   assert.ok(existsSync(join(run.worktree, 'README.md')), 'the worktree is a checkout');
-  const brief = readFileSync(join(runDir(root, BRIEF_RUN), 'brief.md'), 'utf8');
-  assert.equal(run.briefHash, sha256(brief));
-  assert.equal(readFileSync(join(root, 'blobs', run.briefHash), 'utf8'), brief);
-  const stored = rows(root).find((r) => r.kind === 'brief.stored');
-  assert.equal(stored.payload.hash, run.briefHash);
+  const brief = readFileSync(join(runDir(root, BRIEF_RUN), 'prompt.md'), 'utf8');
+  assert.equal(run.promptHash, sha256(brief));
+  assert.equal(readFileSync(join(root, 'blobs', run.promptHash), 'utf8'), brief);
+  const stored = rows(root).find((r) => r.kind === 'prompt.stored');
+  assert.equal(stored.payload.hash, run.promptHash);
   assert.equal(stored.item, 'it-1');
   assert.equal(stored.state, '"briefing"');
   assert.deepEqual(waiting(root, 'it-1'), [{ run: BRIEF_RUN, actor: 'brief', prompt: `ccp-run ${BRIEF_RUN}` }]);
@@ -86,13 +86,13 @@ test('a state that invokes an agent actor prepares its run: brief, folder, workt
 test('the Agent call gets the brief as its prompt, once: a second start of the run, or an unknown run, is refused', async () => {
   const { root } = await started();
   const s = spawn({ root, prompt: `ccp-run ${BRIEF_RUN}`, toolUseId: 't1' });
-  assert.equal(s.prompt, readFileSync(join(runDir(root, BRIEF_RUN), 'brief.md'), 'utf8'));
+  assert.equal(s.prompt, readFileSync(join(runDir(root, BRIEF_RUN), 'prompt.md'), 'utf8'));
   assert.match(spawn({ root, prompt: `ccp-run ${BRIEF_RUN}`, toolUseId: 't2' }).deny, /^already-started: /);
   assert.match(spawn({ root, prompt: 'ccp-run it-1:9.build', toolUseId: 't3' }).deny, /^unknown-run: /);
   assert.equal(spawn({ root, prompt: 'write a poem', toolUseId: 't4' }), null);
 });
 
-test('SubagentStart binds the agent its Agent call started, journals agent.spawn with item, state and briefHash', async () => {
+test('SubagentStart binds the agent its Agent call started, journals agent.spawn with item, state and promptHash', async () => {
   const { root } = await started();
   spawn({ root, prompt: `ccp-run ${BRIEF_RUN}`, toolUseId: 't1' });
   assert.equal(bind({ root, agentId: 'other', toolUseId: 'nope' }), null);
@@ -101,7 +101,7 @@ test('SubagentStart binds the agent its Agent call started, journals agent.spawn
   assert.equal(bind({ root, agentId: 'ag2', toolUseId: 't1' }), null, 'a run binds one agent');
   assert.equal(boundRun(root, 'ag1').run, BRIEF_RUN);
   const row = rows(root).find((r) => r.kind === 'agent.spawn');
-  assert.deepEqual([row.item, row.state, row.agent, row.payload.run, row.payload.briefHash], ['it-1', '"briefing"', 'ag1', BRIEF_RUN, loadRun(root, BRIEF_RUN).briefHash]);
+  assert.deepEqual([row.item, row.state, row.agent, row.payload.run, row.payload.promptHash], ['it-1', '"briefing"', 'ag1', BRIEF_RUN, loadRun(root, BRIEF_RUN).promptHash]);
 });
 
 test('SubagentStart finds the session\'s one started run; with several starting at once, the agent binds at its first call', async () => {
@@ -163,8 +163,8 @@ test('an accepted brief fixes both briefs before any build, moves the item to bu
   assert.equal(d.state, 'building');
   assert.deepEqual(d.results.map((r) => r.outcome), ['applied']);
   const build = loadRun(root, 'it-1:1.build');
-  const prompt = readFileSync(join(runDir(root, 'it-1:1.build'), 'brief.md'), 'utf8');
-  assert.equal(build.briefHash, sha256(prompt), 'the run journals the hash of its whole rendered prompt');
+  const prompt = readFileSync(join(runDir(root, 'it-1:1.build'), 'prompt.md'), 'utf8');
+  assert.equal(build.promptHash, sha256(prompt), 'the run journals the hash of its whole rendered prompt');
   assert.equal(prompt.split('\n## Task\n')[1].split('\n\n## Output\n')[0], briefs.builder, 'the builder\'s brief is its Task part exactly');
   const t = rows(root).find((r) => r.kind === 'engine.transition' && r.payload.event.type === 'xstate.done.actor.brief');
   assert.deepEqual(t.source, { system: 'harness', ref: 'return r1' });
@@ -220,8 +220,8 @@ test('ref: a claimed PR GitHub doesn\'t show, shows at another head, or the work
     gh.green(head);
     assert.ok((await accept({ root, caller: 'ag2', run: 'it-1:1.build', result: claim(head), github: gh.client })).accepted);
     assert.equal((await deliver({ root, run: 'it-1:1.build' })).state, 'verifying');
-    const prompt = readFileSync(join(runDir(root, 'it-1:2.verify'), 'brief.md'), 'utf8');
-    assert.equal(loadRun(root, 'it-1:2.verify').briefHash, sha256(prompt));
+    const prompt = readFileSync(join(runDir(root, 'it-1:2.verify'), 'prompt.md'), 'utf8');
+    assert.equal(loadRun(root, 'it-1:2.verify').promptHash, sha256(prompt));
     assert.equal(prompt.split('\n## Task\n')[1].split('\n\n## ')[0], BRIEFS.verifier, 'the verifier brief is its Task part exactly');
   } finally {
     await gh.close();
@@ -342,7 +342,7 @@ test('rebuild: after a FAIL the build run\'s worktree is on the PR\'s branch at 
     assert.equal(gitIn(run.worktree, 'rev-parse', '--abbrev-ref', 'HEAD'), build1.branch);
     assert.match(readFileSync(join(runDir(root, 'it-1:3.build'), 'context.md'), 'utf8'), new RegExp(`branch ${build1.branch}\\.`));
     assert.equal(gitIn(build1.worktree, 'rev-parse', '--abbrev-ref', 'HEAD'), 'HEAD', 'the finished build\'s worktree was detached, not removed');
-    assert.ok(readFileSync(join(runDir(root, 'it-1:3.build'), 'brief.md'), 'utf8').includes(`"branch":"${build1.branch}"`), 'the stamped branch is shown in previous');
+    assert.ok(readFileSync(join(runDir(root, 'it-1:3.build'), 'prompt.md'), 'utf8').includes(`"branch":"${build1.branch}"`), 'the stamped branch is shown in previous');
     const fix = commitIn(run.worktree);
     gitIn(run.worktree, 'push', '-q');
     assert.equal(gitIn(origin, 'rev-parse', `refs/heads/${build1.branch}`), fix, 'a plain git push updates the PR\'s branch');

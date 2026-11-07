@@ -7,7 +7,7 @@
 //                              [--workflow <file> | --rev <rev>] [--out <dir>]
 //
 // Each run is a folder <out>/<case>.<k>/ that is a journal root (items/<item>.jsonl, the run folder
-// items/<item>/runs/<n>.<stage>/ with brief.md, context.md, stage.json, run.json and result.json, blobs/), so
+// items/<item>/runs/<n>.<stage>/ with prompt.md, context.md, stage.json, run.json and result.json, blobs/), so
 // scripts/inspector/build.mjs shows it, plus bench.json (time, tokens, model, workflow version, ambient, returns),
 // transcript.jsonl (the session cut down) and, after score.mjs, judge/ and score.json. The session is Claude Code
 // headless (`claude -p`, or $BENCH_CLAUDE), started in the run's worktree with the prompt on stdin, the run's context
@@ -55,11 +55,11 @@ export async function benchRun({ c, k, stage, version, out, model = null, force 
     const prepared = await prepareRun({ spec, actor: stage, item, root: dir, repo, worktrees: join(work, 'wt'), caseInput: c.input });
     const agentId = `bench-${item}`;
     const started = startAgent({ root: dir, run: prepared.run, agentId });
-    if (started.prompt !== prepared.prompt) throw new Error('spawn() handed out a prompt other than brief.md');
+    if (started.prompt !== prepared.prompt) throw new Error('spawn() handed out a prompt other than prompt.md');
     const runJson = readJson(join(prepared.dir, 'run.json'));
     const mcpFile = join(work, 'mcp.json');
     writeJson(mcpFile, { mcpServers: { harness: { type: 'stdio', command: process.execPath, args: [SERVER], env: { BENCH_ROOT: resolve(dir), BENCH_RUN: prepared.run, BENCH_AGENT: agentId } } } });
-    const sent = readFileSync(join(prepared.dir, 'brief.md'));
+    const sent = readFileSync(join(prepared.dir, 'prompt.md'));
     log(`${c.id}.${k}: running ${prepared.run} in ${runJson.worktree}`);
     const t0 = new Date().toISOString();
     const got = await runClaude({ args: sessionArgs({ context: started.context, mcpFile, model }), prompt: sent, cwd: runJson.worktree });
@@ -143,8 +143,8 @@ export async function promptOnly({ stage, version, c = null, input = null, runId
       const inv = invokeOf(spec, stage);
       const id = runId ?? `${item}:0.${inv.id}`;
       prepare({ host: { root, item, spec, session: SESSION, release: RELEASE, snapshot: null }, effect: { id, actor: stage, invoke: inv.id, input: input ?? stageInput(spec, stage, c?.input ?? {}), transition: null }, repo, worktrees: join(work, 'wt') });
-      const { runDir } = await import('../../packages/engine/src/actors.js');
-      prepared = { run: id, prompt: readFileSync(join(runDir(root, id), 'brief.md'), 'utf8') };
+      const { promptFile } = await import('../../packages/engine/src/names.js');
+      prepared = { run: id, prompt: readFileSync(promptFile(root, id), 'utf8') };
     } else {
       prepared = await prepareRun({ spec, actor: stage, item, root, repo, worktrees: join(work, 'wt'), caseInput: c.input });
     }

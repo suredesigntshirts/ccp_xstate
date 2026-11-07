@@ -39,13 +39,13 @@ test('same prompt: prompt-only renders every quick-fix stage of the adopt trial 
   }
 });
 
-test('same prompt: a bench run sends brief.md on stdin, and brief.md is render() of its run.json', async () => {
+test('same prompt: a bench run sends prompt.md on stdin, and prompt.md is render() of its run.json', async () => {
   const dir = fake(GOOD);
   const [c] = casesOf('brief', 'planted-half-met');
   const out = join(dir, 'runs');
   const bench = await benchRun({ c, k: 1, stage: 'brief', version: workflowVersion(), out });
   const runDir = join(out, 'planted-half-met.1', bench.runFolder);
-  const brief = readFileSync(join(runDir, 'brief.md'), 'utf8');
+  const brief = readFileSync(join(runDir, 'prompt.md'), 'utf8');
   assert.equal(readFileSync(join(dir, 'out/prompt.txt'), 'utf8'), brief);
   assert.equal(render(readJson(join(runDir, 'run.json'))), brief);
   // the input is the case's, with the workflow's literal task
@@ -69,7 +69,7 @@ test('alone: the run folder is a journal root the Inspector export replays, with
   const b = await exportRun({ engine: REPO, journal: join(out, 'planted-missing-line.2') });
   assert.equal(b.replay.ok, true);
   const run = b.steps[0].actors.find((a) => a.actor === 'brief');
-  assert.equal(run.layers.l2.text, readFileSync(join(out, 'planted-missing-line.2/items/planted-missing-line-2/runs/0.brief/brief.md'), 'utf8'));
+  assert.equal(run.layers.l2.text, readFileSync(join(out, 'planted-missing-line.2/items/planted-missing-line-2/runs/0.brief/prompt.md'), 'utf8'));
   assert.deepEqual(run.layers.l6.result, GOOD);
   assert.equal(run.layers.outcome.status, 'accepted');
 });

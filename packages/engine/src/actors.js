@@ -1,6 +1,6 @@
 // Invoked actors: the agents a workflow starts, and the one way their results come back.
 // When a state invokes a model stage (an actor whose meta.actors entry has stage parts), the host's run handler renders
-// the run's prompt from that entry (stages.js) into brief.md in its own run folder, makes it a git worktree named by item and run,
+// the run's prompt from that entry (stages.js) into prompt.md in its own run folder, makes it a git worktree named by item and run,
 // journals the prompt's hash, and writes the run's stage record, stage.json (trace.js): every prompt piece and input with
 // its source, and, once the item takes the result (the handler's ended), where the output went. The session then starts the agent with the Agent tool and the prompt `ccp-run <run>`;
 // the harness's PreToolUse hook swaps in that prompt, and its SubagentStart hook binds the agent's id to the run.
@@ -19,12 +19,12 @@ import { prRef } from './effects/merge.js';
 import { render, said } from './messages.js';
 import { assemble, BLOCKED, blockedOf, contextOf, coverGap, isStage, returnLine, sections, stagesOf, STAMPED } from './stages.js';
 import { endRecord, stageRecord } from './trace.js';
-import { agentFile, itemFile, resultHash, runDir, runOf, runsDir, safe, sha256, spawnFile } from './names.js';
+import { agentFile, itemFile, promptFile, resultHash, runDir, runOf, runsDir, safe, sha256, spawnFile } from './names.js';
 
 // The actors that are agents are the workflow's model stages (stages.js isStage). Others (merge, ask, post) are host
 // effects (effects/index.js), and a workflow's name starts a child item.
 
-/** The prompt the session gives the Agent tool to start a run; the hook replaces it with the run's brief. */
+/** The prompt the session gives the Agent tool to start a run; the hook replaces it with the run's prompt. */
 export const MARKER = /^\s*ccp-run\s+(\S+)\s*$/;
 export const spawnPrompt = (run) => `ccp-run ${run}`;
 
@@ -71,7 +71,10 @@ const storeBlob = (root, text) => {
 /** The run's record (run.json), or null. */
 export const loadRun = (root, run) => {
   const dir = runDir(root, run);
-  return dir && readJson(join(dir, 'run.json'));
+  const loaded = dir && readJson(join(dir, 'run.json'));
+  // A run.json without promptHash takes it from the prompt file, so every run reports the hash of the prompt it hands out.
+  if (loaded && !loaded.promptHash && existsSync(promptFile(root, run))) loaded.promptHash = sha256(readFileSync(promptFile(root, run), 'utf8'));
+  return loaded;
 };
 
 // One journal row about a run, in the item's own file.
@@ -89,7 +92,7 @@ function journal(root, run, row) {
 /**
  * Run handlers for the agent actors, for effects/index.js handlers({ actors }). `host` is the item's host (its root,
  * item, session, release, spec and state); `repo` is the git clone each actor's worktree is added from (its HEAD),
- * `worktrees` the folder they go in. start() prepares the run and returns its outcome: { ref: the run, briefHash,
+ * `worktrees` the folder they go in. start() prepares the run and returns its outcome: { ref: the run, promptHash,
  * folder, worktree, branch, spawn: { tool, prompt } }. The run stays open until accept() hands back its result.
  */
 export function actors({ host, repo = process.cwd(), worktrees = join(dirname(resolve(repo)), 'ccp-actors'), names = stagesOf(host.spec) }) {
@@ -133,7 +136,7 @@ export function githubOf(repo) {
 
 const outcomeOf = (run) => ({
   ref: run.run,
-  briefHash: run.briefHash,
+  promptHash: run.promptHash,
   folder: runDir(run.root, run.run),
   worktree: run.worktree,
   branch: run.branch,
@@ -188,7 +191,7 @@ function freeBranch({ repo, worktrees, branch }) {
   }
 }
 
-/** Write the run's folder, brief and worktree, and journal the brief. Returns the run effect's outcome. */
+/** Write the run's folder, prompt and worktree, and journal the prompt. Returns the run effect's outcome. */
 export function prepare({ host, effect, repo, worktrees }) {
   const { root, item, spec } = host;
   const r = runOf(effect.id);
@@ -233,22 +236,22 @@ export function prepare({ host, effect, repo, worktrees }) {
   };
   const parts = sections(run);
   const prompt = assemble(parts);
-  run.briefHash = sha256(prompt);
+  run.promptHash = sha256(prompt);
   // The run facts go to the agent once, as its context (SubagentStart, or the first tool call's refusal), not in the prompt.
   const context = contextOf(run);
   run.context = context.text;
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, 'brief.md'), prompt); // file name kept: spawn() and the hook read brief.md
+  writeFileSync(promptFile(root, run.run), prompt);
   writeFileSync(join(dir, 'context.md'), run.context);
   const { hash, bytes } = storeBlob(root, prompt);
   journal(root, run, {
-    kind: 'brief.stored',
+    kind: 'prompt.stored',
     source: { system: 'journal', ref: `blobs/${hash}` },
     payload: { run: run.run, actor: run.actor, role: run.actor, hash, bytes, contextHash: sha256(run.context), worktree }
   });
   const rows = itemRows(root, item);
   const value = host.snapshot?.value ?? null;
-  writeJson(join(dir, 'stage.json'), stageRecord({ spec, run, parts, context, promptHash: run.briefHash, value, rows, transition: effect.transition }));
+  writeJson(join(dir, 'stage.json'), stageRecord({ spec, run, parts, context, promptHash: run.promptHash, value, rows, transition: effect.transition }));
   writeJson(join(dir, 'run.json'), run);
   return outcomeOf(run);
 }
@@ -257,7 +260,7 @@ export function prepare({ host, effect, repo, worktrees }) {
 
 /**
  * PreToolUse of the Agent tool. A prompt that is not `ccp-run <run>` is not ours: null. Otherwise { allow, prompt }
- * with the brief to start the agent with, or { deny } when the run is unknown or already has its agent.
+ * with the prompt to start the agent with, or { deny } when the run is unknown or already has its agent.
  */
 export function spawn({ root, prompt, toolUseId, session = null }) {
   const m = String(prompt ?? '').match(MARKER);
@@ -271,7 +274,7 @@ export function spawn({ root, prompt, toolUseId, session = null }) {
     return { deny: render('spawn-started-elsewhere', { run: run.run }) };
   }
   writeJson(spawnFile(root, toolUseId), { run: run.run, session });
-  return { allow: true, prompt: readFileSync(join(dir, 'brief.md'), 'utf8'), run };
+  return { allow: true, prompt: readFileSync(promptFile(root, run.run), 'utf8'), run };
 }
 
 /**
@@ -296,7 +299,7 @@ export function startedRun({ root, session }) {
 
 /**
  * Bind an agent to the run its Agent call (toolUseId) started. Journals agent.spawn and returns { run, context }
- * (what the agent is told besides its brief), or null when that call started no run or the run has its agent.
+ * (what the agent is told besides its prompt), or null when that call started no run or the run has its agent.
  * `via` says how the call was found: `start` (startedRun) or `meta` (the agent's meta.json, exact).
  */
 export function bind({ root, agentId, toolUseId, agentType = null, session = null, via = 'meta' }) {
@@ -312,7 +315,7 @@ export function bind({ root, agentId, toolUseId, agentType = null, session = nul
     kind: 'agent.spawn',
     source: { system: 'claude-code', ref: toolUseId },
     agent: agentId,
-    payload: { agentId, type: agentType, run: run.run, actor: run.actor, briefHash: run.briefHash, worktree: run.worktree, via, hookSession: session }
+    payload: { agentId, type: agentType, run: run.run, actor: run.actor, promptHash: run.promptHash, worktree: run.worktree, via, hookSession: session }
   });
   return { run, context: run.context };
 }
@@ -395,7 +398,7 @@ export function agrees(given, input) {
 
 // A value as a refusal shows it: JSON, cut to CUT characters.
 const CUT = 200;
-const brief = (v) => {
+const cut = (v) => {
   const t = JSON.stringify(v) ?? 'undefined';
   return t.length > CUT ? `${t.slice(0, CUT)}…` : t;
 };
@@ -415,7 +418,7 @@ export function differences(given, input, path, inPath) {
     return given.flatMap((v, i) => differences(v, input[i], `${path}[${i}]`, `${inPath}[${i}]`));
   }
   if (agrees(given, input)) return [];
-  return [render('difference', { path: String(path), given: brief(given), inPath: String(inPath), input: brief(input) })];
+  return [render('difference', { path: String(path), given: cut(given), inPath: String(inPath), input: cut(input) })];
 }
 
 /** The refusals of a result that count toward a run's cap, and the cap. */

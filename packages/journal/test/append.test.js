@@ -20,7 +20,7 @@ const input = (over = {}) => ({
 test('append stamps v, id and at and writes one line', () => {
   const path = fresh();
   const row = append(path, input());
-  assert.equal(row.v, 1);
+  assert.equal(row.v, 2);
   assert.match(row.id, /^[0-9a-f-]{36}$/);
   assert.match(row.at, /Z$/);
   assert.deepEqual(JSON.parse(readFileSync(path, 'utf8')), row);
@@ -36,7 +36,7 @@ test('append refuses an invalid row, an unknown kind and another version', () =>
   const path = fresh();
   assert.throws(() => append(path, input({ source: undefined })), /row.source must be object/);
   assert.throws(() => append(path, input({ kind: 'engine.unknown' })), /unknown kind engine.unknown/);
-  assert.throws(() => append(path, input({ v: 2 })), /writes v1 rows, not v2/);
+  assert.throws(() => append(path, input({ v: 1 })), /writes v2 rows, not v1/);
   assert.throws(() => append(path, input({ payload: { big: 'x'.repeat(MAX_LINE_BYTES) } })), /byte limit/);
 });
 

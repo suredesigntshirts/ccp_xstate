@@ -189,7 +189,7 @@ async function advance(w) {
     if (stage) {
       const dir = runDir(ROOT, stage.id);
       if (!existsSync(join(dir, 'result.json'))) {
-        const brief = readFileSync(join(dir, 'brief.md'), 'utf8');
+        const brief = readFileSync(join(dir, 'prompt.md'), 'utf8');
         const context = readFileSync(join(dir, 'context.md'), 'utf8');
         const prepared = loadRun(ROOT, stage.id);
         wire(prepared.worktree);

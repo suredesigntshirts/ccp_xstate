@@ -1,6 +1,6 @@
 // Stage files (why: plan/decisions/2026-11-05-stage-prompt-files-ready.md): a model stage's
 // prose lives in one markdown file beside its workflow, workflows/<workflow>/<stage>.md, which its meta.actors entry
-// names by path ("prompt": "quick-fix/brief.md", relative to the workflow folder). The JSON keeps the wiring and the
+// names by path ("prompt": "quick-fix/build.md", relative to the workflow folder). The JSON keeps the wiring and the
 // output schema; the file holds the words:
 //
 //   # <stage>
