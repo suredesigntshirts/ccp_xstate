@@ -100,7 +100,8 @@ const stateOf = (run) => {
   }
 };
 
-// Fails a run that has no agent: failed.json, then a refusal row with the rule. False when it had already failed.
+// Fails a run that has no agent by the store's fail transition, with a refusal row naming the rule. False when it had
+// already failed.
 function failUnstarted(root, run, rule, { text: why, message }, tool, session) {
   return transition(root, run, 'fail', { agentId: null, why, at: new Date().toISOString() }, {
     kind: 'refusal',
