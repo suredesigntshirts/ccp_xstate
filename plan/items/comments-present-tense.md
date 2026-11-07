@@ -5,7 +5,7 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "ready",
-  "outcome": "Comments in the harness source (packages/engine/src, packages/engine/bin, packages/journal/src, packages/journal/bin, plugins/harness/scripts, scripts/inspector, scripts/bench) and the two READMEs (packages/engine/README.md, plugins/harness/README.md) state present-tense facts and invariants, with no plan item ids, design-letter sections, lanes, tournament rounds or grafts; the engine README describes its entry points, guarantees and files; and the PR gate refuses a new history reference in that source, as it refuses a TODO.",
+  "outcome": "Comments in the harness source (packages/engine/src, packages/engine/bin, packages/journal/src, packages/journal/bin, plugins/harness/scripts, scripts/inspector, scripts/bench) and the two READMEs (packages/engine/README.md, plugins/harness/README.md) state present-tense facts and invariants, with no plan item ids, design-letter sections, lanes, tournament rounds or grafts; the engine README describes its entry points, guarantees and files; CLAUDE.md states the rule and that a cleanup changes structure, not behaviour; and the PR gate refuses a new history reference in that source, as it refuses a TODO.",
   "why": "About 140 history references sit in harness source comments and the two READMEs (50 in packages/engine/src alone). They make every file read as an archive, they cost every agent session tokens for history it cannot use, and builders add more by habit. The why already travels with the plan item, the commit and the PR (CLAUDE.md principles). APOSD chapters 12-13 and Pragmatic's single source of truth; research plan/research/design-books-cleanup.md, finding 2.",
   "serves": [
     "L-theory-written",
@@ -50,6 +50,10 @@
     {
       "ref": "docs/layout.md",
       "what": "One paragraph: comments are present tense; item ids go in commits, PRs and the plan"
+    },
+    {
+      "ref": "CLAUDE.md",
+      "what": "Two principles: comments say what holds now (item ids, lanes and rounds go in commits, PRs and the plan, never in code comments or READMEs); a cleanup changes structure, not behaviour (tests that pass on main pass at its head, changed only for the renames and imports its item names)"
     }
   ],
   "expect": [
@@ -95,7 +99,7 @@
     "budget": 0
   },
   "non_goals": [
-    "No code changes: only comments, the two READMEs, the gate and docs/layout.md",
+    "No code changes: only comments, the two READMEs, the gate, docs/layout.md and CLAUDE.md",
     "docs/ (journal.md names which item defines each payload, on purpose), tests, plan/, verify/ and workflow stage files are not swept",
     "No rename of any identifier, file or journal kind (harness-glossary does that)"
   ],
