@@ -1,4 +1,4 @@
-// The attention view (plan item obs-person-attention): what the harness asked of the person, from journal rows.
+// The attention view: what the harness asked of the person, from journal rows.
 // Per UTC day and per thread it counts the person's messages and taps, the cards and posts put in front of them,
 // and how long each card waited for its tap; and it flags any hour in which posts went over the platform's caps
 // (ledger L-message-caps: about 20 per thread and 60 per project). It reads rows and writes nothing.

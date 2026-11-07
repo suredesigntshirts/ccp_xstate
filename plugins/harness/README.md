@@ -1,6 +1,6 @@
 # ccp-harness plugin
 
-The v2 Claude Code plugin (plan item env-bootstrap). Sessions never load this folder: the setup script
+The v2 Claude Code plugin. Sessions never load this folder: the setup script
 (`infra/cloud-environment/setup.sh`) installs a copy of a release at `~/.claude/skills/ccp-harness`, where Claude
 Code loads it as `ccp-harness@skills-dir`. Editing this folder changes nothing a running session uses
 (ledger L-no-self-modification, L-plugins-load-at-start).
@@ -17,7 +17,7 @@ journal row (a tag also carries it in its annotation). The setup script installs
 tag or branch, and writes its version into the copy's `plugin.json`; with none it installs the clone's HEAD and says
 so. The copy carries `release.json`: name, version, tag, commit and its file list. `packages/journal` is bundled
 into the copy at `lib/journal`, and `packages/engine/src` at `lib/engine/src` for the actor hooks. A running session never changes its copy: a new release reaches the next session
-(plan item self-update-by-version, plan/decisions/2026-10-30-self-update-by-version.md).
+(plan/decisions/2026-10-30-self-update-by-version.md).
 
 ## The gate
 
@@ -64,7 +64,7 @@ the release this copy runs, the session is told: `ccp-harness: this session runs
 
 ## Capture
 
-`scripts/capture.mjs` (plan item obs-live-capture), timeout 5 s, its own watchdog at 3 s, on UserPromptSubmit,
+`scripts/capture.mjs`, timeout 5 s, its own watchdog at 3 s, on UserPromptSubmit,
 PostToolUse, PostToolUseFailure, PermissionDenied, SubagentStart, SubagentStop and Stop. On PostToolUse, PostToolUseFailure and SubagentStop
 it is `async`: Claude Code starts it and goes on without waiting, so a tool call is never held up by it (a node process
 takes about 40 ms idle and 60 ms under load, mostly its own start). On SubagentStop it first waits until the subagent's
@@ -83,7 +83,7 @@ every field the rows need (plan/decisions/2026-10-30-capture-by-hooks.md).
 
 ### Refusals
 
-Capture also journals a `refusal` row for every refused call (plan item obs-refusal-log; `docs/journal.md`, "Refusal
+Capture also journals a `refusal` row for every refused call (`docs/journal.md`, "Refusal
 rows"). An auto mode classifier refusal comes live on PermissionDenied, which it handles in line. A hook's or a
 permission rule's denial fires no hook, so the Stop and SubagentStop handlers find them in the transcript. A later call
 of the same action (same tool and input, minus its `description`) links back to the refusal by `retryOf`; the session's
@@ -99,13 +99,13 @@ uncommitted change is what they test.
 
 ## Actors
 
-`scripts/actors.mjs` (plan item engine-actors) starts, binds, confines and checks the agents a workflow invokes, on
+`scripts/actors.mjs` starts, binds, confines and checks the agents a workflow invokes, on
 PreToolUse, SubagentStart, SubagentStop, UserPromptSubmit, PostToolUse of Agent and Stop; on Stop it blocks the main
-session, at most twice per run, while a run of an item that session owns waits for its agent, then fails the run
-(plan item fix-waiting-run-stall). After a wake or an Agent call it names only the waiting runs of the session's own
-items, the runs the Stop guard checks (plan item fix-waiting-lines-owner); the logic is `packages/engine/src/actors.js`
+session, at most twice per run, while a run of an item that session owns waits for its agent, then fails the run.
+After a wake or an Agent call it names only the waiting runs of the session's own
+items, the runs the Stop guard checks; the logic is `packages/engine/src/actors.js`
 (`packages/engine/README.md`, "Actors"). `.mcp.json` registers one MCP server, `harness`
 (`scripts/return-tool.mjs`), with one tool, `return`. The hook checks every call before it reaches the server; the
 server only answers whether the hook stored that result, so a return with the hook absent is never accepted. It
 matches the call by result.json's `sent`, the hash of the result as the agent sent it, because the stored result has
-the host's stamps on its PR refs (fix-return-tool-answer).
+the host's stamps on its PR refs.

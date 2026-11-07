@@ -1,4 +1,4 @@
-// The rework view (plan item obs-time-and-rework): per PR, how many pushes CI judged, how many were red, how many
+// The rework view: per PR, how many pushes CI judged, how many were red, how many
 // rounds that made, and how many replans its item had; and the tripwire rows for a PR past its round limit.
 // Before the engine exists, rounds are counted per PR, not per item. It reads rows and writes nothing.
 // docs/journal.md, "Derived views", defines each count.
@@ -6,7 +6,7 @@
 /** A check run with one of these conclusions is red. Cancelled, skipped and neutral runs are neither red nor green. */
 export const RED = Object.freeze(['failure', 'timed_out', 'action_required', 'startup_failure']);
 
-/** The round limit when the PR's item sets none (plan item head `step_back.max_rounds`). */
+/** The round limit when the PR's item head sets no `step_back.max_rounds`. */
 export const DEFAULT_LIMIT = 2;
 
 /**

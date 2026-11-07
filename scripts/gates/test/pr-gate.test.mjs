@@ -85,6 +85,16 @@ test('freeze gate: a status-only change passes', () => {
   assert.equal(r.run('freeze').status, 0);
 });
 
+test('stubs gate: a history comment in engine source is red, naming the file, line and rule; the same line in plan/ is not', () => {
+  const r = repo();
+  r.commit({ 'plan/items/note.md': '// (plan item fix-x)\n', 'packages/engine/src/a.js': 'export const a = 1;\n' });
+  assert.equal(r.run('stubs').status, 0);
+  r.commit({ 'packages/engine/src/a.js': 'export const a = 1;\n// (plan item fix-x)\n' });
+  const out = r.run('stubs');
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /packages\/engine\/src\/a.js:2 has a history reference/);
+});
+
 test('stubs gate: one TODO under packages/ is red', () => {
   const r = repo();
   r.commit({ 'packages/a/index.js': 'export const a = 1;\n' });

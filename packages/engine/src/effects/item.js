@@ -1,4 +1,4 @@
-// Child items (design A, 4.2): an invoke whose src names a workflow starts a child item. The child's id is the run's
+// Child items: an invoke whose src names a workflow starts a child item. The child's id is the run's
 // effect id, so it is deterministic, and its seq-0 row is created exclusively (host.js persist), so two starts make one
 // child. The child's final output comes back to the parent as the invoke's done event (childResults).
 import { existsSync } from 'node:fs';

@@ -14,7 +14,7 @@ const REPO = fileURLToPath(new URL('../../../', import.meta.url));
 const LANE_A = '/home/user/lanes/A-minimalist';
 const LANE_C = '/home/user/lanes/C-provenance';
 const FRI = '/mnt/project-files/first-real-issue/harness/journal';
-// The first real issue ran on the engine before the stage contract (engine-stage-contract), which today's engine refuses
+// The first real issue ran on an engine without the stage contract, whose workflows today's engine refuses
 // to load by design. Its export is replayed on that engine: main at 36da3e4, the last commit before the contract landed,
 // checked out as a worktree of this repo when the commit is here (it is not in a shallow clone).
 const PRE_CONTRACT = '36da3e4421c88e6d1762f1f671494a71f0b70940';
@@ -421,7 +421,7 @@ test('fri-jsonl-lint-2 verify: the agent was resumed with a message that was not
 });
 
 // ---- The stage record (stage.json): a tiny journal with two stage runs, no engine checkout needed.
-// Main's engine has the stage contract (engine-stage-contract), so its own tourney scenarios make stage records.
+// Main's engine has the stage contract, so its own tourney scenarios make stage records.
 const MAIN = REPO;
 function stageFixture() {
   const engine = mkdtempSync(join(tmpdir(), 'wi-stage-eng-'));
@@ -546,7 +546,7 @@ test('main Q1 and R1: every model run has its stage record, producers link to ru
   assert.deepEqual(answers.amended, []);
 });
 
-// The adopt trial of engine-stage-contract is committed, so this check runs everywhere: real agents, main's engine.
+// The stage-contract tournament's adopt trial is committed, so this check runs everywhere: real agents, main's engine.
 const ADOPT = join(REPO, 'tournaments/2026-11-04-stage-contract/trials/adopt/journal');
 
 test('adopt trial: every model run carries its stage.json as on disk, and the flow is brief, build, verify with briefs.builder, pr and verdict between them', { timeout: 300000 }, async () => {

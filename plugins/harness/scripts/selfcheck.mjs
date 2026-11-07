@@ -5,7 +5,7 @@
 import { DEPTH_ENV, allowRules, byVersion } from './fingerprint.mjs';
 import { messages } from './host.mjs';
 
-// Every sentence is an entry of the message catalogue (plan item prompt-catalogue); a check gives its values.
+// Every sentence is an entry of the message catalogue; a check gives its values.
 const { render } = await messages();
 
 export const WANT_DEPTH = '3';

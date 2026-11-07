@@ -92,12 +92,27 @@ const STUBS = [
   [/\{[^}]*\b(?:skip|todo)\s*:\s*(?:true|['"`])/, 'a skipped test'],
   [/\bt\.(?:skip|todo)\s*\(/, 'a skipped test'],
 ];
+
+// History ban: the harness source and its two READMEs state what holds now. A plan item id, a design letter's
+// section, a tournament lane, round or graft names where a line came from, and that belongs in the commit, the PR and
+// the plan (CLAUDE.md). Tests and vendored code are not held to it: a test may name a lane it runs.
+export const HISTORY = /plan item|\((?:fix|engine|obs|wf|inspector|stage|prompt|probe|journal|refine)-[a-z-]+[),]|[Dd]esign [A-E],|lane [A-E]|graft|round[- ][12]|before (?:fix|stage|prompt)-/;
+const HISTORY_RULE = 'a history reference (comments say what holds now; item ids go in commits, PRs and the plan)';
+const HISTORY_DIRS = /^(?:packages\/engine\/(?:src|bin)|packages\/journal\/(?:src|bin)|plugins\/harness\/scripts|scripts\/inspector|scripts\/bench)\//;
+const HISTORY_FILES = new Set(['packages/engine/README.md', 'plugins/harness/README.md']);
+const isTest = (path) => /(?:^|\/)test\/|\.test\.[cm]?js$/.test(path);
+export const historyChecked = (path) =>
+  HISTORY_FILES.has(path) || (HISTORY_DIRS.test(path) && !isTest(path) && !/(?:^|\/)vendor\//.test(path));
+
 export function findStubs(files) {
   const reasons = [];
   for (const { path, text } of files) {
-    if (!/^(packages|plugins)\//.test(path)) continue;
+    const stubs = /^(packages|plugins)\//.test(path);
+    const history = historyChecked(path);
+    if (!stubs && !history) continue;
     text.split('\n').forEach((line, i) => {
-      for (const [re, what] of STUBS) if (re.test(line)) { reasons.push(`${path}:${i + 1} has ${what}`); break; }
+      const what = (stubs && STUBS.find(([re]) => re.test(line))?.[1]) || (history && HISTORY.test(line) && HISTORY_RULE);
+      if (what) reasons.push(`${path}:${i + 1} has ${what}`);
     });
   }
   return reasons;

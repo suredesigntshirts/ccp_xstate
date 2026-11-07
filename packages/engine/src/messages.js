@@ -1,4 +1,4 @@
-// The message catalogue (plan item prompt-catalogue): every text the engine or the harness plugin hands a model,
+// The message catalogue: every text the engine or the harness plugin hands a model,
 // outside the stage files, is a named entry of packages/engine/messages.md, rendered here. The code picks an entry and
 // gives its slot values; it writes no wording of its own. Why and how: plan/decisions/2026-11-06-prompt-catalogue.md.
 //

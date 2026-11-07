@@ -1,4 +1,4 @@
-// The overhead view (plan item obs-time-and-rework): tokens spent on harness work against product work. A session's
+// The overhead view: tokens spent on harness work against product work. A session's
 // tokens (its turn.usage and agent.finish rows) are split by the PRs it wrote commits on: by the share of changed
 // lines in paths the config lists as harness. A session with no PR is unattributed. It reads rows and writes nothing.
 // docs/journal.md, "Derived views", says where the PR facts come from.
@@ -26,7 +26,7 @@ export function overhead(rows, prs, config) {
   const seen = new Set();
   const sessions = {};
   // An agent.finish row's tokens cover the agent's whole transcript, so an agent that finished twice counts once: its
-  // last row (retro finding 3, plan item engine-item-views).
+  // last row.
   const last = new Map();
   for (const r of rows) {
     if (r?.kind !== 'agent.finish') continue;

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// The derived views on the command line (plan item obs-time-and-rework). docs/journal.md, "Derived views".
+// The derived views on the command line. docs/journal.md, "Derived views".
 //   derive.js time --journal <file|root>
 //   derive.js rework --repo <owner/repo> --pr <n> [--pr <n> ...] [--facts <file>] [--save-facts <file>]
 //                    [--plan <items dir>] [--checks a,b] [--append <journal file> --session <id> --release <x.y.z>]

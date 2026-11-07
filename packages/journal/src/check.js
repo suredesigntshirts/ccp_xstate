@@ -1,9 +1,9 @@
-// The journal check (plan item obs-journal-vs-world): compares the journal with facts from outside it, a session's
+// The journal check: compares the journal with facts from outside it, a session's
 // own event log and GitHub's merged PRs, and lists what doesn't match. It reads what it is given and writes nothing;
 // bin/journal-check.js fetches, prints and records the check row. docs/journal.md, "The journal check", says how.
 
 // A tool_result that Claude Code wrote without running the tool (a blocked or malformed call). No hook fires for
-// these, so no capture can journal them (seen 2026-10-30, verify/obs-live-capture: "Blocked: standalone sleep").
+// these, so no capture can journal them (such as "Blocked: standalone sleep").
 const NOT_RUN = /^\s*<tool_use_error>/;
 
 const textOf = (content) =>
@@ -123,7 +123,7 @@ export const mergeKey = (repo, number) => `${String(repo).toLowerCase()}#${numbe
 
 /**
  * The host's merge effects that ended done, as merge rows: { id, at, repo, number, sha }. These are the only merges
- * the host made (plan item engine-effects, packages/engine/src/effects/merge.js).
+ * the host made (packages/engine/src/effects/merge.js).
  */
 export const hostMerges = (rows) =>
   rows

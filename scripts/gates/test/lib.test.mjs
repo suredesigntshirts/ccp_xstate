@@ -57,6 +57,36 @@ test('the verdict session must differ from every builder session', () => {
   assert.match(checkSessions({ item: 'x', verdictCommit: { sha: 'v', message: s(2) }, builderCommits: builder, afterVerified: builder })[0], /changes a.js after the verified sha/);
 });
 
+test('the history ban finds item ids, lanes, rounds and grafts in harness source and its READMEs, not in tests or plan/', () => {
+  const files = [
+    { path: 'packages/engine/src/a.js', text: 'ok\n// (plan item fix-x)' },
+    { path: 'packages/engine/bin/host.js', text: '// the pin (design A, 4.3)' },
+    { path: 'packages/journal/src/b.js', text: '// grafted from lane M' },
+    { path: 'plugins/harness/scripts/c.mjs', text: '// a rebuild (fix-rebuild-worktree) works on its branch' },
+    { path: 'scripts/inspector/export.mjs', text: '// round 2 of the tournament' },
+    { path: 'scripts/bench/lib.mjs', text: '// as before stage-prompt-files' },
+    { path: 'packages/engine/README.md', text: 'The host (plan item engine-host).' },
+    { path: 'plugins/harness/README.md', text: 'Capture (obs-live-capture), on every hook.' },
+    { path: 'scripts/inspector/test/export.test.mjs', text: "test('lane A Q1: the brief', () => {})" },
+    { path: 'packages/engine/src/vendor/x.js', text: '// round 1' },
+    { path: 'packages/engine/test/a.test.js', text: '// (plan item fix-x)' },
+    { path: 'plan/items/x.md', text: '// (plan item fix-x)' },
+    { path: 'docs/journal.md', text: 'defined by plan item fix-x' },
+    { path: 'packages/engine/src/clean.js', text: '// A rebuild works on the PR\'s branch at its head; the round limit is two.' },
+  ];
+  const rule = 'a history reference (comments say what holds now; item ids go in commits, PRs and the plan)';
+  assert.deepEqual(findStubs(files), [
+    `packages/engine/src/a.js:2 has ${rule}`,
+    `packages/engine/bin/host.js:1 has ${rule}`,
+    `packages/journal/src/b.js:1 has ${rule}`,
+    `plugins/harness/scripts/c.mjs:1 has ${rule}`,
+    `scripts/inspector/export.mjs:1 has ${rule}`,
+    `scripts/bench/lib.mjs:1 has ${rule}`,
+    `packages/engine/README.md:1 has ${rule}`,
+    `plugins/harness/README.md:1 has ${rule}`,
+  ]);
+});
+
 test('the stub ban finds markers and skipped tests only under packages/ and plugins/', () => {
   const files = [
     { path: 'packages/a/x.js', text: 'ok\n// TODO later' },

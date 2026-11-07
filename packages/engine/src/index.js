@@ -1,4 +1,4 @@
-// The engine: a workflow file loaded into XState. Ported from ccp_machine PR #110 (packages/orchestrator).
+// The engine: a workflow file loaded into XState.
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -39,12 +39,12 @@ const workflowNames = (dir) => {
 };
 
 /**
- * A workflow by name (design A, 4.3: the pin). `name@<sha256>` reads the pinned bytes from <root>/blobs and checks
+ * A workflow by name, or by its pin. `name@<sha256>` reads the pinned bytes from <root>/blobs and checks
  * their hash; when the blob is missing and <dir>/<name>.json (with its stage files) gives exactly those bytes, they are
  * stored from it. A plain name reads <dir ?? repo workflows>/<name>.json and its stage files (prompts.js), stores the
  * bytes it is pinned as under root (when given), and returns the spec with id `<name>@<sha256>`, so every row the item
  * writes names the bytes it runs on. A workflow with stage files is pinned as its composed spec, so its blob alone
- * replays an item; one without is pinned as its file bytes, as before stage-prompt-files.
+ * replays an item; one without is pinned as its file bytes.
  */
 export const loadWorkflow = (name, { root = null, dir = null } = {}) => {
   const pinned = String(name).match(PINNED);
@@ -68,7 +68,7 @@ export const loadWorkflow = (name, { root = null, dir = null } = {}) => {
     const bytes = readFileSync(blob);
     const hash = createHash('sha256').update(bytes).digest('hex');
     if (hash !== pinned[2]) throw new Error(`blob ${pinned[2]} hashes to ${hash}`);
-    // An item pinned before fix-waiting-wake keeps its asking states with no timer until it finishes.
+    // A pinned workflow's asking states may lack a timer; its items keep running on it as pinned until they finish.
     return checkStages({ ...JSON.parse(bytes.toString('utf8')), id: name }, { workflows: workflowNames(dir ?? REPO_WORKFLOWS), pinned: true });
   }
   const { spec: composed, bytes } = readWorkflow(name, { dir: dir ?? REPO_WORKFLOWS });

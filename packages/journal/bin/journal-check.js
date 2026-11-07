@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// The journal check (plan item obs-journal-vs-world). Compares the journal with a session's own event log and with
+// The journal check. Compares the journal with a session's own event log and with
 // GitHub's merged PRs, prints what is missing or unexplained, and with --record appends a journal.check row with the
 // counts. Exit 0 when nothing is listed, 1 when something is, 2 when it couldn't run. docs/journal.md, "The journal
 // check", has the usage.

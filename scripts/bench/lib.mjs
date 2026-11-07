@@ -1,4 +1,4 @@
-// The stage bench (plan item stage-bench): run one model stage of a workflow alone, on committed cases, with the
+// The stage bench: run one model stage of a workflow alone, on committed cases, with the
 // exact prompt the engine renders. Nothing here assembles a prompt: a run's prompt is the brief.md the engine's own
 // prepare() writes (packages/engine/src/actors.js, which calls stages.js sections() and assemble()), and the bench
 // sends that file's bytes. Usage and the refinement procedure: docs/prompts.md.

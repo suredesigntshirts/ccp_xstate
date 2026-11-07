@@ -1,19 +1,18 @@
 #!/usr/bin/env node
-// The return tool (plan item engine-actors): the harness's MCP server, `harness`, with one tool, `return`. An invoked
+// The return tool: the harness's MCP server, `harness`, with one tool, `return`. An invoked
 // actor hands back its result with it: { run, result }. The checks are not here. The PreToolUse hook (actors.mjs)
 // runs them before the call reaches this server, refuses a call that fails one, and stores the result of one that
 // passes. So this server only answers whether that happened: it says accepted when the run's stored result is this
 // result, and refuses anything else, such as a call made while the hook was not running. The host stamps PR refs
 // before storing (key, branch, checkout, gates, green), so the match is against `sent`, the hash of the result as the
-// agent sent it; only a result.json stored before sent existed is matched by `hash`, the stamped result's
-// (fix-return-tool-answer).
+// agent sent it; a result.json that has no sent is matched by `hash`, the stamped result's.
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline';
 import { journalDir, messages } from './host.mjs';
 
-// Its words are entries of the message catalogue (plan item prompt-catalogue).
+// Its words are entries of the message catalogue.
 const { render } = await messages();
 
 const TOOL = {

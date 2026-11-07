@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Run one model stage alone, k times per case, with the exact prompt the engine renders (plan item stage-bench).
+// Run one model stage alone, k times per case, with the exact prompt the engine renders.
 //
 //   node scripts/bench/run.mjs --stage brief --out <dir> [--case <id,id|all>] [--k 3] [--workflow <file> | --rev <git rev>]
 //                              [--model <id>] [--parallel 3] [--force]

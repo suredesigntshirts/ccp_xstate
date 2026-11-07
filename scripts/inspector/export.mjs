@@ -203,7 +203,7 @@ function applyActions(eng, context, event, actions) {
 // ---- Loading an engine checkout (main's or a lane's), and xstate as that checkout resolves it
 
 // A workflow of the engine checkout as its own engine reads it (with its stage files), or null when that engine has no
-// stage files (packages/engine/src/prompts.js, from stage-prompt-files on).
+// stage files (packages/engine/src/prompts.js).
 export async function composedIn(checkout, name) {
   const at = join(checkout, 'packages/engine/src/prompts.js');
   if (!existsSync(at)) return null;
@@ -1149,13 +1149,13 @@ const names = (p, id) => !!p && (p.run === id || (p.kind === 'copy' && names(p.o
 
 function sourceRef(src, byName, ctx) {
   if (!src || typeof src !== 'object') return { kind: 'unknown', label: 'not recorded' };
-  // Since plan item prompt-catalogue a record names the message catalogue entry each piece was rendered from
-  // (packages/engine/messages.md); older records don't, and read as before.
+  // A record may name the message catalogue entry each piece was rendered from (packages/engine/messages.md); one
+  // that names none reads without it.
   const entry = typeof src.entry === 'string' ? { entry: src.entry } : {};
   const where = entry.entry ? `message catalogue entry ${entry.entry} (packages/engine/messages.md)` : null;
   if (src.frame != null) return { kind: 'frame', name: src.frame, label: `harness frame: ${src.frame}`, fixed: !!src.fixed, filled: src.filled ?? null, ...entry,
     detail: src.filled ? `${where ? `${where}, ` : 'an engine template, '}filled in with this run's ${Object.keys(src.filled).join(', ')}` : src.fixed ? `${where ?? 'fixed text in the engine (packages/engine/src/stages.js)'}, the same for every stage` : 'engine text (the record does not say whether it is fixed or filled in)' };
-  // A piece whose words came from a stage file (plan item stage-prompt-files) is labelled by that file and line.
+  // A piece whose words came from a stage file is labelled by that file and line.
   if (src.workflow != null) return { kind: 'workflow', at: src.workflow, inlined: src.inlined ?? null, file: src.file ?? null, line: src.line ?? null, ...entry,
     label: src.file ? `${src.file}:${src.line}` : 'workflow JSON', detail: [src.inlined ? `with ${src.inlined} inlined` : null, where && `line shape: ${where}`].filter(Boolean).join('; ') || null };
   if (src.input != null) {

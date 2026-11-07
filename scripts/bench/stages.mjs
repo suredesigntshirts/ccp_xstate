@@ -1,4 +1,4 @@
-// What the bench knows about each stage it can score (plan items stage-bench, wf-intake): the workflow the stage
+// What the bench knows about each stage it can score: the workflow the stage
 // belongs to, its mechanical criteria, and how a judge and a blind reader see a case and an output. Everything else
 // in scripts/bench/ is the same for every stage. A stage with no entry here cannot be scored or compared, though
 // run.mjs can still run it. docs/prompts.md has the procedure.
@@ -94,7 +94,7 @@ const brief = {
     'no-restated-rules': (s) => noRestatedRules(s.result),
     'builder-criteria': (s) => builderCriteria(s.result, s.case.input.issue.expect)
   },
-  // The judge's view, unchanged since stage-bench for an issue with only url and expect, so the brief bench's kept
+  // The judge's view of an issue with only url and expect must not change, so the brief bench's kept
   // verdicts (keyed by prompt hash) stay valid; an issue from intake also shows its proofs, non-goals and assumptions.
   judgeCase: (c) => [`# The issue's expect lines, in order\n\n${list(c.input.issue.expect)}`, ...intakePart(c.input.issue)],
   repoFacts: ['runs-as-written'],

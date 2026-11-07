@@ -1,4 +1,4 @@
-// Invoked actors (plan item engine-actors): the agents a workflow starts, and the one way their results come back.
+// Invoked actors: the agents a workflow starts, and the one way their results come back.
 // When a state invokes a model stage (an actor whose meta.actors entry has stage parts), the host's run handler renders
 // the run's prompt from that entry (stages.js) into brief.md in its own run folder, makes it a git worktree named by item and run,
 // journals the prompt's hash, and writes the run's stage record, stage.json (trace.js): every prompt piece and input with
@@ -33,7 +33,7 @@ export const isReturnTool = (name) => /^mcp__(?:plugin_[\w.-]+_)?harness__return
 
 const sha256 = (text) => createHash('sha256').update(text).digest('hex');
 // A value serialised with its object keys sorted at every depth, so the return tool's server and accept() hash the
-// same result alike whatever order its keys came in (fix-return-tool-answer). return-tool.mjs repeats these lines,
+// same result alike whatever order its keys came in. return-tool.mjs repeats these lines,
 // since it may not import the engine.
 const sorted = (v) => (Array.isArray(v) ? v.map(sorted) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sorted(v[k])])) : v);
 export const sentHash = (result) => sha256(JSON.stringify(sorted(result ?? null)));
@@ -219,7 +219,7 @@ export function prepare({ host, effect, repo, worktrees }) {
 
   const stage = spec.meta.actors?.[effect.actor];
   if (!isStage(stage)) throw new Error(`${effect.actor} is no stage`);
-  // A rebuild (input.previous is a PR ref) works on that PR's branch at its head (fix-rebuild-worktree); any other run
+  // A rebuild (input.previous is a PR ref) works on that PR's branch at its head; any other run
   // gets a fresh branch named by its run, at the clone's HEAD.
   const previous = prRef(effect.input?.previous?.url) ? effect.input.previous : null;
   const start = previous ? rebuildStart({ repo, worktrees, previous }) : { branch: `run/${safe(item)}/${safe(r.name)}`, at: 'HEAD' };
@@ -326,7 +326,7 @@ export function bind({ root, agentId, toolUseId, agentType = null, session = nul
   if (!run) return null;
   const dir = runDir(root, run.run);
   if (!writeOnce(join(dir, 'agent.json'), { agentId, toolUseId, via, at: new Date().toISOString() })) return null;
-  // item and state: what capture tags the agent's own rows with (plan item engine-item-views).
+  // item and state: what capture tags the agent's own rows with.
   writeJson(agentFile(root, agentId), { run: run.run, item: run.item, state: run.state, worktree: run.worktree, toolUseId, verified: via === 'meta' });
   journal(root, run, {
     kind: 'agent.spawn',
@@ -399,7 +399,7 @@ export function confine({ worktree, tool, input }) {
 const plain = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
 /**
- * Whether a restated value agrees with the input it restates (fix-verify-issue-echo): an object may leave out keys,
+ * Whether a restated value agrees with the input it restates: an object may leave out keys,
  * and every key it carries must agree with the input's, at any depth; arrays and other values must be equal. The
  * schema's required list says what must be carried. Key order does not matter.
  */
@@ -413,7 +413,7 @@ export function agrees(given, input) {
   return JSON.stringify(given) === JSON.stringify(input);
 }
 
-// A value as a refusal shows it: JSON, cut to CUT characters (fix-refusal-hints).
+// A value as a refusal shows it: JSON, cut to CUT characters.
 const CUT = 200;
 const brief = (v) => {
   const t = JSON.stringify(v) ?? 'undefined';
@@ -422,7 +422,7 @@ const brief = (v) => {
 
 /**
  * Where a restated value disagrees with its input, as agrees() decides it: every differing path, with the returned
- * value and the input's (fix-refusal-hints). A key the input lacks is named as not in the input; arrays of different
+ * value and the input's. A key the input lacks is named as not in the input; arrays of different
  * length are named whole.
  */
 export function differences(given, input, path, inPath) {
@@ -438,7 +438,7 @@ export function differences(given, input, path, inPath) {
   return [render('difference', { path: String(path), given: brief(given), inPath: String(inPath), input: brief(input) })];
 }
 
-/** The refusals of a result that count toward a run's cap, and the cap (fix-refusal-hints). */
+/** The refusals of a result that count toward a run's cap, and the cap. */
 export const RESULT_RULES = Object.freeze(['schema', 'reserved', 'restated', 'covers', 'ref']);
 export const REFUSAL_CAP = 10;
 
@@ -474,7 +474,7 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   const run = loadRun(root, runId);
   if (!run) return { refused: { rule: 'unknown-run', reason: render('accept-unknown-run', { run: JSON.stringify(runId ?? null) }) } };
   // A refusal of the result (RESULT_RULES) carries how to fix it and counts toward the run's cap; the one that reaches
-  // the cap fails the run, so its item takes the invoke's error instead of the agent looping (fix-refusal-hints).
+  // the cap fails the run, so its item takes the invoke's error instead of the agent looping.
   // `told` is a catalogue render with what to record (messages.js said): the row keeps its entry and slot values.
   const refuse = (rule, told) => {
     const { text: reason, message } = told;
@@ -516,7 +516,8 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   const problems = check(run.schema, result, run.defs);
   if (problems.length) return refuse('schema', said('schema', { actor: run.actor, problems: problems.join('; ').replaceAll('$', 'result') }));
 
-  // Design A, 4.1: refs observed, restated inputs equal, stamped fields reserved. Only the stamped result is stored.
+  // A result is taken only when its refs are observed on GitHub, its restated inputs equal the inputs, and it sets no
+  // stamped field. Only the stamped result is stored.
   const refs = refsIn(result);
   for (const { path, ref } of refs) {
     const taken = STAMPED.filter((k) => k in ref);
@@ -550,14 +551,14 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
       }
       if (head !== ref.at) return refuse('ref', said('ref-worktree', { path, head, at: ref.at }));
       ref.key = `${pr.owner}/${pr.repo}#${pr.pullNumber}`;
-      // The PR's branch, for a rebuild's worktree (fix-rebuild-worktree): only when the head is in the PR's own
+      // The PR's branch, for a rebuild's worktree: only when the head is in the PR's own
       // repository, since a fork's branch is not on origin. GitHub gives head.repo null when the fork is gone.
       const from = now?.head?.repo;
       const own = from === undefined || (typeof from?.full_name === 'string' && from.full_name.toLowerCase() === `${pr.owner}/${pr.repo}`.toLowerCase());
       if (own && typeof now?.head?.ref === 'string' && now.head.ref) ref.branch = now.head.ref;
-      // The exact commands that put this head in a worktree (judge's round-1 graft from lane A): host-filled data.
+      // The exact commands that put this head in a worktree: host-filled data.
       ref.checkout = `git fetch origin pull/${pr.pullNumber}/head && git checkout --detach ${ref.at}`;
-      // Fails closed (round 2, graft from lane B): when the files cannot all be listed, the gates are unknown, and an
+      // Fails closed: when the files cannot all be listed, the gates are unknown, and an
       // unknown gate is a touched gate, so the person's CI-change card is asked.
       let files = null;
       let unlisted = null;
@@ -612,7 +613,7 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
 }
 
 /**
- * The text an agent sees for a refused return (fix-refusal-hints): `<rule>: <reason>`, then for a result refusal how
+ * The text an agent sees for a refused return: `<rule>: <reason>`, then for a result refusal how
  * to fix it, from the run's Output, and which refusal of the cap this is; at the cap, that the run has failed.
  */
 export function refusalText({ refused, fix = null, failed = null }) {
@@ -628,7 +629,7 @@ export function refusalText({ refused, fix = null, failed = null }) {
   return hints ? render('refusal-counted-hints', { ...counted, hints }) : render('refusal-counted', counted);
 }
 
-// Every ref { url, at } in a value, depth-first, with its path (design A, 4.1). STAMPED (stages.js): the fields the
+// Every ref { url, at } in a value, depth-first, with its path. STAMPED (stages.js): the fields the
 // host stamps on a PR ref.
 const FILES_PAGE = 100; // github.files asks for one page of 100
 const GREEN = ['success', 'neutral', 'skipped'];
@@ -638,11 +639,11 @@ function refsIn(value, path = 'result') {
   return [...here, ...Object.entries(value).flatMap(([k, v]) => refsIn(v, `${path}.${k}`))];
 }
 
-// An agent ending with its run still open (plan item engine-actor-returns) is sent back once to call the return tool;
+// An agent ending with its run still open is sent back once to call the return tool;
 // the next time it ends, its run fails, so the item gets the actor's error instead of waiting forever. An agent ends
 // in two ways, and both are watched: the SubagentHandback tool (PreToolUse, handback()) and a plain stop (SubagentStop,
-// stopped()). A block at SubagentStop does not re-prompt an agent that already handed back (seen in the verifier's
-// scratch run ar2, 2026-10-31), so such a stop fails the run at once.
+// stopped()). A block at SubagentStop does not re-prompt an agent that already handed back (a
+// Claude Code behaviour), so such a stop fails the run at once.
 const sentBackFile = (dir) => join(dir, 'sent-back.json');
 
 // The bound agent's open run and its folder, or null when the agent is no actor or its run returned or failed.
@@ -660,7 +661,7 @@ function sentBackBefore(dir, agentId, how) {
   return !writeOnce(sentBackFile(dir), { agentId, how, at: new Date().toISOString() });
 }
 
-// The send-back message is journalled word for word with its hash (critique fix 12, grafted from lane M).
+// The send-back message is journalled word for word with its hash.
 function sentBack(root, run, agentId, tool, { text, message }, session) {
   journal(root, run, {
     kind: 'refusal',
@@ -728,7 +729,7 @@ export function resultsOf(host) {
     if (!got) continue;
     // The stage's "could not" (stages.js BLOCKED): the actor's error, so the invoke's onError takes it like a stop.
     // The event also carries the reason as `blocked`, so a chart can route a block apart from other errors by a guard
-    // on event.blocked (plan item fix-blocked-retry); `error` keeps the same text for every other onError.
+    // on event.blocked; `error` keeps the same text for every other onError.
     const blocked = blockedOf(host.spec.meta.actors[run.actor], got.result);
     if (blocked != null) {
       inputs.push({ event: { type: `xstate.error.actor.${run.invoke}`, error: `${run.actor} blocked: ${blocked}`, [BLOCKED]: blocked }, run: run.id, source: { system: 'harness', ref: `return ${got.toolUseId ?? got.hash}` } });
@@ -785,7 +786,7 @@ export function waiting(root, item) {
   return waitingRecords(root, item).map((run) => ({ run: run.run, actor: run.actor, prompt: spawnPrompt(run.run) }));
 }
 
-// ---- The stall guard (plan item fix-waiting-run-stall)
+// ---- The stall guard
 //
 // A Stop of the session that owns an item, with one of the item's runs prepared and no agent, is blocked with the
 // exact Agent call to make. Claude Code's stop_hook_active only marks a stop that follows a block, so the guard keeps
@@ -813,7 +814,7 @@ function ownedRecords(root, sessions) {
 /**
  * The runs, across all items, prepared, not started and not failed, whose item is owned by one of `sessions` (the
  * session's id and its sessionName): { run, actor, prompt, item }, by item then run. The runs the Stop guard checks,
- * and the ones the hook names after a wake or an Agent call (plan item fix-waiting-lines-owner).
+ * and the ones the hook names after a wake or an Agent call.
  */
 export function ownedWaiting(root, sessions) {
   return ownedRecords(root, sessions).map((run) => ({ run: run.run, actor: run.actor, prompt: spawnPrompt(run.run), item: run.item }));

@@ -1,4 +1,4 @@
-// A stand-in's answer to an item's open ask (plan item engine-cards-standin). The person may be away for hours, so a
+// A stand-in's answer to an item's open ask. The person may be away for hours, so a
 // stand-in session answers a declared ask through the host instead of the person's tap, under a grant the person set.
 // The answer is taken only if it is one of the ask's choices and a grant entry covers this workflow, ask, repo and
 // time; it then reaches the item as the ask run's completion, with source standin and the grant id, and the host runs
@@ -25,7 +25,7 @@ export const repoOf = (url) => String(url ?? '').match(/github\.com\/([^/]+\/[^/
 export const issueRepoOf = (url) => String(url ?? '').match(/^https:\/\/github\.com\/([^/]+\/[^/]+)\/issues\/\d+\/?$/)?.[1] ?? null;
 
 /**
- * The repository a grant is checked against for an ask run (plan item fix-blocked-card-grant): the card's PR's when the
+ * The repository a grant is checked against for an ask run: the card's PR's when the
  * card has a pr input, else the item's issue's when that is a github.com issue URL (a card asked before any PR, such
  * as quick-fix's blocked card), else none. The issue is set by whoever started the item, never by an agent.
  * Returns { repo, from }, from being 'pr', 'issue' or null.
@@ -50,25 +50,25 @@ export function standinInput(host, { effect, choice, by, why: reason, grants, at
   const choices = card.choices ?? run.input?.choices ?? [];
   if (!choices.includes(choice)) throw new Error(`refused: "${choice}" is not one of the ask's choices (${choices.join(', ')})`);
   const { repo, from } = cardRepo(host, run);
-  // The repo first, so a refusal reads as before ("repo o/r not granted"), then where it was read.
+  // The repo first ("repo o/r not granted"), then where it was read.
   const named = repo ? `${repo} not granted (read from the ${from})` : '(none) not granted (the card has no pr, and the item\'s issue is not a GitHub issue URL)';
   const now = Date.parse(at);
   const why = [];
-  // An item runs on its pinned workflow, `<name>@<sha256>` (lane A, 4.3). A grant names the workflow by name, which
+  // An item runs on its pinned workflow, `<name>@<sha256>`. A grant names the workflow by name, which
   // covers every pinned version of it, or by the pinned id, which covers that version alone.
   const [name] = String(host.spec.id).split('@');
   const grant = grants.find((g) => {
     if (g.workflow !== name && g.workflow !== host.spec.id) return why.push(`${g.id}: workflow ${g.workflow}, not ${name}`), false;
     if (g.ask !== run.invoke) return why.push(`${g.id}: ask ${g.ask}, not ${run.invoke}`), false;
     if (!Array.isArray(g.choices) || !g.choices.includes(choice)) return why.push(`${g.id}: does not grant "${choice}"`), false;
-    // A card with no repository is covered by no grant, even one listing null (plan item fix-grant-null-repo).
+    // A card with no repository is covered by no grant, even one listing null.
     if (repo === null || !Array.isArray(g.repos) || !g.repos.includes(repo)) return why.push(`${g.id}: repo ${named}`), false;
     if (!(Date.parse(g.until) > now)) return why.push(`${g.id}: expired ${g.until}`), false;
     return true;
   });
   if (!grant) throw new Error(`refused: no grant covers ${choice} on ${effect}${why.length ? ` (${why.join('; ')})` : ' (no grants)'}`);
   const event = { type: `xstate.done.actor.${run.invoke}`, output: { choice, by: by.trim(), grant: grant.id, ...(typeof reason === 'string' && reason.trim() ? { why: reason.trim() } : {}) } };
-  // Asked of the chart before anything is written (fix-blocked-card-grant): an answer its guards turn away (a replan
+  // Asked of the chart before anything is written: an answer its guards turn away (a replan
   // with no why) is refused here, because the answer's source names the grant and the card, and once offered and
   // refused, the same grant's answer on that card would be a duplicate the host never takes.
   if (host.snapshot && !host.snapshot.can(event)) throw new Error(`refused: the workflow does not take "${choice}" on ${effect} as given${event.output.why ? '' : ' (does it need --why?)'}`);

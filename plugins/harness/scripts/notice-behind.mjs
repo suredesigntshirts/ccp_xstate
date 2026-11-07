@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// UserPromptSubmit hook (plan item self-update-by-version). A session loads the plugin only when it starts, so a
+// UserPromptSubmit hook. A session loads the plugin only when it starts, so a
 // long session keeps running its release after a newer one is out. At most once per 30 minutes per session, this
 // asks origin for the newest harness-v* tag and, when it is above the release this copy runs, tells the session in
 // one line that a new thread loads it. It never updates anything: a session must not edit the plugin it runs

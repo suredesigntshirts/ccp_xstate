@@ -1,7 +1,7 @@
 // The card effect: the run of a workflow's `ask` actor. It puts the question in front of the person as a decision
 // card, keyed by the effect id, and records the card's id as the run's ref. The answer is not the card's to give: it
 // arrives as a tap wake, which wake.js matches to this run by that ref. When the item leaves the state that asked, the
-// run's stop effect closes the card by the same key (plan item fix-finish-closes-waits), so it stays up for no one.
+// run's stop effect closes the card by the same key, so it stays up for no one.
 
 /**
  * The card handler over a hearth client: card({ key, question, choices, inputs }) -> { ref }, find?(key) -> { ref } or

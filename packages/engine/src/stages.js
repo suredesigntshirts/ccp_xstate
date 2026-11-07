@@ -1,4 +1,4 @@
-// The stage contract (tournament 2026-11-04-stage-contract, lane S, cleaned up): a stage is a function from
+// The stage contract: a stage is a function from
 // instructions plus inputs to an output, and a workflow is the wiring from one stage's output to the next stage's
 // inputs. A model stage is an actor in meta.actors whose entry carries two parts beside its output JSON Schema:
 //   rules   who it is (the first rule), then what it must not do, then when to return: wording, in the JSON;
@@ -26,8 +26,8 @@ export const PARTS = Object.freeze(['rules', 'inputs']);
 export const TASK = 'task';
 /** The host effects an invoke may name besides a stage or a workflow (effects/index.js handlers). */
 export const EFFECTS = Object.freeze(['merge', 'ask', 'post']);
-// Every word of the frame is an entry of the message catalogue (packages/engine/messages.md, plan item
-// prompt-catalogue); these names keep their values, so the renderer and its readers are unchanged.
+// Every word of the frame is an entry of the message catalogue (packages/engine/messages.md); the heading names below
+// are the values the renderer and its readers key on.
 /** The part headings, in prompt order, and the catalogue entry of each. */
 export const HEADING_ENTRIES = Object.freeze({ rules: 'heading-rules', inputs: 'heading-inputs', task: 'heading-task', output: 'heading-output', return: 'heading-return' });
 export const HEADINGS = Object.freeze(Object.fromEntries(Object.entries(HEADING_ENTRIES).map(([part, entry]) => [part, say(entry)])));
@@ -48,7 +48,7 @@ export const BLOCKED = 'blocked';
 
 /** The fields the host stamps on a ref { url, at }: an agent may not set them. */
 export const STAMPED = Object.freeze(['key', 'gates', 'green', 'checkout', 'branch']);
-/** The stamped fields an agent is not shown. branch, the PR's branch on GitHub, is shown (fix-rebuild-worktree). */
+/** The stamped fields an agent is not shown. branch, the PR's branch on GitHub, is shown: a rebuild works on it. */
 export const HIDDEN = Object.freeze(['key', 'gates', 'green', 'checkout']);
 
 const text = (v) => typeof v === 'string' && v.trim() !== '';
@@ -492,8 +492,7 @@ export function decisions(spec, src, wiring = chart(spec)) {
  *   non-empty text, and a wired task may hold text there (mayBeText); a child workflow's invoke gives every input
  *   its item input requires;
  * - every state that invokes ask sets a timer: an after transition whose delay is a number of ms or a positive
- *   meta.delays entry (plan item fix-waiting-wake). Not for a `pinned` workflow, which an item started before it may
- *   still run.
+ *   meta.delays entry. Not for a `pinned` workflow: an item already running on one keeps its asking states as pinned.
  */
 export function checkStages(spec, { workflows = null, pinned = false } = {}) {
   const children = Array.isArray(workflows) ? Object.fromEntries(workflows.map((n) => [n, null])) : workflows;
@@ -530,8 +529,8 @@ export function checkStages(spec, { workflows = null, pinned = false } = {}) {
     const lacks = PARTS.filter((p) => !(isObject(st) && p in st)).join(' and ');
     throw new Error(`${spec.id}: actor ${inv.src}, invoked at ${inv.at}, is not a stage (it lacks ${lacks}), a host effect (${EFFECTS.join(', ')}) or a workflow. A workflow pinned before the stage contract cannot run: finish its items on the engine that started them, or migrate it`);
   }
-  // A state that asks the person sets a timer, so a wake is scheduled for the item while it waits (plan item
-  // fix-waiting-wake, case C-waiting-does-not-stall). Its delay is a number of ms or a name in meta.delays.
+  // A state that asks the person sets a timer, so a wake is scheduled for the item while it waits (case
+  // C-waiting-does-not-stall). Its delay is a number of ms or a name in meta.delays.
   for (const inv of pinned ? [] : wiring.invokes.filter((v) => v.src === 'ask')) {
     const state = inv.state.join('.');
     const delays = Object.keys(wiring.nodes.get(state)?.after ?? {});

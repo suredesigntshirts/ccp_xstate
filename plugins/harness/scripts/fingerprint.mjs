@@ -114,7 +114,7 @@ const CODE_REF = /(?:\bfrom\s*|\bimport\s*\(\s*|\bnew URL\(\s*)(['"])(\.{1,2}\/[
  * `root`. It starts from what Claude Code reads (plugin.json, hooks.json and each command in it, each skill and the
  * scripts it names), plus the bundled journal and message catalogue in an installed copy, and follows every relative
  * import (and new URL) from there.
- * A file deleted from the plugin, or lost from an installed copy, is named here (plan item clean-room-install-test).
+ * A file deleted from the plugin, or lost from an installed copy, is named here.
  */
 export function neededFiles(root, installed = false) {
   const missing = [], seen = new Set();
@@ -146,7 +146,7 @@ export function neededFiles(root, installed = false) {
     for (const m of read(skill).matchAll(/<this skill's base directory>\/([^"\s`]+)/g)) need(resolve(dirname(skill), m[1]), relative(root, skill));
   }
   if (installed) need(join(root, 'lib', 'journal', 'src', 'index.js'), 'scripts/host.mjs');
-  // The message catalogue every hook's words come from (plan item prompt-catalogue), with its renderer.
+  // The message catalogue every hook's words come from, with its renderer.
   if (installed) need(join(root, 'lib', 'engine', 'src', 'messages.js'), 'scripts/host.mjs');
   return { checked: seen.size, missing };
 }

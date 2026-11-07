@@ -1,9 +1,9 @@
-// The host's effect handlers (plan item engine-effects): every outside action an item takes is one of these, run by
+// The host's effect handlers: every outside action an item takes is one of these, run by
 // the host once per effect id (host.js runEffects). Each takes an effect and returns its outcome. None runs a shell
 // command: GitHub is reached over REST (github.js), and the thread and the clock through clients the caller hands in.
 //
 // A workflow names the action by its actor: merge -> merge.js, ask -> card.js, post -> post.js. Other actors (brief,
-// build, verify) are agents, which engine-actors starts; this run handler leaves them for a handler that has them.
+// build, verify) are agents, which actors.js starts; this run handler leaves them for a handler that has them.
 import { merge } from './merge.js';
 import { card } from './card.js';
 import { post } from './post.js';
@@ -34,7 +34,7 @@ export { relay, recordCard, recordClosed, cardFile, closedFile } from './relay.j
  * the wake a timer needs. `actors` adds run handlers by actor name. A hearth with ready(effect) (relay.js) holds a
  * card or post until it says the thread side is done.
  *
- * stop (plan item fix-finish-closes-waits): a run's state was left. An ask's card is closed through hearth.close by the
+ * stop: a run's state was left. An ask's card is closed through hearth.close by the
  * run's key; with no hearth.close the stop stays pending for a host that has one, and a hearth with ready(effect) holds
  * it until the thread side has closed the card. Any other stopped run has nothing in front of the person: its stop
  * ends at once, and a late result is turned away as stale.
@@ -42,10 +42,9 @@ export { relay, recordCard, recordClosed, cardFile, closedFile } from './relay.j
 export function handlers({ github, hearth = null, clock = {}, actors = {}, host = null, workflows = [], load, handlersFor } = {}) {
   const byActor = {
     ...Object.fromEntries(EFFECTS.map((name) => [name, MAKERS[name]({ github, hearth })]).filter(([, h]) => h)),
-    // Design A, 4.2: a workflow name as an actor starts a child item.
+    // A workflow name as an actor starts a child item.
     ...(host && handlersFor ? Object.fromEntries(workflows.map((name) => [name, item({ host, load, handlersFor })])) : {}),
-    // Model stages last (stage contract, lane S round 2): a stage named like a workflow is still its own agent, never a
-    // child item.
+    // Model stages last: a stage named like a workflow is still its own agent, never a child item.
     ...actors
   };
   return {
