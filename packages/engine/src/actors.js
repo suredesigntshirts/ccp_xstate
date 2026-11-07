@@ -11,7 +11,6 @@
 // Nothing here imports XState: the harness hook loads this file in a session that may not have it. Handing an
 // accepted result to the item (deliver) imports the host only when it is called.
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { append, readFile } from '../../journal/src/index.js';
@@ -20,6 +19,7 @@ import { prRef } from './effects/merge.js';
 import { render, said } from './messages.js';
 import { assemble, BLOCKED, blockedOf, contextOf, coverGap, isStage, returnLine, sections, stagesOf, STAMPED } from './stages.js';
 import { endRecord, stageRecord } from './trace.js';
+import { agentFile, itemFile, resultHash, runDir, runOf, runsDir, safe, sha256, spawnFile } from './names.js';
 
 // The actors that are agents are the workflow's model stages (stages.js isStage). Others (merge, ask, post) are host
 // effects (effects/index.js), and a workflow's name starts a child item.
@@ -31,28 +31,8 @@ export const spawnPrompt = (run) => `ccp-run ${run}`;
 /** True for the return tool under any plugin prefix: mcp__harness__return, mcp__plugin_ccp-harness_harness__return. */
 export const isReturnTool = (name) => /^mcp__(?:plugin_[\w.-]+_)?harness__return$/.test(String(name));
 
-const sha256 = (text) => createHash('sha256').update(text).digest('hex');
-// A value serialised with its object keys sorted at every depth, so the return tool's server and accept() hash the
-// same result alike whatever order its keys came in. return-tool.mjs repeats these lines,
-// since it may not import the engine.
-const sorted = (v) => (Array.isArray(v) ? v.map(sorted) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sorted(v[k])])) : v);
-export const sentHash = (result) => sha256(JSON.stringify(sorted(result ?? null)));
-
-/** A run's id is its effect id, `<item>:<seq>.<invoke>`; its name inside the item is `<seq>.<invoke>`. */
-export function runOf(run) {
-  const m = String(run ?? '').match(/^(.+):(\d+\.[\w-]+)$/);
-  return m ? { item: m[1], name: m[2] } : null;
-}
-
-const safe = (s) => String(s).replace(/[^A-Za-z0-9._-]/g, '_');
-/** The run's folder: brief, context, binding and result, under the item's own folder in the journal root. */
-export const runDir = (root, run) => {
-  const r = runOf(run);
-  return r && join(root, 'items', safe(r.item), 'runs', safe(r.name));
-};
-const agentFile = (root, agentId) => join(root, 'actors', 'agents', `${safe(agentId)}.json`);
-const spawnFile = (root, toolUseId) => join(root, 'actors', 'spawns', `${safe(toolUseId)}.json`);
-const itemFile = (root, item) => join(root, 'items', `${item}.jsonl`);
+// Run ids, file names and the result hash are names.js's, shared with the return tool and the inspector.
+export { runOf, runDir, resultHash as sentHash } from './names.js';
 
 const readJson = (path) => {
   try {
@@ -592,7 +572,7 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   const text = JSON.stringify(stamped);
   const { hash, bytes } = storeBlob(root, text);
   // sent is the result as the agent sent it, before the stamp: the return tool's server matches its call by it.
-  if (!writeOnce(join(dir, 'result.json'), { result: stamped, hash, sent: sentHash(result), caller, toolUseId, at: new Date().toISOString() })) {
+  if (!writeOnce(join(dir, 'result.json'), { result: stamped, hash, sent: resultHash(result), caller, toolUseId, at: new Date().toISOString() })) {
     return refuse('already-returned', said('already-returned', { run: run.run }));
   }
   journal(root, run, {
@@ -767,7 +747,7 @@ export async function deliver({ root, run: runId, github = null, workflow = null
 
 // The run records of an item prepared, not started and not failed.
 function waitingRecords(root, item) {
-  const dir = join(root, 'items', safe(item), 'runs');
+  const dir = runsDir(root, item);
   let names = [];
   try {
     names = readdirSync(dir).sort();

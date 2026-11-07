@@ -8,7 +8,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, statSy
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { performance } from 'node:perf_hooks';
-import { gate, journal, journalDir, pluginRoot, release, sessionFile, sessionName, stdin } from './host.mjs';
+import { gate, journal, journalDir, pluginRoot, release, sessionFile, sessionName, stdin, names as engineNames } from './host.mjs';
 import { EVENTS, capture, handedBack, read } from './capture-rows.mjs';
 
 const WATCHDOG_MS = 3000;
@@ -133,14 +133,16 @@ try {
   const refusals = refusedPath(session);
   const refused = REFUSAL_AWARE.includes(event) ? loadRefused(refusals) : {};
   // An invoked actor's agent is bound to its run by the actor hook (actors.mjs), in <journal>/actors/agents/; its rows
-  // carry the run's item and state.
+  // carry the run's item and state. Where that binding lives is the engine's names.js; without an engine library no
+  // agent reads as bound.
+  const names = await engineNames(root).catch(() => null);
   const bound = new Map();
   const boundOf = (agentId) => {
-    if (!agentId) return null;
+    if (!agentId || !names) return null;
     if (!bound.has(agentId)) {
       let b = null;
       try {
-        b = JSON.parse(readFileSync(join(journalDir(), 'actors', 'agents', `${String(agentId).replace(/[^A-Za-z0-9._-]/g, '_')}.json`), 'utf8'));
+        b = JSON.parse(readFileSync(names.agentFile(journalDir(), agentId), 'utf8'));
       } catch {}
       bound.set(agentId, b);
     }

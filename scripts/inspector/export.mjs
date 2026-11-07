@@ -12,6 +12,10 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from '
 import { createRequire } from 'node:module';
 import { basename, dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import * as ownNames from '../../packages/engine/src/names.js';
+
+// Bundle ids are file names, spelled as the engine spells them (names.js).
+const { safe } = ownNames;
 
 const sha256 = (text) => createHash('sha256').update(text).digest('hex');
 const readText = (path) => { try { return readFileSync(path, 'utf8'); } catch { return null; } };
@@ -19,7 +23,6 @@ const readJson = (path) => { const t = readText(path); if (t == null) return nul
 const readRows = (path) => (readText(path) ?? '').split('\n').filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
 const get = (root, path) => String(path).split('.').reduce((v, k) => v?.[k], root);
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const safe = (s) => String(s).replace(/[^A-Za-z0-9._-]/g, '_');
 
 // ---- The workflow graph, from the JSON alone
 
@@ -209,6 +212,16 @@ export async function composedIn(checkout, name) {
   if (!existsSync(at)) return null;
   const { readWorkflow } = await import(pathToFileURL(at).href);
   return readWorkflow(name, { dir: join(checkout, 'workflows') });
+}
+
+// How the engine checkout names an item's runs and cards (its names.js), or this repo's own names.js when the checkout
+// is older than that file.
+async function namesOf(checkout) {
+  const at = join(checkout ?? '', 'packages/engine/src/names.js');
+  if (checkout && existsSync(at)) {
+    try { return await import(pathToFileURL(at).href); } catch { /* fall back */ }
+  }
+  return ownNames;
 }
 
 async function loadEngine(checkout) {
@@ -568,10 +581,9 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
   }
   const sessionsDirs = [join(journal, 'sessions'), join(journal, '..', 'sessions')].filter((d) => existsSync(d) && statSync(d).isDirectory());
   const sessionRows = sessionsDirs.flatMap((d) => readdirSync(d).filter((n) => n.endsWith('.jsonl')).flatMap((n) => readRows(join(d, n))));
-  const itemDir = join(itemsDir, safe(item));
-  const runsDir = join(itemDir, 'runs');
+  const names = await namesOf(engine);
+  const runsDir = names.runsDir(journal, item);
   const runNames = existsSync(runsDir) ? readdirSync(runsDir) : [];
-  const cardsDir = join(itemDir, 'cards');
 
   const steps = [];
   let snap = null, prevContext = {}, prevLeaves = [];
@@ -616,7 +628,7 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
       const invokeId = name.slice(name.indexOf('.') + 1);
       const done = rows.find((r) => r.kind === 'engine.effect' && r.payload?.effect === e.effect && r.payload?.phase === 'done');
       const def = findInvoke(spec, toLeaves, invokeId);
-      const folder = runNames.find((n) => n === safe(name));
+      const folder = runNames.find((n) => n === names.safe(name));
       const runPath = folder ? join(runsDir, folder) : null;
       const brief = runPath ? readText(join(runPath, 'brief.md')) : null;
       const runJson = runPath ? readJson(join(runPath, 'run.json')) : null;
@@ -629,7 +641,7 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
       const stageRaw = runPath ? readJson(join(runPath, 'stage.json')) : null;
       if (stageRaw) Object.defineProperty(a, 'stageRaw', { value: stageRaw, enumerable: false });
       if (!a.model) {
-        const cardPath = join(cardsDir, `${safe(name)}.json`);
+        const cardPath = names.cardFile(journal, names.runId(item, name));
         a.card = readJson(cardPath);
         a.hostNote = runPath ? 'It has a run folder but no brief.md, so no prompt was written for it.' : null;
       } else {
