@@ -6,19 +6,11 @@
 // Closing is the same in reverse: when the item leaves the state that asked, the
 // run's stop waits until that session has withdrawn the card (close_decision) and recorded it with `bin/host.js closed`.
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname } from 'node:path';
+import { cardFile, closedFile } from '../names.js';
 
-const safe = (s) => String(s).replace(/[^A-Za-z0-9._-]/g, '_');
-
-/** Where the record of an ask run's posted card lives: beside the item's runs, under cards/. */
-export function cardFile(root, effectId) {
-  const m = String(effectId ?? '').match(/^(.+):(\d+\.[\w-]+)$/);
-  if (!m) throw new Error(`${effectId} is not a run id`);
-  return join(root, 'items', safe(m[1]), 'cards', `${safe(m[2])}.json`);
-}
-
-/** Where the record that an ask run's card was withdrawn lives: beside the card's record. */
-export const closedFile = (root, effectId) => cardFile(root, effectId).replace(/\.json$/, '.closed.json');
+// Where a card's records live is names.js's: cardFile and closedFile.
+export { cardFile, closedFile };
 
 const readJson = (path) => {
   try {

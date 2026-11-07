@@ -107,3 +107,12 @@ function engineFile(file, root, env) {
 export async function messages(root = pluginRoot(), env = process.env) {
   return import(engineFile('messages.js', root, env));
 }
+
+/**
+ * The engine's names (packages/engine/src/names.js): how a run id names its folder, where an agent's binding is, and
+ * how a returned result is hashed. Like the catalogue it imports only node: built-ins, so the return tool and capture
+ * share it with the engine instead of keeping copies.
+ */
+export async function names(root = pluginRoot(), env = process.env) {
+  return import(engineFile('names.js', root, env));
+}

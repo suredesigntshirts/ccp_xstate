@@ -41,6 +41,11 @@ Everything below is exported from `src/index.js`.
   text, and `dueTimers(host, at)` lists the timers due by a time.
 - `tripwiresOf(host)` is the tripwire rows in the item's file not yet offered, as `tripwire` events.
 
+**Names** (`src/names.js`). How a run id is spelled and parsed (`runId`, `runOf`), how an id becomes a file name
+(`safe`), where an item's, session's, run's, card's, agent's and spawn's files are under a journal root, and the
+key-order-free hash of a returned result (`resultHash`). It imports only `node:` built-ins, so the plugin's return
+tool and hooks and the inspector load this same file instead of keeping copies.
+
 **Actors** (`src/actors.js`, `src/trace.js`).
 
 - `actors({ host, repo, worktrees })` is the run handler for model stages: it prepares a run's brief, folder and

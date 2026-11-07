@@ -6,14 +6,15 @@
 // result, and refuses anything else, such as a call made while the hook was not running. The host stamps PR refs
 // before storing (key, branch, checkout, gates, green), so the match is against `sent`, the hash of the result as the
 // agent sent it; a result.json that has no sent is matched by `hash`, the stamped result's.
-import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline';
-import { journalDir, messages } from './host.mjs';
+import { journalDir, messages, names } from './host.mjs';
 
 // Its words are entries of the message catalogue.
 const { render } = await messages();
+// How a run id names its folder and how a result is hashed are the engine's names.js, which imports only node: built-ins.
+const { resultHash, runDir, sha256 } = await names();
 
 const TOOL = {
   name: 'return',
@@ -28,22 +29,16 @@ const TOOL = {
   }
 };
 
-const sha256 = (text) => createHash('sha256').update(text).digest('hex');
-// As the engine's sentHash (packages/engine/src/actors.js): object keys sorted at every depth.
-const sorted = (v) => (Array.isArray(v) ? v.map(sorted) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sorted(v[k])])) : v);
-const sentHash = (result) => sha256(JSON.stringify(sorted(result ?? null)));
-const safe = (s) => String(s).replace(/[^A-Za-z0-9._-]/g, '_');
-
 // Whether the hook stored exactly this result for this run.
 function answer({ run, result } = {}) {
-  const m = String(run ?? '').match(/^(.+):(\d+\.[\w-]+)$/);
+  const dir = runDir(journalDir(), run);
   let stored = null;
-  if (m) {
+  if (dir) {
     try {
-      stored = JSON.parse(readFileSync(join(journalDir(), 'items', safe(m[1]), 'runs', safe(m[2]), 'result.json'), 'utf8'));
+      stored = JSON.parse(readFileSync(join(dir, 'result.json'), 'utf8'));
     } catch {}
   }
-  const same = stored && (typeof stored.sent === 'string' ? stored.sent === sentHash(result) : stored.hash === sha256(JSON.stringify(result)));
+  const same = stored && (typeof stored.sent === 'string' ? stored.sent === resultHash(result) : stored.hash === sha256(JSON.stringify(result)));
   if (same) {
     return { content: [{ type: 'text', text: render('return-accepted', { run: String(run), hash: String(stored.hash.slice(0, 12)) }) }] };
   }

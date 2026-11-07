@@ -19,6 +19,7 @@ import { initialTransition, transition } from 'xstate';
 import { append, readFile } from '../../journal/src/index.js';
 import { machineOf, hashOf, startRefusal } from './spec.js';
 import { check } from './schema.js';
+import { itemFile, sessionFile } from './names.js';
 
 const START = 'xstate.init';
 const DONE = 'xstate.done.actor.'; // + the invoke's id: the actor finished, with event.output
@@ -26,10 +27,8 @@ const ERROR = 'xstate.error.actor.'; // + the invoke's id: the actor failed, wit
 const TIMER = 'xstate.after.'; // the event a delayed transition's timer sends
 const TERMINAL = ['done', 'refused', 'failed', 'unknown'];
 
-/** The one file an item's journal lives in. Restore reads it by this path and never lists a folder. */
-export const itemFile = (root, item) => join(root, 'items', `${item}.jsonl`);
-/** A session's own journal file, where it records what it was refused for an item it does not own. */
-export const sessionFile = (root, session) => join(root, 'sessions', `${session}.jsonl`);
+// Where an item's and a session's journal files are (names.js), exported here too for the host's callers.
+export { itemFile, sessionFile };
 
 /** Thrown when another session made the item's file between this host's restore and its first write. */
 export class OwnedError extends Error {
