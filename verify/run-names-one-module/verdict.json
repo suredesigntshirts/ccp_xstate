@@ -1,0 +1,52 @@
+{
+  "item": "run-names-one-module",
+  "verified_sha": "521ff004ab71b7c6bd4ef8a7f6c64a35b8b03ac3",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GWMY9u3FExvVX3UfR",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "one-place",
+      "status": "MET",
+      "command": "node --test verify/run-names-one-module/one-place.test.mjs (walks every .js/.mjs/.cjs/.sh/.py under packages/, plugins/, scripts/ skipping node_modules, vendor, test folders and *.test.*; looks for ':(\\d+\\.[\\w-]+)$', '[^A-Za-z0-9._-]' and an Object.keys(..).sort().map(k => [k, f(..)]) sorted-keys serialiser); plus grep -rnF of the same strings and grep -rn createHash at 521ff00 and at main 683cb32",
+      "excerpt": "Head: hits = runId, safe and sortedHash each only in packages/engine/src/names.js (lines 26, 31, 13). Main: run id pattern in actors.js, effects/relay.js, return-tool.mjs; safe pattern in those three plus capture.mjs and scripts/inspector/export.mjs. Other createHash users at head (index.js, wake.js, spec.js hashOf, fingerprint.mjs, capture-rows.mjs, inspector build/export, bench) hash bytes or arrays, none sorts object keys; stages.js:525 sorts keys only to compare two key lists."
+    },
+    {
+      "id": "node-only",
+      "status": "MET",
+      "command": "node --test verify/run-names-one-module/node-only.test.mjs (parses every import/import()/require in names.js; copies packages/engine/src to a fresh os.tmpdir() folder, asserts no node_modules in any parent, imports names.js there and calls runId/runOf; control: host.js imported from the same copy)",
+      "excerpt": "imports: node:crypto, node:path only. names.js loads from the copy and exports runId, runOf, safe, itemFile, sessionFile, runsDir, runDir, cardFile, closedFile, agentFile, spawnFile, resultHash; runOf(runId('it/1','3.build')) = {item:'it/1', name:'3.build'}. Control: host.js from the same copy rejects with Cannot find package 'xstate'. 2/2 pass."
+    },
+    {
+      "id": "return-answers",
+      "status": "MET",
+      "command": "node --test verify/run-names-one-module/return-answers.test.mjs (verify/run-names-one-module/lib.mjs + scenario.mjs: start quick-fix item it-1 with the head engine; Agent PreToolUse and SubagentStart through plugins/harness/scripts/actors.mjs bind ag-brief to it-1:0.brief; the return tool's PreToolUse through actors.mjs with {builder, verifier}; then return-tool.mjs over stdio, CCP_REPO pointing nowhere)",
+      "excerpt": "hook: null (let through); result.json sent 65f1a6a57cad. Keys reordered {verifier, builder}: 'accepted: run it-1:0.brief's result is stored (65f1a6a57cad). You are done.' Changed value: 'not accepted: no harness check passed this result for run it-1:0.brief. ...'. Added key: 'not accepted: ...'. 1/1 pass."
+    },
+    {
+      "id": "installed-layout",
+      "status": "MET",
+      "command": "node --test verify/run-names-one-module/installed-layout.test.mjs (git archive HEAD of plugins/harness, packages/journal, packages/engine/src, packages/engine/messages.md, laid out as setup.sh lines 88-99: plugin files at out/, lib/journal, lib/engine/src, lib/engine/messages.md, in os.tmpdir() with no repo or node_modules beside it; same scenario through out/scripts/actors.mjs and out/scripts/return-tool.mjs; control: rename out/lib/engine/src/names.js and ask the server again)",
+      "excerpt": "Installed copy: reordered keys 'accepted: run it-1:0.brief's result is stored (65f1a6a57cad)', changed value and added key 'not accepted'. Control without lib/engine/src/names.js: server exits 1, stderr 'Error: no engine library at /tmp/verify-rn-inst-.../out/lib/engine/src, /tmp/packages/engine/src, /tmp/verify-rn-.../no-repo/packages/engine/src', so the answers came from the bundled names.js. 1/1 pass."
+    },
+    {
+      "id": "behaviour-unchanged",
+      "status": "MET",
+      "command": "npm ci, then npm test -- --test-reporter=tap in separate clean clones at main 683cb32 and head 521ff00, one after the other; passing test names compared with comm (evidence/*.pass); git diff --name-status 683cb32 521ff00 filtered to test files",
+      "excerpt": "main: tests 1637, pass 1621, fail 1, skipped 15. head: tests 1642, pass 1626, fail 1, skipped 15. The one failure is the same at both: 'copy-not-link: with release tags, setup installs the newest release by version, not the HEAD' (known to fail in this container on main). comm -23 main.pass head.pass: empty. New at head: the 5 tests of packages/engine/test/names.test.js. Test files changed: only 'A packages/engine/test/names.test.js'; no existing test edited."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 163 at 521ff00; gates job log 128515199454; HEAD_SHA=521ff00 BASE_SHA=683cb32 node scripts/gates/pr-gate.mjs stubs|freeze",
+      "excerpt": "'test' (128515199322) success 20:13:14Z; 'clean-room' (128515199460) success. 'gates' (128515199454) failed only at the verdict step: 'verdict gate failed (item run-names-one-module): no verify/run-names-one-module/verdict.json at the head sha'. Locally: 'stubs gate passed (item run-names-one-module)', 'freeze gate passed (item run-names-one-module)'. This verdict commit is what the gates check waits for."
+    }
+  ],
+  "notes": [
+    "return-tool.mjs and capture.mjs load names.js through a new host.mjs names() rather than engine(), because verify/engine-host/plugin-tools.test.mjs pins actors.mjs as the only engine() caller. names() resolves through the same engineFile() places as engine() and messages(), so the outcome's 'through host.mjs engine()' holds in substance; installed-layout shows it loads lib/engine/src/names.js.",
+    "capture.mjs now reads an agent as unbound when no engine library can be found (before, it used its own copy of safe). An installed plugin always carries lib/engine/src from the same release, so this only changes a layout without the engine.",
+    "Path knowledge still spelled outside names.js, not covered by any Expect pattern: actors.js startedRun lists join(root, 'actors', 'spawns') directly (lines 286, 291) instead of from spawnFile's folder; host.mjs sessionFile keeps its own different rule ([^A-Za-z0-9_-], no dot) for session journal names. Candidates for a later item, not failures here.",
+    "export.mjs now builds the card path with names.cardFile(journal, runId(item, name)), which throws for a name that is not '<seq>.<invoke>'; names there come from effect ids of that shape, and the inspector tests pass at the head."
+  ]
+}
