@@ -1,1 +1,0 @@
-Run v-2:0.brief, worktree /tmp/verify-rls/pre/wt/v-2--0.brief of /tmp/verify-rls/pre/repo, branch run/v-2/0.brief.

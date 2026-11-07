@@ -7,7 +7,7 @@ import { cpSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { cont, engineOf } from './scenario.mjs';
+import { cont, engineOf, unpack } from './scenario.mjs';
 import { BUDGET, spent } from '../../packages/engine/src/run/store.js';
 import { REFUSAL_CAP } from '../../packages/engine/src/run/accept.js';
 import { STALL_CAP } from '../../packages/engine/src/run/supervise.js';
@@ -70,7 +70,7 @@ test('one-budget: outside the store, no run module reads the journal (readFile, 
 test('one-budget: a root main left with 7 refusals and 1 stall block (no attempts) continues at the head as at main', async () => {
   const root = join(tmpdir(), 'verify-rls-cont', 'root');
   rmSync(dirname(root), { recursive: true, force: true });
-  cpSync(join(HERE, 'evidence', 'main', 'pre'), root, { recursive: true });
+  unpack(JSON.parse(readFileSync(join(HERE, 'evidence', 'main', 'pre.json'), 'utf8')), root);
   const runJson = (item) => JSON.parse(readFileSync(join(root, 'items', item, 'runs', '0.brief', 'run.json'), 'utf8'));
   assert.equal(runJson('v-1').attempts, undefined);
   assert.equal(runJson('v-2').attempts, undefined);

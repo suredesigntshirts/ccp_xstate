@@ -7,7 +7,7 @@
 //   node verify/run-lifecycle-store/scenario.mjs <checkout> <out-dir>
 //
 // writes <out-dir>/trace.json, <out-dir>/states/<scenario>/<milestone>/ (the lifecycle files of every run folder and
-// the pointer files, as the checkout's engine left them) and <out-dir>/pre/ (a whole root that main leaves with
+// the pointer files, as the checkout's engine left them) and <out-dir>/pre.json (a whole root that main leaves with
 // refusals and stall rows already spent, for the continuation in one-budget).
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -74,7 +74,7 @@ async function world(E, name, items = ['v-1']) {
   rmSync(base, { recursive: true, force: true });
   const root = join(base, 'root');
   const repo = gitRepo(join(base, 'repo'));
-  const spec = E.loadWorkflow('quick-fix');
+  const spec = E.loadWorkflow('quick-fix', { root });
   const hosts = {};
   for (const item of items) {
     const host = E.restore({ root, item, spec, session: SESSION, release: '0.2.0' });
@@ -279,6 +279,16 @@ export async function cont(E, root) {
   return out;
 }
 
+// A root as one JSON file ({ relative path: text }), so repo-wide scans of committed journals (items/*.jsonl) do not
+// take this evidence for a finished item's journal; unpack writes it back.
+export const pack = (root) => Object.fromEntries(walk(root).sort().map((p) => [relative(root, p), readFileSync(p, 'utf8')]));
+export function unpack(files, root) {
+  for (const [rel, text] of Object.entries(files)) {
+    mkdirSync(join(root, rel, '..'), { recursive: true });
+    writeFileSync(join(root, rel), text);
+  }
+}
+
 /** actors.js's exports: { name: { type, value } }, the value of each that is not a function (a RegExp as its source). */
 export async function exportsOf(checkout) {
   const m = await import(pathToFileURL(join(resolve(checkout), 'packages/engine/src/actors.js')).href);
@@ -303,7 +313,7 @@ export async function record(checkout, out) {
   const p = await world(E, 'pre', ['v-1', 'v-2']);
   await pre(E, p);
   trace.pre = p.steps;
-  cpSync(p.root, join(out, 'pre'), { recursive: true });
+  writeFileSync(join(out, 'pre.json'), `${JSON.stringify(pack(p.root), null, 1)}\n`);
   trace.cont = await cont(E, p.root);
   writeFileSync(join(out, 'trace.json'), `${JSON.stringify(trace, null, 1)}\n`);
   return trace;

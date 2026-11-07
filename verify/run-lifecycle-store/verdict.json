@@ -27,7 +27,7 @@
     {
       "id": "one-budget",
       "status": "MET",
-      "command": "node --test verify/run-lifecycle-store/budget.test.mjs and answers.test.mjs (one-budget tests); evidence/main/pre is main's root with v-1 bound and 7 refusals, v-2 prepared and 1 stall block, no attempts; main's continuation from it is trace.json's cont",
+      "command": "node --test verify/run-lifecycle-store/budget.test.mjs and answers.test.mjs (one-budget tests); evidence/main/pre.json is main's root (packed as one file so journal scans don't take it for a finished item) with v-1 bound and 7 refusals, v-2 prepared and 1 stall block, no attempts; main's continuation from it is trace.json's cont",
       "excerpt": "BUDGET deep-equals { refused: 10, sentBack: 1, stalled: 2 }, frozen, the one line holding those numbers; REFUSAL_CAP = BUDGET.refused, STALL_CAP = BUDGET.stalled, send-back checked with spent(...) >= BUDGET.sentBack. No other 10/1/2 limit (left: startedRun's open.length === 1, h.slice(at + 2), m[2]). At every step attempts equal the counted rows so far (refusal-cap 1..10, sent-back 1, stall-cap 1,2; main writes none). Failure step same at both: refuse 10, stopped after the send-back, stopped again / handedBack at once, stall 3. Continuation at the head over main's pre: spent = 7 and 1 from the journal; refuse 8, 9, then 10 fails, 11 already-failed; stall 'Block 2 of 2.', then failed ['v-2:0.brief'], then null; equal to main's cont; run.json attempts then { refused: 10 } and { stalled: 2 }. Outside the store, run modules read the journal only for the stage record (actors.js itemRows) and to list the refusals in the refusal-cap text (accept.js resultRefusals), not to count. 6/6 pass."
     },
     {
