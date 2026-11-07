@@ -279,3 +279,4 @@ any time.
 
 Each is `draft` in `plan/items/`, in stage s5-parity. That stage's `measured` gate compares concept counts with v1,
 so cleanup that lowers the count serves it directly.
+// (plan item fix-x)
