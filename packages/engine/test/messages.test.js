@@ -29,7 +29,7 @@ test('the catalogue loads, and every entry is used by the engine or the plugin a
   const all = entries();
   assert.equal(load(CATALOGUE).entries.size, all.size);
   const sources = [
-    ...readdirSync(join(here, '..', 'src')).filter((f) => f.endsWith('.js')).map((f) => join(here, '..', 'src', f)),
+    ...readdirSync(join(here, '..', 'src'), { recursive: true }).filter((f) => f.endsWith('.js') && !f.startsWith('vendor')).map((f) => join(here, '..', 'src', f)),
     ...readdirSync(join(repo, 'plugins', 'harness', 'scripts')).filter((f) => f.endsWith('.mjs')).map((f) => join(repo, 'plugins', 'harness', 'scripts', f))
   ].map((f) => readFileSync(f, 'utf8')).join('\n');
   const named = new Set([...sources.matchAll(/\b(?:render|said|say)\('([a-z0-9-]+)'/g)].map((m) => m[1]));

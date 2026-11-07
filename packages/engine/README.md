@@ -46,7 +46,21 @@ Everything below is exported from `src/index.js`.
 key-order-free hash of a returned result (`resultHash`). It imports only `node:` built-ins, so the plugin's return
 tool and hooks and the inspector load this same file instead of keeping copies.
 
-**Actors** (`src/actors.js`, `src/trace.js`).
+**Actors** (`src/actors.js`, `src/run/`, `src/trace.js`). `src/actors.js` prepares, starts, binds and confines runs
+and hands their results to the item; it also exports what the modules below export, so the harness hooks import one
+file.
+
+- `src/run/store.js` is the run store, the one owner of a run's folder. `state(root, run)` reads `prepared`,
+  `spawned`, `bound`, `returned` or `failed` from the folder's files, and `transition(root, run, event, record, row)`
+  writes an event's file once with its journal row, only from the states the event leaves from (`TRANSITIONS`).
+  `ANSWERS` says which catalogue entry a hook answers with when a run is in a state it cannot act in. `BUDGET` is the
+  attempt budget: 10 refused results, 1 send-back and 2 stall blocks, counted in `run.json`'s `attempts`
+  (`spend`, `spent`).
+- `src/run/worktree.js` adds a run's worktree (`addWorktree`, `rebuildStart`, `freeBranch`) and names the clone's
+  GitHub repository (`githubOf`).
+- `src/run/accept.js` checks a returned result (`accept`, `refusalText`).
+- `src/run/supervise.js` sends back or fails an agent that ends without returning (`handback`, `stopped`) and blocks or
+  fails a session that does not start its run (`stall`, `cannotStart`).
 
 - `actors({ host, repo, worktrees })` is the run handler for model stages: it prepares a run's prompt, folder and
   worktree.
@@ -161,7 +175,7 @@ The person sets the file; the first one is `plan/decisions/2026-10-31-first-gran
 
 ## Actors
 
-A state that invokes a model stage (`brief`, `build`, `verify`) starts an agent (`src/actors.js`). The run handler
+A state that invokes a model stage (`brief`, `build`, `verify`) starts an agent (`src/actors.js`, `src/run/`). The run handler
 writes the run's folder under `<root>/items/<item>/runs/<seq>.<invoke>/` and journals the prompt's hash (`prompt.md`, row `prompt.stored`). It adds a git
 worktree named `<item>--<seq>.<invoke>` on branch `run/<item>/<seq>.<invoke>`, from `--repo`'s HEAD, under
 `--worktrees`.
@@ -196,6 +210,9 @@ The run stays open until its agent returns:
    `stalled: ...`, a `stall-cap` row), and the item gets the actor's error event. A session that cannot start the run
    calls the Agent tool with `ccp-cannot-start <run>: <why>` (`cannotStart`), which fails it with that reason. A
    failed run is not `waiting`, and `ccp-run` of it is refused. `derive.js stalls` counts how often this happens.
+
+The limits in steps 4 to 6 are the run's attempt budget (`src/run/store.js` `BUDGET`). `run.json` gains `attempts`
+(`refused`, `sentBack`, `stalled`) once one is spent; a `run.json` without it counts from the journal rows.
 
 ## Files
 
