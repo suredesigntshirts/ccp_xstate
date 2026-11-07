@@ -4,7 +4,7 @@
   "title": "Make harness comments state what holds now, not which item added it",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Comments in the harness source (packages/engine/src, packages/engine/bin, packages/journal/src, packages/journal/bin, plugins/harness/scripts, scripts/inspector, scripts/bench) and the two READMEs (packages/engine/README.md, plugins/harness/README.md) state present-tense facts and invariants, with no plan item ids, design-letter sections, lanes, tournament rounds or grafts; the engine README describes its entry points, guarantees and files; CLAUDE.md states the rule and that a cleanup changes structure, not behaviour; and the PR gate refuses a new history reference in that source, as it refuses a TODO.",
   "why": "About 140 history references sit in harness source comments and the two READMEs (50 in packages/engine/src alone). They make every file read as an archive, they cost every agent session tokens for history it cannot use, and builders add more by habit. The why already travels with the plan item, the commit and the PR (CLAUDE.md principles). APOSD chapters 12-13 and Pragmatic's single source of truth; research plan/research/design-books-cleanup.md, finding 2.",
   "serves": [
@@ -128,6 +128,18 @@ it must hold. The gate makes the rule hold for later builders, who otherwise add
 Rewrite rule for the builder: a comment like "(fix-rebuild-worktree)" becomes the invariant it protects ("a rebuild
 works on the previous PR's branch at the head the host last saw"), or goes when the code already says it. Keep
 comments that say why a non-obvious choice holds (a platform fact, a race), and drop the story of how it got there.
+
+## Done
+
+Built in PR #159 (merged 0e2fe1e), verified by a separate session at 1b43a58: all five Expect lines MET. The verdict
+records one reading: nine test-name strings in `scripts/inspector/test/export.test.mjs` still match the no-history grep,
+because they name the lane checkouts the tests run on. The non-goals keep tests out of the sweep, and code-unchanged
+forbids changing strings, so they stay, and the gate skips test files. The build also republished the Harness Observe
+artifact, with only two bundled comment lines changed, because `verify/obs-page/live.test.mjs` pins it to the built
+page. Released with harness-v0.1.34.
+
+Draft idea, not an item yet: the `HISTORY` pattern misses a bare item id ("engine-actors") and "ported from #N". The
+gate could also match every id in `plan/items/`, in comments only.
 
 ## Verifier brief
 
