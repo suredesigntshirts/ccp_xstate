@@ -40,7 +40,7 @@ How a workflow carries an item through its states. An engine item is the same id
 | run folder | A run's files: `prompt.md`, `context.md`, `run.json`, `stage.json`, `result.json` | `packages/engine/src/names.js` `runDir` |
 | run store | The one owner of a run's folder: reads its run state and moves it by transitions | `packages/engine/src/run/store.js` `state`, `transition` |
 | run state | Where a run is in its lifecycle: prepared, spawned, bound, returned or failed | `packages/engine/src/run/store.js` `STATES` |
-| attempt budget | How many refused results, send-backs and stall blocks a run may spend before it fails | `packages/engine/src/run/store.js` `BUDGET`, `run.json` `attempts` |
+| attempt budget | How many refused results, send-backs and stall blocks a run may spend before it fails; run.json counts them as attempts | `run.json`, `packages/engine/src/run/store.js` `BUDGET` |
 | prompt | The exact text a run's agent starts with, rendered from its stage file and input | `prompt.md`, `packages/engine/src/names.js` `promptFile`, `prompt.stored` |
 | context | The run's facts (run id, worktree, repo, branch), given to the agent once beside its prompt | `context.md`, `packages/engine/src/stages.js` `contextOf` |
 | stage record | Every piece of a run's prompt with its source, and where its output went | `stage.json`, `packages/engine/src/trace.js` `stageRecord` |
