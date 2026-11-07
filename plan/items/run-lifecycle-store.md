@@ -81,7 +81,7 @@
   "expect": [
     {
       "id": "one-owner",
-      "check": "At the head, outside packages/engine/src/run/store.js, no file under packages/engine/src, plugins/harness/scripts or packages/journal/src reads, writes or tests the existence of run.json, spawn.json, agent.json, result.json, failed.json or sent-back.json in a run folder, or writes the spawn or agent pointer files; actors.js, accept.js and supervise.js get each run's state from the store",
+      "check": "At the head, outside packages/engine/src/run/store.js, no file under packages/engine/src or packages/journal/src reads, writes or tests the existence of run.json, spawn.json, agent.json, result.json, failed.json or sent-back.json in a run folder, or reads or writes the spawn or agent pointer files; under plugins/harness/scripts nothing writes them (return-tool.mjs reading result.json and capture.mjs reading the agent pointer stay, unchanged); actors.js, accept.js and supervise.js get each run's state from the store",
       "how": "The verifier's grep of those file names and of existsSync, readFileSync, writeFileSync and writeOnce calls on run folders, and reading each hook",
       "proof": "verifier"
     },
@@ -147,7 +147,7 @@
     "No model-facing text change: every refusal, block and deny reads as on main (answers-unchanged checks it); one generic 'run is <state>' message, as the research suggested, would change what agents read and is left for an item that measures it",
     "The three limits keep their own values; one shared number across refusals, send-backs and stalls would let stalls spend a builder's refusals and is a behaviour change (plan/decisions/2026-11-07-run-lifecycle-store.md)",
     "Run-folder file names and contents, journal kinds and rows are unchanged, so the inspector, derive.js and committed evidence read as before; run.json only gains attempts once an attempt is spent",
-    "plugins/harness/scripts/actors.mjs, the anticorruption layer for Claude Code's terms, does not change",
+    "plugins/harness/scripts does not change: actors.mjs, the anticorruption layer for Claude Code's terms, calls actors.js as before, and return-tool.mjs and capture.mjs keep reading result.json and the agent pointer directly, since they load only names.js",
     "The engine still knows the brief stage by its actor name in accept; stage-contract-declares-rules moves that"
   ],
   "records": [
@@ -190,8 +190,8 @@ Check out the PR at its head sha in a clean clone and run `npm ci`. Keep a secon
 reading the builder's tests, write your own under `verify/run-lifecycle-store/`:
 
 - **one-owner:** grep the six run-folder file names and the spawn and agent pointer paths (names.js `spawnFile`,
-  `agentFile`) in packages/engine/src, plugins/harness/scripts and packages/journal/src; only run/store.js may touch
-  them. Read each hook and show it asks the store.
+  `agentFile`) in packages/engine/src and packages/journal/src; only run/store.js may touch them. In
+  plugins/harness/scripts, show the only uses are the two unchanged reads. Read each hook and show it asks the store.
 - **states-true:** drive runs with main's engine (verify/engine-actors, verify/fix-waiting-run-stall and
   verify/fix-refusal-hints show how) into temp roots, one per end state and failure kind; read each with the head's
   store. Also read the committed folders the Expect line names. Call a transition from a state it does not leave
