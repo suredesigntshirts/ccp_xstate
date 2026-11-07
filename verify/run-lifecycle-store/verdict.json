@@ -1,0 +1,61 @@
+{
+  "item": "run-lifecycle-store",
+  "verified_sha": "2639844a1f871a82a268a8d600450de1583bbbf1",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GjqtjyGPrcS96cMM9",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "one-owner",
+      "status": "MET",
+      "command": "node --test verify/run-lifecycle-store/owner.test.mjs (greps run.json, spawn.json, agent.json, result.json, failed.json, sent-back.json, spawnFile, agentFile, 'spawns', 'agents' over packages/engine/src and packages/journal/src; existsSync/writeOnce/renameSync/readJson/writeJson/fs calls in actors.js and run/*.js; the same names in plugins/harness/scripts; reads each hook's body for its store calls)",
+      "excerpt": "Outside run/store.js the only hits are names.js's two definitions (export const agentFile = ..., export const spawnFile = ...), and only run/store.js imports them. actors.js and run/accept|supervise|worktree.js hold no writeOnce or renameSync; their one existsSync is existsSync(worktree). actors.js itself reads and writes only prompt.md, context.md and stage.json. plugins/harness/scripts: only capture.mjs readFileSync(names.agentFile(...)) and return-tool.mjs readFileSync(join(dir, 'result.json')); git diff 3b7b6e8 2639844 -- plugins/ is empty. Hooks: spawn answerOf('spawn', state(root, run)) + transition 'spawn'; bind transition 'bind'; bindLate boundRun/verifyBinding; startedRun unboundSpawns; resultsOf resultOf/failureOf; waiting/ownedWaiting waitingRecords/ownedRecords; accept bindingOf, state, answerOf('return'), transition 'return'/'fail', spend; handback/stopped openRunOf via state(); stall spent/spend; cannotStart answerOf('cannot-start', state()). 4/4 pass."
+    },
+    {
+      "id": "states-true",
+      "status": "MET",
+      "command": "node verify/run-lifecycle-store/scenario.mjs <main 3b7b6e8 clone> evidence/main (main's engine drives 11 scenarios; the lifecycle files of each milestone kept in evidence/main/states/), then node --test verify/run-lifecycle-store/states.test.mjs reads them with the head's store.state, reads every committed run folder, and calls every transition that does not leave from each kept state on a copy",
+      "excerpt": "Main's folders: returned/{prepared,spawned,bound,returned} -> prepared, spawned, bound, returned; refusal-cap, no-return-stop, no-return-again (stop_hook_active), no-return-handback, no-return-handed-back, stall-cap, cannot-start -> failed (failed.json why 'refused 10 times', 'the actor ended (SubagentStop)...', 'stalled', 'cannot-start'); no-return-stop/sent-back and cannot-start-started/bound -> bound; stall-two v-2 -> prepared; unknown run -> null. 192 committed run folders (verify/engine-toy-run/evidence, bench/brief/runs): all agree with main's file checks, all 'returned'. 65 refused transitions (e.g. prepared:bind, spawned:return, bound:spawn, returned:fail, failed:send-back): each returned false and left every byte of the root unchanged, no journal row. 3/3 pass."
+    },
+    {
+      "id": "answers-unchanged",
+      "status": "MET",
+      "command": "scenario.mjs at main (evidence/main/trace.json) and node --test verify/run-lifecycle-store/answers.test.mjs, which records the same scenarios with the head's engine in the same fixed temp paths (git repo committed at a fixed date) and compares each step's return, changed lifecycle/pointer files and added journal rows, with at, id and hookSession removed and run.json's attempts kept apart",
+      "excerpt": "139 steps over 11 scenarios: spawn, bind, bindLate (mismatch, verify, verified), accept (unbound, main session, unknown run, restated/schema, accepted, already-returned, already-failed-refused, already-failed-stopped), handback, stopped (again, handedBack), stall (owner, other session, two items, cap), cannotStart (no reason, bad form, unknown, wrong session, done, already-failed, already-started), waiting, ownedWaiting, startedRun, resultsOf, boundRun, probed in prepared, spawned, bound, returned and failed. Every return, file and row equal to main's; the only difference anywhere is run.json's attempts. 2/2 pass."
+    },
+    {
+      "id": "one-budget",
+      "status": "MET",
+      "command": "node --test verify/run-lifecycle-store/budget.test.mjs and answers.test.mjs (one-budget tests); evidence/main/pre.json is main's root (packed as one file so journal scans don't take it for a finished item) with v-1 bound and 7 refusals, v-2 prepared and 1 stall block, no attempts; main's continuation from it is trace.json's cont",
+      "excerpt": "BUDGET deep-equals { refused: 10, sentBack: 1, stalled: 2 }, frozen, the one line holding those numbers; REFUSAL_CAP = BUDGET.refused, STALL_CAP = BUDGET.stalled, send-back checked with spent(...) >= BUDGET.sentBack. No other 10/1/2 limit (left: startedRun's open.length === 1, h.slice(at + 2), m[2]). At every step attempts equal the counted rows so far (refusal-cap 1..10, sent-back 1, stall-cap 1,2; main writes none). Failure step same at both: refuse 10, stopped after the send-back, stopped again / handedBack at once, stall 3. Continuation at the head over main's pre: spent = 7 and 1 from the journal; refuse 8, 9, then 10 fails, 11 already-failed; stall 'Block 2 of 2.', then failed ['v-2:0.brief'], then null; equal to main's cont; run.json attempts then { refused: 10 } and { stalled: 2 }. Outside the store, run modules read the journal only for the stage record (actors.js itemRows) and to list the refusals in the refusal-cap text (accept.js resultRefusals), not to count. 6/6 pass."
+    },
+    {
+      "id": "split-by-knowledge",
+      "status": "MET",
+      "command": "Read run/store.js, worktree.js, accept.js, supervise.js and actors.js at 2639844; node --test verify/run-lifecycle-store/owner.test.mjs (split tests; actors.js's export list at main recorded by scenario.mjs exportsOf into evidence/main/exports.json); git diff 3b7b6e8 2639844 -- plugins/harness/scripts",
+      "excerpt": "worktree.js: githubOf, rebuildStart, freeBranch and the git worktree add/list; it is the only file under packages/ and plugins/ (outside tests) that runs git worktree (main: actors.js). accept.js: accept, agrees, differences, refsIn, hintOf, REFUSAL_CAP, refusalText. supervise.js: handback, stopped, stall, cannotStart, STALL_CAP, CANNOT_START, cannotStartPrompt, stallText. actors.js 312 lines (main 884). All 37 exports of main's actors.js present at the head with the same type and value (MARKER and CANNOT_START regexps, REFUSAL_CAP 10, STALL_CAP 2, RESULT_RULES), none added; function behaviour by answers-unchanged. plugins diff empty. 3/3 pass."
+    },
+    {
+      "id": "store-tests",
+      "status": "MET",
+      "command": "In a copy of 2639844: node --test packages/engine/test/run-store.test.js intact, then with each mutation of packages/engine/src/run/store.js",
+      "mutation": "1) transition's guard 'if (!t.from.includes(state(root, run))) return false;' replaced by 'if (false) return false;'. 2) spend's 'if (record) writeJson(fileOf(root, run, 'run.json'), { ...record, attempts: ... });' removed.",
+      "red_test": "1) 'a transition from a state it does not leave from writes nothing and journals nothing'. 2) 'the budget is one table, the caps read from it, and run.json counts what was spent' and 'a run.json written without attempts counts from its journal rows, then carries on in run.json'.",
+      "excerpt": "Intact: 5/5 pass. Mutation 1: not ok 2, pass 4 fail 1. Mutation 2: not ok 4 and not ok 5, pass 3 fail 2. My own suite also goes red: mutation 1 fails states-true's guard test; mutation 2 fails three one-budget tests; BUDGET.stalled 3 fails six."
+    },
+    {
+      "id": "behaviour-unchanged",
+      "status": "MET",
+      "command": "npm ci, then npm test -- --test-reporter=tap in separate clean clones at main 3b7b6e8 and head 2639844, one after the other (the head clone also held this folder's 17 tests); passing names compared with comm (evidence/main.pass, evidence/head.pass); git diff 3b7b6e8 2639844 of test files read in full",
+      "excerpt": "main: tests 1673, pass 1657, fail 1, skipped 15. head: tests 1695, pass 1679, fail 1, skipped 15. The failure is the same at both: 'copy-not-link: with release tags, setup installs the newest release by version, not the HEAD' (fails in this container on main). Passing at main and not at head: none. New at head: the builder's 5 run-store tests and my 17. Test diff: new packages/engine/test/run-store.test.js; verify/harness-glossary/one-meaning.test.mjs pins the brief.stored writer to run/accept.js (the named change); packages/engine/test/messages.test.js reads src/ recursively (skipping vendor) for catalogue uses: the files it scans are main's plus effects/*.js and run/*.js, and effects/ renders no catalogue entry, so the set of entries it finds used is main's, read from their new place: a path change only."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 169 at 2639844; gates job log 128552485174; HEAD_SHA=2639844 BASE_SHA=3b7b6e8 node scripts/gates/pr-gate.mjs stubs|freeze; node plan/check.mjs",
+      "excerpt": "'test' (128552485522) success 22:47:38Z. 'gates' (128552485174) failed only at the verdict step: 'verdict gate failed (item run-lifecycle-store): no verify/run-lifecycle-store/verdict.json at the head sha'. Locally: 'stubs gate passed', 'freeze gate passed', 'plan ok'. This verdict commit is what the gates check waits for."
+    }
+  ],
+  "notes": "One observation, not a failure: store.spent(root, run, kind) on a run.json without attempts falls back to the journal using run.item and run.run, so called with a run id string it returns 0; every caller passes the run's record, so nothing reaches it today. The no-return-again failure text says 'after being sent back once' though no send-back happened; that is main's text, unchanged. evidence/main/ is scenario.mjs's output at main 3b7b6e8."
+}

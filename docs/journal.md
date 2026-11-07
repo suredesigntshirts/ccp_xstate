@@ -356,9 +356,10 @@ person (plan item fix-finish-closes-waits). An effect that has ended is never ru
 
 ## Actor rows
 
-The engine's actor runs (plan item engine-actors, `packages/engine/src/actors.js`) write these to the item's own file,
+The engine's actor runs (`packages/engine/src/actors.js` and `packages/engine/src/run/`) write these to the item's own file,
 beside its engine rows, with `item` and the `state` the run was started in. A run's folder is
-`<journal root>/items/<item>/runs/<seq>.<invoke>/`: `prompt.md`, `context.md`, `run.json`, `stage.json` (the stage
+`<journal root>/items/<item>/runs/<seq>.<invoke>/`: `prompt.md`, `context.md`, `run.json` (with `attempts`, the
+refused results, send-backs and stall blocks spent, once one is), `stage.json` (the stage
 record), `spawn.json` (the Agent call that started it), `agent.json` (the agent bound to it) and `result.json` (its
 accepted result: `result` as stamped, `hash` of it, `sent`, the hash of the result as the agent sent it with object keys
 sorted at every depth, which the return tool's server matches its call by, `caller`, `toolUseId` and `at`). Brief and

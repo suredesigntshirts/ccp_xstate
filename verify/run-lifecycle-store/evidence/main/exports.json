@@ -1,0 +1,124 @@
+{
+ "CANNOT_START": {
+  "type": "regexp",
+  "value": "/^\\s*ccp-cannot-start\\s+(\\S+:\\d+\\.[\\w-]+):\\s*(\\S[\\s\\S]*?)\\s*$/"
+ },
+ "MARKER": {
+  "type": "regexp",
+  "value": "/^\\s*ccp-run\\s+(\\S+)\\s*$/"
+ },
+ "REFUSAL_CAP": {
+  "type": "number",
+  "value": 10
+ },
+ "RESULT_RULES": {
+  "type": "array",
+  "value": [
+   "schema",
+   "reserved",
+   "restated",
+   "covers",
+   "ref"
+  ]
+ },
+ "STALL_CAP": {
+  "type": "number",
+  "value": 2
+ },
+ "accept": {
+  "type": "function"
+ },
+ "actors": {
+  "type": "function"
+ },
+ "agrees": {
+  "type": "function"
+ },
+ "bind": {
+  "type": "function"
+ },
+ "bindLate": {
+  "type": "function"
+ },
+ "boundRun": {
+  "type": "function"
+ },
+ "boundText": {
+  "type": "function"
+ },
+ "cannotStart": {
+  "type": "function"
+ },
+ "cannotStartPrompt": {
+  "type": "function"
+ },
+ "confine": {
+  "type": "function"
+ },
+ "deliver": {
+  "type": "function"
+ },
+ "differences": {
+  "type": "function"
+ },
+ "githubOf": {
+  "type": "function"
+ },
+ "handback": {
+  "type": "function"
+ },
+ "isReturnTool": {
+  "type": "function"
+ },
+ "loadRun": {
+  "type": "function"
+ },
+ "ownedWaiting": {
+  "type": "function"
+ },
+ "prepare": {
+  "type": "function"
+ },
+ "rebuildStart": {
+  "type": "function"
+ },
+ "refusalText": {
+  "type": "function"
+ },
+ "resultsOf": {
+  "type": "function"
+ },
+ "runDir": {
+  "type": "function"
+ },
+ "runOf": {
+  "type": "function"
+ },
+ "sentHash": {
+  "type": "function"
+ },
+ "spawn": {
+  "type": "function"
+ },
+ "spawnPrompt": {
+  "type": "function"
+ },
+ "stall": {
+  "type": "function"
+ },
+ "stallText": {
+  "type": "function"
+ },
+ "startedRun": {
+  "type": "function"
+ },
+ "stopped": {
+  "type": "function"
+ },
+ "waiting": {
+  "type": "function"
+ },
+ "waitingText": {
+  "type": "function"
+ }
+}

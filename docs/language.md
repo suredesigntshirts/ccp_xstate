@@ -35,14 +35,17 @@ How a workflow carries an item through its states. An engine item is the same id
 | host effect | An actor the host runs itself: merge, ask, post | `packages/engine/src/stages.js` `EFFECTS`, `packages/engine/src/effects/` |
 | stage file | A model stage's prose: rules, inputs and task | `packages/engine/src/prompts.js`, `workflows/quick-fix/` |
 | brief stage | The model stage that writes the per-role briefs the later stages work from | `workflows/quick-fix/brief.md` |
-| brief | One role's instructions, returned by the brief stage and fixed before any build starts; only this is a brief | `brief.stored`, `packages/engine/src/actors.js` `accept` |
+| brief | One role's instructions, returned by the brief stage and fixed before any build starts; only this is a brief | `brief.stored`, `packages/engine/src/run/accept.js` `accept` |
 | run | One invocation of a model stage for an item, with id `<item>:<seq>.<invoke>` | `packages/engine/src/names.js` `runOf` |
 | run folder | A run's files: `prompt.md`, `context.md`, `run.json`, `stage.json`, `result.json` | `packages/engine/src/names.js` `runDir` |
+| run store | The one owner of a run's folder: reads its run state and moves it by transitions | `packages/engine/src/run/store.js` `state`, `transition` |
+| run state | Where a run is in its lifecycle: prepared, spawned, bound, returned or failed | `packages/engine/src/run/store.js` `STATES` |
+| attempt budget | How many refused results, send-backs and stall blocks a run may spend before it fails; run.json counts them as attempts | `run.json`, `packages/engine/src/run/store.js` `BUDGET` |
 | prompt | The exact text a run's agent starts with, rendered from its stage file and input | `prompt.md`, `packages/engine/src/names.js` `promptFile`, `prompt.stored` |
 | context | The run's facts (run id, worktree, repo, branch), given to the agent once beside its prompt | `context.md`, `packages/engine/src/stages.js` `contextOf` |
 | stage record | Every piece of a run's prompt with its source, and where its output went | `stage.json`, `packages/engine/src/trace.js` `stageRecord` |
 | result | What a run's agent returns, checked against its output schema | `result.json`, `result.stored` |
-| return | The one way a result comes back: the return tool, whose call the hook accepts or refuses | `plugins/harness/scripts/return-tool.mjs`, `packages/engine/src/actors.js` `accept` |
+| return | The one way a result comes back: the return tool, whose call the hook accepts or refuses | `plugins/harness/scripts/return-tool.mjs`, `packages/engine/src/run/accept.js` `accept` |
 | card | A decision put in front of the person by the ask effect | `packages/engine/src/effects/card.js`, `packages/engine/src/names.js` `cardFile` |
 | catalogue | Every sentence of code the harness hands a model, one entry each | `packages/engine/messages.md`, `packages/engine/src/messages.js` |
 
@@ -73,8 +76,8 @@ What the harness records, and how it is read back.
 | version | A row's format version `v`; older rows are upcast on read, never rewritten | `packages/journal/src/index.js` `VERSION`, `UPCASTERS` |
 | blob | A stored text (a prompt, a brief, a result), kept once by its sha256 | `<journal root>/blobs/` |
 | prompt.stored | The engine stored a run's prompt | `prompt.stored`, `packages/engine/src/actors.js` `prepare` |
-| brief.stored | The engine stored one brief from a brief stage's result | `brief.stored`, `packages/engine/src/actors.js` `accept` |
-| result.stored | The engine accepted a run's result | `result.stored`, `packages/engine/src/actors.js` `accept` |
+| brief.stored | The engine stored one brief from a brief stage's result | `brief.stored`, `packages/engine/src/run/accept.js` `accept` |
+| result.stored | The engine accepted a run's result | `result.stored`, `packages/engine/src/run/accept.js` `accept` |
 | agent.prompt | Capture saw the prompt an Agent call gave a subagent | `agent.prompt`, `plugins/harness/scripts/capture-rows.mjs` |
 | agent.final | Capture saw a subagent's final message | `agent.final`, `plugins/harness/scripts/capture-rows.mjs` |
 | derived view | A number computed from rows, never stored back | `packages/journal/src/derive/`, `packages/journal/bin/derive.js` |
