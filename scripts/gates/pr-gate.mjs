@@ -27,7 +27,7 @@ const named = namedItem({ branch: env.PR_BRANCH, body: env.PR_BODY, ids: itemIds
 
 const gates = {
   stubs() {
-    const files = lines(git('ls-tree', '-r', '--name-only', head, 'packages/', 'plugins/'))
+    const files = lines(git('ls-tree', '-r', '--name-only', head, 'packages/', 'plugins/', 'scripts/'))
       .map((path) => ({ path, text: show(head, path) ?? '' }));
     return findStubs(files);
   },

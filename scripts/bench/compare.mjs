@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Compare two scored run sets of one stage, made on two workflow versions (plan item stage-bench): per case and
+// Compare two scored run sets of one stage, made on two workflow versions: per case and
 // criterion, how many runs met it in each, what changed in the stage's part of the workflow, and time and tokens.
 // No overall score: a criterion that got worse is listed as worse whatever the others did.
 //

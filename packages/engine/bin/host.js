@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// The host from the command line, one item per call (plan item engine-host). See packages/engine/README.md.
+// The host from the command line, one item per call. See packages/engine/README.md.
 //
 //   host.js start --item <id> --workflow <name> --input <json> --session <id> [--root <dir>] [--release x.y.z]
 //   host.js wake  --item <id> --workflow <name> [--root <dir>] [--release x.y.z]   < hook input JSON
@@ -11,27 +11,25 @@
 //
 // wake reads a Claude Code hook's input on stdin: UserPromptSubmit (the wake is its prompt) or PostToolUse of
 // ReadNotifications, where only notifications GitHub's webhook delivered and fired reminders (origin trigger_fire, read
-// as a bare wake at the time they fired; fix-reminder-wake) are read. Any other tool's output is
+// as a bare wake at the time they fired) are read. Any other tool's output is
 // ignored, whatever it contains. The session is the hook input's session_id. Nothing on the command line can name an
 // event or its source: those come only from the wake text. What this cannot stop: an agent with a shell can run this
 // command with stdin it typed, as it can append rows by hand (ledger L-same-account-everywhere); the decision says so.
-// Effects run with the handlers in src/effects (plan item engine-effects): merges, over GitHub REST. A command has no
-// way into the thread and no clock to wake it, so posts stay pending and are printed. A timer effect ends at once with
-// its due time, and the open timer stays listed under pending.timers: its due time is there for the session to
-// schedule its wake (send_later), and any wake past it fires the timer (plan item fix-waiting-wake). A card waits until the session that can post it has put it up and run
-// `card` with its id (src/effects/relay.js, plan item engine-toy-run); `card` then finishes the card effect as the
-// item's owner, so the item's file names the card from then on (plan item engine-item-views), and a tap on it is
-// matched to its run. When the item leaves the state that asked, the ask run's stop is listed under pending; the
-// session withdraws the card (close_decision) and runs `closed`, which finishes the stop as the owner (plan item
-// fix-finish-closes-waits). An agent actor's run (brief, build, verify; plan item
-// engine-actors) is prepared here: its brief, folder and worktree (added from --repo, default the current folder,
+// Effects run with the handlers in src/effects: merges, over GitHub REST. A command has no way into the thread and no
+// clock to wake it, so posts stay pending and are printed. A timer effect ends at once with its due time, and the open
+// timer stays listed under pending.timers: its due time is there for the session to schedule its wake (send_later),
+// and any wake past it fires the timer. A card waits until the session that can post it has put it up and run `card`
+// with its id (src/effects/relay.js); `card` then finishes the card effect as the item's owner, so the item's file
+// names the card from then on, and a tap on it is matched to its run. When the item leaves the state that asked, the
+// ask run's stop is listed under pending; the session withdraws the card (close_decision) and runs `closed`, which
+// finishes the stop as the owner. An agent actor's run (brief, build, verify; src/actors.js) is prepared here: its brief, folder and worktree (added from --repo, default the current folder,
 // under --worktrees). `waiting` lists the runs whose agent the session starts next, with the Agent prompt to use.
 // CCP_GITHUB_API points GitHub calls at another server (tests), as it does for the actor hook.
 // Every call also offers the results the harness's return hook accepted and has not yet handed to the item.
-// answer is a stand-in's answer to an open ask whose card is up (src/standin.js, plan item engine-cards-standin): taken
+// answer is a stand-in's answer to an open ask whose card is up (src/standin.js): taken
 // only if it is one of the ask's choices and an entry in the grants file (default <root>/../grants.json) covers it.
 // It is applied as the item's owner, like a tap the owner's hook reads, so the host runs what follows itself.
-// A card with no PR is checked against the item's GitHub issue's repo, and --why goes with the answer (fix-blocked-card-grant).
+// A card with no PR is checked against the item's GitHub issue's repo, and --why goes with the answer.
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { loadWorkflow, workflowOf } from '../src/index.js';
@@ -68,7 +66,7 @@ const manifestRelease = () =>
 // The wake text a hook input carries: a UserPromptSubmit's prompt, or from a ReadNotifications result the bodies of
 // the GitHub notifications and, for each scheduled trigger that fired (a send_later reminder, origin trigger_fire), a
 // wake with no body at the time it fired. A reminder's content is never read: the session or any agent wrote it, and
-// a bare wake can only fire timers already due by the host's clock (plan item fix-reminder-wake). Nothing else.
+// a bare wake can only fire timers already due by the host's clock. Nothing else.
 const wakeTextOf = (hook) => {
   if (hook.hook_event_name === 'UserPromptSubmit') return typeof hook.prompt === 'string' ? hook.prompt : '';
   if (hook.hook_event_name !== 'PostToolUse' || hook.tool_name !== 'ReadNotifications') return '';
@@ -125,7 +123,7 @@ if (command === 'answer') {
 let card = null;
 if (command === 'card') {
   // A record of which card was put up; the card effect then finishes with it now, as the owner, so the item's file
-  // holds the card's id from the moment it is up (the item view joins the card's rows by it: engine-item-views).
+  // holds the card's id from the moment it is up (the item view joins the card's rows by it).
   card = recordCard({ host, effect: opts.effect, ref: opts.ref });
   if (host.owner) host = restore({ root: opts.root, item: opts.item, spec, session: host.owner, release });
 }
@@ -141,7 +139,7 @@ if (command === 'start') {
 const agents = actors({ host, repo: opts.repo ?? process.cwd(), ...(opts.worktrees ? { worktrees: opts.worktrees } : {}) });
 const all = handlers({ github: github(process.env.CCP_GITHUB_API ? { api: process.env.CCP_GITHUB_API } : {}), hearth: relay({ root: opts.root }), actors: agents });
 // timer and cancel have no clock here: a timer ends with its due time, still listed under pending.timers for the
-// session to schedule its wake, and a cancel ends at once (plan item fix-waiting-wake).
+// session to schedule its wake, and a cancel ends at once.
 const effects = { run: all.run, stop: all.stop, timer: all.timer, cancel: all.cancel };
 // Effects left open (a card now put up) run first, so the wake's inputs are read against the item as they leave it.
 const before = command === 'show' ? [] : await offer(host, [], effects);

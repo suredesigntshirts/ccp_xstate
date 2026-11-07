@@ -1,4 +1,4 @@
-// fix-inspector-guard-label: a guarded step's label quotes the guard's name, so a guard called "failed" does not
+// A guarded step's label quotes the guard's name, so a guard called "failed" does not
 // read as a verb ("its guard failed held").
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

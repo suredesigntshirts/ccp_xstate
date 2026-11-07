@@ -1,4 +1,4 @@
-// The stalls view (plan item fix-waiting-run-stall): how often a session ended a turn with one of its runs prepared
+// The stalls view: how often a session ended a turn with one of its runs prepared
 // and no agent, and what came of it. It reads the rows the stall guard writes (refusal rows with rule stall,
 // stall-cap or cannot-start; packages/engine/src/actors.js stall and cannotStart), the brief.stored row each prepared
 // run has, and the agent.spawn row that binds a run's agent. It writes nothing. docs/journal.md, "Derived views".

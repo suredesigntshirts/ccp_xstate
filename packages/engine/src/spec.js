@@ -4,8 +4,8 @@
 // - Paths. A string like "context.pr.headSha" or "event.output" reads from { context, event };
 //   { "value": x } is the literal x. Invoke input and the root output map names to paths.
 // - Context op. Actions are { type: "set", params: { "<context path>": <path or value> } }. Every source in one
-//   set reads the context as it was before that set, so { b: "context.a", a: x } shifts a into b (design A,
-//   round 2: a bounded loop is a short shift register, and `inc` is gone). Nothing else writes context.
+//   set reads the context as it was before that set, so { b: "context.a", a: x } shifts a into b (a
+//   bounded loop is a short shift register). Nothing else writes context.
 // - Guards. meta.guards names lists of conditions that must all hold: a path that must be present,
 //   { path, is: literal }, { path, in: [literals] }, { path, same: otherPath } or { path, below: number }.
 // - Needs. A state's meta.needs names the guards that must hold to enter it. Every transition into the
@@ -146,7 +146,7 @@ export const machineOf = (spec) => {
   });
 };
 
-// ---- Starting and replaying, without a host (ported from #110's Host#refuseStart, hashOf and replay)
+// ---- Starting and replaying, without a host
 
 /** Why an item cannot start with this input, or null: the input must match meta.input and the first state's needs must hold. */
 export const startRefusal = (spec, input) => {

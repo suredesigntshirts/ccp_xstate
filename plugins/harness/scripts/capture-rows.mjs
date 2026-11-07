@@ -1,9 +1,9 @@
-// Capture's handlers (plan item obs-live-capture): one Claude Code hook input in, the journal rows and blobs it
+// Capture's handlers: one Claude Code hook input in, the journal rows and blobs it
 // makes out. They write nothing themselves; capture.mjs appends what they return, and the tests replay a recorded
 // session through them. Rows carry hashes and sizes of what a tool was given, never the input itself; the only
 // text kept is a subagent's brief and final answer, stored as blobs by content hash. docs/journal.md, "Capture
-// rows", "Refusal rows" and "Person rows", says what each row holds; refusals are plan item obs-refusal-log. The
-// person rows (plan item obs-person-attention) come from two paths: what the person did arrives as a hearth wake, and
+// rows", "Refusal rows" and "Person rows", says what each row holds. The
+// person rows come from two paths: what the person did arrives as a hearth wake, and
 // what the session put in front of them is its own hearthbot tool call.
 import { createHash, randomUUID } from 'node:crypto';
 import { closeSync, fstatSync, openSync, readSync } from 'node:fs';
@@ -58,7 +58,7 @@ export function actionHash(tool, input) {
  * and the thread of the last hearth wake, which UserPromptSubmit sets).
  * `refused` maps the actionHash of each action this session already had refused to that refusal row's id; `newId`
  * makes a refusal row's id, so a later row can link to it. `actor(agentId)` says whether a subagent is an invoked
- * actor's agent (plan item engine-actors), whose tool calls also keep their paths. Returns { rows, blobs, state }; each row has kind,
+ * actor's agent, whose tool calls also keep their paths. Returns { rows, blobs, state }; each row has kind,
  * source, agent, payload and maybe placeholder, id and at.
  */
 export function capture(input, { read, state = {}, refused = {}, newId = randomUUID, actor = () => false } = {}) {
@@ -111,7 +111,7 @@ const SEARCH_TOOLS = { Glob: 'path', Grep: 'path', LS: 'path' };
 const CONFINED = /^\( cd '((?:[^']|'\\'')*)' \|\| exit 1\n/;
 
 /**
- * The paths a tool call names (plan item engine-actors): a file tool's path, a search's folder (the session's when it
+ * The paths a tool call names: a file tool's path, a search's folder (the session's when it
  * names none), and the folder a shell command ran from. Kept only on an invoked actor's tool.call rows, the one part
  * of a tool's input a row keeps, so the journal shows where each actor worked.
  */
@@ -253,7 +253,7 @@ function briefOf(input) {
 }
 
 // A merge done with the GitHub MCP merge tool, as its own response reports it, so the journal check can tell it
-// from a merge done any other way (obs-journal-vs-world). Only the PR's identifiers and GitHub's sha are kept.
+// from a merge done any other way. Only the PR's identifiers and GitHub's sha are kept.
 export const MERGE_TOOL = /^mcp__.*github.*__merge_pull_request$/;
 
 function mergeOf(input) {

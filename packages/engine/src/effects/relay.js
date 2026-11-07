@@ -1,9 +1,9 @@
-// The thread as a command-line host reaches it (plan item engine-toy-run). A host process can't call the thread's
+// The thread as a command-line host reaches it. A host process can't call the thread's
 // tools, so the session that has them posts the card the host asks for (`bin/host.js show` lists the ask run under
 // pending) and records the card's id with `bin/host.js card`. The host's card effect waits until that record exists,
 // then finishes with the card's id as its ref, and the tap wake naming that id is the answer (wake.js). Nothing here
 // answers a card: a record only says which card was put up, and the platform's tap wake is what moves the item.
-// Closing is the same in reverse (plan item fix-finish-closes-waits): when the item leaves the state that asked, the
+// Closing is the same in reverse: when the item leaves the state that asked, the
 // run's stop waits until that session has withdrawn the card (close_decision) and recorded it with `bin/host.js closed`.
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

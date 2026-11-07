@@ -26,6 +26,15 @@ Tests use `node:test` and `node:assert`, nothing else. Name them `*.test.js` or 
 every test under `test/`, `scripts/`, `packages/`, `plugins/` and `verify/`, so a workspace needs no test script
 of its own to be covered by CI.
 
+## Comments
+
+Comments and READMEs are present tense: they say what holds and why it must hold, such as a platform fact or a race
+the code guards against. Where a line came from (its plan item, a design's section, a tournament lane, round or graft)
+goes in the commit, the PR and the plan, where `git log` and the item id find it. The `stubs` gate refuses a history
+reference in the harness source (`packages/engine/src` and `bin`, `packages/journal/src` and `bin`,
+`plugins/harness/scripts`, `scripts/inspector`, `scripts/bench`) and the engine and plugin READMEs; tests and
+vendored code are exempt. The pattern is `HISTORY` in `scripts/gates/lib.mjs`.
+
 ## Dependencies
 
 A runtime dependency is allowed when a file in `plan/decisions/` names it, on a line of its own:

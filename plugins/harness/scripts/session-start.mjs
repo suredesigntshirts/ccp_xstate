@@ -6,8 +6,8 @@
 // It must never get in the session's way: it swallows every failure, always exits 0, and a watchdog ends it
 // within about 4 s, inside the hook's 5 s timeout.
 // Its own modules are imported once it runs, so a copy missing one of them still says which file is gone, in any
-// project, rather than crash with nothing said (plan item clean-room-install-test).
-// What it says is an entry of the message catalogue (plan item prompt-catalogue), loaded first and from its own path,
+// project, rather than crash with nothing said.
+// What it says is an entry of the message catalogue, loaded first and from its own path,
 // so a copy missing any other file still renders its line. The one line no entry gives is the one said when the
 // catalogue itself cannot be loaded: nothing could render it then.
 import { existsSync } from 'node:fs';

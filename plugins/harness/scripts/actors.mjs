@@ -1,20 +1,20 @@
 #!/usr/bin/env node
-// The actor hooks (plan item engine-actors): how the harness starts an invoked actor's agent, keeps it in its
+// The actor hooks: how the harness starts an invoked actor's agent, keeps it in its
 // worktree and checks what it returns. The logic is packages/engine/src/actors.js; this file reads the hook input,
 // calls it and answers Claude Code. In a project that hasn't installed the harness it does nothing.
 //
 //   PreToolUse of Agent with the prompt `ccp-run <run>`: swap in the run's brief, or refuse an unknown or started run.
 //   PreToolUse of the return tool: refuse unless the caller, the schema and GitHub check out, saying how to fix it and
 //     which refusal of the run's cap this is; then hand the result to the item, which prepares the runs its next state
-//     invokes. The refusal that reaches the cap fails the run, and its error goes to the item (fix-refusal-hints).
+//     invokes. The refusal that reaches the cap fails the run, and its error goes to the item.
 //   PreToolUse of any other tool a bound agent calls: run shell commands from its worktree, refuse file tools outside.
 //   SubagentStart: bind the agent to its run and give it its run, worktree and return instructions. When the session
 //     has several runs starting at once, the agent is bound at its first tool call instead, from its meta.json.
 //   SubagentHandback, or SubagentStop, of a bound agent whose run has no result: send it back once to call the return
-//     tool; the next time it ends, fail the run, so the item gets the actor's error instead of waiting (plan item
-//     engine-actor-returns). A stop after a handback fails at once: a block doesn't bring that agent back.
+//     tool; the next time it ends, fail the run, so the item gets the actor's error instead of waiting.
+//     A stop after a handback fails at once: a block doesn't bring that agent back.
 //   PreToolUse of Agent with the prompt `ccp-cannot-start <run>: <why>`: refuse the call and fail the run with the
-//     session's reason, so its item takes the error path (plan item fix-waiting-run-stall).
+//     session's reason, so its item takes the error path.
 //   Stop of the main session with a run of an item it owns prepared and no agent: block with the exact Agent call,
 //     at most twice per run by the stall rows in the journal; the stop after that fails the run.
 //   PostToolUse of Agent in the main session, and UserPromptSubmit (a wake, such as a background agent finishing):
@@ -109,7 +109,7 @@ async function main() {
     return;
   }
   // The main session ends a turn with a run of its own items waiting for its agent: block, at most STALL_CAP times
-  // per run, then fail the run so its item takes the error path (plan item fix-waiting-run-stall).
+  // per run, then fail the run so its item takes the error path.
   if (event === 'Stop') {
     const r = A.stall({ root, sessions: owners, session });
     if (!r) return;
@@ -124,7 +124,7 @@ async function main() {
     return;
   }
   // After an Agent call, or a wake such as a background agent's task notification: name the runs of this session's
-  // own items waiting, the ones the Stop guard checks (plan item fix-waiting-lines-owner).
+  // own items waiting, the ones the Stop guard checks.
   if ((event === 'PostToolUse' && tool === 'Agent' && !input.agent_id) || event === 'UserPromptSubmit') {
     const runs = A.ownedWaiting(root, owners);
     if (!runs.length) return;

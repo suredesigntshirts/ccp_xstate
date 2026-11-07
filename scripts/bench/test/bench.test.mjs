@@ -1,4 +1,4 @@
-// The stage bench's own tests (plan item stage-bench). No model runs: BENCH_CLAUDE points at fake-claude.mjs.
+// The stage bench's own tests. No model runs: BENCH_CLAUDE points at fake-claude.mjs.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { chmodSync, cpSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';

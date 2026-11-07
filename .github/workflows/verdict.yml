@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: no stubs under packages/ and plugins/
+      - name: no stubs under packages/ and plugins/, no history references in the harness source
         run: node scripts/gates/pr-gate.mjs stubs
       - name: contract freeze
         if: ${{ !cancelled() }}

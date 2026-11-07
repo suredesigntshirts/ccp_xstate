@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Capture's hook (plan item obs-live-capture), registered in hooks/hooks.json on every event capture-rows.mjs handles. In a
+// Capture's hook, registered in hooks/hooks.json on every event capture-rows.mjs handles. In a
 // project that installed the harness, it appends the rows for one hook input to this session's journal file, stores
 // any brief or answer under <journal>/blobs/<sha256> once, then appends a hook.run row with its own time.
 // Like every hook here it does nothing elsewhere, prints nothing, swallows every failure and always exits 0. Its
@@ -17,7 +17,7 @@ const WATCHDOG_MS = 3000;
 const statePath = (session, env = process.env) =>
   join(env.CCP_HARNESS_STATE || join(tmpdir(), 'ccp-harness'), `capture-${sessionFile(session)}`.replace(/\.jsonl$/, '.json'));
 
-// This session's refusals so far, one { hash, id } line each (plan item obs-refusal-log), so a later call of the same
+// This session's refusals so far, one { hash, id } line each, so a later call of the same
 // action links back by retryOf. Lines are only ever appended, so the async tool-call hooks can read it while
 // PermissionDenied or Stop adds to it.
 const refusedPath = (session, env = process.env) =>
@@ -133,7 +133,7 @@ try {
   const refusals = refusedPath(session);
   const refused = REFUSAL_AWARE.includes(event) ? loadRefused(refusals) : {};
   // An invoked actor's agent is bound to its run by the actor hook (actors.mjs), in <journal>/actors/agents/; its rows
-  // carry the run's item and state (plan item engine-item-views).
+  // carry the run's item and state.
   const bound = new Map();
   const boundOf = (agentId) => {
     if (!agentId) return null;

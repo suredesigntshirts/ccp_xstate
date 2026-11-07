@@ -1,4 +1,4 @@
-// The tripwire acted on (plan item engine-item-views). derive.js rework appends a `tripwire` row when a PR passes its
+// The tripwire acted on. derive.js rework appends a `tripwire` row when a PR passes its
 // item's round limit (packages/journal/src/derive/rework.js); written into the item's own file, it reaches the item
 // as a `tripwire` event on the host's next call, and the workflow decides what it means (quick-fix steps back to
 // replanning when the event names the item's PR). Each row is offered once: its id is the event's source.

@@ -1,7 +1,7 @@
 // The host: one item's workflow, driven by what reaches it from outside. restore() rebuilds the item from its one
 // journal file, applyEvent() takes one event from its source, persist() appends the rows, and runEffects() carries
-// out what the transition asked for, once per effect id. Ported from ccp_machine PR #110 (host.js, driver.js,
-// step.js); why it is shaped this way is in plan/items/engine-host.md and plan/decisions/2026-10-30-engine-host.md.
+// out what the transition asked for, once per effect id. Why it is
+// shaped this way: plan/decisions/2026-10-30-engine-host.md.
 //
 // XState's pure transition() runs nothing: it returns the actions a step would run. The host turns four of them
 // into effects for the outside world, each with an id that names it for good:
@@ -149,7 +149,7 @@ export function persist(host, rows) {
  * timer, cancel }, each { start(effect) -> outcome, find?(effect) -> outcome or null }. An outcome is {} or
  * { ref, output, source, choices } when the effect worked, or { refused: { rule, text } } when something refused it.
  * An effect whose type has no handler, or whose handler's handles?(effect) says no, stays pending for a host that
- * has one. The handlers for merge, card, post and timer are in effects/ (plan item engine-effects).
+ * has one. The handlers for merge, card, post and timer are in effects/.
  *
  * An effect that started and never ended (the host stopped mid-effect) is not started again blindly: find() asks the
  * world whether it happened. With no find(), it is journalled unknown and left alone. A refused effect is journalled
@@ -157,7 +157,7 @@ export function persist(host, rows) {
  *
  * Only the item's owner carries out its effects. A host restored by another session runs none of them and writes
  * nothing to the item's file, so a card, post, run, timer or merge the owner has open is started by the owner alone
- * (plan item fix-other-host-runs-effects, case C-two-hosts-one-item). Its events are turned away by applyEvent.
+ * (case C-two-hosts-one-item). Its events are turned away by applyEvent.
  *
  * Returns { rows, follow }: the engine.effect rows written, and the events to apply next (completions with output).
  */
@@ -299,7 +299,7 @@ function refusal(host, event, run) {
   } else if (type.startsWith(TIMER)) {
     if (!host.timers.has(type)) return { stale: true, why: `no timer ${type} is set` };
     // A timer set and not cancelled is taken where it was set, even by a transition that changes nothing (a waiting
-    // state's checkBack, plan item fix-waiting-wake), which XState's can() reports as not taken.
+    // state's checkBack), which XState's can() reports as not taken.
     return null;
   } else {
     const schema = host.spec.meta.events?.[type];

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Score bench outputs per rubric criterion (plan item stage-bench): mechanical checks first, then one fresh judge
+// Score bench outputs per rubric criterion: mechanical checks first, then one fresh judge
 // session per judge criterion per output. There is no overall score.
 //
 //   node scripts/bench/score.mjs --stage brief --runs <dir> [--report <file.md>] [--notes <file.md>]

@@ -149,7 +149,7 @@ export async function build({ config, out, captureDir }) {
       const text = readFileSync(path, 'utf8');
       let spec; try { spec = JSON.parse(text); } catch { skipped.push(`${path}: not JSON`); continue; }
       let key = createHash('sha256').update(text).digest('hex');
-      // A workflow with stage files is keyed and shown as its engine pins it: filled in from them (stage-prompt-files).
+      // A workflow with stage files is keyed and shown as its engine pins it: filled in from them.
       try {
         const read = await composedIn(engine, basename(file, '.json'));
         if (read && read.spec !== read.raw) { spec = read.spec; key = createHash('sha256').update(read.bytes).digest('hex'); }

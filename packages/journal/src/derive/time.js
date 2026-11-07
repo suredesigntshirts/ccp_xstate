@@ -1,4 +1,4 @@
-// The time view (plan item obs-time-and-rework): where one session's wall-clock time went. Time is working while a
+// The time view: where one session's wall-clock time went. Time is working while a
 // turn, a tool call, a hook or a subagent is in progress; every other stretch is waiting, labelled by the wake that ended it
 // (on the person, on CI, on another wake), or rebuild for the start-up between a new SessionStart and that wake, or
 // unknown when no wake with a reason ends it. A gap is never counted as working. It reads rows and writes nothing.

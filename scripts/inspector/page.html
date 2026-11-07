@@ -327,7 +327,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
         <li>The Claude Code system prompt is never recorded (layer 1).</li>
         <li>Tool calls keep only the tool name, time, size and paths. The exact commands are not stored, only a hash of them.</li>
         <li>When the parent session resumes an agent (for example because it finished without calling the return tool), the message it sends is not recorded. The prompt shown in layer 2 is then the agent's first message, not everything it was told; the page marks such agents "resumed, message not recorded".</li>
-        <li>Scenario runs (main's tourney tests, lane A and lane C) are <b>scripted</b>: their "agents" are test fixtures (briefs and results typed into the test), GitHub is a fake server, and no model ran. They show what each design's engine would hand a real agent.</li>
+        <li>Scenario runs (main's tourney tests and the tournament lanes' tests) are <b>scripted</b>: their "agents" are test fixtures (briefs and results typed into the test), GitHub is a fake server, and no model ran. They show what each design's engine would hand a real agent.</li>
         <li>The context after each step is recovered by <b>replay</b>. The page says where replay did not match or failed.</li>
         <li>Real runs from before workflows were pinned are shown with today's workflow file; the page says so on those runs.</li>
       </ul>
@@ -886,7 +886,7 @@ ins.d{background:var(--ins);color:var(--ins-fg);text-decoration:none;font-weight
     return '<div class="vprev">' + linkify(s.slice(0, 90)) + '… <details><summary>show the whole value (' + s.length.toLocaleString() + ' chars)</summary>' + pre(v, null, label) + '</details></div>';
   };
   const SRC_TAG = { frame: 'harness frame', workflow: 'workflow JSON', input: 'input' };
-  // The message catalogue entry a piece was rendered from (plan item prompt-catalogue), when its record names one.
+  // The message catalogue entry a piece was rendered from, when its record names one.
   const entryNote = (src) => (src.entry ? '; message catalogue entry <code>' + esc(src.entry) + '</code> (packages/engine/messages.md)' : '');
   function pieceSource(src) { return pieceWhere(src) + (src.kind === 'frame' || src.kind === 'workflow' || src.kind === 'input' ? entryNote(src) : ''); }
   function pieceWhere(src) {

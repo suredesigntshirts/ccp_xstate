@@ -60,7 +60,7 @@ const tasksIn = (text) =>
  * - a card tap on a card one of the item's runs posted: that run's completion, { choice, by }, source hearth and the
  *   card id;
  * - a task notification that a run's worker failed or was stopped: that run's error, source claude-code and the
- *   task id (a worker's output arrives through its return tool, engine-actors);
+ *   task id (a worker's output arrives through its return tool, actors.js);
  * - each timer the host set that is due by the wake's current-time: the timer's event, source timer and its id.
  *
  * A run is found by the ref its run effect's outcome recorded (the card id, the task id). A tap or task that matches

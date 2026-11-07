@@ -7,7 +7,7 @@ rules in `plan/README.md`, "How slop is kept out", so the builder isn't the one 
 |---|---|---|
 | `ci` | `npm test` | any test under `test/`, `scripts/`, `packages/`, `plugins/` or `verify/` fails |
 | `ci` | plan check | `node plan/check.mjs` refuses the plan |
-| `verdict` | no stubs | a file under `packages/` or `plugins/` has TODO, FIXME, "not implemented" or a skipped test |
+| `verdict` | no stubs | a file under `packages/` or `plugins/` has TODO, FIXME, "not implemented" or a skipped test ; or a line of the harness source or its two READMEs has a history reference (`docs/layout.md`, "Comments") |
 | `verdict` | contract freeze | the PR changes a frozen item's head or Verifier brief and isn't a plan-only replan |
 | `verdict` | verdict | the named item has no complete verdict at the head sha, or it came from a builder's session |
 

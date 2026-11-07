@@ -100,7 +100,7 @@ function engineFile(file, root, env) {
 }
 
 /**
- * The message catalogue (packages/engine/src/messages.js, plan item prompt-catalogue): every text a hook or the return
+ * The message catalogue (packages/engine/src/messages.js): every text a hook or the return
  * tool hands a model is an entry of it. It is engine source only by where it lives; it imports nothing of the engine,
  * so the scripts that must not run engine code (the return tool, session-start) may load it.
  */
