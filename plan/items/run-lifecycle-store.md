@@ -4,7 +4,7 @@
   "title": "Model an agent run's lifecycle explicitly in one run store",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "packages/engine/src/run/store.js owns a run's folder: it alone reads and writes the folder's lifecycle files, reports a run's state (prepared, spawned, bound, returned, failed) and moves it by named transitions that write the file and its journal row together. Every actor hook asks the store for the state, and one table there says what each hook answers in each state, with the catalogue entries used today. The three caps (ten result refusals, one send-back, two stall blocks) are one attempt budget declared once in the store, and run.json counts the attempts spent, so no hook re-reads the journal to count; a run.json written before this counts from its journal rows as today. actors.js is split by knowledge: the store, run/worktree.js, run/accept.js and run/supervise.js, with actors.js keeping prepare, spawn, bind and delivery and still exporting every name it exports today. No model-facing text, rule name, journal row or run-folder file changes.",
   "why": "The run lifecycle exists only as which files exist, checked separately by eight hook functions with three caps, and five of the eight 11-05 fixes patched this module (DDD make implicit concepts explicit, APOSD define errors out of existence; research plan/research/design-books-cleanup.md, finding 4).",
   "serves": [
@@ -183,6 +183,18 @@ accepting results, and supervising agents that stop or stall.
 
 It is a cleanup: what every hook returns, every row it writes and every file in a run folder stay as on main. The
 choices made writing this contract are in `plan/decisions/2026-11-07-run-lifecycle-store.md`.
+
+## Done
+
+Built in PR #169 (merged 9851d46). A separate session verified it at 2639844: all eight Expect lines MET. Released
+as harness-v0.1.37 (release branch from scripts/release/release.mjs).
+
+The build touched one test the outputs did not list: `packages/engine/test/messages.test.js` scanned `src/` one level
+deep for catalogue uses, so it now reads `src/` recursively and sees the entries rendered from `src/run/`. The verifier
+confirmed that is a path change only.
+
+The verifier noted that `spent()` given a run id string, rather than the record, reads 0 from the journal when
+`run.json` has no attempts, since the journal fallback needs the record's item. No caller passes an id today.
 
 ## Verifier brief
 
