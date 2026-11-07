@@ -1,6 +1,6 @@
 // The stalls view (plan item fix-waiting-run-stall): how often a session ended a turn with its run waiting, and what
 // came of each such run. Rows shaped as the stall guard (packages/engine/src/actors.js stall, cannotStart) and the
-// actor hooks (brief.stored, agent.spawn) write them.
+// actor hooks (prompt.stored, agent.spawn) write them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -17,7 +17,7 @@ const row = (kind, run, m, payload = {}) => ({
   id: `r${++n}`, at: at(m), kind, session: 's', release: '0.2.0', item: run.split(':')[0], state: null, agent: null,
   source: { system: 'hook', ref: run }, payload: { run, actor: 'brief', ...payload }
 });
-const brief = (run, m) => row('brief.stored', run, m);
+const brief = (run, m) => row('prompt.stored', run, m);
 const block = (run, m, count) => row('refusal', run, m, { rule: 'stall', outcome: 'blocked', count, cap: 2 });
 const failed = (run, m, rule) => row('refusal', run, m, { rule, outcome: 'failed' });
 const spawn = (run, m) => row('agent.spawn', run, m);

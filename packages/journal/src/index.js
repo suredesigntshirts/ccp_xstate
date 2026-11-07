@@ -9,7 +9,7 @@ import { KINDS } from './kinds.js';
 
 export { KINDS };
 
-export const VERSION = 1;
+export const VERSION = 2;
 
 // One appended line must reach the file in a single write, so its size is capped.
 export const MAX_LINE_BYTES = 1024 * 1024;
@@ -18,8 +18,28 @@ const TAIL_BYTES = 64 * 1024;
 
 export const schema = JSON.parse(nodeFs.readFileSync(new URL('../schema/row.schema.json', import.meta.url), 'utf8'));
 
-// Upcasters turn a row of version n into version n + 1, keyed by n. There are none until the first version bump.
-export const UPCASTERS = Object.freeze({});
+// Upcasters turn a row of version n into version n + 1, keyed by n.
+export const UPCASTERS = Object.freeze({ 1: toV2 });
+
+/**
+ * v1 to v2. In v1, brief.stored had three writers and result.stored two; v2 gives each meaning its own kind:
+ * - brief.stored with a contextHash is the engine storing a run's prompt: prompt.stored;
+ * - brief.stored with no run is the capture hook storing an Agent call's prompt: agent.prompt;
+ * - result.stored with no run is the capture hook storing a subagent's final message: agent.final;
+ * - agent.spawn's payload briefHash is promptHash.
+ * A brief.stored with a run and no contextHash (a brief stage's returned brief) and every other row stay as they were.
+ */
+function toV2(row) {
+  const p = row.payload ?? {};
+  if (row.kind === 'brief.stored' && p.contextHash) return { ...row, kind: 'prompt.stored' };
+  if (row.kind === 'brief.stored' && !p.run) return { ...row, kind: 'agent.prompt' };
+  if (row.kind === 'result.stored' && !p.run) return { ...row, kind: 'agent.final' };
+  if (row.kind === 'agent.spawn' && 'briefHash' in p) {
+    const { briefHash, ...rest } = p;
+    return { ...row, payload: { ...rest, promptHash: briefHash } };
+  }
+  return row;
+}
 
 export class JournalError extends Error {
   constructor(message, details = {}) {

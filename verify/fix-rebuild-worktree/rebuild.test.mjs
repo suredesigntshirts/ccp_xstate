@@ -32,9 +32,9 @@ function checkRebuild(w, item, runId, seen, { branch, at }) {
   assert.equal(run.branch, branch, 'run.json names the branch');
   const context = readFileSync(join(runDir(w.root, runId), 'context.md'), 'utf8');
   assert.match(context, new RegExp(`branch ${branch.replace(/[/.]/g, '\\$&')}\\.$`), 'the context.md run line names the branch');
-  const stored = w.rows(item).find((r) => r.kind === 'brief.stored' && r.payload.run === runId);
-  assert.ok(stored, 'a brief.stored row for the rebuild run');
-  assert.equal(stored.payload.contextHash, sha256(context), 'the brief.stored row is of this context');
+  const stored = w.rows(item).find((r) => r.kind === 'prompt.stored' && r.payload.run === runId);
+  assert.ok(stored, 'a prompt.stored row for the rebuild run');
+  assert.equal(stored.payload.contextHash, sha256(context), 'the prompt.stored row is of this context');
   // The plain git push went to origin's branch, and the PR (one, number 1) is at it.
   const pushed = git(w.origin, 'rev-parse', `refs/heads/${branch}`);
   assert.equal(pushed, w.gh.prs[1].head);
@@ -156,7 +156,7 @@ test('branch-stamped: own repo stamps head.ref (any case), a fork or a gone fork
     assert.ok((await w.agent('x', 'verify', verifies(w, 'FAIL'))).accepted);
     await w.drive('x');
     const run = w.openRun('x', 'build');
-    const brief = readFileSync(join(runDir(w.root, run.id), 'brief.md'), 'utf8');
+    const brief = readFileSync(join(runDir(w.root, run.id), 'prompt.md'), 'utf8');
     const line = brief.split('\n').find((l, i, all) => all[i - 1]?.startsWith('- previous:'));
     assert.ok(line?.trim().startsWith('= {'), `previous shown: ${line}`);
     // Replan #96: branch is reserved but shown; key, gates, green and checkout stay hidden.

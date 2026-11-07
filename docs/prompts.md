@@ -67,10 +67,10 @@ Every model run has a folder `<journal>/items/<item>/runs/<n>.<stage>/`:
 
 | File | What |
 |---|---|
-| `brief.md` | The exact prompt, byte for byte (also under `<journal>/blobs/<sha256>`) |
+| `prompt.md` | The exact prompt, byte for byte (also under `<journal>/blobs/<sha256>`) |
 | `context.md` | The run line the agent was given besides the prompt |
 | `stage.json` | Every prompt piece with its source, every input with who produced it, and where the output went |
-| `run.json` | The run's input, schema and facts; `render(run.json)` gives `brief.md` again |
+| `run.json` | The run's input, schema and facts; `render(run.json)` gives `prompt.md` again |
 | `result.json` | The accepted result |
 
 The Workflow Inspector (`docs/inspector.md`) shows all of it for any journal root. A bench run folder is a journal
@@ -100,7 +100,7 @@ Open `/tmp/bench-inspector/index.html`. A bench run has no live capture, so its 
 | `bench/<stage>/reports/` | Reports: `baseline.md` |
 
 A bench run is Claude Code headless (`claude -p`) started in a fresh worktree of the case repository, with
-`brief.md` on stdin and the run's context appended to its system prompt. Its one MCP server, `harness`, gives it
+`prompt.md` on stdin and the run's context appended to its system prompt. Its one MCP server, `harness`, gives it
 the return tool its prompt names, and every call goes to the engine's real `accept()`, which refuses a bad result as
 it does in a real run. The bench has no GitHub access and needs none. A case with a `git` repository fetches that
 public repository with git; a case with a `repo/` seed folder needs no network at all. Each run's folder is a

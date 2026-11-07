@@ -49,7 +49,7 @@ test('P4: the verifier brief fixed at the brief agent\'s accept is exactly the v
   const rows = readFile(join(root, 'items', `${item}.jsonl`)).rows;
   const fixed = rows.find((r) => r.kind === 'brief.stored' && r.payload.role === 'verifier');
   assert.equal(fixed.payload.hash, sha256(part(prompt, 'Task')));
-  const own = rows.find((r) => r.kind === 'brief.stored' && r.payload.run === run.run);
+  const own = rows.find((r) => r.kind === 'prompt.stored' && r.payload.run === run.run);
   assert.equal(own.payload.hash, sha256(prompt));
-  assert.equal(run.briefHash, sha256(prompt));
+  assert.equal(run.promptHash, sha256(prompt));
 });

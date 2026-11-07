@@ -13,6 +13,7 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 - **A cleanup changes structure, not behaviour.** Tests that pass on `main` pass at its head, changed only for the
   renames and imports its item names.
 - **A working small system first** (Gall's Law), end to end before wide, root cause over symptom.
+- **One word per thing.** Use the terms in `docs/language.md`; add a line there before introducing a new one.
 - **Step back, don't grind.** An item's `step_back` caps its rounds; past that, replan instead of retrying.
 - **Decide two-way doors and write them down** in `plan/decisions/`. One-way doors (settings, secrets,
   anything outside this repo and the scratch repo) go in `plan/decisions/waiting-for-person.md`.
@@ -45,7 +46,7 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 | `infra/cloud-environment/` | The cloud environment's setup script |
 | `vendor/` | Third-party tools copied in verbatim; `vendor/documentation-downloader/` is the docs skill setup installs |
 | `.github/workflows/` | `.github/workflows/ci.yml` and `.github/workflows/verdict.yml` |
-| `docs/` | Standing knowledge; `docs/layout.md`, `docs/gates.md`, `docs/journal.md`, `docs/prompts.md` and `docs/tournaments.md` |
+| `docs/` | Standing knowledge; `docs/language.md` (the glossary), `docs/layout.md`, `docs/gates.md`, `docs/journal.md`, `docs/prompts.md` and `docs/tournaments.md` |
 
 ## Commands
 

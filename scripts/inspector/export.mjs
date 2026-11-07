@@ -2,7 +2,7 @@
 // Workflow Inspector exporter: one item of one journal root, replayed on one engine checkout, as a plain JSON bundle
 // the page (page.html) renders. Nothing here knows a workflow's state names or which actors are models:
 // - the graph comes from the workflow JSON (states, on, after, always, invoke onDone/onError, a state's own onDone);
-// - an actor is a model when its run has a folder with brief.md; every other started actor is host code;
+// - an actor is a model when its run folder has a prompt file (names.js promptFile); every other started actor is host code;
 // - step labels come from the transitions' "description" in the JSON, else from the event type and target.
 // It degrades instead of failing: when the engine cannot be loaded or a step does not replay, the bundle says so and
 // keeps what the journal itself recorded. Usage: docs/inspector.md.
@@ -13,6 +13,7 @@ import { createRequire } from 'node:module';
 import { basename, dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as ownNames from '../../packages/engine/src/names.js';
+import { upcast } from '../../packages/journal/src/index.js';
 
 // Bundle ids are file names, spelled as the engine spells them (names.js).
 const { safe } = ownNames;
@@ -20,7 +21,8 @@ const { safe } = ownNames;
 const sha256 = (text) => createHash('sha256').update(text).digest('hex');
 const readText = (path) => { try { return readFileSync(path, 'utf8'); } catch { return null; } };
 const readJson = (path) => { const t = readText(path); if (t == null) return null; try { return JSON.parse(t); } catch { return null; } };
-const readRows = (path) => (readText(path) ?? '').split('\n').filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+// Rows as the journal reads them: each upcast to the current version, so older rows carry today's kinds and fields.
+const readRows = (path) => (readText(path) ?? '').split('\n').filter(Boolean).map((l) => { try { return upcast(JSON.parse(l)); } catch { return null; } }).filter(Boolean);
 const get = (root, path) => String(path).split('.').reduce((v, k) => v?.[k], root);
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -630,24 +632,25 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
       const def = findInvoke(spec, toLeaves, invokeId);
       const folder = runNames.find((n) => n === names.safe(name));
       const runPath = folder ? join(runsDir, folder) : null;
-      const brief = runPath ? readText(join(runPath, 'brief.md')) : null;
+      const promptPath = runPath ? ownNames.promptFile(journal, ownNames.runId(item, name)) : null;
+      const promptText = promptPath ? readText(promptPath) : null;
       const runJson = runPath ? readJson(join(runPath, 'run.json')) : null;
       let input = runJson?.input ?? null, inputFrom = runJson ? 'run.json (recorded when the run started)' : null;
       if (!input && def?.input && context) {
         try { input = eng.spec.mapPaths(def.input, { context }); inputFrom = 'recomputed by replaying the journal (the host does not store it)'; } catch { /* leave null */ }
       }
-      const a = { effect: e.effect, type: 'run', state: def?.state ?? null, actor: e.actor ?? def?.src ?? invokeId, invoke: invokeId, inputMap: def?.input ?? null, input, inputFrom, outcome: done?.payload?.outcome ?? null, model: brief != null };
+      const a = { effect: e.effect, type: 'run', state: def?.state ?? null, actor: e.actor ?? def?.src ?? invokeId, invoke: invokeId, inputMap: def?.input ?? null, input, inputFrom, outcome: done?.payload?.outcome ?? null, model: promptText != null };
       // The stage record the engine wrote for this run (runs/<n>.<actor>/stage.json), when it writes one: resolved below.
       const stageRaw = runPath ? readJson(join(runPath, 'stage.json')) : null;
       if (stageRaw) Object.defineProperty(a, 'stageRaw', { value: stageRaw, enumerable: false });
       if (!a.model) {
         const cardPath = names.cardFile(journal, names.runId(item, name));
         a.card = readJson(cardPath);
-        a.hostNote = runPath ? 'It has a run folder but no brief.md, so no prompt was written for it.' : null;
+        a.hostNote = runPath ? 'It has a run folder but no prompt.md, so no prompt was written for it.' : null;
       } else {
         occurrences[a.actor] = (occurrences[a.actor] ?? 0) + 1;
         a.occurrence = occurrences[a.actor];
-        a.layers = layersOf({ a, step: p.seq, runPath, runJson, brief, rows, sessionRows, sessionsDirs, kind, def, spec, steps: [...steps, { seq: p.seq, event, context, actors }], context, eng, toLeaves });
+        a.layers = layersOf({ a, step: p.seq, runPath, runJson, promptPath, promptText, rows, sessionRows, sessionsDirs, kind, def, spec, steps: [...steps, { seq: p.seq, event, context, actors }], context, eng, toLeaves });
         modelRuns.push({ key: `${a.actor} #${a.occurrence}`, step: p.seq, effect: a.effect });
       }
       actors.push(a);
@@ -674,11 +677,11 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
     const left = state ? later.find((x) => !x.to.some((l) => l === state || l.startsWith(`${state}.`))) : null;
     const pick = done && (!left || done.seq <= left.seq) ? done : left;
     L.after = pick ? { step: pick.seq, index: pick.index, eventType: pick.eventType, to: pick.to, label: pick.label, took: pick === done } : null;
-    const o = outcomeOf({ trace: L.l5.trace, rows: L.l7.rows, files: L.l7.files, accepted: !!L.l6.raw, after: L.after, state, scripted: kind === 'scripted', agentId: L.agentId });
+    const o = outcomeOf({ trace: L.l5.trace, rows: L.l7.rows, files: L.l7.files, accepted: !!L.l6.raw, after: L.after, state, scripted: kind === 'scripted', agentId: L.agentId, prompt: L.l2.file });
     L.outcome = o;
     L.l5.story = o.story;
     L.l2.resumes = o.resumes;
-    L.l2.resumeNote = resumeNote(o.resumes, L.l5.trace);
+    L.l2.resumeNote = resumeNote(o.resumes, L.l5.trace, L.l2.file);
     if (!L.l6.raw) {
       L.l6.missing = o.sentence;
       L.l6.short = o.short;
@@ -753,14 +756,13 @@ function labelOf(seq, event, edge, toLeaves) {
   return `${cap}${why}; ${where}`;
 }
 
-// Who wrote each live-capture row, and what it means in plain words. The capture's own result.stored and brief.stored
-// rows are hashes the capture hook keeps of the agent's final message and prompt: not the harness accepting anything.
+// Who wrote each live-capture row, and what it means in plain words.
 const TRACE_BY = { 'tool.call': 'agent', 'agent.finish': 'agent', 'agent.spawn': 'platform' };
 const TRACE_WHAT = {
   'agent.spawn': 'agent started (SubagentStart)',
   'agent.finish': 'agent finished',
-  'result.stored': "capture saved the agent's final message (a hash, not a harness accept)",
-  'brief.stored': "capture saved the agent's prompt (a hash)"
+  'agent.final': "capture saved the agent's final message (a hash)",
+  'agent.prompt': "capture saved the agent's prompt (a hash)"
 };
 const times = (n) => (n === 1 ? 'once' : n === 2 ? 'twice' : `${n} times`);
 const isReturnTool = (tool) => /(^|[_\s])return$/i.test(String(tool ?? ''));
@@ -768,9 +770,10 @@ const hms = (at) => String(at ?? '').slice(11, 19);
 
 /**
  * What a reader must know when an agent took in messages after its first one: the text of those messages is never
- * recorded, so brief.md is the first message, not everything the agent was told. Null when it was never resumed.
+ * recorded, so the run's prompt file (`prompt`) is the first message, not everything the agent was told. Null when it
+ * was never resumed.
  */
-export function resumeNote(resumes = [], trace = []) {
+export function resumeNote(resumes = [], trace = [], prompt = 'prompt.md') {
   if (!resumes.length) return null;
   const n = resumes.length;
   const firstFinish = trace.find((r) => r.kind === 'agent.finish');
@@ -784,7 +787,7 @@ export function resumeNote(resumes = [], trace = []) {
   const carries = resumes.every((r) => r.carries);
   return {
     chip,
-    text: `This agent was resumed ${times(n)} after it finished ${returnedFirst ? '(it had already returned)' : 'without returning'}. ${how} So brief.md is the first message it was given, not everything it was told.` +
+    text: `This agent was resumed ${times(n)} after it finished ${returnedFirst ? '(it had already returned)' : 'without returning'}. ${how} So ${prompt} is the first message it was given, not everything it was told.` +
       (carries ? ' Its time and token counts carry on across the resume, which is how the capture shows it was one conversation and not a fresh start.' : '')
   };
 }
@@ -795,7 +798,7 @@ export function resumeNote(resumes = [], trace = []) {
  * 'left' | 'waiting'. Never says "still running" when the capture shows the agent finished, and never "never returned"
  * when the host refused a return.
  */
-export function outcomeOf({ trace = [], rows = [], files = [], accepted = false, after = null, state = null, scripted = false, agentId = null }) {
+export function outcomeOf({ trace = [], rows = [], files = [], accepted = false, after = null, state = null, scripted = false, agentId = null, prompt = 'prompt.md' }) {
   const refusals = rows.filter((r) => r.verdict === 'refused');
   // A refusal of a handback (the agent ended its turn with a chat message, rule no-return) is not a refused return:
   // the agent never called the return tool, and the harness sent it back.
@@ -831,7 +834,7 @@ export function outcomeOf({ trace = [], rows = [], files = [], accepted = false,
       if (i > 0) resumes.push({ at: spawn ? spawn.at : null, after: prev?.at ?? null, how: spawn ? 'spawn' : handback ? 'handback' : 'other', carries });
       const carryWords = carries ? '; its time and token counts carry on from the first start' : '';
       const lead = i === 0 ? 'It'
-        : spawn ? `At ${hms(spawn.at)} the parent session resumed this same agent (same agent id${carryWords}) with a new message. That message is not recorded: only brief.md and context.md are. It then`
+        : spawn ? `At ${hms(spawn.at)} the parent session resumed this same agent (same agent id${carryWords}) with a new message. That message is not recorded: only ${prompt} and context.md are. It then`
           : `It was then resumed (same agent id, no new start row${carryWords}) by a further message whose text is not recorded${handback ? '; it handed back a chat message (SubagentHandback)' : ''}, and`;
       const secs = f.ms != null ? ` (${Math.round(f.ms / 1000)} s in)` : '';
       const before = trace.slice(0, from).some((r) => r.kind === 'tool.call' && isReturnTool(r.tool));
@@ -894,7 +897,7 @@ export function outcomeOf({ trace = [], rows = [], files = [], accepted = false,
 }
 
 // The seven layers of one model run.
-function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, sessionsDirs, kind, def, spec, steps, context, eng, toLeaves }) {
+function layersOf({ a, step, runPath, runJson, promptPath, promptText, rows, sessionRows, sessionsDirs, kind, def, spec, steps, context, eng, toLeaves }) {
   const agent = readJson(join(runPath, 'agent.json'));
   const result = readJson(join(runPath, 'result.json'));
   const added = readText(join(runPath, 'context.md'));
@@ -913,7 +916,7 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
   // not guessed from input.brief (that input no longer exists) or from the template.
   const stageRec = readJson(join(runPath, 'stage.json'));
   const taskPieces = stageRec?.prompt?.parts?.task ?? null;
-  if (brief != null && taskPieces?.length) {
+  if (promptText != null && taskPieces?.length) {
     const writers = taskPieces.map((x) => {
       const p = x.source?.producer ?? {};
       if (p.kind === 'stage') return { kind: 'stage', actor: p.actor, run: p.run, field: p.field ?? null, model: true, words: `the ${p.actor} agent (run ${p.run}${p.field ? `, its ${p.field} field` : ''})` };
@@ -927,17 +930,17 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
       summary: `The Task part of this prompt was written by ${[...new Set(writers.map((w) => w.words))].join(' and ')}; the rest is the harness's fixed frame around it. The Stage view above names the source of every piece, from stage.json.` +
         (scripted && stageWriter ? ' In this scenario that "agent" is a test fixture: the text was typed into the test, not written by a model.' : '')
     };
-  } else if (brief == null) provenance = { kind: 'missing', summary: 'brief.md is missing from the run folder.' };
-  else if (typeof input?.brief === 'string' && input.brief && input.brief === brief) {
+  } else if (promptText == null) provenance = { kind: 'missing', summary: `${basename(promptPath)} is missing from the run folder.` };
+  else if (typeof input?.brief === 'string' && input.brief && input.brief === promptText) {
     // Passed through: find the step that put this text into the context, and the run whose result it was.
     let producer = null;
     if (briefPath?.startsWith('context.')) {
       const inner = briefPath.slice(8);
-      const k = steps.findIndex((s) => s.context && get(s.context, inner) === brief);
+      const k = steps.findIndex((s) => s.context && get(s.context, inner) === promptText);
       if (k >= 0) {
         const s = steps[k];
         const ev = s.event ?? {};
-        const field = pathOfString(ev.output ?? ev, brief);
+        const field = pathOfString(ev.output ?? ev, promptText);
         const by = ev.type?.startsWith('xstate.done.actor.') ? ev.type.slice(18) : null;
         const run = by ? [...steps.slice(0, k)].reverse().flatMap((x) => x.actors).find((x) => x.invoke === by) : null;
         producer = { step: s.seq, event: ev.type, invoke: by, actor: run?.actor ?? by, run: run?.effect ?? null, model: !!run?.model, field };
@@ -951,12 +954,12 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
     };
   } else {
     const fromTemplate = sourceOf(actorsSrc, 'writtenBrief');
-    const used = literals.filter((l) => l.text.length >= 3 && brief.includes(l.text));
+    const used = literals.filter((l) => l.text.length >= 3 && promptText.includes(l.text));
     const where = `state ${def?.state ?? '?'}, invoke ${a.invoke}`;
     const seen = fromTemplate ? 'the engine\'s template writtenBrief() (packages/engine/src/actors.js)' : 'what is presumably the engine\'s fill-in template (its code could not be read from this checkout, so this is inferred from the run folder)';
     provenance = used.length ? {
       kind: 'template+workflow', scripted, literals: used.map((l) => l.key), state: def?.state ?? null, invoke: a.invoke,
-      share: Math.round(100 * used.reduce((n, l) => n + l.text.length, 0) / Math.max(1, brief.length)),
+      share: Math.round(100 * used.reduce((n, l) => n + l.text.length, 0) / Math.max(1, promptText.length)),
       summary: `The instructions in this prompt were written by the workflow author, in the workflow JSON (${where}, ${used.map((l) => `input.${l.key}`).join(', ')}). The input had no brief text, so ${seen} wrapped those instructions; the rest is the actor input as JSON.`
     } : {
       kind: 'template', scripted, literals: [],
@@ -976,9 +979,9 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
   eng.pieces ??= piecesOf(eng.sources);
   const runValues = runValuesOf(runJson, input);
   const fill = (note) => (t) => labelGap(t, eng.pieces, runValues, note);
-  const promptSegments = brief == null ? [] : provenance.kind === 'passthrough'
-    ? [{ text: brief, from: 'passthrough', note: provenance.summary }]
-    : segmentsOf(brief, promptKnown, fill('fixed text in the engine code: a string literal in packages/engine/src (writtenBrief)'));
+  const promptSegments = promptText == null ? [] : provenance.kind === 'passthrough'
+    ? [{ text: promptText, from: 'passthrough', note: provenance.summary }]
+    : segmentsOf(promptText, promptKnown, fill('fixed text in the engine code: a string literal in packages/engine/src (writtenBrief)'));
 
   // Layer 3: added context.
   const schema = runJson?.schema ?? spec.meta?.actors?.[a.actor] ?? null;
@@ -1001,7 +1004,7 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
   const stored6 = result && typeof result === 'object' && 'result' in result ? result.result : result;
   const hostWritten = hostFieldsOf(stored6, added, schemaDiff, eng.sources);
   // Layer 7 extras: other files the host left in the run folder (a send-back, a failure).
-  const KNOWN = new Set(['brief.md', 'context.md', 'run.json', 'result.json', 'agent.json', 'spawn.json']);
+  const KNOWN = new Set([basename(promptPath), 'context.md', 'run.json', 'result.json', 'agent.json', 'spawn.json']);
   const extraFiles = runPath && existsSync(runPath) ? readdirSync(runPath).filter((n) => !KNOWN.has(n)).sort().map((n) => ({ name: n, value: readJson(join(runPath, n)) ?? readText(join(runPath, n)) })) : [];
 
   // Layer 5: what it did.
@@ -1021,23 +1024,23 @@ function layersOf({ a, step, runPath, runJson, brief, rows, sessionRows, session
         : !sessionsDirs.length ? 'None recorded: this journal kept no live session capture (no sessions/ folder), so tool calls cannot be shown.'
           : `None recorded: the live session capture has no rows for agent ${agentId}.`;
   }
-  // Hash checks: the prompt the model received is the bytes in brief.md.
-  const briefHash = brief != null ? sha256(brief) : null;
+  // Hash checks: the prompt the model received is the bytes in the run's prompt file.
+  const promptHash = promptText != null ? sha256(promptText) : null;
   const checks = [];
-  const stored = rows.find((r) => r.kind === 'brief.stored' && r.payload?.run === runId && r.payload?.contextHash);
-  if (stored && briefHash) checks.push({ what: 'brief.md matches the hash the host journaled when it wrote the brief', ok: stored.payload.hash === briefHash });
+  const stored = rows.find((r) => r.kind === 'prompt.stored' && r.payload?.run === runId);
+  if (stored && promptHash) checks.push({ what: `${basename(promptPath)} matches the hash the host journaled when it wrote the prompt`, ok: stored.payload.hash === promptHash });
   if (stored && added != null) checks.push({ what: 'context.md matches the hash the host journaled', ok: stored.payload.contextHash === sha256(added) });
-  const live = agentId && sessionRows.find((r) => r.kind === 'brief.stored' && (r.agent === agentId || r.payload?.agentId === agentId));
-  if (live && briefHash) checks.push({ what: 'the prompt the harness\'s SubagentStart capture saw the agent start with hashes to brief.md', ok: live.payload.hash === briefHash });
+  const live = agentId && sessionRows.find((r) => r.kind === 'agent.prompt' && (r.agent === agentId || r.payload?.agentId === agentId));
+  if (live && promptHash) checks.push({ what: `the prompt the harness's capture saw the agent start with hashes to ${basename(promptPath)}`, ok: live.payload.hash === promptHash });
 
   // Layer 7: the host's answer to the return.
-  const verdicts = rows.filter((r) => r.payload?.run === runId && ['result.stored', 'refusal', 'result.refused', 'result.accepted'].includes(r.kind) || (r.kind === 'brief.stored' && r.payload?.run === runId && r.payload?.role && !r.payload?.contextHash))
+  const verdicts = rows.filter((r) => r.payload?.run === runId && ['result.stored', 'refusal', 'result.refused', 'result.accepted', 'brief.stored'].includes(r.kind))
     .map((r) => ({ at: r.at, kind: r.kind, verdict: r.kind === 'refusal' || /refus/.test(r.kind) ? 'refused' : r.kind === 'result.stored' || r.kind === 'result.accepted' ? 'accepted' : 'info', payload: r.payload }));
 
   return {
     agentId, model: finish?.model ?? null, ms: finish?.ms ?? null, tokens: finish?.tokens ?? null, worktree: runJson?.worktree ?? null, runId, folder: runPath,
     l1: { note: scripted ? 'No model ran in this scenario, so there was no system prompt.' : 'Not recorded. The agent is a Claude Code subagent, so it also got Claude Code\'s own system prompt, its tool list and the CLAUDE.md files of its worktree. The harness writes none of that down.' },
-    l2: { text: brief, bytes: brief == null ? 0 : Buffer.byteLength(brief), sha256: briefHash, provenance, segments: promptSegments, checks: checks.filter((c) => !/context\.md/.test(c.what)) },
+    l2: { file: basename(promptPath), text: promptText, bytes: promptText == null ? 0 : Buffer.byteLength(promptText), sha256: promptHash, provenance, segments: promptSegments, checks: checks.filter((c) => !/context\.md/.test(c.what)) },
     l3: { text: added, segments: contextSegments, templateSource: withHelpers(actorsSrc, 'contextOf'), checks: checks.filter((c) => /context\.md/.test(c.what)) },
     l4: { schema: agentSchema ?? schema, hostSchema: schemaDiff ? schema : null, diff: schemaDiff, defs, shownInContext: !!agentSchema, from: schemaDiff ? `workflow file (meta.actors.${a.actor}), with the fields the host writes removed by the engine` : `workflow file (its list of actor output shapes, meta.actors.${a.actor})` },
     l5: { trace, hooks, reason: traceReason, bound: !!agentId },

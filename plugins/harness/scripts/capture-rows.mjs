@@ -1,7 +1,7 @@
 // Capture's handlers: one Claude Code hook input in, the journal rows and blobs it
 // makes out. They write nothing themselves; capture.mjs appends what they return, and the tests replay a recorded
 // session through them. Rows carry hashes and sizes of what a tool was given, never the input itself; the only
-// text kept is a subagent's brief and final answer, stored as blobs by content hash. docs/journal.md, "Capture
+// text kept is a subagent's prompt and final answer, stored as blobs by content hash. docs/journal.md, "Capture
 // rows", "Refusal rows" and "Person rows", says what each row holds. The
 // person rows come from two paths: what the person did arrives as a hearth wake, and
 // what the session put in front of them is its own hearthbot tool call.
@@ -69,8 +69,8 @@ export function capture(input, { read, state = {}, refused = {}, newId = randomU
 
 const HANDLERS = {
   PostToolUse: (input, ctx) => {
-    const brief = briefOf(input);
-    return { rows: [toolCall(input, true, ctx), ...brief.rows, ...mergeOf(input), ...posted(input, ctx.state)], blobs: brief.blobs };
+    const prompt = promptOf(input);
+    return { rows: [toolCall(input, true, ctx), ...prompt.rows, ...mergeOf(input), ...posted(input, ctx.state)], blobs: prompt.blobs };
   },
   PostToolUseFailure: (input, ctx) => ({ rows: [toolCall(input, false, ctx)] }),
   PermissionDenied: (input, ctx) => ({ rows: [classifierRefusal(input, ctx)] }),
@@ -219,35 +219,35 @@ const lines = (text) => text.split('\n').flatMap((l) => {
   }
 });
 
-// SubagentStart: the brief is the first line of the agent's transcript, which a foreground agent has written by now.
-// A background agent may not have, so the spawn row's briefHash can be null; brief.stored comes from the Agent call.
+// SubagentStart: the prompt is the first line of the agent's transcript, which a foreground agent has written by now.
+// A background agent may not have, so the spawn row's promptHash can be null; agent.prompt comes from the Agent call.
 function spawn(input, { read }) {
   const agentId = input.agent_id;
   const m = meta(input, read);
   const path = agentFile(input, '.jsonl');
   const first = path && read(path, { from: 0, cap: 1024 * 1024 });
   const opening = first ? lines(first.text.split('\n')[0])[0] : null;
-  const brief = opening?.type === 'user' ? textOf(opening.message?.content) : '';
+  const prompt = opening?.type === 'user' ? textOf(opening.message?.content) : '';
   return {
     rows: [{
       kind: 'agent.spawn',
       source: { system: 'claude-code', ref: m.toolUseId ?? `SubagentStart ${agentId}` },
       agent: agentId,
-      payload: { agentId, type: input.agent_type ?? m.agentType ?? null, model: m.model ?? null, briefHash: brief ? sha256(brief) : null, depth: m.spawnDepth ?? null },
-      ...(brief ? {} : { placeholder: 'the brief was not yet in the subagent transcript at SubagentStart; brief.stored has it' }),
+      payload: { agentId, type: input.agent_type ?? m.agentType ?? null, model: m.model ?? null, promptHash: prompt ? sha256(prompt) : null, depth: m.spawnDepth ?? null },
+      ...(prompt ? {} : { placeholder: 'the prompt was not yet in the subagent transcript at SubagentStart; agent.prompt has it' }),
     }],
   };
 }
 
-// The Agent call's own record of the brief, with the id of the agent it started: returned at once for a background
+// The Agent call's own record of the prompt, with the id of the agent it started: returned at once for a background
 // agent, at its end for a foreground one.
-function briefOf(input) {
+function promptOf(input) {
   const agentId = input.tool_response?.agentId;
   const text = input.tool_input?.prompt;
   if (typeof agentId !== 'string' || typeof text !== 'string' || !text) return { rows: [], blobs: [] };
   const b = blob(text);
   return {
-    rows: [{ kind: 'brief.stored', source: { system: 'journal', ref: `blobs/${b.hash}` }, agent: agentId, payload: { agentId, hash: b.hash, bytes: b.bytes } }],
+    rows: [{ kind: 'agent.prompt', source: { system: 'journal', ref: `blobs/${b.hash}` }, agent: agentId, payload: { agentId, hash: b.hash, bytes: b.bytes } }],
     blobs: [b],
   };
 }
@@ -322,8 +322,8 @@ export function handedBack(text) {
 const isMessage = (e) => e?.type === 'user' || e?.type === 'assistant';
 
 /**
- * How long a subagent ran: from its brief (the transcript's first line, a user row) to its last user or assistant row.
- * Other rows (attachments, system rows) don't count, and nor does any row stamped before the brief: one can carry the
+ * How long a subagent ran: from its prompt (the transcript's first line, a user row) to its last user or assistant row.
+ * Other rows (attachments, system rows) don't count, and nor does any row stamped before the prompt: one can carry the
  * time a relayed message was written, days before the run (plan/decisions/2026-11-05-agent-finish-ms.md). The first
  * line is read from offset 0, since `entries` is the file's tail. Null when no message has a time.
  */
@@ -331,8 +331,8 @@ function runMs(path, entries, read) {
   const head = path && read(path, { from: 0, cap: 1024 * 1024 });
   const opening = head ? lines(head.text.split('\n')[0])[0] : null;
   const times = entries.filter(isMessage).map((e) => Date.parse(e.timestamp)).filter(Number.isFinite);
-  const brief = opening?.type === 'user' ? Date.parse(opening.timestamp) : NaN;
-  const start = Number.isFinite(brief) ? brief : times.length ? Math.min(...times) : NaN;
+  const opened = opening?.type === 'user' ? Date.parse(opening.timestamp) : NaN;
+  const start = Number.isFinite(opened) ? opened : times.length ? Math.min(...times) : NaN;
   const after = times.filter((t) => t >= start);
   return after.length ? Math.max(...after) - start : null;
 }
@@ -351,7 +351,7 @@ function finish(input, { read, refused, newId }) {
   if (text) {
     const b = blob(text);
     blobs.push(b);
-    rows.push({ kind: 'result.stored', source: { system: 'journal', ref: `blobs/${b.hash}` }, agent: agentId, payload: { agentId, hash: b.hash, bytes: b.bytes } });
+    rows.push({ kind: 'agent.final', source: { system: 'journal', ref: `blobs/${b.hash}` }, agent: agentId, payload: { agentId, hash: b.hash, bytes: b.bytes } });
   }
   rows.unshift({
     kind: 'agent.finish',

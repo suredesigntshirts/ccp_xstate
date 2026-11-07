@@ -67,7 +67,7 @@ test('S5 (1): the build prompt names the GitHub tools, the PR url shape and the 
     const run = loadRun(w.root, w.openRun('g', 'build').id);
     assert.equal(run.github, 'o/r');
     assert.equal(readRun(w, run.run, 'context.md'), `Run ${run.run}, worktree ${run.worktree} of https://github.com/o/r, branch ${run.branch}.`);
-    const rules = part(readRun(w, run.run, 'brief.md'), 'Rules');
+    const rules = part(readRun(w, run.run, 'prompt.md'), 'Rules');
     assert.ok(rules.includes(`- ${build.rules[2]}`) && build.rules[2].startsWith('Open the PR with the GitHub tools you have: the gh CLI or the GitHub MCP tools,'));
   } finally {
     await w.close();
@@ -165,7 +165,7 @@ test('S5 (4): build notes go to context and the merge cards, never to the verifi
     await w.drive('n', suiteWake(head, 1));
     const v = loadRun(w.root, w.openRun('n', 'verify').id);
     assert.ok(!JSON.stringify(v.input).includes('NOTE-7'), 'the verify input holds no notes');
-    for (const f of ['brief.md', 'context.md']) assert.ok(!readRun(w, v.run, f).includes('NOTE-7'), `verify ${f} holds no notes`);
+    for (const f of ['prompt.md', 'context.md']) assert.ok(!readRun(w, v.run, f).includes('NOTE-7'), `verify ${f} holds no notes`);
     assert.ok((await w.agent('n', 'verify', verifies(w, 'PASS'))).accepted);
     await w.drive('n');
     assert.equal(w.host('n').snapshot.value, 'awaitingMerge');
@@ -240,7 +240,7 @@ test('S5 (8): the run line is told once, as the run\'s context; the stage record
     await w.start('c', 'quick-fix', { issue: ISSUE });
     const runId = w.openRun('c', 'brief').id;
     const run = loadRun(w.root, runId);
-    const brief = readRun(w, runId, 'brief.md');
+    const brief = readRun(w, runId, 'prompt.md');
     const context = readRun(w, runId, 'context.md');
     assert.equal(context, runLine(run));
     assert.ok(!brief.includes(context), 'the prompt does not repeat the run line');

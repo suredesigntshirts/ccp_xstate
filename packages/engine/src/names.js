@@ -5,6 +5,7 @@
 // It imports only node: built-ins, so a process that must not load XState (the return tool, the actor hooks in a
 // session without it) can load it.
 import { createHash } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const sha256 = (text) => createHash('sha256').update(text).digest('hex');
@@ -37,11 +38,23 @@ export const sessionFile = (root, session) => join(root, 'sessions', `${session}
 
 /** The folder holding an item's run folders. */
 export const runsDir = (root, item) => join(root, 'items', safe(item), 'runs');
-/** The run's folder: brief, context, binding and result, under the item's own folder in the journal root. */
+/** The run's folder: prompt, context, binding and result, under the item's own folder in the journal root. */
 export const runDir = (root, run) => {
   const r = runOf(run);
   return r && join(runsDir(root, r.item), safe(r.name));
 };
+
+/**
+ * The file holding a run's rendered prompt: prompt.md, or brief.md in a folder that has only that one (folders written
+ * before journal v2 are kept as they were). Null for a non-run id.
+ */
+export function promptFile(root, run) {
+  const dir = runDir(root, run);
+  if (!dir) return null;
+  const file = join(dir, 'prompt.md');
+  const earlier = join(dir, 'brief.md');
+  return !existsSync(file) && existsSync(earlier) ? earlier : file;
+}
 
 /** Where the record of an ask run's posted card lives: beside the item's runs, under cards/. Throws for a non-run id. */
 export function cardFile(root, run) {

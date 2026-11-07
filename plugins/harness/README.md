@@ -73,7 +73,7 @@ quiet, 2 s at most), because Claude Code can still be writing the last lines.
 UserPromptSubmit, SubagentStart and Stop run in line: they come once a turn or once an agent, and an async Stop hook
 was lost when a headless session exited straight after it. In an installed project it appends a row per
 wake, tool call, subagent start and finish and turn to `journal/sessions/<session>.jsonl`, stores each subagent's
-brief and final answer once under `journal/blobs/<sha256>`, and ends with a `hook.run` row giving its own time. It
+prompt and final answer once under `journal/blobs/<sha256>`, and ends with a `hook.run` row giving its own time. It
 prints nothing. The rows are in `docs/journal.md`, "Capture rows"; the handlers are in `scripts/capture-rows.mjs`, and
 the tests replay a recorded session (`test/fixtures/capture/`, remade by its `make.mjs`) through them. The Stop
 handler keeps how far it read the transcript under `$CCP_HARNESS_STATE`, never under the plugin root.

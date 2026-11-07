@@ -107,8 +107,8 @@ test('prompt-agrees: quick-fix verify brief.md and stage.json, and research veri
   const w = await makeWorld();
   try {
     await atVerify(w, 't4');
-    const briefs = files(w.root, 'brief.md').filter((p) => /verify/.test(p));
-    assert.ok(briefs.length >= 1, `a verify brief.md under ${w.root}`);
+    const briefs = files(w.root, 'prompt.md').filter((p) => /verify/.test(p));
+    assert.ok(briefs.length >= 1, `a verify prompt.md under ${w.root}`);
     const brief = readFileSync(briefs[0], 'utf8');
     const output = brief.slice(brief.indexOf('## Output'), brief.indexOf('## Return') > 0 ? brief.indexOf('## Return') : undefined);
     assert.ok(output.length > 20, 'brief has an Output part');

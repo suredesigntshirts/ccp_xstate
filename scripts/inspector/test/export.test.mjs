@@ -187,7 +187,7 @@ test('fri-jsonl-lint-2: the brief prompt is the engine template; build and verif
   for (const l of [brief, buildRun, verify]) {
     assert.ok(l.l5.trace.some((r) => r.kind === 'tool.call'), 'tool calls found in the live capture');
     assert.ok(l.model, 'model from agent.finish');
-    assert.ok(l.l2.checks.length >= 2 && l.l2.checks.every((c) => c.ok), 'brief.md hashes match the journal and the capture');
+    assert.ok(l.l2.checks.length >= 2 && l.l2.checks.every((c) => c.ok), 'prompt.md hashes match the journal and the capture');
     assert.ok(l.l7.rows.some((r) => r.verdict === 'accepted'));
     assert.ok(l.l3.text.includes('harness return tool'));
     assert.ok(l.l4.schema);
@@ -363,7 +363,7 @@ test('ar2: an agent that finished without calling the return tool is not "still 
   assert.match(L.l7.empty, /without calling the harness return tool/);
   for (const t of [L.l6.missing, L.l7.empty, b.endNote]) assert.doesNotMatch(t, /still running|never returned/);
   assert.match(b.endNote, /finished without calling the return tool/);
-  const stored = L.l5.trace.filter((r) => r.kind === 'result.stored' || r.kind === 'brief.stored');
+  const stored = L.l5.trace.filter((r) => r.kind === 'agent.final' || r.kind === 'agent.prompt');
   assert.ok(stored.length && stored.every((r) => r.by === 'capture' && /capture saved/.test(r.what)));
 });
 

@@ -106,9 +106,10 @@ export function checkRun(dir, root) {
   if (!model) return { model: false, problems };
   const p = (m) => problems.push(`${dir}: ${m}`);
   if (!existsSync(join(dir, 'stage.json'))) return p('no stage.json'), { model, problems };
-  if (!existsSync(join(dir, 'brief.md'))) return p('no brief.md'), { model, problems };
+  const file = join(dir, existsSync(join(dir, 'prompt.md')) ? 'prompt.md' : 'brief.md');
+  if (!existsSync(file)) return p('no prompt.md'), { model, problems };
   const st = JSON.parse(readFileSync(join(dir, 'stage.json'), 'utf8'));
-  const brief = readFileSync(join(dir, 'brief.md'));
+  const brief = readFileSync(file);
   const parts = st.prompt?.parts ?? {};
   const joined = HEADINGS.map(([k, h]) => [h, ...(parts[k] ?? []).map((x) => x.text)].join('\n')).join('\n\n');
   if (joined !== brief.toString('utf8')) p('parts do not reassemble to brief.md');

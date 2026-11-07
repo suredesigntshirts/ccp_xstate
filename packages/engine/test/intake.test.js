@@ -161,7 +161,7 @@ test('the challenge is held to the expect lines at accept, and its prompt holds 
       const got = await w.agent('in5', 'challenge', () => result, `bad-${i}`);
       assert.ok(got.refused, `bad result ${i} is refused: ${JSON.stringify(got)}`);
     }
-    const prompt = readFileSync(join(runDir(w.root, run.id), 'brief.md'), 'utf8');
+    const prompt = readFileSync(join(runDir(w.root, run.id), 'prompt.md'), 'utf8');
     assert.ok(prompt.includes(REQUEST.text));
     assert.ok(!prompt.includes('"challenge"') && !prompt.includes('"answer"'), 'no shape input reaches the challenger');
   } finally {

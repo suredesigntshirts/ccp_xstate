@@ -1,5 +1,5 @@
 // The stage bench: run one model stage of a workflow alone, on committed cases, with the
-// exact prompt the engine renders. Nothing here assembles a prompt: a run's prompt is the brief.md the engine's own
+// exact prompt the engine renders. Nothing here assembles a prompt: a run's prompt is the prompt.md the engine's own
 // prepare() writes (packages/engine/src/actors.js, which calls stages.js sections() and assemble()), and the bench
 // sends that file's bytes. Usage and the refinement procedure: docs/prompts.md.
 import { execFileSync, spawn as spawnChild } from 'node:child_process';
@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 import { offer, restore } from '../../packages/engine/src/host.js';
 import { accept, actors, bind, loadRun, prepare, runDir, spawn } from '../../packages/engine/src/actors.js';
+import { promptFile } from '../../packages/engine/src/names.js';
 import { handlers } from '../../packages/engine/src/effects/index.js';
 import { loadWorkflow, readWorkflow } from '../../packages/engine/src/index.js';
 import { chart, isStage } from '../../packages/engine/src/stages.js';
@@ -180,7 +181,7 @@ export function caseRepo(c, work) {
 
 /**
  * Prepare one bench run of `actor` with the engine: a journal root at `root` holding item `item`, its run folder
- * (brief.md, context.md, stage.json, run.json) and a worktree of `repo` under `worktrees`. A stage invoked in the
+ * (prompt.md, context.md, stage.json, run.json) and a worktree of `repo` under `worktrees`. A stage invoked in the
  * initial state is started through the real host (restore, then offer the item's start event), so the journal holds
  * the item's first transition and the Inspector can replay it; any other stage is prepared directly with the same
  * prepare() the host's run handler calls, from the given stage input. Returns { run, dir, prompt, context }.
@@ -211,7 +212,7 @@ export async function prepareRun({ spec, actor, item, root, repo, worktrees, cas
     prepare({ host, effect: { id: runId, actor, invoke: inv.id, input: input ?? stageInput(spec, actor, caseInput), transition: null }, repo, worktrees });
   }
   const dir = runDir(root, runId);
-  return { run: runId, dir, prompt: readFileSync(join(dir, 'brief.md'), 'utf8'), context: readFileSync(join(dir, 'context.md'), 'utf8') };
+  return { run: runId, dir, prompt: readFileSync(promptFile(root, runId), 'utf8'), context: readFileSync(join(dir, 'context.md'), 'utf8') };
 }
 
 /** Start the run as the harness hooks do (PreToolUse spawn, SubagentStart bind), for a bench agent id. */

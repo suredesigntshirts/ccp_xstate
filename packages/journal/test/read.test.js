@@ -34,7 +34,7 @@ test('torn, versionless, newer and invalid lines are counted with a reason', () 
     JSON.stringify(base()),
     '{"v":1,"id":"to',
     JSON.stringify(noV),
-    JSON.stringify(base({ v: 2 })),
+    JSON.stringify(base({ v: 3 })),
     JSON.stringify(base({ source: undefined })),
   ].join('\n') + '\n');
   const { rows, bad } = readFile(path);
@@ -42,7 +42,7 @@ test('torn, versionless, newer and invalid lines are counted with a reason', () 
   assert.deepEqual(bad.map((b) => [b.line, b.reason]), [
     [2, 'not JSON (a torn or partial line)'],
     [3, 'no version (v)'],
-    [4, "row is v2, newer than this reader's v1"],
+    [4, "row is v3, newer than this reader's v2"],
     [5, 'row is missing source'],
   ]);
 });

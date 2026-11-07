@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import * as names from '../src/names.js';
 
@@ -46,4 +47,16 @@ test('names.js imports only node: built-ins', () => {
   const from = [...source.matchAll(/^import[^;]*?from\s+'([^']+)'/gm)].map((m) => m[1]);
   assert.ok(from.length > 0);
   for (const f of from) assert.match(f, /^node:/);
+});
+
+test('promptFile is the run folder\'s prompt.md, or the older brief.md when only that one is there', () => {
+  const root = mkdtempSync(join(tmpdir(), 'names-'));
+  const dir = names.runDir(root, 'it-1:0.build');
+  assert.equal(names.promptFile(root, 'it-1:0.build'), join(dir, 'prompt.md'));
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, 'brief.md'), 'old');
+  assert.equal(names.promptFile(root, 'it-1:0.build'), join(dir, 'brief.md'));
+  writeFileSync(join(dir, 'prompt.md'), 'new');
+  assert.equal(names.promptFile(root, 'it-1:0.build'), join(dir, 'prompt.md'));
+  assert.equal(names.promptFile(root, 'not a run'), null);
 });

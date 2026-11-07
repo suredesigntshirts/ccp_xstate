@@ -80,7 +80,7 @@ test('upcast: an old-version row is upcast on read and the file is not touched',
     assert.equal(missing.rows.length, 0);
     assert.equal(missing.bad.length, 1);
     // A newer-version row is counted bad by an older reader and the file is untouched.
-    writeFileSync(file, `${JSON.stringify(baseRow({ v: 2 }))}\n`);
+    writeFileSync(file, `${JSON.stringify(baseRow({ v: 3 }))}\n`);
     assert.match(readFile(file).bad[0].reason, /newer than this reader/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
