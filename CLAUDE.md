@@ -10,6 +10,10 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 - **The why travels with the work.** Every change names its plan item; the item's prose holds the reasoning.
 - **A working small system first** (Gall's Law), end to end before wide, root cause over symptom.
 - **Step back, don't grind.** An item's `step_back` caps its rounds; past that, replan instead of retrying.
+- **Comments say what holds now.** Plan item ids, lanes and tournament rounds go in commits, PRs and the plan,
+  never in code comments or READMEs (`plan/research/design-books-cleanup.md`, finding 2).
+- **A cleanup changes structure, not behaviour.** Tests that pass on `main` pass at its head, changed only for the
+  renames and imports its item names.
 - **Decide two-way doors and write them down** in `plan/decisions/`. One-way doors (settings, secrets,
   anything outside this repo and the scratch repo) go in `plan/decisions/waiting-for-person.md`.
 
