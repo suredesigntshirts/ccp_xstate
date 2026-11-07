@@ -118,7 +118,7 @@ code { font: .8rem var(--mono); }
 window.ObserveData = (() => {
 // packages/journal/src/derive/time.js
 const { WAIT_KINDS, time } = (() => {
-// The time view (plan item obs-time-and-rework): where one session's wall-clock time went. Time is working while a
+// The time view: where one session's wall-clock time went. Time is working while a
 // turn, a tool call, a hook or a subagent is in progress; every other stretch is waiting, labelled by the wake that ended it
 // (on the person, on CI, on another wake), or rebuild for the start-up between a new SessionStart and that wake, or
 // unknown when no wake with a reason ends it. A gap is never counted as working. It reads rows and writes nothing.
@@ -242,7 +242,7 @@ return { WAIT_KINDS, time };
 })();
 // packages/journal/src/derive/attention.js
 const { CAPS, attention, attentionOf } = (() => {
-// The attention view (plan item obs-person-attention): what the harness asked of the person, from journal rows.
+// The attention view: what the harness asked of the person, from journal rows.
 // Per UTC day and per thread it counts the person's messages and taps, the cards and posts put in front of them,
 // and how long each card waited for its tap; and it flags any hour in which posts went over the platform's caps
 // (ledger L-message-caps: about 20 per thread and 60 per project). It reads rows and writes nothing.
