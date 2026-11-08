@@ -5,36 +5,45 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "draft",
-  "outcome": "Every test under verify/ for a done item is either moved to test/regression/<area>.test.mjs with its Expect id in its header and one shared helper, or deleted with its evidence because it read source text, compared a listing or compared a capture of main; verify/<item>/ holds verdict.json for done items; the item's PR and prose carry a table with one row per test file, its verdict and its reason; and no engine, plugin or workflow source changes.",
-  "why": "61 live suites that assert main's bytes let code be added but never removed; the classification is per test, not a deletion pass (L-measure-then-park; research plan/research/verification-swing.md, How to classify a verifier test; decision 4).",
+  "outcome": "Every verify/ folder of a done item holds only verdict.json; the remaining suites (plan, gates, setup, bench and tournament) are moved to test/regression/<area>/ or deleted with their evidence by the same per-test rule as verify-regression-engine and verify-regression-plugin, with one table row per test file; test/regression/ holds the regression set of every done item with one helper; and no engine, plugin or workflow source changes.",
+  "why": "61 live suites that assert stored captures let code be added but never removed; the classification is per test, not a deletion pass (L-measure-then-park; research plan/research/verification-swing.md, How to classify a verifier test; decision 4). Split by suite into three parts at the replan that readied the first (plan/decisions/2026-11-08-verify-regression-split.md); this is the last, and it closes the series' rule for every done folder.",
   "serves": [
     "L-contract-names-behaviour",
     "L-measure-then-park",
     "L-count-concepts"
   ],
   "depends_on": [
-    "verification-contract"
+    "verify-regression-engine",
+    "verify-regression-plugin"
   ]
 }
 ```
 
 Draft from `plan/research/verification-swing.md`, item 2, and `plan/decisions/2026-11-08-verification-swing.md`,
-decision 4. Not ready: inputs, outputs, Expect lines and the Verifier brief are to write when it is readied, under
-`verification-contract`'s rule (no check may say "as on main" or count lines).
+decision 4. Split on 8 Nov into three parts by suite (`plan/decisions/2026-11-08-verify-regression-split.md`):
+`verify-regression-engine` (26 suites: engine, run, marks, and `stage-bench`), `verify-regression-plugin` (19 suites: plugin,
+inspector, journal) and this item, which keeps the id so the items that wait for the whole set
+(`retire-unmarked-reading`, `retire-brief-file-fallback`, `run-message-and-budget`) still wait for all three.
+Readied after `verify-regression-plugin` is done, with the Expect lines and Verifier brief of the earlier parts.
+
+The 19 suites: `clean-room-install-test`, `comments-present-tense`, `env-bootstrap`, `first-real-issue`,
+`fix-budget-rule`, `person-setup-sitting`, `probe-platform-baseline`, `probe-plugin-agents`,
+`probe-plugin-agents-thread`, `refine-brief-stage`, `repo-skeleton`, `retro-first-item`, `self-edit-check-snapshot`,
+`self-update-by-version`, `tool-docs-downloader`, `tournament-kit`, `tournament-scoring-floors`,
+`trial-fail-path`, `verification-contract`. Also any item done after the split (such as `verify-evidence-policy`)
+whose folder still holds tests when this item is readied.
 
 What is known now:
 
-- Areas: `engine`, `run`, `marks`, `journal`, `plugin`, `inspector`, `plan`, `gates`. One helper module,
-  `test/regression/lib.mjs`, replaces the 55 per-suite helpers; it grows only what two moved tests share.
-- Known deletions: `main-prompts.json` and `main-scenarios.json` in six `fix-*` suites, `run-lifecycle-store`'s
-  `evidence/main/trace.json` and its 70 other evidence files, every `.pass` listing (about 16,700 lines), the regex
-  tests over READMEs and source (`comments-present-tense/readme.test.mjs`, `fix-budget-rule/rule-written.test.mjs`,
-  the `no-guessing` and `one-check` greps). Known moves: `stage-contract-declares-rules`'s `marks-checked` and
-  `declared-rules-hold`, `run-lifecycle-store`'s `states` and `answers` scenarios, `retire-pinned-legacy`'s
-  `retired-not-run`, `fix-budget-rule`'s `budget-refuses` and `names-module`.
-- The two root fixes from the 8 Nov time audit (the no-self-edit environment and the copy-not-link tags) are their own
-  item, `self-edit-check-snapshot`; when its tests move, they move as that item left them.
-- If the first round shows the table is too large for one PR, split by area at the replan: `engine` and `run`
-  first, then `plugin` and `inspector`, then `plan`, `gates` and `journal`. Each part is one item with the same rule.
-- The suite should get faster, not slower; the audit measured 12m51s for the local suite with 661 s in one test.
-  Report the time before and after in the PR, as information, not as an Expect line.
+- Areas for this part: `plan`, `gates`, and the areas the earlier parts used; `setup` or `bench` only if a moved test
+  fits none of the eight (add the word to `docs/language.md` first).
+- Known deletions: `comments-present-tense/readme.test.mjs`, `fix-budget-rule/rule-written.test.mjs` and the regex
+  tests over READMEs and source, every `.pass` listing. Known moves: `fix-budget-rule`'s `budget-refuses` and
+  `names-module`. Suites with no tests (`first-real-issue`, `probe-*`, `person-setup-sitting`,
+  `tool-docs-downloader`) keep their verdict and lose their evidence.
+- The two root fixes from the 8 Nov time audit landed with `self-edit-check-snapshot` (#192); its tests move as that
+  item left them.
+- The suite should get faster, not slower; the audit measured 12m51s for the local suite. Report the time before and
+  after in the PR, as information, not as an Expect line.
+- When this item is done, every done item's `verify/` folder holds only `verdict.json`, and only the item being
+  verified has tests under `verify/`.
