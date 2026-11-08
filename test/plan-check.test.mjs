@@ -1,4 +1,5 @@
-// The plan check's fix budget (plan/README.md, "Fix budget"), run on a temp copy of plan/ with items added.
+// The plan check's fix budget (plan/README.md, "Fix budget") and its contract rules ("How slop is kept out"), run on a
+// temp copy of plan/ with items added.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -25,8 +26,8 @@ function check(items, { makeModule = true } = {}) {
   try {
     cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
     if (makeModule) { mkdirSync(join(dir, 'lib')); writeFileSync(join(dir, MODULE), ''); }
-    for (const it of items)
-      writeFileSync(join(dir, 'plan/items', `${it.id}.md`), '```json\n' + JSON.stringify(it, null, 2) + '\n```\n\n## Verifier brief\n\nRead it.\n');
+    for (const { prose = '', ...it } of items)
+      writeFileSync(join(dir, 'plan/items', `${it.id}.md`), '```json\n' + JSON.stringify(it, null, 2) + '\n```\n\n' + prose + '## Verifier brief\n\nRead it.\n');
     const r = spawnSync(process.execPath, [join(dir, 'plan/check.mjs')], { encoding: 'utf8' });
     return { code: r.status, out: r.stdout + r.stderr };
   } finally {
@@ -83,4 +84,45 @@ test('a design item done after the fixes restarts the count; one done before the
 
 test('the design item itself is never refused', () => {
   assert.equal(check([...fixes([1, 2, 3]), item('redesign-m', { status: 'doing', module: MODULE })]).code, 0);
+});
+
+// An item whose Expect lines say `check`, beside a world line, so a ready one passes every other rule.
+const PHRASES = ['as on main', 'as main', 'on main', 'than main', "main's", 'unchanged', 'same as', 'byte', 'bytes', 'both shas'];
+const expecting = (id, status, check) => item(id, {
+  status, done_on: daysAgo(1),
+  expect: [{ id: 'shown', check: 'The PR runs on GitHub', how: 'gh', proof: 'world' }, { id: 'pins', check, how: 'read', proof: 'verifier' }],
+});
+
+test('a ready or doing Expect check that pins main is refused, naming the item, the Expect id and the phrase', () => {
+  for (const phrase of PHRASES) for (const status of ['ready', 'doing']) {
+    const r = check([expecting('pinner', status, `Every stage renders ${phrase} before the change`)]);
+    assert.equal(r.code, 1, `${status}: ${phrase}`);
+    assert.ok(r.out.includes(`pinner.md: Expect pins pins main with "${phrase}"`), `${status}: ${phrase}\n${r.out}`);
+  }
+});
+
+test('a sha of seven or more hex digits is refused; a check that names a repo path is not', () => {
+  for (const sha of ['a575897', '6995413269700494239890eb87c8a33e42a426c3']) {
+    const r = check([expecting('pinner', 'ready', `The suite passes at ${sha} and at the head`)]);
+    assert.equal(r.code, 1, sha);
+    assert.ok(r.out.includes(`pinner.md: Expect pins pins main with the sha ${sha}`), r.out);
+  }
+  assert.equal(check([expecting('reader', 'ready', 'plan/README.md states the rule; scripts/gates/lib.mjs refuses a 6-digit count of 123456')]).code, 0);
+});
+
+test('draft and done items keep their wording', () => {
+  for (const status of ['draft', 'done']) for (const phrase of [...PHRASES, 'a575897'])
+    assert.equal(check([expecting('older', status, `Renders ${phrase}`)]).code, 0, `${status}: ${phrase}`);
+});
+
+test('a contract changes at most once, and a change is written down', () => {
+  const changed = (n, prose) => ({ ...item('moved', { status: 'doing', contract_changes: n }), ...(prose ? { prose } : {}) });
+  const section = '## Contract change\n\nThe build tried one shape, compared it with another, and the contract moved.\n\n';
+  assert.equal(check([changed(1, section)]).code, 0);
+  const none = check([changed(1)]);
+  assert.equal(none.code, 1);
+  assert.match(none.out, /moved\.md: contract_changes is 1, so the item needs a ## Contract change section/);
+  const twice = check([changed(2, section)]);
+  assert.equal(twice.code, 1);
+  assert.match(twice.out, /moved\.md\.contract_changes: must be at most 1/);
 });

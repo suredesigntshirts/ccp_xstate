@@ -1,5 +1,5 @@
 # The merge gates for a PR into main: the stub ban, the contract freeze, and the verdict gate (a verdict for the
-# named item at the head sha, from a session other than the builder's). See docs/gates.md.
+# named item at the head sha, from a session other than the builder's, whose named tests pass). See docs/gates.md.
 name: verdict
 on:
   pull_request:
@@ -29,6 +29,9 @@ jobs:
       - name: contract freeze
         if: ${{ !cancelled() }}
         run: node scripts/gates/pr-gate.mjs freeze
-      - name: verdict at the head sha, from a separate session
+      - name: install dependencies, for the tests the verdict names
+        if: ${{ !cancelled() }}
+        run: npm ci
+      - name: verdict at the head sha, from a separate session, its named tests run
         if: ${{ !cancelled() }}
         run: node scripts/gates/pr-gate.mjs verdict

@@ -11,10 +11,11 @@ export function itemHead(text) {
   try { return JSON.parse(m[1]); } catch { return null; }
 }
 
-// The frozen part of an item: its head without status (which moves as the build goes), and its Verifier brief.
+// The frozen part of an item: its head without status and done_on (which record where the build is, not what it must
+// show), and its Verifier brief.
 export function contract(text) {
   if (text == null) return null;
-  const { status, ...rest } = itemHead(text) ?? {};
+  const { status, done_on, ...rest } = itemHead(text) ?? {};
   const brief = text.split(BRIEF_RE)[1]?.split(/^## /m)[0].trim() ?? '';
   return JSON.stringify({ head: rest, brief });
 }
@@ -30,20 +31,23 @@ export function namedItem({ branch = '', body = '', ids }) {
   return { item: fromBody ?? (ids.has(fromBranch) ? fromBranch : null), reasons };
 }
 
-// Contract freeze: a PR may not change the head or Verifier brief of a frozen item (the one it names, or one whose
-// status at base is doing or done), unless it is labelled replan and touches only plan/.
+// Contract freeze: a PR may not change the head or Verifier brief of a frozen item (the one it names, one whose status
+// at base is doing or done, or one with a verdict file). Before verification starts, a PR labelled replan that touches
+// only plan/ may; once verify/<id>/verdict.json exists at base or head (`verdict` names it), nothing may.
 export function checkFreeze({ changed, frozen, labels }) {
   const touched = frozen.filter((f) => f.before !== null && contract(f.before) !== contract(f.after));
-  if (!touched.length) return [];
   const outside = changed.filter((p) => !p.startsWith('plan/'));
-  if (labels.includes('replan') && !outside.length) return [];
-  return touched.map((f) => `changes the contract of ${f.id} (its head or Verifier brief)` +
-    (labels.includes('replan') ? `; a replan PR touches only plan/, but this one touches ${outside.join(', ')}`
-      : '; only a PR labelled replan that touches nothing but plan/ may'));
+  const replan = labels.includes('replan') && !outside.length;
+  return touched.filter((f) => f.verdict || !replan).map((f) => `changes the contract of ${f.id} (its head or Verifier brief)` +
+    (f.verdict ? `; ${f.verdict} exists, so verification has started and nothing may change it`
+      : labels.includes('replan') ? `; a replan PR touches only plan/, but this one touches ${outside.join(', ')}`
+        : '; only a PR labelled replan that touches nothing but plan/ may'));
 }
 
-// Verdict gate: verdict.json marks every Expect id of the item head MET, with the command and an output excerpt,
-// and names a mutation and the test it turned red for every builder line.
+// Verdict gate: verdict.json marks every Expect id of the item head MET, with the command and an output excerpt; names
+// the test that proves every verifier and builder line (a file under verify/<item>/, and optionally a test name), which
+// the gate then runs; names a mutation and the test it turned red for every builder line; and keeps what the verifier
+// judged rather than ran in observations, a list of strings that never gates.
 export function checkVerdict({ item, head, verdict }) {
   if (!verdict) return [`no verify/${item}/verdict.json at the head sha`];
   if (verdict.item !== item) return [`verdict.json is for item ${verdict.item}, not ${item}`];
@@ -56,12 +60,53 @@ export function checkVerdict({ item, head, verdict }) {
     if (r.status !== 'MET') reasons.push(`Expect ${e.id} is ${r.status ?? 'unmarked'}, not MET`);
     if (!filled(r.command)) reasons.push(`Expect ${e.id} names no command`);
     if (!filled(r.excerpt)) reasons.push(`Expect ${e.id} has no output excerpt`);
+    if (TESTED.includes(e.proof)) {
+      const why = testPathFault(item, r.test);
+      if (why) reasons.push(`Expect ${e.id} is ${e.proof}-proven, so it names the test that proves it: ${why}`);
+      if (r.test_name !== undefined && !filled(r.test_name)) reasons.push(`Expect ${e.id} has an empty test_name`);
+    }
     if (e.proof === 'builder' && !(filled(r.mutation) && filled(r.red_test)))
       reasons.push(`Expect ${e.id} is builder-proven, so it needs a mutation and the test it turned red`);
   }
   for (const id of results.keys()) if (!(head.expect ?? []).some((e) => e.id === id))
     reasons.push(`verdict marks ${id}, which the item head doesn't have`);
+  if (verdict.observations !== undefined && !(Array.isArray(verdict.observations) && verdict.observations.every(filled)))
+    reasons.push('observations is a list of non-empty strings');
   return reasons;
+}
+
+// The proofs whose verdict result names a test the gate runs. A world line is shown by the platform, not a test.
+const TESTED = ['verifier', 'builder'];
+
+function testPathFault(item, test) {
+  if (typeof test !== 'string' || !test.trim()) return 'test is missing';
+  const parts = test.split('/');
+  if (parts[0] !== 'verify' || parts[1] !== item || parts.length < 3 || parts.some((p) => p === '..' || p === '.' || p === ''))
+    return `test ${test} is not a path under verify/${item}/`;
+  return null;
+}
+
+// The tests a verdict names, one entry per file and name, each with the Expect ids it proves; pr-gate.mjs runs them.
+export function verdictTests({ head, verdict }) {
+  const proofs = new Map((head.expect ?? []).map((e) => [e.id, e.proof]));
+  const runs = new Map();
+  for (const r of Array.isArray(verdict?.results) ? verdict.results : []) {
+    if (!TESTED.includes(proofs.get(r?.id)) || typeof r.test !== 'string') continue;
+    const key = JSON.stringify([r.test, r.test_name ?? null]);
+    if (!runs.has(key)) runs.set(key, { file: r.test, name: r.test_name ?? null, ids: [] });
+    runs.get(key).ids.push(r.id);
+  }
+  return [...runs.values()];
+}
+
+// Why a named test's run fails the gate, or null: it exited non-zero, or it ran no test.
+export function testRunFault({ file, name, ids }, { status, output }) {
+  const label = `Expect ${ids.join(', ')}: test ${file}${name ? ` (${name})` : ''}`;
+  const tail = output.trim().split('\n').filter((l) => /^# (?:tests|pass|fail)|^not ok|Error/.test(l)).slice(0, 8).join(' | ');
+  if (status !== 0) return `${label} fails at the head (exit ${status})${tail ? `: ${tail}` : ''}`;
+  const passed = Number(output.match(/^# pass (\d+)/m)?.[1] ?? 0);
+  if (!passed) return `${label} ran no test that passed${tail ? `: ${tail}` : ''}`;
+  return null;
 }
 
 // The Claude-Session trailer of a commit message, or null.

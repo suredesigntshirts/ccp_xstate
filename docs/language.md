@@ -17,6 +17,10 @@ How the work on the harness itself is planned and proved.
 | plan stage | A step of the build, s0 to s6, with its own gate | `plan/stages/` |
 | Expect line | One check the outcome must pass, with its proof (`world`, `verifier` or `builder`) | `plan/item.schema.json` `expect` |
 | verdict | The verifier's MET or NOT MET for every Expect line of an item, at one sha | `verify/<item>/verdict.json`, `scripts/gates/lib.mjs` |
+| plan verifier | The separate session that writes an item's tests under `verify/<item>/` and its verdict; not the `verify` model stage | `verify/<item>/`, `docs/gates.md` |
+| observation | A plan verifier's judged note on a verdict (a naming concern, a design smell, a doc gap); it never gates | `scripts/gates/lib.mjs` `checkVerdict`, `docs/gates.md` |
+| contract change | The one replan a doing item's head and Verifier brief may have, before its verdict file exists, written up under `## Contract change` | `plan/item.schema.json` `contract_changes`, `plan/check.mjs` |
+| regression set | The behavioural tests of done items, kept by area under test/regression with one helper; it is what a cleanup must keep passing | `plan/decisions/2026-11-08-verification-swing.md`, decision 4 |
 | ledger row | A lesson the plan is held to, with an `L-` id | `plan/ledger/` |
 | decision | A two-way door decided and written down, or a one-way door waiting for the person | `plan/decisions/`, `plan/decisions/waiting-for-person.md` |
 | replan | A PR that changes only `plan/`, labelled `replan` | `scripts/gates/pr-gate.mjs` |
@@ -100,6 +104,10 @@ What the harness records, and how it is read back.
 - **brief and prompt.** A brief is a brief stage's output. Every run, the brief stage's included, starts from a prompt.
 - **verdict.** A plan verdict is MET or NOT MET per Expect line, from a verifier session. In the engine, say *verdict
   field* for a model stage's marked pass or fail.
+- **verify.** `verify/` and its sessions are the *plan verifier*; the `verify` model stage in `workflows/quick-fix/`
+  checks a run's Expect lines at a PR head. Say *plan verifier* wherever the model stage could be meant.
+- **observation.** In the plan, an observation is a plan verifier's judged note on a verdict. The Observation context
+  is the records; write *journal* or *row* there, not observation.
 - **item.** A plan item and an engine item are the same idea at two scales, so the word stays.
 - **run.** In the engine a run is one model stage invocation. A CI run and the toy run belong to other contexts and
   are named with their qualifier.

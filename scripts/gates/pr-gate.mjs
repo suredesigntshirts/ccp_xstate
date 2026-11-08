@@ -2,8 +2,9 @@
 // Runs one PR gate against a git checkout: node scripts/gates/pr-gate.mjs stubs|freeze|verdict
 // Reads BASE_SHA, HEAD_SHA, PR_BRANCH, PR_BODY and PR_LABELS (a JSON array) from the environment, which
 // .github/workflows/verdict.yml fills from the pull_request event. Prints each reason and exits 1 if there is any.
-import { execFileSync } from 'node:child_process';
-import { checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem } from './lib.mjs';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem, testRunFault, verdictTests } from './lib.mjs';
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'pipe'] })
   .trimEnd();
@@ -25,6 +26,22 @@ const itemIds = (rev) => new Set(lines(git('ls-tree', '--name-only', rev, 'plan/
   .map((f) => f.slice(0, -3)));
 const named = namedItem({ branch: env.PR_BRANCH, body: env.PR_BODY, ids: itemIds(head) });
 
+// Runs each test file a verdict names under node:test with the TAP reporter, from the checkout, which must be at the
+// head sha. The file runs as the entry point, not under --test, so the summary counts its own tests and a name that
+// matches none passes nothing.
+function runTests(runs) {
+  if (!runs.length) return [];
+  if (git('rev-parse', 'HEAD') !== git('rev-parse', head))
+    return [`the named tests run from the checkout, which is not at the head sha ${head.slice(0, 7)}`];
+  return runs.map((run) => {
+    if (!existsSync(run.file)) return `Expect ${run.ids.join(', ')}: test ${run.file} does not exist at the head`;
+    const args = ['--test-reporter=tap', ...(run.name ? [`--test-name-pattern=${run.name}`] : []), run.file];
+    const { NODE_TEST_CONTEXT, ...env } = process.env; // a gate run inside node --test still reports in TAP
+    const r = spawnSync(process.execPath, args, { encoding: 'utf8', env, maxBuffer: 64 << 20, timeout: 15 * 60 * 1000 });
+    return testRunFault(run, { status: r.status ?? 1, output: `${r.stdout ?? ''}${r.stderr ?? ''}${r.error ? `\n${r.error.message}` : ''}` });
+  }).filter(Boolean);
+}
+
 const gates = {
   stubs() {
     const files = lines(git('ls-tree', '-r', '--name-only', head, 'packages/', 'plugins/', 'scripts/'))
@@ -33,10 +50,13 @@ const gates = {
   },
 
   freeze() {
-    const frozenIds = new Set([...itemIds(base)].filter((id) =>
-      id === named.item || ['doing', 'done'].includes(itemHead(show(base, `plan/items/${id}.md`))?.status)));
+    const verdictFile = (id) => `verify/${id}/verdict.json`;
+    const verified = (id) => show(base, verdictFile(id)) !== null || show(head, verdictFile(id)) !== null;
+    const frozenIds = new Set([...itemIds(base)].filter((id) => id === named.item || verified(id) ||
+      ['doing', 'done'].includes(itemHead(show(base, `plan/items/${id}.md`))?.status)));
     const frozen = [...frozenIds].map((id) => ({
       id, before: show(base, `plan/items/${id}.md`), after: show(head, `plan/items/${id}.md`) ?? '',
+      verdict: verified(id) ? verdictFile(id) : null,
     }));
     return [...named.reasons, ...checkFreeze({ changed, frozen, labels })];
   },
@@ -54,6 +74,7 @@ const gates = {
     }
     const reasons = checkVerdict({ item, head: itemHeadNow, verdict });
     if (!verdict) return reasons;
+    reasons.push(...runTests(verdictTests({ head: itemHeadNow, verdict })));
 
     const outside = (c) => c.files.some((f) => !f.startsWith('verify/'));
     let afterVerified = [];

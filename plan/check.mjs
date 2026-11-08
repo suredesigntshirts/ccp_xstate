@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Checks the plan: every head matches item.schema.json, every id it names exists, depends_on has no
-// cycle and never points at a later stage, a ready item has every readyRequired field filled, and fix items keep to the
+// cycle and never points at a later stage, a ready item has every readyRequired field filled, a ready or doing item's
+// Expect lines name behaviour rather than pinning main, a contract change is written down, and fix items keep to the
 // fix budget.
 // Zero dependencies; it reads only the small part of JSON Schema that item.schema.json uses.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -39,6 +40,7 @@ function validate(schema, value, where) {
   } else if (schema.type === 'integer') {
     if (!Number.isInteger(value)) return fail(where, 'must be an integer');
     if (schema.minimum !== undefined && value < schema.minimum) fail(where, `must be at least ${schema.minimum}`);
+    if (schema.maximum !== undefined && value > schema.maximum) fail(where, `must be at most ${schema.maximum}`);
   }
 }
 
@@ -103,6 +105,31 @@ for (const it of items.values()) {
     for (const c of brief?.match(/C-[a-z0-9-]+[a-z0-9]/g) ?? [])
       if (!(it.cases ?? []).includes(c)) fail(at, `its Verifier brief names ${c}, which its head doesn't`);
   }
+}
+
+// An Expect line names behaviour, never the repository's current state (plan/README.md, How slop is kept out; the list
+// is plan/decisions/2026-11-08-verification-swing.md, decision 1). Ready and doing items are held to it; a draft may
+// keep its author's shorthand until it is readied, and a done item is not reopened. A new way of pinning main is one
+// more line here.
+const PINS = ['as on main', 'as main', 'on main', 'than main', "main's", 'unchanged', 'same as', 'byte', 'bytes', 'both shas']
+  .map((p) => [p, new RegExp(`(?<![\\w'])${p.replace(/ /g, '\\s+')}(?![\\w'])`, 'i')]);
+const SHA = /(?<!\w)[0-9a-f]{7,}(?!\w)/i;
+for (const it of items.values()) {
+  if (!['ready', 'doing'].includes(it.status)) continue;
+  for (const e of it.expect ?? []) {
+    const check = String(e?.check ?? '').replace(/\u2019/g, "'");
+    for (const [phrase, re] of PINS) if (re.test(check))
+      fail(it.path, `Expect ${e.id} pins main with "${phrase}"; name the behaviour to show instead (plan/README.md, How slop is kept out)`);
+    const sha = check.match(SHA)?.[0];
+    if (sha) fail(it.path, `Expect ${e.id} pins main with the sha ${sha}; name the behaviour to show instead (plan/README.md, How slop is kept out)`);
+  }
+}
+
+// A contract change (plan/README.md, How slop is kept out): a doing item's head and Verifier brief may change once,
+// before its verdict file exists, and the item file says why under ## Contract change.
+for (const it of items.values()) {
+  if (it.contract_changes === 1 && !/^## Contract change$/m.test(readFileSync(join(root, it.path), 'utf8')))
+    fail(it.path, 'contract_changes is 1, so the item needs a ## Contract change section saying what the build tried and why the contract moved');
 }
 
 // The fix budget (plan/README.md, Fix budget): a fix item names the module it changes, and three done fix items to one
