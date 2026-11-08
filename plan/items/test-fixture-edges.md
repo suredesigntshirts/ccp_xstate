@@ -4,7 +4,8 @@
   "title": "Close three test-fixture edges the self-edit check left",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
+  "done_on": "2026-11-08",
   "outcome": "The copy-not-link and no-self-edit tests pass when the checkout they run in is a detached HEAD with a local release/harness-v* branch at that very commit; scripts/debug/trace-writes.mjs --keep writes the trace where it is told even when that path is on another file system from the temp folder; and the capture hook's p95 bar, like its median bar, measures what capture adds over a bare node start measured at the same quantile, so a busy runner that slows every node start does not fail it while a capture that adds over 200 ms still does.",
   "why": "The verifier of self-edit-check-snapshot noted two edges (verdict notes 2 and 3), and ci on its verdict head failed once on capture.test.mjs's absolute 200 ms p95 (514 ms) once the no-self-edit tests stopped skipping on CI and the suite got busier (L-attention-is-the-constraint). A red that is the runner, not the harness, costs a thread a rerun and a look each time.",
   "serves": [
@@ -121,6 +122,15 @@ Draft from the self-edit-check-snapshot verdict and its CI. Edges, each small:
   (`plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md`). On a busy runner every node start is slow,
   and the slowest one most, so the bar fails for the runner. Reading p95 over the p95 of the bare starts measured the
   same way keeps the bar on what capture adds.
+
+## Done
+
+Readied in PR #209 and built in PR #210 (merged c71e557). A separate session verified it at af64a36: all five Expect
+lines MET. Its verdict head b14ab78 had ci, gates and clean-room green. The first verdict commit tripped
+`runs-without-strace` (its new test named the tracer as a quoted command), and the verifier fixed that in its own
+file. No plugin code changed, so there is no release (`release.mjs branch --push` reported nothing to release).
+Found on the way, not fixed here: `writesUnder` can resolve a child's relative mkdir against its parent's cwd when
+strace logs the child's syscalls before the parent's clone returns (the strace-kept flake on #202), now its own item.
 
 ## Verifier brief
 
