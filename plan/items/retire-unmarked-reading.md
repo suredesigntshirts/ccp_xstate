@@ -12,13 +12,15 @@
     "L-count-concepts"
   ],
   "depends_on": [
-    "retire-pinned-legacy"
+    "retire-pinned-legacy",
+    "verify-regression-set"
   ]
 }
 ```
 
 Draft from `plan/decisions/2026-11-08-retire-pinned-legacy.md`, "The unmarked reading in marks.js stays, for now".
-Not ready: it needs a decision on updating the done suites that assert the reading
-(verify/stage-contract-declares-rules, verify/stage-prompt-files/files.test.mjs,
-verify/prompt-catalogue/same-text.test.mjs), which fix-blocked-retry's decision 9 does not cover, and the inline
-test specs that rely on it marked.
+The decision it waited for is made: `plan/decisions/2026-11-08-verification-swing.md`, decision 4, retires the
+done-suite tests that assert the reading (verify/stage-contract-declares-rules `unmarked-as-main`,
+verify/stage-prompt-files/files.test.mjs, verify/prompt-catalogue/same-text.test.mjs) through
+`verify-regression-set`, so this item now depends on it. Measured on 8 Nov at c6fc6db: removing the reading fails 6
+of 869 tests, all of which assert the reading. The inline test specs that rely on it are marked by this item.
