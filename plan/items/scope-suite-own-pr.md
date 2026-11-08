@@ -42,8 +42,8 @@
     },
     {
       "id": "own-pr-reads-git",
-      "check": "Run at rules-said-once's build PR head (#202's verified_sha) with BASE_SHA set to that PR's base and PR_BODY holding the line Item: rules-said-once, the head's suite file reads the file list from git and passes; with one more commit adding a file outside the item's outputs it fails naming that file; with PR_BODY naming another item it checks from the tree instead",
-      "how": "The verifier's own test, a temp worktree at #202's verified_sha with the head's suite file copied in, run three ways",
+      "check": "Run at rules-said-once's build PR head (#202's last commit, which holds its verdict) with BASE_SHA set to that PR's base and PR_BODY holding the line Item: rules-said-once, the head's suite file reads the file list from git and passes; with one more commit adding a file outside the item's outputs it fails naming that file; with PR_BODY naming another item it checks from the tree instead",
+      "how": "The verifier's own test, a temp worktree at #202's last commit with the head's suite file copied in, run three ways",
       "proof": "verifier"
     },
     {
@@ -115,9 +115,8 @@ run of the suite under test goes through a child `node --test` with `PR_BODY`, `
 
 - **full-clone-passes:** in temp worktrees, run the suite at the head, and at the commit `origin/main` points to with
   the head's file copied over it. Then the same with the base's file. Read the diagnostic that names the mode.
-- **own-pr-reads-git:** take `verified_sha` from `verify/rules-said-once/verdict.json` and #202's base (the first
-  parent of its merge commit, or the merge-base of `verified_sha` and that merge's first parent). In a temp worktree
-  at `verified_sha`, copy the head's suite file in and run it with `BASE_SHA` and `PR_BODY="Item: rules-said-once"`;
+- **own-pr-reads-git:** take #202's last commit (the second parent of its merge into main) and its base (the first
+  parent of that merge). In a temp worktree at that commit (it holds `verify/rules-said-once/lib.mjs`), copy the head's suite file in and run it with `BASE_SHA` and `PR_BODY="Item: rules-said-once"`;
   commit a stray file and run again; then run with `PR_BODY="Item: another-item"`. Your test must pass in ci's depth-1
   checkout too, where none of this history exists: fetch the shas it needs at depth 1, as earlier verifiers did.
 - **scope:** `git diff --name-only <base> <head>`.
