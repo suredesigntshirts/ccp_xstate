@@ -12,7 +12,8 @@
     "L-verdict-is-a-test-result"
   ],
   "depends_on": [
-    "verification-contract"
+    "verification-contract",
+    "rules-said-once"
   ]
 }
 ```
