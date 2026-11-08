@@ -4,7 +4,7 @@
   "title": "Retire the plugin, inspector and journal suites into the regression set",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Each of the 19 verify/ folders this item names holds only verdict.json; every test file they held is either moved to test/regression/<area>/ (area one of the eight of decision 4, mostly plugin, inspector or journal, with the Expect id it proves in its first comment) or deleted with its evidence because it read source text, compared a listing, compared a stored capture or only asserted a recorded past run, and a test that did both is split; moved tests share test/regression/lib.mjs; the item's prose carries a table with one row per test file, its verdict and its reason; and no engine, plugin, workflow or script source changes.",
   "why": "Second of three parts of verify-regression-set, split by suite (plan/decisions/2026-11-08-verify-regression-split.md); same rule as verify-regression-engine (L-measure-then-park; decision 4 of plan/decisions/2026-11-08-verification-swing.md).",
   "serves": [
@@ -144,7 +144,8 @@
     "The recorded Claude Code transcripts the real-agent and real-session tests replay are input, not captures; they move to test/regression/fixtures/ with their tests, and the PR names each one's size",
     "A moved test that drove a hook or a page against a stored capture must be rewritten to assert the behaviour directly or be split; the table says which"
   ],
-  "contract_changes": 1
+  "contract_changes": 1,
+  "done_on": "2026-11-08"
 }
 ```
 
