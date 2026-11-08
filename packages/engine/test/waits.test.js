@@ -1,6 +1,7 @@
 // The load check that every state asking the person sets a timer (plan item fix-waiting-wake, Expect load-check;
 // plan/decisions/2026-11-04-waiting-wake.md): a workflow with an asking state and no after transition is refused,
-// naming the workflow and the state; the workflows in workflows/ load; an item pinned before the check still loads.
+// naming the workflow and the state; the workflows in workflows/ load; a pinned workflow without a timer loads
+// retired, so its journal replays and the host does not run it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
@@ -8,7 +9,7 @@ import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { loadWorkflow, readWorkflow } from '../src/index.js';
-import { checkStages } from '../src/stages.js';
+import { checkStages, retiredOf } from '../src/stages.js';
 
 const WORKFLOWS = new URL('../../../workflows/', import.meta.url).pathname;
 const names = readdirSync(WORKFLOWS).filter((f) => f.endsWith('.json')).map((f) => f.replace(/\.json$/, ''));
@@ -47,7 +48,7 @@ test('a delay that names no meta.delays entry, or not a positive one, is refused
   assert.doesNotThrow(() => checkStages({ ...ms, id: 'quick-fix' }, { workflows: names }));
 });
 
-test('an item pinned to a workflow from before the check still loads it', () => {
+test('a pinned workflow whose asking state has no timer loads retired, naming the state', () => {
   const root = mkdtempSync(join(tmpdir(), 'waits-'));
   const old = read('quick-fix');
   for (const state of asking(old)) delete old.states[state].after;
@@ -57,4 +58,5 @@ test('an item pinned to a workflow from before the check still loads it', () => 
   writeFileSync(join(root, 'blobs', hash), bytes);
   const spec = loadWorkflow(`quick-fix@${hash}`, { root });
   assert.equal(spec.states.awaitingMerge.after, undefined);
+  assert.match(retiredOf(spec), /state \w+ asks the person \(invoke \w+\) and sets no timer/);
 });

@@ -3,7 +3,9 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { readFile } from '../../journal/src/index.js';
-import { checkStages } from './stages.js';
+import { checkStages, retire } from './stages.js';
+
+export { retiredOf } from './stages.js';
 import { readWorkflow } from './prompts.js';
 
 export { machineOf, failing, get, mapPaths, startRefusal, hashOf, replay } from './spec.js';
@@ -20,8 +22,7 @@ const PINNED = /^(.+)@([0-9a-f]{64})$/;
 
 // The workflows an invoke may start as a child item: the files in the workflow folder, each with its meta.input
 // schema, so the load check can hold a child invoke to the inputs the child requires. The load check refuses an invoke
-// of anything else that is no stage and no host effect, such as an agent of a workflow pinned before the stage
-// contract.
+// of anything else that is no stage and no host effect.
 const workflowNames = (dir) => {
   let names;
   try {
@@ -45,6 +46,10 @@ const workflowNames = (dir) => {
  * bytes it is pinned as under root (when given), and returns the spec with id `<name>@<sha256>`, so every row the item
  * writes names the bytes it runs on. A workflow with stage files is pinned as its composed spec, so its blob alone
  * replays an item; one without is pinned as its file bytes.
+ *
+ * Both go through the same load check. A name the check refuses throws, so it is never pinned. A pin the check refuses
+ * is a record from an earlier release: it loads, marked retired with the check's message (retiredOf), so its journal
+ * still replays and its prompts render, and the host does not run it.
  */
 export const loadWorkflow = (name, { root = null, dir = null } = {}) => {
   const pinned = String(name).match(PINNED);
@@ -68,8 +73,12 @@ export const loadWorkflow = (name, { root = null, dir = null } = {}) => {
     const bytes = readFileSync(blob);
     const hash = createHash('sha256').update(bytes).digest('hex');
     if (hash !== pinned[2]) throw new Error(`blob ${pinned[2]} hashes to ${hash}`);
-    // A pinned workflow's asking states may lack a timer; its items keep running on it as pinned until they finish.
-    return checkStages({ ...JSON.parse(bytes.toString('utf8')), id: name }, { workflows: workflowNames(dir ?? REPO_WORKFLOWS), pinned: true });
+    const spec = { ...JSON.parse(bytes.toString('utf8')), id: name };
+    try {
+      return checkStages(spec, { workflows: workflowNames(dir ?? REPO_WORKFLOWS) });
+    } catch (error) {
+      return retire(spec, error);
+    }
   }
   const { spec: composed, bytes } = readWorkflow(name, { dir: dir ?? REPO_WORKFLOWS });
   const hash = createHash('sha256').update(bytes).digest('hex');

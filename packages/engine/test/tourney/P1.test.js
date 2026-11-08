@@ -9,7 +9,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { loadWorkflow } from '../../src/index.js';
-import { stagesOf } from '../../src/stages.js';
+import { retiredOf, stagesOf } from '../../src/stages.js';
 import { WORKFLOWS } from './contract.js';
 
 const PARTS = ['rules', 'inputs'];
@@ -63,7 +63,7 @@ test('P1: broken field rules refuse to load: no meaning, empty rules or task, no
   for (const [name, change, want] of cases) assert.throws(loadChanged(name, change), want, String(want));
 });
 
-test('P1: a pinned workflow blob that lacks a part refuses to load too', () => {
+test('P1: a pinned workflow blob that lacks a part loads retired, with the same refusal', () => {
   const spec = structuredClone(WORKFLOWS['quick-fix']);
   delete spec.meta.actors.verify.rules;
   const bytes = JSON.stringify(spec);
@@ -71,5 +71,5 @@ test('P1: a pinned workflow blob that lacks a part refuses to load too', () => {
   const root = mkdtempSync(join(tmpdir(), 'p1-root-'));
   mkdirSync(join(root, 'blobs'));
   writeFileSync(join(root, 'blobs', hash), bytes);
-  assert.throws(() => loadWorkflow(`quick-fix@${hash}`, { root }), /stage verify lacks rules$/);
+  assert.match(retiredOf(loadWorkflow(`quick-fix@${hash}`, { root })), /stage verify lacks rules$/);
 });
