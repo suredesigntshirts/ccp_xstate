@@ -25,6 +25,34 @@ test('writesUnder follows chdir and fork, resolves dirfds, and drops reads and f
   assert.deepEqual(hits.map((h) => [h.pid, h.call, h.path]), [[11, 'openat', '/w/a.txt'], [10, 'mkdirat', '/w/d/sub']]);
 });
 
+test('writesUnder gives a child its parent\'s folder when the child is logged before its clone returns', () => {
+  const trace = [
+    '10 chdir("/w/p") = 0',
+    '10 clone(child_stack=NULL, flags=SIGCHLD <unfinished ...>',
+    '11 chdir("sub") = 0',
+    '11 mkdir("made", 0777) = 0',
+    '10 <... clone resumed>) = 11',
+    '11 mkdir("again", 0777) = 0',
+    '10 clone3({flags=CLONE_VM|CLONE_VFORK, exit_signal=SIGCHLD}, 88 <unfinished ...>',
+    '12 mkdir("m2", 0777) = 0',
+    '10 <... clone3 resumed>) = 12',
+  ].join('\n');
+  const hits = writesUnder(trace, '/w', '/start');
+  assert.deepEqual(hits.map((h) => [h.pid, h.path]), [[11, '/w/p/sub/made'], [11, '/w/p/sub/again'], [12, '/w/p/m2']]);
+});
+
+test('writesUnder gives a child its parent\'s folder at the clone, not one the parent moves to after', () => {
+  const trace = [
+    '10 chdir("/w/p") = 0',
+    '10 clone(child_stack=NULL, flags=SIGCHLD) = 11',
+    '10 chdir("/w/q") = 0',
+    '11 mkdir("m", 0777) = 0',
+    '13 mkdir("orphan", 0777) = 0',
+  ].join('\n');
+  const hits = writesUnder(trace, '/w', '/w/start');
+  assert.deepEqual(hits.map((h) => [h.pid, h.path]), [[11, '/w/p/m'], [13, '/w/start/orphan']]);
+});
+
 test('the script reports writes by absolute and relative path, keeps the command status, and leaves no trace', { skip: !hasStrace && 'strace missing' }, (t) => {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), 'tw-test-')));
   t.after(() => rmSync(dir, { recursive: true, force: true }));

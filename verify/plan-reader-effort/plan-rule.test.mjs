@@ -4,9 +4,9 @@
 // read from git now, so a verified done build item without the field passes too.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { REPO, joinItem, node, splitItem } from './lib.mjs';
 
 const BUILD = 'clean-room-install-test'; // a done build item on the real plan, with no done_on
@@ -16,10 +16,18 @@ const WELL_FORMED = { pr: 189, files: 28, exports_added: 2, exports_removed: 0, 
   added: { code: 120, tests: 160, verifier: 455, evidence: 163, docs: 59 },
   removed: { code: 18, tests: 11, verifier: 0, evidence: 0, docs: 21 } };
 
+const liveModules = () => readdirSync(join(REPO, 'plan/items'))
+  .filter((f) => f.endsWith('.md'))
+  .map((f) => splitItem(readFileSync(join(REPO, 'plan/items', f), 'utf8')).head ?? {})
+  .filter((it) => it.module && ['ready', 'doing'].includes(it.status))
+  .map((it) => it.module);
+
 function check(t, id, edit, { verdict }) {
   const dir = mkdtempSync(join(tmpdir(), 'pre-plan-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
+  // The copy holds plan/ alone, so each module a real ready or doing item names is made in it too.
+  for (const path of liveModules()) { mkdirSync(dirname(join(dir, path)), { recursive: true }); writeFileSync(join(dir, path), ''); }
   const p = join(dir, 'plan/items', `${id}.md`);
   const { head, rest } = splitItem(readFileSync(p, 'utf8'));
   writeFileSync(p, joinItem(edit({ ...head }), rest));
