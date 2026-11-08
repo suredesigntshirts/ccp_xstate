@@ -4,7 +4,7 @@
   "title": "Write down that a test reads a rule text for what it says, not its sentence",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "docs/layout.md's Tests section says a test that reads a rule text (CLAUDE.md, plan/README.md, docs/) checks what the text says, by the words that carry the rule, and never matches a whole sentence, so a rewording that keeps the rule keeps the test green.",
   "why": "Round 7 rewrote step 2 of plan/README.md without changing what it says, and turned a done item's verifier suite red, because the suite matched step 2's exact sentences. Round 1 took such tests out of the repo's own suites (Evans: frozen language), but nothing tells a verifier, who writes a new suite for every item, not to write one; each wording round then pays to loosen it (L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-8.md).",
   "serves": [
