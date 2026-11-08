@@ -14,7 +14,8 @@
   ],
   "depends_on": [
     "verify-regression-engine",
-    "verify-regression-plugin"
+    "verify-regression-plugin",
+    "test-fixture-edges"
   ]
 }
 ```
