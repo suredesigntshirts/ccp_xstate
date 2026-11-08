@@ -102,7 +102,7 @@
     },
     {
       "id": "scope",
-      "check": "The PR adds, changes or deletes files only under test/regression/, under the retired verify/ folders, and plan/items/verify-regression-set.md, except that a test or helper in a verify/ folder of an item not yet done that read a file this PR moved or deleted changes only so it reads the new path or no longer reads that file; nothing under packages/, plugins/, workflows/, scripts/ or bench/ changes",
+      "check": "The PR adds, changes or deletes files only under test/regression/, under the retired verify/ folders, and plan/items/verify-regression-set.md, except that a test or helper in a verify/ folder of an item not yet done that read a file this PR moved or deleted changes only so it reads the new path or no longer reads that file, and that docs/traps.md, where it names a test file this PR deletes as an example, changes only to drop that example; nothing under packages/, plugins/, workflows/, scripts/ or bench/ changes",
       "how": "The verifier's own test reading git diff --name-only between base and head",
       "proof": "verifier"
     },
@@ -136,6 +136,7 @@
     "The local suite time before and after, in the PR body, as information"
   ],
   "person_prereqs": [],
+  "contract_changes": 1,
   "step_back": {
     "max_rounds": 3,
     "max_tokens": 4000000,
@@ -184,6 +185,17 @@ Known now:
 Report the local suite time before and after in the PR, as information; dropping the two moved-pass suites and every
 evidence-comparing test should cut it.
 
+## Contract change
+
+The scope line allowed no change outside `test/regression/`, the retired folders and the item file, except a reader in
+a not-done item's folder. But `docs/traps.md` names two of the retired test files as examples:
+`verify/item-head-trim/scope.test.mjs` for fetching pinned commits into a temp bare repo, and
+`verify/rules-said-once/suite-and-scope.test.mjs` for a scope test that reads git only on its own PR. Both leave as
+scope tests of their own PRs, and `test/docs.test.mjs` fails when a path `docs/traps.md` names does not exist. No
+test that stays does either thing, so there is nothing to re-point to. The scope line and the Verifier brief's scope
+bullet now also allow `docs/traps.md` to drop those example names and nothing else. The traps themselves are
+unchanged. No other line moves.
+
 ## Verifier brief
 
 Check out the PR at its head sha in a clean clone, `git fetch --unshallow origin` if shallow, and run `npm ci`.
@@ -207,7 +219,8 @@ builder's moved tests first, write your own under `verify/verify-regression-set/
   line only for a left test that drove behaviour and asserted on the result without a stored capture.
 - **scope:** `git diff --name-only <base> <head>`; for any changed file outside the retired folders,
   `test/regression/` and the item file, show that it belongs to an item not done and that its diff only re-points or
-  drops the read of a file this PR moved or deleted.
+  drops the read of a file this PR moved or deleted, or that it is `docs/traps.md` and its diff only drops the name of
+  a test file this PR deletes.
 - **ci:** read the ci and gates checks at the head sha.
 
 Commit one small evidence file per Expect line at most: the command, the excerpt, the inputs to run it again. No
