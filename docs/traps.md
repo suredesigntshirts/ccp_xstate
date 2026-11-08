@@ -13,8 +13,15 @@ them. In temp repos, commit without the container's config:
 ## Clones can be shallow
 
 A container clone may stop at a shallow boundary, so a test that reads history (a done item's first commit, a merge
-base) fails with "shallow boundary" or a missing commit. Run `git fetch --unshallow origin` once, then rerun. CI checks
-out full history.
+base) fails with "shallow boundary" or a missing commit. Run `git fetch --unshallow origin` once, then rerun. `ci.yml`
+checks out at depth 1, so a test that `ci` runs must pass without history.
+
+## A scope test reads git only on its own PR
+
+A verifier's test that a PR "changes only these files" reads the file list from git against `BASE_SHA` or
+`origin/main`. Once that PR merges, every full clone of another branch sees that branch's own files and fails. Read git
+only when `PR_BODY`'s `Item:` line names the test's item (`namedItem` in `scripts/gates/lib.mjs`, as the verdict job
+sets it), and otherwise check the scope from the tree; `verify/rules-said-once/suite-and-scope.test.mjs` does this.
 
 ## A headless session inherits the thread's session
 
