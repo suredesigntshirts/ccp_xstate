@@ -109,6 +109,22 @@ export function testRunFault({ file, name, ids }, { status, output }) {
   return null;
 }
 
+// Evidence: what a plan verifier commits under verify/ says what was shown, one small file per Expect line, so a PR
+// may not add, change or rename a file there to one larger than EVIDENCE_LIMIT or one named *.pass (a test listing).
+// files is [{ path, size }] for the files the PR adds, changes or renames; deleted files are never passed.
+export const EVIDENCE_LIMIT = 64 * 1024;
+
+export function checkEvidence(files) {
+  const reasons = [];
+  for (const { path, size } of files) {
+    if (!path.startsWith('verify/')) continue;
+    if (path.endsWith('.pass')) reasons.push(`${path} is a test listing (.pass); commit the command, the excerpt and the inputs instead`);
+    if (size > EVIDENCE_LIMIT)
+      reasons.push(`${path} is ${size} bytes, over the ${EVIDENCE_LIMIT}-byte limit for a file under verify/; commit the command, the excerpt and the inputs instead`);
+  }
+  return reasons;
+}
+
 // The Claude-Session trailer of a commit message, or null.
 export function sessionOf(message) {
   return message.match(/^Claude-Session:\s*(\S+)\s*$/m)?.[1] ?? null;

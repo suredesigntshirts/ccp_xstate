@@ -84,7 +84,10 @@ that up, and each is enforced by something other than the builder:
   the PR when it fails or is missing. A `builder` result also names the code it broke and the test that went red.
   What the verifier judged rather than ran (a naming concern, a design smell, a doc gap) goes in `observations`,
   which never gates. CI (the verdict gate, `docs/gates.md`) checks this at the head sha and refuses a verdict
-  committed from the builder's session.
+  committed from the builder's session. Evidence is what was shown: per Expect line, one evidence file under
+  `verify/<item>/evidence/` holding the command, the excerpt and the inputs to run it again, never a test listing, a
+  journal root or a capture of main. The evidence gate refuses a PR that adds or changes a file under `verify/`
+  larger than 64 KB or named `*.pass`.
 - **The contract changes once, then freezes.** Once an item's verification starts, nothing changes its head or
   Verifier brief. Before that, one replan may, with a `## Contract change` section. That replan is labelled
   `replan`, touches only `plan/`, raises `contract_changes` to 1, and says in the section what shape the build

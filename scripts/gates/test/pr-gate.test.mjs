@@ -155,3 +155,23 @@ test('stubs gate: one TODO under packages/ is red', () => {
   assert.equal(out.status, 1);
   assert.match(out.stderr, /packages\/a\/index.js:1 has TODO/);
 });
+
+test('evidence gate: refuses an added or grown file over the limit and a .pass file, never reads a deletion', () => {
+  const big = 'x'.repeat(65537);
+  const r = repo();
+  const base = r.commit({ 'verify/x/old.pass': 'ok 1\n', 'verify/x/old.json': big, 'verify/x/notes.md': 'small\n' });
+  const env = { BASE_SHA: base };
+  assert.equal(r.run('evidence', env).status, 0);
+
+  r.commit({ 'verify/x/evidence/a.md': 'y'.repeat(65536), 'docs/big.json': big });
+  r.git('rm', '-q', 'verify/x/old.pass', 'verify/x/old.json');
+  r.git('commit', '-q', '-m', 'drop old evidence');
+  let out = r.run('evidence', env);
+  assert.equal(out.status, 0, out.stderr);
+
+  r.commit({ 'verify/x/notes.md': big, 'verify/x/listing.pass': 'ok 1\n' });
+  out = r.run('evidence', env);
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /verify\/x\/notes\.md is 65537 bytes/);
+  assert.match(out.stderr, /verify\/x\/listing\.pass is a test listing/);
+});

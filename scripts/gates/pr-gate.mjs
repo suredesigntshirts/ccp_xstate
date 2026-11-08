@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Runs one PR gate against a git checkout: node scripts/gates/pr-gate.mjs stubs|freeze|verdict
+// Runs one PR gate against a git checkout: node scripts/gates/pr-gate.mjs stubs|freeze|evidence|verdict
 // Reads BASE_SHA, HEAD_SHA, PR_BRANCH, PR_BODY and PR_LABELS (a JSON array) from the environment, which
 // .github/workflows/verdict.yml fills from the pull_request event. Prints each reason and exits 1 if there is any.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem, testRunFault, verdictTests } from './lib.mjs';
+import { checkEvidence, checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem, testRunFault, verdictTests } from './lib.mjs';
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'pipe'] })
   .trimEnd();
@@ -59,6 +59,12 @@ const gates = {
       verdict: verified(id) ? verdictFile(id) : null,
     }));
     return [...named.reasons, ...checkFreeze({ changed, frozen, labels })];
+  },
+
+  evidence() {
+    const kept = git('diff', '-z', '--name-only', '--no-renames', '--diff-filter=d', base, head, '--', 'verify/')
+      .split('\0').filter(Boolean);
+    return checkEvidence(kept.map((path) => ({ path, size: Number(git('cat-file', '-s', `${head}:${path}`)) })));
   },
 
   verdict() {
