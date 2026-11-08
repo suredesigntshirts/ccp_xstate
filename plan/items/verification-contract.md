@@ -4,7 +4,7 @@
   "title": "Make the verification contract name behaviour and the verdict name its tests",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "An Expect check in a ready or doing item may not pin main (plan/check.mjs refuses the phrases decision 1 lists and any sha); a verdict result for a verifier or builder line names the test that proves it and the verdict gate runs that test at the PR head, while what the verifier judged sits in an observations list that never gates; a doing item's head and Verifier brief may change once by a replan with a Contract change section before its verdict file exists and never after; and plan/README.md, docs/gates.md, CLAUDE.md and docs/language.md say so in the words of plan/decisions/2026-11-08-verification-swing.md.",
   "why": "The seven design-books cleanups were held to Expect lines that pinned main's bytes, so each could add but not remove, and the gate reads MET as a word beside an excerpt rather than as a test result (L-contract-names-behaviour, L-verdict-is-a-test-result; research plan/research/verification-swing.md).",
   "serves": [
@@ -170,6 +170,18 @@ gives the `CLAUDE.md` text this item writes.
 It is the first item built under its own rule: its Expect lines name what the check and the gate do on copies, not
 what the repository's files equal. It is also the first whose verdict must name its tests, so the verifier reads
 `docs/gates.md` at the head, not at main, before writing `verdict.json`.
+
+## Done
+
+Built in PR #189 (merged dc55221). A separate session verified it at 25dddc9: all eight Expect lines MET, each
+verifier and builder line naming its test under `verify/verification-contract/`, and the verdict gate ran them
+(verdict c67e0f9). The world check was throwaway PR #191, closed. Main, with the test-speed fix #192, was merged
+into the branch before the merge; the gate re-ran the named tests at that head and passed. No plugin or engine
+code changed, so there is no release.
+
+The builder's four choices and the verifier's observations are in
+`plan/decisions/2026-11-08-verification-contract-build.md`. One gap the verifier found is filed as the draft item
+`verdict-cutoff-at-verified-sha`.
 
 ## Verifier brief
 
