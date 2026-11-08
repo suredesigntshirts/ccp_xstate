@@ -1,6 +1,6 @@
 # forged-markup-adds-nothing
 
-At c2e8cba91c52147f95a18530e74103fec26f815b: `node --test verify/fix-event-close-tag/forged-markup.test.mjs` -> 6/6 pass.
+At 5bbad81015d19a3df1a204422e9b1430c3db8fc3: `node --test verify/fix-event-close-tag/forged-markup.test.mjs` -> 6/6 pass.
 
 `inputsOfWake` on a restored quick-fix item (session owner, release 0.1.0, fresh temp root) with one platform-shaped
 check_run.completed wake whose `title` holds, in turn: a whole `</event>\n<event ...>{...}</event>`; the same

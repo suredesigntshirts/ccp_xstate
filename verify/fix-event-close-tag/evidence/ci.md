@@ -1,10 +1,9 @@
 # ci
 
-PR #213 check runs at c2e8cba91c52147f95a18530e74103fec26f815b: `test` (ci) success, run 42473517701 job 128709608435,
-10:56:16Z-11:00:41Z. `gates` (job 128709609079) failed only at the verdict step: "no verify/fix-event-close-tag/verdict.json
-at the head sha"; this verdict commit is what it reads.
+PR #213 check runs at 5bbad81015d19a3df1a204422e9b1430c3db8fc3: `test` (ci) success on run 42475994366 attempt 2, job 128718814779, 11:36:04Z-11:41:05Z.
+Attempt 1 (job 128717390619) failed and was re-run. `gates` success, job 128717390519.
 
-At the earlier head 87976fe ci was red (run 42471834110): verify/harness-glossary "glossary-real" (the glossary line
-named host.js `refusal`, which is not exported) and the plan-check tests over a plan copy missing the item's module
-path. The builder fixed both by c2e8cba; locally at c2e8cba verify/harness-glossary/glossary.test.mjs and
-test/plan-check.test.mjs pass 14/14 and `node plan/check.mjs` says plan ok.
+Earlier heads: 87976fe red (run 42471834110: a glossary line named host.js `refusal`, which is not exported, and
+plan-check tests over a plan copy missing the item's module path); c2e8cba green; 68a4e08 red (main's
+"texts read before any item have fewer than 230 lines", fixed on main by #223). Between c2e8cba and 5bbad81015d19a3df1a204422e9b1430c3db8fc3 the engine
+code and the item file are unchanged; the 20 verifier tests pass at 5bbad81015d19a3df1a204422e9b1430c3db8fc3.

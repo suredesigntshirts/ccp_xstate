@@ -1,6 +1,6 @@
 # close-tag-kept
 
-At c2e8cba91c52147f95a18530e74103fec26f815b, after `npm ci`: `node --test verify/fix-event-close-tag/close-tag-kept.test.mjs` -> 4/4 pass.
+At 5bbad81015d19a3df1a204422e9b1430c3db8fc3, after `npm ci`: `node --test verify/fix-event-close-tag/close-tag-kept.test.mjs` -> 4/4 pass.
 
 Each test takes a quick-fix item to awaitingMerge on head A (`test/regression/lib.mjs` `toAwaitingMerge`), reads its
 journal file `<root>/items/it-1.jsonl`, then runs `node packages/engine/bin/host.js wake --item it-1 --workflow quick-fix

@@ -1,6 +1,6 @@
 # real-wakes-read
 
-At c2e8cba91c52147f95a18530e74103fec26f815b: `node --test verify/fix-event-close-tag/real-wakes.test.mjs` -> 7/7 pass.
+At 5bbad81015d19a3df1a204422e9b1430c3db8fc3: `node --test verify/fix-event-close-tag/real-wakes.test.mjs` -> 7/7 pass.
 
 For each of packages/engine/test/fixtures/wakes/{check-run-failed,check-suite-completed,pr-merged,tap-wake}.txt and
 test/regression/fixtures/red-ci/delivered-wake.txt, `wakesIn` returns one wake whose `github` list, as { kind, data },

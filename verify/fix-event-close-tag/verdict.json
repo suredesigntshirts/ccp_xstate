@@ -1,6 +1,6 @@
 {
   "item": "fix-event-close-tag",
-  "verified_sha": "c2e8cba91c52147f95a18530e74103fec26f815b",
+  "verified_sha": "5bbad81015d19a3df1a204422e9b1430c3db8fc3",
   "verifier": { "session": "https://claude.ai/code/session_01KfkB5FQcyCjfsHuspAVZ5t", "model": "claude-opus-5-5" },
   "results": [
     { "id": "close-tag-kept", "status": "MET", "command": "node --test verify/fix-event-close-tag/close-tag-kept.test.mjs",
@@ -15,8 +15,8 @@
     { "id": "real-wakes-read", "status": "MET", "command": "node --test verify/fix-event-close-tag/real-wakes.test.mjs",
       "excerpt": "7/7 pass: the 4 wake fixtures and red-ci/delivered-wake.txt each give one wake whose github events, parsed, equal the events read independently from the file; a one-line <wake reason=\"scheduled\" ...></wake> after a timed item's due time offers one timer input, before it none.",
       "test": "verify/fix-event-close-tag/real-wakes.test.mjs" },
-    { "id": "ci", "status": "MET", "command": "PR #213 check runs at c2e8cba (GitHub MCP get_check_runs)",
-      "excerpt": "test (ci) success at c2e8cba, run 42473517701 job 128709608435, 10:56:16Z-11:00:41Z. gates (job 128709609079) failed only at the verdict step: 'no verify/fix-event-close-tag/verdict.json at the head sha'. At the earlier head 87976fe ci was red (glossary line named an unexported refusal; plan-copy tests); both fixed by c2e8cba." }
+    { "id": "ci", "status": "MET", "command": "PR #213 check runs at 5bbad81 (GitHub MCP get_check_runs)",
+      "excerpt": "test (ci) success at 5bbad81, run 42475994366 attempt 2, job 128718814779, 11:36:04Z-11:41:05Z (attempt 1, job 128717390619, failed and was re-run); gates success at 5bbad81, job 128717390519. Earlier heads: 87976fe red (glossary line, plan-copy tests), 68a4e08 red (main's docs line budget, fixed by #223)." }
   ],
   "observations": [
     "The journal reads rows in time order, and a GitHub event's transition row carries the wake's current-time rather than the host's clock, so a test that takes 'the rows after n' misses it; these tests compare by row id. Not a defect of this item, but a trap for anyone reading a journal by position.",
