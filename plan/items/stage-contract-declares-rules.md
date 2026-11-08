@@ -209,6 +209,10 @@ and #172 moved them to the workflows' `meta.marks` once building showed the in-s
 schemas and Schema lines that done suites assert. Done suites' snapshots of main's workflow hashes were re-captured
 (only ids and hashes changed), as fix-blocked-retry's decision 9 allows for an item that changes a workflow.
 
+The verifier noted two load-check gaps for a later item, not failures here: `"briefs": "builder"` given as a string
+passes checkMarks (it flattens the value) while marks.js reads a non-list as no briefs, so the result is accepted with
+no `brief.stored` row; and `meta.marks` given as a list loads, with every stage then read as unmarked.
+
 ## Verifier brief
 
 Check out the PR at its head sha in a clean clone and run `npm ci`. Keep a second clone at its base on main. Without
