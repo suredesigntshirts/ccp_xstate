@@ -35,7 +35,7 @@ test('Item: <id> in the body judges the PR against that item, whatever the branc
   const r = gateRepo(t);
   // A toy item whose one Expect line is world-proven, so a hand-written verdict can be complete.
   const { head, rest } = splitItem(r.file(`plan/items/${DRAFT}.md`));
-  const toy = { ...head, id: 'rso-toy', status: 'doing',
+  const toy = { ...head, id: 'rso-toy', status: 'done',
     expect: [{ id: 'shown', check: 'A line is shown', how: 'Read it', proof: 'world' }] };
   r.commit({ 'plan/items/rso-toy.md': `\`\`\`json\n${JSON.stringify(toy, null, 2)}\n\`\`\`\n${rest}` }, 'base: toy item');
   const base2 = r.git('rev-parse', 'HEAD');

@@ -13,7 +13,7 @@ test('node plan/check.mjs passes on the head plan', () => {
   assert.match(r.out, /items/);
 });
 
-test('done items holding listed phrases exist and pass; no ready or doing item holds one', () => {
+test('done items holding listed phrases exist and pass; no ready item holds one', () => {
   const dir = join(REPO, 'plan/items');
   const pinned = { done: 0, live: [] };
   for (const f of readdirSync(dir).filter((f) => f.endsWith('.md') && f !== 'README.md')) {
@@ -23,7 +23,7 @@ test('done items holding listed phrases exist and pass; no ready or doing item h
       const hit = DECISION_PHRASES.some((p) => new RegExp(`(^|[^\\w'])${p.replace(/ /g, '\\s+')}($|[^\\w'])`).test(c));
       if (!hit) continue;
       if (head.status === 'done') pinned.done++;
-      if (['ready', 'doing'].includes(head.status)) pinned.live.push(`${head.id}/${e.id}`);
+      if (head.status === 'ready') pinned.live.push(`${head.id}/${e.id}`);
     }
   }
   assert.ok(pinned.done > 0, 'some done item still pins main');

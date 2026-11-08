@@ -12,7 +12,7 @@ const verdictJson = (verified) => JSON.stringify({
 }, null, 2);
 
 /**
- * base: item x ready (unless withItem is false) and another plan file; build/x: status doing, a source change and a
+ * base: item x ready (unless withItem is false) and another plan file; build/x: status done, a source change and a
  * passing test from the builder (verified_sha), then verdict.json from another session. side(files) branches from
  * the base, commits files, merges into build/x (their side wins a conflict) and runs the verdict gate as main would.
  */
@@ -20,7 +20,7 @@ function world(t, { withItem = true } = {}) {
   const r = tempRepo(t, { ...(withItem ? { 'plan/items/x.md': itemText() } : {}), 'plan/items/other.md': itemText({ id: 'other' }),
     'src/a.js': 'export const a = 1;\n' });
   r.git('checkout', '-q', '-b', 'build/x');
-  const verified = r.commit({ ...(withItem ? { 'plan/items/x.md': itemText({ status: 'doing' }) } : {}),
+  const verified = r.commit({ ...(withItem ? { 'plan/items/x.md': itemText({ status: 'done' }) } : {}),
     'src/a.js': 'export const a = 2;\n', 'verify/x/pass.test.mjs': PASSING_TEST }, `build x\n\n${BUILDER}`);
   r.commit({ 'verify/x/verdict.json': verdictJson(verified) }, `verify x\n\n${VERIFIER}`);
   return {
@@ -83,7 +83,7 @@ test('a merged side branch that changes only another plan file: exit 0', (t) => 
 
 test('a verdict whose verified_sha predates the item file: exit 1', (t) => {
   const w = world(t, { withItem: false });
-  const r = w.side({ 'plan/items/x.md': itemText({ status: 'doing' }) });
+  const r = w.side({ 'plan/items/x.md': itemText({ status: 'done' }) });
   t.diagnostic(r.out.trim());
   assert.equal(r.status, 1, r.out);
   assert.match(r.out, /plan\/items\/x\.md does not exist at the verified sha/);

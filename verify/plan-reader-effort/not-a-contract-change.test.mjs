@@ -1,7 +1,7 @@
 // Expect not-a-contract-change: the freeze gate, run in a temp repo on a PR that only adds reader_effort and status
 // done to an item whose verify/<item>/verdict.json exists at the base, passes; the same PR that also changes one
 // Expect check is refused naming the item. The temp repo's base holds a copy of the head's plan/, scripts/ and
-// package.json, with the item set to doing and its verdict file added.
+// package.json, with the item at ready and its verdict file added.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -17,9 +17,9 @@ const EFFORT = { pr: 7, files: 3, exports_added: 0, exports_removed: 0, reader_l
 function pr(t, change) {
   const r = tempRepo(t, { copy: ['plan', 'scripts', 'package.json'] });
   const base = r.commit({
-    [PATH]: joinItem({ ...HEAD, status: 'doing' }, REST),
+    [PATH]: joinItem({ ...HEAD, status: 'ready' }, REST),
     [`verify/${ID}/verdict.json`]: JSON.stringify({ item: ID }) + '\n',
-  }, 'base: the item is doing and verified');
+  }, 'base: the item is ready and verified');
   r.branch(`replan/${ID}-done`);
   r.commit({ [PATH]: joinItem(change({ ...HEAD, status: 'done', done_on: '2026-11-09', reader_effort: EFFORT }), REST) },
     'done replan');
@@ -54,7 +54,7 @@ test('a changed reader_effort on an item already done passes too (it is outside 
 test('control: with contract() freezing reader_effort again, the done PR is refused, so the pass comes from contract()', (t) => {
   const r = tempRepo(t, { copy: ['plan', 'scripts', 'package.json'] });
   const base = r.commit({
-    [PATH]: joinItem({ ...HEAD, status: 'doing' }, REST),
+    [PATH]: joinItem({ ...HEAD, status: 'ready' }, REST),
     [`verify/${ID}/verdict.json`]: JSON.stringify({ item: ID }) + '\n',
   }, 'base');
   r.branch(`replan/${ID}-done`);
