@@ -1,0 +1,49 @@
+{
+  "item": "map-once-traps-written",
+  "verified_sha": "d9e142f7dc7235d4c964a5c364bdf942afc76afb",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5EPzyxSqpfkLCjGeTp", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "map-complete",
+      "status": "MET",
+      "command": "node --test verify/map-once-traps-written/map-complete.test.mjs (folders read from disk; Layout table rows parsed independently; test/docs.test.mjs run at the head and in a temp copy with scripts/x added); evidence/map-complete.md",
+      "excerpt": "4/4 pass. 21 folders (.github, bench, docs, infra, packages, plan, plugins, probes, scripts, test, tournaments, vendor, verify, workflows, scripts/{bench,clean-room,debug,gates,inspector,release,tournament}) all named in the Layout table. docs/layout.md has no fenced block, keeps Tests, Comments, Dependencies. docs.test.mjs 14/0 at the head; with scripts/x 13 pass 1 fail, output names scripts/x. At base 43b4f45 tests 1, 2 and 4 fail (map missed .github, infra, probes, scripts, scripts/clean-room, scripts/inspector, scripts/release; fenced tree present).",
+      "test": "verify/map-once-traps-written/map-complete.test.mjs"
+    },
+    {
+      "id": "traps-answered",
+      "status": "MET",
+      "command": "env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p '<the brief's prompt>' in a clean clone of the head (origin removed); answers (1)-(3) tried in this container, (4) graded against docs/traps.md; evidence/traps-answered.md (prompt, verbatim answer, what was tried)",
+      "excerpt": "The reader cited docs/traps.md for all four. (1) GIT_CONFIG_GLOBAL=/dev/null git -c commit.gpgsign=false -c user.name=t -c user.email=t@example.com commit: no gpgsig header (container default has one); with fixed dates two fresh repos give the same sha 5172a22. (2) container clone at b70fe62: backfill-true.test.mjs 'first done commit is a shallow boundary; fetch more history', 3/1; git fetch --unshallow origin; 4/0. (3) printenv via claude -p: plain cse_01KfkB5EPzyxSqpfkLCjGeTp, under env -u UNSET; host.mjs sessionName() falls back to the local session_id. (4) no, run one then the other, as docs/traps.md says."
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/map-once-traps-written/tests-bite.test.mjs (temp copies; runs node --test test/docs.test.mjs green, broken, restored); evidence/tests-bite.md",
+      "excerpt": "2/2 pass. '`scripts/gates/` the PR gates; ' taken out of the Layout table's scripts row: 14/0, 13/1 (names scripts/gates), 14/0. Whole scripts/ row taken out: 14/0, 13/1, 14/0.",
+      "test": "verify/map-once-traps-written/tests-bite.test.mjs",
+      "mutation": "CLAUDE.md: remove the clause '`scripts/gates/` the PR gates; ' from the Layout table's scripts/ row (the table groups scripts/ folders in one row); also remove the whole '| `scripts/` |' row",
+      "red_test": "test/docs.test.mjs: CLAUDE.md's Layout table names every top-level folder and every scripts/ folder (1 failing)"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "node --test verify/map-once-traps-written/suite-and-scope.test.mjs (plan check; verdict.yml read; git diff --name-only 43b4f45..d9e142f, both pinned, fetched at depth 1 when missing); npm test in a full-history clean clone and on ci; evidence/suite-and-scope.md",
+      "excerpt": "4/4 pass, also in a depth-1 clone. Plan ok. verdict.yml: no PR_BRANCH; BASE_SHA, HEAD_SHA, PR_BODY, PR_LABELS kept. Files: .github/workflows/verdict.yml, CLAUDE.md, docs/layout.md, docs/traps.md, plan/items/map-once-traps-written.md, test/docs.test.mjs. npm test on ci (depth 1): 1902 tests, 1885 pass, 0 fail. Locally with origin/main reachable 1896 pass, 1 fail: verify/rules-said-once/suite-and-scope.test.mjs, the known fault of that frozen suite.",
+      "test": "verify/map-once-traps-written/suite-and-scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #220; evidence/ci.md",
+      "excerpt": "test job 128708711185 at d9e142f7dc7235d4c964a5c364bdf942afc76afb: success, 1885 pass 0 fail, plan ok. gates job 128708710433: refused only for 'no verify/map-once-traps-written/verdict.json at the head sha', and reruns on this commit, which changes only verify/map-once-traps-written/."
+    }
+  ],
+  "observations": [
+    "docs/traps.md, 'Clones can be shallow', ends 'CI checks out full history.' That holds for verdict.yml, release.yml and clean-room.yml (fetch-depth: 0) but not for ci.yml, whose actions/checkout is depth 1, where npm test and every verifier suite run; verify/fix-budget-rule/backfill-true.test.mjs says so itself ('CI fetches one commit'). A reader who trusts the line writes a history-reading test that passes locally after --unshallow and fails or skips on ci. Worth a one-line fix: 'ci.yml checks out one commit; verdict.yml full history.'",
+    "docs/traps.md, 'The container signs commits', says signed temp-repo commits 'get different shas on every run'. Here the SSH signature is deterministic: with fixed dates two signed runs gave the same sha. The trap stands because no machine without this key can make that sha, which is what the doc's next clause says.",
+    "The Layout table groups the scripts/ folders in one row, so the Expect line's 'scripts/gates/ row' was read as that row's scripts/gates/ clause; removing the whole row was tried as well and also goes red.",
+    "verify/rules-said-once/suite-and-scope.test.mjs fails in any clone where origin/main is reachable and this PR is not yet on main; this PR's verdict.yml change is one of the files it then flags. Not this item's fault; another thread is fixing it.",
+    "Verified at d9e142f, the merge of main (#217) into b70fe62; the merge changed only plan/items/rules-said-once.md. The fresh-reader run and the container tries were made at b70fe62, whose docs/traps.md and CLAUDE.md are identical."
+  ]
+}
