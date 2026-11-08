@@ -71,6 +71,5 @@ not. A `done_on` set at the base moves only by such a replan whose item says why
 
 ## After the merge
 
-The thread that merged runs `git fetch origin main && node scripts/release/release.mjs branch --push`. When the merge
-changed a released path (`RELEASED` in that script), it pushes the release as branch `release/harness-v<x.y.z>`;
-otherwise it makes nothing, so it is safe after every merge. See `plugins/harness/README.md`, "Releases".
+The thread that merged runs `git fetch origin main && node scripts/release/release.mjs branch --push`: it pushes
+`release/harness-v<x.y.z>` if the merge changed a path in its `RELEASED`, else nothing (`plugins/harness/README.md`).
