@@ -13,13 +13,17 @@
     "L-count-concepts"
   ],
   "depends_on": [
-    "verify-regression-engine"
+    "verify-regression-engine",
+    "rules-said-once"
   ]
 }
 ```
 
 Draft. Readied after `verify-regression-engine` is done, with its Expect lines and Verifier brief, changed only where
-that build's done replan says the rule needs it.
+that build's done replan says the rule needs it. It also waits for `rules-said-once`, whose build deletes the
+claude-md test in `verify/harness-glossary/notes.test.mjs`; mark that row gone in the table. The v1 journals under
+`test/regression/fixtures/v1/` are read only by `verify/harness-glossary/lib.mjs`: they go with whatever of that suite
+moves, or are deleted if nothing moved reads them.
 
 The 19 suites: `engine-item-views`, `fix-agent-finish-ms`, `fix-inspector-guard-label`, `fix-refusal-hints`,
 `fix-return-tool-answer`, `fix-waiting-lines-owner`, `fix-waiting-run-stall`, `harness-glossary`,

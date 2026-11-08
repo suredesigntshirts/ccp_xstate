@@ -85,8 +85,8 @@ export function captured(repo, name = 'capture') {
 
 /** The committed v1 journals the Expect line names. */
 export const V1 = {
-  toyItem: 'verify/engine-toy-run/evidence/item-toy-v1.jsonl',
-  toySession: 'verify/engine-toy-run/evidence/session-4a54715a-cd89-4d82-8b17-baefea4cf3a6.jsonl',
+  toyItem: 'test/regression/fixtures/v1/item-toy-v1.jsonl',
+  toySession: 'test/regression/fixtures/v1/session-4a54715a-cd89-4d82-8b17-baefea4cf3a6.jsonl',
   finishRun1: 'verify/fix-agent-finish-ms/evidence/real/journal-run1.jsonl',
   finishRun2: 'verify/fix-agent-finish-ms/evidence/real/journal-run2.jsonl',
   bench: 'bench/brief/runs/baseline/real-adopt-clamp.3/items/real-adopt-clamp-3.jsonl',
