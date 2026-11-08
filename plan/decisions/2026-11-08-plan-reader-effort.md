@@ -46,8 +46,13 @@ verifier files are not counted: their exports serve only their own suites.
 `reader_effort` sits beside `module` and `done_on`: integers only (`pr`, `files`, `exports_added`,
 `exports_removed`, `reader_lines`, and `added` and `removed`, each an object of the five categories). The done
 replan pastes the command's `--json` output. `plan/check.mjs` refuses a done build item with `done_on` on or after
-2026-11-09 that lacks it. Earlier items are not backfilled: forty-one done build items have no `done_on`, and
-reopening their heads buys nothing a later review needs.
+2026-11-09 and a `verify/<item>/verdict.json` that lacks it. Earlier items are not backfilled: forty-one done build
+items have no `done_on`, and reopening their heads buys nothing a later review needs.
+
+The verdict file is in the rule because the plan check's own tests, and the frozen suites of done items, add made-up
+done build items to a temp copy of `plan/` with `done_on` a day or two before today. A date rule alone would turn
+those suites red from 2026-11-10 with no change to the code. A made-up item has no verdict file; a real done build
+item always does. The gap this leaves, a done replan that omits `done_on`, is the done step's to close: it sets both.
 
 Recording it is not a contract change: `scripts/gates/lib.mjs` `contract()` leaves it out of the frozen head with
 `status` and `done_on`, because it says what the build cost, not what it must show.

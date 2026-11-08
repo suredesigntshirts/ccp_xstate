@@ -5,7 +5,7 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "ready",
-  "outcome": "For any merged PR, one command reports the files it touched, the exports it added or removed, the lines a reader must open to follow the change (the changed hunks plus the definitions they call), and the verifier lines and evidence lines it added, split code, tests, verifier, evidence and docs; a done build item records that report in a reader_effort head field beside its fix budget fields, the plan check refuses a build item done on or after 2026-11-09 without one, and recording it is not a contract change.",
+  "outcome": "For any merged PR, one command reports the files it touched, the exports it added or removed, the lines a reader must open to follow the change (the changed hunks plus the definitions they call), and the verifier lines and evidence lines it added, split code, tests, verifier, evidence and docs; a done build item records that report in a reader_effort head field beside its fix budget fields, the plan check refuses a build item with a verdict file and done on or after 2026-11-09 without one, and recording it is not a contract change.",
   "why": "The 8 Nov review counted by hand what the plan should count, and the cleanups passed every gate while growing (complexity is what the reader experiences; research plan/research/verification-swing.md, item 7).",
   "serves": [
     "L-count-concepts",
@@ -47,7 +47,7 @@
     },
     {
       "ref": "plan/check.mjs",
-      "what": "Refuses a done build item whose done_on is 2026-11-09 or later and that has no reader_effort, naming the item and the command to run"
+      "what": "Refuses a done build item whose done_on is 2026-11-09 or later, that has verify/<item>/verdict.json and no reader_effort, naming the item and the command to run"
     },
     {
       "ref": "scripts/gates/lib.mjs",
@@ -85,7 +85,7 @@
     },
     {
       "id": "plan-rule",
-      "check": "On a temp copy of the head's plan/, check.mjs refuses (exit 1, naming the item) a done build item with done_on 2026-11-09 or later and no reader_effort, and one whose reader_effort has an unknown field or a non-integer value; it passes the same item with a well-formed reader_effort, a done build item with an earlier done_on, and a done probe item with neither",
+      "check": "On a temp copy of the head's plan/, check.mjs refuses (exit 1, naming the item) a done build item with done_on 2026-11-09 or later, a verify/<item>/verdict.json beside the copy, and no reader_effort, and one whose reader_effort has an unknown field or a non-integer value; it passes the same item with a well-formed reader_effort, the same item with no verdict file (a test's made-up item), a done build item with an earlier done_on, and a done probe item with neither",
       "how": "The verifier's own tests copying plan/ to a temp folder and editing heads",
       "proof": "verifier"
     },
@@ -164,7 +164,7 @@ the count one command and records it on every done build item, so the next revie
 
 The choices made while readying it are in `plan/decisions/2026-11-08-plan-reader-effort.md`: a script under
 `scripts/` that reads git, five categories by path, reader lines as hunks plus called top-level definitions, and a
-head field beside `module` and `done_on` that the plan check requires from 2026-11-09.
+head field beside `module` and `done_on` that the plan check requires of verified items done from 2026-11-09.
 
 ## Verifier brief
 
@@ -180,7 +180,8 @@ your own under `verify/plan-reader-effort/`:
 - **categories, exports, reader-lines:** in temp repos (`git init`, commit a base, branch, commit, merge with
   `--no-ff -m "Merge pull request #7 from x/y"`), run the command with the range and with the PR number. Take the
   path rules from the decision file, not from the script.
-- **plan-rule:** copy the head's `plan/` to a temp folder, edit or add heads, run `node <temp>/check.mjs`.
+- **plan-rule:** copy the head's `plan/` to a temp folder, edit or add heads, add `verify/<id>/verdict.json` beside
+  it where the line needs one, run `node <temp>/plan/check.mjs`.
 - **not-a-contract-change:** a temp repo from the head with a base holding an item and its verdict file, and a
   branch changing the head; run `BASE_SHA=<base> node scripts/gates/pr-gate.mjs freeze` with the PR environment the
   gate reads.
