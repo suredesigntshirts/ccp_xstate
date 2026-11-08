@@ -19,14 +19,14 @@ const WELL_FORMED = { pr: 189, files: 28, exports_added: 2, exports_removed: 0, 
 const liveModules = () => readdirSync(join(REPO, 'plan/items'))
   .filter((f) => f.endsWith('.md'))
   .map((f) => splitItem(readFileSync(join(REPO, 'plan/items', f), 'utf8')).head ?? {})
-  .filter((it) => it.module && ['ready', 'doing'].includes(it.status))
+  .filter((it) => it.module && it.status === 'ready')
   .map((it) => it.module);
 
 function check(t, id, edit, { verdict }) {
   const dir = mkdtempSync(join(tmpdir(), 'pre-plan-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
-  // The copy holds plan/ alone, so each module a real ready or doing item names is made in it too.
+  // The copy holds plan/ alone, so each module a real ready item names is made in it too.
   for (const path of liveModules()) { mkdirSync(dirname(join(dir, path)), { recursive: true }); writeFileSync(join(dir, path), ''); }
   const p = join(dir, 'plan/items', `${id}.md`);
   const { head, rest } = splitItem(readFileSync(p, 'utf8'));

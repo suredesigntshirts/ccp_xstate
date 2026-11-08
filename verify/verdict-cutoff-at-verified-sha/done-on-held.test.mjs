@@ -8,11 +8,11 @@ import { itemText, tempRepo } from './lib.mjs';
 const WAS = '2026-11-01', NOW = '2026-11-05';
 const WHY = '\n## Done on change\n\nThe merge landed on 2026-11-05; 2026-11-01 was the replan date.\n';
 
-/** base: item y done on WAS, item z doing with no date, a source file. pr(files, labels) runs freeze on a PR branch. */
+/** base: item y done on WAS, item z ready with no date, a source file. pr(files, labels) runs freeze on a PR branch. */
 function world(t, { yExtra = '' } = {}) {
   const r = tempRepo(t, {
     'plan/items/y.md': itemText({ id: 'y', status: 'done', done_on: WAS, extra: yExtra }),
-    'plan/items/z.md': itemText({ id: 'z', status: 'doing' }),
+    'plan/items/z.md': itemText({ id: 'z', status: 'ready' }),
     'src/a.js': 'export const a = 1;\n',
   });
   let n = 0;

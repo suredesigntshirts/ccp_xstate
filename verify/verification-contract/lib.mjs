@@ -12,11 +12,11 @@ export const REPO = resolve(process.env.VC_REPO ?? join(HERE, '..', '..'));
 
 const HEAD_RE = /^```json\n([\s\S]*?)\n```/;
 
-/** The modules the checkout's ready and doing items name. */
+/** The modules the checkout's ready items name. */
 const liveModules = () => readdirSync(join(REPO, 'plan/items'))
   .filter((f) => f.endsWith('.md'))
   .map((f) => JSON.parse(readFileSync(join(REPO, 'plan/items', f), 'utf8').match(HEAD_RE)?.[1] ?? '{}'))
-  .filter((it) => it.module && ['ready', 'doing'].includes(it.status))
+  .filter((it) => it.module && it.status === 'ready')
   .map((it) => it.module);
 export const headOf = (text) => JSON.parse(text.match(HEAD_RE)[1]);
 export const withHead = (text, head) => text.replace(HEAD_RE, '```json\n' + JSON.stringify(head, null, 2) + '\n```');
@@ -41,7 +41,7 @@ export function itemText(id, fields = {}) {
   return withHead(text, head);
 }
 
-/** A copy of plan/ lacks the rest of the tree: make an empty file at each module a ready or doing item names. */
+/** A copy of plan/ lacks the rest of the tree: make an empty file at each module a ready item names. */
 export function makeLiveModules(dir) {
   for (const path of liveModules()) { mkdirSync(dirname(join(dir, path)), { recursive: true }); writeFileSync(join(dir, path), ''); }
 }

@@ -51,8 +51,8 @@
     },
     {
       "id": "parallel-green",
-      "check": "In such a depth-1 clone of the head, the four suites each started three times at once (twelve node --test processes in parallel) all pass",
-      "how": "The verifier's own test starting the processes together and reading every exit code",
+      "check": "In such a depth-1 clone of the head, the four suites each started three times at once (twelve node --test processes in parallel), leaving out only the start-timing tests (p95-over-bare, capture p95, moved-pass), all pass: every test that reads a pinned commit passes in all twelve runs and none fails on .git/shallow.lock",
+      "how": "The verifier's own test starting the processes together, with the timing tests left out by file choice or --test-name-pattern, and reading every exit code",
       "proof": "verifier"
     },
     {
@@ -91,7 +91,8 @@
   "step_back": {
     "max_rounds": 2
   },
-  "verifier": "A separate session, using the Verifier brief below."
+  "verifier": "A separate session, using the Verifier brief below.",
+  "contract_changes": 1
 }
 ```
 
@@ -112,6 +113,15 @@ Options considered:
 Editing done items' `verify/` tests follows `plan/decisions/2026-11-08-done-verify-edits.md`: each file is named in
 `inputs` and `outputs`, no Expect line changes, and no verdict or evidence is touched. `verify-regression-set` now
 waits for this item, so it moves the fixed files.
+
+## Contract change
+
+parallel-green first asked every test in the four suites to pass with twelve processes on one machine. The verifier
+found the fetch fix holds in every run (each test reading a pinned commit passed, `.git/shallow` stayed at the head),
+but the start-timing tests in the same suites (`verify/test-fixture-edges/p95-over-bare.test.mjs`, capture p95,
+moved-pass) measure a node start against a bare one and fail at random under twelve-way load on four cores. They
+test start time, not fetching, and `ci` runs them unloaded. The line now leaves them out of the parallel run and
+asks that every pinned-commit reader passes in all twelve runs, which is what the item is for.
 
 ## Verifier brief
 
