@@ -57,6 +57,8 @@ function world() {
   execFileSync('git', ['clone', '-q', '--bare', REPO, origin]);
   // A clone of this repo carries whatever releases it has seen (a thread's clone has harness-v0.1.0 since 16:45Z,
   // CI's shallow checkout has none), so drop them: the world's releases are only the ones each test makes.
+  // A bare clone of a detached HEAD points HEAD at a branch at that commit if one exists, which may be one of these refs.
+  git(origin, 'update-ref', '--no-deref', 'HEAD', 'HEAD');
   for (const ref of git(origin, 'for-each-ref', '--format=%(refname)', 'refs/tags/harness-v*', 'refs/heads/release/').split('\n').filter(Boolean)) {
     git(origin, 'update-ref', '-d', ref);
   }
