@@ -4,7 +4,8 @@
   "title": "Keep capture's cheap check from failing under the suite's own load",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
+  "done_on": "2026-11-08",
   "outcome": "plugins/harness/test/capture.test.mjs's cheap test (capture adds at most 50 ms at the median and 200 ms at p95 over a bare node start per tool call) runs alone, after the parallel npm test pass, in ci and locally, so no other test file shares the machine while it measures; its bars and what they measure do not change; and every other test file still runs in the parallel pass.",
   "why": "The cheap test measures wall time, and npm test runs every file at once. It failed on main loads and on #251, a plan-only replan, with p95 348 ms against a 26 ms bare start, after verify-regression-plugin's contract change (#245) left the plugin's copy as the only holder of obs-live-capture/cheap (decision 7 of plan/decisions/2026-11-08-verify-regression-split.md). A bar that fails on load it did not cause teaches the team to re-run red CI. The choice of a serial lane over CPU time is in plan/decisions/2026-11-08-capture-cheap-serial-lane.md.",
   "serves": [
