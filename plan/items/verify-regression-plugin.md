@@ -13,7 +13,8 @@
     "L-count-concepts"
   ],
   "depends_on": [
-    "verify-regression-engine"
+    "verify-regression-engine",
+    "rules-said-once"
   ]
 }
 ```

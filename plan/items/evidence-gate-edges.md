@@ -12,7 +12,8 @@
     "L-count-concepts"
   ],
   "depends_on": [
-    "verify-evidence-policy"
+    "verify-evidence-policy",
+    "rules-said-once"
   ]
 }
 ```
