@@ -46,7 +46,8 @@ test('moved-pass: each test file under test/regression/ passes alone, with at le
   assert.ok(files.length > 20, `${files.length} files`);
   const results = {};
   const queue = [...files];
-  const workers = Array.from({ length: Math.max(2, Math.min(6, availableParallelism())) }, async () => {
+  // Two at a time: test/regression/ holds a timing test (plugin/live-capture's cheap) that load from parallel runs can push red.
+  const workers = Array.from({ length: Math.min(2, availableParallelism()) }, async () => {
     while (queue.length) { const f = queue.shift(); results[f] = await runAlone(f); }
   });
   await Promise.all(workers);
