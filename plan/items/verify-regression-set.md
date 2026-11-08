@@ -38,8 +38,10 @@ What is known now:
 
 - Areas for this part: `plan`, `gates`, and the areas the earlier parts used; `setup` or `bench` only if a moved test
   fits none of the eight (add the word to `docs/language.md` first).
-- Known deletions: `comments-present-tense/readme.test.mjs`, `fix-budget-rule/rule-written.test.mjs` and the regex
-  tests over READMEs and source, every `.pass` listing. Known moves: `fix-budget-rule`'s `budget-refuses` and
+- Known deletions: `comments-present-tense/readme.test.mjs` and the regex tests over READMEs and source, every
+  `.pass` listing. `rules-said-once`'s build deletes `repo-skeleton/claude-md.test.mjs`,
+  `verification-contract/rules-written.test.mjs` and `fix-budget-rule/rule-written.test.mjs`; mark them gone in the
+  table. Known moves: `fix-budget-rule`'s `budget-refuses` and
   `names-module`. Suites with no tests (`first-real-issue`, `probe-*`, `person-setup-sitting`,
   `tool-docs-downloader`) keep their verdict and lose their evidence.
 - The two root fixes from the 8 Nov time audit landed with `self-edit-check-snapshot` (#192); its tests move as that
