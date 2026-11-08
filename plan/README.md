@@ -27,7 +27,8 @@ An item file starts with a fenced `json` block, which is the item's head and fol
 Prose follows the block: the reasoning, the options considered, anything a builder needs that doesn't fit
 a field. The head is the contract, and the prose explains it.
 
-A complete head answers nine questions. The checker refuses an item marked `ready` that leaves one open.
+A complete head answers nine questions, and a fix item answers a tenth. The checker refuses an item marked
+`ready` that leaves one open.
 
 | Field | Question it answers | Why v1 taught us to ask |
 |---|---|---|
@@ -39,6 +40,7 @@ A complete head answers nine questions. The checker refuses an item marked `read
 | `records` | What does it log, so we can see it working? | v1 salvaged its own history after the fact |
 | `person_prereqs` | What must the person do before the thread starts? | A thread can't add its own allow rules |
 | `step_back` | When does it stop retrying and replan? | PR #72 ran 5 rounds before anyone stepped back |
+| `module`, `done_on` | Which module does a fix change, and when was it done? | Seven 11-05 fixes changed `actors.js` before anyone looked at its shape |
 | `verifier` | Who checks it, from what brief, written when? | Self-approval is a verification gap, not a judgment call |
 
 ## Splicing in new work
@@ -56,7 +58,7 @@ The plan will change. These rules keep a change to one file plus edges:
 - **To add a stage,** write its file and give it an `order` between two existing ones (use decimals,
   such as 2.5).
 - Run `node plan/check.mjs` after any change. It refuses unknown ids, cycles, an item that depends on a
-  later stage, and a `ready` item with an empty field. `--order` prints the items in build order, and
+  later stage, a `ready` item with an empty field, and a fix item over the fix budget. `--order` prints the items in build order, and
   `--coverage` lists ledger rows no item serves.
 
 ## How slop is kept out
@@ -81,6 +83,21 @@ What this doesn't close: every agent acts as the person's GitHub account, so a `
 identity, and a determined builder session could forge a verdict commit. The journal records which session wrote
 what, and the stage gates put a real result in front of the person. A separate verdict identity stays parked
 (ledger L-same-account-everywhere) until a forged verdict is actually seen.
+
+## Fix budget
+
+`step_back` caps the rounds inside one item. The fix budget caps fixes across items, because when one module keeps
+needing patches its design is wrong, and another patch hides that:
+
+- A `fix-` item names the one module its main change lands in, a file or folder path, in `module`. When it is done
+  it records the date in `done_on`.
+- When three fix items naming the same module were done in the last 14 days, and no design item for that module was
+  done after them, a fourth fix item there is refused at `ready` or `doing`.
+- The next item there is a design item: any item that is not a fix and names that module in `module`. It names the
+  concept that keeps breaking in `concepts` and designs it twice, with the tournament kit (`docs/tournaments.md`).
+  Once it is done, the module's count starts again.
+
+`plan/check.mjs` enforces all three on every PR. The reasoning is in `plan/decisions/2026-11-08-fix-budget-rule.md`.
 
 ## Status
 
