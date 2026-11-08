@@ -27,6 +27,7 @@ How the work on the harness itself is planned and proved.
 | replan | A PR that changes only `plan/`, labelled `replan` | `scripts/gates/pr-gate.mjs` |
 | fix budget | Three done fix items naming one module in 14 days, with no design item for it done after them, refuse a fourth | `plan/README.md`, `plan/item.schema.json` `module` |
 | design item | An item, not a fix, that names the module it redesigns: it names the recurring concept and designs it twice, and restarts the module's fix budget | `plan/README.md`, `plan/item.schema.json` `module` |
+| reader effort | What a change costs its reader: the lines a reader opens to follow it (its changed hunks plus the definitions they call), its exports added and removed, and its lines by category; a done build item records it in `reader_effort` | `scripts/reader-effort.mjs`, `plan/item.schema.json` `reader_effort` |
 
 ## Engine
 

@@ -8,7 +8,7 @@
 // directory fd strace names (-y). The trace is written to a temp file and removed unless --keep names where to put it.
 // Exits with the command's status; 127 when strace is missing.
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, renameSync, rmSync } from 'node:fs';
+import { copyFileSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { isAbsolute, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -82,7 +82,7 @@ function main(argv) {
     const hits = writesUnder(readFileSync(file, 'utf8'), folder, process.cwd());
     for (const h of hits) process.stdout.write(`${h.pid} ${h.call} ${h.path}\n`);
     process.stderr.write(`${hits.length} write-like call(s) under ${resolve(folder)}\n`);
-    if (keep) renameSync(file, resolve(keep));
+    if (keep) copyFileSync(file, resolve(keep));
     return r.status ?? 1;
   } finally {
     rmSync(dir, { recursive: true, force: true });

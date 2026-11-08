@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readdirSync, realpathSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, realpathSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,4 +37,17 @@ test('the script reports writes by absolute and relative path, keeps the command
   const kept = join(dir, 'kept.trace');
   assert.equal(spawnSync(process.execPath, [SCRIPT, dir, '--keep', kept, '--', 'true']).status, 0);
   assert.ok(existsSync(kept));
+});
+
+// /dev/shm is a tmpfs on Linux, so on another file system from the temp dir wherever that is a disk.
+const shm = existsSync('/dev/shm') && statSync('/dev/shm').dev !== statSync(tmpdir()).dev;
+test('--keep writes the trace to a path on another file system from the temp dir', { skip: (!hasStrace && 'strace missing') || (!shm && 'no second file system') }, (t) => {
+  const dir = mkdtempSync('/dev/shm/tw-keep-');
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const before = readdirSync(tmpdir()).filter((n) => n.startsWith('trace-writes-'));
+  const kept = join(dir, 'kept.trace');
+  const r = spawnSync(process.execPath, [SCRIPT, dir, '--keep', kept, '--', 'true'], { encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(statSync(kept).size > 0);
+  assert.deepEqual(readdirSync(tmpdir()).filter((n) => n.startsWith('trace-writes-')), before);
 });

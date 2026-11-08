@@ -100,9 +100,10 @@ test('the hook journals the expected rows and stores each blob once, as files na
 });
 
 // hook.run ms counts from the hook process's start, so it holds Node's own start, which grows when the suite runs
-// in parallel on a busy runner. What capture adds is the median minus a bare node start measured the same way, here
-// and now (plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md); p95 stays an absolute bar.
-test('cheap: hook.run rows show at most 50 ms median over a bare node start and 200 ms p95 per tool call', () => {
+// in parallel on a busy runner, and its slowest start most. What capture adds is each quantile minus the same
+// quantile of a bare node start measured the same way, here and now
+// (plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md, plan/decisions/2026-11-08-capture-p95-over-bare-start.md).
+test('cheap: hook.run rows show at most 50 ms median and 200 ms p95 over a bare node start per tool call', () => {
   const dir = project();
   const all = runFixture(dir).filter((r) => r.kind === 'hook.run');
   const handled = events().filter((e) => EVENTS.includes(e.hook_event_name));
@@ -112,14 +113,15 @@ test('cheap: hook.run rows show at most 50 ms median over a bare node start and 
   const rows = all.filter((r) => r.payload.name.startsWith('capture PostToolUse'));
   assert.equal(rows.length, 5);
   const ms = rows.map((r) => r.payload.ms).sort((a, b) => a - b);
-  const at = (q) => ms[Math.min(ms.length - 1, Math.ceil(q * ms.length) - 1)];
+  const quantile = (xs) => (q) => xs[Math.min(xs.length - 1, Math.ceil(q * xs.length) - 1)];
+  const at = quantile(ms);
   const bare = join(dir, 'bare.mjs');
   writeFileSync(bare, 'process.stdout.write(String(Math.round(performance.now())));\n');
   const starts = Array.from({ length: 15 }, () => Number(execFileSync(process.execPath, [bare], { env: { PATH: process.env.PATH }, encoding: 'utf8' })))
     .sort((a, b) => a - b);
-  const node = starts[Math.floor(starts.length / 2)];
-  assert.ok(at(0.5) - node <= 50, `median ${at(0.5)} ms, of which a bare node start is ${node} ms`);
-  assert.ok(at(0.95) <= 200, `p95 ${at(0.95)} ms`);
+  const node = quantile(starts);
+  assert.ok(at(0.5) - node(0.5) <= 50, `median ${at(0.5)} ms, of which a bare node start is ${node(0.5)} ms`);
+  assert.ok(at(0.95) - node(0.95) <= 200, `p95 ${at(0.95)} ms, of which a bare node start is ${node(0.95)} ms`);
 });
 
 test('SubagentStop stops waiting once the transcript ends with the hand-back result, and only then', () => {
