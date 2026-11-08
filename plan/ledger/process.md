@@ -114,3 +114,13 @@
 **Lesson:** A MET the gate reads as a word beside a non-empty excerpt is the verifier's claim, not a result; the judged and the run must be told apart.
 **Evidence:** The 8 Nov review found `scripts/gates/lib.mjs` checks that every result says MET with a command and an excerpt, and ties no MET to a test. Of 134 verifier test files, about a fifth read source text or hash snapshots rather than run anything; "readme-complete" lines rested on the verifier's reading.
 **Fate:** design. A verifier or builder result names the test that proves it and the gate runs it; what the verifier judged goes in an `observations` list that never gates (item verification-contract).
+
+### L-rules-live-in-the-repo
+**Lesson:** A rule a thread learns from project memory instead of the repo is a rule the next thread breaks, and a rule
+said in three files drifts in two of them.
+**Evidence:** On 8 Nov, `CLAUDE.md` told threads to name a replan branch `replan/<item-id>`, while the gate reads an item
+id from a branch's last segment and then demands a verdict, so threads kept the working rule ("the last segment is not
+an item id") in project memory. The contract-freeze rule was written out in full in both `plan/README.md` and
+`docs/gates.md`, and the session-identity caveat twice; the steps from ready to done lived nowhere in the repo.
+**Fate:** design. Each process rule has one home and the others point at it; the gate is changed where a rule needed
+memory to follow (item rules-said-once).
