@@ -21,6 +21,7 @@ How the work on the harness itself is planned and proved.
 | evidence file | What a plan verifier commits for one Expect line: the command, the excerpt and the inputs to run it again; never a listing or a capture | `verify/<item>/evidence/`, `scripts/gates/lib.mjs` `checkEvidence` |
 | observation | A plan verifier's judged note on a verdict (a naming concern, a design smell, a doc gap); it never gates | `scripts/gates/lib.mjs` `checkVerdict`, `docs/gates.md` |
 | contract change | The one replan a doing item's head and Verifier brief may have, before its verdict file exists, written up under `## Contract change` | `plan/item.schema.json` `contract_changes`, `plan/check.mjs` |
+| done_on change | The replan that moves an item's set `done_on`, saying why under `## Done on change` | `scripts/gates/lib.mjs` `checkDoneOn`, `docs/gates.md` |
 | regression set | The behavioural tests of done items, kept by area under test/regression with one helper; it is what a cleanup must keep passing | `plan/decisions/2026-11-08-verification-swing.md`, decision 4 |
 | ledger row | A lesson the plan is held to, with an `L-` id | `plan/ledger/` |
 | decision | A two-way door decided and written down, or a one-way door waiting for the person | `plan/decisions/`, `plan/decisions/waiting-for-person.md` |
