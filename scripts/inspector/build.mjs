@@ -118,14 +118,18 @@ export async function build({ config, out, captureDir }) {
         const label = `${src.label}${cap.roots.length > 1 ? ` · test ${i + 1} of ${cap.roots.length}${shortName ? `: ${shortName}` : ''}` : ''}`;
         const note = `Scripted scenario (${src.scenario}${cap.ok ? '' : ', and the test FAILED'}): the agents here are test fixtures (their briefs and results are written in the test), GitHub is a fake local server, and no model ran.` +
           (name ? ` Test: "${name}".` : cap.roots.length > 1 ? ' The test file made several journals; their test names could not be matched.' : '') + (about ? ` Scenario: ${about}` : '');
-        const bundles = await exportRoot({ engine, journal: root, kind: 'scripted', label, origin: src.origin, note, id: slug(`${src.origin}-${basename(src.scenario, '.test.js')}-${i + 1}`) });
+        let bundles;
+        try { bundles = await exportRoot({ engine, journal: root, kind: 'scripted', label, origin: src.origin, note, id: slug(`${src.origin}-${basename(src.scenario, '.test.js')}-${i + 1}`) }); }
+        catch (error) { skipped.push(`${label}: ${error.message}`); continue; }
         bundles.forEach((b) => { b.scenario = { file: src.scenario, test: name, about, passed: cap.ok }; });
         runs.push(...bundles);
       }
     } else {
       const journal = resolve(REPO, src.journal);
       if (!existsSync(join(journal, 'items'))) { skipped.push(`${src.label}: no items/ under ${journal}`); continue; }
-      const bundles = await exportRoot({ engine, journal, workflow: src.workflow ?? null, kind: src.kind ?? 'real', label: src.label, origin: src.origin, note: src.note ?? null, id: slug(`${src.origin}-${src.label}`) });
+      let bundles;
+      try { bundles = await exportRoot({ engine, journal, workflow: src.workflow ?? null, kind: src.kind ?? 'real', label: src.label, origin: src.origin, note: src.note ?? null, id: slug(`${src.origin}-${src.label}`) }); }
+      catch (error) { skipped.push(`${src.label}: ${error.message}`); continue; }
       runs.push(...bundles);
     }
   }
@@ -155,7 +159,10 @@ export async function build({ config, out, captureDir }) {
         if (read && read.spec !== read.raw) { spec = read.spec; key = createHash('sha256').update(read.bytes).digest('hex'); }
       } catch (error) { skipped.push(`${path}: ${error.message}`); continue; }
       const used = runs.filter((r) => r.workflow.key === key);
-      workflows[key] ??= { name: basename(file, '.json'), spec, graph: graphOf(spec) };
+      if (!workflows[key]) {
+        try { workflows[key] = { name: basename(file, '.json'), spec, graph: await graphOf(engine, spec) }; }
+        catch (error) { skipped.push(`${path}: ${error.message}`); continue; }
+      }
       shelf.push({ id: slug(`wf-${owner}-${file}`), key, file: path, engine, label: `${owner} · ${file}`, runs: used.map((r) => r.id) });
     }
   }

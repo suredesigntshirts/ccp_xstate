@@ -1,0 +1,1747 @@
+C-builder-cannot-change-own-workflow: the filed workflow and hash are journalled, and an edited file changes nothing the item runs
+C-claimed-pr-not-on-github: a PR GitHub doesn't have, or has at another head, is refused naming the fact, and the item stays in building
+C-duplicate-wake-no-double-effect: a host that stopped mid-merge looks the merge up on GitHub instead of merging again
+C-duplicate-wake-no-double-effect: the same red check wake twice, and again to a fresh host, starts one build
+C-duplicate-wake-no-double-effect: the same tap delivered twice merges once
+C-finish-closes-waits: a stopped agent run, and an ask whose card was never made, close nothing and wait on no one
+C-finish-closes-waits: leaving the merge card by closed unmerged closes the card, and nothing about it waits
+C-finish-closes-waits: leaving the merge card by merged elsewhere closes the card, and nothing about it waits
+C-finish-closes-waits: leaving the merge card by push closes the card, and nothing about it waits
+C-finish-closes-waits: leaving the merge card by red check closes the card, and nothing about it waits
+C-finish-closes-waits: the stop of an ask whose card was never made closes nothing
+C-finish-closes-waits: with no way to close a card, the ask's stop stays pending for a host that has one
+C-merge-outside-host-detected: merges the host's merge effect didn't make are listed, bound to an item or not, and --host fails on them
+C-missing-expect-fails-closed: an issue with Expect lines starts (the control)
+C-missing-expect-fails-closed: an issue with an empty expect list is refused, naming expect
+C-missing-expect-fails-closed: an issue with no expect field is refused, naming expect
+C-missing-expect-fails-closed: an issue with no expect, or an empty one, is refused naming expect, and no item or run exists
+C-missing-expect-fails-closed: bin/host.js start refuses it too, and the control with Expect lines starts
+C-missing-expect-fails-closed: no Expect lines cannot leave queued, refusal names the input
+C-missing-expect-fails-closed: with the input schema gone, the first state's needs still refuse it
+C-older-writer-refused: a host on an older release is refused writing to the item, naming both releases, and writes nothing
+C-older-writer-refused: the same or a newer release writes (the control)
+C-pass-carries-to-merge-of-main: by default a merge of main onto a PASS is verified again, and only the new PASS merges
+C-pass-carries-to-merge-of-main: quick-fix names no carry rule, so the default applies
+C-push-after-pass: a new PASS for B waits to merge again, and an approval merges at B
+C-push-after-pass: a push to B in awaitingMerge returns the item to verifying, for B
+C-push-after-pass: a push to B while waiting to merge returns the item to verifying for B, and the merge is at B
+C-push-after-pass: push to B while awaitingMerge returns to verifying for B
+C-push-after-pass: the old PASS for A can no longer reach merging, even if approved
+C-red-ci-back-to-building: a green check, or a red one on another head, changes nothing (the control)
+C-red-ci-back-to-building: a red check on the head while waiting to merge sends the item to building with the check, and the approval merges nothing
+C-red-ci: a green check, or a red one on another head, changes nothing
+C-red-ci: a red check after a PASS, while waiting to merge, can no longer reach merging
+C-red-ci: a red check on the PR head while verifying sends the item back to building, the check named
+C-red-ci: through the host, the real wake steps the item back and the new build gets the failing check
+C-red-ci: with no build left, a red check sends the item to replanning instead
+C-refused-action-not-retried: a refused merge is journalled with its rule, never started again, and the item steps back with it
+C-second-fail-replans: FAIL, rebuild, second FAIL goes to replanning, no third build, waits for why
+C-second-fail-replans: a replan with a written why briefs again, with the build bound reset
+C-second-fail-replans: a tap on replan carries no written why, so it is refused, the card stays open and no build starts
+C-second-fail-replans: drop ends the item
+C-second-fail-replans: replan with a written why briefs again with the build bound reset
+C-second-fail-replans: replan without a written why is not taken: the item stays replanning and starts no build
+C-second-fail-replans: the first FAIL rebuilds, the second goes to replanning
+C-second-fail-replans: the second FAIL goes to replanning, asks for a replan, and starts no third build
+C-second-fail-replans: the second FAIL starts the replan question, not a build
+C-stale-completion-dropped: the replaced build run's completion is journalled stale and the item is unchanged
+C-stand-in-picks-legal-event: a legal answer is journalled with the grant that covered it, and the host merges
+C-stand-in-picks-legal-event: an answer that is not one of the open ask's choices is refused, and the item is unchanged
+C-stand-in-picks-legal-event: an answer where no ask is open, or under no covering grant, is refused
+C-two-hosts-one-item: an owner's host and another session's host restored together put the card up once
+C-two-hosts-one-item: another session's host, offered a wake or nothing, starts none of the item's effects and writes nothing to its file
+C-two-hosts-one-item: bin/host.js wake from another session posts nothing and adds no row; the owner's next call finishes the card once
+C-two-hosts-one-item: the owner's host still runs its open card once, after another session's host woke first
+C-verdict-on-old-head: PASS for A while head is B never reaches merging, verdict is recorded
+C-verdict-on-old-head: a PASS for A on a PR whose head is B goes to replanning, never merging, the verdict kept beside the head
+C-verdict-on-old-head: a PASS for A while the head is B goes to replanning, not awaitingMerge or merging
+C-verdict-on-old-head: a push to B during verifying, then the PASS for A, goes to replanning
+C-verdict-on-old-head: control, PASS at the head reaches awaitingMerge
+C-verdict-on-old-head: the same PASS at the head goes to awaitingMerge (the control)
+C-verdict-on-old-head: the same PASS at the head waits to merge (the control)
+C-verdict-on-old-head: the stale verdict is recorded beside the head it does not match
+C-waiting-does-not-stall: an item waiting on its card has a wake scheduled, and another item still advances
+C-waiting-does-not-stall: leaving the waiting state drops its wake
+CLAUDE.md gives the branch convention and no claude/ prefix
+CLAUDE.md is under 100 lines
+F1: bounded rounds, slice 2 escalates, slice 1 kept, whole goal verified before main, one tap for the merge
+F2 (a): a host restored in a new process, mid-slice, starts no slice again
+F2 (b): a host that stopped mid-start of s2 (start row, no end) finds the child on restore and does not start it again
+F2 (c): another session restoring the parent and offering a wake is not the owner and starts nothing
+FINDING (observed, not asserted as good): a GitHub field holding the literal text </event> makes that event vanish with no row
+P1: a pinned workflow blob that lacks a part loads retired, with the same refusal
+P1: broken field rules refuse to load: no meaning, empty rules or task, no output schema, a covers path to nothing, invoke inputs that differ
+P1: every stage of every workflow, missing any one of its parts, refuses to load
+P1: the three repo workflows load, and their model stages are the agents they invoke
+P2: every line of every rendered prompt traces to the workflow JSON, the run input, or the fixed frame
+P2: none of the control's engine-held agent wording is left in packages/engine/src
+P2: the frame is only headings, the data rule, the worktree limit and the return mechanics; stages.js has no other wording
+P2: the rules printed are the JSON's
+P3: the data rule and every rule are in every prompt, under Rules, ahead of the task
+P3: the data rule states that it and the rules outrank the task, that only the Rules and Task instruct, and covers inputs, files and program output
+P4: each brief appears once, as the whole Task part, and the other parts are the workflow's
+P4: the verifier brief fixed at the brief agent's accept is exactly the verify run's Task part, and the run journals its whole prompt
+P5: quick-fix verify: a missing, extra or repeated line, or a PASS over a FAIL line, is refused as covers; every line is accepted
+P5: research verify: a result missing an Expect line is refused as covers; one with every line is accepted
+P6: a first build shows previous, verdict and failure as null, each with its meaning
+P6: every declared input of every stage appears with its meaning; the task input does not appear under Inputs
+P6: the quick-fix brief shows why with its meaning, null on a first attempt
+PASS for A while the PR head is B never reaches awaitingMerge or merging; the verdict is kept as the stale one
+Q1: issue to merged at the verified head, with one person tap
+Q2 (round 2, no reenter): the head moves twice while verifying; each move stops the open verify run and starts one for the new head
+Q2 variant: approve tapped after the push but before CI reports the new head: GitHub refuses the merge at A; no merge
+Q2: a push after PASS sends the item back to verify the new head; the old card and an old-head verdict count for nothing
+Q3 (round 2, no reenter): a replan tap without a why is refused and the item keeps waiting; a replan with a why rebuilds from scratch
+Q3: red on the head rebuilds with the typed failure; red again with no build left replans; no verify for a red head
+Q4 (round 2, fail closed): the PR has a full page of files: no merge on green without the CI-change card
+Q4 (round 2, fail closed): the files call fails: no merge on green without the CI-change card
+Q4: a CI-changing PR, green and verified, waits for an explicit approval of the CI change; reject does not merge
+Q4: a parent's grant (a feature slice) does not skip the CI-change card
+Q4: the explicit approval of the CI change merges at the verified head, and records it
+Q5: PASS naming the PR head from a worktree at another commit is refused; the item stays verifying; the honest PASS counts
+Q6: after a replan, every event and return from attempt 1 is refused or stale; attempt 2 merges its own PR
+Q7: a merge on GitHub outside the host ends the item closedOutside, with its card closed and no new card; never done
+Q8: an item pinned to v1 finishes on v1 after the file becomes v2, and its journal replays
+Q9: an issue edit mid-build is refused; the verifier grades the original lines and must restate them exactly
+R1 (round 2, no inc): drafts are bounded at two; a second FAIL replans
+R1: a rejected report is not published
+R1: one researcher fails, the join completes, sources are host-checked, and publishing waits for the tap
+S2: a send-back (SubagentStop and SubagentHandback) is journalled word for word with its hash
+S2: a stage named like a workflow is started by the stage handler, not as a child item
+S2: the verify prompt carries the exact checkout commands; target shows only url and at; a stamped field set by an agent is refused
+S3 (C): a pre-contract quick-fix pinned in the journal loads retired, naming the actor and the parts it lacks
+S3 (C): a round-2 blob, whose stages carry a task part instead of an input task, loads retired: its stage lacks input task
+S3 (C): host effects and child workflows still load; an unknown actor name does not
+S3 (C): the same holds for research and feature, and for one stage stripped of its parts
+S3 (D): a stage given lines whose output may say PASS or FAIL declares covers, though no guard reads the word
+S3 (D): a stage given lines whose output the chart decides on, with no covers, is refused at load, in quick-fix and research
+S3 (D): no spelling, shape, copy or routing of the verdict switches coverage off
+S3 (D, E, F): an action anywhere but on a transition the chart walks is refused at load, naming the key and its pointer
+S3 (E): a context path naming an Object.prototype member is not fed by it
+S3 (E): a stage input read from a context path nothing writes is refused at load
+S3 (E): a task wired from a context path that holds no text there is refused at load
+S3 (E): the repo workflows are fully wired: item input, a set action or a literal feeds every invoke input
+S4: a FAIL loop, a head move and a replan: every producer is the run that really wrote it, and a stopped run says so
+S4: a null default built wholly from part-writes names the part-writers as its producer (research answers)
+S4: the quick-fix happy path leaves a complete stage record per run, each input traced to its real producer
+S5 (1): the build prompt names the GitHub tools, the PR url shape and the repository in the run line
+S5 (2): a blocked output that is not an alternative, or whose invoke has no onError, is refused at load
+S5 (2): build returns exactly one of pr and blocked; a blocked first build goes to the blocked card
+S5 (3): a PR ref must be a GitHub PR url; a prose url fails the schema, never the web-quote check
+S5 (4): build notes go to context and the merge cards, never to the verifier
+S5 (4b): the PR-opening rule asks for a title and body saying how each expect line is met
+S5 (5): the worktree rule claims only what confine() enforces
+S5 (6): the brief rule keeps stricter checks under Advisory, and the verify rule reads them the same way
+S5 (7): covered lines must come in the expect lines' order
+S5 (8): the run line is told once, as the run's context; the stage record keeps it beside the prompt
+Stop: another session, a started run or no harness gives nothing and writes nothing
+Stop: the cloud form of the session name owns the item too
+Stop: the owner is blocked with the exact Agent call, the count and the way out; the row has count and cap
+Stop: two blocks whatever stop_hook_active says, then the third stop fails the run and the item steps back
+Stop: with two waiting runs it blocks on one at a time, and one run's count is its own
+SubagentHandback: refused once with the return instruction; a second handback fails the run, and the item steps back
+SubagentStart binds the agent its Agent call started, journals agent.spawn with item, state and promptHash
+SubagentStart finds the session's one started run; with several starting at once, the agent binds at its first call
+SubagentStop after a handback the hook let through (its transcript ends in the handback result) fails the run at once
+SubagentStop stops waiting once the transcript ends with the hand-back result, and only then
+SubagentStop whose transcript tail is the real SubagentHandback result (recorded in ar2) fails the run at once
+SubagentStop: a bound actor with its run open is blocked once with the return instruction; stopping again fails the run
+SubagentStop: an actor whose result was accepted stops freely
+\#\# Task in a stage no invoke wires a task to (quick-fix build) is refused at its line
+\#\# Task in research researcher (task wired from the planner, not the file) is refused
+a 10-minute idle gap ended by a person wake is waiting on the person, never working
+a FAIL challenge reshapes with the challenge as input, twice; the third FAIL puts up the card
+a FAIL reruns shape with that challenge as input, at most twice; the third FAIL puts a card up
+a FAIL then a PASS goes on to the child (a revision that holds is frozen)
+a GitHub notification whose own fields hold wake/event/note/task markup adds no extra event
+a PASS challenge freezes the issue: the quick-fix child starts with it, url from the request, new fields passed through
+a PASS verdict for A cannot be carried over a push: after a push to B, A's verdict does not merge
+a PR labelled replan counts as a replan of every other PR of its item
+a PR names its item by body line or branch
+a PR past its limit emits one tripwire row, and none again for the same limit
+a ReadNotifications result is read only for origin github_webhook; other origins and shapes are ignored
+a ReadNotifications result's GitHub notification is offered, with GitHub as its source
+a SessionStart inside the gap splits its tail off as rebuild
+a background agent whose transcript is not written yet still gets its brief, from the Agent call
+a bound actor agent's rows carry its run's item and state; other rows carry none (plan item engine-item-views)
+a build result whose url is not shaped /pull/N is refused by the schema, and the item stays in building
+a build result with a PR ref, stamped by the host, is answered accepted by the return tool; a changed one is not
+a capture final message (result.stored with no run) reads as agent.final; an engine accept stays result.stored
+a capture prompt row (brief.stored with no run) reads as agent.prompt
+a card (post) is put up once when the host is restarted and offered nothing
+a card with a PR is still checked against the PR's repository, not the issue's
+a card with no record stays pending: no effect row, no ref
+a challenge bench run folder (made through the host) is shown by the Inspector with its prompt and result
+a cloud session is journalled under its Claude-Session URL
+a comment rewrapped over different lines strips the same, a code change does not
+a complete verdict passes
+a completion from a replaced run is journalled stale and changes nothing
+a delay that names no meta.delays entry, or not a positive one, is refused
+a dependency no decision names is caught, and naming it on its own line lets it through
+a design-and-judge toy runs through the runner with stub agents
+a future current-time never makes a timer due, from a prompt or from a GitHub notification
+a grant listing null in repos does not cover a card with no repository, and still covers the repos it names
+a guarded transition without a description names its guard in quotes
+a handback after the return was accepted, and by an unbound agent, goes through untouched
+a handback with the run open is sent back with the return line inside its entry
+a host of another session starts nothing and leaves the item file alone; the owner then runs the card once
+a host restart mid-merge does not merge twice (no way to look up: marked unknown; with a lookup: completed from it)
+a host restored later still offers an accepted result it was not handed
+a host stopped mid-effect asks the world on restart instead of doing the effect again
+a journal entry whose hash no longer matches is refused, naming the entry
+a journal file's text parses to rows, and torn lines are counted, not dropped silently
+a journal replays to the state and output it recorded
+a journal whose model run has no stage record, and an engine that cannot explain, are refused by name; build skips them
+a journal with a model run lacking stage.json, and an engine without explain.js, are refused by name, and build skips them
+a lane failing any floor is not qualified, with the floor named, whatever its primitive count
+a malformed catalogue is refused at load, naming the line
+a malformed stage file is refused at load, naming the file and line
+a merge effect row explains its merge, and a closed-unmerged PR is never listed
+a merge with no PR URL or no verified sha never calls GitHub
+a message wake is one person.message with its id, and keeps a hash of the text, not the text
+a missing blob is not taken from an edited file: the load fails
+a missing upcaster is reported, not guessed
+a missing verdict, a missing id, a NOT MET line and a bare builder line each fail
+a model run is a run folder with a stage record; its prompt is the record's pieces in order, its host fields the record's stamped
+a need is checked on the context as the transition's actions leave it
+a page.refresh row is a valid journal row with its duration and row count
+a pick stage runs only the ranked lanes, and a lane whose agent dies stops
+a pinned id loads from the stored blob, and a missing blob is stored from a file with exactly the pinned bytes
+a pinned workflow whose asking state has no timer loads retired, naming the state
+a placeholder row says why
+a pre-contract quick-fix copy, started on an earlier release, is never advanced; a current item in the same root advances
+a primitive counts only if every model stage uses it in more than one workflow; the rest are special cases
+a quick-fix copy whose awaitingGates has no after, started on an earlier release, is never advanced; a current item in the same root advances
+a real-shape transcript: ms is brief to last message
+a red check on the head sends awaitingMerge back to building, with the check in the build input, and approving the old card merges nothing
+a red check while verifying also returns to building, and it cannot reach merging
+a ref is checked by its declared kind: a web-page ref to a PR url is read as a page
+a refused effect is journalled with its rule, not retried, and the item steps back
+a reminder's content is never read: a wake, tap or GitHub event written into it offers nothing
+a render gives exactly the entry's slots, as text or numbers, and escapes nothing
+a returned brief (brief.stored with run, role and no contextHash) stays brief.stored
+a returned result from a committed adopt run, delivered, applies nothing (the same cut journal applies it at a runnable pin)
+a row missing source fails
+a row missing v fails
+a row of every kind validates
+a run id parses into its item and name, and formats back
+a run moves prepared, spawned, bound, returned, and each state is read from its folder
+a run with stage.json and no prompt file is still a model run; the map is chart()
+a run's stage.json names the stage file and line of every rule, output description, input meaning and the task
+a run.json written without attempts counts from its journal rows, then carries on in run.json
+a scope keeps a day, a thread's sessions or one session, and lists what can be picked
+a second session is refused the item and the refusal goes to its own file
+a shape bench run folder is shown by the Inspector with its prompt and result
+a source needs both system and ref
+a stage record that names catalogue entries (prompt-catalogue) carries them on each piece and in the detail
+a stage without marks is read as before them: the stage named brief stores each text field
+a stall, its cap and a cannot-start record their entries
+a start without request.url or request.text is refused
+a started item journals its transition with source, transition id and the effects it asked for
+a state that invokes an agent actor prepares its run: brief, folder, worktree named by item and run, prompt.stored
+a stopped ask is closed, not open, and its wait ends when its stop is done (fix-finish-closes-waits)
+a subagent's hook denial is a refusal row carrying its agent id
+a tap first still answers the ask, and a stand-in answer after it is refused
+a tap on a card a run posted completes that run; a timer fires once it is due (timer on the timed fixture)
+a tap wake is one person.tap naming the card, the option and the thread
+a template is kept byte for byte: leading \#\# lines, blank lines and trailing spaces
+a template with any tag but a plain slot is refused at load, naming the entry and its line
+a transition from a state it does not leave from writes nothing and journals nothing
+a tripwire on the item's PR moves it as the workflow says; another PR's tripwire does not
+a turn that never closed leaves the gap after it unknown, and rows read twice count once
+a verdict is the field its marks name, and the value they name is the pass, whatever the words
+a wake quoted inside agent text is not read: mid-line, indented, inside a subagent hand-back
+a wake-shaped line inside agent text is not read
+a writer older than the newest row is refused, naming both releases
+accept refuses challenge results that skip, add, reorder or contradict lines, or whose result disagrees
+adopt trial: every model run carries its stage.json as on disk, and the flow is brief, build, verify with briefs.builder, pr and verdict between them
+agent time: last finish ms per agent sums to the 153.7 s the retro gives
+agent.spawn payload briefHash reads as promptHash, null or not
+agrees: objects may leave out keys; arrays and values compare exactly
+all 3 runs pinned the combined workflow and returned
+alone, a later stage: a challenge run is reached through the real host from the start, so the Inspector shows it
+alone: the run folder is a journal root the Inspector export replays, with the prompt and the result
+ambientOf: marks found in the recorded system prompt or the context attachments
+an accepted brief fixes both briefs before any build, moves the item to building and prepares the build run
+an agent SubagentStart could not bind is bound from its meta.json at its first tool call, and told its run
+an asking state with no timer is refused, naming the workflow and the state
+an engine prompt row (brief.stored with contextHash) reads as prompt.stored, payload unchanged
+an event nothing listens for tries nothing and takes nothing
+an event the engine ignored lists the transitions it tried, none taken, with the tests that failed
+an event with no source, or one the workflow does not take from outside, is refused
+an invoke's result and error and a timer answer XState's done, error and after events
+an item is a scope: its rows, its agents' rows and its driving sessions' main rows
+an item not yet started on a retired pin is refused its start, and none is written to its file
+an item on a current pin starts and advances
+an item pinned before the edit loads, replays and renders from its blob alone, stage files deleted
+an item whose issue is not a GitHub issue URL has no repository on a card with no PR
+an older row is upcast on read and the file is left as it was
+another tool's output is never read as a wake, whatever it holds
+answers-unchanged: every step of every scenario returns, writes and journals what main did
+answers-unchanged: the hooks named in the Expect line are all called, in each state they can see
+append keeps a given id and at
+append opens exactly one file and lists no folder
+append refuses an invalid row, an unknown kind and another version
+append stamps v, id and at and writes one line
+ar2 at 51eced2 (old code): the block came after the handback, nothing failed, the item stayed in briefing
+ar4 at c4d87a8: first SubagentHandback denied no-return, second goes through and fails the run, the item leaves briefing, no person
+args.mjs builds valid args from the toy folder
+args.mjs refuses a config missing each pinned field
+args.mjs refuses a config with base deleted
+args.mjs refuses a config with base emptied
+args.mjs refuses a config with base.repo deleted
+args.mjs refuses a config with base.repo emptied
+args.mjs refuses a config with base.sha deleted
+args.mjs refuses a config with base.sha emptied
+args.mjs refuses a config with lanes deleted
+args.mjs refuses a config with lanes emptied
+args.mjs refuses a config with runner deleted
+args.mjs refuses a config with runner emptied
+args.mjs refuses a config with runner.sha deleted
+args.mjs refuses a config with runner.sha emptied
+args.mjs refuses a config with scoring deleted
+args.mjs refuses a config with scoring emptied
+args.mjs refuses a config with scoring.floors deleted
+args.mjs refuses a config with scoring.floors emptied
+args.mjs refuses a config with scoring.tradeoffs deleted
+args.mjs refuses a config with scoring.tradeoffs emptied
+args.mjs refuses a config with stages deleted
+args.mjs refuses a config with stages emptied
+args.mjs refuses a prompt naming a value the runner never fills
+args.mjs refuses scoring with no floors, a free-text rule alone, or a single trade-off
+args: 2026-11-03-context builds args, with its scoring as floors and trade-offs
+args: 2026-11-03-context with empty floors, one trade-off, or only a free-text rule is refused
+args: 2026-11-03-context with its floors removed is refused
+args: 2026-11-04-recipe-cards builds args, with its scoring as floors and trade-offs
+args: 2026-11-04-recipe-cards with empty floors, one trade-off, or only a free-text rule is refused
+args: 2026-11-04-recipe-cards with its floors removed is refused
+attentionOf reads every journal file under a root
+attributed: subagent calls carry its agentId, the parent's carry none
+attributed: the subagent's calls carry its agentId, the parent's carry none
+bad shapes fail with a reason
+base-workflows/ equals the base commit's workflows/
+baseline rescored with --no-judge: all 27 runs carry both new criteria, totals as committed
+baseline: all 27 runs pinned one brief stage file, the one on main
+baseline: rescored with --no-judge matches the decision's table
+behind-notice: a newer release published as a branch release/harness-v<x.y.z> is noticed too
+behind-notice: a session on an older release is told once, then not again within 30 minutes
+behind-notice: each session has its own 30 minutes
+behind-notice: inert with no install marker or with CCP_HARNESS_DISABLED=1, and writes no state
+behind-notice: nothing is said on the newest release, with no release, or when origin cannot be reached
+bench/brief/runs/baseline/intake-shared-parser.1/items/intake-shared-parser-1.jsonl replays on its pinned quick-fix@8d046c5a5d47...
+bench/brief/runs/baseline/intake-shared-parser.1/items/intake-shared-parser-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/intake-shared-parser.2/items/intake-shared-parser-2.jsonl replays on its pinned quick-fix@8d046c5a5d47...
+bench/brief/runs/baseline/intake-shared-parser.2/items/intake-shared-parser-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/intake-shared-parser.3/items/intake-shared-parser-3.jsonl replays on its pinned quick-fix@8d046c5a5d47...
+bench/brief/runs/baseline/intake-shared-parser.3/items/intake-shared-parser-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/intake-suggested-fix.1/items/intake-suggested-fix-1.jsonl replays on its pinned quick-fix@8d046c5a5d47...
+bench/brief/runs/baseline/intake-suggested-fix.1/items/intake-suggested-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/intake-suggested-fix.2/items/intake-suggested-fix-2.jsonl replays on its pinned quick-fix@8d046c5a5d47...
+bench/brief/runs/baseline/intake-suggested-fix.2/items/intake-suggested-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/intake-suggested-fix.3/items/intake-suggested-fix-3.jsonl replays on its pinned quick-fix@8d046c5a5d47...
+bench/brief/runs/baseline/intake-suggested-fix.3/items/intake-suggested-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-after-merge.1/items/planted-after-merge-1.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-after-merge.1/items/planted-after-merge-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-after-merge.2/items/planted-after-merge-2.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-after-merge.2/items/planted-after-merge-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-after-merge.3/items/planted-after-merge-3.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-after-merge.3/items/planted-after-merge-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-half-met.1/items/planted-half-met-1.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-half-met.1/items/planted-half-met-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-half-met.2/items/planted-half-met-2.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-half-met.2/items/planted-half-met-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-half-met.3/items/planted-half-met-3.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-half-met.3/items/planted-half-met-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-missing-line.1/items/planted-missing-line-1.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-missing-line.1/items/planted-missing-line-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-missing-line.2/items/planted-missing-line-2.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-missing-line.2/items/planted-missing-line-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-missing-line.3/items/planted-missing-line-3.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-missing-line.3/items/planted-missing-line-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-prescribed-fix.1/items/planted-prescribed-fix-1.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-prescribed-fix.1/items/planted-prescribed-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-prescribed-fix.2/items/planted-prescribed-fix-2.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-prescribed-fix.2/items/planted-prescribed-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/planted-prescribed-fix.3/items/planted-prescribed-fix-3.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/planted-prescribed-fix.3/items/planted-prescribed-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/real-adopt-clamp.1/items/real-adopt-clamp-1.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/real-adopt-clamp.1/items/real-adopt-clamp-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/real-adopt-clamp.2/items/real-adopt-clamp-2.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/real-adopt-clamp.2/items/real-adopt-clamp-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/real-adopt-clamp.3/items/real-adopt-clamp-3.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/real-adopt-clamp.3/items/real-adopt-clamp-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/real-jsonl-lint.1/items/real-jsonl-lint-1.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/real-jsonl-lint.1/items/real-jsonl-lint-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/real-jsonl-lint.2/items/real-jsonl-lint-2.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/real-jsonl-lint.2/items/real-jsonl-lint-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/baseline/real-jsonl-lint.3/items/real-jsonl-lint-3.jsonl replays on its pinned quick-fix@39430bff16ef...
+bench/brief/runs/baseline/real-jsonl-lint.3/items/real-jsonl-lint-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/example-variant/planted-half-met.1/items/planted-half-met-1.jsonl replays on its pinned quick-fix@6fa0330ff8f1...
+bench/brief/runs/example-variant/planted-half-met.1/items/planted-half-met-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/example-variant/planted-half-met.2/items/planted-half-met-2.jsonl replays on its pinned quick-fix@6fa0330ff8f1...
+bench/brief/runs/example-variant/planted-half-met.2/items/planted-half-met-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/example-variant/planted-half-met.3/items/planted-half-met-3.jsonl replays on its pinned quick-fix@6fa0330ff8f1...
+bench/brief/runs/example-variant/planted-half-met.3/items/planted-half-met-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/intake-shared-parser.1/items/intake-shared-parser-1.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/intake-shared-parser.1/items/intake-shared-parser-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/intake-shared-parser.2/items/intake-shared-parser-2.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/intake-shared-parser.2/items/intake-shared-parser-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/intake-shared-parser.3/items/intake-shared-parser-3.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/intake-shared-parser.3/items/intake-shared-parser-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/intake-suggested-fix.1/items/intake-suggested-fix-1.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/intake-suggested-fix.1/items/intake-suggested-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/intake-suggested-fix.2/items/intake-suggested-fix-2.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/intake-suggested-fix.2/items/intake-suggested-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/intake-suggested-fix.3/items/intake-suggested-fix-3.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/intake-suggested-fix.3/items/intake-suggested-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-after-merge.1/items/planted-after-merge-1.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-after-merge.1/items/planted-after-merge-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-after-merge.2/items/planted-after-merge-2.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-after-merge.2/items/planted-after-merge-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-after-merge.3/items/planted-after-merge-3.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-after-merge.3/items/planted-after-merge-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-half-met.1/items/planted-half-met-1.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-half-met.1/items/planted-half-met-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-half-met.2/items/planted-half-met-2.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-half-met.2/items/planted-half-met-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-half-met.3/items/planted-half-met-3.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-half-met.3/items/planted-half-met-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-missing-line.1/items/planted-missing-line-1.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-missing-line.1/items/planted-missing-line-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-missing-line.2/items/planted-missing-line-2.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-missing-line.2/items/planted-missing-line-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-missing-line.3/items/planted-missing-line-3.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-missing-line.3/items/planted-missing-line-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-prescribed-fix.1/items/planted-prescribed-fix-1.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-prescribed-fix.1/items/planted-prescribed-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-prescribed-fix.2/items/planted-prescribed-fix-2.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-prescribed-fix.2/items/planted-prescribed-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/planted-prescribed-fix.3/items/planted-prescribed-fix-3.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/planted-prescribed-fix.3/items/planted-prescribed-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/real-adopt-clamp.1/items/real-adopt-clamp-1.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/real-adopt-clamp.1/items/real-adopt-clamp-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/real-adopt-clamp.2/items/real-adopt-clamp-2.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/real-adopt-clamp.2/items/real-adopt-clamp-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/real-adopt-clamp.3/items/real-adopt-clamp-3.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/real-adopt-clamp.3/items/real-adopt-clamp-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/real-jsonl-lint.1/items/real-jsonl-lint-1.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/real-jsonl-lint.1/items/real-jsonl-lint-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/real-jsonl-lint.2/items/real-jsonl-lint-2.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/real-jsonl-lint.2/items/real-jsonl-lint-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-combined/real-jsonl-lint.3/items/real-jsonl-lint-3.jsonl replays on its pinned quick-fix@cb8645f40db0...
+bench/brief/runs/variant-combined/real-jsonl-lint.3/items/real-jsonl-lint-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/intake-shared-parser.1/items/intake-shared-parser-1.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/intake-shared-parser.1/items/intake-shared-parser-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/intake-shared-parser.2/items/intake-shared-parser-2.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/intake-shared-parser.2/items/intake-shared-parser-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/intake-shared-parser.3/items/intake-shared-parser-3.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/intake-shared-parser.3/items/intake-shared-parser-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/intake-suggested-fix.1/items/intake-suggested-fix-1.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/intake-suggested-fix.1/items/intake-suggested-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/intake-suggested-fix.2/items/intake-suggested-fix-2.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/intake-suggested-fix.2/items/intake-suggested-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/intake-suggested-fix.3/items/intake-suggested-fix-3.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/intake-suggested-fix.3/items/intake-suggested-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-after-merge.1/items/planted-after-merge-1.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-after-merge.1/items/planted-after-merge-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-after-merge.2/items/planted-after-merge-2.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-after-merge.2/items/planted-after-merge-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-after-merge.3/items/planted-after-merge-3.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-after-merge.3/items/planted-after-merge-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-half-met.1/items/planted-half-met-1.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-half-met.1/items/planted-half-met-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-half-met.2/items/planted-half-met-2.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-half-met.2/items/planted-half-met-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-half-met.3/items/planted-half-met-3.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-half-met.3/items/planted-half-met-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-missing-line.1/items/planted-missing-line-1.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-missing-line.1/items/planted-missing-line-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-missing-line.2/items/planted-missing-line-2.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-missing-line.2/items/planted-missing-line-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-missing-line.3/items/planted-missing-line-3.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-missing-line.3/items/planted-missing-line-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-prescribed-fix.1/items/planted-prescribed-fix-1.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-prescribed-fix.1/items/planted-prescribed-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-prescribed-fix.2/items/planted-prescribed-fix-2.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-prescribed-fix.2/items/planted-prescribed-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/planted-prescribed-fix.3/items/planted-prescribed-fix-3.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/planted-prescribed-fix.3/items/planted-prescribed-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/real-adopt-clamp.1/items/real-adopt-clamp-1.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/real-adopt-clamp.1/items/real-adopt-clamp-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/real-adopt-clamp.2/items/real-adopt-clamp-2.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/real-adopt-clamp.2/items/real-adopt-clamp-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/real-adopt-clamp.3/items/real-adopt-clamp-3.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/real-adopt-clamp.3/items/real-adopt-clamp-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint.1/items/real-jsonl-lint-1.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint.1/items/real-jsonl-lint-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint.2/items/real-jsonl-lint-2.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint.2/items/real-jsonl-lint-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint.3/items/real-jsonl-lint-3.jsonl replays on its pinned quick-fix@d0142865a2c4...
+bench/brief/runs/variant-criteria-not-methods/real-jsonl-lint.3/items/real-jsonl-lint-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/intake-shared-parser.1/items/intake-shared-parser-1.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/intake-shared-parser.1/items/intake-shared-parser-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/intake-shared-parser.2/items/intake-shared-parser-2.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/intake-shared-parser.2/items/intake-shared-parser-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/intake-shared-parser.3/items/intake-shared-parser-3.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/intake-shared-parser.3/items/intake-shared-parser-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/intake-suggested-fix.1/items/intake-suggested-fix-1.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/intake-suggested-fix.1/items/intake-suggested-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/intake-suggested-fix.2/items/intake-suggested-fix-2.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/intake-suggested-fix.2/items/intake-suggested-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/intake-suggested-fix.3/items/intake-suggested-fix-3.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/intake-suggested-fix.3/items/intake-suggested-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-after-merge.1/items/planted-after-merge-1.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-after-merge.1/items/planted-after-merge-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-after-merge.2/items/planted-after-merge-2.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-after-merge.2/items/planted-after-merge-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-after-merge.3/items/planted-after-merge-3.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-after-merge.3/items/planted-after-merge-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-half-met.1/items/planted-half-met-1.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-half-met.1/items/planted-half-met-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-half-met.2/items/planted-half-met-2.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-half-met.2/items/planted-half-met-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-half-met.3/items/planted-half-met-3.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-half-met.3/items/planted-half-met-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-missing-line.1/items/planted-missing-line-1.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-missing-line.1/items/planted-missing-line-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-missing-line.2/items/planted-missing-line-2.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-missing-line.2/items/planted-missing-line-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-missing-line.3/items/planted-missing-line-3.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-missing-line.3/items/planted-missing-line-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-prescribed-fix.1/items/planted-prescribed-fix-1.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-prescribed-fix.1/items/planted-prescribed-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-prescribed-fix.2/items/planted-prescribed-fix-2.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-prescribed-fix.2/items/planted-prescribed-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/planted-prescribed-fix.3/items/planted-prescribed-fix-3.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/planted-prescribed-fix.3/items/planted-prescribed-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/real-adopt-clamp.1/items/real-adopt-clamp-1.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/real-adopt-clamp.1/items/real-adopt-clamp-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/real-adopt-clamp.2/items/real-adopt-clamp-2.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/real-adopt-clamp.2/items/real-adopt-clamp-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/real-adopt-clamp.3/items/real-adopt-clamp-3.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/real-adopt-clamp.3/items/real-adopt-clamp-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint.1/items/real-jsonl-lint-1.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint.1/items/real-jsonl-lint-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint.2/items/real-jsonl-lint-2.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint.2/items/real-jsonl-lint-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint.3/items/real-jsonl-lint-3.jsonl replays on its pinned quick-fix@8e2bc5fce909...
+bench/brief/runs/variant-dry-run-copy/real-jsonl-lint.3/items/real-jsonl-lint-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/intake-shared-parser.1/items/intake-shared-parser-1.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/intake-shared-parser.1/items/intake-shared-parser-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/intake-shared-parser.2/items/intake-shared-parser-2.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/intake-shared-parser.2/items/intake-shared-parser-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/intake-shared-parser.3/items/intake-shared-parser-3.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/intake-shared-parser.3/items/intake-shared-parser-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/intake-suggested-fix.1/items/intake-suggested-fix-1.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/intake-suggested-fix.1/items/intake-suggested-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/intake-suggested-fix.2/items/intake-suggested-fix-2.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/intake-suggested-fix.2/items/intake-suggested-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/intake-suggested-fix.3/items/intake-suggested-fix-3.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/intake-suggested-fix.3/items/intake-suggested-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-after-merge.1/items/planted-after-merge-1.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-after-merge.1/items/planted-after-merge-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-after-merge.2/items/planted-after-merge-2.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-after-merge.2/items/planted-after-merge-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-after-merge.3/items/planted-after-merge-3.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-after-merge.3/items/planted-after-merge-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-half-met.1/items/planted-half-met-1.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-half-met.1/items/planted-half-met-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-half-met.2/items/planted-half-met-2.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-half-met.2/items/planted-half-met-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-half-met.3/items/planted-half-met-3.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-half-met.3/items/planted-half-met-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-missing-line.1/items/planted-missing-line-1.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-missing-line.1/items/planted-missing-line-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-missing-line.2/items/planted-missing-line-2.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-missing-line.2/items/planted-missing-line-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-missing-line.3/items/planted-missing-line-3.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-missing-line.3/items/planted-missing-line-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-prescribed-fix.1/items/planted-prescribed-fix-1.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-prescribed-fix.1/items/planted-prescribed-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-prescribed-fix.2/items/planted-prescribed-fix-2.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-prescribed-fix.2/items/planted-prescribed-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/planted-prescribed-fix.3/items/planted-prescribed-fix-3.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/planted-prescribed-fix.3/items/planted-prescribed-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/real-adopt-clamp.1/items/real-adopt-clamp-1.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/real-adopt-clamp.1/items/real-adopt-clamp-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/real-adopt-clamp.2/items/real-adopt-clamp-2.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/real-adopt-clamp.2/items/real-adopt-clamp-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/real-adopt-clamp.3/items/real-adopt-clamp-3.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/real-adopt-clamp.3/items/real-adopt-clamp-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/real-jsonl-lint.1/items/real-jsonl-lint-1.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/real-jsonl-lint.1/items/real-jsonl-lint-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/real-jsonl-lint.2/items/real-jsonl-lint-2.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/real-jsonl-lint.2/items/real-jsonl-lint-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-dry-run/real-jsonl-lint.3/items/real-jsonl-lint-3.jsonl replays on its pinned quick-fix@a0349da41801...
+bench/brief/runs/variant-dry-run/real-jsonl-lint.3/items/real-jsonl-lint-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/intake-shared-parser.1/items/intake-shared-parser-1.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/intake-shared-parser.1/items/intake-shared-parser-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/intake-shared-parser.2/items/intake-shared-parser-2.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/intake-shared-parser.2/items/intake-shared-parser-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/intake-shared-parser.3/items/intake-shared-parser-3.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/intake-shared-parser.3/items/intake-shared-parser-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/intake-suggested-fix.1/items/intake-suggested-fix-1.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/intake-suggested-fix.1/items/intake-suggested-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/intake-suggested-fix.2/items/intake-suggested-fix-2.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/intake-suggested-fix.2/items/intake-suggested-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/intake-suggested-fix.3/items/intake-suggested-fix-3.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/intake-suggested-fix.3/items/intake-suggested-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-after-merge.1/items/planted-after-merge-1.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-after-merge.1/items/planted-after-merge-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-after-merge.2/items/planted-after-merge-2.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-after-merge.2/items/planted-after-merge-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-after-merge.3/items/planted-after-merge-3.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-after-merge.3/items/planted-after-merge-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-half-met.1/items/planted-half-met-1.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-half-met.1/items/planted-half-met-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-half-met.2/items/planted-half-met-2.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-half-met.2/items/planted-half-met-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-half-met.3/items/planted-half-met-3.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-half-met.3/items/planted-half-met-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-missing-line.1/items/planted-missing-line-1.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-missing-line.1/items/planted-missing-line-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-missing-line.2/items/planted-missing-line-2.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-missing-line.2/items/planted-missing-line-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-missing-line.3/items/planted-missing-line-3.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-missing-line.3/items/planted-missing-line-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-prescribed-fix.1/items/planted-prescribed-fix-1.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-prescribed-fix.1/items/planted-prescribed-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-prescribed-fix.2/items/planted-prescribed-fix-2.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-prescribed-fix.2/items/planted-prescribed-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/planted-prescribed-fix.3/items/planted-prescribed-fix-3.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/planted-prescribed-fix.3/items/planted-prescribed-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/real-adopt-clamp.1/items/real-adopt-clamp-1.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/real-adopt-clamp.1/items/real-adopt-clamp-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/real-adopt-clamp.2/items/real-adopt-clamp-2.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/real-adopt-clamp.2/items/real-adopt-clamp-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/real-adopt-clamp.3/items/real-adopt-clamp-3.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/real-adopt-clamp.3/items/real-adopt-clamp-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint.1/items/real-jsonl-lint-1.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint.1/items/real-jsonl-lint-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint.2/items/real-jsonl-lint-2.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint.2/items/real-jsonl-lint-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint.3/items/real-jsonl-lint-3.jsonl replays on its pinned quick-fix@cf8728df37dd...
+bench/brief/runs/variant-proof-at-head/real-jsonl-lint.3/items/real-jsonl-lint-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/intake-shared-parser.1/items/intake-shared-parser-1.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/intake-shared-parser.1/items/intake-shared-parser-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/intake-shared-parser.2/items/intake-shared-parser-2.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/intake-shared-parser.2/items/intake-shared-parser-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/intake-shared-parser.3/items/intake-shared-parser-3.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/intake-shared-parser.3/items/intake-shared-parser-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/intake-suggested-fix.1/items/intake-suggested-fix-1.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/intake-suggested-fix.1/items/intake-suggested-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/intake-suggested-fix.2/items/intake-suggested-fix-2.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/intake-suggested-fix.2/items/intake-suggested-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/intake-suggested-fix.3/items/intake-suggested-fix-3.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/intake-suggested-fix.3/items/intake-suggested-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-after-merge.1/items/planted-after-merge-1.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-after-merge.1/items/planted-after-merge-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-after-merge.2/items/planted-after-merge-2.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-after-merge.2/items/planted-after-merge-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-after-merge.3/items/planted-after-merge-3.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-after-merge.3/items/planted-after-merge-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-half-met.1/items/planted-half-met-1.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-half-met.1/items/planted-half-met-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-half-met.2/items/planted-half-met-2.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-half-met.2/items/planted-half-met-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-half-met.3/items/planted-half-met-3.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-half-met.3/items/planted-half-met-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-missing-line.1/items/planted-missing-line-1.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-missing-line.1/items/planted-missing-line-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-missing-line.2/items/planted-missing-line-2.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-missing-line.2/items/planted-missing-line-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-missing-line.3/items/planted-missing-line-3.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-missing-line.3/items/planted-missing-line-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-prescribed-fix.1/items/planted-prescribed-fix-1.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-prescribed-fix.1/items/planted-prescribed-fix-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-prescribed-fix.2/items/planted-prescribed-fix-2.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-prescribed-fix.2/items/planted-prescribed-fix-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/planted-prescribed-fix.3/items/planted-prescribed-fix-3.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/planted-prescribed-fix.3/items/planted-prescribed-fix-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/real-adopt-clamp.1/items/real-adopt-clamp-1.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/real-adopt-clamp.1/items/real-adopt-clamp-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/real-adopt-clamp.2/items/real-adopt-clamp-2.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/real-adopt-clamp.2/items/real-adopt-clamp-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/real-adopt-clamp.3/items/real-adopt-clamp-3.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/real-adopt-clamp.3/items/real-adopt-clamp-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/real-jsonl-lint-multi.1/items/real-jsonl-lint-multi-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/real-jsonl-lint-multi.2/items/real-jsonl-lint-multi-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/real-jsonl-lint-multi.3/items/real-jsonl-lint-multi-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/real-jsonl-lint.1/items/real-jsonl-lint-1.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/real-jsonl-lint.1/items/real-jsonl-lint-1/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/real-jsonl-lint.2/items/real-jsonl-lint-2.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/real-jsonl-lint.2/items/real-jsonl-lint-2/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/brief/runs/variant-words-test/real-jsonl-lint.3/items/real-jsonl-lint-3.jsonl replays on its pinned quick-fix@121508664f06...
+bench/brief/runs/variant-words-test/real-jsonl-lint.3/items/real-jsonl-lint-3/runs/0.brief/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-average.1/items/clean-average-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-average.1/items/clean-average-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-average.2/items/clean-average-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-average.2/items/clean-average-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-average.3/items/clean-average-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-average.3/items/clean-average-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-shout.1/items/clean-shout-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-shout.1/items/clean-shout-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-shout.2/items/clean-shout-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-shout.2/items/clean-shout-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-shout.3/items/clean-shout-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/clean-shout.3/items/clean-shout-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-after-merge.1/items/planted-after-merge-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-after-merge.1/items/planted-after-merge-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-after-merge.2/items/planted-after-merge-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-after-merge.2/items/planted-after-merge-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-after-merge.3/items/planted-after-merge-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-after-merge.3/items/planted-after-merge-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-ambiguous.1/items/planted-ambiguous-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-ambiguous.1/items/planted-ambiguous-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-ambiguous.2/items/planted-ambiguous-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-ambiguous.2/items/planted-ambiguous-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-ambiguous.3/items/planted-ambiguous-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-ambiguous.3/items/planted-ambiguous-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-half-met.1/items/planted-half-met-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-half-met.1/items/planted-half-met-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-half-met.2/items/planted-half-met-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-half-met.2/items/planted-half-met-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-half-met.3/items/planted-half-met-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-half-met.3/items/planted-half-met-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-missing-regression.1/items/planted-missing-regression-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-missing-regression.1/items/planted-missing-regression-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-missing-regression.2/items/planted-missing-regression-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-missing-regression.2/items/planted-missing-regression-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-missing-regression.3/items/planted-missing-regression-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-missing-regression.3/items/planted-missing-regression-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-suggested-fix.1/items/planted-suggested-fix-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-suggested-fix.1/items/planted-suggested-fix-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-suggested-fix.2/items/planted-suggested-fix-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-suggested-fix.2/items/planted-suggested-fix-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-suggested-fix.3/items/planted-suggested-fix-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/baseline/planted-suggested-fix.3/items/planted-suggested-fix-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-average.1/items/clean-average-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-average.1/items/clean-average-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-average.2/items/clean-average-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-average.2/items/clean-average-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-average.3/items/clean-average-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-average.3/items/clean-average-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-shout.1/items/clean-shout-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-shout.1/items/clean-shout-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-shout.2/items/clean-shout-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-shout.2/items/clean-shout-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-shout.3/items/clean-shout-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/clean-shout.3/items/clean-shout-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/planted-ambiguous.1/items/planted-ambiguous-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/planted-ambiguous.1/items/planted-ambiguous-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/planted-ambiguous.2/items/planted-ambiguous-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/planted-ambiguous.2/items/planted-ambiguous-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/planted-ambiguous.3/items/planted-ambiguous-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/first-cases/planted-ambiguous.3/items/planted-ambiguous-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/hosted/planted-half-met.1/items/planted-half-met-1.jsonl replays on its pinned intake@94e679c975cfd11...
+bench/challenge/runs/hosted/planted-half-met.1/items/planted-half-met-1/runs/1.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-average.1/items/clean-average-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-average.1/items/clean-average-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-average.2/items/clean-average-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-average.2/items/clean-average-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-average.3/items/clean-average-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-average.3/items/clean-average-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-shout.1/items/clean-shout-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-shout.1/items/clean-shout-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-shout.2/items/clean-shout-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-shout.2/items/clean-shout-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-shout.3/items/clean-shout-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/clean-shout.3/items/clean-shout-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-after-merge.1/items/planted-after-merge-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-after-merge.1/items/planted-after-merge-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-after-merge.2/items/planted-after-merge-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-after-merge.2/items/planted-after-merge-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-after-merge.3/items/planted-after-merge-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-after-merge.3/items/planted-after-merge-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-ambiguous.1/items/planted-ambiguous-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-ambiguous.1/items/planted-ambiguous-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-ambiguous.2/items/planted-ambiguous-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-ambiguous.2/items/planted-ambiguous-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-ambiguous.3/items/planted-ambiguous-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-ambiguous.3/items/planted-ambiguous-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-half-met.1/items/planted-half-met-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-half-met.1/items/planted-half-met-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-half-met.2/items/planted-half-met-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-half-met.2/items/planted-half-met-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-half-met.3/items/planted-half-met-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-half-met.3/items/planted-half-met-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-missing-regression.1/items/planted-missing-regression-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-missing-regression.1/items/planted-missing-regression-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-missing-regression.2/items/planted-missing-regression-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-missing-regression.2/items/planted-missing-regression-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-missing-regression.3/items/planted-missing-regression-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-missing-regression.3/items/planted-missing-regression-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-suggested-fix.1/items/planted-suggested-fix-1.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-suggested-fix.1/items/planted-suggested-fix-1/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-suggested-fix.2/items/planted-suggested-fix-2.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-suggested-fix.2/items/planted-suggested-fix-2/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-suggested-fix.3/items/planted-suggested-fix-3.jsonl names no workflow without a pin: listed, not replayed
+bench/challenge/runs/variant-good-faith/planted-suggested-fix.3/items/planted-suggested-fix-3/runs/0.challenge/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-after-merge.1/items/planted-after-merge-1.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-after-merge.1/items/planted-after-merge-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-after-merge.2/items/planted-after-merge-2.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-after-merge.2/items/planted-after-merge-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-after-merge.3/items/planted-after-merge-3.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-after-merge.3/items/planted-after-merge-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-bug-regression.1/items/planted-bug-regression-1.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-bug-regression.1/items/planted-bug-regression-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-bug-regression.2/items/planted-bug-regression-2.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-bug-regression.2/items/planted-bug-regression-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-bug-regression.3/items/planted-bug-regression-3.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-bug-regression.3/items/planted-bug-regression-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-half-rule.1/items/planted-half-rule-1.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-half-rule.1/items/planted-half-rule-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-half-rule.2/items/planted-half-rule-2.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-half-rule.2/items/planted-half-rule-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-half-rule.3/items/planted-half-rule-3.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-half-rule.3/items/planted-half-rule-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-not-one-change.1/items/planted-not-one-change-1.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-not-one-change.1/items/planted-not-one-change-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-not-one-change.2/items/planted-not-one-change-2.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-not-one-change.2/items/planted-not-one-change-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-not-one-change.3/items/planted-not-one-change-3.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-not-one-change.3/items/planted-not-one-change-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-shared-parser.1/items/planted-shared-parser-1.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-shared-parser.1/items/planted-shared-parser-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-shared-parser.2/items/planted-shared-parser-2.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-shared-parser.2/items/planted-shared-parser-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-shared-parser.3/items/planted-shared-parser-3.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-shared-parser.3/items/planted-shared-parser-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-suggested-fix.1/items/planted-suggested-fix-1.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-suggested-fix.1/items/planted-suggested-fix-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-suggested-fix.2/items/planted-suggested-fix-2.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-suggested-fix.2/items/planted-suggested-fix-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/planted-suggested-fix.3/items/planted-suggested-fix-3.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/planted-suggested-fix.3/items/planted-suggested-fix-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/real-jsonl-lint.1/items/real-jsonl-lint-1.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/real-jsonl-lint.1/items/real-jsonl-lint-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/real-jsonl-lint.2/items/real-jsonl-lint-2.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/real-jsonl-lint.2/items/real-jsonl-lint-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/baseline/real-jsonl-lint.3/items/real-jsonl-lint-3.jsonl replays on its pinned intake@00ee9240a284b09...
+bench/shape/runs/baseline/real-jsonl-lint.3/items/real-jsonl-lint-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-after-merge.1/items/planted-after-merge-1.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-after-merge.1/items/planted-after-merge-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-after-merge.2/items/planted-after-merge-2.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-after-merge.2/items/planted-after-merge-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-after-merge.3/items/planted-after-merge-3.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-after-merge.3/items/planted-after-merge-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-bug-regression.1/items/planted-bug-regression-1.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-bug-regression.1/items/planted-bug-regression-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-bug-regression.2/items/planted-bug-regression-2.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-bug-regression.2/items/planted-bug-regression-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-bug-regression.3/items/planted-bug-regression-3.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-bug-regression.3/items/planted-bug-regression-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-half-rule.1/items/planted-half-rule-1.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-half-rule.1/items/planted-half-rule-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-half-rule.2/items/planted-half-rule-2.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-half-rule.2/items/planted-half-rule-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-half-rule.3/items/planted-half-rule-3.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-half-rule.3/items/planted-half-rule-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-not-one-change.1/items/planted-not-one-change-1.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-not-one-change.1/items/planted-not-one-change-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-not-one-change.2/items/planted-not-one-change-2.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-not-one-change.2/items/planted-not-one-change-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-not-one-change.3/items/planted-not-one-change-3.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-not-one-change.3/items/planted-not-one-change-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-shared-parser.1/items/planted-shared-parser-1.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-shared-parser.1/items/planted-shared-parser-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-shared-parser.2/items/planted-shared-parser-2.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-shared-parser.2/items/planted-shared-parser-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-shared-parser.3/items/planted-shared-parser-3.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-shared-parser.3/items/planted-shared-parser-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-suggested-fix.1/items/planted-suggested-fix-1.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-suggested-fix.1/items/planted-suggested-fix-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-suggested-fix.2/items/planted-suggested-fix-2.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-suggested-fix.2/items/planted-suggested-fix-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/planted-suggested-fix.3/items/planted-suggested-fix-3.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/planted-suggested-fix.3/items/planted-suggested-fix-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/real-jsonl-lint.1/items/real-jsonl-lint-1.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/real-jsonl-lint.1/items/real-jsonl-lint-1/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/real-jsonl-lint.2/items/real-jsonl-lint-2.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/real-jsonl-lint.2/items/real-jsonl-lint-2/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bench/shape/runs/variant-observable/real-jsonl-lint.3/items/real-jsonl-lint-3.jsonl replays on its pinned intake@9144efa71fe6aee...
+bench/shape/runs/variant-observable/real-jsonl-lint.3/items/real-jsonl-lint-3/runs/0.shape/bench-returns.jsonl names no workflow without a pin: listed, not replayed
+bin/host.js answer on the blocked card: retry builds again, replan needs --why, drop ends it; refusals change nothing
+bin/host.js answer: a refused answer exits 2 and changes nothing; a granted one is journalled with its grant and the host merges at the verdict sha
+bin/host.js: a card the item left waits as a pending stop until the thread withdraws it and runs `closed`
+bin/host.js: a tap before the card is recorded matches nothing; after `card`, the tap merges at the verdict sha
+blind reads committed with their keys, and both packets regenerate from the sets
+blobs: brief and answer are blobs whose sha256 match the rows, recomputed from the transcripts
+blobs: the brief and the answer are blobs whose hashes match the rows
+block: a Stop from T (not the owner) gives no output and no row
+block: after the run's Agent call (spawn.json) the Stop gives no output and no row
+block: the cloud form (CLAUDE_CODE_REMOTE_SESSION_ID set, run.session the URL) blocks too
+block: the owner S is blocked with item, state, run, actor, ccp-run, Block 1 of 2 and the exit; one stall row
+blocked-card-answered: drop ends the item dropped
+blocked-card-answered: replan with --why moves to briefing with that why
+blocked-card-answered: retry under a grant moves to building with the same briefs and the block as failure
+blocked-retry: a blocked first build goes to blocked, whose card offers retry, replan and drop with the block
+blocked-retry: a retried build blocked again, or a rebuild blocked, goes to replanning with replan and drop only
+blocked-retry: only a block reaches the card: a stop without a return and a brief error replan as before
+blocked-retry: replan from the blocked card needs a why and briefs again; drop ends; nothing else is taken
+blocked-retry: retry builds again with the same briefs, the block as failure, no why and no brief run
+blocked-retry: the retried build counts as the second: its PR verifies and merges, and a FAIL after it replans
+blocked-route: build returns blocked naming the refused push, item at replanning, card carries "build blocked: <reason>"
+both journals replay on the quick-fix they pinned (restore re-runs every transition and checks its hash)
+bound outside merge: a pr.merge row naming an item explains it as journalled, but it is still listed as not made by the host
+branch-stamped: own repo stamps head.ref (any case), a fork or a gone fork does not; the agent may not set it, and sees it in previous
+brief-one-meaning: brief.md, briefHash and briefOf appear only in promptFile and the v1 upcaster
+brief-one-meaning: the only brief.stored writer is accept's per-role loop over the briefs the stage declares
+brief: bench --prompt-only for every case equals my render() of the task literal plus the case input
+brief: bench --prompt-only on the recorded input equals my render(), current workflow
+brief: bench --prompt-only on the trial's pinned blob equals my render() and the committed brief.md
+build writes index.html and data.js from a config, and skips missing sources by name
+build: bench --prompt-only on the recorded input equals my render(), current workflow
+build: bench --prompt-only on the trial's pinned blob equals my render() and the committed brief.md
+builder briefs carry no PASS or FAIL condition
+builder briefs quoting every expect line: runs 1 and 2 do, run 3 restates them (the accepted builder-criteria trade)
+builder-criteria accepts escaped double quotes and refuses a paraphrase
+builder-criteria on the verifier's own planted brief verifier-methods-copied
+builder-criteria on the verifier's own planted brief verifier-paraphrased
+builder: beyond Expect: an agent whose tools name the return tool completes the loop
+builder: harness-works: the swap hands the agent its brief byte for byte, and SubagentStart binds it
+builder: holds: only Read and Glob are called, every turn is haiku, and the marker comes from the agent body
+builder: listed: the plugin loads from the skills dir and the Agent tool starts ccp-harness:probe-reader
+cannot-start: a run failed at the cap is refused already-failed and keeps its stalled why
+cannot-start: a started run is refused
+cannot-start: an unknown run and a started run are refused and change nothing
+cannot-start: from another session it is refused wrong-session and changes nothing
+cannot-start: the owner fails the run with its reason; others and bad prompts change nothing
+cannot-start: the owner's prompt is denied, fails the run with its why, journals a row, item replanning; no later block
+cap: 9 open, the 10th fails the run, the 11th is already-failed, the item takes onError
+cap: 9 refusals then a good result is accepted; already-returned does not count
+cap: a run refused one short of the cap is still accepted
+cap: a run started after one block is not failed later, and the other run still gets its own two
+cap: blocks 1 and 2 (stop_hook_active either way), the third fails the run: stalled:, stall-cap row, replanning, not waiting, ccp-run refused already-failed
+cap: the refusal that reaches the cap fails the run, and the item takes the invoke's error
+cap: two waiting runs block one at a time; one run's count does not use up the other's
+caps: an hour with more than 20 posts in one thread is flagged, 20 is not
+caps: more than 60 posts across threads in an hour flags the project, not any one thread
+capture-own-kinds: agent.prompt and agent.final carry what main's brief.stored and result.stored carried
+capture-own-kinds: capture-rows.mjs names neither brief.stored nor result.stored
+capture-own-kinds: every other row is the same, but agent.spawn names its hash promptHash
+captured: exactly one refusal row, source classifier, rule = the fixture reason, tool and action hash from the fixture
+captured: the probe's classifier refusal becomes one refusal row with the classifier's rule text
+card: build as is starts the child with the last issue
+card: drop ends the item dropped, with no child
+card: puts up a card keyed by the effect id and records its id and choices; the answer comes from the tap
+card: revise with no words is not taken
+card: revise with words reruns shape with the answer (one more round)
+caseRepo: a seed case becomes a one-commit repository with the case origin
+cases: at least 6, 2 real and 3 planted, each with must_catch and must_not
+catches: a commit that deletes scripts/fingerprint.mjs fails the clean room, and the self-check names the file
+catches: a commit that deletes scripts/notice-behind.mjs fails the clean room, and the self-check names the file
+changing the config moves the split
+cheap (fixture run): median hook.run ms minus a bare node start <= 50 ms, raw p95 <= 200 ms
+cheap: hook.run rows show at most 50 ms median over a bare node start and 200 ms p95 per tool call
+checkScoring accepts measure trade-offs only with a direction
+checkStages takes { workflows } only, and loadWorkflow calls it the same way for a pin and a name
+ci.result rows are valid journal rows, one per completed check run
+claude-md: names docs/language.md, says to use its terms and add one first, under 100 lines
+clean room passes on the tree and starts with empty HOME and project
+clean-home: two runs against an empty HOME leave the same ~/.claude files
+clean-home: two setup runs in an empty HOME leave identical ~/.claude trees
+closed and card refuse what does not fit: no stop waiting, no card to close, a second record, a card for a stopped run
+comment markers inside strings stay
+comments go, code stays
+committed journals and scenario journals are found
+committed journals exist, and the trial journals among them pin their workflow
+compare-combined.md recomputes from the rescored sets
+compare-criteria-not-methods.md recomputes from the rescored sets
+compare-dry-run-copy.md recomputes from the rescored sets
+compare-dry-run.md recomputes from the rescored sets
+compare-proof-at-head.md recomputes from the rescored sets
+compare-words-test.md recomputes from the rescored sets
+compare: two versions, per case and criterion, with the rule that changed and a blind packet
+compareReleases orders x.y.z numerically
+complete: every tool_use in the driver and agent transcripts has a tool.call row, and no row lacks a call
+complete: one tool.call per tool call that ran, none extra (a call Claude Code blocked fires no hook)
+complete: the handlers make the expected rows, one tool.call per tool call and none extra
+complete: the resumed tap turn is in the logs and its call is journalled
+content-not-read: a queued_at far ahead fires no timer early
+content-not-read: poisoned content past due fires only the due timer
+content-not-read: poisoned content with the host clock before due offers nothing at all
+content-not-read: the hook input here is built on the decision capture, verbatim
+content-not-read: the poison is live (control) — the same text as a UserPromptSubmit prompt is read
+context changes only through set
+control: an untouched scratch copy loads
+control: with no push, the same flow merges PR \#15 at A and the merge effect journals done with the merge sha
+copy-not-link: no symlinks, and working-tree edits do not reach the installed copy
+copy-not-link: replacing the installed copy leaves no old files behind
+copy-not-link: the installed plugin is a copy of a commit, not the working tree
+counts: per day and per thread, and a message seen on two wakes counts once
+coverage: missing, swapped and reworded lines are refused as covers; the exact set is accepted
+declared-rules-hold: a brief stage whose marks name one field stores only that one
+declared-rules-hold: a github-pr ref is checked against GitHub and stamped
+declared-rules-hold: a renamed brief stage, its marks moved with it, still stores the named fields as briefs under the new name
+declared-rules-hold: a research web-page ref whose url is a GitHub PR is checked as a page
+declared-rules-hold: a verdict of other words, its marks naming the pass, loads, is held to its lines and routes as PASS/FAIL do
+declared-rules-hold: an unmarked PASS/FAIL field in a marked stage is not held to the lines (and is, without marks)
+deleting plugins/harness/scripts/fingerprint.mjs fails the clean room and the self-check names it
+deleting plugins/harness/scripts/notice-behind.mjs fails the clean room and the self-check names it
+denials are told apart by their text; classifier refusals and ordinary errors are not counted here
+deps: CLAUDE.md and docs/layout.md state the new rule, and no longer the xstate-only one
+deps: a prose mention does not name it; a "Runtime dependency" line in plan/decisions does
+deps: an unnamed runtime dependency fails the test, in a package and in a plugin
+deps: dropping the mustache record fails the test with mustache still a dependency
+deps: the workspaces as they are (xstate and mustache) pass
+derive.js rework --append writes the check rows and tripwires once, however often it runs
+derive.js stalls prints the view from a journal folder
+division is not a regex
+docs/journal.md lists exactly the kinds a writer may append
+docs/tournaments.md walks a new tournament end to end
+duplicate (a): same GitHub wake delivered twice in one hook and again after restart -> effect once
+duplicate (b): process dies mid-effect (real child, exit 9); restart does not repeat the side effect
+each hook answers a state it cannot act in with one catalogue entry
+each ref kind declares what it stamps; STAMPED and HIDDEN are their union
+each wake reason picks its waiting kind; a wake with no reason makes the gap unknown
+early settle: a tail ending in another call's result is not a hand-back, and a late hand-back is still captured
+echo: a verdict whose issue carries only url and expect is accepted and stored as sent
+echo: a verdict whose issue differs from the input in anything it carries is refused as restated
+echo: the full issue in another key order is accepted
+effects-acked-once: a host that stopped mid-merge asks GitHub, and does not merge again
+effects-acked-once: find() says merged at the verified head, or null when it never merged
+engineOf: a string engine is relative to the repo root, a { commit } engine is a worktree of that commit
+every command the briefs give runs as written in the seed repo at the case commit
+every committed bench run folder sent brief.md, and brief.md is render() of its run.json
+every committed journal replays on its pinned blob with a brief rule edited
+every committed journal still replays (test/journals-replay.test.mjs)
+every committed pin loads and every pinned journal replays; only the adopt trial's pin is retired
+every committed run folder still renders its brief.md
+every committed run folder whose journal pins a blob: render() on that blob gives its committed brief.md
+every event taken from outside has a schema, and every delay a value
+every guard a state needs or a transition takes is defined
+every guard condition is a path, or a path with one of is, in, same or below
+every invoked actor has an output schema and an error path
+every model stage of every workflow names its own stage file, and the JSON holds none of its words
+every path CLAUDE.md names in backticks exists
+every required field is required
+every runtime dependency of a workspace is a sibling or named by a plan/decisions/ file
+every step's ways out are what the engine tried, in its order, and the taken one is where the item went
+every target is a state, and every state but the first is a target
+every tournaments/<id>/config.json records the pinned fields
+every workflow in workflows/ loads, and each asking state has its checkBack timer
+explain agrees with XState over every committed journal
+explain agrees with XState over the main tourney scenarios Q1, Q3, Q5 and R1
+explain agrees with the machine: on the hand spec, the taken transition is where XState goes
+explain-tests: the builder's explain tests pass intact and go red under each mutation
+explained: every step is the engine's explain, XState agrees, and every tried way out fails as failingOf says
+fail-closed (verifier): buildsLeft fails when rebuilt is absent or set, and holds only for null
+fail-closed (verifier): every guard fails for each absent field it reads
+fail-closed: a below condition fails on null or a non-number, not only on absent
+fail-closed: approved fails when any field it reads is absent
+fail-closed: blockedBuild fails when any field it reads is absent
+fail-closed: buildsLeft fails when any field it reads is absent
+fail-closed: ciGreen fails when any field it reads is absent
+fail-closed: closedOutside fails when any field it reads is absent
+fail-closed: drop fails when any field it reads is absent
+fail-closed: failed fails when any field it reads is absent
+fail-closed: gatesApproved fails when any field it reads is absent
+fail-closed: gatesTouched fails when any field it reads is absent
+fail-closed: hasBriefs fails when any field it reads is absent
+fail-closed: hasIssue fails when any field it reads is absent
+fail-closed: hasPr fails when any field it reads is absent
+fail-closed: isMerged fails when any field it reads is absent
+fail-closed: mine fails when any field it reads is absent
+fail-closed: redOnHead fails when any field it reads is absent
+fail-closed: replan fails when any field it reads is absent
+fail-closed: retry fails when any field it reads is absent
+fail-closed: sameHead fails when any field it reads is absent
+fail-closed: verifiedHead fails when any field it reads is absent
+fail-loop: brief, injected build 1, verify FAIL, build 2 with that verdict, verify PASS at the new head, approve, merged, done
+fails-after (handback path): a second handback fails the run and the item leaves the state; a stop after it is quiet
+fails-after: stopping again fails the run, journals no-return, and the item leaves the state by the actor error
+fails-closed: a branch held by the clone's own checkout is not touched and the rebuild fails
+fails-closed: a fork PR (no stamped branch) fails its rebuild with a reason and steps back
+fails-closed: previous.at in neither the clone nor origin fails with a reason and steps back
+fast-forward: a clean clone detached at an ancestor of origin/main is moved, still detached
+fast-forward: a clean clone on main tracking origin/main is brought to origin/main
+fast-forward: a dirty clone, another branch, or a diverged clone is left alone, saying why
+feature brief: made-up input renders the same on base JSON and head files
+feature.json: no invoke holds a task literal
+feature.json: stage entries name their file and hold no rules, inputs or top-level descriptions
+feature/brief.md holds exactly the base JSON's words for brief
+files: a copy missing a module the hook itself imports still names it, exits 0 and journals nothing
+files: a copy that lost a journal file fails files naming it, and the journal check says why the rows are lost
+files: the repo plugin needs its hooks, skill and journal files, and none is missing
+finish-once: a second agent that finished twice in another session is counted once per session and agent
+finish-once: an agent with two cumulative agent.finish rows counts its last row, here and in tokensByAgent
+finish-once: item view counts the brief agent once, at its last row: 833,859 as the retro counted by hand
+finish-once: row order does not matter (the later row by time wins, not the later in the file)
+finish-once: tokensByAgent and the overhead view count the brief agent once too
+fires-holds: before the due time nothing fires; after it the timer row is journalled and the item holds; a tap still moves it
+fixture is the real run: the brief agent has two cumulative finish rows
+fixture sanity: the tap envelope is a real decision-chosen wake naming the card
+fixture sanity: the transcripts hold a subagent call and the journal one row per call
+fixture sanity: two parent calls, a subagent with calls, a secret in a tool input
+fixture: 6 person messages and 1 tap counted in the world, 20 wake prompts run
+floors: a floor the judge leaves out, or reports with a non-true pass, counts as failed
+floors: each lane failing one kind of floor is not qualified, with that floor named
+floors: whatever its primitive count or other costs, a lane that fails a floor is not in the trade-off table
+flow: each box lists every input path and the run that produced it, as the records say
+flow: the arrows carry briefs.builder, pr and verdict, as stage.json wrote and readBy say
+flow: the strip shows brief, then build, then verify, adjacent, in that order
+freeze gate: a status-only change passes
+freeze gate: softening an Expect line of the named item is red unless a plan-only replan
+freshness gives the newest row time and the newest release that wrote rows
+frozen issue (PASS after a revision): challenge input == child start input == child brief input
+frozen issue (first PASS): challenge input == child start input == child brief input
+generic: scripts/inspector/ code names no state, actor or workflow of any workflow file
+globs: ** spans folders, * stays in one
+glossary-real: a line for every term the outputs list
+glossary-real: every path, export, key, kind and run-folder file a line names is real
+glossary-real: the four context sections, each with a table
+grant-source: a legal answer is journalled with source standin, the grant id in ref, and the session in output; the host merges at the verdict sha
+grant-source: reject is also journalled with its grant and does not merge
+green checks, and red ones on another head, change nothing
+green: the plugin at this commit passes the clean room, with the self-check line and both journal rows
+handback: an agent sent back that then returns hands back freely
+handback: the first SubagentHandback with the run open is refused with the return instruction, the next fails the run
+harnessHook finds ccp-harness among the SessionStart hook responses of a stream-json transcript
+hint: a build result with a prose url gets the build stage's pr line
+hint: each field the reason names gets its Output line once; the reason is unchanged
+hint: short pr.at, two fields, build prose url and covers each get the named fields' Output lines
+hook and permission denials in the transcript become refusal rows at Stop, retries linked
+hooks.json runs actors.mjs on SubagentStop synchronously
+hooks.json runs capture on every event it handles, in the background (async) on tool calls and subagent stops
+host-merges: GitHub shows PR 28 merged, its head the verdict sha
+host-merges: the ask is answered by a stand-in under the grant, then the host merges at the verdict sha
+in a project without the install marker the hook answers nothing
+inert: CCP_HARNESS_DISABLED=1 silences an installed project too
+inert: the SessionStart hook is silent and writes nothing without an install marker
+inert: with no install marker the hook exits 0, prints nothing and writes nothing
+inert: with no install marker the hook writes nothing and prints nothing
+input name in research researcher that is not its input is refused at its line
+input name that is not one of the stage's inputs (a misspelt one) is refused at its line
+input name that is not one of the stage's inputs (an extra one) is refused at its line
+installed-layout: the installed copy answers as the repo does, from lib/engine/src/names.js
+intake loads through the load check, with shape and challenge as its stages and quick-fix as a child
+intake-shared-parser trap: proof 6 names npm run test:cli, which the repo lacks; parse() is shared with CSV
+intake-shared-parser: 3 baseline runs
+intake-shared-parser: issue fits intake's \#shaped schema, with url, and has must_catch and must_not
+intake-suggested-fix trap: the test asserts SyntaxError, and Node already gives line 3 column 3
+intake-suggested-fix: 3 baseline runs
+intake-suggested-fix: issue fits intake's \#shaped schema, with url, and has must_catch and must_not
+intake.json loads through the engine load check (checkStages), with stages shape and challenge
+issueRepoOf reads owner/repo from a GitHub issue URL only
+journal with the builder rich fixture added: tokens, refusals, cards and wall clock match my hand counts
+judge check has at least 2 planted-bad outputs for methods-private
+judge-checked: a planted-bad extra entry graded met is reported as a miss
+kept: combined = baseline + words-test rewrite + proof-at-head rule, = the branch file and the combined pin
+key-order: keys reordered at every depth are still the accepted result
+kinds-declare-stamps: REF_KINDS holds github-pr and web-page; STAMPED and HIDDEN are their union, as main's lists
+left-closes: a PR closed event for another PR moves nothing
+left-closes: a push closes the merge card once
+left-closes: a red check on the head closes the merge card once
+left-closes: the PR closed on GitHub ends in closedOutside with the card closed, no new card, no merge
+left-closes: the PR merged on GitHub ends in closedOutside with the card closed, no new card, no merge
+legal-only: a wrong effect id, no --by and a card not yet up are refused
+legal-only: every refusal exits 2, prints its reason, and adds no transition and no merge
+lines-owned: A is named only its own runs (a-1) after a wake and after an Agent call
+lines-owned: A+cloud is named only its own runs (a-1, u-1) after a wake and after an Agent call
+lines-owned: B is named only its own runs (b-1) after a wake and after an Agent call
+lines-owned: U is named only its own runs (u-1) after a wake and after an Agent call
+lines-owned: a session owning no item gets no output
+lines-owned: on main the same inputs name every session's runs, and the line text is main's
+load-check: an after with a delay name missing from meta.delays is refused too
+load-check: every asking state has after.checkBack of one hour, and nothing else asks
+load-check: feature with replanning's after removed is refused, naming both
+load-check: quick-fix with awaitingGates's after removed is refused, naming both
+load-check: quick-fix with awaitingMerge's after removed is refused, naming both
+load-check: quick-fix with blocked's after removed is refused, naming both
+load-check: quick-fix with replanning's after removed is refused, naming both
+load-check: research with awaitingPublish's after removed is refused, naming both
+load-check: research with replanning's after removed is refused, naming both
+load-check: the three workflows in workflows/ load
+long-transcript: an unreadable transcript gives null, and the hook still writes its rows
+long-transcript: empty gives null
+long-transcript: noMessages gives null
+long-transcript: notUserFirst gives 7000
+long-transcript: over READ_CAP with the brief first, ms starts at the brief
+long-transcript: past the read cap the start is still the brief
+main Q1 and R1: every model run has its stage record, producers link to runs of the item, and R1 answers are made of researcher parts
+main's baseline system prompts are all still there
+marks-checked: refuses a brief naming a list (research)
+marks-checked: refuses a brief naming a nested text field (quick-fix)
+marks-checked: refuses a brief naming no field (quick-fix)
+marks-checked: refuses a const verdict holding another value (intake)
+marks-checked: refuses a marked covering stage naming no <list>.0.result (quick-fix)
+marks-checked: refuses a marked covering stage with no verdicts at all (intake)
+marks-checked: refuses a part other than verdicts, briefs and refs (quick-fix)
+marks-checked: refuses a ref kind not in refs/ (quick-fix)
+marks-checked: refuses a ref path naming no { url, at } (quick-fix)
+marks-checked: refuses a verdict path naming a text field (research)
+marks-checked: refuses a verdict path naming no field (quick-fix)
+marks-checked: refuses a verdict value the enum does not hold (quick-fix)
+marks-checked: refuses a { url, at } in an empty marks entry (quick-fix)
+marks-checked: refuses a { url, at } whose kind the marks do not name (research)
+marks-checked: refuses an entry naming a host effect (quick-fix)
+marks-checked: refuses an entry naming no stage (quick-fix)
+marks-checked: refuses an entry naming the ask effect (research)
+marks-checked: the repo workflows, and the same marks on a stage renamed with them, load
+measure.mjs runs the suite and the measure in a checkout
+measure: prepared 4, blocked 2, blocks 3, startedAfterBlock 1, failedAtCap 1, cannotStart 1, rate 0.5
+mechanical check: the builder brief quotes every expect line, in any order
+mechanical checks: one check per line, quoted and in order; no branch, base or return mechanics
+merge-at-sha: a push after the verdict makes the merge fail, the PR stays open, and the item steps back
+merge-at-sha: the merge passes the verdict sha as expectedHeadSha, and the item ends done with the merge sha
+merge-diff: --since after the merge hides it
+merge-diff: a PR merged on GitHub with no journal row is listed
+merge-diff: a pr.merge row GitHub does not bear out is listed
+merge-diff: a pr.merge row with a wrong sha is listed as not borne out
+merge: a classifier refusal row and the person rows come from the same hook and session
+merged: GitHub shows the toy PR merged at the sha the verify run passed
+merged: the journal has the engine.effect merge done row, at that sha, and GitHub bears it out
+missing Inputs line: build.md without its - previous: line is refused at the \#\# Inputs heading
+missing Output line: verify.md without its - pr: line is refused at the \#\# Output heading
+missing file: quick-fix/build.md deleted is refused naming the file
+missing file: research/write.md deleted is refused naming the file
+missing section: brief.md without \#\# Inputs
+missing section: brief.md without \#\# Output
+missing section: brief.md without \#\# Task, which its invoke wires
+missing section: build.md without \#\# Rules
+named-repos-unchanged: grant [null, "o/r"] answers the blocked card of an o/r issue
+named-repos-unchanged: grant [null, "o/r"] answers the merge card of a PR in o/r
+names.js imports only node: built-ins
+no brief first: the earliest message read is the start
+no engine source is read as text, no guessed provenance kinds, no model test on a prompt file
+no message, an empty file, or no file: ms is null
+no plugin script reads wakes, runs the engine host command or applies an event; only the actor hook loads the engine
+no source names the pinned option or workflows pinned before the stage contract or the asking timer
+no-bash: across this suite, no effect ran a shell command (child_process and $.process record zero calls)
+no-content: no row or blob holds the secret or any raw tool input; hash and size are of the input JSON
+no-content: rows hold hashes and sizes, never what a tool was given
+no-guessing: STAMPED and HIDDEN in stages.js come from refs/index.js
+no-guessing: accept imports nothing from effects/ and holds no GitHub or web-page policy
+no-guessing: no source outside marks.js calls prRef to choose how a returned ref is checked
+no-guessing: nothing outside marks.js compares a stage name with brief (or names any stage) to decide what to store
+no-guessing: nothing outside marks.js tests a value or enum against PASS or FAIL in any case
+no-second-retry: a rebuild after a red check that is blocked replans
+no-second-retry: a rebuild after a verify FAIL that is blocked replans
+no-second-retry: a replan resets the count, so a fresh attempt may be retried once
+no-second-retry: a retried build blocked again replans with replan and drop only
+no-second-retry: a retried build whose verify FAILs has no build left and replans
+no-self-edit: a Claude running from a different HOME does not block the install (the guard is not a blanket skip)
+no-self-edit: release.mjs branch --push writes only git refs, and pushes release/harness-v<x.y.z> to origin
+no-self-edit: release.mjs only writes git objects and refs in the repo it is run in, never the plugin
+no-self-edit: setup leaves the plugin alone while Claude Code runs from the same HOME
+no-self-edit: setup.sh beside a live Claude, with the newest release only a branch, leaves the plugin untouched; without Claude it installs that branch
+no-self-edit: setup.sh run beside a live Claude Code in the same HOME writes nothing under the plugin root
+no-self-edit: the notice hook writes nothing under the plugin root it runs from
+no-self-edit: the notice hook, run from the installed copy while behind, writes nothing under the plugin root
+no-single-count: a lane better on one trade-off only does not rank above another; the table shows all three
+no-single-count: dominance needs every trade-off; a missing value on one blocks a rank
+no-translation: capture rows and engine rows are told apart by kind, not by payload shape
+no-translation: the capture-row notes are gone
+no-values-logged: the setup log names environment variables but never their values
+node-only: names.js imports only node: built-ins
+node-only: names.js loads with xstate absent; host.js there does not (control)
+non-message rows after the last message do not count
+none of the deleted functions is left in the inspector code
+not-blocked-unchanged: verify FAIL, red check, stopped agent and briefing error match main; a block's error text is main's
+nothing-else-held: a tap on the closed card moves nothing
+nothing-else-held: a verify run left by a push stops at once with nothing closed
+nothing-else-held: the stop of an ask whose card was never made finishes with nothing closed
+null-repo-refused: issue https://github.com/o/r/pull/7, every choice, grants with null in repos are refused; item and journal unchanged
+null-repo-refused: issue https://gitlab.com/o/r/issues/7, every choice, grants with null in repos are refused; item and journal unchanged
+null-repo-refused: issue o/r\#7, every choice, grants with null in repos are refused; item and journal unchanged
+null-repo-refused: several null-listing grants in one file are all refused, each named
+old-entry: an attachment and a user row stamped days before the brief do not count
+old-entry: main, on the same inputs through its own hook, gave about 5.9 days (evidence/main-scenarios.json)
+old-entry: ms is the brief to the last message, within 10 ms, despite rows stamped days before
+older-writer (C-older-writer-refused): refused, both versions named, file unchanged
+once holds across both ways of ending: a handback deny then a plain stop fails the run
+one changed line in each kind of stage-file text changes the pinned id
+one-budget: BUDGET is { refused: 10, sentBack: 1, stalled: 2 } and the caps are read from it
+one-budget: a root main left with 7 refusals and 1 stall block (no attempts) continues at the head as at main
+one-budget: after every step, run.json attempts equal the counted refusals, send-backs and stall blocks so far
+one-budget: no number 10, 1 or 2 is a limit anywhere in the run modules or actors.js but BUDGET
+one-budget: outside the store, no run module reads the journal (readFile, itemRows, resultRefusals) to count
+one-budget: the run fails at the same attempt as on main (10th refusal, the end after a send-back, 3rd Stop)
+one-owner: each hook asks the store for the run's state
+one-owner: in plugins/harness/scripts the only uses are return-tool.mjs reading result.json and capture.mjs reading the agent pointer
+one-owner: outside the store, no engine module calls fs on a run folder: no existsSync, writeOnce or fs write of the six files
+one-owner: under packages/engine/src and packages/journal/src, only run/store.js names the lifecycle files or pointers
+one-path: dropping needs in spec.js changes the machine and the bundle alike, scripts/inspector untouched
+one-place: the run id, safe and sorted-hash patterns are only in names.js
+one-writer: two processes, 100 rows each, no torn line, time order, per-writer order
+only a merge effect that ended done explains a merge: a failed merge effect row does not
+optional fields may be left out
+other origins stay unread, and a GitHub notification beside a reminder is still read
+other rows only gain v2
+outcomeOf words a run that finished without returning, one whose returns were refused, and one that failed
+output field out of the schema order is refused at its line
+output name that is not an output property is refused at its line
+output of any other tool is never read, even a perfect wake with a far-future time
+outside-merge: a host merge row GitHub merged at another sha is not borne out
+outside-merge: every merge the host merge effect did not make is listed, even one a pr.merge row explains
+own-folder: a bound agent's shell runs from its worktree, and file tools outside it are refused
+ownedWaiting lists the waiting runs of the items the given sessions own, and none once started
+page: check-page.mjs passes on the build
+page: every run, step, way out and model prompt renders at 1280 and 390 px with no error
+page: every source of sources.json is built, none skipped
+parity: a case with neither, both, or a gap given to a missing item is caught
+parity: every case in plan/cases/ has a parity test or a gaps.json entry naming an open fix item, never both
+parseStageFile keeps a multi-line task as written, and the line it starts on
+parseTap reads the summary lines
+plugin.json declares no MCP servers, tools, agents or commands; .mcp.json declares only the return tool server
+post: posts the text keyed by the effect id and finishes with the message id as output
+post_message is a post.sent with the message and thread ids hearthbot returned
+pr-cards-unchanged: a merge card is checked against its PR repo (o/s), not the issue repo (o/r)
+pr.merge: the MCP merge tool makes a pr.merge row from its own response
+prRef reads owner, repo and number from a PR URL, and nothing else
+pre-contract and timerless pins load retired; a current pin does not
+primitive-rule: counted only if every model stage uses it in more than one workflow; the rest are special cases
+producerRef words every producer kind, and runs without stage records make no flow
+prompt-agrees: quick-fix verify brief.md and stage.json, and research verify description
+prompt-unchanged: a run folder prepared by main (brief.md only) still starts with its bytes at the head
+prompt-unchanged: prompt.md at the head is main's brief.md, byte for byte, with the same hash
+prompt-unchanged: the Agent hook at the head hands out prompt.md, and binds with its promptHash
+promptFile is the run folder's prompt.md, or the older brief.md when only that one is there
+prompts-unchanged: every stage invoke of the four workflows renders the same sections and prompt as main; meta.actors and stage files are main's
+pushes, red pushes, red runs and rounds match the PRs' commits and check runs
+qualified lanes rank only by dominance over every trade-off, never by one count
+quick-fix brief: 196 recorded run inputs render the same on base JSON and head files
+quick-fix brief: made-up input renders the same on base JSON and head files
+quick-fix build: 6 recorded run inputs render the same on base JSON and head files
+quick-fix build: made-up input renders the same on base JSON and head files
+quick-fix has exactly the three model stages the recorded inputs cover
+quick-fix verify: 4 recorded run inputs render the same on base JSON and head files
+quick-fix verify: made-up input renders the same on base JSON and head files
+quick-fix.json: no invoke holds a task literal
+quick-fix.json: stage entries name their file and hold no rules, inputs or top-level descriptions
+quick-fix/brief.md holds exactly the base JSON's words for brief
+quick-fix/build.md holds exactly the base JSON's words for build
+quick-fix/verify.md holds exactly the base JSON's words for verify
+re-scoring the stage-contract tournament floors first qualifies S and M, not the control
+readAll merges every journal under a root in time order
+readFile returns rows in time order
+readFile upcasts a v1 file and leaves it as it was
+real journal copy: the page showed my counts (rows, wall clock, tokens, refusals, cards), release and newest row time
+real wakes parse into events whose source is the envelope
+real-agent: a real build agent returned a PR ref, the hook accepted it, the tool answered accepted, once
+real-agent: fixed from the refusal alone; the hook accepted the next return
+real-agent: the same bad result 10 times fails the run at the 10th, the deny says so, the item took onError
+real-agents run 1: three agents finish, each ms within 1000 of finish.at - spawn.at, foreground ones of the Agent call
+real-agents run 2: three agents finish, each ms within 1000 of finish.at - spawn.at, foreground ones of the Agent call
+real-agents: each pending prompt is brief.md + context.md with one blank separator line and nothing else
+real-agents: the injected build 1 diff, applied to the driver's seed repo, misses exactly expect line 2
+real-agents: the real transcripts hold attachment rows, and the head's hook over their timelines gives the journalled ms
+real-merge / merge-diff (recorded responses): a merge with no pr.merge row is listed; the closed-unmerged PR is not
+real-merge / merge-diff: a pr.merge row for \#12 removes it from the list, leaving \#11
+real-session s1: the stop is blocked, then the model calls Agent with ccp-run; stall row then agent.spawn
+real-session s2 (no Agent tool): two blocks, then the run fails at the cap and the item is in replanning
+real-session: derive.js stalls over that journal shows both blocked, one started after a block, one failed at the cap
+real-session: every waiting-runs line names only s1's item r1, never r2
+real-session: r2's run stays waiting with no spawn.json
+real-session: the session is s1 with the PR's plugin loaded inline
+real-session: the session started only its own runs; agent.spawn rows for r1, none for r2
+rebuild-on-branch: a FAIL sends the item back to building on the PR branch at its head; a second FAIL replans
+rebuild-on-branch: a host on a fresh clone fetches the PR head from origin
+rebuild-on-branch: a red check_run sends the item back to building on the PR branch at its head
+rebuild-on-branch: the branch is GitHub's head.ref, not the earlier run's name
+rebuild: a build result that sets pr.branch itself is refused as reserved
+rebuild: a commit only on origin is fetched; a fork PR, or a head nowhere, fails the run and the item steps back
+rebuild: after a FAIL the build run's worktree is on the PR's branch at its head, and a plain push lands on it
+recordCard refuses a run that is not an open ask run, an empty id, and a second record
+recorded: every refusal row carries { entry, slots }, and rendering them gives the row's reason byte for byte
+recorded: stage.json names the entry of each fixed frame piece and of the run context
+recorded: the row text the model got matches the hook output (stall and send-back blocks, deny reasons)
+recorded: the scripted run journals a refusal, a refusal cap, send-backs, no-returns, a stall, a stall cap and a cannot-start
+red-ci: a red check on another head, or a green one, does not send it back
+red-ci: a red check on the PR head sends a verifying item back to building, naming the check, and the new build gets it
+red-ci: the wake the platform delivered for PR 18 carries the same facts as REST, and does the same
+ref: a claimed PR GitHub doesn't show, shows at another head, or the worktree is not at, is refused and the item stays in building
+ref: made-up PR, real PR at the wrong head, worktree not at the head: refused naming the fact; item stays in building; right head accepted
+refusals come with their rule, source and what happened next
+refusals-counted: refused accept rows by rule in each journal and driver log equal the report tables
+refused-effect: refusal journalled with rule, not retried (same host, restarted host, repeated wakes); item steps back
+refused-when-not-covered: an issue url that is not a github.com issue URL (https://github.com/o/r) gives no repo
+refused-when-not-covered: an issue url that is not a github.com issue URL (https://github.com/o/r/pull/7) gives no repo
+refused-when-not-covered: an issue url that is not a github.com issue URL (https://gitlab.com/o/r/issues/7) gives no repo
+refused-when-not-covered: an issue url that is not a github.com issue URL (o/r\#7) gives no repo
+refused-when-not-covered: another repo, a choice not named, an expired grant, and a replan with no why are refused; the item and journal stay
+regex literals with slashes and comment-like text
+release: a change a failed run missed is released by the next push, and a released sha is not tagged twice
+release: a new release on origin is fetched and installed at the next container build
+release: a raised manifest version is used; a lower one never lowers the release
+release: a release branch on origin counts like a tag, and the newer of the two by version is installed
+release: a skipped push still gives a valid ci.result row and makes no tag
+release: a thread release is a branch release/harness-v<x.y.z>, pushed to origin with its ci.result row
+release: an engine-only change is released (setup.sh copies packages/engine/src); engine tests are not
+release: an install whose commit already contains the newest release passes, though its version is lower
+release: an older install fails unless it is an untagged commit that contains the release, or git cannot tell
+release: contains() says true for an ancestor, false for a commit not in the history, null when it cannot tell
+release: each later plugin or journal change is a higher tag; docs and tests are not released
+release: every path setup.sh archives into a session is a released path
+release: setup installs the newest release by version and the copy carries that version
+release: tags and release branches count as one series; the next is above both, and none is made twice
+release: the first plugin change is released at the manifest version, with no tag before it
+release: the next version is always above the newest
+release: the tag is annotated with a valid ci.result row and pushed to origin
+reminder-fires: queued_at before due fires nothing, even with the host clock past due
+reminder-fires: queued_at past due fires the checkBack timer, source timer; item stays awaitingMerge with its ask open
+reminder-fires: with queued_at missing, arrived_at is the time it fired
+replay (extra): restored snapshot hash equals the live one
+replaying an item's journal rebuilds its snapshot exactly
+replays-110: \#110's pre-contract journal does not replay on the stage-contract quick-fix; it stops at entry 0
+replays-110: a changed journal entry is refused by replay
+replays-110: a changed target is refused by replay
+replays: every recorded hash matches and the item ends done with the merge sha, its verdict at the PR head
+repoOf reads owner/repo from a PR URL
+request_decision is a card.posted keyed by the card id, in the thread the session was woken in
+rescore: A is not qualified for want of contract tests; S and M qualify
+rescore: the folder's own scores.json agrees with the round-2 measure files on promptInEngine
+rescore: the trade-off table holds primitives under the counting rule, promptInEngine S 8471 / M 9021, and trials S 2 / M 0
+research brief: made-up input renders the same on base JSON and head files
+research researcher: made-up input renders the same on base JSON and head files
+research verify: made-up input renders the same on base JSON and head files
+research write: made-up input renders the same on base JSON and head files
+research.json: no invoke holds a task literal
+research.json: stage entries name their file and hold no rules, inputs or top-level descriptions
+research/brief.md holds exactly the base JSON's words for brief
+research/researcher.md holds exactly the base JSON's words for researcher
+research/verify.md holds exactly the base JSON's words for verify
+research/write.md holds exactly the base JSON's words for write
+restated: names every differing key with both values, cut to 200 characters
+restated: one line, an added key, url and a line, a long value; then the echo is accepted
+retry-linked: a later identical call that runs carries retryOf on its tool.call row
+retry-linked: an identical action (reworded description) later links by retryOf to the first row; a different one does not
+retry-linked: the same action refused again links to the first refusal by retryOf
+retry-route (note): a stand-in grant answers the blocked card, reading the repository from the issue
+retry-route: a blocked first build reaches blocked; retry rebuilds with the same briefs and the block as failure; the PR then verifies and merges
+retry-route: replan and drop on the blocked card do what replanning does; nothing retries without an answer
+return tool server: accepts only the exact result the hook stored for the run
+return tool server: lists exactly one tool taking only run and result; a call no hook stored is not accepted
+return-answers: repo layout, keys reordered answered, different result not
+returned: a result the host refuses is handed back, and the second return is accepted
+rework: PR \#14, derived pushes, red runs and rounds equal what GitHub's commits and check runs show
+rework: PR \#28, derived pushes, red runs and rounds equal what GitHub's commits and check runs show
+rework: PR \#31, derived pushes, red runs and rounds equal what GitHub's commits and check runs show
+rounds, asks and tool calls match the retro
+rows append in order
+rows read twice count once, and --checks narrows which checks count
+rows-real: the message ids and card id read from the thread equal the ids the hook journals (sets)
+rows: a failing copy check is the only failure, named in one plain sentence
+rows: a failing depth check is the only failure, named in one plain sentence
+rows: a failing files check is the only failure, named in one plain sentence
+rows: a failing release check is the only failure, named in one plain sentence
+rows: a failing rules check is the only failure, named in one plain sentence
+rows: a journal that cannot be written is named in the session line, and the hook still exits 0
+rows: a post_message call makes a post.sent row in the same thread
+rows: an installed session writes one fingerprint and one passing self-check
+rows: an unreachable origin leaves the release unchecked, not failed
+rows: no row holds what the person wrote or the card said
+rows: no settings file fails the settings check and says the setup script did not run
+rows: one message, one card, one tap yield three rows linked by card id (real hook)
+rows: replaying the same wake does not double count a message in the view
+rows: the attention view links the three by card id; wait = tap sentAt - card row time
+rubric has builder-criteria (mechanical) and methods-private (judged), approved with a record
+runEffects carries out none of a retired item's effects
+runner.workflow.js hard-codes no stage id, role name or scoring
+safe keeps letters, digits, dot, underscore and dash, and turns the rest into _
+same prompt: a bench run sends prompt.md on stdin, and prompt.md is render() of its run.json
+same prompt: prompt-only renders every quick-fix stage of the adopt trial byte for byte as its committed brief.md
+same-text: accept() refusals and the text functions give the base commit's text
+same-text: every hook output, brief and context of the scripted quick-fix runs equals the base commit's
+same-text: render() on every committed run folder gives its brief.md
+same-text: the entries no run reaches render the base commit's template literal for the same values
+same-text: the scenario, the direct calls and the literals reach every catalogue entry
+scheduled: feature replanning (the brief run failed)
+scheduled: leaving awaitingMerge by a push (fresh item) drops the key and leaves no timer open
+scheduled: leaving awaitingMerge by a tap drops the key and leaves no timer open (merging, then done)
+scheduled: quick-fix awaitingGates (PASS on a PR changing CI config)
+scheduled: quick-fix awaitingMerge asks for one wake while an independent item advances to its own card
+scheduled: quick-fix replanning (the brief run failed)
+scheduled: research awaitingPublish (a PASS on the draft)
+scheduled: research replanning (the brief run failed)
+schema: a build result missing pr.url, or with a bad sha, or with no pr, is refused naming the field
+schema: a result missing a required field is refused, naming it
+score.mjs refuses a config with no floors
+score.mjs writes scoring.json and scoring.md for a folder, and refuses a judge naming an unknown lane
+score: mechanical then judge per criterion; verdicts are kept and reused while prompt and model are the same
+scripts/tournament names no tournament, lane, workflow or engine path
+scripts/tournament names no tournament, lane, workflow or engine path
+segmentsFrom says so when the prompt file does not hold the recorded pieces
+sent-back (handback path): the first SubagentHandback of a bound agent with its run open is denied no-return, naming the tool and run
+sent-back: a bound actor with its run open is blocked once, naming the return tool and the run
+session-diff (list_events page): deleting any one tool.call row lists exactly that call (all 5, subagent's included)
+session-diff (list_events page): the whole journal shows 0 missing, exit 0
+session-diff (transcript): deleting any one tool.call row lists exactly that call (all 5, subagent's included)
+session-diff (transcript): the whole journal shows 0 missing, exit 0
+session-diff: a complete journal shows 0 missing; deleting one row shows exactly that call
+session-diff: a row whose call the log does not have is listed, unless it falls outside the log
+session-diff: an empty journal lists every call
+session-diff: an invented tool.call row (no such call in the log) is listed as unfound
+session-diff: both event-log shapes give the same calls
+setup keeps settings already in ~/.claude/settings.json and adds the repo rules once
+shape then a PASS challenge starts one quick-fix child whose issue is shape's issue with url = request.url
+shape's blocked answer reaches the card (with its reason); build as is is then not taken (no issue)
+shebang goes
+sources: completions come from the return hook or the engine effect, not from an agent saying so
+sources: every engine.transition row is a wake, a completion or a timer
+sources: the tap row names the card the thread recorded, and the session saw the tap wake
+spans-sessions: an open card waits until now, and another item's card with another id is not joined
+spans-sessions: card.posted and person.tap in the thread's file give the item the 16 min 7 s wait and the card
+spans-sessions: the item scope does not pull in the thread session's rows, but itemView still joins them
+spans-sessions: the item's card wait is joined from the thread session's card and tap rows by the card id
+spans-sessions: without the thread's file the card is unknown (wait counts from the effect row naming it, 2 s later), so the join is what supplies it
+split-by-knowledge: actors.js exports every name it exported at main, each with the same type and value
+split-by-knowledge: worktree.js, accept.js and supervise.js hold their parts; only worktree.js runs git worktree; actors.js under 450 lines
+stage-record: every model run folder the scenario tests write has a stage.json that reassembles and resolves
+stage-record: every model run has stage.json, and assemble(prompt.parts) is brief.md byte for byte
+stage-record: every model run in the adopt trial has a stage.json that reassembles to brief.md, every source resolving
+stage-record: the checker catches an edited brief.md, a moved source pointer and a changed rule
+stage.json goes into the run bundle: prompt parts with sources, inputs with producers linked to runs, output with readers linked to runs
+stale: a commit B pushed after the PASS at A -> merge sent expectedHeadSha A, GitHub refused (409), PR \#17 stays open
+stale: completion from a replaced run is journalled stale and changes nothing (also across restart, forged run id)
+stale: the journal shows the verdict at A, then a merge effect that started and failed, and the item stepped back
+stall-unchanged: stall() and cannotStart() return main's answers
+stall-unchanged: the Stop hook (and cannot-start through the hook) answers and journals as main does
+stall-unchanged: the rows and run files they leave are main's
+stalls: a row read twice counts once; a spawn before the first block is no start after it; none prepared is rate 0
+stalls: counts, the rate and a line per run
+stamped-accepted: on main the same steps answer not accepted (committed evidence)
+stamped-accepted: the hook accepts a PR-ref build result and the server answers accepted
+standinInput refuses before the card is up, an illegal choice, a missing session, and any grant that does not cover it
+states-true: a transition from a state it does not leave from writes nothing and returns false
+states-true: every committed run folder under verify/engine-toy-run/evidence and bench/brief/runs reads as main would
+states-true: main's run folders, one per end state and failure kind, read as the state that made them
+still-refuses: a hand-written result.json with only result and hash is accepted for exactly that result
+still-refuses: one changed value, the stamped key added, the stamped result, a run with no result.json
+stopped: a stop after a handback the hook never saw fails the run at once, since a block cannot bring it back
+stopped: an agent whose result was accepted stops freely
+stopped: sent back once, then the run fails with a no-return refusal and the actor's error moves the item
+stops freely: an actor whose result was accepted
+stops freely: an unbound agent, even with stop_hook_active
+strict: < and & and quotes in a value are not HTML-escaped
+strict: a duplicate entry name is refused at load, naming the line
+strict: a render with a missing slot value is refused, naming the entry and the slot
+strict: a template using a ampersand is refused, naming the entry
+strict: a template using a comment is refused, naming the entry
+strict: a template using a delimiter change is refused, naming the entry
+strict: a template using a dotted name is refused, naming the entry
+strict: a template using a inverted section is refused, naming the entry
+strict: a template using a partial is refused, naming the entry
+strict: a template using a section is refused, naming the entry
+strict: a template using a unescaped triple is refused, naming the entry
+strict: a value no slot names is refused, naming the entry and the value
+strict: an empty entry is refused at load, naming the line
+strict: an unknown entry is refused, naming it
+strict: the harness catalogue itself loads, and every entry uses plain slots only
+stubs gate: a history comment in engine source is red, naming the file, line and rule; the same line in plan/ is not
+stubs gate: one TODO under packages/ is red
+tagged: every tool.call from the item's three agents carries item iv1 and its step's state
+tamper-refused: each tampered issue is refused as restated, journalled, item stays verifying
+templates, nested ${} and strings inside them
+testNames reads top-level test names from TAP
+the 21 old baseline runs only gained the new criteria: files and old verdicts as on main
+the 7 old cases are unchanged from main
+the 8 model stages, on the base JSON and on the head composed from files
+the Agent call gets the brief as its prompt, once: a second start of the run, or an unknown run, is refused
+the CLI exits 1 with the reason on a refused folder
+the README holds no history reference
+the README names every bin/host.js command as a command
+the README names every export of src/index.js
+the adopt trial (done on 0.2.0) replays and is never advanced
+the adopt trial pin loads retired, naming its asking state without a timer, and its journal replays
+the blocked card, which has no PR, is checked against the issue's repository
+the briefs stored are the fields its marks name, whatever the stage is named
+the budget is one table, the caps read from it, and run.json counts what was spent
+the built page is current with its sources, and its bundled script gives the same answers as the module
+the captured reminder fires nothing when the timer was due after it fired
+the captured reminder, unedited, fires a timer due before it fired, with the timer as its source
+the card: build as is starts the child with the last issue; drop ends dropped; a blocked shape reaches it with no issue
+the catalogue loads, and every entry is used by the engine or the plugin and every name the code renders exists
+the challenge is held to the expect lines at accept, and its prompt holds only the request and the issue
+the challenge prompt holds the request and the issue, and nothing else of shape's, of earlier rounds or of the card
+the child's end ends intake done with the child's output
+the command: exits 0 when nothing is listed, and 2 when it cannot run
+the command: reports, exits 1 on a gap, and records a journal.check row with the counts
+the composed bytes written as one file pin the same id as the JSON and its stage files
+the context measure tallies a chart
+the contract ignores status but sees the head and the Verifier brief
+the control: PASS for the head does wait to merge
+the copied journal holds the verifier row, and it is the newest row
+the deepest state is tried first, each state in file order; a failing guard and a failing need move on
+the engine exports and host commands are read from the source
+the files of an item, run, card, agent and spawn sit where the journal keeps them
+the first tournament builds args with every stage role resolved
+the fixture is 26 schema-valid rows of three real sessions
+the fixture really holds a classifier refusal with a bracketed rule
+the freeze refuses a changed contract unless the PR is a plan-only replan
+the history ban finds item ids, lanes, rounds and grafts in harness source and its READMEs, not in tests or plan/
+the hook journals message, card and tap linked by the card id, with the card wait from post to tap
+the hook journals the expected rows and stores each blob once, as files named by their hash
+the hook journals the probe's refusal, then links its retry and the later call that ran, across hook runs
+the hooks start, bind, confine and check an actor, and the return tool accepts only what the hook stored
+the host offers rework's tripwire row for the item once, and the item moves on
+the host turns every event to a retired item away, naming the pin, why and the release to finish it on
+the install script makes the journal root and the marker once, and a second run changes nothing
+the item view gives workflow, state, handles and rounds; an open card waits until now
+the journal is at v2
+the kit prompts read the scoring as text, and a prompt naming a scoring field that is gone is refused
+the load check refuses marks that name nothing the output holds, and an unnamed ref or covered result
+the map of every workflow file is the engine's chart: every state, and every transition by its JSON pointer
+the newest release is found past a torn last line and a long tail
+the page never tells a scripted run that Claude Code started its agent
+the page reads only on load and on Refresh: no timers
+the pin hashes the stage files: a one-line edit changes the id, and the old pin still loads from its blob alone
+the published page contains the built file byte for byte and declares the same bundled release
+the real hook: rows match the replay, blobs are named by sha256 and stored once, no secret on disk
+the real session alone: working, plus start-up before the first wake, sums to wall-clock
+the repo workflows mark every verdict, brief and ref their stages return
+the result hash does not depend on key order, at any depth, and does depend on values
+the return tool is known under its plugin prefix and its bare name only
+the return tool server lists one tool, return, taking only a run and a result, and imports no engine code
+the root declares the workspaces and Node 22+
+the rows of a refusal, a send-back, a no-return and a stall carry the entry and slots that give their text
+the same GitHub event delivered twice starts its effect once
+the same or a newer release may append
+the same red-check wake twice, then to a restarted host, spawns one rebuild
+the saved REST facts are a real red check run on the PR head
+the saved evidence is what GitHub said: 15 and 16 merged, 14 closed unmerged
+the stub ban finds markers and skipped tests only under packages/ and plugins/
+the test deny hook denies only commands containing ccp-refusal-probe, naming its rule first
+the three brief stages are the ones with a task, and no other .md sits in the stage folders
+the toy tournament runs through the runner with stub agents to a result
+the untouched toy folder is accepted (control)
+the vendored mustache.mjs is the locked npm package's, byte for byte
+the verdict session must differ from every builder session
+the verifier transcript of probe-plugin-agents-thread gives its real 4944
+through the hook: the journal row carries the real ms
+time by kind is the time view: working, each wait, rebuild and unknown, summing to the wall clock
+timer: a waiting item journals its timeout timer effect done, once
+timer: asks the clock for a wake at the due time keyed by the effect id; cancel drops it
+tokens by agent: the main turn and the subagent, summed as the rows give them
+tokens: item total from turn.usage plus the last agent.finish per agent matches the retro table
+tokens: summing both finish rows of the brief agent would overcount by about 9%
+torn, versionless, newer and invalid lines are counted with a reason
+tournaments/2026-11-04-stage-contract/trials/adopt/journal/items/trial.jsonl replays on its pinned quick-fix@8dc9451a4516...
+tournaments/2026-11-04-stage-contract/trials/blocked-retry/journal/items/trial.jsonl replays on its pinned quick-fix@6a0b9dfd27e7...
+tournaments/2026-11-04-stage-contract/trials/blocked/journal/items/trial.jsonl replays on its pinned quick-fix@39430bff16ef...
+tournaments/2026-11-04-stage-contract/trials/fail/journal/items/trial.jsonl replays on its pinned quick-fix@39430bff16ef...
+tournaments/README.md has a 2026-11-03-context row with question, winner, issue and viewer
+trimmed-accepted: in a fresh item, all four keys in another order are accepted
+trimmed-accepted: { url, expect } is accepted and the item moves on
+tripwire: C-second-fail-replans, the third round writes exactly one row; running again, or a fourth round, writes no second for the same limit
+tripwire: the limit is the item's step_back.max_rounds, and a different limit is a different tripwire
+tripwire: two rounds (a FAIL and a rebuild) is at the limit and writes no tripwire
+tripwire: without --append nothing is written, and two PRs past the limit get one row each
+true-to-record: every input, its meaning, value, path, producer and later changes equals stage.json
+true-to-record: every output, stamped field, write, replaced value and reader equals stage.json
+true-to-record: every producer and reader link lands on the run it names, its step open
+true-to-record: every prompt piece and its source equals stage.json
+true-to-record: model runs, prompt segments, context and hostWritten come from the run folders
+true-to-record: the sources render, every run with stage.json has a Stage view, and the page has no errors
+turn.usage reads the transcript only from where the last Stop stopped
+two writers at once never tear a line
+unbound outside merge: PR 16 (merged via the MCP tool) is listed as outside the host and as unexplained; the host-merged PR 15 is not
+unchanged: agent.finish ms is main's wherever the transcript is only messages from its brief
+unchanged: empty: every row, payload and blob but agent.finish ms is main's
+unchanged: fixture: every row, payload and blob but agent.finish ms is main's
+unchanged: hook answers, refusal and result.stored rows and stored results are main's; only the server answer moved
+unchanged: long: every row, payload and blob but agent.finish ms is main's
+unchanged: noMessages: every row, payload and blob but agent.finish ms is main's
+unchanged: notUserFirst: every row, payload and blob but agent.finish ms is main's
+unchanged: oldEntry: every row, payload and blob but agent.finish ms is main's
+unchanged: refusals: every row, payload and blob but agent.finish ms is main's
+unchanged: renders and hashes of every workflow are main's
+unchanged: renders and hashes of every workflow are main's
+unchanged: renders and hashes of every workflow are main's
+unchanged: renders and hashes of every workflow are main's
+unchanged: spawn() direct and through the hook answer and write what main does
+unchanged: the same scenarios run at the head and at main
+unchanged: unreadable: every row, payload and blob but agent.finish ms is main's
+unknown section: \#\# Notes in build.md is refused at its line
+unknown section: a \#\#\# sub-heading under Rules is refused at its line
+unmarked-as-main and kinds-declare-stamps: accept returns, journals and stores the same as main
+unmarked-as-main: coverGap and uncovered answer as on main without marks
+unmarked-as-main: every workflow blob pinned in the committed journals loads as on main
+unmarked-as-main: the repo workflows without meta.marks, and changed copies of them, load or are refused as on main, with the same message
+upcast: an old-version row is upcast on read and the file is not touched
+v1-reads: derive.js stalls gives the same prepared and blocked counts as main
+v1-reads: every committed v1 journal reads with no bad rows, at v2, in the mapped kinds
+v1-reads: the inspector shows each model run's prompt as its brief.md, every check ok as at main
+variant-combined: rescored with --no-judge matches the decision's table
+variant-criteria-not-methods: exactly one change to the baseline stage file
+variant-criteria-not-methods: rescored with --no-judge matches the decision's table
+variant-dry-run-copy: exactly one change to the baseline stage file
+variant-dry-run-copy: rescored with --no-judge matches the decision's table
+variant-dry-run: exactly one change to the baseline stage file
+variant-dry-run: rescored with --no-judge matches the decision's table
+variant-proof-at-head: exactly one change to the baseline stage file
+variant-proof-at-head: rescored with --no-judge matches the decision's table
+variant-words-test: exactly one change to the baseline stage file
+variant-words-test: rescored with --no-judge matches the decision's table
+verdict gate: a PR that names no item passes only if it touches plan/ alone
+verdict gate: none, then from the builder session, then from a separate session
+verifier briefs: one check per line, and check 4 rests on npm test, never on the proof's spec glob
+verifier: beyond Expect: an agent whose tools name the return tool completes the loop
+verifier: harness-works: the swap hands the agent its brief byte for byte, and SubagentStart binds it
+verifier: holds: only Read and Glob are called, every turn is haiku, and the marker comes from the agent body
+verifier: listed: the plugin loads from the skills dir and the Agent tool starts ccp-harness:probe-reader
+verifier: the install was the PR head, with the agent file in it
+verify/engine-host/one-owner-evidence/items/own-1.jsonl names quick-fix without a pin: listed, not replayed
+verify: bench --prompt-only on the recorded input equals my render(), current workflow
+verify: bench --prompt-only on the trial's pinned blob equals my render() and the committed brief.md
+view: the item view's state, tokens and person wait equal the hand counts from the rows
+view: the page (Chromium, browser-check.mjs --item iv1) showed the same
+wait: a card waits from its post to its tap
+wait: an untapped card is open with no wait, and a tap on an unseen card is listed with no post time
+waiting lines: each session is named only its own runs, after a wake and after an Agent call
+waiting lines: the cloud form of the session name owns its runs
+wakes are told apart without keeping their text
+wakes with no person in them make no person rows
+wakesIn: the same fixtures still parse at column zero (real wakes are not broken by the line anchor)
+what was asked of the person matches the attention view: one card, tapped after 25 minutes, and one message
+with no queued_at the reminder fires at arrived_at; with neither it is no wake
+with the shipped config, this repo is harness, a product repo is product, a session with no PR is unattributed
+without a thread client, cards stay pending: the run handler leaves actors it has no effect for
+words in both the JSON and the stage file, or a task source with no \#\# Task, are refused
+world fixed-before-build: each agent's received prompt hashes to the briefHash journalled for its run; the verifier's was stored before the builder spawned
+world github-fact: made-up PR and wrong head refused with the fact named; item stayed in building until the right head
+world own-folder: worktrees are named item--run; every path in a bound actor's tool.call rows is under its worktree
+world wrong-caller: the impostor's returns were refused and journalled; only the run's agent has a result.stored
+wrong-caller: a return from any agent but the run's, or from the main session, is refused and journalled
+wrong-caller: any other agent, the main session, or a run with no agent is refused and journalled; the rule comes before schema
+xstate and mustache are the named runtime dependencies

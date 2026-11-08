@@ -1,0 +1,61 @@
+{
+  "item": "inspector-reads-records",
+  "verified_sha": "b0d36808687903f1e8906c440e3b4cefb952e7ad",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5EaLM6bDvK8gVfBvu7",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "explained",
+      "status": "MET",
+      "command": "node --test verify/inspector-reads-records/records.test.mjs: every git ls-files <root>/items/<item>.jsonl with engine.transition rows (240) plus every item journal tourney Q1, Q3, Q5 and R1 leave at the head with TMPDIR at a kept folder (7); each is exported with exportRun and replayed here with machineOf and xstate's initialTransition/transition on the pinned blob (sha checked against the pin); explain and failingOf are called by the test",
+      "excerpt": "items 247, applied steps 69, events not applied 1, tried transitions checked 103 (34 not taken). For every step the bundle's candidates equal explain's tried entry for entry (pointer, from, to, taken, failing); each tried transition's failing equals failingOf(spec, def, target, context before the step), taken exactly when nothing fails, and only the last can be taken. For every applied step the bundle's edge is explain's taken, XState's next snapshot lands under that transition's target, and hashOf(next) equals the journal's hash. The one event not applied (Q3 q3r, a stale ask result) has explain taken null and no candidate taken. At main b1639ef the test fails: engine.explain is not a function."
+    },
+    {
+      "id": "one-path",
+      "status": "MET",
+      "command": "node --test verify/inspector-reads-records/one-path.test.mjs: a scratch copy of package.json, packages, plugins, workflows and scripts, with spec.js's one `...(target?.meta?.needs ?? [])` removed from testsOf; the tourney Q3 item q3 cut before seq 2 (the first build's result) is restored and offered that event with the host's restore, applyEvent and persist on a temp root, then exported, once on the checkout and once on the scratch copy; scripts/inspector/ hashed file by file before and after",
+      "excerpt": "intact: applied, state checking, tried [/states/building/invoke/onDone/0 -> verifying failing [ciGreen] not taken, /states/building/invoke/onDone/1 -> checking taken]. mutated: applied, state verifying, tried [/states/building/invoke/onDone/0 -> verifying failing [] taken]. scripts/inspector/ identical to the checkout's before and after. A later step (seq 5, the second red check run) could not be used: under the mutation seq 2 already replays to another hash, which is the same point."
+    },
+    {
+      "id": "true-to-record",
+      "status": "MET",
+      "command": "node --test verify/inspector-reads-records/records.test.mjs (true-to-record test) over the same 247 bundles: the four stage-contract trials (adopt, blocked, blocked-retry, fail), every committed bench run with engine transitions (bench/brief 192, bench/shape 42, bench/challenge 1) and the tourney items; each run folder, prompt file (names.promptFile), context.md and stage.json read from disk",
+      "excerpt": "run folders 283, model runs 283, non-model runs in the bundles 18 (host effects without a run folder). Every run folder with stage.json is a model run and appears in its bundle; segments joined equal the prompt file byte for byte; the non-frame-gap segments are the 4941 non-empty stage.json pieces in part order, each with that piece's text, a note starting '<part> part:' naming its frame, file:line or input, and from = template/workflow/input by its source kind; context.md (283) is the one context segment and equals stage.json context.text; hostWritten equals stage.json stamped in all 283 (51 paths). Not covered: 51 committed bench/challenge journals have no engine.transition rows, so exportRun refuses them at main and at the head alike ('cannot find the workflow null'); the inspector never showed them."
+    },
+    {
+      "id": "no-guessing",
+      "status": "MET",
+      "command": "node --test verify/inspector-reads-records/no-guessing.test.mjs over scripts/inspector/*.mjs and page.html (test/ excluded), plus reading export.mjs and build.mjs; the adopt trial copied to a temp root with 3.verify/stage.json deleted, an engine copy without explain.js, and build() over a temp sources file holding both and the intact adopt trial",
+      "excerpt": "None of matchEdge, candidatesOf, listenersOf, applyActions, findInvoke, stringPieces, piecesOf, labelGap, runValuesOf, segmentsOf, jsonChunks, sourceOf, withHelpers, hostFieldsOf, stampOf, schemaDifference. graphOf remains as a name only: its body is loadEngine plus graphFrom, and graphFrom is eng.chart(spec) mapped, walking no states itself; bundle graph edges equal chart().transitions (at, state, after) and nodes chart().nodes. No read call names engine source (the only reads are journal rows, blobs, run folders, workflow JSON and xstate's package.json); no provenance kind passthrough, template or template+workflow; no brief.md; the model flag is `model: stageRaw != null`, and a build run with its prompt file deleted is still a model run. Refusals: 'trial: run 3.verify has a prompt but no stage record (stage.json), so it was recorded before stage records and is not shown' and 'the engine at <dir> cannot explain its transitions (no packages/engine/src/explain.js)'; build gives runs 1 with both skipped under their labels."
+    },
+    {
+      "id": "page",
+      "status": "MET",
+      "command": "node --test verify/inspector-reads-records/page.test.mjs (build() from sources.json, then Chromium via /opt/node-tools Playwright at 1280 and 390 px over every run and step, then scripts/inspector/check-page.mjs --out <build>); node --test verify/inspector-stage-record/true-to-record.test.mjs flow.test.mjs; evidence/compare-main.mjs main vs head",
+      "excerpt": "build: 9 runs (blocked-retry, adopt, 7 tourney items) from 6 sources, skipped []. DOM: 134 steps rendered per width set, 168 ways out named in their step, 80 model prompts shown, no console or page error. check-page: 'no console errors and no sideways page scroll at 390px and 1280px, over every run, step, workflow and compare pair'. inspector-stage-record: flow 3/3 and true-to-record 5/5 pass with Playwright. stageView, flowOf, producerRef, sourceRef, outcomeOf and resumeNote are byte-identical to main, and the four trials' Stage views (14), flow strips and taken edges export identically on main and head (evidence/compare-main.txt)."
+    },
+    {
+      "id": "current-as-main",
+      "status": "MET",
+      "command": "npm ci, then npm test in clean clones at main b1639ef and at head b0d3680 (with this suite), one after the other; ok lines compared with comm (evidence/main-b1639ef.pass, head-b0d3680.pass, test-diff.txt); git diff b1639ef..b0d3680 -- verify/ read",
+      "excerpt": "main: tests 1750, pass 1734, fail 1, skipped 15. head: tests 1753, pass 1747, fail 1, skipped 5. The failure is the same at both: 'copy-not-link: with release tags, setup installs the newest release by version, not the HEAD' (known to fail in this container). Passing at main and not at head: 14, all tests of scripts/inspector/test/export.test.mjs (rewritten). Skips gone: 8 lane tests of that file and the 2 tests of verify/inspector-stage-record/older.test.mjs (deleted). New passing: 27 (the builder's explain.test.js 7, the rewritten export tests and this suite's 12). git diff main..head -- verify/ is only the deletion of older.test.mjs."
+    },
+    {
+      "id": "explain-tests",
+      "status": "MET",
+      "command": "node --test verify/inspector-reads-records/explain-tests.test.mjs: in a git worktree of HEAD, node --test packages/engine/test/explain.test.js intact, then with each mutation of packages/engine/src/explain.js",
+      "mutation": "1) upward() returns the ancestors first ('.reverse()' appended), so a parent state is tried before its child. 2) the failing check called as failingOf(spec, t.def, null, scope), so a target's needs are skipped and explain stops at a transition whose need fails.",
+      "red_test": "1) 'the deepest state is tried first, each state in file order; a failing guard and a failing need move on' and 'explain agrees with the machine: on the hand spec, the taken transition is where XState goes'. 2) those two and 'explain agrees with XState over every committed journal' and 'explain agrees with XState over the main tourney scenarios Q1, Q3, Q5 and R1'.",
+      "excerpt": "intact: pass 7 fail 0. Mutation 1: pass 5 fail 2. Mutation 2: pass 3 fail 4."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs on PR 180 at b0d3680, and again at this verdict commit",
+      "excerpt": "At b0d3680: test success; gates failure (no verdict yet). Re-read at this verdict commit (see the PR comment)."
+    }
+  ],
+  "notes": "Observations, none blocking an Expect line: (1) page.html keeps dead CSS for the removed provenance kinds (.who.template, .who.template-workflow, .who.passthrough, .seg-passthrough, --seg-pass, --seg-run), and two texts still describe the old reading: the help list (line 318, 'or nobody (the engine's fill-in template around the actor's input)') and the compare note (line 1181, 'Differences in engine templates (layer 2 template text, layer 3)'). (2) export.mjs has two section headers in a row ('Loading an engine checkout, and xstate ...' then '(main's or a lane's)'). (3) The item lists graphOf among the deleted functions; the name survives as a thin chart() wrapper build.mjs calls, which is the decision's intent. (4) The DOM checks in page.test.mjs and inspector-stage-record skip without Playwright, as in CI; explain-tests.test.mjs needs git worktree."
+}

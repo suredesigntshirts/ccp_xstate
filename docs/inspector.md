@@ -2,11 +2,13 @@
 
 One HTML page that shows, for any ccp_xstate workflow run, how the item moved through its workflow, how its context
 was created and changed at each step, and exactly what every model agent was given, did and returned, and whether the
-host accepted it. It works for any workflow JSON and any engine checkout: main's, or a tournament lane's.
+host accepted it. It works for any workflow JSON on any engine checkout that explains its transitions
+(`packages/engine/src/explain.js`).
 
-It was built because a person reading a real run found that the brief actor's prompt is a bare template ("Do what the
-brief step asks") with no authored instructions. So the page's first job is to say **where every piece of text came
-from**, and to say plainly what was never recorded.
+Its first job is to say **where every piece of text came from**, and to say plainly what was never recorded. It
+shows what the engine recorded and says, never its own reading of the workflow or the engine's code: the map is the
+engine's `chart()`, each step's ways out are the engine's `explain()`, and everything about a model run comes from
+its stage record (`stage.json`) and `run.json`.
 
 ## Files
 
@@ -49,53 +51,55 @@ node scripts/inspector/export.mjs --engine <checkout> --journal <journal root> [
 A string `engine` or `journal` is relative to this repo's root, so `"."` is this checkout and a committed journal
 (such as the adopt trial, `tournaments/2026-11-04-stage-contract/trials/adopt/journal`) is named by its repo path. An
 engine `{ "commit": "<sha>" }` is this repo at that commit: the build checks it out once as a git worktree under the
-capture folder and links this checkout's `node_modules` into it. That is how journals recorded before the stage
-contract (the October runs in `/mnt/project-files`) are replayed on main at 36da3e4, the engine that made them, since
-today's engine refuses them by design. A shallow clone may lack the commit; the source is then skipped and named.
+capture folder and links this checkout's `node_modules` into it. A shallow clone may lack the commit; the source is
+then skipped and named.
 
 - **A journal root** (`engine`, `journal`, `kind`, `label`, `origin`): a folder with `items/<item>.jsonl`, the
   items' run folders, and maybe `sessions/*.jsonl` (the live capture). Every item in it becomes a run on the page.
-- **A lane scenario** (`engine`, `scenario`, `label`, `origin`): a scenario test of a tournament lane checkout, such
-  as `packages/engine/test/tourney/Q1.test.js`. The build runs it with `node --test` and `TMPDIR` pointed at a
-  capture folder, so the journal roots the test makes in its temp folders are kept. The test is not edited. Each root
-  becomes a run, named after its test when the count matches.
+- **A scenario** (`engine`, `scenario`, `label`, `origin`): a scenario test of an engine checkout, such as
+  `packages/engine/test/tourney/Q1.test.js`. The build runs it with `node --test` and `TMPDIR` pointed at a capture
+  folder, so the journal roots the test makes in its temp folders are kept. The test is not edited. Each root becomes
+  a run, named after its test when the count matches.
 
-`engines` (optional) names each engine checkout for the page ("Lane A"). Every `workflows/*.json` of every engine
+`engines` (optional) names each engine checkout for the page ("Main"). Every `workflows/*.json` of every engine
 checkout is also shown on its own, under "Workflows (map only)", with its map and a table of all states and ways out,
 even when no run of it was captured.
+
+**What is refused.** The exporter refuses an engine checkout without `explain.js` (one older than the engine's
+explanation), and a journal whose model run has a prompt but no `stage.json` (recorded before stage records, such as
+the October runs in the shared folder). The build skips such a source and names why, at the foot of the page.
 
 ## How it reads a run, without knowing the workflow
 
 - **Workflow.** If the journal's first row pins the workflow (`name@<sha256>`), the exact bytes come from the
   journal's `blobs/`. Otherwise the file given with `--workflow`, else `<engine>/workflows/<name>.json`, and the page
   warns that it may have changed since the run.
-- **Graph.** From the JSON alone: every state (nested and parallel too), and every `on`, `after`, `always`, invoke
-  `onDone` and `onError`, and a compound state's own `onDone`. No state name is built in.
+- **Map.** The engine's `chart()` of the workflow: every state, and every transition (a state's `on` and `after`, an
+  invoke's `onDone` and `onError`), each named by its JSON pointer in the workflow file. Those are all the transitions
+  the engine runs: its load check refuses the rest.
 - **Context.** The journal keeps only a hash of the context, so the exporter replays the journal's events through
   the checkout's own `spec.js` (`machineOf`, `hashOf`) and its own `xstate`, and checks each hash. Where replay fails
   or differs, the page says so and keeps showing what the journal itself holds.
-- **Step labels.** The matched transition's `description` in the JSON, else words made from the event and target.
-- **Actors.** From the journal's `engine.effect` start rows. An actor is a model agent when its run folder has a
-  prompt file (`prompt.md`, or `brief.md` in folders written before journal v2); anything else is host code, shown with its card or outcome.
-- **Who wrote the prompt.** If the actor's input had a `brief` text equal to its prompt file, it was passed through:
-  the page names the context path the workflow maps into `input.brief`, the step that put it there and the field of
-  the result it came from, and says in turn who prompted that agent. Otherwise the engine filled its `writtenBrief()`
-  template, and the page shows that code from the checkout's `actors.js`. When the template wraps a literal from the
-  workflow JSON (an invoke input such as `task: { value }`), the prompt is credited to the workflow author
-  (`template+workflow`); "nobody wrote it" is said only when the template and the actor input are all of it. "Where each part came from" colours the text: engine template, workflow JSON
-  literal, actor input, run values, passed through, or unknown origin. Text is labelled engine template only where it
-  is literally a static piece of a string literal in that engine's `packages/engine/src/*.js` (a quoted string, or a
-  template literal split on its `${...}` holes). Embedded JSON is matched to the schema, defs and input; the rest is
-  tiled with those static pieces and this run's scalar values (every string or number in `run.json` and the actor
-  input, plus the PR or issue number and owner/repo a GitHub URL implies), labelled run or input. Whatever none of
-  these explains is labelled unknown origin, never template. A test checks this for every model step of every bundle.
-- **Schema and stored result.** Layer 4 shows the schema the agent was shown (the schema JSON in `context.md`); if
-  it differs from `run.json`'s, the difference is named and both are shown. Layer 6 is `result.json`, what the host
-  stored; fields the host wrote itself are marked: keys the agent-facing schema removed, and keys the added context
-  tells the agent never to set ("Never set key, gates or green", "Don't include an \"attested\" field").
-- **Ways out tried.** For each step the page lists the transitions the engine tried for that event, in order, each
-  with its guard and the needs of its target, and which failed, using the checkout's own `failing()` on the context
-  the transition's actions would leave. A join (a group finishing) is shown as a second list.
+- **Ways out tried.** For each step, the engine's `explain(spec, snapshot, event)` on the snapshot before it: the
+  transitions it tried for that event, in its order (the deepest active state first, each state's transitions in file
+  order), each with its guard, the needs of the state it enters and which of them failed, up to the one it took. The
+  check is `failingOf` in `spec.js`, the same one the machine's guards run. An event the engine ignored lists what it
+  tried, none taken; "nothing listens for it" is said only when it tried nothing.
+- **Step labels.** The taken transition's `description` in the JSON, else words made from the event and target.
+- **Actors.** From the journal's `engine.effect` start rows, each matched to its invoke in `chart()`. An actor is a
+  model agent when its run folder has a stage record (`stage.json`); anything else is host code, shown with its card
+  or outcome.
+- **Who wrote the prompt.** The producers of the Task part's pieces in the stage record: the brief agent's field, a
+  literal in the workflow JSON, or the item's start input. A stage with no Task part is the harness frame around the
+  rules, inputs and output its workflow names.
+- **Where each part came from.** The prompt is split into the stage record's pieces, in part order, each coloured by
+  its recorded source: the harness frame (a fixed or filled-in catalogue entry), the workflow (a JSON pointer or a
+  stage file line) or an input. The text between pieces is the frame's part headings and line breaks. If the prompt
+  file does not hold the pieces in order, the page says so and marks the whole text unknown. The added context is the
+  record's context piece.
+- **Schema and stored result.** Layer 4 is `run.json`'s schema, the one the host checks the return against; the agent
+  saw it in the Output part of its prompt. Layer 6 is `result.json`, what the host stored, with the paths the stage
+  record lists as `stamped` marked as the host's.
 - **Runs that never returned** say where the item went instead (the next step that left the run's state), or that
   the journal ends while the run was open.
 - **Trace.** Rows of the live capture whose agent is the run's agent (`agent.json`). Only the tool name, time, size
@@ -103,9 +107,8 @@ even when no run of it was captured.
 
 ## The stage record (stage.json)
 
-An engine with the stage contract (main since engine-stage-contract, `packages/engine/src/trace.js`; the format is in
-`docs/journal.md`) writes `runs/<n>.<actor>/stage.json` for every model stage run. When a run folder has one, the
-exporter puts it in the run's bundle as `stage` (`stageView` in `export.mjs`), with every run id it names resolved to
+The engine (`packages/engine/src/trace.js`; the format is in `docs/journal.md`) writes `runs/<n>.<actor>/stage.json`
+for every model stage run. The exporter puts it in the run's bundle as `stage` (`stageView` in `export.mjs`), with every run id it names resolved to
 a run of the same item, and the page shows it as the run's **Stage** view, before the seven layers:
 
 1. **Instructions**: the prompt part by part (rules, inputs, task, output, return), each piece with its source: a
@@ -119,11 +122,8 @@ a run of the same item, and the page shows it as the run's **Stage** view, befor
    as the producer, "read a newer value" when it does not, and a host effect's run marked as not traced. A reader that
    is the writing invoke itself (`self`) is shown as read by itself on the next round.
 
-For such a run, layer 2's "who wrote this prompt" is read from the record too: the producer of each Task piece (the
-brief agent's field, or a literal in the workflow JSON), never guessed from the older `input.brief` rule.
-
 The bundle also gets `flow`: the item's runs in start order with the context paths between them, shown above the
-steps as "Data flow between stages". Runs without stage.json render as before.
+steps as "Data flow between stages".
 
 ## What it cannot show
 
@@ -131,11 +131,9 @@ steps as "Data flow between stages". Runs without stage.json render as before.
 - The exact commands an agent ran: the capture stores only a hash of each tool's input.
 - The messages the parent session sends when it resumes an agent (after it finished without returning, or after a
   handback): only that a resume happened is known.
-- The raw return of an agent, where the engine stores only its stamped version (lanes A and C): host-written fields
-  are marked from the rules the context states, not from a stored copy of the return.
-- That a `template` prompt is byte for byte what `writtenBrief()` gives today: the code is shown, not re-run.
-- Anything about a model in a lane scenario: those agents are test fixtures, GitHub is a fake server, and no model
-  ran. Their prompts still show what that lane's engine would hand a real agent.
+- Anything about a model in a scenario: those agents are test fixtures, GitHub is a fake server, and no model ran.
+  Their prompts still show what that engine would hand a real agent.
+- Runs recorded before stage records, and engines without `explain.js`: they are refused, not guessed at.
 
 ## How it words what became of a model run
 
