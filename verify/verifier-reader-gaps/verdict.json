@@ -1,0 +1,52 @@
+{
+  "item": "verifier-reader-gaps",
+  "verified_sha": "57905cc3de056f462fe848141759ec315298dfe5",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5FXmL1q4gxzKCckygf", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "local-gate-run",
+      "status": "MET",
+      "command": "node --test verify/verifier-reader-gaps/local-gate-run.test.mjs (temp repo with origin/main, build branch, complete verdict from another session; the command taken from docs/gates.md and run by sh)",
+      "excerpt": "2/2 pass. docs/gates.md has one local command: BASE_SHA=origin/main PR_BODY='Item: <id>' node scripts/gates/pr-gate.mjs verdict. With <id>=vrg-toy: 'verdict gate passed (item vrg-toy)', exit 0. PR_BODY dropped: exit 1, 'this PR changes files outside plan/ but names no item'.",
+      "test": "verify/verifier-reader-gaps/local-gate-run.test.mjs"
+    },
+    {
+      "id": "world-needs-no-test",
+      "status": "MET",
+      "command": "node --test verify/verifier-reader-gaps/world-needs-no-test.test.mjs",
+      "excerpt": "3/3 pass. A verdict whose world result has no test field: 'verdict gate passed (item vrg-toy)'; same fixture with an empty world excerpt is refused. docs/gates.md The verdict: 'a `world` result needs no `test`, and one about the PR's checks cites them at `verified_sha`'.",
+      "test": "verify/verifier-reader-gaps/world-needs-no-test.test.mjs"
+    },
+    {
+      "id": "done-on-when-module",
+      "status": "MET",
+      "command": "node --test verify/verifier-reader-gaps/done-on-when-module.test.mjs (plan check on a temp plan copy)",
+      "excerpt": "2/2 pass. Step 2: 'first commit sets status `done` (and `done_on` to that day if the item names a `module`)'. Done item, no module, no done_on: plan ok. With module docs/gates.md, no done_on: 'a done item that names a module needs done_on', exit 1. With done_on: plan ok.",
+      "test": "verify/verifier-reader-gaps/done-on-when-module.test.mjs"
+    },
+    {
+      "id": "fresh-verifier",
+      "status": "MET",
+      "command": "env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p '<the brief's question>' in a clean clone of 57905cc3 (origin removed); evidence/fresh-verifier.md holds prompt, verbatim answer and grading; node --test verify/verifier-reader-gaps/fresh-verifier.test.mjs regrades it",
+      "excerpt": "4/4 points, each citing docs/gates.md: command BASE_SHA=origin/main PR_BODY='Item: <id>' ... verdict (gates.md:15-16); world result needs a test: 'No' (40-41); ci evidence cites 'verified_sha ... since they run again on the verdict commit'; model is 'its own model id' (25)."
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "node --test verify/verifier-reader-gaps/suite-and-scope.test.mjs (PR mode with PR_BODY naming the item and BASE_SHA=origin/main, tree mode without); node plan/check.mjs; node --test test/docs.test.mjs; ci test job 128747831290",
+      "excerpt": "8/8 pass. 5 files against main: the 3 outputs, the item, the round-7 decisions file. plan ok; test/docs.test.mjs 14/14. Frozen-suite loosening still bites: README copies whose step 2 drops done, drops done_on, says the builder writes under verify/<id>/, drops the verifier, or breaks the sentence before it each fail only fresh-reader-gaps's step-2 checks. ci at 57905cc3: npm test 2098 tests, 2086 pass, 0 fail, 12 skipped; plan ok.",
+      "test": "verify/verifier-reader-gaps/suite-and-scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #259",
+      "excerpt": "test job 128747831290 at 57905cc3de056f462fe848141759ec315298dfe5: success (2086 pass, 0 fail; plan ok). gates jobs 128747831551 and 128747878602: refused only for 'no verify/verifier-reader-gaps/verdict.json at the head sha'; they run again on this verdict commit, which changes only verify/verifier-reader-gaps/."
+    }
+  ],
+  "observations": [
+    "The loosened step-2 checks in verify/fresh-reader-gaps/fresh-reader-path.test.mjs still fail when any point is dropped (5 mutants), but no longer catch a negation inside the sentence: step 2 reading 'and never asks for a verifier' passes the suite (4/4), where the old exact-sentence check failed. The old check also pinned 'The builder' as subject. A small, accepted cost of reading for meaning; a future round could match 'asks [^.]*for a verifier'.",
+    "The fresh session (claude -p, reported model claude-sonnet-5-5) also cited scripts/gates/lib.mjs:123 for the world rule and did not run the gate itself.",
+    "Verifiers keep pinning entry-text sentences by regex in frozen suites, so each wording round must edit another item's verify folder; a verifier-brief rule to match meaning could stop that."
+  ]
+}

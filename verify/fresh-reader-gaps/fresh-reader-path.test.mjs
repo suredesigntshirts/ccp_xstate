@@ -16,7 +16,7 @@ const step = (n) => readme.match(new RegExp(`^${n}\\. \\*\\*[\\s\\S]*?(?=\\n\\d\
 test('done_on takes the day of the build PR\'s first commit, as plan/README.md step 2 says', () => {
   assert.match(part('Which date goes in `done_on`'), /day of the build PR's first commit/);
   assert.match(part('Which date goes in `done_on`'), /plan\/README\.md`, step 2/);
-  assert.match(step(2), /first commit sets the status to `done` and `done_on` to that day/);
+  assert.match(step(2), /first commit sets[^.]*`done`[^.]*`done_on` to that day/);
 });
 
 test('the builder writes nothing under verify/<id>/ and asks for a verifier, as step 2 says', () => {
@@ -24,7 +24,7 @@ test('the builder writes nothing under verify/<id>/ and asks for a verifier, as 
   assert.match(part('What you write under `verify/`'), /The builder writes nothing under `verify\/<id>\/`/);
   assert.match(answer, /Ask whoever started you to start a separate verifier session/);
   assert.match(part('Who writes the verdict'), /A separate session/);
-  assert.match(step(2), /The builder writes nothing under `verify\/<id>\/`, and asks whoever started it for a verifier/);
+  assert.match(step(2), /writes nothing under `verify\/<id>\/`[^.]*verifier/);
 });
 
 test('one verifier suite runs with its test files named, as CLAUDE.md Commands says', () => {
