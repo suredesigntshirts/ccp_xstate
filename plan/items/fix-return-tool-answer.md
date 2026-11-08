@@ -5,6 +5,8 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "done",
+  "done_on": "2026-11-05",
+  "module": "packages/engine/src/actors.js",
   "outcome": "After the harness hook accepts a return, the return tool answers accepted for that same call, including a result whose PR refs the host stamped, so no agent retries an accepted result into already-returned.",
   "why": "fix-refusal-hints' verifier saw it in a real run (plan/decisions/2026-11-05-refusal-hints.md, After the build). result.json's hash is of the stamped result (key, branch, checkout and green added to each PR ref), but plugins/harness/scripts/return-tool.mjs hashes the result the agent sent, so every accepted return with a PR ref gets 'not accepted: no harness check passed this result', and the agent retries into already-returned. Main does the same. How the tool recognises the accepted call is decided in plan/decisions/2026-11-05-return-tool-answer.md.",
   "serves": [
