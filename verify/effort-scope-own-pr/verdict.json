@@ -1,0 +1,40 @@
+{
+  "item": "effort-scope-own-pr",
+  "verified_sha": "0baec6327126ece07b8f5dc7a99069cb6e3c89ba",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5JqPpZ2piX8cscq46J", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "full-clone-passes",
+      "status": "MET",
+      "command": "node --test verify/effort-scope-own-pr/full-clone-passes.test.mjs (temp repos with origin/main = 6a43f40 at head 0baec63, and a temp branch esop-temp adding esop-stray-outside-outputs.txt; suite run in a child node --test with PR_BODY, BASE_SHA, HEAD_SHA, NODE_TEST_CONTEXT removed); evidence/full-clone-passes.md",
+      "excerpt": "5/5 pass. Head's file at the head: exit 0, 'tree mode: PR_BODY does not name plan-reader-effort; every output exists in the tree'. Head's file on the temp branch: exit 0, same tree-mode line. Base's file (6a43f40) on the temp branch: exit 1, 'PR mode: 4 files' including esop-stray-outside-outputs.txt.",
+      "test": "verify/effort-scope-own-pr/full-clone-passes.test.mjs"
+    },
+    {
+      "id": "own-pr-reads-git",
+      "status": "MET",
+      "command": "node --test verify/effort-scope-own-pr/own-pr-reads-git.test.mjs (temp repo at #212's last commit 6339fa5 with the head's suite file committed, BASE_SHA = e126555); evidence/own-pr-reads-git.md",
+      "excerpt": "3/3 subtests pass. 'Item: plan-reader-effort': exit 0, 'PR mode: 31 files'. After a commit adding esop-stray-outside-outputs.txt: exit 1, 'PR mode: 32 files', the assertion diff names 'esop-stray-outside-outputs.txt'. 'Item: another-item': exit 0, 'tree mode: PR_BODY does not name plan-reader-effort'.",
+      "test": "verify/effort-scope-own-pr/own-pr-reads-git.test.mjs"
+    },
+    {
+      "id": "scope",
+      "status": "MET",
+      "command": "node --test verify/effort-scope-own-pr/scope.test.mjs (git diff --name-only 6a43f408..0baec632, and verify/plan-reader-effort/verdict.json and evidence at both); evidence/scope.md",
+      "excerpt": "3/3 pass. 6a43f408..0baec632: docs/traps.md, plan/items/effort-scope-own-pr.md, verify/plan-reader-effort/plan-and-suite-pass.test.mjs. Changes under verify/plan-reader-effort/verdict.json and evidence/: 0; verdict.json blob equal.",
+      "test": "verify/effort-scope-own-pr/scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #234; evidence/ci.md",
+      "excerpt": "test job 128718661134 at 0baec6327126ece07b8f5dc7a99069cb6e3c89ba: success. gates job 128718661649: verdict refused only for 'no verify/effort-scope-own-pr/verdict.json at the head sha', and reruns on this commit, which changes only verify/effort-scope-own-pr/."
+    }
+  ],
+  "observations": [
+    "Verified at 0baec63, after readying replan #233 and #223 merged and main was merged into the build; the first head a994a23 passed the same tests but its test check was red only from main's 230-line entry-text budget, which #223 fixed.",
+    "The outcome's docs/traps.md half has no Expect line; read by eye at the head: the shallow-clone entry now says ci.yml checks out at depth 1, and a new entry 'A scope test reads git only on its own PR' names namedItem and verify/rules-said-once/suite-and-scope.test.mjs.",
+    "Before writing its tests the verifier saw the build's diff of the suite file and docs/traps.md; the tests were written from the Expect lines and brief, reusing verify/scope-suite-own-pr/lib.mjs's clone pattern.",
+    "In a depth-1 checkout the tests fetch the four pinned commits in full into a temp bare repo, so the checkout stays shallow and gains no origin/main; all three test files pass there."
+  ]
+}
