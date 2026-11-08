@@ -1,0 +1,67 @@
+{
+  "item": "stage-contract-declares-rules",
+  "verified_sha": "cc8de07bc0266060b6e2bd46afecd4ad1de6202c",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5HMgf9JRtyMxQ9KkPo",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "no-guessing",
+      "status": "MET",
+      "command": "node --test verify/stage-contract-declares-rules/no-guessing.test.mjs (greps every code line of packages/engine/src outside marks.js for quoted 'brief' and stage-name comparisons, PASS/FAIL words and pass|fail regexps, prRef( calls, github./web. calls in accept.js, accept.js's imports, and stages.js's STAMPED/HIDDEN); read accept, checkStages, checkMarks, coverGap and refs/*.js",
+      "excerpt": "No quoted 'brief' and no actor/src === '<stage>' outside marks.js; accept stores via for (const [role, brief] of marks.briefs(result)). PASS/FAIL appear only in stages.js:592 and :597, inside refusal texts chosen by marks.inferred; WORD, isWord and verdictAt are gone from stages.js; coverGap asks marks.passes and marks.verdicts. prRef( is called only in refs/github-pr.js (parses its own url), run/worktree.js (rebuild start), actors.js prepare (input.previous, a non-goal) and effects/merge.js. accept.js imports marks.js, refs/index.js, stages.js, schema/messages/names, run/worktree.js and run/store.js, nothing from effects/, and has no github.pull/files/suites, web.get, FILES_PAGE, GREEN or check_suites; it runs REF_KINDS[marks.kindOf(...)].check(ref, ...). stages.js imports HIDDEN and STAMPED from ./refs/index.js and re-exports them. 5/5 pass; all 5 fail at main."
+    },
+    {
+      "id": "declared-rules-hold",
+      "status": "MET",
+      "command": "node --test verify/stage-contract-declares-rules/declared.test.mjs: workflow copies in temp folders loaded by name through the tourney world (real loadWorkflow, spawn, bind, accept, drive; fake GitHub and web)",
+      "excerpt": "quick-fix with brief renamed plan (marks moved, stage file titled # plan): brief.stored rows [plan, builder, 'build multiply'], [plan, verifier, 'check multiply']. briefs ['verifier'] only: one row, role verifier. verify spelled OK/BAD (result, line result, guards, marks { result: OK, lines.0.result: OK }): loads; OK over a BAD line and BAD over OK lines refused 'result.result disagrees with result.lines'; after BAD the item goes to building and after OK to the same state as the repo workflow's PASS. Unmarked note enum [PASS, FAIL] in marked verify: PASS/lines PASS/note FAIL accepted (the unmarked copy refuses 'result.note disagrees with result.lines'). Research source url https://github.com/o/r/pull/9 (no such PR on the fake GitHub): accepted when the page holds the quote, refused 'the page at ... does not contain the quoted text' otherwise. github-pr build: PR 5 refused 'GitHub shows no such PR'; PR 1 stored with url, at, key o/r#1, branch, checkout, gates ['.github/workflows/x.yml'], green true. 6/6 pass; at main 5 fail."
+    },
+    {
+      "id": "marks-checked",
+      "status": "MET",
+      "command": "node --test verify/stage-contract-declares-rules/checked.test.mjs: 17 changed copies of the repo workflows loaded by name, each refusal's message matched for stage, path and reason",
+      "excerpt": "'stage verify marks have stores: a stage's marks are verdicts, briefs, refs'; 'stage verify marks verdict outcome as \"PASS\", which is not one of its values' (also lines.0.evidence, result as \"OK\", intake const result as \"YES\"); 'stage brief marks brief tester, which is no top-level text field' (also research questions, verify pr.url); 'stage verify marks ref issue as \"github-pr\": a ref names a kind (github-pr, web-page) on a ref { url, at }' (also build pr as \"gitlab-mr\"); 'stage write output sources.0 is a ref { url, at } its marks name no kind for' (also build with empty marks: output pr); 'stage verify output lines covers issue.expect, but meta.marks.verify.verdicts has no lines.0.result' (also intake challenge {}); 'meta.marks names review / merge / ask, which is no model stage'. The four repo workflows load. 18/18 pass."
+    },
+    {
+      "id": "unmarked-as-main",
+      "status": "MET",
+      "command": "node verify/stage-contract-declares-rules/capture.mjs <main 28c2d8f clone> evidence/main.json, then node --test verify/stage-contract-declares-rules/same.test.mjs, which captures the head the same way (fixed git dates, no signing) and compares: load outcomes, pinned blobs, coverGap/uncovered, and accept through the hooks",
+      "excerpt": "Repo workflows with meta.marks deleted load with main's exact ids (quick-fix@6a0b9dfd..., research@bd614808..., intake@94e679c9..., feature@ffafc63d...), so their bytes are main's; 11 changed variants x 4 workflows (verdict boolean/lower-case/OK-BAD, no covers, routed on sources, intake FAIL/Pass/x, renamed brief...) accept or refuse with main's message. 15 distinct workflow blobs pinned in committed journals (bench/, tournaments/) all load at both. 13 coverGap/uncovered cases (upper, lower, mixed case, a second word field agreeing and disagreeing, non-word, missing/extra/out-of-order lines) equal. Accept on unmarked quick-fix (also with pass/fail lower-case enums) and research: brief (brief.stored per text field), PR refs refused no-such-PR and head-elsewhere, stamped build, verdicts agreeing/disagreeing with lines, web ref found/not found, a PR url source checked as a PR: returns, refusal/result.stored/brief.stored rows and stored blobs identical apart from times, ids and tool-use ids. 4/4 pass."
+    },
+    {
+      "id": "prompts-unchanged",
+      "status": "MET",
+      "command": "same.test.mjs prompts test: sections() (JSON) and render() for all 13 stage invokes of quick-fix, research, intake and feature with fixed inputs, sha256 at both shas; sha256 of each raw meta.actors and every stage file; npm test covers verify/stage-bench",
+      "excerpt": "All 13 section/prompt hashes, the 4 meta.actors hashes and every workflows/<wf>/*.md hash equal main's. npm test at the head passes verify/stage-bench (bench's committed prompts still match)."
+    },
+    {
+      "id": "kinds-declare-stamps",
+      "status": "MET",
+      "command": "same.test.mjs: imports refs/index.js and stages.js; compares the stamped build result of the repo's own quick-fix (marked at the head) accepted against the same fake GitHub at both shas",
+      "excerpt": "REF_KINDS keys github-pr, web-page, each with kind and check(). STAMPED = [key, gates, green, checkout, branch] and HIDDEN = [key, gates, green, checkout], equal to the union of the kinds' stamps/hidden and to main's lists; stages.STAMPED/HIDDEN are the same objects. Stamped PR result blob 236439e233013e21ccf5a1a9578c9ad6dd1016206fc9ce4b7f618082822c922f at both shas, pr keys in order url, at, key, branch, checkout, gates, green."
+    },
+    {
+      "id": "marks-tests",
+      "status": "MET",
+      "command": "In a copy of cc8de07: node --test packages/engine/test/marks.test.js intact, then with each mutation",
+      "mutation": "1) run/accept.js: 'for (const [role, brief] of marks.briefs(result))' replaced by a loop over Object.entries(result) text fields when run.actor === 'brief'. 2) stages.js coverGap: 'entries.every((e) => marks.passes(field, e?.result))' replaced by String(e?.result).toUpperCase() === 'PASS', and the marks.verdicts(result) loop by any top-level /^(pass|fail)$/i field compared with the word PASS.",
+      "red_test": "1) 'the briefs stored are the fields its marks name, whatever the stage is named'. 2) 'a verdict is the field its marks name, and the value they name is the pass, whatever the words'.",
+      "excerpt": "Intact: tests 7, pass 7. Mutation 1: not ok 2, pass 6 fail 1. Mutation 2: not ok 4, pass 6 fail 1."
+    },
+    {
+      "id": "behaviour-unchanged",
+      "status": "MET",
+      "command": "npm ci, then npm test in separate clean clones at main 28c2d8f and head cc8de07, one after the other; passing test names compared with comm; git diff 28c2d8f cc8de07 of test files read; each re-captured snapshot of main diffed after replacing main's four workflow ids with the head's",
+      "excerpt": "main: tests 1695, pass 1679, fail 1, skipped 15. head: tests 1702, pass 1686, fail 1, skipped 15. The one failure is the same at both: 'copy-not-link: with release tags, setup installs the newest release by version, not the HEAD' (fails in this container on main). Passing at main and not at head: only one-meaning's test, renamed to '...per-role loop over the briefs the stage declares' and passing. New at head: the builder's 7 marks tests. Test diff: S3.test.js's verdict-spelling tests switch changed() to unmarked() (same assertions, workflows without meta.marks); one-meaning's regexp pins marks.briefs(result); new marks.test.js. fix-refusal-hints, fix-return-tool-answer, fix-waiting-lines-owner (prompts, scenarios), fix-waiting-run-stall and run-lifecycle-store trace.json: byte-identical to main's after swapping the quick-fix/research/intake/feature ids."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs PR 173 at cc8de07, and again after this verdict commit",
+      "excerpt": "At cc8de07: 'test' (128573427123) success; 'gates' (128573427582) failure, waiting on this verdict.json. Re-read at the verdict commit (see the PR comment)."
+    }
+  ],
+  "notes": "Two observations, not failures of any Expect line. 1) A briefs part written as a string ('briefs': 'builder') passes the load check (checkMarks wraps it as a list) but marks.js declared() reads a non-list briefs as [], so accept stores no brief: probed, the result is accepted with 0 brief.stored rows. The check and the reader should agree (refuse a non-list, or read it as the check does). 2) meta.marks given as a list loads and reads every stage as unmarked. evidence/main.json is capture.mjs's output at main 28c2d8f."
+}

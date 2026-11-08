@@ -53,6 +53,19 @@ export const storeBlob = (root, text) => {
   return { hash, bytes: Buffer.byteLength(text) };
 };
 
+/**
+ * The workflow a run was prepared from, as pinned in the journal's blobs (its run.json workflow, `<name>@<sha256>`),
+ * parsed; null when the run names no pin or the blob is not there.
+ */
+export const pinnedSpec = (root, run) => {
+  const pin = String(run?.workflow ?? '').match(/@([0-9a-f]{64})$/);
+  try {
+    return pin ? JSON.parse(readFileSync(join(root, 'blobs', pin[1]), 'utf8')) : null;
+  } catch {
+    return null;
+  }
+};
+
 const idOf = (run) => (typeof run === 'string' ? run : run?.run);
 const fileOf = (root, run, name) => {
   const dir = runDir(root, idOf(run));

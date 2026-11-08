@@ -58,7 +58,8 @@ file.
   (`spend`, `spent`).
 - `src/run/worktree.js` adds a run's worktree (`addWorktree`, `rebuildStart`, `freeBranch`) and names the clone's
   GitHub repository (`githubOf`).
-- `src/run/accept.js` checks a returned result (`accept`, `refusalText`).
+- `src/run/accept.js` checks a returned result (`accept`, `refusalText`). It reads what the run's stage declares
+  through `src/marks.js` and checks each ref with its kind's checker in `src/refs/`.
 - `src/run/supervise.js` sends back or fails an agent that ends without returning (`handback`, `stopped`) and blocks or
   fails a session that does not start its run (`stall`, `cannotStart`).
 
@@ -173,6 +174,38 @@ one listing `null` in `repos`.
 as given (a replan with no why) is refused before anything is written, so the same grant can answer the card again.
 The person sets the file; the first one is `plan/decisions/2026-10-31-first-grant.md`.
 
+## Marks
+
+A workflow declares the rules the host keeps for each model stage's output in `meta.marks`, one entry per stage
+(`src/marks.js`). The engine reads these and nothing else: not a stage's name, not the words in an enum, not a ref's
+url. A path is the output's field names joined by dots, `0` for any entry of a list.
+
+```json
+"marks": {
+  "brief": { "briefs": ["builder", "verifier"] },
+  "build": { "refs": { "pr": "github-pr" } },
+  "verify": { "verdicts": { "result": "PASS", "lines.0.result": "PASS" }, "refs": { "pr": "github-pr" } }
+}
+```
+
+- `verdicts`: each verdict field, and the value that means the check passed. A stage given lines (expect lines, or
+  per-line results) whose output has a verdict field declares `covers`, and names the passing value of its covered
+  entries' `result` (`<list>.0.result`). Accept refuses a result whose top-level verdict disagrees with its covered
+  entries: it passes exactly when every entry passes. The chart may decide only on the covered list or a top-level
+  verdict field.
+- `briefs`: top-level text fields whose values are the briefs of the roles they are named for, stored when the result
+  is accepted (`brief.stored`).
+- `refs`: each ref `{ url, at }` in the output, and its kind. `src/refs/` holds one checker per kind: `github-pr`
+  (GitHub shows the PR at `at`, the run's worktree is there too; stamps `key`, `gates`, `green`, `checkout` and
+  `branch`) and `web-page` (the page holds the quoted text `at`; stamps nothing). `STAMPED` and `HIDDEN` are the union
+  of what the kinds declare. A stage with marks names a kind for every `{ url, at }` its output holds.
+
+The load check refuses marks that name nothing the output holds. The output schema is untouched, so prompts read as
+before. Accept reads a run's marks from the workflow it was prepared from, pinned in the journal's blobs. A stage
+with no entry in `meta.marks` is read as before marks: its verdict is a field whose values are the words PASS or FAIL,
+the stage named `brief` stores each text field, and a ref is a PR when its url is one. Items pinned to a workflow from
+before marks, and runs prepared from one, keep running that way.
+
 ## Actors
 
 A state that invokes a model stage (`brief`, `build`, `verify`) starts an agent (`src/actors.js`, `src/run/`). The run handler
@@ -194,8 +227,8 @@ The run stays open until its agent returns:
 2. SubagentStart binds the agent to the run and tells it its run, worktree and result schema. Its shell commands run
    from the worktree, and file tools outside it are refused.
 3. The agent calls the return tool (`mcp__plugin_ccp-harness_harness__return`, `{ run, result }`). Its PreToolUse hook
-   refuses it unless the caller is the run's agent, the result matches the actor's schema and any claimed PR is on
-   GitHub at the claimed head (`accept`). It then hands the result to the item (`deliver`), which prepares the next
+   refuses it unless the caller is the run's agent, the result matches the actor's schema and every ref passes its
+   kind's check (`accept`). It then hands the result to the item (`deliver`), which prepares the next
    runs.
 4. A refusal of the result (rules `schema`, `reserved`, `restated`, `covers`, `ref`) says how to fix it. Each output
    field its reason names comes with that field's own Output line, and a `restated` reason names every differing key

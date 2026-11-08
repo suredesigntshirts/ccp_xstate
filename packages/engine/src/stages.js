@@ -19,7 +19,11 @@
 // that a field marked covers covers every line it names (uncovered). Nothing here imports XState: the harness hook loads actors.js, which imports this file.
 
 import { checkForm } from './form.js';
+import { isRef, marksIn, marksOf, nodeAt as markedNode, nodesOf, PARTS as MARK_PARTS, pathOf } from './marks.js';
 import { render as say, said } from './messages.js';
+import { HIDDEN, REF_KINDS, STAMPED } from './refs/index.js';
+
+export { HIDDEN, STAMPED };
 
 export const PARTS = Object.freeze(['rules', 'inputs']);
 /** The input that fills the Task part. Every stage declares it; it is never shown under Inputs. */
@@ -45,11 +49,6 @@ export const contextOf = ({ run, worktree, repo, github = null, branch }) =>
 
 /** The output field that is a stage's "could not": { reason }, a oneOf alternative to the rest of its output. */
 export const BLOCKED = 'blocked';
-
-/** The fields the host stamps on a ref { url, at }: an agent may not set them. */
-export const STAMPED = Object.freeze(['key', 'gates', 'green', 'checkout', 'branch']);
-/** The stamped fields an agent is not shown. branch, the PR's branch on GitHub, is shown: a rebuild works on it. */
-export const HIDDEN = Object.freeze(['key', 'gates', 'green', 'checkout']);
 
 const text = (v) => typeof v === 'string' && v.trim() !== '';
 const isObject = (v) => v != null && typeof v === 'object' && !Array.isArray(v);
@@ -310,25 +309,7 @@ export function shapes(spec, path, state, wiring = chart(spec), seen = new Set()
 
 /** Whether a shape may hold text: a text literal, an open value, or a schema that is not only some other type. */
 const mayBeText = (s) => (s.value !== undefined ? typeof s.value === 'string' : s.open || !(s.type ? [s.type].flat().every((t) => t !== 'string') : isObject(s.properties) || isObject(s.items)));
-/** The verdict words the host checks against covered lines at accept (uncovered), in any case. */
-const WORD = /^(pass|fail)$/i;
 const words = (s) => [...(Array.isArray(s?.enum) ? s.enum : []), ...(isObject(s) && 'const' in s ? [s.const] : [])];
-/** A field the accept check holds to the covered lines: every value it can take is the word PASS or FAIL. */
-const isWord = (s) => words(s).length > 0 && words(s).every((v) => typeof v === 'string' && WORD.test(v));
-/**
- * The first output field, at any depth ($refs resolved), that may say the word PASS or FAIL (any case): the output
- * declares a PASS/FAIL result there. Its path as a list of names (`0` for a list's entries), or null.
- */
-function verdictAt(s, defs, path = [], depth = 0) {
-  s = deref(s, defs);
-  if (!isObject(s) || depth > 8) return null;
-  if (path.length && words(s).some((v) => typeof v === 'string' && WORD.test(v))) return path;
-  for (const [k, x] of Object.entries(isObject(s.properties) ? s.properties : {})) {
-    const found = verdictAt(x, defs, [...path, k], depth + 1);
-    if (found) return found;
-  }
-  return isObject(s.items) ? verdictAt(s.items, defs, [...path, '0'], depth + 1) : null;
-}
 
 /**
  * Whether a shape may hold lines: a list whose entries are, or hold, text, at any depth ($refs resolved). An open value
@@ -475,6 +456,32 @@ export function decisions(spec, src, wiring = chart(spec)) {
 }
 
 /**
+ * Whether a stage's marks (its meta.marks entry, marks.js) name what is there, or a call of bad naming the first that
+ * does not: only the parts verdicts, briefs and refs; a verdict path names an enum (or const) field holding the value;
+ * a brief names a top-level text field; a ref path names a ref { url, at } and a ref kind (refs/index.js); and every
+ * ref { url, at } of the output has its kind named, since the host checks only the refs it knows the kind of.
+ */
+function checkMarks(marks, st, defs, bad) {
+  if (marks === undefined) return;
+  for (const k of Object.keys(marks)) if (!MARK_PARTS.includes(k)) bad(`marks have ${k}: a stage's marks are ${MARK_PARTS.join(', ')}`);
+  for (const [path, value] of Object.entries(marks.verdicts ?? {})) {
+    const node = markedNode(st, defs, path.split('.'));
+    if (!words(node).includes(value)) bad(`marks verdict ${path} as ${JSON.stringify(value)}, which is not one of its values`);
+  }
+  for (const field of [marks.briefs ?? []].flat()) {
+    const node = markedNode(st, defs, [String(field)]);
+    if (node?.type !== 'string') bad(`marks brief ${field}, which is no top-level text field`);
+  }
+  const refs = marks.refs ?? {};
+  for (const [path, kind] of Object.entries(refs)) {
+    if (!isRef(markedNode(st, defs, path.split('.'))) || !Object.hasOwn(REF_KINDS, kind)) bad(`marks ref ${path} as ${JSON.stringify(kind)}: a ref names a kind (${Object.keys(REF_KINDS).join(', ')}) on a ref { url, at }`);
+  }
+  for (const { node, path } of nodesOf(st, defs)) {
+    if (isRef(node) && !Object.hasOwn(refs, pathOf(path))) bad(`output ${pathOf(path) || '(the whole output)'} is a ref { url, at } its marks name no kind for (${Object.keys(REF_KINDS).join(', ')})`);
+  }
+}
+
+/**
  * The spec, or a throw naming the first breach. `workflows` names the workflows an invoke may start as a child item:
  * a list of names, or { name: its meta.input schema }; without it, an invoke that is no stage and no effect is not
  * checked. Checks, in order:
@@ -483,9 +490,10 @@ export function decisions(spec, src, wiring = chart(spec)) {
  * - covers: a field marked covers is a list of { line, result } entries, and its covers path names a list in the
  *   input the stage is given (through its wiring);
  * - form: every key is one the harness reads, and every action is a set on a transition the chart walks (form.js);
- * - coverage: a stage whose input may hold lines (mayHoldLines) and whose output may say PASS or FAIL (verdictAt) or
+ * - marks: a stage's meta.marks name what its output holds, and an entry names a model stage (checkMarks);
+ * - coverage: a stage whose input may hold lines (mayHoldLines) and whose output has a verdict field (marks.js) or
  *   is decided on by the chart (decisions) declares covers, and the chart decides only on the covered field or a
- *   PASS/FAIL word field, which accept holds to the covered lines (uncovered);
+ *   top-level verdict field, which accept holds to the covered lines (uncovered);
  * - every invoke names a stage, a host effect or a workflow (a workflow pinned before the contract is refused here);
  * - every stage invoke gives exactly its declared inputs, and every invoke input (stage, effect or workflow) is a
  *   literal or a context path that something feeds when the invoke's state is entered (shapes); a literal task is
@@ -518,6 +526,7 @@ export function checkStages(spec, { workflows = null, pinned = false } = {}) {
         if (!wiring.transitions.some((t) => t.at === `${inv.at}/onError` || t.at.startsWith(`${inv.at}/onError/`))) bad(src, `output ${BLOCKED} becomes the stage's error, but invoke ${inv.id} (at ${inv.at}) has no onError`);
       }
     }
+    checkMarks(marksIn(spec, src), st, defs, (what) => bad(src, what));
   }
   for (const inv of wiring.invokes) {
     const st = actors[inv.src];
@@ -528,6 +537,9 @@ export function checkStages(spec, { workflows = null, pinned = false } = {}) {
     if (EFFECTS.includes(inv.src) || !children || Object.hasOwn(children, inv.src)) continue;
     const lacks = PARTS.filter((p) => !(isObject(st) && p in st)).join(' and ');
     throw new Error(`${spec.id}: actor ${inv.src}, invoked at ${inv.at}, is not a stage (it lacks ${lacks}), a host effect (${EFFECTS.join(', ')}) or a workflow. A workflow pinned before the stage contract cannot run: finish its items on the engine that started them, or migrate it`);
+  }
+  for (const [name, m] of Object.entries(spec.meta?.marks ?? {})) {
+    if (!isStage(actors[name]) || !isObject(m)) throw new Error(`${spec.id}: meta.marks names ${name}, which is no model stage, or its marks are not an object`);
   }
   // A state that asks the person sets a timer, so a wake is scheduled for the item while it waits (case
   // C-waiting-does-not-stall). Its delay is a number of ms or a name in meta.delays.
@@ -550,6 +562,8 @@ export function checkStages(spec, { workflows = null, pinned = false } = {}) {
       if (!Object.hasOwn(st.inputs, head)) bad(src, `output ${name} covers nothing`);
       const item = deref(nodeAt(st, defs, [name, '0']), defs);
       if (!isObject(item?.properties?.line) || !isObject(item?.properties?.result)) bad(src, `output ${name} covers ${p.covers}, but is not a list of { line, result } entries`);
+      const own = marksIn(spec, src);
+      if (own && !Object.hasOwn(own.verdicts ?? {}, `${name}.0.result`)) bad(src, `output ${name} covers ${p.covers}, but meta.marks.${src}.verdicts has no ${name}.0.result: name the value that means a line passed`);
       for (const inv of mine) {
         const from = inv.input[head];
         const got = isLiteral(from) ? [{ value: at(from.value, rest.join('.')) }]
@@ -558,11 +572,13 @@ export function checkStages(spec, { workflows = null, pinned = false } = {}) {
         if (!list) bad(src, `output ${name} covers ${p.covers}, which is not a list in the input invoke ${inv.id} gives (at ${inv.at})`);
       }
     }
-    // A stage given lines whose output may say PASS or FAIL, or that the chart decides on, must say which lines its
+    // A stage given lines whose output has a verdict field, or that the chart decides on, must say which lines its
     // verdict covers, and the chart may decide only on what the host holds to those lines: the covered entries, or a
-    // PASS/FAIL word. The word catches a verdict a person or a parent reads; decisions catch one spelled any other way.
+    // top-level verdict field. The verdict field catches a verdict a person or a parent reads; decisions catch one
+    // spelled any other way.
+    const marks = marksOf(src, st, defs, marksIn(spec, src));
     const decided = decisions(spec, src, wiring);
-    const verdict = verdictAt(st, defs);
+    const verdict = marks.verdictAt();
     if (!decided.length && !verdict) continue;
     let given = null;
     for (const inv of mine) {
@@ -573,12 +589,12 @@ export function checkStages(spec, { workflows = null, pinned = false } = {}) {
     }
     if (!given) continue;
     const covering = Object.keys(st.properties).filter((k) => st.properties[k]?.covers != null);
-    if (!covering.length && !decided.length) bad(src, `output ${verdict.join('.')} may say PASS or FAIL while input ${given} may hold lines, but no output field declares covers`);
+    if (!covering.length && !decided.length) bad(src, `output ${verdict.join('.')} ${marks.inferred ? 'may say PASS or FAIL' : 'is a verdict (meta.marks)'} while input ${given} may hold lines, but no output field declares covers`);
     for (const d of decided) {
       const field = d.segs.join('.') || '(the whole output)';
       if (!covering.length) bad(src, `output ${field} decides guard ${d.guard} (at ${d.at}) while input ${given} may hold lines, but no output field declares covers`);
-      if (!covering.includes(d.segs[0]) && !(d.segs.length === 1 && isWord(nodeAt(st, defs, d.segs)))) {
-        bad(src, `output ${field} decides guard ${d.guard} (at ${d.at}), but the host holds only ${covering.join(', ')} and PASS/FAIL word fields to the covered lines: decide on those`);
+      if (!covering.includes(d.segs[0]) && !marks.isVerdict(d.segs)) {
+        bad(src, `output ${field} decides guard ${d.guard} (at ${d.at}), but the host holds only ${covering.join(', ')} and ${marks.inferred ? 'PASS/FAIL word' : 'verdict'} fields to the covered lines: decide on those`);
       }
     }
   }
@@ -610,14 +626,14 @@ export function checkStages(spec, { workflows = null, pinned = false } = {}) {
 
 /**
  * Why a result breaks a field marked covers in its schema, or null. Every entry's line is one of the covered lines,
- * each exactly once, in the covered lines' order, and any top-level field whose value is the word PASS or FAIL (any
- * case) agrees with the entries.
+ * each exactly once, in the covered lines' order, and every top-level verdict field the result sets agrees with the
+ * entries: it passes exactly when every entry's result passes, as `marks` (marks.js marksOf) reads them; without
+ * marks, as a stage without marks is read.
  */
-export const uncovered = (schema, input, result) => coverGap(schema, input, result)?.text ?? null;
+export const uncovered = (schema, input, result, marks = marksOf(null, schema)) => coverGap(schema, input, result, marks)?.text ?? null;
 
 /** As uncovered, with what a refusal row records: { text, message: { entry, slots } } (messages.js said), or null. */
-export function coverGap(schema, input, result) {
-  const word = (v) => String(v).toUpperCase() === 'PASS';
+export function coverGap(schema, input, result, marks = marksOf(null, schema)) {
   for (const [field, f] of Object.entries(schema?.properties ?? {})) {
     if (f?.covers == null) continue;
     const want = at(input, f.covers);
@@ -630,9 +646,9 @@ export function coverGap(schema, input, result) {
     if (extra !== undefined) return said('covers-extra', { field, line: String(JSON.stringify(extra)) });
     const moved = got.findIndex((l, i) => l !== want[i]);
     if (moved !== -1) return said('covers-order', { field, index: moved, got: String(JSON.stringify(got[moved])), want: String(JSON.stringify(want[moved])) });
-    const all = entries.every((e) => word(e?.result));
-    for (const [k, v] of Object.entries(result ?? {})) {
-      if (typeof v === 'string' && /^(pass|fail)$/i.test(v) && word(v) !== all) return said('covers-disagrees', { key: k, field });
+    const all = entries.every((e) => marks.passes(field, e?.result));
+    for (const [k, passed] of marks.verdicts(result)) {
+      if (passed !== all) return said('covers-disagrees', { key: k, field });
     }
   }
   return null;

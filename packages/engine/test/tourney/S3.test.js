@@ -43,6 +43,21 @@ function changed(name, change) {
   writeFileSync(join(dir, `${name}.json`), JSON.stringify(spec));
   return () => loadWorkflow(name, { dir });
 }
+// A workflow copy without meta.marks loaded by name: its stages are read as before marks, verdicts found by the words
+// PASS and FAIL. The spellings below hold that reading; test/marks.test.js holds the marked one.
+const unmark = (spec) => {
+  const copy = structuredClone(spec);
+  delete copy.meta.marks;
+  return copy;
+};
+function unmarked(name, change) {
+  const dir = mkdtempSync(join(tmpdir(), 's3-'));
+  for (const [n, wf] of Object.entries(WORKFLOWS)) writeFileSync(join(dir, `${n}.json`), JSON.stringify(unmark(wf)));
+  const spec = unmark(WORKFLOWS[name]);
+  change(spec);
+  writeFileSync(join(dir, `${name}.json`), JSON.stringify(spec));
+  return () => loadWorkflow(name, { dir });
+}
 // What a workflow looked like before the stage contract: its agents were bare output schemas.
 const preContract = (spec) => {
   for (const src of stagesOf(spec)) {
@@ -168,9 +183,9 @@ test('S3 (D): no spelling, shape, copy or routing of the verdict switches covera
     // A verdict by presence of an optional ref: the host checks a ref's value, but the stage chooses whether to give it.
     (s) => { delete v(s).result; req(s, 'result'); v(s).ok = { $ref: '#ref', description: 'x' }; s.meta.guards.verifiedHead[0] = 'context.verdict.ok'; s.meta.guards.failed = [{ path: 'context.verdict.pr.url', in: ['never'] }]; }
   ];
-  for (const change of cases) assert.throws(changed('quick-fix', (s) => { change(s); noCovers(s); }), uncoveredVerdict, String(change));
+  for (const change of cases) assert.throws(unmarked('quick-fix', (s) => { change(s); noCovers(s); }), uncoveredVerdict, String(change));
   // The same in research, where verify also restates issue and returns sources.
-  assert.throws(changed('research', (s) => { noCovers(s); dropLines(s); v(s).result = { type: 'boolean', description: 'x' }; s.meta.guards.passed[0] = { path: 'context.verdict.result', in: [true] }; s.meta.guards.failed = [{ path: 'context.verdict.result', in: [false] }]; }), uncoveredVerdict);
+  assert.throws(unmarked('research', (s) => { noCovers(s); dropLines(s); v(s).result = { type: 'boolean', description: 'x' }; s.meta.guards.passed[0] = { path: 'context.verdict.result', in: [true] }; s.meta.guards.failed = [{ path: 'context.verdict.result', in: [false] }]; }), uncoveredVerdict);
   // With covers kept, the chart may decide only on what accept holds to the covered lines: the covered field, or a
   // field whose every value is the word PASS or FAIL. Anything else beside a covered list is refused.
   const offLines = /stage verify output [\w.]+ decides guard \w+ \(at \/meta\/guards\/\w+\/\d+\), but the host holds only lines and PASS\/FAIL word fields to the covered lines: decide on those$/;
@@ -184,21 +199,21 @@ test('S3 (D): no spelling, shape, copy or routing of the verdict switches covera
     // A required field that may be null, routed on by presence.
     (s) => { v(s).why = { type: ['string', 'null'], description: 'x' }; s.meta.actors.verify.required.push('why'); s.meta.guards.failed = ['context.verdict.why']; }
   ];
-  for (const change of beside) assert.throws(changed('quick-fix', change), offLines, String(change));
+  for (const change of beside) assert.throws(unmarked('quick-fix', change), offLines, String(change));
   // A copy of the PASS/FAIL word may be routed on; an unrouted second list decides nothing and loads.
-  assert.doesNotThrow(changed('quick-fix', (s) => {
+  assert.doesNotThrow(unmarked('quick-fix', (s) => {
     for (const st of [s.states.verifying, s.states.reverifying]) for (const t of st.invoke.onDone) t.actions = [{ type: 'set', params: { verdict: 'event.output', ok: 'context.verdict.result' } }];
     s.context.ok = null; s.meta.guards.verifiedHead[0] = { path: 'context.ok', in: ['PASS'] }; s.meta.guards.failed = [{ path: 'context.ok', in: ['FAIL'] }];
   }));
-  assert.doesNotThrow(changed('quick-fix', (s) => { v(s).again = { type: 'array', items: { $ref: '#line' }, description: 'x' }; }));
+  assert.doesNotThrow(unmarked('quick-fix', (s) => { v(s).again = { type: 'array', items: { $ref: '#line' }, description: 'x' }; }));
   // Round 4 found this in research: passed also needed verdict.sources, a list the schema lets be empty, so a PASS
   // with no sources would have replanned. The guard is now the word alone; putting the old condition back is refused.
-  assert.throws(changed('research', (s) => { s.meta.guards.passed.push('context.verdict.sources'); }), /stage verify output sources decides guard passed \(at \/meta\/guards\/passed\/1\), but the host holds only lines/);
+  assert.throws(unmarked('research', (s) => { s.meta.guards.passed.push('context.verdict.sources'); }), /stage verify output sources decides guard passed \(at \/meta\/guards\/passed\/1\), but the host holds only lines/);
   // A covers that names no list of lines, or on a field that is no list of { line, result }, is refused at load too.
-  assert.throws(changed('quick-fix', (s) => { s.meta.actors.verify.properties.lines.covers = 'issue.url'; }), /stage verify output lines covers issue\.url, which is not a list in the input invoke verify gives \(at \/states\/verifying\/invoke\)/);
-  assert.throws(changed('quick-fix', (s) => { s.meta.actors.verify.properties.lines.covers = 'issue.expectt'; }), /covers issue\.expectt, which is not a list/);
-  assert.throws(changed('research', (s) => { s.meta.actors.verify.properties.lines.covers = 'draft.text'; }), /stage verify output lines covers draft\.text, which is not a list/);
-  assert.throws(changed('quick-fix', (s) => { noCovers(s); s.meta.actors.verify.properties.note = { type: 'string', covers: 'issue.expect' }; }), /stage verify output note covers issue\.expect, but is not a list of \{ line, result \} entries/);
+  assert.throws(unmarked('quick-fix', (s) => { s.meta.actors.verify.properties.lines.covers = 'issue.url'; }), /stage verify output lines covers issue\.url, which is not a list in the input invoke verify gives \(at \/states\/verifying\/invoke\)/);
+  assert.throws(unmarked('quick-fix', (s) => { s.meta.actors.verify.properties.lines.covers = 'issue.expectt'; }), /covers issue\.expectt, which is not a list/);
+  assert.throws(unmarked('research', (s) => { s.meta.actors.verify.properties.lines.covers = 'draft.text'; }), /stage verify output lines covers draft\.text, which is not a list/);
+  assert.throws(unmarked('quick-fix', (s) => { noCovers(s); s.meta.actors.verify.properties.note = { type: 'string', covers: 'issue.expect' }; }), /stage verify output note covers issue\.expect, but is not a list of \{ line, result \} entries/);
   // At accept, an overall word in any field and any case must agree with the lines.
   const schema = { properties: { lines: { covers: 'issue.expect' } } };
   const input = { issue: { expect: ['a'] } };
@@ -214,15 +229,15 @@ test('S3 (D): a stage given lines whose output may say PASS or FAIL declares cov
     s.meta.guards.verifiedHead = s.meta.guards.verifiedHead.filter((c) => c?.path !== 'context.verdict.result');
     s.meta.guards.failed = [{ path: 'context.verdict.pr.url', in: ['never'] }];
   };
-  assert.throws(changed('quick-fix', unrouted), /stage verify output result may say PASS or FAIL while input issue may hold lines, but no output field declares covers$/);
+  assert.throws(unmarked('quick-fix', unrouted), /stage verify output result may say PASS or FAIL while input issue may hold lines, but no output field declares covers$/);
   // The word anywhere in the output, in any case, through a $ref.
-  assert.throws(changed('quick-fix', (s) => { unrouted(s); s.meta.schemas.w = { enum: ['ok', 'Fail'] }; s.meta.actors.verify.properties.result = { type: 'object', properties: { overall: { $ref: '#w' } }, description: 'x' }; }),
+  assert.throws(unmarked('quick-fix', (s) => { unrouted(s); s.meta.schemas.w = { enum: ['ok', 'Fail'] }; s.meta.actors.verify.properties.result = { type: 'object', properties: { overall: { $ref: '#w' } }, description: 'x' }; }),
     /stage verify output result\.overall may say PASS or FAIL while input issue may hold lines/);
   // A per-line list without covers says PASS or FAIL in its entries.
-  assert.throws(changed('quick-fix', (s) => { unrouted(s); delete s.meta.actors.verify.properties.result; s.meta.actors.verify.required = s.meta.actors.verify.required.filter((r) => r !== 'result'); }),
+  assert.throws(unmarked('quick-fix', (s) => { unrouted(s); delete s.meta.actors.verify.properties.result; s.meta.actors.verify.required = s.meta.actors.verify.required.filter((r) => r !== 'result'); }),
     /stage verify output lines\.0\.result may say PASS or FAIL/);
   // With covers kept, the unrouted verdict loads: accept holds it to the lines.
-  assert.doesNotThrow(changed('quick-fix', (s) => { unrouted(s); s.meta.actors.verify.properties.lines.covers = 'issue.expect'; }));
+  assert.doesNotThrow(unmarked('quick-fix', (s) => { unrouted(s); s.meta.actors.verify.properties.lines.covers = 'issue.expect'; }));
 });
 
 test('S3 (D, E, F): an action anywhere but on a transition the chart walks is refused at load, naming the key and its pointer', () => {

@@ -32,7 +32,7 @@ test('brief-one-meaning: brief.md, briefHash and briefOf appear only in promptFi
   assert.match(jidx.join('\n'), /UPCASTERS = Object\.freeze\(\{ 1: toV2 \}\)/);
 });
 
-test('brief-one-meaning: the only brief.stored writer is accept\'s per-role loop for the brief stage', (t) => {
+test('brief-one-meaning: the only brief.stored writer is accept\'s per-role loop over the briefs the stage declares', (t) => {
   // Every file that could write a journal row: engine, plugin, journal, scripts, tournaments' drivers, excluding tests.
   const all = files(['packages', 'plugins', 'scripts']).filter((f) => /\.(m?js|cjs)$/.test(f));
   const writes = grep(/kind:\s*['"]brief\.stored['"]/, all);
@@ -41,7 +41,7 @@ test('brief-one-meaning: the only brief.stored writer is accept\'s per-role loop
   assert.equal(writes[0].f, 'packages/engine/src/run/accept.js');
   const src = readFileSync(join(REPO, 'packages/engine/src/run/accept.js'), 'utf8').split('\n');
   const before = src.slice(writes[0].line - 6, writes[0].line).join('\n');
-  assert.match(before, /if \(run\.actor === 'brief'\) \{\s*\n\s*for \(const \[role, brief\] of Object\.entries\(result\)\)/);
+  assert.match(before, /for \(const \[role, brief\] of marks\.briefs\(result\)\)/);
   const fn = src.slice(0, writes[0].line).reverse().find((l) => /^export (async )?function \w+/.test(l));
   assert.match(fn, /function accept\b/);
   // No other spelling (a variable kind, a computed string) builds the name anywhere else.
