@@ -5,6 +5,8 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "done",
+  "done_on": "2026-11-05",
+  "module": "packages/engine/src/actors.js",
   "outcome": "A verify result whose issue carries the input issue's url and expect exactly is accepted whether or not it repeats the title and body, so the Schema and the restated rule agree and a real verifier is not refused for following the Schema; any key a restated field does carry must still equal the input's exactly.",
   "why": "In the engine-stage-contract adopt trial (tournaments/2026-11-04-stage-contract/trials/adopt/report.md) the real verifier's first return was refused by rule restated: its issue held only url and expect, the two keys the verify Schema marks required, and dropped title and body, which the input had. The Output text says to copy the issue byte for byte, but the Schema reads as permission to send less. Trial 2 had already named this echo as the most fragile field (N5). The first decision, narrow the comparison rather than widen the Schema, is recorded in plan/decisions/2026-11-04-verify-issue-echo.md: the echo exists so the verdict carries the lines it graded, and title and body are never graded.",
   "serves": [

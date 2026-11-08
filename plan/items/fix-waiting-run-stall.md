@@ -5,6 +5,8 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "done",
+  "done_on": "2026-11-05",
+  "module": "packages/engine/src/actors.js",
   "outcome": "When the session that owns an item ends a turn while one of the item's actor runs is prepared and has no agent, the harness's Stop hook blocks the stop with the exact Agent call to make, at most twice per run by its own count in the journal; a third stop fails the run so the item takes its error path; the thread can fail a run it cannot start by saying why; and a derived view reports how often runs stall and whether a block led to a spawn.",
   "why": "Today the engine prepares a run, and a hook adds a line to the thread's context naming the Agent call to make, but nothing forces the call. A thread that ends its turn instead leaves the run waiting until something else wakes it. The person asked on 5 Nov what hooks could make the thread move more deterministically, and then for a guard that keeps its own count of blocks per run, has a fail exit, and measures how often stalls happen. Claude Code's Stop hook can block a stop with a reason that becomes the next instruction; its stop_hook_active flag only marks a stop that follows a block, so it does not count across turns. The harness registers a Stop hook already, but only for capture. How each part is shaped is decided in plan/decisions/2026-11-05-waiting-run-stall.md.",
   "serves": [

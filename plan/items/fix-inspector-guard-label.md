@@ -5,6 +5,8 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "done",
+  "done_on": "2026-11-05",
+  "module": "scripts/inspector/export.mjs",
   "outcome": "A step label the Inspector writes from a guarded transition names the guard as a quoted name, so a guard called failed reads as \"the guard \\\"failed\\\" held\" and never as \"its guard failed held\".",
   "why": "Reviewing the fail trial in the Workflow Inspector on 5 Nov, the step where verify FAILed was labelled \"The verify actor finished, and its guard failed held\", which reads as nonsense: failed is the guard's name, not a verb. labelOf in scripts/inspector/export.mjs drops the bare guard name into the sentence.",
   "serves": [

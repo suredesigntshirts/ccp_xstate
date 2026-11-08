@@ -5,6 +5,8 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "done",
+  "done_on": "2026-11-07",
+  "module": "packages/engine/src/actors.js",
   "outcome": "packages/engine/src/run/store.js owns a run's folder: it alone reads and writes the folder's lifecycle files, reports a run's state (prepared, spawned, bound, returned, failed) and moves it by named transitions that write the file and its journal row together. Every actor hook asks the store for the state, and one table there says what each hook answers in each state, with the catalogue entries used today. The three caps (ten result refusals, one send-back, two stall blocks) are one attempt budget declared once in the store, and run.json counts the attempts spent, so no hook re-reads the journal to count; a run.json written before this counts from its journal rows as today. actors.js is split by knowledge: the store, run/worktree.js, run/accept.js and run/supervise.js, with actors.js keeping prepare, spawn, bind and delivery and still exporting every name it exports today. No model-facing text, rule name, journal row or run-folder file changes.",
   "why": "The run lifecycle exists only as which files exist, checked separately by eight hook functions with three caps, and five of the eight 11-05 fixes patched this module (DDD make implicit concepts explicit, APOSD define errors out of existence; research plan/research/design-books-cleanup.md, finding 4).",
   "serves": [
