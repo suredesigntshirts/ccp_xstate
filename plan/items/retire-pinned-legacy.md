@@ -4,7 +4,7 @@
   "title": "Retire compatibility for items pinned to older workflow formats",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "The cutoff is recorded (plan/decisions/2026-11-08-retire-pinned-legacy.md): no item pinned to an older workflow format runs on this release. loadWorkflow of a pin runs the same load check as a workflow loaded by name, with no relaxation; a pinned workflow it refuses still loads for reading, marked retired with the check's message, so restore replays it and every committed journal still replays and renders. The host refuses to advance an item on a retired workflow: applyEvent turns its events away as refused, naming the pin, the check's message and the release on the item's seq-0 row to finish it on, and runEffects runs none of its effects, so no run of it starts and a result from a run an earlier release prepared goes nowhere. checkStages has no pinned option, and no engine source keeps a branch or message for workflows pinned before the stage contract or before the asking timer.",
   "why": "Each keep-old-behaviour branch is small and together they are much of the reading cost; nothing is live (research plan/research/design-books-cleanup.md, finding 7).",
   "serves": [
@@ -165,6 +165,20 @@ workflow the engine would refuse to pin today is one it no longer runs.
 The unmarked reading in `marks.js` was the other candidate. Measuring its removal showed done suites assert it, so it
 stays here and is drafted as `retire-unmarked-reading`. The choices are in
 `plan/decisions/2026-11-08-retire-pinned-legacy.md`.
+
+## Done
+
+Built in PR #176 (merged f957d02). A separate session verified it at a8e2dc5: all seven Expect lines MET (verdict
+ad000c1). Released as harness-v0.1.39.
+
+The first verdict marked cutoff-recorded NOT MET: the decision file named only the four trial roots, and the verifier
+found verifier and tournament journal roots under the shared folder that it missed. Replan #177 named them and dropped
+their unfinished items; the code did not change. While building, the accept-time refusal and its catalogue entry were
+dropped before the build PR opened (second commit of #175): accept cannot load the engine's loader in the installed
+plugin, and verify/prompt-catalogue requires every catalogue entry to be reached by its fixed runs.
+
+The verifier noted that marks.js still describes the unmarked reading as for "a workflow pinned before marks"; that
+stays true (a pre-marks pin that passes the check loads runnable), and retire-unmarked-reading owns it.
 
 ## Verifier brief
 
