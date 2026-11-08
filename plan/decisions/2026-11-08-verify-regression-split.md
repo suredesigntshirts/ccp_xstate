@@ -55,3 +55,12 @@ A test that only reads a recorded past run (a journal root, transcripts, saved G
 happened in it leaves too: the run cannot change, so the test re-proves a fact of the past on every `npm test` and
 pins its files forever. Where a test runs the head's code on recorded input (a saved check-run fed to the engine, a
 saved closed-PR list fed to the journal check), it moves and its input goes to `test/regression/fixtures/`.
+
+## 6. A reader in another folder follows the move
+
+Readying `verify-regression-plugin` on 8 Nov. A done suite outside a part's folders can read a file inside them:
+part 1 found `verify/harness-glossary/lib.mjs` reading the toy run's v1 journals, and part 2 finds
+`verify/rules-said-once/suite-and-scope.test.mjs` reading `verify/harness-glossary/notes.test.mjs`. Each part's scope
+line lets such a reader change only so it reads the new path, or no longer reads a file the part deleted. The other
+choice, keeping the file in place until the reader's own suite retires, leaves a part's folder holding more than its
+verdict, which is the outcome every part states.
