@@ -1,5 +1,0 @@
-Verifier run for plan item fix-agent-finish-ms. Start three subagents with the Agent tool, in this order, and report what each returned:
-1. Foreground, subagent_type "ccp-harness:probe-reader": read /home/user/vw/head/CLAUDE.md and quote its first line, then use Glob to list verify/fix-agent-finish-ms/*.mjs under /home/user/vw/head.
-2. Foreground, subagent_type "general-purpose": read /home/user/vw/head/plan/items/fix-agent-finish-ms.md and report its "title" value, then read /home/user/vw/head/docs/journal.md and quote the agent.finish row of its table.
-3. Background (run_in_background: true), subagent_type "general-purpose": read /home/user/vw/head/package.json and report the "test" script, then read /home/user/vw/head/plan/decisions/2026-11-05-agent-finish-ms.md and quote its first heading.
-After starting the background agent, wait for its completion notification before you give your final answer; do not end your turn until all three agents have finished.
