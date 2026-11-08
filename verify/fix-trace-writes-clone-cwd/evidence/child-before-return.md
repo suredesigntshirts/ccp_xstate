@@ -1,9 +1,9 @@
 # child-before-return
 
-Command, from a checkout at 6472dc6bd76d43db4c6ace82f857f15403020abc: `node --test verify/fix-trace-writes-clone-cwd/child-before-return.test.mjs`.
+Command, from a checkout at 82c86117f65646132646540b8006bed66aa2b2a4: `node --test verify/fix-trace-writes-clone-cwd/child-before-return.test.mjs`.
 The traces are built in the test (lib.mjs: parent 4100 chdirs to /vroot/p, logs `clone(... <unfinished ...>`,
 child 4101 logs its calls, then `4100 <... clone resumed>) = 4101`); root /vroot, start folder /vstart. The base is
-`git show 8244eae5c7b411b175f05af25f2144555e7abfb0:scripts/debug/trace-writes.mjs` written to a temp file and imported; in a depth-1 checkout the base is
+`git show e9ed7db2dc1fb0c601583fcd43dd102eb2ba0ea4:scripts/debug/trace-writes.mjs` written to a temp file and imported; in a depth-1 checkout the base is
 fetched at depth 1 first, and only the base test skips if that fails.
 
 Excerpt:

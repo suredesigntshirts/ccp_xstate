@@ -9,9 +9,9 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-/** The PR's base on GitHub (main after the readying replan #215 merged) and the head this verdict names. */
-export const BASE = '8244eae5c7b411b175f05af25f2144555e7abfb0';
-export const HEAD = '6472dc6bd76d43db4c6ace82f857f15403020abc';
+/** The PR's base on GitHub (main e9ed7db, as merged into the branch) and the head this verdict names. */
+export const BASE = 'e9ed7db2dc1fb0c601583fcd43dd102eb2ba0ea4';
+export const HEAD = '82c86117f65646132646540b8006bed66aa2b2a4';
 export const MODULE = 'scripts/debug/trace-writes.mjs';
 
 export const git = (...a) => execFileSync('git', ['-C', ROOT, ...a], { encoding: 'utf8', maxBuffer: 1e8,
