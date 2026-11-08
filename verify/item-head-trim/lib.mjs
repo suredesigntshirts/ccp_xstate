@@ -1,7 +1,7 @@
 // Verifier's helpers for plan item item-head-trim, written from the item's Expect lines and Verifier brief. REPO is the
 // checkout under test. Nothing here reads git history, so the tests pass in ci.yml's depth-1 checkout.
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -35,6 +35,19 @@ export function heads(planDir = join(REPO, 'plan')) {
 }
 
 /**
+ * Copies plan/ into dir, and makes each module a ready or doing item names, since the copy holds plan/ alone and the
+ * plan check refuses a ready item whose module is missing.
+ */
+export function copyPlan(dir) {
+  cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
+  for (const { head } of heads()) {
+    if (!head.module || !['ready', 'doing'].includes(head.status)) continue;
+    mkdirSync(dirname(join(dir, head.module)), { recursive: true });
+    writeFileSync(join(dir, head.module), '');
+  }
+}
+
+/**
  * A temp copy of the head's whole plan/. withItem(id, edit) writes plan/items/<id>.md from the item-head-trim file
  * (head made ready under the new id, with no verifier and no step_back, then passed to edit) and runs the copy's
  * check.mjs, returning { status, out }.
@@ -42,7 +55,7 @@ export function heads(planDir = join(REPO, 'plan')) {
 export function planCopy(t) {
   const dir = mkdtempSync(join(tmpdir(), 'iht-plan-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
-  cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
+  copyPlan(dir);
   const src = splitItem(read('plan/items/item-head-trim.md'));
   const check = () => node([join(dir, 'plan/check.mjs')], { cwd: dir });
   return {
