@@ -1,11 +1,12 @@
 // Expect: inspector-stage-record/true-to-record, inspector-stage-record/flow
-// In Chromium, the inspector page's stage views equal stage.json on disk for the adopt trial and tourney scenarios Q1 and R1, every producer and reader link lands on its run, and the flow strip shows brief, build and verify with the paths between them. Skips without Playwright.
+// In Chromium, the inspector page's stage views equal stage.json on disk for the adopt trial and tourney scenarios Q1 and R1, every producer and reader link lands on its run, and the flow strip shows brief, build and verify with the paths between them. Without Playwright only the page data is checked: built from the adopt trial, it carries each stage.json as is and a flow of brief, build, verify.
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { runInNewContext } from 'node:vm';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -162,6 +163,24 @@ const EXTRACT_FLOW = `() => {
   return Array.from(f.children).map((c) => c.classList.contains('farrow') ? { arrow: c.textContent, none: c.classList.contains('none') }
     : { node: (c.querySelector('[data-goto]') || c.querySelector('b')).textContent, run: c.querySelector('[data-goto]')?.dataset.goto ?? 'start', lines: Array.from(c.querySelectorAll('.fin')).map((x) => x.textContent) });
 }`;
+
+test('true-to-record: the built page data carries every stage.json of the adopt trial as is, and a flow of brief, build, verify', () => {
+  const built = buildPage([{ origin: 'v', kind: 'real', engine: '.', journal: TRIAL, label: 'trial' }]);
+  const box = { window: {} };
+  runInNewContext(readFileSync(join(built.out, 'data.js'), 'utf8'), box);
+  const run = box.window.INSPECTOR_DATA.runs.find((r) => r.id === 'v-trial');
+  assert.ok(run, 'the page has the trial run');
+  const shown = {};
+  for (const step of run.steps) for (const a of step.actors ?? []) for (const f of a.layers?.l7?.files ?? []) {
+    if (f.value && f.value.run && f.value.inputs) shown[f.value.run] = JSON.parse(JSON.stringify(f.value));
+  }
+  const recs = stageRecords(TRIAL, 'trial');
+  assert.ok(Object.keys(recs).length >= 3, `${Object.keys(recs).length} stage.json files`);
+  assert.deepEqual(Object.keys(shown).sort(), Object.keys(recs).sort());
+  for (const [id, rec] of Object.entries(recs)) assert.deepEqual(shown[id], rec, `${id}: page data equals stage.json`);
+  const staged = JSON.parse(JSON.stringify(run.flow.nodes.filter((n) => n.staged).map((n) => n.actor)));
+  assert.deepEqual(staged, ['brief', 'build', 'verify']);
+});
 
 const skip = skipReason();
 let strip = null, recs = null;
