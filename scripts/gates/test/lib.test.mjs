@@ -23,8 +23,9 @@ test('a missing verdict, a missing id, a NOT MET line and a bare builder line ea
   assert.match(checkVerdict({ item: 'x', head, verdict: { ...full, item: 'y' } })[0], /for item y/);
 });
 
-test('the contract ignores status and done_on but sees the head and the Verifier brief', () => {
+test('the contract ignores status, done_on and reader_effort but sees the head and the Verifier brief', () => {
   assert.equal(contract(item(head)), contract(item({ ...head, status: 'done', done_on: '2026-11-08' })));
+  assert.equal(contract(item(head)), contract(item({ ...head, reader_effort: { files: 1 } })));
   assert.notEqual(contract(item(head)), contract(item({ ...head, expect: [head.expect[0]] })));
   assert.notEqual(contract(item(head)), contract(item(head, 'Skim it.')));
 });

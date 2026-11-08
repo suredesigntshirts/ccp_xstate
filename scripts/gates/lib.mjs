@@ -11,11 +11,11 @@ export function itemHead(text) {
   try { return JSON.parse(m[1]); } catch { return null; }
 }
 
-// The frozen part of an item: its head without status and done_on (which record where the build is, not what it must
-// show), and its Verifier brief.
+// The frozen part of an item: its head without status, done_on and reader_effort (which record where the build is and
+// what it cost, not what it must show), and its Verifier brief.
 export function contract(text) {
   if (text == null) return null;
-  const { status, done_on, ...rest } = itemHead(text) ?? {};
+  const { status, done_on, reader_effort, ...rest } = itemHead(text) ?? {};
   const brief = text.split(BRIEF_RE)[1]?.split(/^## /m)[0].trim() ?? '';
   return JSON.stringify({ head: rest, brief });
 }
