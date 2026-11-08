@@ -38,8 +38,8 @@
       "what": "node scripts/reader-effort.mjs <pr-number | base..head> [--json] reads git only and prints the report; --json prints exactly the object the reader_effort field holds"
     },
     {
-      "ref": "scripts/reader-effort.test.mjs",
-      "what": "The builder's tests, on temp git repos"
+      "ref": "scripts/reader-effort.test.mjs, test/plan-check.test.mjs, scripts/gates/test/lib.test.mjs",
+      "what": "The builder's tests: the report on temp git repos; the plan rule and the field's shape on a temp copy of plan/; contract() ignoring reader_effort"
     },
     {
       "ref": "plan/item.schema.json",
