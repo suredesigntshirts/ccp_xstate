@@ -1,0 +1,57 @@
+{
+  "item": "capture-cheap-serial",
+  "verified_sha": "2d33a0fe648d2c2bfc58715e55cce76e8204c0f5",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5Jgmf9HCJ4cU8WeqRz",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "runs-alone",
+      "status": "MET",
+      "command": "node --test verify/capture-cheap-serial/runs-alone.test.mjs; full runs by record.mjs head1..head3 at 2d33a0f",
+      "excerpt": "4/4 pass. Script is two commands joined by &&: the parallel pass with --test-skip-pattern=\"^cheap: \" and no concurrency flag, then --test-concurrency=1 --test-name-pattern=\"^cheap: \" capture.test.mjs. In 3 full runs the serial pass started 8-12 ms after the parallel pass (262 files, 2076 tests, exit 0) ended, and ran exactly one test, the cheap one; the parallel pass held no result for it (the skip pattern leaves it out of the report).",
+      "test": "verify/capture-cheap-serial/runs-alone.test.mjs"
+    },
+    {
+      "id": "same-bars",
+      "status": "MET",
+      "command": "node --test verify/capture-cheap-serial/same-bars.test.mjs",
+      "excerpt": "2/2 pass: the cheap test's block hashes to the base's (7b23e6dd...), with the <= 50 median and <= 200 p95 bars over a bare start; capture.test.mjs, helpers.mjs and capture.mjs are the base blobs.",
+      "test": "verify/capture-cheap-serial/same-bars.test.mjs"
+    },
+    {
+      "id": "others-parallel",
+      "status": "MET",
+      "command": "node --test verify/capture-cheap-serial/others-parallel.test.mjs; record.mjs base at c33644a and head1 at 2d33a0f",
+      "excerpt": "2/2 pass: the parallel command is the base script plus only the skip pattern (default concurrency). Base 261 files / 2074 tests exit 0; head parallel pass 262 files / 2076 tests exit 0; no base file missing, one added (test/test-passes.test.mjs, the builder's). Only differing result: the cheap test, pass at base, absent (skipped) at head. No flaky differences.",
+      "test": "verify/capture-cheap-serial/others-parallel.test.mjs"
+    },
+    {
+      "id": "still-catches-slow",
+      "status": "MET",
+      "command": "node --test verify/capture-cheap-serial/still-catches-slow.test.mjs; record.mjs slow --slow-capture at 2d33a0f",
+      "excerpt": "2/2 pass. With capture busy-waiting 250 ms on the first PostToolUse per CCP_HARNESS_DIR, full npm test: parallel pass exit 0, serial pass exit 1, the cheap test not ok with 'p95 284 ms, of which a bare node start is 29 ms'; median held. In a temp clone the serial command alone fails the same way.",
+      "test": "verify/capture-cheap-serial/still-catches-slow.test.mjs"
+    },
+    {
+      "id": "green-under-suite",
+      "status": "MET",
+      "command": "node --test verify/capture-cheap-serial/green-under-suite.test.mjs; record.mjs head1..head3",
+      "excerpt": "2/2 pass: 3 of 3 full npm test runs exit 0 in both passes with the cheap test passing in the serial pass; node --test plugins/harness/test/capture.test.mjs on its own runs and passes it.",
+      "test": "verify/capture-cheap-serial/green-under-suite.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "PR #254 check runs at 2d33a0f (GitHub MCP get_check_runs)",
+      "excerpt": "test (ci) success at 2d33a0fe648d2c2bfc58715e55cce76e8204c0f5, job 128739503439 (13:05-13:14Z). gates failed at that sha because no verdict existed yet; this verdict commit, which changes only verify/capture-cheap-serial/, is what the verdict check reads."
+    }
+  ],
+  "observations": [
+    "--test-skip-pattern leaves a matching test out of node's report entirely (no '# SKIP' line), so 'reports no result other than skipped' holds as 'no result'. A reader counting skips in pass 1 will not find it.",
+    "packages/engine/test/standin.test.js leaves run/it* branches and worktrees at ../ccp-actors beside the checkout; a later npm test from a git worktree of the same repo then fails it. Full runs here used fresh clones. Worth its own fix item.",
+    "The build branch shows mergeable_state dirty against main; the builder rebases or merges main before merging. A merge of main that touches no verified file keeps these results.",
+    "The recorded tests (runs-alone 4th, others-parallel 2nd, still-catches-slow 2nd, green-under-suite 2nd) read the full runs' summaries from evidence/*.md; record.mjs and summarize.mjs re-run them (about 9 min a run on 4 CPUs)."
+  ]
+}
