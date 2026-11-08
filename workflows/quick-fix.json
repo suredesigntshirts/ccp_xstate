@@ -223,6 +223,11 @@
       "github.check_run.completed": { "type": "object", "required": ["check", "conclusion", "head_sha", "pr"], "properties": { "check": { "type": "string", "minLength": 1 }, "conclusion": { "type": "string" }, "head_sha": { "$ref": "#sha" }, "pr": { "type": "string", "minLength": 1 } } },
       "github.pull_request.closed": { "type": "object", "required": ["outcome", "pr"], "properties": { "outcome": { "type": "string" }, "pr": { "type": "string", "minLength": 1 } } }
     },
+    "marks": {
+      "brief": { "briefs": ["builder", "verifier"] },
+      "build": { "refs": { "pr": "github-pr" } },
+      "verify": { "verdicts": { "result": "PASS", "lines.0.result": "PASS" }, "refs": { "pr": "github-pr" } }
+    },
     "actors": {
       "brief": {
         "prompt": "quick-fix/brief.md",

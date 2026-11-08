@@ -134,6 +134,12 @@
     },
     "input": { "type": "object", "required": ["issue"], "properties": { "issue": { "$ref": "#issue" } } },
     "events": {},
+    "marks": {
+      "brief": { "briefs": ["researcher", "writer", "verifier"] },
+      "researcher": { "refs": { "sources.0": "web-page" } },
+      "write": { "refs": { "sources.0": "web-page" } },
+      "verify": { "verdicts": { "result": "PASS", "lines.0.result": "PASS" }, "refs": { "sources.0": "web-page" } }
+    },
     "actors": {
       "brief": {
         "prompt": "research/brief.md",

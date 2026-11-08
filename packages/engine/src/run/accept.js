@@ -1,14 +1,15 @@
 // Accepting a run's result: the one way a result counts. The caller must be the run's agent, the run must still be
-// bound, the result must match the actor's schema, restate its inputs as they were, cover what it must, and every PR
-// it claims must be on GitHub at the claimed head. A refused result spends one of the run's refused attempts
+// bound, the result must match the actor's schema, restate its inputs as they were, cover what it must, and every ref
+// it gives must pass its kind's check (refs/). A refused result spends one of the run's refused attempts
 // (run/store.js BUDGET); the one that spends the last fails the run.
 import { check } from '../schema.js';
-import { prRef } from '../effects/merge.js';
 import { render, said } from '../messages.js';
-import { blockedOf, coverGap, STAMPED } from '../stages.js';
+import { marksIn, marksOf } from '../marks.js';
+import { REF_KINDS, STAMPED } from '../refs/index.js';
+import { blockedOf, coverGap } from '../stages.js';
 import { resultHash, sha256 } from '../names.js';
 import { headOf } from './worktree.js';
-import { answerOf, BUDGET, bindingOf, journal, loadRun, RESULT_RULES, resultRefusals, spend, state, storeBlob, transition } from './store.js';
+import { answerOf, BUDGET, bindingOf, journal, loadRun, pinnedSpec, RESULT_RULES, resultRefusals, spend, state, storeBlob, transition } from './store.js';
 
 export { RESULT_RULES };
 
@@ -77,6 +78,9 @@ function hintOf(schema, reason) {
 export async function accept({ root, caller, run: runId, result, toolUseId, github, web = null, session = null }) {
   const run = loadRun(root, runId);
   if (!run) return { refused: { rule: 'unknown-run', reason: render('accept-unknown-run', { run: JSON.stringify(runId ?? null) }) } };
+  // What the run's stage declares (marks.js, from the workflow the run was prepared from): its verdict fields, the
+  // briefs it returns and its refs' kinds.
+  const marks = marksOf(run.actor, run.schema, run.defs, marksIn(pinnedSpec(root, run), run.actor));
   // A refusal of the result (RESULT_RULES) carries how to fix it and counts toward the run's cap; the one that reaches
   // the cap fails the run, so its item takes the invoke's error instead of the agent looping.
   // `told` is a catalogue render with what to record (messages.js said): the row keeps its entry and slot values.
@@ -117,7 +121,7 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
   const problems = check(run.schema, result, run.defs);
   if (problems.length) return refuse('schema', said('schema', { actor: run.actor, problems: problems.join('; ').replaceAll('$', 'result') }));
 
-  // A result is taken only when its refs are observed on GitHub, its restated inputs equal the inputs, and it sets no
+  // A result is taken only when its refs pass their kind's check, its restated inputs equal the inputs, and it sets no
   // stamped field. Only the stamped result is stored.
   const refs = refsIn(result);
   for (const { path, ref } of refs) {
@@ -131,58 +135,16 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
     }
   }
   // A blocked result (the stage's "could not") covers nothing: it becomes the stage's error (resultsOf).
-  const gap = blockedOf(run.schema, result) == null ? coverGap(run.schema, run.input, result) : null;
+  const gap = blockedOf(run.schema, result) == null ? coverGap(run.schema, run.input, result, marks) : null;
   if (gap) return refuse('covers', gap);
   const stamped = structuredClone(result);
+  // Each ref the stage declares is checked by its kind's checker (refs/), which says what it stamps on the ref.
   for (const { path, ref } of refsIn(stamped)) {
-    const pr = prRef(ref.url);
-    if (pr) {
-      let now;
-      try {
-        now = await github.pull(pr);
-      } catch (error) {
-        return refuse('ref', error.status === 404 ? said('ref-no-pr', { path, url: ref.url }) : said('ref-unreadable', { path, url: ref.url, error: String(error.message) }));
-      }
-      if (now?.head?.sha !== ref.at) return refuse('ref', said('ref-head', { path, url: ref.url, sha: String(now?.head?.sha ?? 'none'), at: ref.at }));
-      const head = headOf(run.worktree);
-      if (head !== ref.at) return refuse('ref', said('ref-worktree', { path, head, at: ref.at }));
-      ref.key = `${pr.owner}/${pr.repo}#${pr.pullNumber}`;
-      // The PR's branch, for a rebuild's worktree: only when the head is in the PR's own
-      // repository, since a fork's branch is not on origin. GitHub gives head.repo null when the fork is gone.
-      const from = now?.head?.repo;
-      const own = from === undefined || (typeof from?.full_name === 'string' && from.full_name.toLowerCase() === `${pr.owner}/${pr.repo}`.toLowerCase());
-      if (own && typeof now?.head?.ref === 'string' && now.head.ref) ref.branch = now.head.ref;
-      // The exact commands that put this head in a worktree: host-filled data.
-      ref.checkout = `git fetch origin pull/${pr.pullNumber}/head && git checkout --detach ${ref.at}`;
-      // Fails closed: when the files cannot all be listed, the gates are unknown, and an
-      // unknown gate is a touched gate, so the person's CI-change card is asked.
-      let files = null;
-      let unlisted = null;
-      try {
-        files = await github.files(pr);
-      } catch (error) {
-        unlisted = `GitHub could not list the PR's files (${error.message})`;
-      }
-      if (!unlisted && !Array.isArray(files)) unlisted = 'GitHub gave no file list';
-      if (!unlisted && files.length >= FILES_PAGE) unlisted = `the PR has ${FILES_PAGE} or more files, more than one page`;
-      const gates = unlisted
-        ? [`(unknown: ${unlisted})`]
-        : files.map((f) => f.filename).filter((f) => typeof f === 'string' && f.startsWith('.github/'));
-      if (gates.length) ref.gates = gates;
-      const suites = (await github.suites({ owner: pr.owner, repo: pr.repo, sha: ref.at }))?.check_suites ?? [];
-      if (suites.length && suites.every((x) => x.status === 'completed' && GREEN.includes(x.conclusion))) ref.green = true;
-    } else {
-      let page = null;
-      try {
-        page = await web.get(ref.url);
-      } catch (error) {
-        page = { status: 0, body: String(error?.message ?? error) };
-      }
-      const flat = (t) => String(t ?? '').replace(/\s+/g, ' ').trim();
-      if (!(page?.status >= 200 && page?.status <= 299) || !flat(page.body).includes(flat(ref.at))) {
-        return refuse('ref', said('ref-page', { path, url: ref.url }));
-      }
-    }
+    const kind = REF_KINDS[marks.kindOf(path.split('.').slice(1), ref)];
+    if (!kind) continue;
+    const seen = await kind.check(ref, { path, github, web, worktree: run.worktree, headOf });
+    if (seen.refused) return refuse('ref', seen.refused);
+    Object.assign(ref, seen.stamp);
   }
 
   const text = JSON.stringify(stamped);
@@ -195,13 +157,11 @@ export async function accept({ root, caller, run: runId, result, toolUseId, gith
     payload: { run: run.run, actor: run.actor, agentId: caller, hash, bytes, toolUseId: toolUseId ?? null }
   });
   if (!stored) return refuse('already-returned', said('already-returned', { run: run.run }));
-  // A brief actor's briefs are fixed here, before any build starts: the verifier later gets this text exactly.
-  if (run.actor === 'brief') {
-    for (const [role, brief] of Object.entries(result)) {
-      if (typeof brief !== 'string') continue;
-      const b = storeBlob(root, brief);
-      journal(root, run, { kind: 'brief.stored', source: { system: 'journal', ref: `blobs/${b.hash}` }, payload: { run: run.run, actor: run.actor, role, hash: b.hash, bytes: b.bytes } });
-    }
+  // The briefs the stage declares are fixed here, before any build starts: the verifier later gets this
+  // text exactly.
+  for (const [role, brief] of marks.briefs(result)) {
+    const b = storeBlob(root, brief);
+    journal(root, run, { kind: 'brief.stored', source: { system: 'journal', ref: `blobs/${b.hash}` }, payload: { run: run.run, actor: run.actor, role, hash: b.hash, bytes: b.bytes } });
   }
   return { accepted: { run: run.run, hash } };
 }
@@ -223,10 +183,8 @@ export function refusalText({ refused, fix = null, failed = null }) {
   return hints ? render('refusal-counted-hints', { ...counted, hints }) : render('refusal-counted', counted);
 }
 
-// Every ref { url, at } in a value, depth-first, with its path. STAMPED (stages.js): the fields the
-// host stamps on a PR ref.
-const FILES_PAGE = 100; // github.files asks for one page of 100
-const GREEN = ['success', 'neutral', 'skipped'];
+// Every ref { url, at } in a value, depth-first, with its path. STAMPED (refs/index.js): the fields the host stamps on
+// a ref of any kind.
 function refsIn(value, path = 'result') {
   if (!value || typeof value !== 'object') return [];
   const here = typeof value.url === 'string' && typeof value.at === 'string' ? [{ path, ref: value }] : [];

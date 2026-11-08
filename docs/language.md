@@ -34,8 +34,13 @@ How a workflow carries an item through its states. An engine item is the same id
 | model stage | An actor an agent plays, defined by a stage file and an output schema. Say model stage wherever stage could be read as a plan stage | `packages/engine/src/stages.js` `isStage`, `workflows/quick-fix/build.md` |
 | host effect | An actor the host runs itself: merge, ask, post | `packages/engine/src/stages.js` `EFFECTS`, `packages/engine/src/effects/` |
 | stage file | A model stage's prose: rules, inputs and task | `packages/engine/src/prompts.js`, `workflows/quick-fix/` |
-| brief stage | The model stage that writes the per-role briefs the later stages work from | `workflows/quick-fix/brief.md` |
+| brief stage | The model stage that writes the per-role briefs the later stages work from, each in an output field its marks name as a brief | `workflows/quick-fix/brief.md` |
 | brief | One role's instructions, returned by the brief stage and fixed before any build starts; only this is a brief | `brief.stored`, `packages/engine/src/run/accept.js` `accept` |
+| marks | What a workflow's `meta.marks` declares about a model stage's output, so the host keeps its rules: its verdicts, briefs and refs. A stage with no marks is read as before marks | `packages/engine/src/marks.js` `marksOf` |
+| verdict field | An output field its marks name as a verdict, with the value that means the stage's check passed; accept holds it to the covered lines | `packages/engine/src/marks.js` `marksOf`, `workflows/quick-fix.json` |
+| ref | An output value `{ url, at }` the host checks against the world before a result counts | `packages/engine/src/run/accept.js` `accept` |
+| ref kind | What a ref points at, `github-pr` or `web-page`: a checker module that says what counts and which fields it stamps | `packages/engine/src/refs/index.js` `REF_KINDS` |
+| stamped field | A field the host sets on a ref from what its kind's checker saw; an agent may not set it | `packages/engine/src/refs/index.js` `STAMPED` |
 | run | One invocation of a model stage for an item, with id `<item>:<seq>.<invoke>` | `packages/engine/src/names.js` `runOf` |
 | run folder | A run's files: `prompt.md`, `context.md`, `run.json`, `stage.json`, `result.json` | `packages/engine/src/names.js` `runDir` |
 | run store | The one owner of a run's folder: reads its run state and moves it by transitions | `packages/engine/src/run/store.js` `state`, `transition` |
@@ -89,6 +94,8 @@ What the harness records, and how it is read back.
 - **stage.** A plan stage (s0 to s6) and a model stage share the word. Write *plan stage* or *model stage* wherever
   the other could be meant; inside `packages/engine/` alone, *stage* is a model stage.
 - **brief and prompt.** A brief is a brief stage's output. Every run, the brief stage's included, starts from a prompt.
+- **verdict.** A plan verdict is MET or NOT MET per Expect line, from a verifier session. In the engine, say *verdict
+  field* for a model stage's marked pass or fail.
 - **item.** A plan item and an engine item are the same idea at two scales, so the word stays.
 - **run.** In the engine a run is one model stage invocation. A CI run and the toy run belong to other contexts and
   are named with their qualifier.
