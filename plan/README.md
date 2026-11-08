@@ -1,34 +1,45 @@
 # The v2 plan
 
-This folder is the plan for building the harness again on XState, in this repo. It is a plan only. Nothing
-here is built until an item's status says `ready` and a thread picks it up.
-
-The plan is data. Every item is one file with a fixed JSON head, so a script can check the plan, and the
-v2 harness can take its first real work items from it.
-
-## Layout
+This folder is the plan for building the harness again on XState, in this repo. The plan is data: every item is one
+file with a fixed JSON head, so `check.mjs` can check it and the harness can take work from it. Nothing is built until
+an item is `ready` and a thread picks it up.
 
 ```
 plan/
-  README.md          this file: how the plan works and how to change it
+  README.md          this file: how an item moves, how it is written, how the plan changes
   item.schema.json   the shape of an item's JSON head
-  check.mjs          checks the whole plan (node plan/check.mjs)
-  stages/<id>.md     one file per stage: its goal and its exit gate
+  check.mjs          checks the whole plan (node plan/check.mjs; --order prints build order)
+  stages/<id>.md     one file per plan stage: its goal and its exit gate
   items/<id>.md      one file per item: JSON head, then prose
   ledger/            what v1 taught us, one row per lesson (L-... ids)
   cases/             real situations v1 handled, which v2 must pass (C-... ids)
   research/          what we read before deciding, with sources
-  decisions/         the person's choices, in their words
+  decisions/         two-way doors decided, and waiting-for-person.md for one-way doors
 ```
+
+## How an item moves
+
+Status runs `draft` → `ready` → `doing` → `done` (off the path: `split`, `dropped`, `parked`), in five steps. A PR
+names its item only by an `Item: <id>` line in its body; branch names are for people.
+
+1. **Readying replan.** Fill the head until `check.mjs` passes with `ready`. Branch `replan/<topic>`, label `replan`,
+   changes under `plan/` only, no `Item:` line.
+2. **Build PR.** Branch `<kind>/<id>` (such as `build/journal-schema`), body with `Item: <id>`. Its first commit
+   sets the status to `doing`; from then on the contract is frozen.
+3. **Verdict.** A separate session, given the item's Verifier brief and not the builder's tests, writes its tests
+   and evidence under `verify/<id>/` and commits `verify/<id>/verdict.json` to the build PR's branch.
+4. **Merge and release.** Merge when `ci` and `verdict` are green at the head sha; to take main after the verdict,
+   merge main in rather than rebase. A merge that changes `plugins/harness/` or `packages/journal/` is released
+   (`docs/gates.md`, "After the merge").
+5. **Done replan.** Set the status to `done` (and `done_on` for a fix item), and add a `## Done` section saying where
+   it was built and verified. Branch `replan/<id>-done`, label `replan`, changes under `plan/` only.
+
+Every commit ends with a `Claude-Session:` trailer (`docs/gates.md`, "Sessions").
 
 ## How an item is written
 
-An item file starts with a fenced `json` block, which is the item's head and follows `item.schema.json`.
-Prose follows the block: the reasoning, the options considered, anything a builder needs that doesn't fit
-a field. The head is the contract, and the prose explains it.
-
-A complete head answers nine questions, a fix item answers a tenth, and an item whose contract moved answers an
-eleventh. The checker refuses an item marked `ready` that leaves one open.
+An item file is a fenced `json` head following `item.schema.json`, then prose: the reasoning, the options considered
+and a `## Verifier brief`. The head is the contract; `check.mjs` refuses a `ready` item that leaves a field open.
 
 | Field | Question it answers | Why v1 taught us to ask |
 |---|---|---|
@@ -41,89 +52,44 @@ eleventh. The checker refuses an item marked `ready` that leaves one open.
 | `person_prereqs` | What must the person do before the thread starts? | A thread can't add its own allow rules |
 | `step_back` | When does it stop retrying and replan? | PR #72 ran 5 rounds before anyone stepped back |
 | `module`, `done_on` | Which module does a fix change, and when was it done? | Seven fixes in two days changed `actors.js` before anyone looked at its shape |
-| `contract_changes` | Did the contract move once the build started, and why? | The aim was fixed before the first shot, so a build that found a better shape could not take it |
-| `verifier` | Who checks it, from what brief, written when? | Self-approval is a verification gap, not a judgment call |
-
-## Splicing in new work
-
-The plan will change. These rules keep a change to one file plus edges:
-
-- **Ids are names, not numbers.** An id is a short slug (`obs-live-journal`). Order comes from `stage` and
-  `depends_on`, never from an id or a file name, so inserting an item never renumbers anything.
-- **To add an item,** write its file and point its `depends_on` at what it needs. If something later now
-  needs it, add the new id to that item's `depends_on`.
-- **To split an item,** mark it `split` with `replaced_by` naming the new ids. Items that depended on it
-  move to the new ids.
-- **To drop an item,** mark it `dropped` with a reason in `why`. Never delete the file: the reason is part
-  of the theory.
-- **To add a stage,** write its file and give it an `order` between two existing ones (use decimals,
-  such as 2.5).
-- Run `node plan/check.mjs` after any change. It refuses unknown ids, cycles, an item that depends on a
-  later stage, a `ready` item with an empty field, an Expect line that pins main, an unwritten contract change,
-  and a fix item over the fix budget. `--order` prints the items in build order, and
-  `--coverage` lists ledger rows no item serves.
+| `contract_changes` | Did the contract move once the build started, and why? | A build that found a better shape could not take it |
+| `verifier` | Who checks it, from what brief? | Self-approval is a verification gap, not a judgment call |
 
 ## How slop is kept out
 
-An item is done when the verifier, not the builder, shows its outcome holds (ledger L-proof-source). Five rules hold
-that up, and each is enforced by something other than the builder:
+An item is done when the verifier, not the builder, shows its outcome holds (ledger L-proof-source). Five rules, each
+enforced by something other than the builder (`docs/gates.md`), hold that up.
 
-- **Every Expect line names its proof.** `world` means the real platform or GitHub shows it before accept (a real
-  session, PR, CI run or published page). `verifier` means tests or reads the verifier writes itself. `builder` means
-  the builder's own tests. `check.mjs` refuses a ready build item with no `world` line, or with more than half its
-  lines `builder`.
-- **The contract names behaviour.** An Expect check says what the harness does, in the words of
-  `docs/language.md`, never what the repository's files equal today. `check.mjs` refuses a ready or doing item whose
-  check holds a sha or a phrase that pins main ("on main", "main's", "unchanged", "bytes", "both shas" and the rest
-  of the list in `plan/decisions/2026-11-08-verification-swing.md`, decision 1); draft and done items are exempt. A
-  new way of pinning main is one more entry in that list. No item repeats "every test that passes on main passes at
-  the head": `ci` runs `npm test` at the head already.
-- **The verdict names its tests.** The verifier writes its tests under `verify/<item>/` and a `verdict.json` that
-  marks every Expect id MET or NOT MET with the command and an output excerpt. A result for a `verifier` or
-  `builder` line names in `test` the file that proves it; the verdict gate runs that file at the head and refuses
-  the PR when it fails or is missing. A `builder` result also names the code it broke and the test that went red.
-  What the verifier judged rather than ran (a naming concern, a design smell, a doc gap) goes in `observations`,
-  which never gates. CI (the verdict gate, `docs/gates.md`) checks this at the head sha and refuses a verdict
-  committed from the builder's session. Evidence is what was shown: per Expect line, one evidence file under
-  `verify/<item>/evidence/` holding the command, the excerpt and the inputs to run it again, never a test listing, a
-  journal root or a capture of main. The evidence gate refuses a PR that adds or changes a file under `verify/`
-  larger than 64 KB or named `*.pass`.
-- **The contract changes once, then freezes.** Once an item's verification starts, nothing changes its head or
-  Verifier brief. Before that, one replan may, with a `## Contract change` section. That replan is labelled
-  `replan`, touches only `plan/`, raises `contract_changes` to 1, and says in the section what shape the build
-  tried, what it was compared with and why the contract moved. `check.mjs` refuses a second change and a change
-  with no section; the freeze gate refuses any head or brief change, label or not, once
-  `verify/<item>/verdict.json` exists at the PR's base or head.
-- **No stubs count as done.** CI fails on TODO, FIXME, "not implemented" or a skipped test in `packages/` and
-  `plugins/`.
+- **Every Expect line names its proof:** `world` (the real platform or GitHub shows it before accept), `verifier`
+  (tests the verifier writes) or `builder` (the builder's tests). A ready build item has a `world` line, and at most
+  half its lines are `builder`.
+- **The contract names behaviour.** A check says what the harness does, in the words of `docs/language.md`, never what
+  the repository's files equal today: `check.mjs` refuses a ready or doing item whose check holds a sha or a phrase
+  in its `PINS` list (a new way of pinning main is one more entry). `ci` runs `npm test`, so no item repeats it.
+- **The verdict names its tests.** Each `verifier` or `builder` result names the test file that proves it, and the
+  verdict gate runs it at the head. What the verifier judged rather than ran goes in `observations`, which never
+  gates. Evidence is what was shown: one small evidence file per Expect line, never a listing or a capture.
+- **The contract changes once, then freezes.** Before its verdict file exists, one replan may change a doing item's
+  contract, with a `## Contract change` section saying what the build tried and why the contract moved.
+- **No stubs count as done.** No TODO, FIXME, "not implemented" or skipped test in `packages/` and `plugins/`.
 
-What this doesn't close: every agent acts as the person's GitHub account, so a `Claude-Session` trailer is weak
-identity, and a determined builder session could forge a verdict commit. The journal records which session wrote
-what, and the stage gates put a real result in front of the person. A separate verdict identity stays parked
-(ledger L-same-account-everywhere) until a forged verdict is actually seen.
+## Changing the plan
+
+A change is one file plus edges. Run `node plan/check.mjs` after it; `--coverage` lists ledger rows no item serves.
+
+- **Ids are names, not numbers.** An id is a short slug (`obs-live-journal`). Order comes from `stage` and
+  `depends_on`, never from an id, so inserting an item renumbers nothing.
+- **To add an item,** write its file with `depends_on`, and add its id to the `depends_on` of what now needs it.
+- **To split an item,** mark it `split` with `replaced_by` naming the new ids, and move its dependants to them.
+- **To drop an item,** mark it `dropped` with the reason in `why`. Never delete the file: the reason is theory.
+- **To add a plan stage,** write its file with an `order` between two existing ones (decimals, such as 2.5).
 
 ## Fix budget
 
-`step_back` caps the rounds inside one item. The fix budget caps fixes across items, because when one module keeps
-needing patches its design is wrong, and another patch hides that:
-
-- A `fix-` item names the one module its main change lands in, a file or folder path, in `module`. When it is done
-  it records the date in `done_on`.
-- When three fix items naming the same module were done in the last 14 days, and no design item for that module was
-  done after them, a fourth fix item there is refused at `ready` or `doing`.
-- The next item there is a design item: any item that is not a fix and names that module in `module`. It names the
-  concept that keeps breaking in `concepts` and designs it twice, with the tournament kit (`docs/tournaments.md`).
-  Once it is done, the module's count starts again.
-
-`plan/check.mjs` enforces all three on every PR. The reasoning is in `plan/decisions/2026-11-08-fix-budget-rule.md`.
-
-## Status
-
-`draft` (being written) → `ready` (complete head, can be picked up) → `doing` → `done`. Off-path:
-`split`, `dropped`, `parked` (kept, not now).
-
-## Principles the plan is held to
-
-Gall's Law (a working small system first), Theory of Constraints (each stage attacks the current
-bottleneck), walking skeleton (end to end before wide), root cause over symptom, programming as theory
-building (the why travels with the item), Kaikaku.
+`step_back` caps the rounds inside one item; the fix budget caps fixes across items, because a module that keeps
+needing patches has the wrong design. A `fix-` item names the module (file or folder) its main change lands in, in
+`module`, and its done date in `done_on`. When three fix items naming one module were done in the last 14 days with
+no design item for it done after them, `check.mjs` refuses a fourth at `ready` or `doing`. The next item there is a
+design item: not a fix, naming that module in `module`, the concept that keeps breaking in `concepts`, and designing
+it twice with the tournament kit (`docs/tournaments.md`). Once it is done, the count starts again. The reasoning is in
+`plan/decisions/2026-11-08-fix-budget-rule.md`.

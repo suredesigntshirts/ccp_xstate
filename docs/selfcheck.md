@@ -27,7 +27,7 @@ step marked `FAILED`:
 - **setup**: the setup script did not install the plugin. The step quotes the setup log's `plugin` line, or says
   none was written; the cause is in `infra/cloud-environment/setup.sh` or in the ref it installed (could not
   extract `plugins/harness`).
-- **install**: `scripts/install.mjs` failed; its line says why.
+- **install**: `plugins/harness/scripts/install.mjs` failed; its line says why.
 - **session**: the session never ran the plugin's hook. With `claude -p`, either Claude Code ran no SessionStart
   hook (auth or startup failed; the step quotes its stderr) or it ran others but not ccp-harness's (the plugin did
   not load: look at `.claude-plugin/plugin.json` and `hooks/hooks.json`). Without a model, either `hooks/hooks.json`

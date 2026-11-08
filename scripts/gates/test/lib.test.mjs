@@ -94,13 +94,14 @@ test('a named test fails the gate when it exits non-zero or passes nothing', () 
   assert.match(testRunFault({ ...run, name: 'nope' }, { status: 0, output: '# tests 0\n# pass 0\n' }), /\(nope\) ran no test that passed/);
 });
 
-test('a PR names its item by body line or branch', () => {
+test('a PR names its item by its body line alone', () => {
   const ids = new Set(['x', 'y']);
-  assert.equal(namedItem({ branch: 'build/x', body: '', ids }).item, 'x');
-  assert.equal(namedItem({ branch: 'claude/thread-1', body: 'Builds it.\nItem: y\n', ids }).item, 'y');
-  assert.equal(namedItem({ branch: 'chore/z', body: '', ids }).item, null);
-  assert.match(namedItem({ branch: 'build/x', body: 'Item: y', ids }).reasons[0], /body names y but the branch names x/);
-  assert.match(namedItem({ branch: 'a', body: 'Item: q', ids }).reasons[0], /doesn't have/);
+  assert.equal(namedItem({ body: 'Builds it.\nItem: y\n', ids }).item, 'y');
+  assert.equal(namedItem({ branch: 'build/x', body: '', ids }).item, null);
+  assert.equal(namedItem({ branch: 'replan/x', body: 'Makes x ready.', ids }).item, null);
+  assert.equal(namedItem({ branch: 'build/x', body: 'Item: y', ids }).item, 'y');
+  assert.deepEqual(namedItem({ body: 'Item: y', ids }).reasons, []);
+  assert.match(namedItem({ body: 'Item: q', ids }).reasons[0], /names item q, which plan\/items\/ doesn't have/);
 });
 
 test('the verdict session must differ from every builder session', () => {
