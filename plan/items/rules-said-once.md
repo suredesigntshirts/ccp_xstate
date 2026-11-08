@@ -5,6 +5,7 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "ready",
+  "contract_changes": 1,
   "outcome": "A PR names its item only by an `Item: <id>` line in its body, so a branch name never changes what the gates demand; plan/README.md holds, in one section, the path an item takes from ready to done (the readying replan, the build PR, the verdict, the merge and release, the done replan) with each PR's branch, label and body line; every process rule has one home among CLAUDE.md, plan/README.md and docs/gates.md and the others point at it; a repo test fails when a path those texts or docs/ name in backticks does not exist or when CLAUDE.md, plan/README.md and docs/gates.md together reach 230 lines; and the done-suite tests that matched the old wording of these files leave.",
   "why": "Threads followed a working rule from project memory because CLAUDE.md's replan branch name made the gate demand a verdict, and the freeze, verdict and session rules were each written out twice, so a model reads about 270 lines of rules before its item and can find two versions of one (L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-1.md).",
   "serves": [
@@ -89,7 +90,7 @@
     },
     {
       "id": "world-replan-branch",
-      "check": "A throwaway PR in ccp_xstate based on the head (title starting throwaway:, closed unmerged), on branch replan/<id of an existing draft item>, labelled replan, changing only that item's prose, with no Item line in its body, gets a green verdict check on GitHub",
+      "check": "A throwaway PR in ccp_xstate based on the head (title starting throwaway:, closed unmerged), on branch replan/<id of an existing draft item>, labelled replan, with no Item line in its body, gets a verdict check on GitHub whose only verdict-gate refusal is that it changes files outside plan/ and names no item, never a missing verdict for that draft item",
       "how": "The PR and its verdict run on GitHub",
       "proof": "world"
     },
@@ -171,6 +172,17 @@ The tests that leave matched sentences of these files by regex; they pinned word
 fail on any rewrite. What they protected that matters (`CLAUDE.md` is short and its paths are real) moves into
 `test/docs.test.mjs`, widened to `plan/README.md` and `docs/`, with a line budget for the three entry texts.
 
+## Contract change
+
+The build tried the world line as first written: a throwaway PR on `replan/<draft id>`, labelled replan, with no Item
+line, showing a green verdict check. Before the build merges that cannot be shown. A PR based on the build's head
+carries its `scripts/` and `docs/` changes, so the new gate rightly refuses it for changing files outside `plan/` with
+no Item line (verifier's PR #203); a plan-only PR runs main's gate, which still names the item from the branch. The
+line now asks for what a pre-merge PR can show: the gate on GitHub does not read the branch, so its refusal is "names
+no item", never a missing verdict for the draft item the branch names. The green check on a `replan/<id>` branch is
+shown after merge by the item's own done replan. Compared with moving the line to `after_landing`, this keeps a world
+check before accept.
+
 ## Verifier brief
 
 Check out the PR at its head sha in a clean clone and run `npm ci`. Read `docs/gates.md` at the head: every verifier
@@ -193,9 +205,9 @@ Without reading the builder's tests, write your own:
   run the freeze and verdict gates on each (the build PR is refused for its missing verdict, not for its naming).
   Grade (3) against `docs/gates.md` at the head. MET when every answer holds. Commit the prompt, the answer
   and the gate outputs as the evidence file.
-- **world-replan-branch:** push a throwaway branch `replan/test-fixture-edges` from the head that edits only that
-  item's prose, open a PR titled "throwaway: ..." with no Item line, add the `replan` label, read the verdict check
-  (re-run after labelling if the first run predates the label), close it unmerged, delete the branch.
+- **world-replan-branch:** push a throwaway branch `replan/test-fixture-edges` from the head, open a PR titled
+  "throwaway: ..." with no Item line, add the `replan` label, and read the verdict gate's output: it refuses only for
+  files outside `plan/` with no item named. Close it unmerged and delete the branch.
 - **tests-bite:** rename a path `CLAUDE.md` names (or edit the name in `CLAUDE.md`), run
   `node --test test/docs.test.mjs`, show red, restore; pad the three files to 230 lines, show red, restore; make
   `namedItem` fall back to the branch's last segment, run `node --test scripts/gates/test/lib.test.mjs`, show red,
