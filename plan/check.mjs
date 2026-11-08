@@ -137,7 +137,6 @@ for (const it of items.values()) {
 // Reader effort (plan/decisions/2026-11-08-plan-reader-effort.md): a build item verified and done from this date records
 // what its build cost a reader beside its fix budget fields; items done earlier predate the report. Its verdict file is
 // what makes it a real item rather than a test's made-up one.
-const READER_EFFORT_FROM = '2026-11-09';
 const isFix = (i) => i.id.startsWith('fix-');
 const DAY = 24 * 60 * 60 * 1000;
 const today = Date.parse(new Date().toISOString().slice(0, 10));
@@ -149,9 +148,6 @@ for (const it of items.values()) {
   if (building && !empty(it.module) && !existsSync(join(root, '..', it.module)))
     fail(at, `module ${it.module} does not exist`);
   if (it.status === 'done' && !empty(it.module) && empty(it.done_on)) fail(at, 'a done item that names a module needs done_on');
-  if (it.status === 'done' && it.kind === 'build' && it.done_on >= READER_EFFORT_FROM && it.reader_effort === undefined &&
-    existsSync(join(root, '..', 'verify', it.id, 'verdict.json')))
-    fail(at, `a build item done from ${READER_EFFORT_FROM} records reader_effort: node scripts/reader-effort.mjs <pr> --json`);
 }
 for (const it of items.values()) {
   if (!isFix(it) || !['ready', 'doing'].includes(it.status) || empty(it.module)) continue;

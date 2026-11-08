@@ -1,7 +1,7 @@
 // Expect plan-rule: on a temp copy of the head's plan/, check.mjs refuses (exit 1, naming the item) a done build item
-// with done_on 2026-11-09 or later, a verify/<item>/verdict.json beside the copy and no reader_effort, and one whose
-// reader_effort has an unknown field or a non-integer value; it passes the same item with a well-formed reader_effort,
-// with no verdict file, with an earlier done_on, and a done probe item with neither.
+// whose reader_effort has an unknown field or a non-integer value; it passes the same item with a well-formed
+// reader_effort, with no verdict file, with an earlier done_on, and a done probe item with neither. Reader effort is
+// read from git now, so a verified done build item without the field passes too.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -39,14 +39,6 @@ const passed = (r) => assert.equal(r.status, 0, r.out);
 const done = (on, extra = {}) => (h) => ({ ...h, status: 'done', done_on: on, ...extra });
 
 test('the untouched copy passes', (t) => passed(check(t, BUILD, (h) => h, { verdict: false })));
-
-test('a verified done build item done on 2026-11-09 or later with no reader_effort is refused, naming it', (t) => {
-  for (const on of ['2026-11-09', '2026-12-01']) {
-    const r = check(t, BUILD, done(on), { verdict: true });
-    refused(r, BUILD);
-    assert.match(r.out, /reader_effort/);
-  }
-});
 
 test('a reader_effort with an unknown field or a non-integer value is refused, naming the item', (t) => {
   const bad = [
