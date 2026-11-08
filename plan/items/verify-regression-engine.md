@@ -4,7 +4,7 @@
   "title": "Retire the engine and run suites into the regression set",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Each of the 26 verify/ folders this item names holds only verdict.json; every test file they held is either moved to test/regression/<area>/ (area one of the eight of decision 4, mostly engine, run or marks, with the Expect id it proves in its first comment) or deleted with its evidence because it read source text, compared a listing or compared a stored capture, and a test that did both is split; test/regression/ has one shared helper, lib.mjs; the item's prose carries a table with one row per test file, its verdict and its reason; and no engine, plugin, workflow or script source changes.",
   "why": "Done suites that assert stored captures let code be added but never removed; the classification is per test, not a deletion pass (L-measure-then-park; research plan/research/verification-swing.md, How to classify a verifier test; decision 4). First of three parts of verify-regression-set, split by suite (plan/decisions/2026-11-08-verify-regression-split.md).",
   "serves": [
@@ -264,6 +264,27 @@ Other files, one row per suite:
 | `stage-prompt-files` | 18 | `lib.mjs` inlined into `stage-files.test.mjs` (its base-commit helpers dropped); `base-workflows/`, `merge-workflows/` (captures of earlier commits) and `evidence/` deleted |
 | `wf-intake` | 7 | `lib.mjs` inlined into `intake.test.mjs`; `evidence/` deleted |
 | `wf-quick-fix` | 0 | none |
+
+## Done
+
+Readied by replan #196 and built in PR #199. A separate session verified it at ad3d018: all eight Expect lines MET,
+each verifier line naming its test under `verify/verify-regression-engine/` (the table, folder, moved-pass,
+one-helper, bite, left-reasons and scope tests), `ci` from the PR's check runs. The 61 test files became 33 under
+`test/regression/` (30 moved, 17 split, 14 left), 239 tests in about 36 seconds; the local suite fell from 399 s to
+288 s. Main was merged into the verified branch once, for the new evidence gate step, and `ci` and `gates` were
+green at that head. No engine, plugin or workflow code changed, so there is no release.
+
+From the verifier's observations, for the later parts:
+
+- `test/regression/fixtures/v1/` is read only by `verify/harness-glossary/lib.mjs`. When `verify-regression-plugin`
+  retires that suite, the two v1 journals go with whatever of its tests moves, or are deleted if nothing moved reads
+  them.
+- `retired-pins` and `bench-prompts` scan every committed `*/items/*.jsonl`; a journal committed under `verify/`
+  later would be read by them. The evidence policy keeps journals out of `verify/`, so this stays an observation.
+- The per-suite quick-fix worlds inlined into each moved file are near-copies. Merging them into `lib.mjs` is design
+  work for a later item, not part of a move.
+- The engine-host FINDING test left because it pinned an open defect (a GitHub field holding a literal `</event>`
+  drops that event). The defect is filed as the draft `fix-event-close-tag`.
 
 ## Verifier brief
 
