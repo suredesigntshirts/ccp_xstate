@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkFreeze, checkSessions, checkVerdict, contract, findStubs, namedItem, sessionOf, testRunFault, verdictTests } from '../lib.mjs';
+import { EVIDENCE_LIMIT, checkEvidence, checkFreeze, checkSessions, checkVerdict, contract, findStubs, namedItem, sessionOf, testRunFault, verdictTests } from '../lib.mjs';
 
 const item = (head, brief = 'Run it.') => `\`\`\`json\n${JSON.stringify(head, null, 2)}\n\`\`\`\n\nWhy.\n\n## Verifier brief\n\n${brief}\n`;
 const head = {
@@ -160,4 +160,16 @@ test('the stub ban finds markers and skipped tests only under packages/ and plug
     'packages/a/test/w.test.js:1 has a skipped test',
     'packages/a/test/v.test.js:1 has a skipped test',
   ]);
+});
+
+test('evidence: a file under verify/ over the limit is refused with its size; one at the limit passes', () => {
+  assert.equal(EVIDENCE_LIMIT, 65536);
+  const [why] = checkEvidence([{ path: 'verify/x/evidence/a.md', size: 65537 }]);
+  assert.match(why, /verify\/x\/evidence\/a\.md is 65537 bytes, over the 65536-byte limit/);
+  assert.deepEqual(checkEvidence([{ path: 'verify/x/evidence/a.md', size: 65536 }]), []);
+});
+
+test('evidence: a .pass file under verify/ is refused at any size; files outside verify/ are not read', () => {
+  assert.match(checkEvidence([{ path: 'verify/x/suite.pass', size: 12 }])[0], /verify\/x\/suite\.pass is a test listing/);
+  assert.deepEqual(checkEvidence([{ path: 'docs/big.json', size: 900000 }, { path: 'test/a.pass', size: 3 }]), []);
 });

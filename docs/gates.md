@@ -9,6 +9,7 @@ rules in `plan/README.md`, "How slop is kept out", so the builder isn't the one 
 | `ci` | plan check | `node plan/check.mjs` refuses the plan |
 | `verdict` | no stubs | a file under `packages/` or `plugins/` has TODO, FIXME, "not implemented" or a skipped test ; or a line of the harness source or its two READMEs has a history reference (`docs/layout.md`, "Comments") |
 | `verdict` | contract freeze | the PR changes a frozen item's head or Verifier brief and isn't a plan-only replan, or the item already has a verdict file |
+| `verdict` | evidence | the PR adds, changes or renames a file under `verify/` to one larger than 64 KB (65,536 bytes) or named `*.pass` |
 | `verdict` | verdict | the named item has no complete verdict at the head sha, a test it names fails or is missing, or it came from a builder's session |
 
 The logic is in `scripts/gates/lib.mjs` (pure checks) and `scripts/gates/pr-gate.mjs` (reads git and the PR).
@@ -57,6 +58,19 @@ The gate checks, against the item head at the PR head sha:
   change after verification needs a new verdict);
 - the last commit that wrote `verdict.json` has a `Claude-Session:` trailer, and no commit that changes
   anything outside `verify/` carries the same one.
+
+## Evidence
+
+Evidence is what was shown. For each Expect line the verifier commits one evidence file,
+`verify/<item>/evidence/<expect-id>.md`, holding the command it ran, the excerpt it saw and the inputs needed to run
+it again (the sha, the temp files it made, the environment it set). It commits no test listing, no journal root and
+no capture of main: the verdict's `test` is what the gate runs, and the evidence file is what a reader opens.
+
+The evidence gate (`node scripts/gates/pr-gate.mjs evidence`) runs on every PR. It reads the files the PR adds,
+changes or renames under `verify/`, at their size at the head, and refuses one larger than 64 KB (65,536 bytes) or
+one whose name ends in `.pass`, naming the path and the size. It never reads a deleted file, so a PR that removes old
+evidence passes; evidence committed before the rule is removed by the regression-set work, not by this gate. The
+limit is `EVIDENCE_LIMIT` in `scripts/gates/lib.mjs`; raising it is a replan.
 
 ## Sessions
 

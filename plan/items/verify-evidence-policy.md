@@ -4,7 +4,7 @@
   "title": "Make verifier evidence say what was shown",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "doing",
   "outcome": "A verifier commits one file per Expect line holding the command, the excerpt and the inputs to run it again; the verdict gate refuses a PR that adds a file under verify/ larger than 64 KB or named *.pass; plan/README.md and docs/gates.md state the policy.",
   "why": "Evidence was 82 percent of the lines the seven cleanups added (full journal roots, .pass listings, captures of main), and nothing read it back (decision 5; research plan/research/verification-swing.md, item 5).",
   "serves": [
