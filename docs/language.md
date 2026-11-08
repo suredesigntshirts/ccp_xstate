@@ -22,6 +22,7 @@ How the work on the harness itself is planned and proved.
 | test listing | node:test output saved whole: a pass and a fail summary line with ten or more result lines, TAP or spec; the evidence gate refuses one under `verify/` | `scripts/gates/lib.mjs` `isListing` |
 | observation | A plan verifier's judged note on a verdict (a naming concern, a design smell, a doc gap); it never gates | `scripts/gates/lib.mjs` `checkVerdict`, `docs/gates.md` |
 | contract change | The one replan an item's head and Verifier brief may have once its build PR names it, before its verdict file exists, written up under `## Contract change` | `plan/item.schema.json` `contract_changes`, `plan/check.mjs` |
+| round | One build push and the verdict on it; an item's `step_back` caps its rounds | `plan/README.md`, "How an item moves" |
 | done_on change | The replan that moves an item's set `done_on`, saying why under `## Done on change` | `scripts/gates/lib.mjs` `checkDoneOn`, `docs/gates.md` |
 | regression set | The behavioural tests of done items, kept by area under test/regression with one helper; it is what a cleanup must keep passing | `plan/decisions/2026-11-08-verification-swing.md`, decision 4 |
 | ledger row | A lesson the plan is held to, with an `L-` id | `plan/ledger/` |
@@ -80,6 +81,7 @@ What the harness runs on: Claude Code and the Hearth project threads.
 | capture | The plugin hook that records tool calls, agents and turns as rows | `plugins/harness/scripts/capture.mjs`, `plugins/harness/scripts/capture-rows.mjs` |
 | release | A tagged build of the harness plugin, `harness-v<x.y.z>` | `scripts/release/release.mjs` |
 | thread | A Hearth project thread: one piece of work, with its own session | `person.message`, `post.sent` |
+| starter | The session that started a thread and hears its asks: the coordinator, or the person | `plan/README.md`, "How an item moves" |
 | person | The human the work is for | `person.message`, `person.tap` |
 
 ## Observation

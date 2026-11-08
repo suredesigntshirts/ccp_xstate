@@ -8,7 +8,7 @@ Code loads it as `ccp-harness@skills-dir`. Editing this folder changes nothing a
 ## Releases
 
 A release is `harness-v<x.y.z>`, made by `scripts/release/release.mjs` after a merge to `main` that changes what a
-session runs: `plugins/harness/` or `packages/journal/`, tests aside. The thread that merged pushes it as a branch
+session runs: a path in `RELEASED` in that script. The thread that merged pushes it as a branch
 `release/harness-v<x.y.z>` (`node scripts/release/release.mjs branch --push`), because the git proxy drops tag pushes
 from threads; `.github/workflows/release.yml` makes the same release as a tag when Actions runs. Both count as one
 series, so whichever comes second makes nothing. The version only rises: the newest release's patch + 1, or

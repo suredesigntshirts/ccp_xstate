@@ -1,7 +1,8 @@
 # PR gates
 
 Two workflows run on every PR into `main`, and a PR merges only when both are green at its head sha. They check the
-rules of `plan/README.md`, "How slop is kept out", so the builder isn't the one enforcing them.
+rules of `plan/README.md`, "How slop is kept out", in `scripts/gates/lib.mjs`.
+Run one at the checkout's HEAD with `BASE_SHA=origin/main PR_BODY='Item: <id>' node scripts/gates/pr-gate.mjs verdict`.
 
 | Workflow | Step | Fails when |
 |---|---|---|
@@ -10,10 +11,7 @@ rules of `plan/README.md`, "How slop is kept out", so the builder isn't the one 
 | `verdict` | no stubs | a file under `packages/` or `plugins/` has TODO, FIXME, "not implemented" or a skipped test, or a line of the harness source or its two READMEs has a history reference (`docs/layout.md`, "Comments") |
 | `verdict` | contract freeze | the PR changes a frozen item's head or Verifier brief and isn't a plan-only replan, or the item already has a verdict file |
 | `verdict` | evidence | the PR adds, changes or renames under `verify/` an entry that is not a regular file (a symlink, a submodule), one larger than 64 KB (65,536 bytes), one named `*.pass`, or a test listing: a node:test pass and fail summary with ten or more result lines; a deletion is never read |
-| `verdict` | verdict | the named item has no complete verdict at the head sha, a test it names fails or is missing, or the verdict came from a builder's session; or the PR names no item and changes files outside `plan/` |
-
-A PR names its item only by an `Item: <id>` line in its body. The checks are in `scripts/gates/lib.mjs`; run one at
-the checkout's HEAD with `BASE_SHA=origin/main PR_BODY='Item: <id>' node scripts/gates/pr-gate.mjs verdict`.
+| `verdict` | verdict | the named item has no complete verdict for the head (below), a test it names fails or is missing, or the verdict came from a builder's session; or the PR names no item and changes files outside `plan/` |
 
 ## The verdict
 
