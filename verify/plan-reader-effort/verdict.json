@@ -1,0 +1,86 @@
+{
+  "item": "plan-reader-effort",
+  "verified_sha": "314dbde98001790c85284a7e28c4be8923ae6fd6",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5HhpdERwMDLtk1dsoU",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "real-prs",
+      "status": "MET",
+      "command": "git fetch --unshallow origin; node scripts/reader-effort.mjs 189 --json and 192 --json; git diff --no-renames --name-only and --numstat between each merge (dc55221, 2371c17) and its first parent; evidence/real-prs.md",
+      "excerpt": "PR 189: files 28 = 28 paths; added 120+160+455+163+59 = 957 = numstat 957; removed 18+11+0+0+21 = 50 = 50. PR 192: files 15 = 15; added 92+55+598+65+2 = 812 = 812; removed 0+3+89+0+1 = 93 = 93."
+    },
+    {
+      "id": "categories",
+      "status": "MET",
+      "command": "node --test verify/plan-reader-effort/categories.test.mjs (temp git repo, branch merged as \"Merge pull request #7 from x/feature\"); evidence/categories.md",
+      "excerpt": "3/3 pass. 15 paths split by the decision rules by hand: added code 10 (incl. workflows/quick-fix/plan.md and packages/engine/messages.md), tests 6, verifier 6 (incl. verify/toy/lib.mjs), evidence 9 (incl. verify/toy/notes.md), docs 3; removed 7/1/0/2/3. Range and `7` give the same object; a later #70 merge is not taken for #7.",
+      "test": "verify/plan-reader-effort/categories.test.mjs"
+    },
+    {
+      "id": "exports",
+      "status": "MET",
+      "command": "node --test verify/plan-reader-effort/exports.test.mjs; evidence/exports.md",
+      "excerpt": "2/2 pass. export function, export const, export { a as b }, export default added and one export function removed: exports_added 4, exports_removed 1 by range and by `12`; exports added only in test and verifier files: 0 and 0.",
+      "test": "verify/plan-reader-effort/exports.test.mjs"
+    },
+    {
+      "id": "reader-lines",
+      "status": "MET",
+      "command": "node --test verify/plan-reader-effort/reader-lines.test.mjs; evidence/reader-lines.md",
+      "excerpt": "5/5 pass. Four calls to an unchanged 4-line helper from code and a test: 4 hunk lines + 4 = 8. one-line and 3-line const definitions: 2+1+3 = 6. Undefined names: 2. Definitions the branch adds (new file and changed file): 8 hunk lines, nothing added. 11 evidence lines containing helper( calls: reader_lines 1+4 = 5.",
+      "test": "verify/plan-reader-effort/reader-lines.test.mjs"
+    },
+    {
+      "id": "plan-rule",
+      "status": "MET",
+      "command": "node --test verify/plan-reader-effort/plan-rule.test.mjs (temp copies of plan/, node <tmp>/plan/check.mjs); evidence/plan-rule.md",
+      "excerpt": "7/7 pass. clean-room-install-test done 2026-11-09 and 2026-12-01 with verify/<id>/verdict.json and no reader_effort: exit 1 \"items/clean-room-install-test.md: a build item done from 2026-11-09 records reader_effort: node scripts/reader-effort.mjs <pr> --json\". Unknown field (top and nested) and non-integers (1.5, \"28\", added.code 2.5): exit 1 naming the item. Well-formed: 0; no verdict file: 0; done_on 2026-11-08: 0; done probe with and without verdict: 0.",
+      "test": "verify/plan-reader-effort/plan-rule.test.mjs"
+    },
+    {
+      "id": "not-a-contract-change",
+      "status": "MET",
+      "command": "node --test verify/plan-reader-effort/not-a-contract-change.test.mjs (temp repo from the head; BASE_SHA=<base> PR_LABELS=[\"replan\"] node scripts/gates/pr-gate.mjs freeze); evidence/not-a-contract-change.md",
+      "excerpt": "4/4 pass. doing+verdict at base, PR adds status done, done_on, reader_effort: \"freeze gate passed\". Same plus one Expect check changed: exit 1 \"changes the contract of clean-room-install-test ... verdict.json exists, so verification has started\". Control: contract() no longer dropping reader_effort makes the done-only PR fail.",
+      "test": "verify/plan-reader-effort/not-a-contract-change.test.mjs"
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/plan-reader-effort/tests-bite.test.mjs (temp copy; node --test scripts/reader-effort.test.mjs green, broken, restored); evidence/tests-bite.md",
+      "excerpt": "1/1 pass. green 6/0, broken 2 pass 4 fail, restored 6/0.",
+      "test": "verify/plan-reader-effort/tests-bite.test.mjs",
+      "mutation": "return 'code'; as the first line of export function category(path) in scripts/reader-effort.mjs",
+      "red_test": "scripts/reader-effort.test.mjs: each path falls in the category its first matching rule gives; a merged PR is read as its merge against the first parent; exports added and removed are counted in code files only; reader lines are the hunks plus each called definition once"
+    },
+    {
+      "id": "rules-written",
+      "status": "MET",
+      "command": "node --test verify/plan-reader-effort/rules-written.test.mjs; evidence/rules-written.md",
+      "excerpt": "3/3 pass. plan/README.md table row `reader_effort` and done step 5 \"a build item also pastes `node scripts/reader-effort.mjs <pr> --json` into `reader_effort`\"; docs/gates.md freeze: \"head (all but `status`, `done_on` and `reader_effort`)\"; docs/language.md row \"reader effort\".",
+      "test": "verify/plan-reader-effort/rules-written.test.mjs"
+    },
+    {
+      "id": "plan-and-suite-pass",
+      "status": "MET",
+      "command": "node plan/check.mjs; npm test; git diff --name-only against the merge base; node --test verify/plan-reader-effort/plan-and-suite-pass.test.mjs, also in a git clone --depth 1; evidence/plan-and-suite-pass.md",
+      "excerpt": "plan ok. npm test locally 1928 pass, 2 fail, both of this container (fix-budget-rule backfill-true on a shallow clone, passes 4/0 after unshallow; the known rules-said-once suite-and-scope); ci npm test green at the head. 11 changed files, all outputs or the item file, no other verify/ folder. 2/2 pass, depth-1 mode passes too.",
+      "test": "verify/plan-reader-effort/plan-and-suite-pass.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "PR #212 check runs at 314dbde via GitHub (jobs 128707174550, 128707174833); evidence/ci.md",
+      "excerpt": "test: success. gates: failed only \"no verify/plan-reader-effort/verdict.json at the head sha\", which this verdict supplies; stubs, freeze and evidence gates pass locally against origin/main."
+    }
+  ],
+  "observations": [
+    "A call reads a definition in another file only when that file exports it (report() keeps own-file definitions, else exported ones); the decision text does not say exported. Harmless for module code, but a non-exported helper called by name from another file would be missed.",
+    "plan/README.md names the command in done step 5, not in the head-field table row; together they name both, which is how this verdict reads the Expect line.",
+    "The PR body still says the plan/README.md and docs/gates.md lines are still to come; they landed in 314dbde.",
+    "The real-prs reader_lines (1494 for #189, 1450 for #192) are dominated by verifier lines; the verifier category is counted in reader_lines per the decision, so verification-heavy PRs read as costly."
+  ]
+}

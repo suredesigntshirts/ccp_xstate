@@ -26,23 +26,24 @@ branch, label and `Item:` line; `docs/gates.md` gives what the gates check. Bran
 
 ## Layout
 
+The one map of the repo; `docs/layout.md` holds the rules for tests, comments and dependencies.
+
 | Path | What |
 |---|---|
 | `plan/` | The plan: items, stages, ledger, cases, decisions. Start at `plan/README.md` |
-| `packages/` | npm workspaces for the harness libraries; `packages/journal/` is the record format, `packages/engine/` loads and hosts workflows and runs their effects; `packages/engine/messages.md` is every text the harness hands a model |
-| `workflows/` | Workflow files as XState JSON; `workflows/quick-fix.json` is the first |
-| `plugins/` | npm workspaces for the Claude Code plugins |
-| `verify/<item>/` | The verifier's tests and `verdict.json` for each item |
-| `scripts/gates/` | The PR gates CI runs |
-| `scripts/tournament/` | The generic design-tournament runner, args builder, measure and CI template (`docs/tournaments.md`) |
-| `scripts/debug/` | Debugging aids: `scripts/debug/trace-writes.mjs` straces a command and lists what it wrote under a folder |
-| `scripts/bench/`, `bench/` | The stage bench: run one model stage alone on fixed cases, score and compare prompts (`docs/prompts.md`) |
+| `packages/` | npm workspaces for the harness libraries: `packages/journal/` is the record format, `packages/engine/` loads and hosts workflows and runs their effects, `packages/engine/messages.md` is every text the harness hands a model |
+| `workflows/` | Workflow files as XState JSON, each model stage's words in `workflows/<workflow>/<stage>.md`; `workflows/quick-fix.json` is the first |
+| `plugins/` | npm workspaces for the Claude Code plugins; `plugins/harness/` is the one threads install |
+| `verify/<item>/` | The verifier's tests, evidence and `verdict.json` for each item |
+| `test/` | Repo-wide tests, such as the workspace rules and `test/docs.test.mjs` |
+| `scripts/` | `scripts/gates/` the PR gates; `scripts/release/` cuts a plugin release; `scripts/inspector/` the Workflow Inspector (`docs/inspector.md`); `scripts/bench/` the stage bench (`docs/prompts.md`); `scripts/tournament/` the design-tournament kit (`docs/tournaments.md`); `scripts/clean-room/` checks a fresh install in an empty HOME; `scripts/debug/` debugging aids such as `scripts/debug/trace-writes.mjs` |
+| `bench/` | One folder per benched model stage: rubric, cases, run sets and reports |
 | `tournaments/` | One folder per design tournament, indexed in `tournaments/README.md`; lane code stays in the scratch repo |
-| `test/` | Repo-wide tests, such as the workspace rules |
-| `infra/cloud-environment/` | The cloud environment's setup script |
+| `probes/` | Throwaway platform probes; `probes/platform/` fed `plan/research/platform-baseline.md` |
+| `infra/` | `infra/cloud-environment/` holds the cloud environment's setup script |
 | `vendor/` | Third-party tools copied in verbatim; `vendor/documentation-downloader/` is the docs skill setup installs |
-| `.github/workflows/` | `.github/workflows/ci.yml` and `.github/workflows/verdict.yml` |
-| `docs/` | Standing knowledge; `docs/language.md` (the glossary), `docs/layout.md`, `docs/gates.md`, `docs/journal.md`, `docs/prompts.md` and `docs/tournaments.md` |
+| `.github/` | `.github/workflows/ci.yml` and `.github/workflows/verdict.yml` run on every PR |
+| `docs/` | Standing knowledge, one file per subject; `docs/language.md` is the glossary, `docs/traps.md` the container traps |
 
 ## Commands
 

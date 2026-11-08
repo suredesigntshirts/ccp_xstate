@@ -1,24 +1,7 @@
-# Repo layout
+# Repo rules
 
-```
-package.json        npm workspaces (packages/*, plugins/*); Node 22+; `npm test` runs everything
-packages/<name>/    a harness library: package.json, src/, test/
-plugins/<name>/     a Claude Code plugin: package.json, .claude-plugin/plugin.json, and its parts
-workflows/          workflow files: XState machine config as JSON, loaded by packages/engine, each model stage's
-                    words in workflows/<workflow>/<stage>.md; intake.json shapes and challenges a request into
-                    an issue, then starts quick-fix.json as a child item
-verify/<item>/      the verifier's own tests for an item, and its verdict.json
-scripts/gates/      the PR gates verdict.yml runs, with their tests
-scripts/tournament/ the generic design-tournament kit: runner, args builder, measure, CI template (docs/tournaments.md)
-scripts/inspector/  the Workflow Inspector: exporter, build and page that show any run step by step (docs/inspector.md)
-scripts/bench/      the stage bench: run one model stage alone, score it per rubric criterion, compare versions (docs/prompts.md)
-bench/<stage>/      one stage's bench: rubric, cases (with seed repos), judge check, run sets and reports
-tournaments/<id>/   one design tournament: pack, config, measure, result, scores; indexed in tournaments/README.md
-test/               repo-wide tests
-vendor/<name>/      third-party code copied in verbatim, not a workspace; vendor/README.md names each source and sha
-plan/               the plan (plan/README.md)
-docs/               standing knowledge, one file per subject
-```
+The map of the repo is `CLAUDE.md`'s Layout table. This file holds the rules a table can't: tests, comments and
+dependencies.
 
 ## Tests
 

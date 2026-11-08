@@ -15,7 +15,8 @@
   "depends_on": [
     "verify-regression-engine",
     "verify-regression-plugin",
-    "test-fixture-edges"
+    "test-fixture-edges",
+    "scope-suite-own-pr"
   ]
 }
 ```
@@ -44,6 +45,8 @@ What is known now:
   table. Known moves: `fix-budget-rule`'s `budget-refuses` and
   `names-module`. Suites with no tests (`first-real-issue`, `probe-*`, `person-setup-sitting`,
   `tool-docs-downloader`) keep their verdict and lose their evidence.
+- `scope-suite-own-pr` makes `rules-said-once/suite-and-scope.test.mjs` read the PR's file list only on that item's own
+  PR; classify the suite as that build leaves it.
 - The two root fixes from the 8 Nov time audit landed with `self-edit-check-snapshot` (#192); its tests move as that
   item left them.
 - The suite should get faster, not slower; the audit measured 12m51s for the local suite. Report the time before and
