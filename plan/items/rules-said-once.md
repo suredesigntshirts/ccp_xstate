@@ -4,7 +4,7 @@
   "title": "Say each process rule once, and write a thread's path from ready to done",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "doing",
   "contract_changes": 1,
   "outcome": "A PR names its item only by an `Item: <id>` line in its body, so a branch name never changes what the gates demand; plan/README.md holds, in one section, the path an item takes from ready to done (the readying replan, the build PR, the verdict, the merge and release, the done replan) with each PR's branch, label and body line; every process rule has one home among CLAUDE.md, plan/README.md and docs/gates.md and the others point at it; a repo test fails when a path those texts or docs/ name in backticks does not exist or when CLAUDE.md, plan/README.md and docs/gates.md together reach 230 lines; and the done-suite tests that matched the old wording of these files leave.",
   "why": "Threads followed a working rule from project memory because CLAUDE.md's replan branch name made the gate demand a verdict, and the freeze, verdict and session rules were each written out twice, so a model reads about 270 lines of rules before its item and can find two versions of one (L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-1.md).",

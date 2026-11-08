@@ -62,7 +62,7 @@ lane taking the stage lacks.
    where lanes write; keep that in the pack or `vars`, under `/mnt/project-files/` so it outlives the container.
 4. **Push the lanes.** The session pushes, not a script. In ccp_xstate_scratch: push `tourney/<id>/base` (a
    history-free snapshot of `base.sha` is fine: `git archive <sha> | tar -x`, commit), with
-   `.github/workflows/tournament.yml` copied from `scripts/tournament/ci/tournament.yml` and with `scripts/tournament/`
+   `scripts/tournament/ci/tournament.yml` copied to .github/workflows/tournament.yml, and with `scripts/tournament/`
    and `tournaments/<id>/` in it, since CI reads the kit and config from the base branch. Then push one
    `tourney/<id>/<lane>` branch per lane from that base, open one draft PR per lane into the base, label them
    `tourney:<id>`, and open one tracking issue that links them. Never merge them.

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Runs one PR gate against a git checkout: node scripts/gates/pr-gate.mjs stubs|freeze|evidence|verdict
-// Reads BASE_SHA, HEAD_SHA, PR_BRANCH, PR_BODY and PR_LABELS (a JSON array) from the environment, which
+// Reads BASE_SHA, HEAD_SHA, PR_BODY and PR_LABELS (a JSON array) from the environment, which
 // .github/workflows/verdict.yml fills from the pull_request event. Prints each reason and exits 1 if there is any.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -24,7 +24,7 @@ const commits = lines(git('rev-list', '--no-merges', `${base}..${head}`)).map((s
 const itemIds = (rev) => new Set(lines(git('ls-tree', '--name-only', rev, 'plan/items/'))
   .map((p) => p.replace(/^plan\/items\//, '')).filter((f) => f.endsWith('.md') && f !== 'README.md')
   .map((f) => f.slice(0, -3)));
-const named = namedItem({ branch: env.PR_BRANCH, body: env.PR_BODY, ids: itemIds(head) });
+const named = namedItem({ body: env.PR_BODY, ids: itemIds(head) });
 
 // Runs each test file a verdict names under node:test with the TAP reporter, from the checkout, which must be at the
 // head sha. The file runs as the entry point, not under --test, so the summary counts its own tests and a name that
