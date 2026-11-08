@@ -155,7 +155,7 @@ opposite.
 
 Readied in #211 (contract at draft) and built in PR #213 (merged c26dca4), which set the status to ready beside the
 fix to the four test helpers that copy `plan/` alone (decision 4; `verify/plan-reader-effort/plan-rule.test.mjs` got
-the same fix after main brought it in). A separate session verified it at c2e8cba: all five Expect lines MET, each
+the same fix after main brought it in). A separate session verified it at c2e8cba and again at 5bbad81, after main was merged in: all five Expect lines MET, each
 verifier line naming its test under `verify/fix-event-close-tag/`. Engine code changed, so it was released as
 harness-v0.1.41 (branch `release/harness-v0.1.41`). The head's `reader_effort` is
 `node scripts/reader-effort.mjs 213 --json`.
