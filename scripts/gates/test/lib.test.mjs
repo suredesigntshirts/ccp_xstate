@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { EVIDENCE_LIMIT, checkEvidence, checkFreeze, checkSessions, checkVerdict, contract, findStubs, namedItem, sessionOf, testRunFault, verdictTests } from '../lib.mjs';
+import { EVIDENCE_LIMIT, checkCutoff, checkDoneOn, checkEvidence, checkFreeze, checkSessions, checkVerdict, contract, contractMoves, findStubs, namedItem, sessionOf, testRunFault, verdictTests } from '../lib.mjs';
 
 const item = (head, brief = 'Run it.') => `\`\`\`json\n${JSON.stringify(head, null, 2)}\n\`\`\`\n\nWhy.\n\n## Verifier brief\n\n${brief}\n`;
 const head = {
@@ -27,6 +27,35 @@ test('the contract ignores status and done_on but sees the head and the Verifier
   assert.equal(contract(item(head)), contract(item({ ...head, status: 'done', done_on: '2026-11-08' })));
   assert.notEqual(contract(item(head)), contract(item({ ...head, expect: [head.expect[0]] })));
   assert.notEqual(contract(item(head)), contract(item(head, 'Skim it.')));
+});
+
+test('contractMoves names the head fields and the brief that moved, never status or done_on', () => {
+  assert.deepEqual(contractMoves(item(head), item({ ...head, status: 'done', done_on: '2026-11-08' })), []);
+  assert.deepEqual(contractMoves(item(head), item({ ...head, expect: [head.expect[0]], outcome: 'new' })), ['expect', 'outcome']);
+  assert.deepEqual(contractMoves(item(head), item(head, 'Skim it.')), ['Verifier brief']);
+});
+
+test('the cutoff refuses a verdict whose item contract moved after the verified sha, or had no file there', () => {
+  const verified = 'abcdef0123456789';
+  assert.deepEqual(checkCutoff({ item: 'x', verified, before: item(head), after: item({ ...head, status: 'done' }) }), []);
+  const [moved] = checkCutoff({ item: 'x', verified, before: item(head), after: item({ ...head, expect: [head.expect[0]] }, 'Skim it.') });
+  assert.match(moved, /contract of x moved after the verified sha abcdef0 \(expect, Verifier brief\)/);
+  assert.match(checkCutoff({ item: 'x', verified, before: null, after: item(head) })[0], /plan\/items\/x.md does not exist at the verified sha abcdef0/);
+});
+
+test('a set done_on moves only by a plan-only replan that says why under ## Done on change', () => {
+  const dated = item({ ...head, status: 'done', done_on: '2026-11-01' });
+  const moved = item({ ...head, status: 'done', done_on: '2026-11-08' });
+  const said = `${moved}\n## Done on change\n\nThe first date was the build's, not the merge's.\n`;
+  const plan = ['plan/items/x.md'];
+  const run = (after, labels, changed = plan) => checkDoneOn({ changed, items: [{ id: 'x', before: dated, after }], labels });
+  assert.match(run(moved, [])[0], /changes done_on of x from 2026-11-01 to 2026-11-08/);
+  assert.match(run(said, ['replan'], [...plan, 'docs/a.md'])[0], /touches docs\/a.md/);
+  assert.match(run(moved, ['replan'])[0], /does not add or rewrite/);
+  assert.match(run(item({ ...head, status: 'done' }), ['replan'])[0], /to \(none\)/);
+  assert.deepEqual(run(said, ['replan']), []);
+  assert.deepEqual(run(dated, []), []);
+  assert.equal(checkDoneOn({ changed: plan, items: [{ id: 'x', before: `${said}`, after: `${said.replace('11-08', '11-09')}` }], labels: ['replan'] }).length, 1);
 });
 
 test('the freeze refuses a changed contract unless the PR is a plan-only replan', () => {

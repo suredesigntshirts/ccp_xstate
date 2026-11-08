@@ -43,7 +43,8 @@ The gate checks, against the item head at the PR head sha:
 - every named test passes: the gate runs `node --test-reporter=tap [--test-name-pattern=<test_name>] <file>` from
   the head checkout and refuses one that exits non-zero or passes no test;
 - every `builder` result has a `mutation` and a `red_test`; `observations`, if present, is a list of strings;
-- `verified_sha` is in the PR's history, and no later commit other than a merge changes anything outside `verify/`;
+- `verified_sha` is in the PR's history, no later commit other than a merge changes anything outside `verify/`, and
+  the item's contract (see below) at `verified_sha` matches the head's, or the gate names the fields that moved;
 - the last commit that wrote `verdict.json` has a `Claude-Session:` trailer that no commit changing anything outside
   `verify/` carries.
 
@@ -68,7 +69,8 @@ An item is frozen when the PR names it, its status at the base is `doing` or `do
 frozen item's head (all but `status` and `done_on`) and `## Verifier brief` change only by its one contract change: a
 PR labelled `replan` that changes nothing outside `plan/`, with `contract_changes` 1 and a `## Contract change`
 section. Verification has started once `verify/<item>/verdict.json` exists at the PR's base or head; from then on the
-gate refuses any head or brief change, label or not.
+gate refuses any head or brief change, label or not. A `done_on` set at the base moves only by such a replan whose
+item says why under `## Done on change`; setting one where there was none is free.
 
 ## After the merge
 

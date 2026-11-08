@@ -13,11 +13,60 @@ export function itemHead(text) {
 
 // The frozen part of an item: its head without status and done_on (which record where the build is, not what it must
 // show), and its Verifier brief.
+function contractParts(text) {
+  const { status, done_on, ...head } = itemHead(text) ?? {};
+  return { head, brief: section(text, BRIEF_RE) ?? '' };
+}
+
 export function contract(text) {
-  if (text == null) return null;
-  const { status, done_on, ...rest } = itemHead(text) ?? {};
-  const brief = text.split(BRIEF_RE)[1]?.split(/^## /m)[0].trim() ?? '';
-  return JSON.stringify({ head: rest, brief });
+  return text == null ? null : JSON.stringify(contractParts(text));
+}
+
+// The text of an item's `## <title>` section up to the next `## ` heading, trimmed, or null when it has none.
+function section(text, re) {
+  const parts = text.split(re);
+  return parts.length > 1 ? parts[1].split(/^## /m)[0].trim() : null;
+}
+
+// What moved in an item's contract between two texts of its file: the head fields whose values differ, and
+// `Verifier brief` when the brief does. Empty when the contracts match.
+export function contractMoves(before, after) {
+  const a = contractParts(before), b = contractParts(after);
+  const keys = [...new Set([...Object.keys(a.head), ...Object.keys(b.head)])];
+  const moved = keys.filter((k) => JSON.stringify(a.head[k]) !== JSON.stringify(b.head[k]));
+  return a.brief === b.brief ? moved : [...moved, 'Verifier brief'];
+}
+
+// The verdict cutoff: a verdict holds only for the contract it verified, so the item's contract at verified_sha must
+// match the head's. before is the item file at verified_sha (null when absent), after at the head.
+export function checkCutoff({ item, verified, before, after }) {
+  const at = `the verified sha ${verified.slice(0, 7)}`;
+  if (before == null) return [`plan/items/${item}.md does not exist at ${at}, so the verdict verified no contract of ${item}`];
+  const moved = contractMoves(before, after ?? '');
+  return moved.length ? [`the contract of ${item} moved after ${at} (${moved.join(', ')}); a verdict holds only for the contract it verified, so verify again at the head`] : [];
+}
+
+const DONE_ON_RE = /^## Done on change$/m;
+
+// A set done_on moves only by a PR labelled replan that changes nothing outside plan/ and whose item says why in a
+// `## Done on change` section that differs from the base's. Setting done_on where it was absent is free. items is
+// [{ id, before, after }], the item files at base and head for every item whose done_on is set at the base.
+export function checkDoneOn({ changed, items, labels }) {
+  const outside = changed.filter((p) => !p.startsWith('plan/'));
+  const replan = labels.includes('replan') && !outside.length;
+  const reasons = [];
+  for (const { id, before, after } of items) {
+    const was = itemHead(before)?.done_on;
+    const now = after == null ? undefined : itemHead(after)?.done_on;
+    if (was === undefined || was === now) continue;
+    const why = after != null && section(after, DONE_ON_RE);
+    const said = why && why !== section(before, DONE_ON_RE);
+    if (replan && said) continue;
+    reasons.push(`changes done_on of ${id} from ${was} to ${now ?? '(none)'}; a set done_on moves only by a PR labelled replan ` +
+      `that touches nothing but plan/ and says why under ## Done on change` +
+      (!labels.includes('replan') ? '' : outside.length ? `, but this one touches ${outside.join(', ')}` : ', which this one does not add or rewrite'));
+  }
+  return reasons;
 }
 
 // Which item a PR names: the `Item: <id>` line in its body, and nothing else. The branch name is for people.
