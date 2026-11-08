@@ -5,7 +5,7 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "ready",
-  "outcome": "Each of the 25 verify/ folders this item names holds only verdict.json; every test file they held is either moved to test/regression/<area>/ (area engine, run or marks, with the Expect id it proves in its first comment) or deleted with its evidence because it read source text, compared a listing or compared a stored capture, and a test that did both is split; test/regression/ has one shared helper, lib.mjs; the item's prose carries a table with one row per test file, its verdict and its reason; and no engine, plugin, workflow or script source changes.",
+  "outcome": "Each of the 26 verify/ folders this item names holds only verdict.json; every test file they held is either moved to test/regression/<area>/ (area engine, run or marks, with the Expect id it proves in its first comment) or deleted with its evidence because it read source text, compared a listing or compared a stored capture, and a test that did both is split; test/regression/ has one shared helper, lib.mjs; the item's prose carries a table with one row per test file, its verdict and its reason; and no engine, plugin, workflow or script source changes.",
   "why": "Done suites that assert stored captures let code be added but never removed; the classification is per test, not a deletion pass (L-measure-then-park; research plan/research/verification-swing.md, How to classify a verifier test; decision 4). First of three parts of verify-regression-set, split by suite (plan/decisions/2026-11-08-verify-regression-split.md).",
   "serves": [
     "L-contract-names-behaviour",
@@ -25,8 +25,8 @@
       "what": "Decision 4 (done suites retire), and the split: which suites, the folder-per-area layout, the Expect header, the one helper, fixtures"
     },
     {
-      "ref": "verify/engine-actor-returns, verify/engine-actors, verify/engine-cards-standin, verify/engine-effects, verify/engine-host, verify/engine-stage-contract, verify/engine-toy-run, verify/fix-blocked-card-grant, verify/fix-blocked-retry, verify/fix-finish-closes-waits, verify/fix-grant-null-repo, verify/fix-other-host-runs-effects, verify/fix-rebuild-worktree, verify/fix-reminder-wake, verify/fix-verify-issue-echo, verify/fix-waiting-wake, verify/parity-cases, verify/prompt-catalogue, verify/retire-pinned-legacy, verify/run-lifecycle-store, verify/run-names-one-module, verify/stage-contract-declares-rules, verify/stage-prompt-files, verify/wf-intake, verify/wf-quick-fix",
-      "what": "The 25 suites this item retires: their tests, helpers, evidence and verdicts, and the Expect lines of the items that wrote them"
+      "ref": "verify/engine-actor-returns, verify/engine-actors, verify/engine-cards-standin, verify/engine-effects, verify/engine-host, verify/engine-stage-contract, verify/engine-toy-run, verify/fix-blocked-card-grant, verify/fix-blocked-retry, verify/fix-finish-closes-waits, verify/fix-grant-null-repo, verify/fix-other-host-runs-effects, verify/fix-rebuild-worktree, verify/fix-reminder-wake, verify/fix-verify-issue-echo, verify/fix-waiting-wake, verify/parity-cases, verify/prompt-catalogue, verify/retire-pinned-legacy, verify/run-lifecycle-store, verify/run-names-one-module, verify/stage-bench, verify/stage-contract-declares-rules, verify/stage-prompt-files, verify/wf-intake, verify/wf-quick-fix",
+      "what": "The 26 suites this item retires: their tests, helpers, evidence and verdicts, and the Expect lines of the items that wrote them"
     },
     {
       "ref": "docs/language.md",
@@ -47,24 +47,24 @@
       "what": "Data a moved test reads as input (a recorded transcript, a workflow under test), never a stored capture of the harness's own output to compare with"
     },
     {
-      "ref": "verify/<each of the 25 suites>/",
+      "ref": "verify/<each of the 26 suites>/",
       "what": "verdict.json only; tests, helpers, evidence, .pass listings and captures deleted"
     },
     {
       "ref": "plan/items/verify-regression-engine.md",
-      "what": "A `## Regression table` section: one row per test file of the 25 suites (path, moved to <path> / split / left, one reason), and one row per suite for its other files (helpers and evidence, and where any went)"
+      "what": "A `## Regression table` section: one row per test file of the 26 suites (path, moved to <path> / split / left, one reason), and one row per suite for its other files (helpers and evidence, and where any went)"
     }
   ],
   "expect": [
     {
       "id": "table-complete",
-      "check": "The item file's Regression table has exactly one row for every *.test.mjs file the 25 named verify/ folders held at the PR's base and no row for any other test file; each row's verdict is moved, split or left with a non-empty reason; every test-file path the table names as a destination exists at the head under test/regression/engine/, run/ or marks/",
+      "check": "The item file's Regression table has exactly one row for every *.test.mjs file the 26 named verify/ folders held at the PR's base and no row for any other test file; each row's verdict is moved, split or left with a non-empty reason; every test-file path the table names as a destination exists at the head under test/regression/engine/, run/ or marks/",
       "how": "The verifier's own test listing the base's verify/ folders with git and parsing the table at the head",
       "proof": "verifier"
     },
     {
       "id": "folders-hold-verdicts",
-      "check": "At the head, each of the 25 named verify/ folders holds verdict.json and no other file, and each verdict.json parses with its item field equal to the folder name",
+      "check": "At the head, each of the 26 named verify/ folders holds verdict.json and no other file, and each verdict.json parses with its item field equal to the folder name",
       "how": "The verifier's own test reading the head's tree",
       "proof": "verifier"
     },
@@ -94,7 +94,7 @@
     },
     {
       "id": "scope",
-      "check": "The PR adds, changes or deletes files only under test/regression/, under the 25 named verify/ folders, and plan/items/verify-regression-engine.md; nothing under packages/, plugins/, workflows/, scripts/, bench/ or any other verify/ folder",
+      "check": "The PR adds, changes or deletes files only under test/regression/, under the 26 named verify/ folders, and plan/items/verify-regression-engine.md, except that a test or helper in another verify/ folder that read a file this PR moved to test/regression/fixtures/ changes only that path; nothing under packages/, plugins/, workflows/, scripts/ or bench/ changes",
       "how": "The verifier's own test reading git diff --name-only between base and head",
       "proof": "verifier"
     },
@@ -108,10 +108,10 @@
   "concepts": {
     "adds": [],
     "merges": [
-      "the per-suite helpers of 25 suites into test/regression/lib.mjs"
+      "the per-suite helpers of 26 suites into test/regression/lib.mjs"
     ],
     "removes": [
-      "stored captures of earlier output as a test oracle, for these 25 suites"
+      "stored captures of earlier output as a test oracle, for these 26 suites"
     ],
     "budget": 1
   },
@@ -135,7 +135,7 @@
   },
   "verifier": "A separate session, not the builder's and not a subagent of it, using the Verifier brief below.",
   "risks": [
-    "A test in another verify/ folder may read a file one of these suites holds (verify/harness-glossary reads verify/obs-live-capture/fixture; a test reads verify/engine-toy-run/evidence run folders); ci shows it, and the file moves to test/regression/fixtures/ with the test that reads it",
+    "A test in another verify/ folder reads a file one of these suites holds (verify/harness-glossary/lib.mjs reads the v1 journals under verify/engine-toy-run/evidence); the file moves to test/regression/fixtures/ and that one path changes, which the scope line allows",
     "A moved test that drove the engine against a stored capture must be rewritten to assert the behaviour directly or be split; the table says which"
   ]
 }
@@ -145,7 +145,8 @@
 
 The first of three parts of `verify-regression-set`, split at the replan that readied it because the whole table is
 147 test files in 64 folders (`plan/decisions/2026-11-08-verify-regression-split.md`). This part takes the suites of
-the engine, the run and the marks: the 25 folders the inputs name. `verify-regression-plugin` takes the plugin,
+the engine, the run and the marks, and `stage-bench`, whose `edit-safe` test lists the journals other folders here
+hold: the 26 folders the inputs name. `verify-regression-plugin` takes the plugin,
 inspector and journal suites, and `verify-regression-set` takes the rest and closes the series.
 
 Read a test, not its name (research, "How to classify a verifier test"). It **moves** when it calls the engine, the
@@ -173,9 +174,9 @@ Check out the PR at its head sha in a clean clone, `git fetch --unshallow origin
 Read `docs/gates.md` at the head: your `verdict.json` carries `test` on every verifier result. Without reading the
 builder's moved tests first, write your own under `verify/verify-regression-engine/`:
 
-- **table-complete:** list `verify/<suite>/*.test.mjs` for the 25 suites at the PR base with `git ls-tree`, parse the
+- **table-complete:** list `verify/<suite>/*.test.mjs` for the 26 suites at the PR base with `git ls-tree`, parse the
   `## Regression table` at the head, compare the two sets, check each destination exists.
-- **folders-hold-verdicts:** read the head tree of each of the 25 folders.
+- **folders-hold-verdicts:** read the head tree of each of the 26 folders.
 - **moved-pass:** run `node --test` on each file under `test/regression/` from a child process (drop
   `NODE_TEST_CONTEXT` from its env); parse each file's first comment for `<item>/<expect-id>` and check it against
   `plan/items/<item>.md`; grep for `verify/` paths read.

@@ -11,9 +11,10 @@ Measured on 8 Nov: 64 `verify/` folders, 147 test files (11,678 lines), 42 helpe
 split is by suite, not by area, so no test file is shared between two PRs and each part's table is the list of
 whole folders it empties; each test still goes to the area it fits.
 
-- `verify-regression-engine`: 25 suites of the engine, the run and the marks. Ready first.
+- `verify-regression-engine`: 25 suites of the engine, the run and the marks, and `stage-bench`, whose `edit-safe`
+  test asserts the list of journals those folders hold. Ready first.
 - `verify-regression-plugin`: 19 suites of the plugin, the inspector and the journal.
-- `verify-regression-set`: the other 20 and anything done since; it keeps the id, so the three items that already
+- `verify-regression-set`: the other 19 and anything done since; it keeps the id, so the three items that already
   wait for it (`retire-unmarked-reading`, `retire-brief-file-fallback`, `run-message-and-budget`) wait for all three
   parts without a change to their files. The tests those items need gone sit in all three parts.
 

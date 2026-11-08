@@ -21,15 +21,15 @@
 
 Draft from `plan/research/verification-swing.md`, item 2, and `plan/decisions/2026-11-08-verification-swing.md`,
 decision 4. Split on 8 Nov into three parts by suite (`plan/decisions/2026-11-08-verify-regression-split.md`):
-`verify-regression-engine` (25 suites: engine, run, marks), `verify-regression-plugin` (19 suites: plugin,
+`verify-regression-engine` (26 suites: engine, run, marks, and `stage-bench`), `verify-regression-plugin` (19 suites: plugin,
 inspector, journal) and this item, which keeps the id so the items that wait for the whole set
 (`retire-unmarked-reading`, `retire-brief-file-fallback`, `run-message-and-budget`) still wait for all three.
 Readied after `verify-regression-plugin` is done, with the Expect lines and Verifier brief of the earlier parts.
 
-The 20 suites: `clean-room-install-test`, `comments-present-tense`, `env-bootstrap`, `first-real-issue`,
+The 19 suites: `clean-room-install-test`, `comments-present-tense`, `env-bootstrap`, `first-real-issue`,
 `fix-budget-rule`, `person-setup-sitting`, `probe-platform-baseline`, `probe-plugin-agents`,
 `probe-plugin-agents-thread`, `refine-brief-stage`, `repo-skeleton`, `retro-first-item`, `self-edit-check-snapshot`,
-`self-update-by-version`, `stage-bench`, `tool-docs-downloader`, `tournament-kit`, `tournament-scoring-floors`,
+`self-update-by-version`, `tool-docs-downloader`, `tournament-kit`, `tournament-scoring-floors`,
 `trial-fail-path`, `verification-contract`. Also any item done after the split (such as `verify-evidence-policy`)
 whose folder still holds tests when this item is readied.
 
