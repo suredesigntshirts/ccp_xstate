@@ -4,7 +4,7 @@
   "title": "Retire the doing status, which no step of the path sets",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "doing is not a status: item.schema.json leaves it out, so plan/check.mjs refuses an item that holds it; the plan check's pins, module and fix-budget rules hold ready items; the freeze gate freezes an item named by the PR, done at the base, or holding a verdict file; and plan/README.md, docs/gates.md and the plan check describe the path with draft, ready and done alone, with merged listed among the statuses off the path.",
   "why": "Since done-with-the-build a build PR's first commit sets its item done, so no step sets doing and main never holds it, yet the schema, the plan check, the freeze gate and the README still name it. A reader meets a status the path never uses and has to ask when it applies (L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-5.md).",
   "serves": [

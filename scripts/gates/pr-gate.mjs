@@ -53,7 +53,7 @@ const gates = {
     const verdictFile = (id) => `verify/${id}/verdict.json`;
     const verified = (id) => show(base, verdictFile(id)) !== null || show(head, verdictFile(id)) !== null;
     const frozenIds = new Set([...itemIds(base)].filter((id) => id === named.item || verified(id) ||
-      ['doing', 'done'].includes(itemHead(show(base, `plan/items/${id}.md`))?.status)));
+      itemHead(show(base, `plan/items/${id}.md`))?.status === 'done'));
     const frozen = [...frozenIds].map((id) => ({
       id, before: show(base, `plan/items/${id}.md`), after: show(head, `plan/items/${id}.md`) ?? '',
       verdict: verified(id) ? verdictFile(id) : null,

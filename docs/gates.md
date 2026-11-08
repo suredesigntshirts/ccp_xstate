@@ -12,8 +12,8 @@ rules of `plan/README.md`, "How slop is kept out", so the builder isn't the one 
 | `verdict` | evidence | the PR adds, changes or renames under `verify/` an entry that is not a regular file (a symlink, a submodule), one larger than 64 KB (65,536 bytes), one named `*.pass`, or a test listing: a node:test pass and fail summary with ten or more result lines; a deletion is never read |
 | `verdict` | verdict | the named item has no complete verdict at the head sha, a test it names fails or is missing, or the verdict came from a builder's session; or the PR names no item and changes files outside `plan/` |
 
-A PR names its item only by an `Item: <id>` line in its body. The checks are in `scripts/gates/lib.mjs`; run one
-locally with `BASE_SHA=origin/main node scripts/gates/pr-gate.mjs verdict`, setting `PR_BODY` and `PR_LABELS`.
+A PR names its item only by an `Item: <id>` line in its body. The checks are in `scripts/gates/lib.mjs`; run one at
+the checkout's HEAD with `BASE_SHA=origin/main PR_BODY='Item: <id>' node scripts/gates/pr-gate.mjs verdict`.
 
 ## The verdict
 
@@ -22,7 +22,7 @@ The verifier, a session other than the builder's, commits `verify/<item>/verdict
 ```json
 {
   "item": "repo-skeleton", "verified_sha": "<the commit the verifier checked out>",
-  "verifier": { "session": "<its Claude-Session value>", "model": "<model id>" },
+  "verifier": { "session": "<its Claude-Session value>", "model": "<its own model id>" },
   "results": [
     { "id": "ci-runs", "status": "MET", "command": "what it ran", "excerpt": "what it saw" },
     { "id": "a-verifier-line", "status": "MET", "command": "node --test verify/repo-skeleton/layout.test.mjs",
@@ -37,11 +37,12 @@ The verifier, a session other than the builder's, commits `verify/<item>/verdict
 
 The gate checks, against the item head at the PR head sha:
 
-- every Expect id, and no other, has a `MET` result with a non-empty `command` and `excerpt`;
-- each `verifier` or `builder` result names a file under `verify/<item>/` in `test`, maybe a pattern in `test_name`;
+- every Expect id, and no other, has a `MET` result with a non-empty `command` and `excerpt`; a `world` result needs
+  no `test`, and one about the PR's checks cites them at `verified_sha`, since they run again on the verdict commit;
+- each `verifier` or `builder` result names a file under `verify/<item>/` in `test`, maybe a pattern in `test_name`,
+  and each `builder` result a `mutation` and a `red_test`; `observations`, if present, is a list of strings;
 - every named test passes: the gate runs `node --test-reporter=tap [--test-name-pattern=<test_name>] <file>` from
   the head checkout and refuses one that exits non-zero or passes no test;
-- every `builder` result has a `mutation` and a `red_test`; `observations`, if present, is a list of strings;
 - `verified_sha` is in the PR's history, no later commit other than a merge changes anything outside `verify/`, and
   the item's contract (see below) at `verified_sha` matches the head's, or the gate names the fields that moved;
 - the last commit to `verdict.json` has a `Claude-Session:` trailer that no commit changing files outside `verify/` has.
@@ -63,7 +64,7 @@ could forge a verdict commit; a separate identity stays parked until one is seen
 
 ## The contract freeze
 
-An item is frozen when the PR names it, its status at the base is `doing` or `done`, or it has a verdict file. Its head
+An item is frozen when the PR names it, its status at the base is `done`, or it has a verdict file. Its head
 (all but `status`, `done_on` and `reader_effort`) and `## Verifier brief` change only by its one contract change: a PR
 labelled `replan` that changes nothing outside `plan/`, with `contract_changes` 1 and a `## Contract change` section.
 Once `verify/<item>/verdict.json` exists at the PR's base or head, the gate refuses any head or brief change, label or
@@ -71,7 +72,5 @@ not. A `done_on` set at the base moves only by such a replan whose item says why
 
 ## After the merge
 
-The thread that merged runs `git fetch origin main && node scripts/release/release.mjs branch --push`. When the merge
-changed `plugins/harness/` or `packages/journal/` (tests aside), that pushes `release/harness-v<x.y.z>` and prints a
-`ci.result` row for the thread's journal; otherwise it makes nothing, so it is safe after every merge. See
-`plugins/harness/README.md`, "Releases".
+The thread that merged runs `git fetch origin main && node scripts/release/release.mjs branch --push`: it pushes
+`release/harness-v<x.y.z>` if the merge changed a path in its `RELEASED`, else nothing (`plugins/harness/README.md`).

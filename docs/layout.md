@@ -14,6 +14,10 @@ a time, and holds the tests that measure wall time, so no other file shares the 
 joins it by a name starting with `cheap: `, in a file the serial pass names; the parallel pass skips such tests by
 the same pattern. `test/test-passes.test.mjs` fails a `cheap: ` test in a file the serial pass does not run.
 
+A test that reads a rule text (`CLAUDE.md`, `plan/`, `docs/`) matches each word or term that carries the rule on its
+own (for "the first commit sets the status to `done`": `first commit`, `status`, `done`), never a phrase or a whole
+sentence, so a rewording that keeps the rule keeps the test green.
+
 ## Comments
 
 Comments and READMEs are present tense: they say what holds and why it must hold, such as a platform fact or a race

@@ -1,0 +1,53 @@
+{
+  "item": "fresh-reader-gaps",
+  "verified_sha": "7d35231e495c41b2dae36edb936fdf8494648814",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5JK9PUp62RXRA3P952", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "fresh-reader-path",
+      "status": "MET",
+      "command": "env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p '<the brief's question>' in a clean clone of the head (origin removed, npm ci); node --test verify/fresh-reader-gaps/fresh-reader-path.test.mjs regrades the answer; evidence/fresh-reader-path.md (prompt, verbatim answer, grading)",
+      "excerpt": "4/4 pass. done_on: 'the day of the build PR's first commit (plan/README.md, step 2)'; verify/: 'Nothing. The builder writes nothing under verify/<id>/', asks whoever started it for a verifier, verdict by a separate session; one suite: node --test \"verify/<item>/*.test.mjs\", 'a bare folder fails (CLAUDE.md, Commands)'; after the merge: git fetch origin main && node scripts/release/release.mjs branch --push (docs/gates.md, After the merge).",
+      "test": "verify/fresh-reader-gaps/fresh-reader-path.test.mjs"
+    },
+    {
+      "id": "one-suite-command",
+      "status": "MET",
+      "command": "node --test verify/fresh-reader-gaps/one-suite-command.test.mjs; evidence/one-suite-command.md",
+      "excerpt": "3/3 pass. CLAUDE.md's command on verify/item-head-trim: exit 0, 8 tests, 8 pass over 4 files; node --test verify/item-head-trim/: exit 1, Cannot find module.",
+      "test": "verify/fresh-reader-gaps/one-suite-command.test.mjs"
+    },
+    {
+      "id": "release-paths-named-once",
+      "status": "MET",
+      "command": "node --test verify/fresh-reader-gaps/release-paths-named-once.test.mjs; evidence/release-paths-named-once.md",
+      "excerpt": "4/4 pass. gates.md After the merge names `RELEASED` and the release command; README step 4 points at it; 0 lines in either naming plugins/harness/ (other than its README) or packages/journal/.",
+      "test": "verify/fresh-reader-gaps/release-paths-named-once.test.mjs"
+    },
+    {
+      "id": "budget",
+      "status": "MET",
+      "command": "node --test verify/fresh-reader-gaps/budget.test.mjs; evidence/budget.md",
+      "excerpt": "2/2 pass. BUDGET = 225; CLAUDE.md 56, plan/README.md 93, docs/gates.md 75, total 224; test/docs.test.mjs exit 0.",
+      "test": "verify/fresh-reader-gaps/budget.test.mjs"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "node --test verify/fresh-reader-gaps/suite-and-scope.test.mjs (PR mode with PR_BODY naming the item, tree mode without); node plan/check.mjs; ci test job 128741173622; evidence/suite-and-scope.md",
+      "excerpt": "3/3 pass. 6 files against main: the 4 outputs, the item and its round-6 decisions file (from stacked replan #255). plan ok. ci npm test: 2082 tests, 0 fail.",
+      "test": "verify/fresh-reader-gaps/suite-and-scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #256; evidence/ci.md",
+      "excerpt": "test job 128741173622 at 7d35231e495c41b2dae36edb936fdf8494648814: success. gates job 128741173650: refused only for 'no verify/fresh-reader-gaps/verdict.json at the head sha', and reruns on this commit, which changes only verify/fresh-reader-gaps/."
+    }
+  ],
+  "observations": [
+    "plan/README.md step 2 now says the first commit sets done_on to that day, but this build's own first commit set status done and no done_on. check.mjs requires done_on only for a done item naming a module, and this item names none; retire-doing and done-with-the-build also carry none. The text reads as unconditional; a later round could say 'done_on, when the item names a module' or have every build set it.",
+    "The fresh reader also cited plan/decisions/2026-11-08-plan-reader-effort.md (reader_effort required for done_on from 2026-11-09), which lies outside the three entry texts and is correct.",
+    "The verifier read the builder's diff before writing its tests; the build added no tests of its own beyond the BUDGET constant."
+  ]
+}

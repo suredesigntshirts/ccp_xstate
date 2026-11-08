@@ -1,5 +1,5 @@
-// budget-refuses: three done fix items to module M with done_on in the last 14 days refuse a fourth fix at ready or
-// doing, by name; two pass; one aged out (15 days) passes; a later done design item resets; an earlier one does not;
+// budget-refuses: three done fix items to module M with done_on in the last 14 days refuse a fourth fix at ready,
+// by name; two pass; one aged out (15 days) passes; a later done design item resets; an earlier one does not;
 // a ready non-fix item naming M (the design item) passes.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -27,14 +27,6 @@ test('three done fixes in 14 days refuse a ready fourth, naming M, the three ids
   for (const id of FIXES) assert.ok(line.includes(id), `${id} in ${line}`);
   assert.ok(line.includes('plan/README.md'), line);
   console.log(line);
-});
-
-test('the same fourth at doing is refused', (t) => {
-  const p = setup(t);
-  fourth(p, 'doing');
-  const r = p.run();
-  assert.equal(r.code, 1, r.out);
-  assert.ok(refusal(r).includes(M));
 });
 
 test('with two such fixes it passes', (t) => {

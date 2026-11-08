@@ -1,0 +1,41 @@
+{
+  "item": "rule-text-tests",
+  "verified_sha": "772c1ad68d096cb0956aea1547f70976fc479a51",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GnnFijLU5VMRKPHxf",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "rule-written",
+      "status": "MET",
+      "command": "node --test verify/rule-text-tests/rule-written.test.mjs; evidence/rule-written.md",
+      "excerpt": "6/6 pass. Tests: 'A test that reads a rule text (`CLAUDE.md`, `plan/`, `docs/`) matches each word or term that carries the rule on its own (... `first commit`, `status`, `done`), never a phrase or a whole sentence, so a rewording that keeps the rule keeps the test green.'",
+      "test": "verify/rule-text-tests/rule-written.test.mjs"
+    },
+    {
+      "id": "fresh-verifier-follows",
+      "status": "MET",
+      "command": "env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p '<the brief's prompt>' in a clean clone of the head (origin removed, npm ci), two separate sessions; each test run in a scratch copy at the head and with step 2 reworded; node --test verify/rule-text-tests/fresh-verifier-follows.test.mjs reruns both; evidence/fresh-verifier-follows.md",
+      "excerpt": "Both sessions match 'first commit', 'status', 'done' each on its own in the build PR step. Each: pass 4/4 at the head, 4/4 reworded as round 7 did ('sets status `done`'), 4/4 reworded 'The PR's first commit sets the item's status to `done`', 4/4 with round 7's whole step 2. Rerun: 8/8.",
+      "test": "verify/rule-text-tests/fresh-verifier-follows.test.mjs"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "node plan/check.mjs; PR_BODY='Item: rule-text-tests' node --test verify/rule-text-tests/suite-and-scope.test.mjs; the whole folder in a depth-1 clone; evidence/suite-and-scope.md",
+      "excerpt": "plan ok; 3/3, PR mode: docs/layout.md, plan/decisions/2026-11-08-refine-round-8.md, plan/items/rule-text-tests.md. Depth-1 clone: 17/17, tree mode.",
+      "test": "verify/rule-text-tests/suite-and-scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #261",
+      "excerpt": "test job 128749408725 at 772c1ad68d096cb0956aea1547f70976fc479a51: success. gates job 128749408683: refused only for 'no verify/rule-text-tests/verdict.json at the head sha', and reruns on this commit, which changes only verify/rule-text-tests/."
+    }
+  ],
+  "observations": [
+    "Both fresh tests fail on a reflow that splits 'first commit' across a line break (same words, pass 3 fail 1): neither collapses whitespace before matching a two-word term. Not a rewording, so not judged; a later round could add 'across line breaks' to the rule.",
+    "The rewordings in the rerun test match step 2 with or without round 7's wording, so the suite stays green once #259 is on main."
+  ]
+}

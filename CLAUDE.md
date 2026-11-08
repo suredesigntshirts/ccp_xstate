@@ -21,7 +21,7 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 
 ## Working an item
 
-One plan item per PR. `plan/README.md`, "How an item moves", gives the four steps from ready to done, with each PR's
+One plan item per PR. `plan/README.md`, "How an item moves", gives the four steps to done, with each PR's
 branch, label and `Item:` line; `docs/gates.md` gives what the gates check. Branches carry no `claude/` prefix.
 
 ## Layout
@@ -50,6 +50,7 @@ The one map of the repo; `docs/layout.md` holds the rules for tests, comments an
 ```
 npm test                 # node:test over test/, scripts/, packages/, plugins/ and verify/
 node plan/check.mjs      # the plan check; CI runs both on every PR
+node --test "verify/<item>/*.test.mjs"   # one suite: name its files, a bare folder fails
 ```
 
 Node 22 or later. A runtime dependency needs a `plan/decisions/` file naming it (`docs/layout.md`, Dependencies).

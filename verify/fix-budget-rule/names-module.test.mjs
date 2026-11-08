@@ -1,4 +1,4 @@
-// names-module: a fix- item at ready, doing or done names module; at ready a module path that does not exist is
+// names-module: a fix- item at ready or done names module; at ready a module path that does not exist is
 // refused; a done item naming a module needs done_on. Drafts and non-fix items without module pass.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -10,7 +10,7 @@ test('the untouched copy of the head plan passes', (t) => {
   assert.equal(r.code, 0, r.out);
 });
 
-for (const status of ['ready', 'doing', 'done']) {
+for (const status of ['ready', 'done']) {
   test(`a ${status} fix item without module is refused by name and field`, (t) => {
     const p = tempPlan(t);
     p.add('fix-vfy-nomodule', { status, module: undefined, done_on: status === 'done' ? daysAgo(1) : undefined });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Checks the plan: every head matches item.schema.json, every id it names exists, depends_on has no
-// cycle and never points at a later stage, a ready item has every readyRequired field filled, a ready or doing item's
+// cycle and never points at a later stage, a ready item has every readyRequired field filled, a ready item's
 // Expect lines name behaviour rather than pinning main, a contract change is written down, and fix items keep to the
 // fix budget.
 // Zero dependencies; it reads only the small part of JSON Schema that item.schema.json uses.
@@ -108,14 +108,14 @@ for (const it of items.values()) {
 }
 
 // An Expect line names behaviour, never the repository's current state (plan/README.md, How slop is kept out; the list
-// is plan/decisions/2026-11-08-verification-swing.md, decision 1). Ready and doing items are held to it; a draft may
+// is plan/decisions/2026-11-08-verification-swing.md, decision 1). Ready items are held to it; a draft may
 // keep its author's shorthand until it is readied, and a done item is not reopened. A new way of pinning main is one
 // more line here.
 const PINS = ['as on main', 'as main', 'on main', 'than main', "main's", 'unchanged', 'same as', 'byte', 'bytes', 'both shas']
   .map((p) => [p, new RegExp(`(?<![\\w'])${p.replace(/ /g, '\\s+')}(?![\\w'])`, 'i')]);
-const SHA = /(?<!\w)[0-9a-f]{7,}(?!\w)/i;
+const SHA = /(?<!\w)(?=[a-f]*\d)[0-9a-f]{7,}(?!\w)/i;
 for (const it of items.values()) {
-  if (!['ready', 'doing'].includes(it.status)) continue;
+  if (it.status !== 'ready') continue;
   for (const e of it.expect ?? []) {
     const check = String(e?.check ?? '').replace(/\u2019/g, "'");
     for (const [phrase, re] of PINS) if (re.test(check))
@@ -125,8 +125,8 @@ for (const it of items.values()) {
   }
 }
 
-// A contract change (plan/README.md, How slop is kept out): a doing item's head and Verifier brief may change once,
-// before its verdict file exists, and the item file says why under ## Contract change.
+// A contract change (plan/README.md, How slop is kept out): an item's head and Verifier brief may change once
+// after its build PR names it and before its verdict file exists, and the item file says why under ## Contract change.
 for (const it of items.values()) {
   if (it.contract_changes === 1 && !/^## Contract change$/m.test(readFileSync(join(root, it.path), 'utf8')))
     fail(it.path, 'contract_changes is 1, so the item needs a ## Contract change section saying what the build tried and why the contract moved');
@@ -134,23 +134,19 @@ for (const it of items.values()) {
 
 // The fix budget (plan/README.md, Fix budget): a fix item names the module it changes, and three done fix items to one
 // module in 14 days, with no design item for it done after them, refuse a fourth until a design item is done.
-// Reader effort (plan/decisions/2026-11-08-plan-reader-effort.md): a build item verified and done from this date records
-// what its build cost a reader beside its fix budget fields; items done earlier predate the report. Its verdict file is
-// what makes it a real item rather than a test's made-up one.
 const isFix = (i) => i.id.startsWith('fix-');
 const DAY = 24 * 60 * 60 * 1000;
 const today = Date.parse(new Date().toISOString().slice(0, 10));
 for (const it of items.values()) {
   const at = it.path;
-  const building = ['ready', 'doing'].includes(it.status);
-  if (isFix(it) && (building || it.status === 'done') && empty(it.module))
+  if (isFix(it) && ['ready', 'done'].includes(it.status) && empty(it.module))
     fail(at, `a ${it.status} fix item names the module it changes (module)`);
-  if (building && !empty(it.module) && !existsSync(join(root, '..', it.module)))
+  if (it.status === 'ready' && !empty(it.module) && !existsSync(join(root, '..', it.module)))
     fail(at, `module ${it.module} does not exist`);
   if (it.status === 'done' && !empty(it.module) && empty(it.done_on)) fail(at, 'a done item that names a module needs done_on');
 }
 for (const it of items.values()) {
-  if (!isFix(it) || !['ready', 'doing'].includes(it.status) || empty(it.module)) continue;
+  if (!isFix(it) || it.status !== 'ready' || empty(it.module)) continue;
   const done = [...items.values()].filter((i) => i.status === 'done' && i.module === it.module && i.done_on);
   const redesigned = done.filter((i) => !isFix(i)).map((i) => i.done_on).sort().at(-1) ?? '';
   const fixes = done.filter((i) => isFix(i) && i.done_on > redesigned && today - Date.parse(i.done_on) <= 14 * DAY);

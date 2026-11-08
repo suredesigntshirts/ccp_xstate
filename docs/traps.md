@@ -14,7 +14,9 @@ them. In temp repos, commit without the container's config:
 
 A container clone may stop at a shallow boundary, so a test that reads history (a done item's first commit, a merge
 base) fails with "shallow boundary" or a missing commit. Run `git fetch --unshallow origin` once, then rerun. `ci.yml`
-checks out at depth 1, so a test that `ci` runs must pass without history.
+checks out at depth 1, so a test that `ci` runs must pass without history. A test that needs a pinned commit fetches
+it at depth 1 into a temp bare repo and reads it there, never into the checkout: `npm test` runs suites in parallel,
+and fetches into one shallow repo collide on `.git/shallow.lock`; `verify/item-head-trim/scope.test.mjs` does this.
 
 ## A scope test reads git only on its own PR
 

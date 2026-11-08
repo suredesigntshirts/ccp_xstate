@@ -11,11 +11,11 @@ export const REPO = resolve(process.env.FBR_REPO ?? join(HERE, '..', '..'));
 
 const HEAD_RE = /^```json\n([\s\S]*?)\n```/;
 
-/** The modules the checkout's ready and doing items name. */
+/** The modules the checkout's ready items name. */
 const liveModules = () => readdirSync(join(REPO, 'plan/items'))
   .filter((f) => f.endsWith('.md'))
   .map((f) => JSON.parse(readFileSync(join(REPO, 'plan/items', f), 'utf8').match(HEAD_RE)?.[1] ?? '{}'))
-  .filter((it) => it.module && ['ready', 'doing'].includes(it.status))
+  .filter((it) => it.module && it.status === 'ready')
   .map((it) => it.module);
 export const headOf = (text) => JSON.parse(text.match(HEAD_RE)[1]);
 export const withHead = (text, head) => text.replace(HEAD_RE, '```json\n' + JSON.stringify(head, null, 2) + '\n```');
@@ -27,7 +27,7 @@ export const daysAgo = (n) => new Date(Date.now() - n * 86400000).toISOString().
 export function tempPlan(t) {
   const dir = mkdtempSync(join(tmpdir(), 'fbr-'));
   cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
-  // The copy holds plan/ alone, so each module a real ready or doing item names is made in it too.
+  // The copy holds plan/ alone, so each module a real ready item names is made in it too.
   for (const path of liveModules()) { mkdirSync(dirname(join(dir, path)), { recursive: true }); writeFileSync(join(dir, path), ''); }
   t?.after?.(() => rmSync(dir, { recursive: true, force: true }));
   // A done fix item with a complete ready head and a Verifier brief, used as the template for new items.

@@ -1,0 +1,56 @@
+{
+  "item": "retire-doing",
+  "verified_sha": "472f72c52a39ebae3da5e74b5d23248a747a59b8",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5FAj3dEfgP8G578RHY", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "doing-refused",
+      "status": "MET",
+      "command": "node --test verify/retire-doing/doing-refused.test.mjs (temp copy of plan/, probe item from this item's head); evidence/doing-refused.md",
+      "excerpt": "4/4 pass. At doing: exit 1, 'items/rd-probe.md.status: must be one of draft, ready, done, split, merged, dropped, parked'. At ready and at done: plan ok.",
+      "test": "verify/retire-doing/doing-refused.test.mjs"
+    },
+    {
+      "id": "ready-rules",
+      "status": "MET",
+      "command": "node --test verify/retire-doing/ready-rules.test.mjs (temp plan copies; temp repos from plan/, scripts/, package.json); evidence/ready-rules.md",
+      "excerpt": "5/5 pass. Ready 'as on main' check, missing module and fourth fix in 14 days each refused by name (draft, made module, two fixes pass). Freeze: 'changes the contract of rd-done' for an item done at the base; 'freeze gate passed' for an unnamed ready item without verdict.",
+      "test": "verify/retire-doing/ready-rules.test.mjs"
+    },
+    {
+      "id": "texts-name-the-path",
+      "status": "MET",
+      "command": "node --test verify/retire-doing/texts-name-the-path.test.mjs; evidence/texts-name-the-path.md",
+      "excerpt": "2/2 pass. 9 files (README, gates.md, language.md, CLAUDE.md, check.mjs, 4 under scripts/gates/) hold no 'doing'. Schema enum draft, ready, done, split, merged, dropped, parked; README names each.",
+      "test": "verify/retire-doing/texts-name-the-path.test.mjs"
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/retire-doing/tests-bite.test.mjs (temp copy of plan/ and test/plan-check.test.mjs); evidence/tests-bite.md",
+      "excerpt": "green {16,0}, broken {15,1}, restored {16,0}; red: 'doing is no longer a status: an item holding it is refused'.",
+      "test": "verify/retire-doing/tests-bite.test.mjs",
+      "mutation": "plan/item.schema.json status enum gets \"doing\" back between ready and done",
+      "red_test": "test/plan-check.test.mjs: doing is no longer a status: an item holding it is refused"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "node --test verify/retire-doing/scope.test.mjs (f8d0ef39..472f72c5); node plan/check.mjs; npm ci && npm test locally; ci test job 128733732063; evidence/suite-and-scope.md",
+      "excerpt": "22 files changed, each an output or the item file; item done. plan ok. ci npm test: 2046 tests, 0 fail. Local: 2059 tests, 2053 pass, 1 fail (fix-budget-rule backfill, needs history this shallow clone lacks).",
+      "test": "verify/retire-doing/scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #250; evidence/ci.md",
+      "excerpt": "test job 128733732063 at 472f72c52a39ebae3da5e74b5d23248a747a59b8: success. gates job 128733732218: refused only for 'no verify/retire-doing/verdict.json at the head sha', and reruns on this commit, which changes only verify/retire-doing/."
+    }
+  ],
+  "observations": [
+    "The PR is stacked on readying replan #249 (f8d0ef39), so against main it also shows plan/decisions/2026-11-08-refine-round-5.md; the scope test measures the build commit from the replan.",
+    "Edits to done items' verify suites checked by reading the diff: the only tests removed are doing cases with a ready twin left beside them (budget-refuses 'fourth at doing', behaviour-lines and names-module doing loops). Every other edit swaps a made-up doing for ready or done where the rule still bites: contract-change-once's item is frozen by done at the base and its unlabelled change is still refused; not-a-contract-change's item is frozen by its verdict file; cutoff, done-on-held and rules-said-once keep their assertions.",
+    "One small loss: contract-change-once's last test used to move status doing to done on a verified item; with the base already done it now changes done_on only. Status sitting outside the frozen head is still shown by done-with-the-build's verifier and pr-gate.test.mjs.",
+    "The verifier read the builder's diff, including test/plan-check.test.mjs, before writing its own tests; its tests build their own probes and import nothing from the builder's."
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "item": "item-writer-gaps",
+  "verified_sha": "ae70217b923d39bba381423bcafba64ae3cda3ea",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5H4ChU4Uga3m395XnD", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "hex-words-pass",
+      "status": "MET",
+      "command": "node --test verify/item-writer-gaps/hex-words-pass.test.mjs (plan check on a temp plan copy with a ready item iwg-hex)",
+      "excerpt": "4/4 pass. Checks holding defaced, effaced, accede, deedbad, facade, decaded, baddeed, cabbaged, DEFACED, Deadbeef: 'plan ok', exit 0. Shas a575897, deadbe1, 1234567, ABCDEF0, fce872b and the 40-digit head sha: exit 1, 'items/iwg-hex.md: Expect hex-words-pass pins main with the sha <sha>'. 'A defaced page at 6ff276e' still refused naming 6ff276e; 123456 and x1234567y pass.",
+      "test": "verify/item-writer-gaps/hex-words-pass.test.mjs"
+    },
+    {
+      "id": "ready-fields-named",
+      "status": "MET",
+      "command": "node --test verify/item-writer-gaps/ready-fields-named.test.mjs (plan check on a temp plan copy; README read by the words that carry each rule)",
+      "excerpt": "4/4 pass. README How an item is written: '`check.mjs` refuses a `ready` item that leaves open a field the schema's `readyRequired` names, and names the field.' Each of the 8 readyRequired fields, empty or absent: exit 1, 'items/iwg-open.md: ready, but <field> is empty'. Changing the plan: 'write it with `depends_on` (none in a later stage)'. Depending on decide-v1-retirement (s6-retire-v1) from s5-parity: 'depends on decide-v1-retirement, which is in a later stage', exit 1; on verifier-reader-gaps (s5-parity): exit 0.",
+      "test": "verify/item-writer-gaps/ready-fields-named.test.mjs"
+    },
+    {
+      "id": "fresh-writer",
+      "status": "MET",
+      "command": "env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p '<the brief's question>' in a clean clone of ae70217b (origin removed); evidence/fresh-writer.md holds prompt, verbatim answer and grading; node --test verify/item-writer-gaps/fresh-writer.test.mjs regrades it",
+      "excerpt": "3/3 points, citing repository files: the 8 readyRequired fields in plan/item.schema.json:17-26, with plan/README.md:39-40 saying the check refuses and names one; depends_on in a later stage 'No', citing plan/README.md:79 and plan/check.mjs:85; reader_effort 'No, not when readying an item', citing docs/language.md:32 'never stored' and its absence from readyRequired."
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/item-writer-gaps/tests-bite.test.mjs (temp copy of plan/ and test/plan-check.test.mjs)",
+      "excerpt": "green {16,0}, broken {15,1}, restored {16,0}; red: 'a sha of seven or more hex digits is refused; a repo path or a word of hex letters alone is not'.",
+      "test": "verify/item-writer-gaps/tests-bite.test.mjs",
+      "mutation": "plan/check.mjs SHA put back to /(?<!\\w)[0-9a-f]{7,}(?!\\w)/i, matching hex letters alone",
+      "red_test": "test/plan-check.test.mjs: a sha of seven or more hex digits is refused; a repo path or a word of hex letters alone is not"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "PR_BODY='Item: item-writer-gaps' BASE_SHA=origin/main node --test verify/item-writer-gaps/suite-and-scope.test.mjs; the same without PR_BODY; all of verify/item-writer-gaps/ in a depth-1 clone; ci test job for npm test",
+      "excerpt": "4/4 pass in both modes. plan ok; test/docs.test.mjs 14/14 (entry-text budget among them). PR mode: 6 files against main: the 4 outputs, the item, plan/decisions/2026-11-08-refine-round-9.md. CLAUDE.md: 'gives the four steps to done'; README field table has no reader_effort row. Depth-1 clone: 16/16. npm test: see ci.",
+      "test": "verify/item-writer-gaps/suite-and-scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #263",
+      "excerpt": "test job 128753421690 at ae70217b923d39bba381423bcafba64ae3cda3ea: success (npm test 2117 tests, 2105 pass, 0 fail, 12 skipped; plan ok). gates job 128753421137 failed before any verdict existed; it runs again on this verdict commit, which changes only verify/item-writer-gaps/."
+    }
+  ],
+  "observations": [
+    "The fresh session also said 'the done replan fills [reader_effort] ... That comes from memory notes', from the container's project memory rather than the repository; it is stale (round 4 retired the done replan) and the session flagged its source. A clean HOME, or memory turned off, would keep the fresh-reader technique to the repository alone.",
+    "docs/gates.md still names reader_effort among the head fields exempt from the freeze, and the schema keeps the field for done items that recorded it; both are consistent with 'never stored' for new items, but a later round could say plainly in plan/README.md that a new item never writes it.",
+    "The SHA lookahead (?=[a-f]*\\d) reaches only across hex letters, so the digit it finds is always inside the matched run; a run of seven or more with no digit can no longer pin main, which is the accepted trade the decision records."
+  ]
+}
