@@ -1,0 +1,38 @@
+{
+  "item": "rule-text-tests",
+  "verified_sha": "c7f14a8ceaba62448e8d92ceb75fe79ff81e2aa8",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5J1N4hbx22j5EnWoWX", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "rule-written",
+      "status": "MET",
+      "command": "node --test verify/rule-text-tests/rule-written.test.mjs; evidence/rule-written.md",
+      "excerpt": "5/5 pass. Tests: 'A test that reads a rule text (`CLAUDE.md`, `plan/`, `docs/`) checks the words that carry the rule, never a whole sentence, so a rewording that keeps the rule keeps the test green.'",
+      "test": "verify/rule-text-tests/rule-written.test.mjs"
+    },
+    {
+      "id": "fresh-verifier-follows",
+      "status": "NOT_MET",
+      "command": "env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p '<the brief's prompt>' in a clean clone of the head (origin removed, npm ci), run twice; each test run at the head and with step 2 reworded as round 7 (#259) reworded it; node --test verify/rule-text-tests/fresh-verifier-follows.test.mjs reruns run 1; evidence/fresh-verifier-follows.md",
+      "excerpt": "Run 1: pass 2/2 at the head; reworded ('sets the status to `done`' -> 'sets status `done`'): fail 1, it matches /first commit sets the status to `done`/. Run 2: same phrase /sets the status to `done`/, same failure. Neither matches a whole sentence; both pin a multi-word phrase.",
+      "test": "verify/rule-text-tests/fresh-verifier-follows.test.mjs"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "node plan/check.mjs; PR_BODY='Item: rule-text-tests' node --test verify/rule-text-tests/suite-and-scope.test.mjs; evidence/suite-and-scope.md",
+      "excerpt": "plan ok; 3/3, PR mode: docs/layout.md, plan/decisions/2026-11-08-refine-round-8.md, plan/items/rule-text-tests.md.",
+      "test": "verify/rule-text-tests/suite-and-scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "NOT_CHECKED",
+      "command": "pull_request_read get_check_runs on PR #261",
+      "excerpt": "test job 128748278402 in progress at c7f14a8c; gates job failed for no verdict. Not judged, since the item fails on fresh-verifier-follows."
+    }
+  ],
+  "observations": [
+    "The rule's 'never a whole sentence' lets a phrase through: both fresh sessions matched seven or so words in a row. A wording such as 'matches each carrying word or term on its own (first commit, status, done), never a phrase or sentence' would name what a reword-proof test does.",
+    "The rewording used is the one round 7 actually made to step 2, so the failure is the case the item was written for, not a contrived one."
+  ]
+}
