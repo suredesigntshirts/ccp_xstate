@@ -1,0 +1,29 @@
+{
+  "item": "fix-trace-writes-clone-cwd",
+  "verified_sha": "6472dc6bd76d43db4c6ace82f857f15403020abc",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5G12v78ynA2PVrKhSp", "model": "claude-opus-5-5" },
+  "results": [
+    { "id": "child-before-return", "status": "MET",
+      "command": "node --test verify/fix-trace-writes-clone-cwd/child-before-return.test.mjs",
+      "excerpt": "head: with chdir [\"/vroot/p/sub/made\"], without chdir [\"/vroot/p/m2\"], both from child pid 4101 logged before `<... clone resumed>) = 4101`; base 8244eae (git show into a temp file): with chdir [], without []",
+      "test": "verify/fix-trace-writes-clone-cwd/child-before-return.test.mjs" },
+    { "id": "child-after-return", "status": "MET",
+      "command": "node --test verify/fix-trace-writes-clone-cwd/child-after-return.test.mjs",
+      "excerpt": "clone returns 5201, parent chdirs to /vroot/q, then child mkdir(\"m3\") -> /vroot/p/m3 (parent's own mkdir -> /vroot/q/pm); pid 6300 with no logged clone -> <start>/orphan",
+      "test": "verify/fix-trace-writes-clone-cwd/child-after-return.test.mjs" },
+    { "id": "scope", "status": "MET",
+      "command": "node --test verify/fix-trace-writes-clone-cwd/scope.test.mjs (git diff --name-only 8244eae 6472dc6; git diff -U0 per helper)",
+      "excerpt": "7 files: the item, trace-writes.mjs, trace-writes.test.mjs and the four helpers; helpers remove only import lines and add only the live-module walk and its empty files, no assert/test/skip",
+      "test": "verify/fix-trace-writes-clone-cwd/scope.test.mjs" },
+    { "id": "ci", "status": "MET",
+      "command": "GitHub check runs for PR #227 at 6472dc6",
+      "excerpt": "test: success (run 42473993435); gates: failure only with 'no verify/fix-trace-writes-clone-cwd/verdict.json at the head sha' (run 42473993458); the verdict check runs again on the commit carrying this file" }
+  ],
+  "observations": [
+    "The three verifier test files also pass 6/6 in a fresh git clone --depth=1 of the build branch with no origin/main; the base and head commits are fetched at depth 1 there, and only the base half of child-before-return would skip if that fetch failed.",
+    "verify/self-edit-check-snapshot/strace-kept.test.mjs with the real tracer passed 15 of 15 runs at the head; the race cannot be forced, so this is a smoke check, not proof.",
+    "The scope line is read against the item head at 6472dc6, which widened it to the four plan-copy helpers; the item was draft at the base, so not frozen.",
+    "PR #227 shows mergeable_state dirty against main; a merge of main into the branch after this verdict keeps verified_sha in its history.",
+    "verify/fix-budget-rule/backfill-true.test.mjs fails in this shallow container clone (shallow boundary), as on main; unrelated to this item."
+  ]
+}
