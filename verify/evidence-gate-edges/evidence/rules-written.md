@@ -13,3 +13,5 @@ Excerpt: 4 tests, 4 pass.
 - wc -l: CLAUDE.md 55 + plan/README.md 97 + docs/gates.md 77 = 229, under 230.
 
 Against origin/main the first three fail.
+
+Re-run at 9cec4e1d409949f143818904d5a2500cb8f9ec3c (after the builder merged main twice and set status done): the same results, 18 of 18 across the five test files.

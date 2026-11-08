@@ -10,3 +10,6 @@ Excerpt: 2 tests, 2 pass in both modes.
   plan/items/evidence-gate-edges.md, scripts/gates/lib.mjs, scripts/gates/pr-gate.mjs, scripts/gates/test/lib.test.mjs,
   scripts/gates/test/pr-gate.test.mjs; plus this folder once the verdict lands. No other item's verify/ folder.
 - Plain mode (ci.yml depth 1): the outputs list equals the allowed files, all present.
+
+At 9cec4e1, PR mode against origin/main lists 20 files: the same 8 plus 12 under verify/evidence-gate-edges/.
+Re-run at 9cec4e1d409949f143818904d5a2500cb8f9ec3c (after the builder merged main twice and set status done): the same results, 18 of 18 across the five test files.

@@ -15,3 +15,5 @@ Excerpt: 4 tests, 4 pass.
 - regular 50-byte verify/x/evidence/a.md: exit 0, "evidence gate passed".
 
 Against origin/main's gate the first three fail (the gate passes them), the fourth passes.
+
+Re-run at 9cec4e1d409949f143818904d5a2500cb8f9ec3c (after the builder merged main twice and set status done): the same results, 18 of 18 across the five test files.

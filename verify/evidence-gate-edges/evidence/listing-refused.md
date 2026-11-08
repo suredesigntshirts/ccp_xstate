@@ -16,3 +16,5 @@ Excerpt: 5 tests, 5 pass.
 - a listing of 12 tests committed at the base, deleted on the branch: exit 0, never read.
 
 Against origin/main's gate the TAP and spec cases fail; the other three pass.
+
+Re-run at 9cec4e1d409949f143818904d5a2500cb8f9ec3c (after the builder merged main twice and set status done): the same results, 18 of 18 across the five test files.
