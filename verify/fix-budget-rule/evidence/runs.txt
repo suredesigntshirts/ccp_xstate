@@ -1,0 +1,141 @@
+# verify/fix-budget-rule at head b7305dcba19c233e29bd7e4db3c8c86df1d55c46 (node --test --test-reporter=spec verify/fix-budget-rule/*.test.mjs)
+done fix items: 16
+fix-agent-finish-ms 2026-11-05 plugins/harness/scripts/capture-rows.mjs
+fix-blocked-card-grant 2026-11-05 packages/engine/src/standin.js
+fix-blocked-retry 2026-11-05 packages/engine/src/actors.js
+fix-finish-closes-waits 2026-11-05 packages/engine/src/host.js
+fix-grant-null-repo 2026-11-05 packages/engine/src/standin.js
+fix-inspector-guard-label 2026-11-05 scripts/inspector/export.mjs
+fix-other-host-runs-effects 2026-11-05 packages/engine/src/host.js
+fix-rebuild-worktree 2026-11-05 packages/engine/src/actors.js
+fix-refusal-hints 2026-11-05 packages/engine/src/actors.js
+fix-reminder-wake 2026-11-05 packages/engine/bin/host.js
+fix-return-tool-answer 2026-11-05 packages/engine/src/actors.js
+fix-verify-issue-echo 2026-11-05 packages/engine/src/actors.js
+fix-waiting-lines-owner 2026-11-05 packages/engine/src/actors.js
+fix-waiting-run-stall 2026-11-05 packages/engine/src/actors.js
+fix-waiting-wake 2026-11-05 workflows/quick-fix.json (exception)
+fix-workflow-pinned 2026-11-05 packages/engine/src/host.js (exception)
+run-lifecycle-store 2026-11-07 packages/engine/src/actors.js
+✔ there are done fix items to check
+✔ every done fix item: module and done_on set, done_on = first done commit date, module is an output
+✔ run-lifecycle-store names packages/engine/src/actors.js and carries done_on
+✔ no other done item names a module without done_on
+items/fix-vfy-fourth.md: is a fourth fix to packages/vfy/m.js: fix-vfy-a, fix-vfy-b, fix-vfy-c were done in the last 14 days and no design item for it was done since; write a design item that names the recurring concept and designs it twice instead (plan/README.md, Fix budget)
+✔ three done fixes in 14 days refuse a ready fourth, naming M, the three ids and plan/README.md
+✔ the same fourth at doing is refused
+✔ with two such fixes it passes
+✔ a fix done exactly 14 days ago still counts
+✔ with one of the three done 15 days ago it passes
+✔ a done non-fix item naming M after the three makes it pass
+✔ a done non-fix item naming M dated before the three does not
+✔ a ready non-fix item naming M (the design item) passes
+✔ a draft fourth fix is not counted or refused
+ready -> items/fix-vfy-nomodule.md: a ready fix item names the module it changes (module)
+doing -> items/fix-vfy-nomodule.md: a doing fix item names the module it changes (module)
+done -> items/fix-vfy-nomodule.md: a done fix item names the module it changes (module)
+items/fix-vfy-ghost.md: module packages/no/such.js does not exist
+items/fix-vfy-nodate.md: a done item that names a module needs done_on
+items/vfy-design-nodate.md: a done item that names a module needs done_on
+✔ the untouched copy of the head plan passes
+✔ a ready fix item without module is refused by name and field
+✔ a doing fix item without module is refused by name and field
+✔ a done fix item without module is refused by name and field
+✔ a ready fix item whose module path does not exist is refused
+✔ the same item passes once the module path exists
+✔ a done item (fix or not) naming a module without done_on is refused
+✔ a draft fix item without module, and a ready non-fix item without module, pass
+`step_back` caps the rounds inside one item. The fix budget caps fixes across items, because when one module keeps
+needing patches its design is wrong, and another patch hides that:
+
+- A `fix-` item names the one module its main change lands in, a file or folder path, in `module`. When it is done
+  it records the date in `done_on`.
+- When three fix items naming the same module were done in the last 14 days, and no design item for that module was
+  done after them, a fourth fix item there is refused at `ready` or `doing`.
+- The next item there is a design item: any item that is not a fix and names that module in `module`. It names the
+  concept that keeps breaking in `concepts` and designs it twice, with the tournament kit (`docs/tournaments.md`).
+  Once it is done, the module's count starts again.
+
+`plan/check.mjs` enforces all three on every PR. The reasoning is in `plan/decisions/2026-11-08-fix-budget-rule.md`.
+CLAUDE.md lines: 59
+| fix budget | Three done fix items naming one module in 14 days, with no design item for it done after them, refuse a fourth | `plan/README.md`, `plan/item.schema.json` `module` |
+| design item | An item, not a fix, that names the module it redesigns: it names the recurring concept and designs it twice, and restarts the module's fix budget | `plan/README.md`, `plan/item.schema.json` `module` |
+✔ plan/README.md Fix budget section states the four parts of the rule
+✔ CLAUDE.md points at the fix budget and stays under 100 lines
+✔ docs/language.md defines fix budget and design item
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 630.094962
+
+# the same suite at main 49c8c558c1fb6ac7971b1cdf64808399e184684c (FBR_REPO=<main worktree>)
+✔ there are done fix items to check
+✔ every done fix item: module and done_on set, done_on = first done commit date, module is an output
+✔ run-lifecycle-store names packages/engine/src/actors.js and carries done_on
+✔ no other done item names a module without done_on
+✖ three done fixes in 14 days refuse a ready fourth, naming M, the three ids and plan/README.md
+✖ the same fourth at doing is refused
+✔ with two such fixes it passes
+✖ a fix done exactly 14 days ago still counts
+✔ with one of the three done 15 days ago it passes
+✔ a done non-fix item naming M after the three makes it pass
+✖ a done non-fix item naming M dated before the three does not
+✔ a ready non-fix item naming M (the design item) passes
+✔ a draft fourth fix is not counted or refused
+✔ the untouched copy of the head plan passes
+✖ a ready fix item without module is refused by name and field
+✖ a doing fix item without module is refused by name and field
+✖ a done fix item without module is refused by name and field
+✖ a ready fix item whose module path does not exist is refused
+✔ the same item passes once the module path exists
+✖ a done item (fix or not) naming a module without done_on is refused
+✔ a draft fix item without module, and a ready non-fix item without module, pass
+✖ plan/README.md Fix budget section states the four parts of the rule
+✖ CLAUDE.md points at the fix budget and stays under 100 lines
+✖ docs/language.md defines fix budget and design item
+ℹ tests 24
+ℹ suites 0
+ℹ pass 12
+ℹ fail 12
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 728.109392
+
+# current-as-main: test/plan-check, test/workspaces, test/journals-replay, verify/harness-glossary/*, verify/engine-item-views/world, verify/obs-page/live, verify/prompt-catalogue/deps, verify/repo-skeleton/claude-md
+head: # tests 621 # pass 621 # fail 0 
+main: # tests 614 # pass 614 # fail 0 
+top-level tests passing at main, not at head: 0
+
+# world-refuses: throwaway PR #184 (branch throwaway/fix-budget-rule-world, head 466b65b7c5754b37e74803a5c01894f8f7b30ee6,
+# parent b7305dc), adds plan/items/fix-throwaway-host-fourth.md (ready, module packages/engine/src/host.js). ci run
+# 42457761047, job 128660327616 (test), failure; plan check step:
+2026-11-08T07:15:04.4697724Z ##[group]Run node plan/check.mjs
+2026-11-08T07:15:04.5273108Z 8 stages, 80 items (69 live), 87 ledger rows, 17 cases
+2026-11-08T07:15:04.5287325Z items/fix-throwaway-host-fourth.md: is a fourth fix to packages/engine/src/host.js: fix-finish-closes-waits, fix-other-host-runs-effects, fix-workflow-pinned were done in the last 14 days and no design item for it was done since; write a design item that names the recurring concept and designs it twice instead (plan/README.md, Fix budget)
+2026-11-08T07:15:04.5330698Z ##[error]Process completed with exit code 1.
+# npm test in the same job: tests 1760, pass 1739, fail 5. Locally at 466b65b the five are test/plan-check.test.mjs tests
+# that copy the real plan, which now holds the over-budget item ("the real plan passes", and 2, 5, 6, 7).
+
+# tests-bite (builder's test/plan-check.test.mjs at b7305dc: 7/7 before and after)
+mutation 1 (window): `<= 14 * DAY` -> `<= 0 * DAY` in plan/check.mjs:
+  not ok 4 - three done fixes in 14 days refuse a fourth at ready and at doing
+  not ok 6 - a design item done after the fixes restarts the count; one done before them does not
+  pass 5 fail 2
+mutation 2 (reset): removed `i.done_on > redesigned && ` from the fixes filter:
+  not ok 6 - a design item done after the fixes restarts the count; one done before them does not
+  pass 6 fail 1
+restored (git checkout plan/check.mjs): pass 7 fail 0
+
+# backfill-true in a full-history clone (git fetch --unshallow; 555 commits): first commit that set status done
+d9ab632 2026-11-04T21:02:28+00:00 replan: fix-finish-closes-waits done (PR #82, verdict all MET)          done_on says 2026-11-05
+c355300 2026-11-04T18:09:09+00:00 replan: fix-other-host-runs-effects done                                done_on says 2026-11-05
+d54c1bf 2026-11-04T20:03:00+00:00 replan: fix-verify-issue-echo done (PR #79, verdict all MET)            done_on says 2026-11-05
+516426a 2026-11-04T22:35:25+00:00 replan: fix-waiting-wake done (PR #85, verdict all MET, harness-v0.1.21) done_on says 2026-11-05
+392065d 2026-11-04T18:43:44+00:00 replan: stage contract done, fix-workflow-pinned done, ...               done_on says 2026-11-05
+# The other 11 done fix items and run-lifecycle-store match. In the first (shallow, 131-commit) clone these five
+# first-done commits were shallow boundaries and log -S gave 2026-11-05; the suite now refuses to judge a boundary.
