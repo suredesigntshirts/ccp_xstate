@@ -4,7 +4,7 @@
   "title": "Check self-edit with a file snapshot, and run the setup tests with the thread's environment",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "doing",
   "outcome": "The no-self-edit tests run their setup.sh, hook and release.mjs commands with the thread's environment (HOME set to the test's temp home, CLAUDE* and CCP* variables removed), prove nothing was written by comparing a snapshot of every entry under the watched folders (path, type, mode, size, mtime, ctime, inode and content hash, the folder itself included) taken before and after, and run where strace is absent; strace stays available as scripts/debug/trace-writes.mjs; the copy-not-link release test drops the release tags and branches its clone inherits; and both files remove the temp folders they make.",
   "why": "On 8 Nov the no-self-edit file took 661 of the local suite's 771 seconds: it built each setup.sh environment from HOME and PATH alone, so the docs skill's npm ci lost the container's CA and proxy settings and retried for about 70 s per run, and five of its six tests skipped on CI, which has no strace. A bench of four write detectors (scratch repo, bench/selfedit) found the snapshot caught all twelve mutations while strace missed writes made through relative paths. The copy-not-link test fails in every thread container because a clone of the repo carries real release tags newer than the ones it makes (audit doc 'Where cleanup time and tokens go'; L-attention-is-the-constraint).",
   "serves": [
