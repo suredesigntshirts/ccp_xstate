@@ -36,7 +36,7 @@
   "outputs": [
     {
       "ref": "test/regression/engine/, test/regression/run/, test/regression/marks/",
-      "what": "The moved tests, one *.test.mjs file per moved or split source file, named for the behaviour it covers; each opens with a comment `Expect: <item>/<expect-id>` for every Expect line it proves"
+      "what": "The moved tests as *.test.mjs files named for the behaviour they cover (the test files of one suite may merge into one file, so its helper is inlined rather than shared); each opens with a comment `Expect: <item>/<expect-id>` for every Expect line it proves"
     },
     {
       "ref": "test/regression/lib.mjs",

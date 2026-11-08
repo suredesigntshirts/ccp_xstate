@@ -36,7 +36,9 @@ in a moved file names an item, a round or a PR.
 ## 4. One helper, and fixtures are data
 
 `test/regression/lib.mjs` holds what two or more moved test files use. A helper only one file uses is inlined into
-that file. Data a moved test reads as input goes to `test/regression/fixtures/`: a real Claude Code transcript, a
+that file. The test files of one suite may merge into one moved file, which turns a suite's helper into a helper one
+file uses; the table then points several rows at the same destination. The shared helper is for what crosses suites:
+the repo root, temp folders that clean up, a temp git repo. Data a moved test reads as input goes to `test/regression/fixtures/`: a real Claude Code transcript, a
 recorded hook payload, a small workflow under test. A capture of the harness's own earlier output, kept to compare
 the head against, is not input and is deleted with its test.
 
