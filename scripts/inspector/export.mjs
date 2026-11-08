@@ -1,22 +1,21 @@
 #!/usr/bin/env node
 // Workflow Inspector exporter: one item of one journal root, replayed on one engine checkout, as a plain JSON bundle
-// the page (page.html) renders. Nothing here knows a workflow's state names or which actors are models:
-// - the graph comes from the workflow JSON (states, on, after, always, invoke onDone/onError, a state's own onDone);
-// - an actor is a model when its run folder has a prompt file (names.js promptFile); every other started actor is host code;
-// - step labels come from the transitions' "description" in the JSON, else from the event type and target.
-// It degrades instead of failing: when the engine cannot be loaded or a step does not replay, the bundle says so and
-// keeps what the journal itself recorded. Usage: docs/inspector.md.
+// the page (page.html) renders. It shows what the engine recorded and says, never its own reading of the workflow:
+// - the map is the engine's chart() of the workflow (its states and transitions, each named by its JSON pointer);
+// - each step's ways out are the engine's explain(): the transitions it tried, in its order, and which tests failed;
+// - a model run is a run folder with a stage record (stage.json); the prompt's pieces, their sources, who wrote the
+//   task, the added context and the fields the host stamped come from that record.
+// It refuses an engine checkout that cannot explain its transitions, and a journal whose model run has no stage
+// record. When a step does not replay, the bundle says so and keeps what the journal itself recorded. Usage:
+// docs/inspector.md.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { basename, dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import * as ownNames from '../../packages/engine/src/names.js';
+import { safe } from '../../packages/engine/src/names.js';
 import { upcast } from '../../packages/journal/src/index.js';
-
-// Bundle ids are file names, spelled as the engine spells them (names.js).
-const { safe } = ownNames;
 
 const sha256 = (text) => createHash('sha256').update(text).digest('hex');
 const readText = (path) => { try { return readFileSync(path, 'utf8'); } catch { return null; } };
@@ -30,164 +29,53 @@ const current = (row) => {
   return Object.defineProperty(up, 'written', { value: row });
 };
 const readRows = (path) => (readText(path) ?? '').split('\n').filter(Boolean).map((l) => { try { return current(JSON.parse(l)); } catch { return null; } }).filter(Boolean);
-const get = (root, path) => String(path).split('.').reduce((v, k) => v?.[k], root);
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-// ---- The workflow graph, from the JSON alone
+// ---- The workflow map, from the engine's chart()
 
-const asList = (t) => (t == null ? [] : [t].flat().map((x) => (typeof x === 'string' ? { target: x } : x)));
-const invokesOf = (state) => (state.invoke == null ? [] : [state.invoke].flat());
-
-/** Every state of a workflow as { id: dotted path, ... } and every transition as an edge. Generic over any XState JSON. */
-export function graphOf(spec) {
-  const nodes = [];
-  const byXsId = {};
-  const walk = (state, path, parent) => {
-    for (const [name, child] of Object.entries(state.states ?? {})) {
-      const id = [...path, name].join('.');
-      nodes.push({
-        id, name, parent, depth: path.length,
-        type: child.type ?? (child.states ? 'compound' : 'atomic'),
-        initial: child.initial ? `${id}.${child.initial}` : null,
-        description: child.description ?? null,
-        needs: child.meta?.needs ?? [],
-        invokes: invokesOf(child).map((i) => ({ id: i.id ?? null, src: i.src ?? null, input: i.input ?? null }))
-      });
-      if (child.id) byXsId[child.id] = id;
-      walk(child, [...path, name], id);
-    }
-  };
-  walk(spec, [], null);
-  const ids = new Set(nodes.map((n) => n.id));
-  // A target is a sibling name, ".child" (a child of the source), "#id", or a dotted path below a sibling.
-  const resolveTarget = (target, sourceId) => {
-    if (target == null) return null;
-    const t = String(target);
-    if (t.startsWith('#')) {
-      const [xs, ...rest] = t.slice(1).split('.');
-      const base = xs === spec.id || xs === String(spec.id ?? '').split('@')[0] ? '' : byXsId[xs];
-      if (base == null) return null;
-      const id = [base, ...rest].filter(Boolean).join('.');
-      return ids.has(id) ? id : null;
-    }
-    if (t.startsWith('.')) { const id = `${sourceId}${t}`; return ids.has(id) ? id : null; }
-    const parent = sourceId.includes('.') ? sourceId.slice(0, sourceId.lastIndexOf('.')) : '';
-    const id = parent ? `${parent}.${t}` : t;
-    return ids.has(id) ? id : (ids.has(t) ? t : null);
-  };
-  const edges = [];
-  const add = (sourceId, kind, event, list) => {
-    asList(list).forEach((t, i) => {
-      const target = [t.target].flat()[0] ?? null;
-      edges.push({
-        id: `e${edges.length}`, from: sourceId, to: target == null ? sourceId : resolveTarget(target, sourceId),
-        rawTarget: target, stays: target == null, kind, event, order: i,
-        guard: t.guard ?? null, description: t.description ?? null, actions: t.actions ?? [], reenter: !!t.reenter
-      });
-    });
-  };
-  const visit = (state, path) => {
-    for (const [name, child] of Object.entries(state.states ?? {})) {
-      const id = [...path, name].join('.');
-      for (const [ev, list] of Object.entries(child.on ?? {})) add(id, 'on', ev, list);
-      for (const [delay, list] of Object.entries(child.after ?? {})) add(id, 'after', delay, list);
-      if (child.always) add(id, 'always', null, child.always);
-      for (const inv of invokesOf(child)) {
-        if (inv.onDone) add(id, 'done', inv.id ?? inv.src, inv.onDone);
-        if (inv.onError) add(id, 'error', inv.id ?? inv.src, inv.onError);
-      }
-      if (child.onDone) add(id, 'join', null, child.onDone);
-      visit(child, [...path, name]);
-    }
-  };
-  visit(spec, []);
-  for (const [ev, list] of Object.entries(spec.on ?? {})) add('', 'on', ev, list);
-  return { id: spec.id ?? null, description: spec.description ?? null, initial: spec.initial ?? null, nodes, edges };
+/**
+ * Every state of a workflow and every transition, as the engine's chart() reads them: nodes { id: dotted path, name,
+ * parent, depth, type, initial, description, needs, invokes } and edges { id: the transition's JSON pointer, from,
+ * to, stays, kind ('on', 'after', 'done' or 'error'), event (the event name, the delay or the invoke id), guard,
+ * description, actions }. eng is a loaded engine checkout (loadEngine).
+ */
+export function graphFrom(eng, spec) {
+  const { nodes, transitions } = eng.chart(spec);
+  const list = [...nodes.entries()].map(([id, st]) => {
+    const cut = id.lastIndexOf('.');
+    return {
+      id, name: id.slice(cut + 1), parent: cut < 0 ? null : id.slice(0, cut), depth: id.split('.').length - 1,
+      type: st.type ?? (st.states ? 'compound' : 'atomic'), initial: st.initial ? `${id}.${st.initial}` : null,
+      description: st.description ?? null, needs: st.meta?.needs ?? [],
+      invokes: (st.invoke == null ? [] : [st.invoke].flat()).map((i) => ({ id: i.id ?? null, src: i.src ?? null, input: i.input ?? null }))
+    };
+  });
+  const edges = transitions.map((t) => ({
+    id: t.at, from: t.state, to: t.after, stays: !t.def.target,
+    kind: t.event != null ? 'on' : t.delay != null ? 'after' : t.on, event: t.event ?? t.delay ?? t.invoke ?? null,
+    guard: t.guard, description: t.def.description ?? null, actions: [t.def.actions ?? []].flat()
+  }));
+  return { id: spec.id ?? null, description: spec.description ?? null, initial: spec.initial ?? null, nodes: list, edges };
 }
 
-/** The active state paths of a snapshot value: "a" -> ["a"], { g: "v" } -> ["g.v"], parallel -> one per region. */
+/** The map of a workflow as the engine checkout at `checkout` charts it. */
+export async function graphOf(checkout, spec) {
+  const eng = await loadEngine(checkout);
+  if (!eng.ok) throw new Error(eng.error);
+  return graphFrom(eng, spec);
+}
+
+/** The active state paths of a snapshot value: "a" -> ["a"], { g: "v" } -> ["g.v"]. */
 export function leavesOf(value, prefix = '') {
   if (value == null) return [];
   if (typeof value === 'string') return [prefix ? `${prefix}.${value}` : value];
   return Object.entries(value).flatMap(([k, v]) => leavesOf(v, prefix ? `${prefix}.${k}` : k));
 }
-const ancestorsOf = (id) => { const parts = id.split('.'); return parts.map((_, i) => parts.slice(0, parts.length - i).join('.')); };
-const within = (leaf, node) => leaf === node || leaf.startsWith(`${node}.`);
 
-// Which edge of the graph an event took: from an active state (or an ancestor), for that event, into the new state.
-function matchEdge(graph, fromLeaves, event, toLeaves) {
-  const type = event?.type ?? '';
-  let kind = 'on', key = type;
-  if (type.startsWith('xstate.done.actor.')) { kind = 'done'; key = type.slice(18); }
-  else if (type.startsWith('xstate.error.actor.')) { kind = 'error'; key = type.slice(19); }
-  else if (type.startsWith('xstate.after.')) { kind = 'after'; key = type.slice(13).split('.')[0]; }
-  const sources = [...new Set(fromLeaves.flatMap(ancestorsOf)), ''];
-  const depth = (id) => (id === '' ? -1 : id.split('.').length);
-  const candidates = graph.edges.filter((e) => sources.includes(e.from) && e.kind === kind && e.event === key)
-    .sort((x, y) => depth(y.from) - depth(x.from));
-  const lands = (e) => (e.stays ? e.from === '' || fromLeaves.some((l) => within(l, e.from)) && toLeaves.some((l) => within(l, e.from)) : toLeaves.some((l) => within(l, e.to)));
-  const hit = candidates.find(lands);
-  if (hit) return hit;
-  // Into a final child, then out through the parent's join (a compound state's own onDone), or on through an
-  // eventless transition: the first edge plus the one that lands, as one chain.
-  const node = (id) => graph.nodes.find((n) => n.id === id);
-  const parentOf = (id) => (id.includes('.') ? id.slice(0, id.lastIndexOf('.')) : null);
-  for (const e of candidates) {
-    if (!e.to) continue;
-    // A join is taken only when the transition lands in a final child; an eventless one from the state it lands in.
-    const next = graph.edges.find((x) => x.to && toLeaves.some((l) => within(l, x.to)) &&
-      ((x.kind === 'join' && node(e.to)?.type === 'final' && ancestorsOf(parentOf(e.to) ?? '').includes(x.from)) ||
-       (x.kind === 'always' && ancestorsOf(e.to).includes(x.from))));
-    if (next) return { ...e, then: next };
-  }
-  return null;
-}
+// The engine's tried transitions, as the page lists them.
+const waysOut = (tried) => tried.map((c) => ({ id: c.at, from: c.state, to: c.after, stays: c.stays, guard: c.guard, needs: c.needs, failing: c.failing, taken: c.taken, description: c.description }));
 
-// Every transition the engine tried for this event, in order, up to the one it took: each with its guard and the needs
-// of the state it enters, and (when this engine exports failing() and the workflow names its guards) which held.
-function candidatesOf({ graph, spec, eng, fromLeaves, event, taken, context, join = false, all = null }) {
-  let kind = taken.kind, key = taken.event;
-  const sources = [...new Set(fromLeaves.flatMap(ancestorsOf)), ''];
-  const depth = (id) => (id === '' ? -1 : id.split('.').length);
-  const list = graph.edges.filter((e) => (join ? e.kind === taken.kind && e.from === taken.from : sources.includes(e.from) && e.kind === kind && e.event === key))
-    .sort((x, y) => depth(y.from) - depth(x.from) || x.order - y.order);
-  const at = list.findIndex((e) => e.id === taken.id);
-  const tried = all ?? (at >= 0 ? list.slice(0, at + 1) : [taken]);
-  const node = (id) => graph.nodes.find((n) => n.id === id);
-  const canCheck = eng.ok && typeof eng.spec.failing === 'function' && spec.meta?.guards;
-  return tried.map((e) => {
-    const needs = (e.stays ? node(e.from)?.needs : node(e.to)?.needs) ?? [];
-    const names = [...(e.guard ? [e.guard] : []), ...needs];
-    let failing = null;
-    if (canCheck && names.length && context) {
-      try {
-        const after = applyActions(eng, context, event, e.actions);
-        failing = eng.spec.failing(spec, names, { context: after, event });
-      } catch { failing = null; }
-    }
-    return { id: e.id, from: e.from, to: e.to, stays: e.stays, guard: e.guard, needs, failing, taken: e.id === taken.id, description: e.description };
-  });
-}
-
-// For an event the engine ignored: every transition on the active states and their ancestors (and the root) that
-// listens for this event type, in the order the engine tries them, each with which of its guard and needs failed on the
-// unchanged context. Empty only when nothing on that path listens for it at all.
-export function listenersOf({ graph, spec, eng, fromLeaves, event, context }) {
-  const type = event?.type ?? '';
-  let kind = 'on', key = type;
-  if (type.startsWith('xstate.done.actor.')) { kind = 'done'; key = type.slice(18); }
-  else if (type.startsWith('xstate.error.actor.')) { kind = 'error'; key = type.slice(19); }
-  else if (type.startsWith('xstate.after.')) { kind = 'after'; key = type.slice(13).split('.')[0]; }
-  const sources = [...new Set(fromLeaves.flatMap(ancestorsOf)), ''];
-  const depth = (id) => (id === '' ? -1 : id.split('.').length);
-  const list = graph.edges.filter((e) => sources.includes(e.from) && e.kind === kind && e.event === key)
-    .sort((x, y) => depth(y.from) - depth(x.from) || x.order - y.order);
-  if (!list.length) return [];
-  const fake = list.at(-1);
-  return candidatesOf({ graph, spec, eng, fromLeaves, event, taken: { ...fake, id: '\u0000none', kind, event: key }, context, all: list });
-}
-
-/** The label of an ignored event, from its listeners (listenersOf). */
+/** The label of an ignored event, from the transitions the engine tried for it (none taken). */
 export function ignoredLabel(words, fromLeaves, listeners) {
   const where = fromLeaves.join(' + ') || 'its state';
   if (!listeners.length) return `The engine ignored this event (${words}): in ${where} nothing listens for it. Nothing changed.`;
@@ -195,22 +83,12 @@ export function ignoredLabel(words, fromLeaves, listeners) {
   const why = listeners.map((c) => {
     const to = c.stays ? '(stays)' : c.to;
     if (c.failing?.length) return `${c.failing.join(' and ')} failed (→ ${to})`;
-    const names = [...(c.guard ? [c.guard] : []), ...c.needs];
-    return names.length ? `${names.join(' and ')} did not hold (→ ${to})` : `the way to ${to} was not taken`;
+    return `the way to ${to} was not taken`;
   });
   return `The engine ignored this event (${words}): ${owners.join(' and ')} ${owners.length > 1 ? 'listen' : 'listens'} for it, but ${why.join(', and ')}. Nothing changed.`;
 }
 
-// The context as a transition's set/inc actions leave it (guards and needs are checked against that).
-function applyActions(eng, context, event, actions) {
-  const out = structuredClone(context);
-  const put = (root, path, v) => { const ks = path.split('.'); let o = root; for (const k of ks.slice(0, -1)) o = o[k] ??= {}; o[ks.at(-1)] = v; };
-  for (const a of actions ?? []) {
-    if (a.type === 'set' && typeof eng.spec.mapPaths === 'function') for (const [path, v] of Object.entries(eng.spec.mapPaths(a.params ?? {}, { context: out, event }))) put(out, path, v);
-    if (a.type === 'inc') put(out, a.params, (get(out, a.params) ?? 0) + 1);
-  }
-  return out;
-}
+// ---- Loading an engine checkout, and xstate as that checkout resolves it
 
 // ---- Loading an engine checkout (main's or a lane's), and xstate as that checkout resolves it
 
@@ -223,313 +101,28 @@ export async function composedIn(checkout, name) {
   return readWorkflow(name, { dir: join(checkout, 'workflows') });
 }
 
-// How the engine checkout names an item's runs and cards (its names.js), or this repo's own names.js when the checkout
-// is older than that file.
-async function namesOf(checkout) {
-  const at = join(checkout ?? '', 'packages/engine/src/names.js');
-  if (checkout && existsSync(at)) {
-    try { return await import(pathToFileURL(at).href); } catch { /* fall back */ }
-  }
-  return ownNames;
-}
-
+// The engine of a checkout: its spec.js (machineOf, hashOf, mapPaths), its chart() and explain(), its names.js, and
+// xstate as that checkout resolves it. { ok: false, error } when it has none of these to give.
 async function loadEngine(checkout) {
-  const specPath = join(checkout, 'packages/engine/src/spec.js');
-  if (!existsSync(specPath)) return { ok: false, error: `no packages/engine/src/spec.js under ${checkout}` };
+  const src = join(checkout, 'packages/engine/src');
+  const missing = ['spec.js', 'stages.js', 'explain.js', 'names.js'].filter((f) => !existsSync(join(src, f)));
+  if (missing.length) return { ok: false, error: `the engine at ${checkout} cannot explain its transitions (no packages/engine/src/${missing.join(', ')})` };
   try {
-    const spec = await import(pathToFileURL(specPath).href);
-    const req = createRequire(specPath);
+    const at = (f) => import(pathToFileURL(join(src, f)).href);
+    const [spec, stages, explained, names] = await Promise.all([at('spec.js'), at('stages.js'), at('explain.js'), at('names.js')]);
+    const req = createRequire(join(src, 'spec.js'));
     const pkgPath = req.resolve('xstate/package.json');
     const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
     const exp = pkg.exports?.['.'];
     const esm = (typeof exp?.import === 'string' ? exp.import : exp?.import?.default) ?? pkg.module ?? pkg.main;
     const xstate = await import(pathToFileURL(join(dirname(pkgPath), esm)).href);
-    const missing = ['machineOf', 'hashOf'].filter((n) => typeof spec[n] !== 'function');
-    if (missing.length) return { ok: false, error: `spec.js does not export ${missing.join(', ')}` };
-    const srcDir = join(checkout, 'packages/engine/src');
-    const sources = Object.fromEntries(readdirSync(srcDir).filter((n) => n.endsWith('.js')).map((n) => [n, readText(join(srcDir, n)) ?? '']));
-    return { ok: true, spec, xstate, specPath, actorsSource: sources['actors.js'] ?? null, sources };
+    return { ok: true, spec, xstate, chart: stages.chart, explain: explained.explain, names };
   } catch (error) {
     return { ok: false, error: String(error?.message ?? error) };
   }
 }
 
 const git = (dir, args) => { try { return execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { return null; } };
-
-/** The source text of a named function or const arrow in a file, or null. Used to show the template that wrote a text. */
-export function sourceOf(text, name) {
-  if (!text) return null;
-  const m = text.match(new RegExp(`(^|\\n)((?:export )?(?:const ${name}\\s*=|function ${name}\\s*\\())`));
-  if (!m) return null;
-  const start = m.index + m[1].length;
-  // Include the comment lines right above it.
-  let head = start;
-  const before = text.slice(0, start).split('\n');
-  before.pop();
-  while (before.length && /^\s*\/\//.test(before.at(-1))) { head -= before.pop().length + 1; }
-  const isFunction = /^(?:export )?function/.test(text.slice(start));
-  let depth = 0, i = start, seen = false, inStr = null;
-  for (; i < text.length; i++) {
-    const c = text[i];
-    if (inStr) { if (c === '\\') i++; else if (c === inStr) inStr = null; continue; }
-    if (c === '/' && text[i + 1] === '/') { const nl = text.indexOf('\n', i); i = nl < 0 ? text.length : nl - 1; continue; }
-    if (c === '"' || c === "'" || c === '`') { inStr = c; continue; }
-    if (c === '{' || c === '(' || c === '[') { depth++; seen = true; continue; }
-    if (c === '}' || c === ')' || c === ']') {
-      depth--;
-      if (isFunction && depth === 0 && c === '}') { i++; break; }
-      continue;
-    }
-    if (!isFunction && depth === 0 && c === ';') { i++; break; }
-    if (!isFunction && seen && depth === 0 && c === '\n' && text[i + 1] === '\n') break;
-  }
-  return text.slice(Math.max(0, head), i).trim();
-}
-
-/** A function's source plus every top-level function or const of the same file it names (one level deep). */
-export function withHelpers(text, name) {
-  const main = sourceOf(text, name);
-  if (!main) return null;
-  const names = [...new Set(main.replace(/\/\/.*$/gm, "").match(/\b[A-Za-z_$][\w$]*\b/g) ?? [])].filter((n) => n !== name);
-  const helpers = names.filter((n) => new RegExp(`(^|\\n)(?:export )?(?:const ${n.replace(/\$/g, '\\$')}\\s*=|function ${n.replace(/\$/g, '\\$')}\\s*\\()`).test(text)).map((n) => sourceOf(text, n)).filter(Boolean);
-  return [main, ...helpers].join('\n\n');
-}
-
-// ---- Where each part of a prompt came from
-
-// The JSON objects and arrays embedded in a text, as { start, end, value }.
-export function jsonChunks(text) {
-  const out = [];
-  for (let i = 0; i < text.length; i++) {
-    if (text[i] !== '{' && text[i] !== '[') continue;
-    let depth = 0, inStr = false, end = -1;
-    for (let j = i; j < text.length; j++) {
-      const c = text[j];
-      if (inStr) { if (c === '\\') j++; else if (c === '"') inStr = false; continue; }
-      if (c === '"') inStr = true; else if (c === '{' || c === '[') depth++; else if (c === '}' || c === ']') { if (--depth === 0) { end = j + 1; break; } }
-    }
-    if (end < 0) continue;
-    try {
-      const value = JSON.parse(text.slice(i, end));
-      if (value && typeof value === 'object' && end - i >= 4) { out.push({ start: i, end, value }); i = end - 1; }
-    } catch { /* not JSON */ }
-  }
-  return out;
-}
-
-// Does every key of part hold the same value in whole? (The input minus some keys, as a template prints it.)
-const subsetOf = (part, whole) => part && whole && typeof part === 'object' && !Array.isArray(part) && Object.keys(part).length > 0 &&
-  Object.entries(part).every(([k, v]) => k in whole && same(v, whole[k]));
-
-/**
- * Split a text into labelled segments. `known` is a list of { from, note, value?, text? }: a JSON value matched
- * against embedded JSON chunks (exactly, or as a subset of an object), or a literal text found verbatim. Everything
- * not matched gets `rest`: a label object, or a function that labels each unmatched stretch (as labelGap does).
- */
-export function segmentsOf(text, known, rest) {
-  const gap = typeof rest === 'function' ? rest : (t) => [{ text: t, ...rest }];
-  const marks = [];
-  for (const chunk of jsonChunks(text)) {
-    const hit = known.find((k) => 'value' in k && (same(chunk.value, k.value) || (k.subset && subsetOf(chunk.value, k.value))));
-    if (hit) marks.push({ start: chunk.start, end: chunk.end, from: hit.from, note: hit.note });
-  }
-  for (const k of known.filter((x) => typeof x.text === 'string' && x.text.length >= 3)) {
-    let at = text.indexOf(k.text);
-    while (at >= 0) {
-      if (!marks.some((m) => at < m.end && at + k.text.length > m.start)) marks.push({ start: at, end: at + k.text.length, from: k.from, note: k.note });
-      at = text.indexOf(k.text, at + k.text.length);
-    }
-  }
-  marks.sort((a, b) => a.start - b.start);
-  const out = [];
-  let last = 0;
-  for (const m of marks) {
-    if (m.start < last) continue;
-    if (m.start > last) out.push(...gap(text.slice(last, m.start)));
-    out.push({ text: text.slice(m.start, m.end), from: m.from, note: m.note });
-    last = m.end;
-  }
-  if (last < text.length) out.push(...gap(text.slice(last)));
-  return out;
-}
-
-// ---- Which text is literally the engine's: the static pieces of its string literals
-
-const unescapeJs = (s) => s.replace(/\\(u\{[0-9a-fA-F]+\}|u[0-9a-fA-F]{4}|x[0-9a-fA-F]{2}|\r\n|[\s\S])/g, (_, e) => {
-  if (e[0] === 'u' && e.length > 1) return String.fromCodePoint(parseInt(e[1] === '{' ? e.slice(2, -1) : e.slice(1), 16));
-  if (e[0] === 'x' && e.length === 3) return String.fromCharCode(parseInt(e.slice(1), 16));
-  return { n: '\n', t: '\t', r: '\r', b: '\b', f: '\f', v: '\v', 0: '\0', '\n': '', '\r\n': '' }[e] ?? e;
-});
-
-/**
- * The fixed text of every string literal in a JavaScript source, as the strings the code can print: a quoted string
- * whole, and a template literal split on its ${...} holes (each static piece separately). Comments and regular
- * expression literals are skipped. These are the only texts a prompt may label as "engine template".
- */
-export function stringPieces(src) {
-  const out = [];
-  const text = String(src ?? '');
-  let prev = '';
-  // A '/' starts a regular expression after an operator, an opening bracket, a comma or a keyword like return.
-  const regexAllowed = () => prev === '' || /[(,=:[!&|?{};+\-*%<>~^]$/.test(prev) || /^(?:return|typeof|case|do|else|in|of|void|yield|await)$/.test(prev);
-  // Scan code from k until the closing character `close` at depth 0 (or the end); returns the index after it.
-  const code = (k, close) => {
-    let depth = 0;
-    while (k < text.length) {
-      const c = text[k];
-      if (c === '/' && text[k + 1] === '/') { const nl = text.indexOf('\n', k); k = nl < 0 ? text.length : nl; continue; }
-      if (c === '/' && text[k + 1] === '*') { const e = text.indexOf('*/', k + 2); k = e < 0 ? text.length : e + 2; continue; }
-      if (c === '"' || c === "'") {
-        let j = k + 1, s = '';
-        while (j < text.length && text[j] !== c && text[j] !== '\n') { if (text[j] === '\\') { s += text.slice(j, j + 2); j += 2; } else s += text[j++]; }
-        out.push(unescapeJs(s)); k = j + 1; prev = 'x'; continue;
-      }
-      if (c === '`') { k = template(k); prev = 'x'; continue; }
-      if (c === '/' && regexAllowed()) {
-        let j = k + 1, cls = false;
-        while (j < text.length && text[j] !== '\n') {
-          if (text[j] === '\\') { j += 2; continue; }
-          if (text[j] === '[') cls = true; else if (text[j] === ']') cls = false; else if (text[j] === '/' && !cls) break;
-          j++;
-        }
-        k = j + 1; while (/[a-z]/.test(text[k] ?? '')) k++;
-        prev = 'x'; continue;
-      }
-      if (c === '{' || c === '(' || c === '[') depth++;
-      else if (c === '}' || c === ')' || c === ']') { if (depth === 0 && c === close) { prev = c; return k + 1; } depth--; }
-      if (!/\s/.test(c)) {
-        if (/[\w$]/.test(c)) { let j = k; while (/[\w$]/.test(text[j] ?? '')) j++; prev = text.slice(k, j); k = j; continue; }
-        prev = c;
-      }
-      k++;
-    }
-    return k;
-  };
-  // text[start] is a backtick; returns the index after the closing one.
-  const template = (start) => {
-    let j = start + 1, piece = '';
-    while (j < text.length) {
-      const c = text[j];
-      if (c === '\\') { piece += text.slice(j, j + 2); j += 2; continue; }
-      if (c === '`') { out.push(unescapeJs(piece)); return j + 1; }
-      if (c === '$' && text[j + 1] === '{') {
-        out.push(unescapeJs(piece)); piece = '';
-        prev = '{';
-        j = code(j + 2, '}');
-        continue;
-      }
-      piece += c; j++;
-    }
-    return j;
-  };
-  code(0, null);
-  return out.filter((s) => s.length > 0);
-}
-
-/** Every distinct static piece of an engine's src/*.js, indexed by first character for the matcher below. */
-export function piecesOf(sources) {
-  const all = new Set();
-  for (const text of Object.values(sources ?? {})) for (const p of stringPieces(text)) all.add(p);
-  const byFirst = new Map();
-  for (const p of all) { const k = p[0]; if (!byFirst.has(k)) byFirst.set(k, []); byFirst.get(k).push(p); }
-  return { all, byFirst };
-}
-
-/**
- * The scalar values a run fills into its prompt and context: every string or number leaf of the actor input labelled
- * "input", every leaf of run.json (outside its schema, defs, input and stored texts) labelled "run", and what a GitHub
- * URL implies (its PR or issue number and owner/repo). Returns [{ text, from, note }], longest first.
- */
-export function runValuesOf(runJson, input) {
-  const out = new Map();
-  const add = (v, from, field, note) => {
-    if (v == null || typeof v === 'object' || typeof v === 'boolean') return;
-    const t = String(v);
-    if (!t.length) return;
-    const had = out.get(t);
-    if (had) { if (had.from === from && field && !had.fields.includes(field)) had.fields.push(field); return; }
-    out.set(t, { text: t, from, fields: field ? [field] : [], note });
-    for (const m of t.matchAll(/github\.com\/([\w.-]+)\/([\w.-]+)\/(?:pull|issues)\/(\d+)/g)) {
-      add(m[3], from, null, `the PR or issue number in ${t}`);
-      add(`${m[1]}/${m[2]}`, from, null, `the repository in ${t}`);
-    }
-  };
-  const leaves = (v, path, from) => {
-    if (v && typeof v === 'object') { for (const [k, x] of Object.entries(v)) leaves(x, [...path, k], from); return; }
-    add(v, from, path.join('.') || 'value', null);
-  };
-  leaves(input ?? {}, [], 'input');
-  const { schema: _s, defs: _d, input: _i, context: _c, brief: _b, ...rest } = runJson ?? {};
-  leaves(rest, [], 'run');
-  return [...out.values()].map(({ text, from, fields, note }) => ({
-    text, from,
-    note: note ?? (from === 'input' ? `the actor input's ${fields.join(' / ')}, filled in by the engine` : `this run's ${fields.join(' / ')} (run.json), filled in by the host`)
-  })).sort((a, b) => b.text.length - a.text.length);
-}
-
-const WORD = /[A-Za-z0-9_]/;
-export const UNKNOWN_ORIGIN = { from: 'unknown', note: 'not found in the engine source, the workflow JSON or this run\'s known values, so where it came from is not known' };
-const TEMPLATE_NOTE = 'fixed text from a string literal in the engine code (packages/engine/src)';
-
-/**
- * Label a stretch of text that no JSON value or workflow literal explained: tile it with the engine's static string
- * pieces ("template") and this run's scalar values ("run" / "input"), leaving as little as possible uncovered; what is
- * left is "unknown", never "template". A token may not cut into a word, and a short or punctuation-only piece only
- * counts next to text already explained, so a stray "." or "/" inside an unexplained value is not called engine text.
- */
-export function labelGap(text, pieces, values, templateNote = TEMPLATE_NOTE) {
-  const n = text.length;
-  if (!n) return [];
-  const isW = (k) => k >= 0 && k < n && WORD.test(text[k]);
-  const bounded = (s, e) => !(s > 0 && isW(s - 1) && isW(s)) && !(e < n && isW(e - 1) && isW(e));
-  const cand = [];
-  for (let k = 0; k < n; k++) {
-    const list = [];
-    for (const p of pieces?.byFirst?.get(text[k]) ?? []) {
-      if (text.startsWith(p, k) && bounded(k, k + p.length)) list.push({ len: p.length, from: 'template', note: templateNote, short: p.length < 3 || !/[A-Za-z0-9]/.test(p) });
-    }
-    for (const v of values ?? []) if (text.startsWith(v.text, k) && bounded(k, k + v.text.length)) list.push({ len: v.text.length, from: v.from, note: v.note, value: true });
-    cand[k] = list;
-  }
-  // best[k][f]: the cheapest labelling of text[k..], given whether text[k-1] was explained (f = 1) or not (f = 0).
-  // Cost: a million per unexplained character, then ten per token, plus one when a piece (not a value) fills a slot.
-  const UNC = 1e6;
-  const best = Array.from({ length: n + 1 }, () => [null, null]);
-  best[n] = [{ cost: 0 }, { cost: 0 }];
-  for (let k = n - 1; k >= 0; k--) {
-    for (const f of [0, 1]) {
-      const prevOk = f === 1 || k === 0;
-      let b = { cost: UNC + best[k + 1][0].cost, len: 1, from: null };
-      for (const c of cand[k]) {
-        if (c.short && !prevOk && k + c.len !== n) continue;
-        const cost = 10 + (c.value ? 0 : 1) + best[k + c.len][1].cost;
-        if (cost < b.cost) b = { cost, len: c.len, from: c.from, note: c.note };
-      }
-      best[k][f] = b;
-    }
-  }
-  const out = [];
-  let k = 0, f = 1;
-  while (k < n) {
-    const b = best[k][f];
-    const seg = b.from ? { text: text.slice(k, k + b.len), from: b.from, note: b.note } : { text: text[k], ...UNKNOWN_ORIGIN };
-    const last = out.at(-1);
-    if (last && last.from === seg.from && last.note === seg.note && (seg.from === 'template' || seg.from === 'unknown')) last.text += seg.text;
-    else out.push(seg);
-    f = b.from ? 1 : 0;
-    k += b.len;
-  }
-  return out;
-}
-
-// Where in a value a string sits, as a dotted path ("builder"), or null.
-function pathOfString(value, needle, path = []) {
-  if (value === needle) return path.join('.') || '(the whole output)';
-  if (value && typeof value === 'object') {
-    for (const [k, v] of Object.entries(value)) { const p = pathOfString(v, needle, [...path, k]); if (p) return p; }
-  }
-  return null;
-}
 
 // ---- The export
 
@@ -543,6 +136,8 @@ const SCRIPTED_NOTE = 'Scripted scenario: the agents here are test fixtures (the
 export async function exportRun({ engine, journal, item = null, workflow = null, kind = 'real', label = null, origin = null, note = null, id = null }) {
   engine = resolve(engine);
   journal = resolve(journal);
+  const eng = await loadEngine(engine);
+  if (!eng.ok) throw new Error(eng.error);
   const itemsDir = join(journal, 'items');
   const items = existsSync(itemsDir) ? readdirSync(itemsDir).filter((n) => n.endsWith('.jsonl')).map((n) => basename(n, '.jsonl')).sort() : [];
   item ??= items[0];
@@ -579,20 +174,21 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
   if (pin && wf.sha256 && wf.sha256 !== pin[2]) wf.note = `The journal pins ${pin[2].slice(0, 12)}, and this file hashes to ${wf.sha256.slice(0, 12)}: the run used other bytes.`;
   if (!pin && wf.source !== 'file given') wf.note = 'The journal names the workflow without pinning its bytes, so this is the file as it is in the engine checkout now; it may have changed since the run.';
   if (wfName) spec = { ...spec, id: wfName };
-  const graph = graphOf(spec);
+  const graph = graphFrom(eng, spec);
 
   // Replay on the engine checkout, to recover the context after every step (the journal keeps only a hash of it).
-  const eng = await loadEngine(engine);
-  const replay = { ok: eng.ok, error: eng.ok ? null : eng.error, mismatches: [], failedAt: null };
+  const replay = { ok: true, error: null, mismatches: [], failedAt: null };
   let machine = null;
-  if (eng.ok) {
-    try { machine = eng.spec.machineOf(spec); } catch (error) { replay.ok = false; replay.error = `machineOf failed: ${error.message}`; }
-  }
+  try { machine = eng.spec.machineOf(spec); } catch (error) { replay.ok = false; replay.error = `machineOf failed: ${error.message}`; }
+  const invokes = eng.chart(spec).invokes;
   const sessionsDirs = [join(journal, 'sessions'), join(journal, '..', 'sessions')].filter((d) => existsSync(d) && statSync(d).isDirectory());
   const sessionRows = sessionsDirs.flatMap((d) => readdirSync(d).filter((n) => n.endsWith('.jsonl')).flatMap((n) => readRows(join(d, n))));
-  const names = await namesOf(engine);
+  const { names } = eng;
   const runsDir = names.runsDir(journal, item);
   const runNames = existsSync(runsDir) ? readdirSync(runsDir) : [];
+  // Runs recorded before stage records are not shown: a run folder with a prompt has one.
+  const unrecorded = runNames.filter((n) => !existsSync(join(runsDir, n, 'stage.json')) && existsSync(names.promptFile(journal, names.runId(item, n))));
+  if (unrecorded.length) throw new Error(`${item}: run ${unrecorded.join(', ')} has a prompt but no stage record (stage.json), so it was recorded before stage records and is not shown`);
 
   const steps = [];
   let snap = null, prevContext = {}, prevLeaves = [];
@@ -603,6 +199,7 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
     const applied = p.outcome === 'applied';
     const event = p.event ?? {};
     let value = null, context = null, replayHash = null;
+    const before = snap;
     if (applied && machine && replay.failedAt == null) {
       try {
         [snap] = snap ? eng.xstate.transition(machine, snap, event) : eng.xstate.initialTransition(machine, event.input);
@@ -614,12 +211,12 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
     }
     if (value == null) { try { value = JSON.parse(row.state); } catch { value = row.state ?? null; } }
     const toLeaves = applied ? leavesOf(value) : prevLeaves;
-    const edge = !applied || p.seq === 0 || event.type === 'xstate.init' ? null : matchEdge(graph, prevLeaves, event, toLeaves);
-    const candidates = applied && edge ? candidatesOf({ graph, spec, eng, fromLeaves: prevLeaves, event, taken: edge, context: prevContext })
-      : !applied ? listenersOf({ graph, spec, eng, fromLeaves: prevLeaves, event, context: prevContext }) : [];
-    const thenCandidates = applied && edge?.then ? candidatesOf({ graph, spec, eng, fromLeaves: [edge.to], event, taken: edge.then, context: context ?? prevContext, join: true }) : [];
+    // What the engine did with the event, in its own words: the transitions it tried and the one it took.
+    const explained = p.seq === 0 || event.type === 'xstate.init' || !before || replay.failedAt != null ? null : eng.explain(spec, before, event);
+    const edge = applied && explained?.taken ? graph.edges.find((x) => x.id === explained.taken) ?? null : null;
+    const candidates = explained ? waysOut(explained.tried) : [];
     const changed = context ? [...new Set([...Object.keys(prevContext), ...Object.keys(context)])].filter((k) => !same(prevContext[k], context[k])) : [];
-    const writes = [...(edge?.actions ?? []), ...(edge?.then?.actions ?? [])].flatMap((a) => (a.type === 'set' ? Object.entries(a.params ?? {}).map(([path, src]) => ({ path: `context.${path}`, source: src })) : a.type === 'inc' ? [{ path: `context.${a.params}`, source: '+1' }] : []));
+    const writes = (edge?.actions ?? []).flatMap((a) => (a.type === 'set' ? Object.entries(a.params ?? {}).map(([path, src]) => ({ path: `context.${path}`, source: src })) : a.type === 'inc' ? [{ path: `context.${a.params}`, source: '+1' }] : []));
     const tid = p.transition ?? `${item}#${p.seq}`;
     const related = rows.filter((r) => r !== row && r.payload && (r.payload.transition === tid || (typeof r.payload.run === 'string' && r.payload.run.startsWith(`${item}:${p.seq}.`))));
 
@@ -636,28 +233,28 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
       const name = String(e.effect).split(':').pop();
       const invokeId = name.slice(name.indexOf('.') + 1);
       const done = rows.find((r) => r.kind === 'engine.effect' && r.payload?.effect === e.effect && r.payload?.phase === 'done');
-      const def = findInvoke(spec, toLeaves, invokeId);
+      const def = invokeOf(invokes, toLeaves, invokeId);
       const folder = runNames.find((n) => n === names.safe(name));
       const runPath = folder ? join(runsDir, folder) : null;
-      const promptPath = runPath ? ownNames.promptFile(journal, ownNames.runId(item, name)) : null;
+      const promptPath = runPath ? names.promptFile(journal, names.runId(item, name)) : null;
       const promptText = promptPath ? readText(promptPath) : null;
       const runJson = runPath ? readJson(join(runPath, 'run.json')) : null;
       let input = runJson?.input ?? null, inputFrom = runJson ? 'run.json (recorded when the run started)' : null;
       if (!input && def?.input && context) {
         try { input = eng.spec.mapPaths(def.input, { context }); inputFrom = 'recomputed by replaying the journal (the host does not store it)'; } catch { /* leave null */ }
       }
-      const a = { effect: e.effect, type: 'run', state: def?.state ?? null, actor: e.actor ?? def?.src ?? invokeId, invoke: invokeId, inputMap: def?.input ?? null, input, inputFrom, outcome: done?.payload?.outcome ?? null, model: promptText != null };
-      // The stage record the engine wrote for this run (runs/<n>.<actor>/stage.json), when it writes one: resolved below.
+      // The stage record the engine writes for every model stage run (runs/<n>.<actor>/stage.json): resolved below.
       const stageRaw = runPath ? readJson(join(runPath, 'stage.json')) : null;
+      const a = { effect: e.effect, type: 'run', state: def?.state ?? null, actor: e.actor ?? def?.src ?? invokeId, invoke: invokeId, inputMap: def?.input ?? null, input, inputFrom, outcome: done?.payload?.outcome ?? null, model: stageRaw != null };
       if (stageRaw) Object.defineProperty(a, 'stageRaw', { value: stageRaw, enumerable: false });
       if (!a.model) {
         const cardPath = names.cardFile(journal, names.runId(item, name));
         a.card = readJson(cardPath);
-        a.hostNote = runPath ? 'It has a run folder but no prompt.md, so no prompt was written for it.' : null;
+        a.hostNote = runPath ? 'It has a run folder but no stage record, so it is no model stage.' : null;
       } else {
         occurrences[a.actor] = (occurrences[a.actor] ?? 0) + 1;
         a.occurrence = occurrences[a.actor];
-        a.layers = layersOf({ a, step: p.seq, runPath, runJson, promptPath, promptText, rows, sessionRows, sessionsDirs, kind, def, spec, steps: [...steps, { seq: p.seq, event, context, actors }], context, eng, toLeaves });
+        a.layers = layersOf({ a, runPath, runJson, promptPath, promptText, stage: stageRaw, rows, sessionRows, sessionsDirs, kind });
         modelRuns.push({ key: `${a.actor} #${a.occurrence}`, step: p.seq, effect: a.effect });
       }
       actors.push(a);
@@ -666,8 +263,8 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
       seq: p.seq, at: row.at, outcome: p.outcome ?? null, reason: p.reason ?? null, event, eventType: event.type ?? null,
       index: steps.length, from: prevLeaves, to: toLeaves, value, words: eventWords(event.type),
       label: applied ? labelOf(p.seq, event, edge, toLeaves) : ignoredLabel(eventWords(event.type), prevLeaves, candidates),
-      atNote: steps.length && row.at && steps.at(-1).at && row.at < steps.at(-1).at ? (kind === 'scripted' ? 'This time comes from the event itself (the test fixture), not the clock, so it is earlier than the step before.' : 'This time is earlier than the step before: the journal stamps the row with the time inside the event.') : null, edge: edge ? { id: edge.id, ids: [edge.id, ...(edge.then ? [edge.then.id] : [])], from: edge.from, to: edge.to, kind: edge.kind, guard: edge.guard, description: edge.description, then: edge.then ? { id: edge.then.id, from: edge.then.from, to: edge.then.to, kind: edge.then.kind, guard: edge.then.guard, description: edge.then.description } : null } : null,
-      writes, candidates, thenCandidates, context, changed, hash: p.hash ?? null, replayHash, hashOk: p.hash && replayHash ? p.hash === replayHash : null,
+      atNote: steps.length && row.at && steps.at(-1).at && row.at < steps.at(-1).at ? (kind === 'scripted' ? 'This time comes from the event itself (the test fixture), not the clock, so it is earlier than the step before.' : 'This time is earlier than the step before: the journal stamps the row with the time inside the event.') : null, edge: edge ? { id: edge.id, ids: [edge.id], from: edge.from, to: edge.to, kind: edge.kind, guard: edge.guard, description: edge.description } : null,
+      writes, candidates, context, changed, hash: p.hash ?? null, replayHash, hashOk: p.hash && replayHash ? p.hash === replayHash : null,
       source: p.source ?? row.source ?? null, actors, rows: related.map((r) => r.written ?? r)
     });
     if (applied && context) prevContext = context;
@@ -727,18 +324,12 @@ export async function exportRun({ engine, journal, item = null, workflow = null,
   };
 }
 
-// The invoke definition a run started from: an invoke with this id on an active state or one of its ancestors.
-function findInvoke(spec, leaves, invokeId) {
-  const nodeAt = (id) => id.split('.').reduce((s, k) => s?.states?.[k], spec);
-  for (const leaf of leaves) for (const id of ancestorsOf(leaf)) {
-    const hit = invokesOf(nodeAt(id) ?? {}).find((i) => (i.id ?? i.src) === invokeId);
-    if (hit) return { ...hit, state: id };
-  }
-  // Not on an active state (the item moved on in the same step): any invoke with that id.
-  const all = [];
-  const walk = (s, path) => { for (const [k, c] of Object.entries(s.states ?? {})) { invokesOf(c).forEach((i) => all.push({ ...i, state: [...path, k].join('.') })); walk(c, [...path, k]); } };
-  walk(spec, []);
-  return all.find((i) => (i.id ?? i.src) === invokeId) ?? null;
+// The invoke a run started from, from the engine's chart: an invoke with this id on an active state or one of its
+// ancestors, else (the item moved on in the same step) any invoke with that id. { ...invoke, state: dotted path }.
+function invokeOf(invokes, leaves, invokeId) {
+  const at = (inv) => ({ ...inv, state: inv.state.join('.') });
+  const mine = invokes.filter((i) => (i.id ?? i.src) === invokeId).map(at);
+  return mine.find((i) => leaves.some((l) => l === i.state || l.startsWith(`${i.state}.`))) ?? mine[0] ?? null;
 }
 
 /** An event type in plain words: "xstate.done.actor.build" -> "the build actor finished". */
@@ -903,117 +494,79 @@ export function outcomeOf({ trace = [], rows = [], files = [], accepted = false,
   return { status, sentence, short, story, finishes: finishes.length, resumes };
 }
 
-// The seven layers of one model run.
-function layersOf({ a, step, runPath, runJson, promptPath, promptText, rows, sessionRows, sessionsDirs, kind, def, spec, steps, context, eng, toLeaves }) {
+
+// How the page colours a piece of a prompt, by the source its stage record names.
+const PIECE_FROM = { frame: 'template', workflow: 'workflow', input: 'input' };
+const FRAME_GAP = { from: 'template', note: "the harness frame's part headings and line breaks, between the pieces the stage record names" };
+
+/**
+ * A prompt file split into the stage record's pieces, in part order, each labelled from the source it records; the
+ * text between pieces is the frame's headings and line breaks. When the file does not hold the pieces in that order,
+ * one segment of unknown origin, and ok: false.
+ */
+export function segmentsFrom(text, parts) {
+  const order = [...PART_ORDER.filter((k) => k in parts), ...Object.keys(parts).filter((k) => !PART_ORDER.includes(k))];
+  const out = [];
+  let pos = 0;
+  for (const part of order) for (const piece of parts[part] ?? []) {
+    const t = piece.text ?? '';
+    const at = text.indexOf(t, pos);
+    if (at < 0) return { ok: false, segments: [{ text, from: 'unknown', note: 'the prompt file does not hold the pieces its stage record names, in order' }] };
+    if (at > pos) out.push({ text: text.slice(pos, at), ...FRAME_GAP });
+    const src = sourceRef(piece.source, {}, { runs: [], steps: [] });
+    if (t) out.push({ text: t, from: PIECE_FROM[src.kind] ?? 'unknown', note: `${part} part: ${src.label}${src.detail ? ` (${src.detail})` : ''}` });
+    pos = at + t.length;
+  }
+  if (pos < text.length) out.push({ text: text.slice(pos), ...FRAME_GAP });
+  return { ok: true, segments: out };
+}
+
+// Who wrote one Task piece, from the producer its stage record names.
+const writerOf = (piece) => {
+  const p = piece.source?.producer ?? {};
+  if (p.kind === 'stage') return { kind: 'stage', actor: p.actor, run: p.run, field: p.field ?? null, model: true, words: `the ${p.actor} agent (run ${p.run}${p.field ? `, its ${p.field} field` : ''})` };
+  if (p.kind === 'literal') return { kind: 'workflow', at: p.at, words: `the workflow author, in the workflow JSON at ${p.at}` };
+  if (piece.source?.workflow != null) return { kind: 'workflow', at: piece.source.workflow, words: `the workflow author, in ${piece.source.file ? `${piece.source.file}:${piece.source.line}` : `the workflow JSON at ${piece.source.workflow}`}` };
+  if (p.kind === 'initial') return { kind: 'initial', words: 'whoever started the item (its start input)' };
+  return { kind: p.kind ?? 'unknown', words: p.kind ? `a ${p.kind} value` : 'an unrecorded source' };
+};
+
+// The seven layers of one model run, from its run folder: stage.json, run.json, the prompt and context files, the
+// result, the host's rows and the live capture.
+function layersOf({ a, runPath, runJson, promptPath, promptText, stage, rows, sessionRows, sessionsDirs, kind }) {
   const agent = readJson(join(runPath, 'agent.json'));
   const result = readJson(join(runPath, 'result.json'));
   const added = readText(join(runPath, 'context.md'));
   const agentId = agent?.agentId ?? null;
   const runId = runJson?.run ?? a.effect;
-  const input = runJson?.input ?? a.input ?? {};
-  const actorsSrc = eng.actorsSource ?? null;
   const scripted = kind === 'scripted';
 
-  // Layer 2: who wrote the prompt.
-  const briefPath = typeof def?.input?.brief === 'string' ? def.input.brief : null;
-  const literals = Object.entries(def?.input ?? {}).filter(([, v]) => v && typeof v === 'object' && 'value' in v && typeof v.value === 'string')
-    .map(([k, v]) => ({ key: k, text: v.value }));
-  let provenance;
-  // A stage-contract run names the source of every prompt piece in stage.json; who wrote its Task part is read there,
-  // not guessed from input.brief (that input no longer exists) or from the template.
-  const stageRec = readJson(join(runPath, 'stage.json'));
-  const taskPieces = stageRec?.prompt?.parts?.task ?? null;
-  if (promptText != null && taskPieces?.length) {
-    const writers = taskPieces.map((x) => {
-      const p = x.source?.producer ?? {};
-      if (p.kind === 'stage') return { kind: 'stage', actor: p.actor, run: p.run, field: p.field ?? null, model: true, words: `the ${p.actor} agent (run ${p.run}${p.field ? `, its ${p.field} field` : ''})` };
-      if (p.kind === 'literal') return { kind: 'workflow', at: p.at, words: `the workflow author, in the workflow JSON at ${p.at}` };
-      if (p.kind === 'initial') return { kind: 'initial', words: "whoever started the item (its start input)" };
-      return { kind: p.kind ?? 'unknown', words: p.kind ? `a ${p.kind} value` : 'an unrecorded source' };
-    });
-    const stageWriter = writers.find((w) => w.kind === 'stage');
-    provenance = {
-      kind: 'stage', scripted, writers, producer: stageWriter ? { actor: stageWriter.actor, run: stageWriter.run, field: stageWriter.field, model: true } : null,
-      summary: `The Task part of this prompt was written by ${[...new Set(writers.map((w) => w.words))].join(' and ')}; the rest is the harness's fixed frame around it. The Stage view above names the source of every piece, from stage.json.` +
-        (scripted && stageWriter ? ' In this scenario that "agent" is a test fixture: the text was typed into the test, not written by a model.' : '')
-    };
-  } else if (promptText == null) provenance = { kind: 'missing', summary: `${basename(promptPath)} is missing from the run folder.` };
-  else if (typeof input?.brief === 'string' && input.brief && input.brief === promptText) {
-    // Passed through: find the step that put this text into the context, and the run whose result it was.
-    let producer = null;
-    if (briefPath?.startsWith('context.')) {
-      const inner = briefPath.slice(8);
-      const k = steps.findIndex((s) => s.context && get(s.context, inner) === promptText);
-      if (k >= 0) {
-        const s = steps[k];
-        const ev = s.event ?? {};
-        const field = pathOfString(ev.output ?? ev, promptText);
-        const by = ev.type?.startsWith('xstate.done.actor.') ? ev.type.slice(18) : null;
-        const run = by ? [...steps.slice(0, k)].reverse().flatMap((x) => x.actors).find((x) => x.invoke === by) : null;
-        producer = { step: s.seq, event: ev.type, invoke: by, actor: run?.actor ?? by, run: run?.effect ?? null, model: !!run?.model, field };
-      }
-    }
-    const who = producer?.model ? `the ${producer.actor} agent` : producer?.event === 'xstate.init' ? 'whoever started the item (its start input)' : producer ? `the ${producer.actor ?? producer.event} step` : 'an earlier step';
-    provenance = {
-      kind: 'passthrough', inputPath: briefPath, producer, scripted,
-      summary: `Written by ${who}${producer?.run ? ` (run ${producer.run})` : ''}, not by the harness${producer?.field ? `: it is the ${producer.field} field of what that step returned, which reached the item at step ${producer.step}` : ''}. The workflow maps ${briefPath ?? 'a context value'} into this actor's input.brief, and the host passes it through unchanged.` +
-        (scripted && producer?.model ? ' In this scenario that "agent" is a test fixture: the text was typed into the test, not written by a model.' : '')
-    };
-  } else {
-    const fromTemplate = sourceOf(actorsSrc, 'writtenBrief');
-    const used = literals.filter((l) => l.text.length >= 3 && promptText.includes(l.text));
-    const where = `state ${def?.state ?? '?'}, invoke ${a.invoke}`;
-    const seen = fromTemplate ? 'the engine\'s template writtenBrief() (packages/engine/src/actors.js)' : 'what is presumably the engine\'s fill-in template (its code could not be read from this checkout, so this is inferred from the run folder)';
-    provenance = used.length ? {
-      kind: 'template+workflow', scripted, literals: used.map((l) => l.key), state: def?.state ?? null, invoke: a.invoke,
-      share: Math.round(100 * used.reduce((n, l) => n + l.text.length, 0) / Math.max(1, promptText.length)),
-      summary: `The instructions in this prompt were written by the workflow author, in the workflow JSON (${where}, ${used.map((l) => `input.${l.key}`).join(', ')}). The input had no brief text, so ${seen} wrapped those instructions; the rest is the actor input as JSON.`
-    } : {
-      kind: 'template', scripted, literals: [],
-      summary: `No person or agent wrote this prompt for this step: the input had no brief text, so the host filled ${seen} with the actor input. The only step-specific words are the actor name and its input as JSON; the workflow JSON gives this actor no instructions of its own.`
-    };
-    provenance.templateSource = fromTemplate;
-    if (!fromTemplate) provenance.templateNote = 'writtenBrief() was not found in this engine\'s actors.js, so the template code cannot be shown.';
-  }
-  const inputMinus = { ...input };
-  const promptKnown = [
-    ...literals.map((l) => ({ text: l.text, from: 'workflow', note: `literal "${l.key}" in the workflow JSON` })),
-    { value: input, subset: true, from: 'input', note: 'the actor input as JSON, computed from the context by the invoke input map' },
-    ...(provenance.kind === 'stage' ? taskPieces.map((x, i) => ({ text: x.text, from: provenance.writers[i].kind === 'workflow' ? 'workflow' : 'passthrough', note: `the Task part, written by ${provenance.writers[i].words} (stage.json)` })) : [])
-  ];
-  // Text is "template" only where it is literally a static piece of the engine's string literals; this run's values
-  // fill the holes; anything neither explains is "unknown", never "template".
-  eng.pieces ??= piecesOf(eng.sources);
-  const runValues = runValuesOf(runJson, input);
-  const fill = (note) => (t) => labelGap(t, eng.pieces, runValues, note);
-  const promptSegments = promptText == null ? [] : provenance.kind === 'passthrough'
-    ? [{ text: promptText, from: 'passthrough', note: provenance.summary }]
-    : segmentsOf(promptText, promptKnown, fill('fixed text in the engine code: a string literal in packages/engine/src (writtenBrief)'));
+  // Layer 2: who wrote the prompt, from the producers of its Task pieces; the rest is the harness frame.
+  const taskPieces = stage.prompt?.parts?.task ?? [];
+  const writers = taskPieces.map(writerOf);
+  const stageWriter = writers.find((w) => w.kind === 'stage');
+  const provenance = promptText == null ? { kind: 'missing', summary: `${basename(promptPath)} is missing from the run folder.` } : {
+    kind: 'stage', scripted, writers, producer: stageWriter ? { actor: stageWriter.actor, run: stageWriter.run, field: stageWriter.field, model: true } : null,
+    summary: (writers.length ? `The Task part of this prompt was written by ${[...new Set(writers.map((w) => w.words))].join(' and ')}; the rest is the harness's fixed frame around it.`
+      : 'This stage has no Task part: its prompt is the harness frame around the rules, inputs and output its workflow names.') +
+      ' The Stage view above names the source of every piece, from stage.json.' +
+      (scripted && stageWriter ? ' In this scenario that "agent" is a test fixture: the text was typed into the test, not written by a model.' : '')
+  };
+  const split = promptText == null ? { ok: true, segments: [] } : segmentsFrom(promptText, stage.prompt?.parts ?? {});
 
-  // Layer 3: added context.
-  const schema = runJson?.schema ?? spec.meta?.actors?.[a.actor] ?? null;
-  const defs = runJson?.defs ?? spec.meta?.schemas ?? null;
-  const ctxKnown = [
-    { value: schema, from: 'workflow', note: `the output schema, from the workflow JSON (meta.actors.${a.actor})` },
-    ...(defs && Object.keys(defs).length ? [{ value: defs, from: 'workflow', note: 'shared schema definitions, from the workflow JSON (meta.schemas)' }] : []),
-    { value: inputMinus, subset: true, from: 'input', note: 'the actor input as JSON' }
-  ];
-  // The schema the agent was shown: a schema-like JSON object in context.md. When it differs from the schema the host
-  // stores (run.json), the difference is named, and the agent-facing one is marked as the workflow's, transformed.
-  const schemaLike = (v) => v && typeof v === 'object' && !Array.isArray(v) && (v.properties || Array.isArray(v.required)) && (v.type === 'object' || v.properties);
-  const shown = added == null ? null : (jsonChunks(added).find((c) => schemaLike(c.value) && !same(c.value, defs))?.value ?? null);
-  const agentSchema = shown ?? null;
-  const schemaDiff = agentSchema && schema && !same(agentSchema, schema) ? schemaDifference(schema, agentSchema) : null;
-  if (agentSchema && schemaDiff) ctxKnown.unshift({ value: agentSchema, from: 'workflow', note: `the output schema from the workflow JSON (meta.actors.${a.actor}), changed by the engine before it was shown: ${schemaDiff.text}` });
-  const contextSegments = added == null ? [] : segmentsOf(added, ctxKnown, fill('fixed text in the engine code: a string literal in packages/engine/src (contextOf and the helpers it calls)'));
+  // Layer 3: added context, the record's context piece.
+  const ctx = stage.context ?? null;
+  const ctxSrc = ctx ? sourceRef(ctx.source, {}, { runs: [], steps: [] }) : null;
+  const contextSegments = added == null ? [] : ctx && ctx.text === added
+    ? [{ text: added, from: PIECE_FROM[ctxSrc.kind] ?? 'unknown', note: `${ctxSrc.label}${ctxSrc.detail ? ` (${ctxSrc.detail})` : ''}` }]
+    : [{ text: added, from: 'unknown', note: 'context.md is not the context piece its stage record names' }];
 
-  // Layer 6: what the host stored, and which of its fields the host wrote itself (the agent was told not to set them).
+  // Layer 6: what the host stored, and the paths the host stamped on it (stage.json stamped).
   const stored6 = result && typeof result === 'object' && 'result' in result ? result.result : result;
-  const hostWritten = hostFieldsOf(stored6, added, schemaDiff, eng.sources);
+  const hostWritten = (stage.stamped ?? []).map((path) => ({ path, why: 'The stage record says the host stamped this on the result when it accepted it, so the host wrote it, not the agent.' }));
   // Layer 7 extras: other files the host left in the run folder (a send-back, a failure).
   const KNOWN = new Set([basename(promptPath), 'context.md', 'run.json', 'result.json', 'agent.json', 'spawn.json']);
-  const extraFiles = runPath && existsSync(runPath) ? readdirSync(runPath).filter((n) => !KNOWN.has(n)).sort().map((n) => ({ name: n, value: readJson(join(runPath, n)) ?? readText(join(runPath, n)) })) : [];
-
+  const extraFiles = existsSync(runPath) ? readdirSync(runPath).filter((n) => !KNOWN.has(n)).sort().map((n) => ({ name: n, value: readJson(join(runPath, n)) ?? readText(join(runPath, n)) })) : [];
   // Layer 5: what it did.
   const mine = agentId ? sessionRows.filter((r) => r.agent === agentId || r.payload?.agentId === agentId) : [];
   // The capture can hold the same row twice (a session file both under the journal and beside it): keep one.
@@ -1044,86 +597,24 @@ function layersOf({ a, step, runPath, runJson, promptPath, promptText, rows, ses
   const verdicts = rows.filter((r) => r.payload?.run === runId && ['result.stored', 'refusal', 'result.refused', 'result.accepted', 'brief.stored'].includes(r.kind))
     .map((r) => ({ at: r.at, kind: r.kind, verdict: r.kind === 'refusal' || /refus/.test(r.kind) ? 'refused' : r.kind === 'result.stored' || r.kind === 'result.accepted' ? 'accepted' : 'info', payload: r.payload }));
 
+  if (!split.ok) checks.push({ what: `${basename(promptPath)} holds the pieces its stage record names, in order`, ok: false });
+
   return {
     agentId, model: finish?.model ?? null, ms: finish?.ms ?? null, tokens: finish?.tokens ?? null, worktree: runJson?.worktree ?? null, runId, folder: runPath,
     l1: { note: scripted ? 'No model ran in this scenario, so there was no system prompt.' : 'Not recorded. The agent is a Claude Code subagent, so it also got Claude Code\'s own system prompt, its tool list and the CLAUDE.md files of its worktree. The harness writes none of that down.' },
-    l2: { file: basename(promptPath), text: promptText, bytes: promptText == null ? 0 : Buffer.byteLength(promptText), sha256: promptHash, provenance, segments: promptSegments, checks: checks.filter((c) => !/context\.md/.test(c.what)) },
-    l3: { text: added, segments: contextSegments, templateSource: withHelpers(actorsSrc, 'contextOf'), checks: checks.filter((c) => /context\.md/.test(c.what)) },
-    l4: { schema: agentSchema ?? schema, hostSchema: schemaDiff ? schema : null, diff: schemaDiff, defs, shownInContext: !!agentSchema, from: schemaDiff ? `workflow file (meta.actors.${a.actor}), with the fields the host writes removed by the engine` : `workflow file (its list of actor output shapes, meta.actors.${a.actor})` },
+    l2: { file: basename(promptPath), text: promptText, bytes: promptText == null ? 0 : Buffer.byteLength(promptText), sha256: promptHash, provenance, segments: split.segments, checks: checks.filter((c) => !/context\.md/.test(c.what)) },
+    l3: { text: added, segments: contextSegments, checks: checks.filter((c) => /context\.md/.test(c.what)) },
+    l4: { schema: runJson?.schema ?? null, defs: runJson?.defs ?? null, from: `run.json (the output schema the host checks the ${a.actor} return against; the agent saw it in the Output part of its prompt)` },
     l5: { trace, hooks, reason: traceReason, bound: !!agentId },
     l6: { result: stored6 ?? null, raw: result, hostWritten },
     l7: { rows: verdicts, files: extraFiles }
   };
 }
 
-// What the host-validated schema has that the agent-facing one lacks (top-level properties and required keys).
-function schemaDifference(hostSchema, agentSchema) {
-  const hp = Object.keys(hostSchema?.properties ?? {}), ap = Object.keys(agentSchema?.properties ?? {});
-  const hr = hostSchema?.required ?? [], ar = agentSchema?.required ?? [];
-  const removed = hp.filter((k) => !ap.includes(k));
-  const added = ap.filter((k) => !hp.includes(k));
-  const notRequired = hr.filter((k) => !ar.includes(k) && !removed.includes(k));
-  const parts = [];
-  if (removed.length) parts.push(`${removed.map((k) => `"${k}"`).join(', ')} removed`);
-  if (added.length) parts.push(`${added.map((k) => `"${k}"`).join(', ')} added`);
-  if (notRequired.length) parts.push(`${notRequired.map((k) => `"${k}"`).join(', ')} no longer required`);
-  return { removed, added, notRequired, text: parts.join('; ') || 'other changes inside the schema' };
-}
-
-const STOP = new Set(['a', 'an', 'the', 'on', 'or', 'and', 'any', 'in', 'to', 'of', 'field', 'fields', 'reference', 'references', 'it', 'its', 'your', 'result']);
-/**
- * Fields of a stored result that the host wrote, not the agent: top-level keys the agent-facing schema removed, and keys
- * the added context tells the agent never to set ("Never set key, gates or green", "Don't include an \"attested\" field").
- * Returns [{ path, why }].
- */
-export function hostFieldsOf(result, contextText, schemaDiff, engineSources) {
-  if (!result || typeof result !== 'object') return [];
-  const out = [];
-  const add = (path, why) => { if (!out.some((x) => x.path === path)) out.push({ path, why }); };
-  for (const k of schemaDiff?.removed ?? []) if (k in result) add(k, `The host validates its stored result against a schema with "${k}", but the schema the agent was shown has no "${k}": the host adds it after accepting the return.`);
-  const rules = [];
-  for (const m of String(contextText ?? '').matchAll(/(?:^|[.!?]\s+|\n)([^.!?\n]*?\b(?:never set|do not set|don't set|don't include|do not include|must not set|must not include)\b([^.:!?\n]*)[^.!?\n]*[.!?]?)/gi)) {
-    const quoted = [...m[2].matchAll(/"([A-Za-z_][\w-]*)"/g)].map((x) => x[1]);
-    const words = quoted.length ? quoted : m[2].split(/[\s,/]+/).map((w) => w.replace(/[^\w-]/g, '')).filter((w) => w.length >= 2 && !STOP.has(w.toLowerCase()));
-    rules.push({ names: words, sentence: m[1].trim() });
-  }
-  const walk = (v, path) => {
-    if (!v || typeof v !== 'object') return;
-    for (const [k, x] of Object.entries(v)) {
-      const p = Array.isArray(v) ? `${path}[${k}]` : path ? `${path}.${k}` : k;
-      const rule = !Array.isArray(v) && rules.find((r) => r.names.includes(k));
-      const stamp = rule ? stampOf(engineSources, k, { nested: !!path }) : null;
-      if (rule && stamp && !path) add(p, `The added context tells the agent: "${rule.sentence}" And the engine code stamps it on every accepted result before it writes result.json (${stamp.file} line ${stamp.line}: ${stamp.text}). So the host wrote this field, not the agent.`);
-      else if (rule && stamp) add(p, `The added context tells the agent: "${rule.sentence}" And the engine code writes this field onto the reference itself while it checks the return (${stamp.file} line ${stamp.line}: ${stamp.text}). So the host wrote this field, not the agent.`);
-      else if (rule) add(p, `The added context tells the agent: "${rule.sentence}" So this field was very likely written by the host after it accepted the return (inferred from that rule: the host does not record who wrote each field).`);
-      walk(x, p);
-    }
-  };
-  walk(result, '');
-  return out;
-}
-
-/**
- * Where the engine's own code adds a field to a result it accepts: for a top-level field, an object literal that
- * spreads the result and sets the key (`{ ...result, attested: ... }`); for a nested one (nested: true), an assignment
- * to that property of an object (`ref.key = ...`). Returns { file, line, text } or null.
- */
-export function stampOf(engineSources, key, { nested = false } = {}) {
-  for (const [file, text] of Object.entries(engineSources ?? {})) {
-    const lines = String(text).split('\n');
-    const k = String(key).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = nested ? new RegExp(`\\b\\w+\\.${k}\\s*=(?!=)`) : new RegExp(`\\.\\.\\.\\s*\\w+\\s*,\\s*${k}\\s*:`);
-    const i = lines.findIndex((l) => !/^\s*\/\//.test(l) && re.test(l));
-    if (i >= 0) return { file: `packages/engine/src/${file}`, line: i + 1, text: lines[i].trim().slice(0, 140) };
-  }
-  return null;
-}
-
-/** Every item of a journal root as a bundle. */
-// ---- The stage record: runs/<n>.<actor>/stage.json, which an engine that writes it (the stage-contract lanes) leaves
-// in each model stage's run folder. It says what went into the prompt and from where, which earlier run produced each
-// input, and where the output went (finished, output or error, the paths the harness stamped, and wrote). The page shows it as the run's "Stage" view; nothing here is inferred, it is the
-// engine's own record with each run id it names resolved to a run of this item.
+// ---- The stage record: runs/<n>.<actor>/stage.json, which the engine leaves in each model stage's run folder. It
+// says what went into the prompt and from where, which earlier run produced each input, and where the output went
+// (finished, output or error, the paths the harness stamped, and wrote). The page shows it as the run's "Stage" view;
+// nothing here is inferred, it is the engine's own record with each run id it names resolved to a run of this item.
 
 const PART_ORDER = ['rules', 'inputs', 'task', 'output', 'return'];
 const seqOfTransition = (t) => { const n = Number(String(t ?? '').split('#').pop()); return t != null && Number.isFinite(n) ? n : null; };

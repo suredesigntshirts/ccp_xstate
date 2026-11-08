@@ -144,7 +144,9 @@ export const overlap = (a, b) => a === b || a.startsWith(`${b}.`) || b.startsWit
  * - writes [{ set, path, from, state, after, event?, src? }]: every context path a set action writes, its source, the
  *   set's JSON pointer, the state whose transition holds it, the state the transition enters (after; the same state
  *   for a transition without a target), the outside event it answers, and the invoke whose result it takes (src);
- * - transitions [{ at, state, after, guard, event?, src? }];
+ * - transitions [{ at, state, after, guard, def, event?, delay?, src?, invoke?, on? }]: def is the transition as the
+ *   file holds it; event names the outside event of a state's on, delay the timer of its after, and an invoke's
+ *   onDone or onError carries the invoke's src and id (invoke) and on ('done' or 'error');
  * - reach(key): the states (dotted paths) the item can be in after entering state key, key included;
  * - live: the states the item can be in at all, reach(initial).
  * Targets are sibling state names, as spec.js binds them.
@@ -160,14 +162,15 @@ export function chart(spec) {
       const p = [...path, name];
       const key = p.join('.');
       nodes.set(key, st);
-      const add = (ts, where, extra) => {
+      // extra goes on the transitions and their writes; more on the transitions alone.
+      const add = (ts, where, extra, more = {}) => {
         const many = Array.isArray(ts);
         [ts].flat().forEach((t, i) => {
           const tr = typeof t === 'string' ? { target: t } : t;
           if (!isObject(tr)) return;
           const tat = many ? `${where}/${i}` : where;
           const after = tr.target ? [...path, tr.target].join('.') : key;
-          transitions.push({ at: tat, state: key, after, guard: tr.guard ?? null, ...extra });
+          transitions.push({ at: tat, state: key, after, guard: tr.guard ?? null, def: tr, ...extra, ...more });
           const acts = tr.actions == null ? [] : Array.isArray(tr.actions) ? tr.actions.map((a, j) => [a, `${tat}/actions/${j}`]) : [[tr.actions, `${tat}/actions`]];
           for (const [a, aat] of acts) {
             if (!isObject(a) || a.type !== 'set' || !isObject(a.params)) continue;
@@ -176,12 +179,12 @@ export function chart(spec) {
         });
       };
       for (const [ev, ts] of Object.entries(st.on ?? {})) add(ts, `${here}/on/${esc(ev)}`, { event: ev });
-      for (const [d, ts] of Object.entries(st.after ?? {})) add(ts, `${here}/after/${esc(d)}`, {});
+      for (const [d, ts] of Object.entries(st.after ?? {})) add(ts, `${here}/after/${esc(d)}`, {}, { delay: d });
       const list = st.invoke == null ? [] : Array.isArray(st.invoke) ? st.invoke.map((v, i) => [v, `${here}/invoke/${i}`]) : [[st.invoke, `${here}/invoke`]];
       for (const [inv, iat] of list) {
         invokes.push({ at: iat, state: p, id: inv.id, src: inv.src, input: inv.input ?? {} });
-        if (inv.onDone != null) add(inv.onDone, `${iat}/onDone`, { src: inv.src });
-        if (inv.onError != null) add(inv.onError, `${iat}/onError`, { src: inv.src });
+        if (inv.onDone != null) add(inv.onDone, `${iat}/onDone`, { src: inv.src }, { invoke: inv.id, on: 'done' });
+        if (inv.onError != null) add(inv.onError, `${iat}/onError`, { src: inv.src }, { invoke: inv.id, on: 'error' });
       }
       walk(st, here, p);
     }

@@ -8,7 +8,8 @@ import { checkStages, retire } from './stages.js';
 export { retiredOf } from './stages.js';
 import { readWorkflow } from './prompts.js';
 
-export { machineOf, failing, get, mapPaths, startRefusal, hashOf, replay } from './spec.js';
+export { machineOf, failing, failingOf, testsOf, get, mapPaths, startRefusal, hashOf, replay } from './spec.js';
+export { explain } from './explain.js';
 export { check } from './schema.js';
 export { restore, applyEvent, persist, runEffects, offer, pending, itemFile, sessionFile, OwnedError } from './host.js';
 export { wakesIn, inputsOfWake, dueTimers } from './wake.js';

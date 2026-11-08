@@ -29,6 +29,7 @@ How a workflow carries an item through its states. An engine item is the same id
 |---|---|---|
 | workflow | An XState machine as JSON: states, transitions, and the `meta.actors` it invokes | `workflows/quick-fix.json`, `packages/engine/src/spec.js` |
 | item | One piece of work carried through a workflow, with its own journal file | `packages/engine/src/names.js` `itemFile`, `packages/engine/src/host.js` `restore` |
+| explanation | The transitions the engine tried for one event, in its order, with the tests that failed and the one it took | `packages/engine/src/explain.js` `explain` |
 | retired workflow | A pinned workflow this release's load check refuses: it loads, so its journal replays, and the host does not advance its item, which is finished on the release that started it | `packages/engine/src/stages.js` `retiredOf`, `packages/engine/src/index.js` `loadWorkflow` |
 | state | Where an item is in its workflow | `packages/engine/src/host.js` `applyEvent` |
 | actor | Anything a state invokes: a model stage, a host effect, or a child workflow | `packages/engine/src/effects/index.js` |

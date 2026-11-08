@@ -30,6 +30,12 @@ Everything below is exported from `src/index.js`.
 - `hashOf(snapshot)` is the short hash of an item's state and context. `replay(spec, entries)` steps a journal of
   inputs by pure transitions and throws when an entry leads to another hash than it recorded.
 - `get(root, path)`, `mapPaths(map, scope)` and `failing(spec, names, scope)` read paths and guards as the machine does.
+- `testsOf(transition, target)` names the tests a transition is held to (its guard, then the needs of the state it
+  enters), and `failingOf(spec, transition, target, scope)` says which of them fail on the context as its actions leave
+  it; the machine's bound guards hold exactly when it finds none.
+- `explain(spec, snapshot, event)` (`src/explain.js`) is the engine's account of one event: every transition it tries,
+  in its order (the deepest active state first, each state's transitions in file order), with its JSON pointer and the
+  tests that fail, up to the one it takes. The Workflow Inspector shows this instead of working it out itself.
 - `check(schema, value)` checks a value against the JSON Schema subset the engine uses.
 
 **The host** (`src/host.js`, `src/wake.js`, `src/tripwire.js`).

@@ -74,19 +74,28 @@ export const failing = (spec, names, scope) =>
 // A transition as XState takes it (a target, an object, or a list of either), as a list of objects.
 const asList = (transitions) => [transitions].flat().map((t) => (typeof t === 'string' ? { target: t } : t));
 
-// A transition whose guard is its own guard plus the needs of the state it enters, checked against the
-// context as its actions will leave it. A transition without a target stays, and keeps its state's needs.
+/** The tests a transition is held to, by name: its own guard, then the needs of the state it enters (target). */
+export const testsOf = (transition, target) => [...(transition.guard ? [transition.guard] : []), ...(target?.meta?.needs ?? [])];
+
+/**
+ * Which of a transition's tests fail for { context, event }, checked against the context as its actions will leave
+ * it. target is the state it enters; a transition without a target stays, and keeps its own state's needs. Empty when
+ * the engine takes it.
+ */
+export const failingOf = (spec, transition, target, { context, event }) => {
+  const names = testsOf(transition, target);
+  if (!names.length) return [];
+  return failing(spec, names, { context: applyActions(context, event, [transition.actions ?? []].flat()), event });
+};
+
+// A transition whose guard holds when failingOf finds nothing.
 const bindTransition = (spec, siblings, state, transition, at) => {
   const target = transition.target ? siblings[transition.target] : state;
   if (!target) throw new Error(`no state ${transition.target} beside the transition to it`);
-  const names = [...(transition.guard ? [transition.guard] : []), ...(target.meta?.needs ?? [])];
   const actions = [transition.actions ?? []].flat();
   const marked = actions.length ? { ...transition, actions: marks(actions, Array.isArray(transition.actions) ? `${at}/actions` : null, at) } : transition;
-  if (!names.length) return marked;
-  const guard = ({ context, event }) => {
-    const after = applyActions(context, event, actions);
-    return failing(spec, names, { context: after, event }).length === 0;
-  };
+  if (!testsOf(transition, target).length) return marked;
+  const guard = (scope) => failingOf(spec, transition, target, scope).length === 0;
   return { ...marked, guard };
 };
 
