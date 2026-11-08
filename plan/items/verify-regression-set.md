@@ -4,7 +4,7 @@
   "title": "Retire the done suites into one regression set",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Every done item's verify/ folder holds only verdict.json: the 30 folders the inputs name, and the folder of any item done by the PR's base. Every test file they held is either moved to test/regression/<area>/ or deleted with its evidence. A moved file goes to one of the eight areas of decision 4, mostly plan or gates, with the Expect id it proves in its first comment. A test is deleted when it read source text, compared a listing, compared a stored capture, only asserted a recorded past run, checked a retired path, or held an assertion a test outside verify/ already holds. A test that did both is split. Moved tests share test/regression/lib.mjs. The item's prose carries a table with one row per test file, its verdict and its reason. No engine, plugin, workflow or script source changes.",
   "why": "Last of three parts of verify-regression-set, split by suite (plan/decisions/2026-11-08-verify-regression-split.md); same rule as verify-regression-engine and verify-regression-plugin (L-measure-then-park; decision 4 of plan/decisions/2026-11-08-verification-swing.md). It closes the series: after it, only the item being verified has tests under verify/.",
   "serves": [
@@ -147,7 +147,8 @@
     "Several suites read git history beyond a depth-1 checkout (fix-budget-rule's backfill, the scope suites); a moved test that needs history must build its own temp repo, as pinned-fetch-temp-repo does, or it leaves as a fact of a recorded past",
     "verify-regression-engine and verify-regression-plugin's suites check test/regression/ itself (moved-pass, one-helper); they read the earlier parts' tables and leave, and this item's verifier writes its own",
     "CI has no Playwright and runs moved files side by side: a moved file needs one test that runs without a browser, its own temp paths, and no wall-clock bar"
-  ]
+  ],
+  "done_on": "2026-11-08"
 }
 ```
 
