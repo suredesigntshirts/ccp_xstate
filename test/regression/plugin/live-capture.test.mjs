@@ -136,8 +136,9 @@ test('the real hook: rows match the replay, blobs are named by sha256 and stored
 // "Adds" per the decision plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md: hook.run ms is
 // performance.now() at the end of the hook, so it counts Node's own start. The same figure for a bare `node`
 // (a .mjs that only prints Math.round(performance.now())) is the baseline, measured here on the same machine; the
-// median difference is what capture adds. The 95th percentile stays an absolute bar on the raw ms.
-test('cheap (fixture run): median hook.run ms minus a bare node start <= 50 ms, raw p95 <= 200 ms', () => {
+// median difference is what capture adds. The 95th percentile is measured over the bare start's 95th percentile too
+// (plan/decisions/2026-11-08-capture-p95-over-bare-start.md).
+test('cheap (fixture run): hook.run ms over a bare node start <= 50 ms at the median and <= 200 ms at p95', () => {
   const { dir, read1 } = runHook();
   const ms = read1().rows.filter((r) => r.kind === 'hook.run').map((r) => r.payload.ms).sort((a, b) => a - b);
   assert.ok(ms.length >= 10);
@@ -151,9 +152,10 @@ test('cheap (fixture run): median hook.run ms minus a bare node start <= 50 ms, 
   }
   base.sort((a, b) => a - b);
   const med = (a) => a[Math.floor(a.length / 2)];
-  const msg = `hook median ${med(ms)} ms (n=${ms.length}), bare node median ${med(base)} ms (n=${base.length}), adds ${med(ms) - med(base)} ms; hook p95 ${ms[Math.ceil(0.95 * ms.length) - 1]} ms`;
+  const p95 = (a) => a[Math.ceil(0.95 * a.length) - 1];
+  const msg = `hook median ${med(ms)} ms (n=${ms.length}), bare node median ${med(base)} ms (n=${base.length}), adds ${med(ms) - med(base)} ms; hook p95 ${p95(ms)} ms, bare p95 ${p95(base)} ms`;
   assert.ok(med(ms) - med(base) <= 50, msg);
-  assert.ok(ms[Math.ceil(0.95 * ms.length) - 1] <= 200, msg);
+  assert.ok(p95(ms) - p95(base) <= 200, msg);
   console.log(msg);
 });
 
