@@ -156,8 +156,8 @@ The environment keeps everything but `CLAUDE*` and `CCP*` names, because those a
 Built in PR #192 (merged 2371c17). A separate session verified it at 595ea2f: all eight Expect lines MET (verdict
 0581cc5). The no-self-edit file runs in 42 s locally with its six tests run and none skipped, on CI too. On the
 verdict head, ci failed once on `plugins/harness/test/capture.test.mjs`'s absolute 200 ms p95 bar (514 ms) and passed
-on one re-run; that bar measures runner load, and making it relative to a bare node start, like its median, is a
-candidate item. No plugin code changed, so there is no release.
+on one re-run; that bar measures runner load. That and the verifier's two edge notes (a detached HEAD at a local
+release branch, --keep across file systems) are the draft `test-fixture-edges`. No plugin code changed, so there is no release.
 
 ## Verifier brief
 
