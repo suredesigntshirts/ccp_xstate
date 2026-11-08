@@ -2,7 +2,7 @@
 // temp copy of plan/ with items added.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -26,8 +26,6 @@ function check(items, { makeModule = true, verdicts = [] } = {}) {
   try {
     cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
     if (makeModule) { mkdirSync(join(dir, 'lib')); writeFileSync(join(dir, MODULE), ''); }
-    // The copy holds plan/ alone, so the modules the real ready and doing items name are made in it too.
-    for (const path of liveModules) { mkdirSync(join(dir, path, '..'), { recursive: true }); writeFileSync(join(dir, path), ''); }
     for (const id of verdicts) { mkdirSync(join(dir, 'verify', id), { recursive: true }); writeFileSync(join(dir, 'verify', id, 'verdict.json'), '{}'); }
     for (const { prose = '', ...it } of items)
       writeFileSync(join(dir, 'plan/items', `${it.id}.md`), '```json\n' + JSON.stringify(it, null, 2) + '\n```\n\n' + prose + '## Verifier brief\n\nRead it.\n');
@@ -37,12 +35,6 @@ function check(items, { makeModule = true, verdicts = [] } = {}) {
     rmSync(dir, { recursive: true, force: true });
   }
 }
-
-const liveModules = readdirSync(join(REPO, 'plan/items'))
-  .filter((f) => f.endsWith('.md'))
-  .map((f) => JSON.parse(readFileSync(join(REPO, 'plan/items', f), 'utf8').match(/^```json\n([\s\S]*?)\n```/)?.[1] ?? '{}'))
-  .filter((it) => it.module && ['ready', 'doing'].includes(it.status))
-  .map((it) => it.module);
 
 const fixes = (ages) => ages.map((a, i) => item(`fix-t${i}`, { module: MODULE, done_on: daysAgo(a) }));
 

@@ -2,7 +2,7 @@
 // plan/decisions/2026-11-08-verification-swing.md; the builder's tests are not read or used. VC_REPO names the
 // checkout under test (default: this repo). Nothing here needs git history, so a depth-1 CI checkout works.
 import { execFileSync, spawnSync } from 'node:child_process';
-import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,13 +11,6 @@ export const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(process.env.VC_REPO ?? join(HERE, '..', '..'));
 
 const HEAD_RE = /^```json\n([\s\S]*?)\n```/;
-
-/** The modules the checkout's ready and doing items name. */
-const liveModules = () => readdirSync(join(REPO, 'plan/items'))
-  .filter((f) => f.endsWith('.md'))
-  .map((f) => JSON.parse(readFileSync(join(REPO, 'plan/items', f), 'utf8').match(HEAD_RE)?.[1] ?? '{}'))
-  .filter((it) => it.module && ['ready', 'doing'].includes(it.status))
-  .map((it) => it.module);
 export const headOf = (text) => JSON.parse(text.match(HEAD_RE)[1]);
 export const withHead = (text, head) => text.replace(HEAD_RE, '```json\n' + JSON.stringify(head, null, 2) + '\n```');
 
@@ -41,16 +34,10 @@ export function itemText(id, fields = {}) {
   return withHead(text, head);
 }
 
-/** A copy of plan/ lacks the rest of the tree: make an empty file at each module a ready or doing item names. */
-export function makeLiveModules(dir) {
-  for (const path of liveModules()) { mkdirSync(dirname(join(dir, path)), { recursive: true }); writeFileSync(join(dir, path), ''); }
-}
-
 /** A temp folder holding a copy of the checkout's plan/ at <dir>/plan. */
 export function tempPlan(t) {
   const dir = mkdtempSync(join(tmpdir(), 'vc-plan-'));
   cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
-  makeLiveModules(dir);
   t?.after?.(() => rmSync(dir, { recursive: true, force: true }));
   return {
     dir,
@@ -71,7 +58,6 @@ export function gateRepo(t, branch, baseFiles = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'vc-gate-'));
   t?.after?.(() => rmSync(dir, { recursive: true, force: true }));
   for (const p of ['plan', 'scripts', 'package.json']) cpSync(join(REPO, p), join(dir, p), { recursive: true });
-  makeLiveModules(dir);
   const git = (...args) => execFileSync('git', ['-c', 'commit.gpgsign=false', ...args],
     { cwd: dir, encoding: 'utf8', env: { ...process.env, ...GIT_ENV }, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   git('init', '-q', '-b', 'main');
