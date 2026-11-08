@@ -42,6 +42,7 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 | `verify/<item>/` | The verifier's tests and `verdict.json` for each item |
 | `scripts/gates/` | The PR gates CI runs |
 | `scripts/tournament/` | The generic design-tournament runner, args builder, measure and CI template (`docs/tournaments.md`) |
+| `scripts/debug/` | Debugging aids: `scripts/debug/trace-writes.mjs` straces a command and lists what it wrote under a folder |
 | `scripts/bench/`, `bench/` | The stage bench: run one model stage alone on fixed cases, score and compare prompts (`docs/prompts.md`) |
 | `tournaments/` | One folder per design tournament, indexed in `tournaments/README.md`; lane code stays in the scratch repo |
 | `test/` | Repo-wide tests, such as the workspace rules |

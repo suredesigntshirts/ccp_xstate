@@ -125,8 +125,7 @@ stored capture, or asserts that a file's bytes equal main's. A test that does bo
 file gets one row in the item's table: path, verdict (move to `<area>` or leave), one reason. Suites with no tests
 (`first-real-issue`, `probe-*`, `person-setup-sitting`, `tool-docs-downloader`, `fix-inspector-guard-label`,
 `inspector-catalogue-entries`) keep their verdict and lose their evidence. The two root fixes from the 8 Nov time
-audit ride along when their tests move: the no-self-edit test inherits the environment and overrides `HOME` only,
-and the copy-not-link clone drops inherited tags.
+audit (the no-self-edit environment and the copy-not-link tags) are their own item, `self-edit-check-snapshot`.
 
 ## What done looks like for the series
 

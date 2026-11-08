@@ -1,11 +1,19 @@
 // The cloud setup script (infra/cloud-environment/setup.sh), run for real against a temp HOME.
 // Expect lines clean-home, copy-not-link and no-values-logged (plan item env-bootstrap).
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
-import { REPO, RULES, TEST_REF, setup, snapshot, temp } from '../plugins/harness/test/helpers.mjs';
+import { REPO, RULES, TEST_REF, setup, snapshot, temp as makeTemp } from '../plugins/harness/test/helpers.mjs';
+
+const made = [];
+const temp = (name) => {
+  const d = makeTemp(name);
+  made.push(d);
+  return d;
+};
+after(() => { for (const d of made) rmSync(d, { recursive: true, force: true }); });
 
 const fresh = () => {
   const home = join(temp('home'), 'home');
@@ -77,6 +85,10 @@ test('no-values-logged: the setup log names environment variables but never thei
 test('copy-not-link: with release tags, setup installs the newest release by version, not the HEAD', () => {
   const clone = join(temp('clone'), 'repo');
   execFileSync('git', ['clone', '-q', REPO, clone]);
+  // A clone of this repo carries the releases it has seen (a thread's clone has real ones, CI's checkout none), so
+  // drop them: the only releases are the three below.
+  const inherited = execFileSync('git', ['-C', clone, 'for-each-ref', '--format=%(refname)', 'refs/tags/harness-v*', 'refs/remotes/origin/release/', 'refs/heads/release/'], { encoding: 'utf8' }).split('\n').filter(Boolean);
+  for (const ref of inherited) execFileSync('git', ['-C', clone, 'update-ref', '-d', ref]);
   for (const t of ['harness-v0.1.9', 'harness-v0.1.10', 'harness-v0.0.20']) execFileSync('git', ['-C', clone, 'tag', '-f', t]);
   const home = fresh();
   execFileSync('bash', [join(clone, 'infra', 'cloud-environment', 'setup.sh')], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: join(home, '..', 'log'), CCP_SETUP_FETCH: '0' } });
