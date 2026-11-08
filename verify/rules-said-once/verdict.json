@@ -1,0 +1,63 @@
+{
+  "item": "rules-said-once",
+  "verified_sha": "d6df5a7674e7ca52454c4b388542b0343cba39e6",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5GJzR6cmdUcnzuof67", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "item-line-names",
+      "status": "MET",
+      "command": "node --test verify/rules-said-once/item-line-names.test.mjs (temp git repos copied from the head, BASE_SHA=<base> node scripts/gates/pr-gate.mjs verdict with PR_BRANCH, PR_BODY, PR_LABELS); evidence/item-line-names.md",
+      "excerpt": "4/4 pass. replan/test-fixture-edges, plan-only, no Item line: 'verdict gate passed', exit 0. build/test-fixture-edges, docs/ change, no Item line: exit 1, 'this PR changes files outside plan/ but names no item (add an \"Item: <id>\" line to its body)'. Item: rso-toy on build/fix-budget-rule and on claude/some-thread with a complete toy verdict: 'verdict gate passed (item rso-toy)'; Item: test-fixture-edges on build/rso-toy: 'verdict gate failed (item test-fixture-edges): no verify/test-fixture-edges/verdict.json'. Item: no-such-item: exit 1 'the body names item no-such-item, which plan/items/ doesn't have' on every branch, plan-only and replan-labelled too.",
+      "test": "verify/rules-said-once/item-line-names.test.mjs"
+    },
+    {
+      "id": "texts-hold-paths",
+      "status": "MET",
+      "command": "node --test verify/rules-said-once/texts-hold-paths.test.mjs; evidence/texts-hold-paths.md",
+      "excerpt": "3/3 pass. 10 texts (CLAUDE.md, plan/README.md, 8 under docs/), 205 distinct repo paths, none missing; plan/README.md's bare names exist under plan/. CLAUDE.md 54, plan/README.md 95, docs/gates.md 78: total 227 < 230. Against main before the build: 0 of 3 (scripts/install.mjs, .github/workflows/tournament.yml missing; 290 lines).",
+      "test": "verify/rules-said-once/texts-hold-paths.test.mjs"
+    },
+    {
+      "id": "fresh-reader-path",
+      "status": "MET",
+      "command": "env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p '<the brief's prompt>' in a clean clone of the head (origin removed); node --test verify/rules-said-once/fresh-reader-path.test.mjs carries out the answers; evidence/fresh-reader-path.md (prompt, verbatim answer, grading, gate output)",
+      "excerpt": "Answers: (1) replan/<topic>, label replan, no Item line, plan/ only, status ready with check.mjs passing; (2) build/test-fixture-edges, 'Item: test-fixture-edges', first commit sets doing, every commit ends with Claude-Session: <id>; (3) a separate session commits verify/test-fixture-edges/verdict.json, every docs/gates.md clause listed correctly; (4) merge when ci and verdict are green at the head sha, merge main in, release.mjs branch --push, done replan replan/test-fixture-edges-done, label replan, plan/ only, status done and ## Done. Carried out: ready replan freeze+verdict passed; build PR freeze passed, verdict refused only 'no verify/test-fixture-edges/verdict.json at the head sha'; done replan freeze+verdict passed."
+    },
+    {
+      "id": "world-replan-branch",
+      "status": "MET",
+      "command": "Throwaway PR https://github.com/suredesigntshirts/ccp_xstate/pull/203 (replan/test-fixture-edges, c9b4858 = build head 528c009 plus one prose line on the draft item, no Item line, label replan), gates job 128700048982 via get_job_logs; closed unmerged; evidence/world-replan-branch.md",
+      "excerpt": "PR_BRANCH: replan/test-fixture-edges, PR_LABELS: [\"replan\"]. 'verdict gate failed: this PR changes files outside plan/ but names no item (add an \"Item: <id>\" line to its body)'. No '(item test-fixture-edges)', no missing-verdict refusal. The code under test there is unchanged at d6df5a7 (scripts/ and docs/ identical to 528c009)."
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/rules-said-once/tests-bite.test.mjs (temp copies; runs node --test test/docs.test.mjs and node --test scripts/gates/test/lib.test.mjs); evidence/tests-bite.md",
+      "excerpt": "4/4 pass. docs/gates.md renamed: green 12/0, broken 7 pass 5 fail, restored 12/0. CLAUDE.md docs/layout.md -> docs/layouts.md: 12/0, 11/1, 12/0. docs/gates.md padded 227 -> 230: 12/0, 11/1, 12/0. namedItem falls back to the branch's last segment: lib.test.mjs 15/0, 14/1, 15/0.",
+      "test": "verify/rules-said-once/tests-bite.test.mjs",
+      "mutation": "rename docs/gates.md; edit docs/layout.md to docs/layouts.md in CLAUDE.md; pad docs/gates.md to a 230-line total; namedItem: '?? null' -> '?? (ids.has(branch.split(\"/\").pop()) ? branch.split(\"/\").pop() : null)' with a branch parameter",
+      "red_test": "test/docs.test.mjs (5, 1, 1 failing) and scripts/gates/test/lib.test.mjs (1 failing: a PR names its item by its body line alone)"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "node --test verify/rules-said-once/suite-and-scope.test.mjs (plan check; git diff --name-status against origin/main's merge-base, or the tree in a depth-1 checkout); npm test in a full-history clone; evidence/suite-and-scope.md",
+      "excerpt": "2/2 pass. '8 stages, 93 items (82 live), 90 ledger rows, 17 cases / plan ok'. 16 files: the outputs, plan/items/rules-said-once.md and scripts/gates/pr-gate.mjs (namedItem's caller: only the call and header line); verify/ changes are exactly D claude-md.test.mjs, D rules-written.test.mjs, D rule-written.test.mjs, M notes.test.mjs, M policy-written.test.mjs. npm test: tests 1884, pass 1879, fail 0.",
+      "test": "verify/rules-said-once/suite-and-scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #202; evidence/ci.md",
+      "excerpt": "test job 128702090263 at d6df5a7674e7ca52454c4b388542b0343cba39e6: success. gates job 128702091038: stubs, freeze, evidence passed; verdict refused only for 'no verify/rules-said-once/verdict.json at the head sha', and reruns on this commit, which changes only verify/rules-said-once/."
+    }
+  ],
+  "observations": [
+    "scripts/gates/pr-gate.mjs changed though the outputs do not name it; the inputs name it as namedItem's caller and its diff is the call site and the header listing the environment it reads. Counted in scope; a later item's outputs should name a caller it must touch.",
+    "The brief's path heuristic (a '/' or a .md/.mjs/.js/.json/.yml ending) catches about a hundred names relative to a folder the text is describing (stage.json, run.json, hooks/hooks.json). This verifier counted a token as a repo path only when its first segment is a top-level repo entry, as test/docs.test.mjs does, and left out .claude/agents/ (Claude Code's location in any project). Bare names in docs/ are not checked by either test.",
+    "verdict.yml still sets PR_BRANCH, which no gate reads now; harmless, and a later cleanup can drop it.",
+    "world-replan-branch was reworded once (#205): before the build is on main, no PR into main can show a replan/<id> branch green, because a PR based on the head carries the build's own non-plan files. A world line that needs the change on main belongs to the done replan.",
+    "The fresh session's answer (2) also cited the cloud environment's Co-Authored-By attribution line next to the repo's Claude-Session rule; the repo text itself was unambiguous.",
+    "Deleting the throwaway branch replan/test-fixture-edges was refused from this session (git push --delete hung up); it needs the person or a session with delete rights."
+  ]
+}
