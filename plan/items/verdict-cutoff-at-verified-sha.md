@@ -82,7 +82,7 @@
     },
     {
       "id": "plan-passes",
-      "check": "node plan/check.mjs passes at the head; the PR changes only the files the outputs name, its own plan item and verify/verdict-cutoff-at-verified-sha/, and no verify/ folder of another item",
+      "check": "node plan/check.mjs passes at the head sha; the PR changes only the files the outputs name, its own plan item and verify/verdict-cutoff-at-verified-sha/, and no verify/ folder of another item",
       "how": "The verifier runs the plan check and reads the diff's file list",
       "proof": "verifier"
     },
