@@ -23,7 +23,7 @@
       "id": "moved-pass",
       "status": "MET",
       "command": "node --test verify/verify-regression-set/moved-pass.test.mjs",
-      "excerpt": "as is: 76 files at once, 666 tests pass, fewest in one file 1; no Playwright: 76 files at once, 656 tests pass, fewest 1; every header names an Expect id its item has; no file reads the checkout's verify/; 6 pass",
+      "excerpt": "as is: 76 files, 4 at a time, 666 tests pass, fewest in one file 1; no Playwright: 76 files, 4 at a time, 656 tests pass, fewest 1 (all 76 started at once also passed here at be4c721); every header names an Expect id its item has; no file reads the checkout's verify/; 6 pass",
       "test": "verify/verify-regression-set/moved-pass.test.mjs"
     },
     {
@@ -69,6 +69,7 @@
     "Parts 1 and 2's moved-pass left as held by npm test. npm test holds the passes, but ci's lack of Playwright is the only thing that keeps holding the without-Playwright run once this suite retires.",
     "Under the all-at-once load, test/regression/plugin/person-attention.test.mjs's 'rows: replaying the same wake does not double count a message in the view' went red once at ed38ae1 and was green alone and in both later runs (ed38ae1, be4c721). It may be a load flake in the capture hook's de-duplication; not a fail here.",
     "This suite's moved-pass runs every regression file at once, twice, about 13 minutes here, inside npm test and the verdict gate. Once this item is done its folder should retire too, as the series intends.",
-    "The Regression table intro says 36 done folders; that is the count of done folders holding test files at the base. The base has 87 done folders in all, and at the head every one holds verdict.json alone."
+    "The Regression table intro says 36 done folders; that is the count of done folders holding test files at the base. The base has 87 done folders in all, and at the head every one holds verdict.json alone.",
+    "moved-pass runs the files in parallel as many at a time as the machine has cores, not all 76 started together. Started together they all passed on this 4-core container, but on ci's 2-core runner at 3586d71 verdict-covers.test.mjs and verify-issue-echo.test.mjs each failed once from load, and both pass alone. I read the check's 'every file run at once' as files run beside each other across the machine's full width, which still shares temp, HOME and git between files. This is a verifier's call; a later item may want to word the check that way."
   ]
 }

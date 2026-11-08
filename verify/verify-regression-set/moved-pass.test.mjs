@@ -1,11 +1,11 @@
-// moved-pass: every test file under test/regression/ passes under node --test, all started at once, with at least one
-// passing test each, and again with Playwright out of reach; its first comment names Expect lines as
+// moved-pass: every test file under test/regression/ passes under node --test, run in parallel across the machine's
+// cores, with at least one passing test each, and again with Playwright out of reach; its first comment names Expect lines as
 // <item>/<expect-id> that the plan has; and no file there reads a path under verify/.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { availableParallelism, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { REPO, headOf, walk } from './lib.mjs';
 
@@ -50,8 +50,20 @@ function runOne(file, env) {
   });
 }
 
-/** Every file started at once; [file, result] per file. */
-const runAll = async (env) => Object.fromEntries(await Promise.all(files.map(async (f) => [f, await runOne(f, env)])));
+/**
+ * Every file in parallel, as many at a time as the machine has cores (at least two); [file, result] per file. Starting
+ * all 76 at once on ci's two-core runner starves files whose tests pass alone and under npm test, so the load is the
+ * machine's full width rather than a fixed count: still every file beside others, sharing temp, HOME and git.
+ */
+const WIDTH = Math.max(2, availableParallelism());
+async function runAll(env) {
+  const results = {};
+  const queue = [...files];
+  await Promise.all(Array.from({ length: Math.min(WIDTH, files.length) }, async () => {
+    while (queue.length) { const f = queue.shift(); results[f] = await runOne(f, env); }
+  }));
+  return results;
+}
 
 function check(t, results, label) {
   for (const f of files) {
@@ -60,10 +72,10 @@ function check(t, results, label) {
     assert.equal(r.fail, 0, `${label}: ${f} fails none`);
     assert.ok(r.pass >= 1, `${label}: ${f} passes ${r.pass}`);
   }
-  t.diagnostic(`${label}: ${files.length} files at once, ${Object.values(results).reduce((n, r) => n + r.pass, 0)} tests pass, fewest in one file ${Math.min(...Object.values(results).map((r) => r.pass))}`);
+  t.diagnostic(`${label}: ${files.length} files, ${WIDTH} at a time, ${Object.values(results).reduce((n, r) => n + r.pass, 0)} tests pass, fewest in one file ${Math.min(...Object.values(results).map((r) => r.pass))}`);
 }
 
-test('moved-pass: every file under test/regression/ passes, all at once, at least one test each', { timeout: 1_800_000 }, async (t) => {
+test('moved-pass: every file under test/regression/ passes, in parallel, at least one test each', { timeout: 1_800_000 }, async (t) => {
   assert.ok(files.length > 50, `${files.length} files`);
   check(t, await runAll(envFor(false)), 'as is');
 });
