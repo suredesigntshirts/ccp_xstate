@@ -1,0 +1,49 @@
+{
+  "item": "test-fixture-edges",
+  "verified_sha": "af64a367c242b66cf968aad168b40e5141d029a3",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5H9MkMN3QJADBusEhr",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "detached-release-clone",
+      "status": "MET",
+      "command": "node --test verify/test-fixture-edges/detached-release-clone.test.mjs: clones of the head, and of the head with to-base.diff applied (the build's four code files taken back to the base), each detached at a fresh empty commit with release/harness-v9.9.9 the only ref at it; node --test test/setup.test.mjs verify/self-update-by-version/no-self-edit.test.mjs in each",
+      "excerpt": "head: pass 12 fail 0 skipped 0. base: pass 5 fail 7 skipped 0, failed: copy-not-link: with release tags, setup installs the newest release by version, not the HEAD, and all six no-self-edit tests, output holding \"Failed to resolve 'HEAD'\". 2/2 pass (also in a depth-1 clone with no strace on PATH).",
+      "test": "verify/test-fixture-edges/detached-release-clone.test.mjs"
+    },
+    {
+      "id": "keep-across-fs",
+      "status": "MET",
+      "command": "node --test verify/test-fixture-edges/keep-across-fs.test.mjs: fresh TMPDIR per run; trace-writes.mjs <watched> --keep <path> -- true with <path> in the temp dir's file system and in /dev/shm (st_dev 27 vs 65024); real strace where present, a stand-in strace on PATH always; then the base trace-writes.mjs to /dev/shm",
+      "excerpt": "real strace, same fs: exit 0, 6823 bytes, left []; other fs (/dev/shm): exit 0, 6823 bytes, left []; both kept traces match execve(\"…/true\". Stand-in: same results. Base: exit 1, 'EXDEV: cross-device link not permitted, rename …/trace-writes-*/trace -> /dev/shm/…/kept.trace'. 3/3 pass here; without strace (as on CI) the real-strace case skips and 2 pass.",
+      "test": "verify/test-fixture-edges/keep-across-fs.test.mjs"
+    },
+    {
+      "id": "p95-over-bare",
+      "status": "MET",
+      "command": "node --test verify/test-fixture-edges/p95-over-bare.test.mjs: in clones, --import of a module blocking 300 ms added to runHook's spawn and to the cheap test's bare start, head and base; and at the head capture.mjs busy-waiting 250 ms on the first PostToolUse run (marker file); each runs node --test --test-name-pattern=cheap plugins/harness/test/capture.test.mjs",
+      "excerpt": "slow starts at head: pass 1 fail 0. slow starts at base: fail 1, 'p95 340 ms' (median held). slow capture at head: fail 1, 'p95 288 ms, of which a bare node start is 31 ms' (median held). 3/3 pass.",
+      "test": "verify/test-fixture-edges/p95-over-bare.test.mjs"
+    },
+    {
+      "id": "scope",
+      "status": "MET",
+      "command": "node --test verify/test-fixture-edges/scope.test.mjs: git diff --name-only 66e47a6a5417484a3da9947148fcb25de73e6738 af64a367c242b66cf968aad168b40e5141d029a3 (fetched at depth 1 if missing)",
+      "excerpt": "plan/decisions/2026-11-08-capture-p95-over-bare-start.md, plugins/harness/test/capture.test.mjs, scripts/debug/trace-writes.mjs, scripts/debug/trace-writes.test.mjs, test/setup.test.mjs, verify/self-update-by-version/no-self-edit.test.mjs: all in the item's list, nothing under packages/, workflows/ or plugins/harness/ outside test/. 1/1 pass.",
+      "test": "verify/test-fixture-edges/scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #210 at af64a367c242b66cf968aad168b40e5141d029a3 (mcp pull_request_read get_check_runs, get_job_logs)",
+      "excerpt": "test (ci): success, 10:30:11-10:35:08Z, '# tests 1886 # pass 1869 # fail 0 # skipped 17', 'plan ok'. clean-room: success. gates: failure only for 'verdict gate failed (item test-fixture-edges): no verify/test-fixture-edges/verdict.json at the head sha', which this commit supplies; the gates re-run on this commit decides it. Locally at this commit: verdict gate passed, evidence gate passed."
+    }
+  ],
+  "observations": [
+    "The base side of each line is the head with to-base.diff applied (git diff -R of the build for its four code files), so the tests run in ci's depth-1 checkout; the diff equals the reverse of main 66e47a6..af64a36 for those files. If a later change touches those lines the base clones stop applying, and these suites belong to verify-regression-set's sweep.",
+    "I read the build's diff while making to-base.diff, after writing the brief's checks from the item text; the tests drive behaviour (clone, file system, timing), not the diff's text.",
+    "keep-across-fs runs a stand-in strace as well as the real one, so the --keep copy is exercised on CI where strace is absent; the real-strace case is the one the Expect line names and ran here."
+  ]
+}
