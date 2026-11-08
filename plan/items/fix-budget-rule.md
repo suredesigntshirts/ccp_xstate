@@ -4,7 +4,8 @@
   "title": "Decide when repeated fixes to one module start a redesign item",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
+  "done_on": "2026-11-08",
   "module": "plan/check.mjs",
   "outcome": "plan/README.md states the fix budget and plan/check.mjs enforces it on every PR: a fix- item at ready, doing or done names the module it changes, a done item that names a module carries done_on, and once three fix items naming one module were done in the last 14 days with no design item for that module done after them, a fourth fix item there is refused at ready or doing, by name, pointing at a design item that names the recurring concept and designs it twice (plan/decisions/2026-11-08-fix-budget-rule.md).",
   "why": "Step back counts rounds within one item, but nothing counts fixes across items; 76 of 148 main commits since 11-04 are fixes, and seven fix items on 11-04 and 11-05 changed packages/engine/src/actors.js before anyone looked at its shape (APOSD strategic programming; research plan/research/design-books-cleanup.md, finding 8).",
@@ -147,6 +148,17 @@ and puts the rule in the plan check so CI enforces it rather than a builder's me
 The kind moved from decision to build: the decision is Claude's as stand-in (the decision file), and the work is a
 change to `plan/check.mjs`. The replan that readied it also added `module` and `done_on` to the schema and
 backfilled them on the done fix items and run-lifecycle-store, since done heads change only in a replan.
+
+## Done
+
+Built in PR #183 (merged 9d114f9). A separate session verified it at 6995413: all eight Expect lines MET (verdict
+60cb310). It changes no plugin code, so there is no release.
+
+The first verdict, at b7305dc, marked backfill-true NOT MET. Five backfilled `done_on` dates were a day late, because
+the builder read them from a shallow clone, which put their first done commits at its boundary. Replan #185 moved them
+to 2026-11-04 and the world window to 2026-11-18; check.mjs did not change. The world check was shown twice, with
+throwaway PRs #184 and #186. Both were refused at the plan check step and closed, and their branches
+`throwaway/fix-budget-rule-world` and `-world-2` are left for the person to delete.
 
 ## Verifier brief
 
