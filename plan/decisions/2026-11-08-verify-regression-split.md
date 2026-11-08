@@ -49,3 +49,8 @@ split if it also asserts behaviour directly: the direct assertions move, the com
 was the only assertion, the test leaves; it is not rewritten into a new test (non-goal of each part), since the
 behaviour it guarded is named by the glossary and covered by the package tests or another moved test. The table says
 which, per file.
+
+A test that only reads a recorded past run (a journal root, transcripts, saved GitHub responses) and asserts what
+happened in it leaves too: the run cannot change, so the test re-proves a fact of the past on every `npm test` and
+pins its files forever. Where a test runs the head's code on recorded input (a saved check-run fed to the engine, a
+saved closed-PR list fed to the journal check), it moves and its input goes to `test/regression/fixtures/`.

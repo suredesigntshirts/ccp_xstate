@@ -88,7 +88,7 @@
     },
     {
       "id": "left-reasons-hold",
-      "check": "For every row marked left, and every left half of a split row, the deleted test read a source or doc file and matched text, compared a .pass or reporter listing, compared output with a capture stored under verify/, or checked a retired path; the verifier records any row it disagrees with in observations and fails this line only if a left test drove the engine, a hook, a gate or the plan check and asserted on what came back without comparing it to a stored capture",
+      "check": "For every row marked left, and every left half of a split row, the deleted test read a source or doc file and matched text, compared a .pass or reporter listing, compared output with a capture stored under verify/, asserted facts of a recorded past run (a journal, transcript or GitHub response under verify/) without running the head's code on it, or checked a retired path; the verifier records any row it disagrees with in observations and fails this line only if a left test drove the engine, a hook, a gate or the plan check and asserted on what came back without comparing it to a stored capture",
       "how": "The verifier reads each left test at the PR's base and writes a test that asserts its sample rows against the base files",
       "proof": "verifier"
     },
