@@ -9,7 +9,8 @@ Tests use `node:test` and `node:assert`, nothing else. Name them `*.test.js` or 
 every test under `test/`, `scripts/`, `packages/`, `plugins/` and `verify/`, so a workspace needs no test script
 of its own to be covered by CI.
 
-A test that reads a rule text (`CLAUDE.md`, `plan/`, `docs/`) checks the words that carry the rule, never a whole
+A test that reads a rule text (`CLAUDE.md`, `plan/`, `docs/`) matches each word or term that carries the rule on its
+own (for "the first commit sets the status to `done`": `first commit`, `status`, `done`), never a phrase or a whole
 sentence, so a rewording that keeps the rule keeps the test green.
 
 ## Comments
