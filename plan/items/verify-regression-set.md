@@ -198,7 +198,7 @@ unchanged. No other line moves.
 
 ## Regression table
 
-One row per test file the 33 done folders held at the base, then one row per folder for its other files. `moved` and
+One row per test file the 34 done folders held at the base, then one row per folder for its other files. `moved` and
 `split` name the file under `test/regression/` that holds the moved tests.
 
 | Test file | Verdict | Moved to | Reason |
@@ -238,6 +238,11 @@ One row per test file the 33 done folders held at the base, then one row per fol
 | `verify/item-head-trim/lean-ready-passes.test.mjs` | moved | `test/regression/plan/lean-ready-head.test.mjs` | runs the plan check on temp plan copies with a lean ready head and with required fields emptied |
 | `verify/item-head-trim/scope.test.mjs` | left |  | read its own PR's file list between two pinned commits |
 | `verify/item-head-trim/tests-bite.test.mjs` | moved | `test/regression/plan/lean-ready-head.test.mjs` | runs test/plan-check.test.mjs on a temp copy with verifier back in readyRequired, red, green restored |
+| `verify/item-writer-gaps/fresh-writer.test.mjs` | left |  | graded a recorded fresh session's answer under verify/ and matched the cited files' text with regexes |
+| `verify/item-writer-gaps/hex-words-pass.test.mjs` | moved | `test/regression/plan/ready-rules-named.test.mjs` | runs the plan check on temp plan copies with hex-letter words, shas with a digit and both side by side |
+| `verify/item-writer-gaps/ready-fields-named.test.mjs` | split | `test/regression/plan/ready-rules-named.test.mjs` | moved: runs the plan check on temp plan copies with each readyRequired field emptied and with a dependency in a later stage; left: two tests matched plan/README.md text with regexes |
+| `verify/item-writer-gaps/suite-and-scope.test.mjs` | split | `test/regression/plan/real-plan.test.mjs` | moved: runs the plan check on the repo's plan; left: the scope test read its own PR's file list, one ran test/docs.test.mjs, which npm test runs itself, and one matched CLAUDE.md and plan/README.md text with regexes |
+| `verify/item-writer-gaps/tests-bite.test.mjs` | moved | `test/regression/plan/ready-rules-named.test.mjs` | runs test/plan-check.test.mjs on a temp copy with the sha pattern matching hex letters alone, red, green restored |
 | `verify/map-once-traps-written/map-complete.test.mjs` | split | `test/regression/plan/layout-map.test.mjs` | moved: runs test/docs.test.mjs on a temp copy with a new scripts/x folder and asserts it fails naming it; left: two tests matched CLAUDE.md and docs/layout.md text with regexes, and one ran test/docs.test.mjs at the checkout, which npm test runs itself |
 | `verify/map-once-traps-written/suite-and-scope.test.mjs` | split | `test/regression/plan/real-plan.test.mjs` | moved: runs the plan check on the repo's plan; left: the scope test read its own PR's file list between pinned commits, and two tests matched verdict.yml and its own item head with regexes |
 | `verify/map-once-traps-written/tests-bite.test.mjs` | moved | `test/regression/plan/layout-map.test.mjs` | runs test/docs.test.mjs on temp copies with the scripts/gates/ entry and the scripts/ row taken out, red each time, green restored |
@@ -343,6 +348,7 @@ One row per test file the 33 done folders held at the base, then one row per fol
 | `fix-trace-writes-clone-cwd` | `lib.mjs` inlined into the moved file and deleted; 4 evidence files deleted |
 | `fresh-reader-gaps` | `lib.mjs` deleted; 6 evidence files deleted |
 | `item-head-trim` | `lib.mjs` inlined into the moved file and deleted; 6 evidence files deleted |
+| `item-writer-gaps` | `lib.mjs` inlined into the moved file and deleted; 6 evidence files deleted |
 | `map-once-traps-written` | `lib.mjs` inlined into the moved file and deleted; 5 evidence files deleted |
 | `pinned-fetch-temp-repo` | `lib.mjs` deleted; 5 evidence files deleted |
 | `plan-reader-effort` | `lib.mjs` inlined into the moved file and deleted; 10 evidence files deleted |
