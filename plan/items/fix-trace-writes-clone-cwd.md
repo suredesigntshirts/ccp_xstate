@@ -4,7 +4,7 @@
   "title": "Give a traced child its parent's folder even when it is logged before its clone returns",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "draft",
   "module": "scripts/debug/trace-writes.mjs",
   "outcome": "writesUnder resolves a child process's relative paths against the folder it really started in (its parent's working directory at the clone) and the chdirs it made itself, in whatever order strace -f logs the parent's clone return and the child's own calls, so a child that chdirs and makes a relative write before the line that returns its pid is still reported at the right path.",
   "why": "ci on #202 at 1af034e went red once on verify/self-edit-check-snapshot/strace-kept.test.mjs, which missed the mkdir of <folder>/sub/made. writesUnder sets a child's folder from its parent's when the parent's `clone(...) = <pid>` line is read; under strace -f that line can come as <unfinished ...> / <... clone resumed> after the child's own chdir, and then it overwrites the folder the child set. A red that is the parser's ordering bug costs a thread a rerun and a look each time (L-attention-is-the-constraint), and a debugging aid that misnames where a write landed reports a wrong fact (L-facts-from-source).",
@@ -104,6 +104,11 @@ inherited), and let the clone return set the folder only of a child not seen yet
 in `main`) and appends a test to `scripts/debug/trace-writes.test.mjs`. This item touches `writesUnder` and adds tests
 in the same test file, so by `plan/decisions/2026-11-08-parallel-deps.md` (decision 2, a shared source file is a
 scheduling rule, not a dependency) its build branches from main after #210 merges.
+
+**Status.** The head is complete, but it stays `draft` here: the tests that copy `plan/` alone into a temp folder
+refuse any real `ready` fix item, because its `module` is not in the copy. The build PR sets it `ready` and makes
+those copies hold the live modules, as `fix-event-close-tag`'s build does; whichever merges second takes the other's
+helper change from main.
 
 ## Verifier brief
 
