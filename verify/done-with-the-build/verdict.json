@@ -1,0 +1,61 @@
+{
+  "item": "done-with-the-build",
+  "verified_sha": "807999f1362281bc882f39a584bbd20935748762",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5HYDRKzEwrpqJJKML7", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "build-sets-done",
+      "status": "MET",
+      "command": "node --test verify/done-with-the-build/build-sets-done.test.mjs (temp repo from plan/, scripts/, packages/; probe item ready on main, build branch whose first commit sets done and done_on); evidence/build-sets-done.md",
+      "excerpt": "1/1 pass. freeze gate passed (item dwtb-probe); verdict gate's only reason 'no verify/dwtb-probe/verdict.json at the head sha'; after a verdict commit with a different Claude-Session: verdict gate passed; plan/check.mjs 'plan ok'.",
+      "test": "verify/done-with-the-build/build-sets-done.test.mjs"
+    },
+    {
+      "id": "effort-by-item",
+      "status": "MET",
+      "command": "node --test verify/done-with-the-build/effort-by-item.test.mjs (temp repo, merges #11, #12 adds verify/probe/verdict.json, #13 changes the item and verdict again); evidence/effort-by-item.md",
+      "excerpt": "2/2 pass. --item probe --json equals '12 --json' ({pr 12, files 4, exports_added 7, reader_lines 10}), differs from #13 (files 3, reader_lines 6); --item never-verified exits 1: 'no merge on HEAD's first-parent line adds verify/never-verified/verdict.json'.",
+      "test": "verify/done-with-the-build/effort-by-item.test.mjs"
+    },
+    {
+      "id": "own-build-done",
+      "status": "MET",
+      "command": "pull_request_read get_commits and get_check_runs on PR #243; git show 1e30140; evidence/own-build-done.md",
+      "excerpt": "First commit 1e3014042eeef26f511a6a6edaa35dc892d6cece changes only plan/items/done-with-the-build.md, '\"status\": \"ready\"' to '\"status\": \"done\"'; the head says done. test green at the head; gates red only for the missing verdict, rerun on this commit."
+    },
+    {
+      "id": "fresh-reader-done",
+      "status": "MET",
+      "command": "env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p '<the brief's question>' --allowedTools Read Glob Grep < /dev/null in a fresh clone detached at 807999f; evidence/fresh-reader-done.md",
+      "excerpt": "'Its first commit sets the item's status to done and sets done_on. The verdict gate is what makes that true.' 'Merge when ci and verdict are both green at the head sha.' 'There is no further plan PR. plan/README.md says \"No PR follows\"'; only a release branch for plugins/harness/ or packages/journal/ changes."
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/done-with-the-build/tests-bite.test.mjs (temp copies of scripts/); evidence/tests-bite.md",
+      "excerpt": "pr-gate.test.mjs: green {13,0}, broken {10,3}, restored {13,0}, the new test among the red. reader-effort.test.mjs: green {7,0}, broken {6,1}, restored {7,0}; red: '--item reads the merge that added the item's verdict, not a later one touching it'.",
+      "test": "verify/done-with-the-build/tests-bite.test.mjs",
+      "mutation": "scripts/gates/lib.mjs contractParts keeps status (dropped from the destructure); scripts/reader-effort.mjs itemRange without --reverse and without the 'not at the first parent' check, so it takes the last merge touching the verdict",
+      "red_test": "scripts/gates/test/pr-gate.test.mjs: a build PR whose first commit sets its item done passes freeze, and merges on a verdict from another session; scripts/reader-effort.test.mjs: --item reads the merge that added the item's verdict, not a later one touching it"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "node --test verify/done-with-the-build/scope.test.mjs (trees of 807999f and base fd32883); node plan/check.mjs; npm ci && npm test locally; ci test job 128722108570; evidence/suite-and-scope.md",
+      "excerpt": "15 files changed, each an output or the item file. plan ok. ci npm test at the head: success. Local: 2046 tests, 2039 pass, 2 fail, both from this shallow branch clone (fix-budget-rule backfill; plan-reader-effort's origin/main scope diff, fixed by #234).",
+      "test": "verify/done-with-the-build/scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #243; evidence/ci.md",
+      "excerpt": "test job 128722108570 at 807999f1362281bc882f39a584bbd20935748762: success. gates job 128722108544: verdict refused only for 'no verify/done-with-the-build/verdict.json at the head sha', and reruns on this commit, which changes only verify/done-with-the-build/."
+    }
+  ],
+  "observations": [
+    "Before writing its tests the verifier saw the builder's two new tests in the PR diff; its own tests build their own repos and probe item and do not import them.",
+    "docs/gates.md is named as an output but unchanged. Its freeze section already lists status, done_on and reader_effort outside the frozen head, which the output allows, but it does not say reader_effort is kept only on done items that recorded it.",
+    "The fresh headless reader also read the container's shared team memory, outside the clone, and named older done replans from it; it set them aside as older practice. Fresh-reader checks would be cleaner with that memory folder hidden.",
+    "In tests-bite, dropping --reverse alone does not turn the --item test red: the 'adds the verdict' check still skips the later merge, so the two guards back each other up."
+  ]
+}
