@@ -4,7 +4,7 @@
   "title": "Mark an item done in its build PR, so no PR follows the merge",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "An item becomes done in its own build PR: the PR's first commit sets status done (and done_on for an item naming a module), the verdict gate proves it before the merge, and no PR follows the merge. Reader effort is read, never stored: node scripts/reader-effort.mjs --item <id> finds the merge that added verify/<id>/verdict.json, the item's build PR, and reports that PR, so plan/check.mjs no longer asks a done item for reader_effort. plan/README.md's How an item moves has four steps with no done replan; a gate test keeps a build PR that sets done passing the freeze gate; the entry texts' line budget in test/docs.test.mjs drops to 226.",
   "why": "Every item costs three PRs: the readying replan, the build, and a done replan whose content is a status flip, a ## Done paragraph saying what git and verify/<id>/ already say, and since plan-reader-effort the reader_effort numbers, which git can give at any time. The done status repeats the verdict, a stored derived number repeats git, and each done replan is one more CI wait and merge, or an item left open when a thread forgets it (L-proof-source, L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-4.md).",
   "serves": [

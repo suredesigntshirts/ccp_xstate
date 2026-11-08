@@ -93,7 +93,7 @@
     },
     {
       "id": "left-reasons-hold",
-      "check": "For every row marked left, and every left half of a split row, the deleted test read a source or doc file and matched text, compared a .pass or reporter listing, compared output with a capture stored under verify/, asserted facts of a recorded past run (a journal, transcript or GitHub response under verify/) without running the head's code on it, or checked a retired path; the verifier records any row it disagrees with in observations and fails this line only if a left test drove the engine, a hook, a gate or the plan check and asserted on what came back without comparing it to a stored capture",
+      "check": "For every row marked left, and every left half of a split row, the deleted test read a source or doc file and matched text, compared a .pass or reporter listing, compared output with a capture stored under verify/, asserted facts of a recorded past run (a journal, transcript or GitHub response under verify/) without running the head's code on it, checked a retired path, or held the same assertion on the same code as a test outside verify/ that npm test runs, which the row names, and could not hold it under the regression set's parallel runs; the verifier records any row it disagrees with in observations and fails this line only if a left test drove the engine, a hook, a gate or the plan check and asserted on what came back without comparing it to a stored capture",
       "how": "The verifier reads each left test at the PR's base and writes a test that asserts its sample rows against the base files",
       "proof": "verifier"
     },
@@ -143,7 +143,8 @@
     "A test in another verify/ folder reads a file one of these suites holds: verify/rules-said-once/suite-and-scope.test.mjs reads verify/harness-glossary/notes.test.mjs in its tree mode; that test changes only so it no longer reads the moved or deleted file, which the scope line allows",
     "The recorded Claude Code transcripts the real-agent and real-session tests replay are input, not captures; they move to test/regression/fixtures/ with their tests, and the PR names each one's size",
     "A moved test that drove a hook or a page against a stored capture must be rewritten to assert the behaviour directly or be split; the table says which"
-  ]
+  ],
+  "contract_changes": 1
 }
 ```
 
@@ -176,6 +177,21 @@ Known now:
   If this PR moves or deletes that file, that one check changes so it no longer reads it (the scope line's exception).
 
 Report the local suite time before and after in the PR, as information.
+
+## Contract change
+
+The build moved `verify/obs-live-capture/capture.test.mjs`'s cheap test into `test/regression/plugin/live-capture.test.mjs`
+with its timing bars: capture adds at most 50 ms at the median, and at most 200 ms at p95, over a bare node start. CI
+runs part 1's and part 2's moved-pass suites side by side, each with up to six workers over every file under
+`test/regression/`. Under that load the moved copy failed: first the p95 bar, then the median bar (94 ms in one
+verifier run). Measuring hook and bare runs in pairs, so that load hits both sides, still failed 4 of 12 runs locally
+under both suites. Capture's own CPU work grows with the load, so no subtraction cancels it.
+
+The same bars over the same hook are held by `plugins/harness/test/capture.test.mjs`, which `npm test` runs as one
+file of the plugin's suite. They are named there as obs-live-capture's `complete` and `cheap`. So `left-reasons-hold` gains
+one leave reason: the left test held the same assertion on the same code as a test outside `verify/` that `npm test`
+runs, which the row names, and could not hold it under the regression set's parallel runs. The cheap test leaves under
+it (decision 7 of `plan/decisions/2026-11-08-verify-regression-split.md`). No other line moves.
 
 ## Verifier brief
 

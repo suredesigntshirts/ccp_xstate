@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Checks the plan: every head matches item.schema.json, every id it names exists, depends_on has no
 // cycle and never points at a later stage, a ready item has every readyRequired field filled, a ready or doing item's
-// Expect lines name behaviour rather than pinning main, a contract change is written down, fix items keep to the
-// fix budget, and a recently done build item records its reader effort.
+// Expect lines name behaviour rather than pinning main, a contract change is written down, and fix items keep to the
+// fix budget.
 // Zero dependencies; it reads only the small part of JSON Schema that item.schema.json uses.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
@@ -137,7 +137,6 @@ for (const it of items.values()) {
 // Reader effort (plan/decisions/2026-11-08-plan-reader-effort.md): a build item verified and done from this date records
 // what its build cost a reader beside its fix budget fields; items done earlier predate the report. Its verdict file is
 // what makes it a real item rather than a test's made-up one.
-const READER_EFFORT_FROM = '2026-11-09';
 const isFix = (i) => i.id.startsWith('fix-');
 const DAY = 24 * 60 * 60 * 1000;
 const today = Date.parse(new Date().toISOString().slice(0, 10));
@@ -149,9 +148,6 @@ for (const it of items.values()) {
   if (building && !empty(it.module) && !existsSync(join(root, '..', it.module)))
     fail(at, `module ${it.module} does not exist`);
   if (it.status === 'done' && !empty(it.module) && empty(it.done_on)) fail(at, 'a done item that names a module needs done_on');
-  if (it.status === 'done' && it.kind === 'build' && it.done_on >= READER_EFFORT_FROM && it.reader_effort === undefined &&
-    existsSync(join(root, '..', 'verify', it.id, 'verdict.json')))
-    fail(at, `a build item done from ${READER_EFFORT_FROM} records reader_effort: node scripts/reader-effort.mjs <pr> --json`);
 }
 for (const it of items.values()) {
   if (!isFix(it) || !['ready', 'doing'].includes(it.status) || empty(it.module)) continue;

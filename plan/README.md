@@ -19,23 +19,19 @@ plan/
 
 ## How an item moves
 
-Status runs `draft` → `ready` → `doing` → `done` (off the path: `split`, `dropped`, `parked`), in five steps. A PR
-names its item only by an `Item: <id>` line in its body; branch names are for people.
+Status runs `draft` → `ready` → `done` (off the path: `split`, `dropped`, `parked`), in four steps. A PR names its
+item only by an `Item: <id>` line in its body; branch names are for people. Every commit ends with a `Claude-Session:`
+trailer (`docs/gates.md`, "Sessions").
 
 1. **Readying replan.** Fill the head until `check.mjs` passes with `ready`. Branch `replan/<topic>`, label `replan`,
    changes under `plan/` only, no `Item:` line.
-2. **Build PR.** Branch `<kind>/<id>` (such as `build/journal-schema`), body with `Item: <id>`. Its first commit
-   sets the status to `doing`; from then on the contract is frozen.
+2. **Build PR.** Branch `<kind>/<id>` (such as `build/journal-schema`), body with `Item: <id>`, which freezes the
+   contract. Its first commit sets the status to `done` (and `done_on`); the verdict gate makes that true.
 3. **Verdict.** A separate session, given the item's Verifier brief and not the builder's tests, writes its tests
    and evidence under `verify/<id>/` and commits `verify/<id>/verdict.json` to the build PR's branch.
 4. **Merge and release.** Merge when `ci` and `verdict` are green at the head sha; to take main after the verdict,
    merge main in rather than rebase. A merge that changes `plugins/harness/` or `packages/journal/` is released
-   (`docs/gates.md`, "After the merge").
-5. **Done replan.** Set the status to `done` and `done_on`; a build item also pastes `node scripts/reader-effort.mjs
-   <pr> --json` into `reader_effort`. Add a `## Done` section saying where it was built and verified. Branch
-   `replan/<id>-done`, label `replan`, changes under `plan/` only.
-
-Every commit ends with a `Claude-Session:` trailer (`docs/gates.md`, "Sessions").
+   (`docs/gates.md`, "After the merge"). No PR follows.
 
 ## How an item is written
 
@@ -54,7 +50,7 @@ read). The head is the contract; `check.mjs` refuses a `ready` item that leaves 
 | `person_prereqs` | What must the person do before the thread starts? | A thread can't add its own allow rules |
 | `step_back` | When does it stop retrying and replan? Two rounds unless `max_rounds` says otherwise | PR #72 ran 5 rounds before anyone stepped back |
 | `module`, `done_on` | Which module does a fix change, and when was it done? | Seven fixes in two days changed `actors.js` before anyone looked at its shape |
-| `reader_effort` | What did the build cost its reader? | The cleanups passed every gate while the harness grew |
+| `reader_effort` | What did the build cost its reader? Read it with `node scripts/reader-effort.mjs --item <id>` | The cleanups passed every gate while the harness grew |
 | `contract_changes` | Did the contract move once the build started, and why? | A build that found a better shape could not take it |
 
 ## How slop is kept out

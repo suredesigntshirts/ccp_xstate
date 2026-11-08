@@ -235,3 +235,18 @@ test('freeze gate: a set done_on moves only by a plan-only replan that says why'
   assert.equal(r.run('freeze', { ...env, PR_LABELS: '["replan"]' }).status, 0);
   assert.equal(r.run('freeze', { ...env, PR_LABELS: '[]' }).status, 1);
 });
+
+test('a build PR whose first commit sets its item done passes freeze, and merges on a verdict from another session', () => {
+  const r = repo();
+  const done = `\`\`\`json\n${JSON.stringify({ id: 'x', status: 'done', done_on: '2026-11-08', expect })}\n\`\`\`\n\n## Verifier brief\n\nRun it.\n`;
+  r.commit({ 'plan/items/x.md': done }, 'builder');
+  const built = r.commit({ 'packages/a/index.js': 'export const a = 1;\n' }, 'builder');
+  let out = r.run('freeze');
+  assert.equal(out.status, 0, out.stderr);
+  out = r.run('verdict');
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /no verify\/x\/verdict.json/);
+  r.commit({ 'verify/x/verdict.json': verdict(built) }, 'verifier');
+  out = r.run('verdict');
+  assert.equal(out.status, 0, out.stderr);
+});

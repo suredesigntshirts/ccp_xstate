@@ -21,7 +21,7 @@ How the work on the harness itself is planned and proved.
 | evidence file | What a plan verifier commits for one Expect line: the command, the excerpt and the inputs to run it again; never a listing or a capture | `verify/<item>/evidence/`, `scripts/gates/lib.mjs` `checkEvidence` |
 | test listing | node:test output saved whole: a pass and a fail summary line with ten or more result lines, TAP or spec; the evidence gate refuses one under `verify/` | `scripts/gates/lib.mjs` `isListing` |
 | observation | A plan verifier's judged note on a verdict (a naming concern, a design smell, a doc gap); it never gates | `scripts/gates/lib.mjs` `checkVerdict`, `docs/gates.md` |
-| contract change | The one replan a doing item's head and Verifier brief may have, before its verdict file exists, written up under `## Contract change` | `plan/item.schema.json` `contract_changes`, `plan/check.mjs` |
+| contract change | The one replan an item's head and Verifier brief may have once its build PR names it, before its verdict file exists, written up under `## Contract change` | `plan/item.schema.json` `contract_changes`, `plan/check.mjs` |
 | done_on change | The replan that moves an item's set `done_on`, saying why under `## Done on change` | `scripts/gates/lib.mjs` `checkDoneOn`, `docs/gates.md` |
 | regression set | The behavioural tests of done items, kept by area under test/regression with one helper; it is what a cleanup must keep passing | `plan/decisions/2026-11-08-verification-swing.md`, decision 4 |
 | ledger row | A lesson the plan is held to, with an `L-` id | `plan/ledger/` |
@@ -29,7 +29,7 @@ How the work on the harness itself is planned and proved.
 | replan | A PR that changes only `plan/`, labelled `replan` | `scripts/gates/pr-gate.mjs` |
 | fix budget | Three done fix items naming one module in 14 days, with no design item for it done after them, refuse a fourth | `plan/README.md`, `plan/item.schema.json` `module` |
 | design item | An item, not a fix, that names the module it redesigns: it names the recurring concept and designs it twice, and restarts the module's fix budget | `plan/README.md`, `plan/item.schema.json` `module` |
-| reader effort | What a change costs its reader: the lines a reader opens to follow it (its changed hunks plus the definitions they call), its exports added and removed, and its lines by category; a done build item records it in `reader_effort` | `scripts/reader-effort.mjs`, `plan/item.schema.json` `reader_effort` |
+| reader effort | What a change costs its reader: the lines a reader opens to follow it (its changed hunks plus the definitions they call), its exports added and removed, and its lines by category; read from git for an item's build PR, never stored (done items that recorded it keep `reader_effort`) | `scripts/reader-effort.mjs`, `plan/item.schema.json` `reader_effort` |
 
 ## Engine
 

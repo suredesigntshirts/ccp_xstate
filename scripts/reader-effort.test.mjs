@@ -106,3 +106,19 @@ test('an unknown PR number is an error naming it', (t) => {
   r.commit({ 'a.js': '' });
   assert.throws(() => execFileSync(process.execPath, [SCRIPT, '9'], { cwd: r.dir, stdio: 'pipe' }), /no merge commit for PR #9/);
 });
+
+test('--item reads the merge that added the item\'s verdict, not a later one touching it', (t) => {
+  const r = repo(t);
+  r.commit({ 'plan/items/it.md': '"status": "ready"\n', 'README.md': 'hi\n' });
+  r.git('checkout', '-q', '-b', 'build');
+  r.commit({ 'src/a.js': lines(3), 'plan/items/it.md': '"status": "done"\n', 'verify/it/verdict.json': lines(2) });
+  r.git('checkout', '-q', 'main');
+  r.git('merge', '-q', '--no-ff', '-m', 'Merge pull request #4 from o/build', 'build');
+  r.git('checkout', '-q', '-b', 'later');
+  r.commit({ 'plan/items/it.md': '"status": "done"\n## Done\n', 'verify/it/verdict.json': lines(3) });
+  r.git('checkout', '-q', 'main');
+  r.git('merge', '-q', '--no-ff', '-m', 'Merge pull request #5 from o/later', 'later');
+  assert.deepEqual(r.run('--item', 'it'), r.run('4'));
+  assert.throws(() => execFileSync(process.execPath, [SCRIPT, '--item', 'other'], { cwd: r.dir, stdio: 'pipe' }),
+    /no merge on HEAD's first-parent line adds verify\/other\/verdict\.json/);
+});

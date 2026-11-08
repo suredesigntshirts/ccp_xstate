@@ -64,3 +64,12 @@ part 1 found `verify/harness-glossary/lib.mjs` reading the toy run's v1 journals
 line lets such a reader change only so it reads the new path, or no longer reads a file the part deleted. The other
 choice, keeping the file in place until the reader's own suite retires, leaves a part's folder holding more than its
 verdict, which is the outcome every part states.
+
+## 7. A timing bar held elsewhere leaves
+
+Building `verify-regression-plugin` on 8 Nov. A test that drives code and asserts a wall-clock bar cannot run in
+the regression set, whose moved-pass suites run every file at once: capture's cheap bar failed there even when
+measured in pairs with a bare node start. Where a test outside `verify/` that `npm test` runs already holds the same
+assertion on the same code, the moved copy leaves, and its row names that test. The other choice, loosening the bar
+in the copy, would change what the test asserts, which a move must not. Reversible: a later item can move the bar back
+into the regression set once that set has a serial lane.

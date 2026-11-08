@@ -4,9 +4,11 @@
 // lines by category. The rules are plan/decisions/2026-11-08-plan-reader-effort.md.
 //
 //   node scripts/reader-effort.mjs <pr-number | base..head> [--json]
+//   node scripts/reader-effort.mjs --item <id> [--json]
 //
 // A PR number names the merge commit titled "Merge pull request #<n> " reachable from HEAD; the change is the merge
-// against its first parent. A range is read as a PR would be, from the merge base of base and head. --json prints the object a done item's reader_effort field holds.
+// against its first parent. A range is read as a PR would be, from the merge base of base and head. An item names the
+// first merge on HEAD's first-parent line that adds verify/<id>/verdict.json: the PR that built it. --json prints the object a done item's reader_effort field holds.
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
@@ -72,6 +74,22 @@ export function prRange(cwd, pr) {
   const sha = git(cwd, ['log', '--merges', '--format=%H', '-F', `--grep=Merge pull request #${pr} `, 'HEAD']).split('\n')[0];
   if (!sha) throw new Error(`no merge commit for PR #${pr} reachable from HEAD`);
   return { base: git(cwd, ['rev-parse', `${sha}^1`]).trim(), head: sha };
+}
+
+// The range of the PR that built an item: the first merge on HEAD's first-parent line that adds the item's
+// verify/<id>/verdict.json, since the build PR is where the verdict is committed.
+const has = (cwd, rev, path) => show(cwd, rev, path) !== null;
+export function itemRange(cwd, id) {
+  const verdict = `verify/${id}/verdict.json`;
+  const merges = git(cwd, ['log', '--merges', '--first-parent', '--reverse', '--format=%H %s', 'HEAD', '--', verdict])
+    .split('\n').filter(Boolean);
+  for (const line of merges) {
+    const [sha, ...subject] = line.split(' ');
+    if (!has(cwd, sha, verdict) || has(cwd, `${sha}^1`, verdict)) continue;
+    const pr = subject.join(' ').match(/^Merge pull request #(\d+) /)?.[1];
+    return { base: git(cwd, ['rev-parse', `${sha}^1`]).trim(), head: sha, ...(pr ? { pr: Number(pr) } : {}) };
+  }
+  throw new Error(`no merge on HEAD's first-parent line adds ${verdict}`);
 }
 
 // The added line numbers (in the head) of each changed file, from a zero-context diff.
@@ -166,16 +184,18 @@ function text(r, range) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  const arg = process.argv.slice(2).find((a) => !a.startsWith('--'));
+  const argv = process.argv.slice(2);
+  const item = argv.includes('--item') ? argv[argv.indexOf('--item') + 1] : undefined;
+  const arg = item ?? argv.find((a) => !a.startsWith('--'));
   const cwd = process.cwd();
   if (!arg) {
-    console.error('usage: node scripts/reader-effort.mjs <pr-number | base..head> [--json]');
+    console.error('usage: node scripts/reader-effort.mjs <pr-number | base..head | --item <id>> [--json]');
     process.exit(2);
   }
   try {
-    const pr = /^#?\d+$/.test(arg) ? Number(arg.replace('#', '')) : undefined;
-    const [base, head] = pr === undefined ? arg.split('..') : [];
-    const range = pr === undefined ? { base, head, pr } : { ...prRange(cwd, pr), pr };
+    const pr = item === undefined && /^#?\d+$/.test(arg) ? Number(arg.replace('#', '')) : undefined;
+    const [base, head] = item === undefined && pr === undefined ? arg.split('..') : [];
+    const range = item !== undefined ? itemRange(cwd, item) : pr === undefined ? { base, head, pr } : { ...prRange(cwd, pr), pr };
     const r = report(cwd, range);
     console.log(process.argv.includes('--json') ? JSON.stringify(r, null, 2) : text(r, arg));
   } catch (e) {

@@ -4,7 +4,7 @@
   "title": "Read plan-reader-effort's PR scope only on its own PR",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "doing",
+  "status": "done",
   "outcome": "verify/plan-reader-effort/plan-and-suite-pass.test.mjs reads a PR's file list from git only when PR_BODY names plan-reader-effort by its Item: line, as verify/rules-said-once/suite-and-scope.test.mjs does since scope-suite-own-pr; in any other run (a full clone of any branch, ci's depth-1 checkout, another item's PR) it checks that every output exists in the tree, so it passes wherever plan-reader-effort's build holds. docs/traps.md tells a verifier writing a scope test to read git only on its own PR, and says ci.yml checks out at depth 1.",
   "why": "The suite diffs merge-base(BASE_SHA or origin/main, HEAD)..HEAD and expects only plan-reader-effort's files, so since #212 merged every full clone of another branch fails it; two builders and a verifier lost a run to it on 8 Nov. It is the same fault scope-suite-own-pr fixed for rules-said-once, and verifiers keep writing it because nothing in the repo says how a scope test should find its PR (L-rules-live-in-the-repo, L-attention-is-the-constraint).",
   "serves": [
@@ -98,3 +98,7 @@ found it), since this item edits the same entry's neighbour.
 Check out the PR head in a full clone (`git fetch --unshallow origin` if needed) and run `npm ci`. Write your tests
 under `verify/effort-scope-own-pr/` without reading the builder's; `verify/scope-suite-own-pr/` shows one way to make
 the clones. Commit temp repos with the container's signing off (`docs/traps.md`).
+
+## Done
+
+Built in #234 and verified 4/4 by a separate session (`verify/effort-scope-own-pr/verdict.json`).
