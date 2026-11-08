@@ -1,7 +1,8 @@
 // Shared by the verifier's tests for verify-regression-engine: the repo, the two commits compared, the 26 suites,
 // a git reader that fetches a pinned commit when the checkout is shallow, and a reader for the item's tables.
 import { execFileSync } from 'node:child_process';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -22,20 +23,38 @@ export const SUITES = Object.freeze([
 /** Decision 4's eight areas. */
 export const AREAS = Object.freeze(['engine', 'run', 'marks', 'journal', 'plugin', 'inspector', 'plan', 'gates']);
 
-export const git = (args, opts = {}) => execFileSync('git', ['-C', REPO, ...args], { encoding: 'utf8', maxBuffer: 1e8, ...opts });
-const has = (sha) => { try { git(['cat-file', '-e', `${sha}^{commit}`], { stdio: 'ignore' }); return true; } catch { return false; } };
+/**
+ * A git dir holding every sha in `shas`: `root` when it has them, else a temp bare repo they are fetched into at
+ * depth 1, removed when the process exits; null when neither can give them. The checkout itself is never fetched
+ * into: suites run in parallel, and fetches into one shallow repo collide on its .git/shallow.lock.
+ */
+function pinnedRepo(root, shas) {
+  const run = (cwd, ...a) => execFileSync('git', a, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 300_000 }).trim();
+  const holds = (dir) => shas.every((s) => { try { run(dir, 'cat-file', '-e', `${s}^{commit}`); return true; } catch { return false; } });
+  if (holds(root)) return root;
+  const dir = mkdtempSync(join(tmpdir(), 'pinned-'));
+  process.on('exit', () => rmSync(dir, { recursive: true, force: true }));
+  // actions/checkout keeps its credentials in the checkout's own config; the temp repo borrows them for this fetch.
+  const auth = (() => { try { return run(root, 'config', '--get-regexp', '^http\\..*extraheader$').split('\n'); } catch { return []; } })()
+    .filter(Boolean).flatMap((l) => { const i = l.indexOf(' '); return ['-c', `${l.slice(0, i)}=${l.slice(i + 1)}`]; });
+  try {
+    run(root, 'init', '-q', '--bare', dir);
+    run(dir, ...auth, 'fetch', '-q', '--depth=1', run(root, 'remote', 'get-url', 'origin'), ...shas);
+  } catch { return null; }
+  return holds(dir) ? dir : null;
+}
+
+let pinned;
+/** git on the repo holding BASE and VERIFIED once haveCommits() found them: the checkout, or the temp repo. */
+export const git = (args, opts = {}) => execFileSync('git', ['-C', pinned || REPO, ...args], { encoding: 'utf8', maxBuffer: 1e8, ...opts });
 
 /**
- * Whether BASE and VERIFIED can be read here. A depth-1 checkout (ci.yml) lacks them, so each is fetched by sha
- * at depth 1, which brings its tree. False only when neither git nor the network can give them.
+ * Whether BASE and VERIFIED can be read. A depth-1 checkout (ci.yml) lacks them, so both are fetched by sha at depth
+ * 1 into a temp repo, which brings their trees. False only when neither git nor the network can give them.
  */
 export function haveCommits() {
-  for (const sha of [BASE, VERIFIED]) {
-    if (has(sha)) continue;
-    try { git(['fetch', '-q', '--depth=1', 'origin', sha], { stdio: 'ignore', timeout: 120_000 }); } catch { /* checked below */ }
-    if (!has(sha)) return false;
-  }
-  return true;
+  if (pinned === undefined) pinned = pinnedRepo(REPO, [BASE, VERIFIED]);
+  return pinned !== null;
 }
 
 export const show = (sha, path) => git(['show', `${sha}:${path}`]);

@@ -4,7 +4,8 @@
   "title": "Fetch pinned commits into a temp repo, never the checkout",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
+  "done_on": "2026-11-08",
   "outcome": "The four verifier suites that fetch a pinned commit missing from a shallow checkout (verify/fix-trace-writes-clone-cwd/lib.mjs, verify/test-fixture-edges/scope.test.mjs, verify/map-once-traps-written/suite-and-scope.test.mjs, verify/verify-regression-engine/lib.mjs) fetch it at depth 1 into a temp bare repo of their own and read it there, so they never write to the checkout's .git and run green side by side in ci.yml's depth-1 checkout; a checkout that already holds the commits is read as before. docs/traps.md's shallow-clone entry says a test fetches pinned commits into a temp repo, never the checkout.",
   "why": "In ci.yml's depth-1 checkout node --test runs suites in parallel, and each of these four runs git fetch --depth=1 origin <sha> into the checkout; concurrent fetches collide on .git/shallow.lock, the helper swallows the error, and a scope test fails at random. It failed twice on #239 (verify/fix-trace-writes-clone-cwd/scope.test.mjs, base and head commits readable) and the evidence-gate-edges verifier reproduced it with three parallel fetches. Every red rerun costs a builder or verifier a look (L-attention-is-the-constraint), and the next verifier copies whichever helper it finds unless the rule is written down (L-rules-live-in-the-repo).",
   "serves": [
