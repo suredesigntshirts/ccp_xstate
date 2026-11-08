@@ -21,11 +21,12 @@ function item(id, fields) {
 }
 
 /** Runs the check over plan/ plus the given items; returns { code, out }. */
-function check(items, { makeModule = true } = {}) {
+function check(items, { makeModule = true, verdicts = [] } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'plan-check-'));
   try {
     cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
     if (makeModule) { mkdirSync(join(dir, 'lib')); writeFileSync(join(dir, MODULE), ''); }
+    for (const id of verdicts) { mkdirSync(join(dir, 'verify', id), { recursive: true }); writeFileSync(join(dir, 'verify', id, 'verdict.json'), '{}'); }
     for (const { prose = '', ...it } of items)
       writeFileSync(join(dir, 'plan/items', `${it.id}.md`), '```json\n' + JSON.stringify(it, null, 2) + '\n```\n\n' + prose + '## Verifier brief\n\nRead it.\n');
     const r = spawnSync(process.execPath, [join(dir, 'plan/check.mjs')], { encoding: 'utf8' });
@@ -125,4 +126,27 @@ test('a contract changes at most once, and a change is written down', () => {
   const twice = check([changed(2, section)]);
   assert.equal(twice.code, 1);
   assert.match(twice.out, /moved\.md\.contract_changes: must be at most 1/);
+});
+
+const EFFORT = {
+  pr: 1, files: 2, exports_added: 0, exports_removed: 0, reader_lines: 10,
+  added: { code: 1, tests: 1, verifier: 0, evidence: 0, docs: 0 }, removed: { code: 0, tests: 0, verifier: 0, evidence: 0, docs: 0 },
+};
+
+test('a verified build item done from 2026-11-09 records reader_effort', () => {
+  const late = item('effort-late', { done_on: '2026-11-09' });
+  const missing = check([late], { verdicts: ['effort-late'] });
+  assert.equal(missing.code, 1);
+  assert.match(missing.out, /effort-late\.md: a build item done from 2026-11-09 records reader_effort/);
+  assert.equal(check([{ ...late, reader_effort: EFFORT }], { verdicts: ['effort-late'] }).code, 0);
+  assert.equal(check([late]).code, 0, 'an item with no verdict file is a made-up one');
+  assert.equal(check([item('effort-early', { done_on: '2026-11-08' })], { verdicts: ['effort-early'] }).code, 0);
+  assert.equal(check([item('effort-probe', { kind: 'probe', done_on: '2026-11-09' })], { verdicts: ['effort-probe'] }).code, 0);
+});
+
+test('a malformed reader_effort is refused', () => {
+  const bad = check([item('effort-bad', { reader_effort: { ...EFFORT, extra: 1 } })]);
+  assert.match(bad.out, /effort-bad\.md\.reader_effort: unknown field extra/);
+  const frac = check([item('effort-frac', { reader_effort: { ...EFFORT, added: { ...EFFORT.added, code: 1.5 } } })]);
+  assert.match(frac.out, /effort-frac\.md\.reader_effort\.added\.code: must be an integer/);
 });

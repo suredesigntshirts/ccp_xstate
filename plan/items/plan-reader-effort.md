@@ -4,7 +4,7 @@
   "title": "Measure what a change costs its reader",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "doing",
   "outcome": "For any merged PR, one command reports the files it touched, the exports it added or removed, the lines a reader must open to follow the change (the changed hunks plus the definitions they call), and the verifier lines and evidence lines it added, split code, tests, verifier, evidence and docs; a done build item records that report in a reader_effort head field beside its fix budget fields, the plan check refuses a build item with a verdict file and done on or after 2026-11-09 without one, and recording it is not a contract change.",
   "why": "The 8 Nov review counted by hand what the plan should count, and the cleanups passed every gate while growing (complexity is what the reader experiences; research plan/research/verification-swing.md, item 7).",
   "serves": [

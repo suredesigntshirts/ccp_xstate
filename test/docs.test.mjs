@@ -27,6 +27,14 @@ for (const path of TEXTS) {
   });
 }
 
+test("CLAUDE.md's Layout table names every top-level folder and every scripts/ folder", () => {
+  const table = read('CLAUDE.md').split(/^## Layout$/m)[1]?.split(/^## /m)[0] ?? '';
+  const named = new Set([...table.matchAll(/`([^`\s]+)`/g)].map((m) => m[1].split('/<')[0].replace(/\/$/, '')));
+  const dirs = (rel) => readdirSync(join(REPO, rel), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
+  const folders = [...dirs('.').filter((n) => top.has(n)), ...dirs('scripts').map((n) => `scripts/${n}`)];
+  assert.deepEqual(folders.filter((f) => !named.has(f)), [], 'folders missing from the map');
+});
+
 test('CLAUDE.md has fewer than 100 lines', () => {
   assert.ok(lineCount(read('CLAUDE.md')) < 100);
 });

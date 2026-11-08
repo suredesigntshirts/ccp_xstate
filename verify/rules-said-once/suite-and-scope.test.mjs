@@ -1,7 +1,8 @@
 // Expect suite-and-scope: node plan/check.mjs passes at the head, and the PR changes only the files the item's outputs
-// name, with only the named verify/ changes. When the base is reachable (BASE_SHA, as the verdict job sets it, or
-// origin/main) the PR's file list is read from git; ci.yml's depth-1 checkout has neither, so there the test checks
-// the same scope from the tree: the three deleted files are gone and the two trimmed tests are gone from their files.
+// name, with only the named verify/ changes. On this item's own PR (PR_BODY's Item: line names it, as the verdict job
+// sets it with BASE_SHA) the PR's file list is read from git, against BASE_SHA or else origin/main. Every other run
+// (ci.yml's depth-1 checkout, a full clone of any branch, another item's PR) checks the same scope from the tree: the
+// three deleted files are gone and the two trimmed tests are gone from their files.
 // npm test itself is run by ci; this file is part of it.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -9,6 +10,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { REPO, node, read, splitItem } from './lib.mjs';
+import { namedItem } from '../../scripts/gates/lib.mjs';
 
 const ITEM = 'rules-said-once';
 const outputs = splitItem(read(`plan/items/${ITEM}.md`)).head.outputs.flatMap((o) => o.ref.split(/,\s*/));
@@ -19,7 +21,9 @@ const git = (...a) => execFileSync('git', a, { cwd: REPO, encoding: 'utf8', stdi
 
 const CALLER = 'scripts/gates/pr-gate.mjs';
 let baseUsed = null;
+const ownPr = namedItem({ body: process.env.PR_BODY, ids: new Set([ITEM]) }).item === ITEM;
 function changedFiles() {
+  if (!ownPr) return null;
   for (const base of [process.env.BASE_SHA, 'origin/main'].filter(Boolean)) {
     try { baseUsed = base; return git('diff', '--name-status', '--no-renames', `${git('merge-base', base, 'HEAD')}`, 'HEAD').split('\n').filter(Boolean)
       .map((l) => { const [s, p] = l.split('\t'); return { s, p }; }); } catch {}
@@ -52,7 +56,8 @@ test('the PR changes only the files its outputs name, and only the named verify/
     const verify = changed.filter(({ p }) => p.startsWith('verify/') && !p.startsWith(`verify/${ITEM}/`));
     assert.deepEqual(verify.map(({ s, p }) => `${s} ${p}`).sort(),
       [...DELETED.map((p) => `D ${p}`), ...TRIMMED.map((p) => `M ${p}`)].sort());
-  } else t.diagnostic('depth-1 mode: no base reachable, checking the scope from the tree');
+  } else t.diagnostic(ownPr ? 'tree mode: no base reachable, checking the scope from the tree'
+    : `tree mode: PR_BODY does not name ${ITEM}, checking the scope from the tree`);
   for (const p of DELETED) assert.ok(!existsSync(join(REPO, p)), `${p} is deleted`);
   assert.doesNotMatch(read(TRIMMED[0]), /CLAUDE\.md/, 'the claude-md test left notes.test.mjs');
   assert.doesNotMatch(read(TRIMMED[1]), /plan\/README\.md/, "the plan/README.md test left policy-written.test.mjs");
