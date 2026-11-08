@@ -19,6 +19,7 @@ How the work on the harness itself is planned and proved.
 | verdict | The verifier's MET or NOT MET for every Expect line of an item, at one sha | `verify/<item>/verdict.json`, `scripts/gates/lib.mjs` |
 | plan verifier | The separate session that writes an item's tests under `verify/<item>/` and its verdict; not the `verify` model stage | `verify/<item>/`, `docs/gates.md` |
 | evidence file | What a plan verifier commits for one Expect line: the command, the excerpt and the inputs to run it again; never a listing or a capture | `verify/<item>/evidence/`, `scripts/gates/lib.mjs` `checkEvidence` |
+| test listing | node:test output saved whole: a pass and a fail summary line with ten or more result lines, TAP or spec; the evidence gate refuses one under `verify/` | `scripts/gates/lib.mjs` `isListing` |
 | observation | A plan verifier's judged note on a verdict (a naming concern, a design smell, a doc gap); it never gates | `scripts/gates/lib.mjs` `checkVerdict`, `docs/gates.md` |
 | contract change | The one replan an item's head and Verifier brief may have once its build PR names it, before its verdict file exists, written up under `## Contract change` | `plan/item.schema.json` `contract_changes`, `plan/check.mjs` |
 | done_on change | The replan that moves an item's set `done_on`, saying why under `## Done on change` | `scripts/gates/lib.mjs` `checkDoneOn`, `docs/gates.md` |

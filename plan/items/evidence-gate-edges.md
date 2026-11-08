@@ -4,7 +4,7 @@
   "title": "Close the evidence gate's symlink and renamed-listing gaps",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "The evidence gate refuses an entry under verify/ that is not a regular file (a symlink, whose blob size is the link text and not what it points at, or a submodule), and refuses a file under verify/ whose text is a test listing (node:test pass and fail summary lines with at least ten ok, not ok, ✔ or ✖ result lines, TAP or spec reporter) whatever its name, naming the path and the rule; an evidence file quoting a few result lines and the summary still passes; plan/README.md and docs/gates.md say what the gate refuses and what stays the verifier's job.",
   "why": "The plan verifier of verify-evidence-policy found the gate measures a symlink by git cat-file -s of the link, so a link to a large file passes, and that the .pass rule is a name suffix only, so a listing saved as listing.txt under 64 KB passes (verify/verify-evidence-policy/verdict.json, observations 1 and 2).",
   "serves": [

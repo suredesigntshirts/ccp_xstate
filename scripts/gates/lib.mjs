@@ -155,17 +155,36 @@ export function testRunFault({ file, name, ids }, { status, output }) {
 }
 
 // Evidence: what a plan verifier commits under verify/ says what was shown, one small file per Expect line, so a PR
-// may not add, change or rename a file there to one larger than EVIDENCE_LIMIT or one named *.pass (a test listing).
-// files is [{ path, size }] for the files the PR adds, changes or renames; deleted files are never passed.
+// may not add, change or rename a file there to one larger than EVIDENCE_LIMIT, one named *.pass, one whose text is a
+// test listing, or an entry that is not a regular file (a symlink's size is its target's name, not what it points at).
+// files is [{ path, size, mode, text }] for the paths the PR adds, changes or renames; deleted files are never passed.
 export const EVIDENCE_LIMIT = 64 * 1024;
+export const LISTING_LINES = 10;
+const REGULAR = new Set(['100644', '100755']);
+const KIND = { '120000': 'a symlink', '160000': 'a submodule', '040000': 'a tree' };
+
+// A node:test listing, TAP or spec reporter: a pass and a fail summary line and at least LISTING_LINES result lines,
+// so an excerpt quoting a few result lines and the summary is not one.
+export function isListing(text = '') {
+  const lines = text.split('\n');
+  const has = (word) => lines.some((l) => new RegExp(`^\\s*(?:#|\u2139) ${word} \\d+\\s*$`).test(l));
+  const results = lines.filter((l) => /^\s*(?:(?:not )?ok \d+\b|[\u2714\u2716] \S)/.test(l)).length;
+  return has('pass') && has('fail') && results >= LISTING_LINES;
+}
 
 export function checkEvidence(files) {
   const reasons = [];
-  for (const { path, size } of files) {
+  const instead = 'commit the command, the excerpt and the inputs instead';
+  for (const { path, size, mode = '100644', text } of files) {
     if (!path.startsWith('verify/')) continue;
-    if (path.endsWith('.pass')) reasons.push(`${path} is a test listing (.pass); commit the command, the excerpt and the inputs instead`);
+    if (!REGULAR.has(mode)) {
+      reasons.push(`${path} is ${KIND[mode] ?? `not a regular file (mode ${mode})`}; a file under verify/ must be a regular file, so ${instead}`);
+      continue;
+    }
+    if (path.endsWith('.pass')) reasons.push(`${path} is a test listing (.pass); ${instead}`);
+    else if (isListing(text)) reasons.push(`${path} is a test listing (node:test results and a pass and fail summary); ${instead}`);
     if (size > EVIDENCE_LIMIT)
-      reasons.push(`${path} is ${size} bytes, over the ${EVIDENCE_LIMIT}-byte limit for a file under verify/; commit the command, the excerpt and the inputs instead`);
+      reasons.push(`${path} is ${size} bytes, over the ${EVIDENCE_LIMIT}-byte limit for a file under verify/; ${instead}`);
   }
   return reasons;
 }

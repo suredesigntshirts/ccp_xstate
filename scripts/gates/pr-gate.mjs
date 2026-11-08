@@ -4,7 +4,7 @@
 // .github/workflows/verdict.yml fills from the pull_request event. Prints each reason and exits 1 if there is any.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { checkCutoff, checkDoneOn, checkEvidence, checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem, testRunFault, verdictTests } from './lib.mjs';
+import { EVIDENCE_LIMIT, checkCutoff, checkDoneOn, checkEvidence, checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem, testRunFault, verdictTests } from './lib.mjs';
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'pipe'] })
   .trimEnd();
@@ -66,7 +66,14 @@ const gates = {
   evidence() {
     const kept = git('diff', '-z', '--name-only', '--no-renames', '--diff-filter=d', base, head, '--', 'verify/')
       .split('\0').filter(Boolean);
-    return checkEvidence(kept.map((path) => ({ path, size: Number(git('cat-file', '-s', `${head}:${path}`)) })));
+    // Each kept path's mode from the head's tree; a regular file's size and, under the limit, its text. A submodule's
+    // object is not in the repo, so nothing but its mode is read.
+    return checkEvidence(kept.map((path) => {
+      const mode = git('ls-tree', head, '--', path).split(/\s/)[0];
+      if (mode !== '100644' && mode !== '100755') return { path, mode };
+      const size = Number(git('cat-file', '-s', `${head}:${path}`));
+      return { path, mode, size, text: size <= EVIDENCE_LIMIT ? show(head, path) ?? '' : '' };
+    }));
   },
 
   verdict() {
