@@ -5,7 +5,7 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "ready",
-  "outcome": "A model stage's output schema declares the three rules the engine guessed: a field marked \"x-verdict\": \"<value>\" is a verdict field and names its passing value (on a covered entry's result too), a top-level text field marked \"x-brief\": true is stored as that role's brief, and a { url, at } schema marked \"x-ref\": \"<kind>\" is a ref of that kind. packages/engine/src/marks.js reads them (marksOf); the load check (stages.js checkStages), the accept-time cover check (coverGap) and accept (run/accept.js) ask it, and accept no longer tests the actor's name, no stages.js code tests the words PASS or FAIL, and accept holds no GitHub or web policy: each ref kind is a checker module under packages/engine/src/refs/ (github-pr.js, web-page.js) that checks a ref and returns the fields it stamps, and STAMPED and HIDDEN are the union the kinds declare. The four repo workflows mark every verdict, brief and ref their stages return, and their prompts are byte-identical to main's. A stage that carries no mark at all is read through one function in marks.js exactly as main reads it, so items pinned to older workflows and runs prepared before keep their rules.",
+  "outcome": "A workflow declares, in meta.marks, the three rules the engine guessed for each model stage's output: \"verdicts\" maps a verdict field's path to the value that means the check passed (a covered list's entries as \"<list>.0.result\"), \"briefs\" lists the top-level text fields stored as their roles' briefs, and \"refs\" maps each ref { url, at } path to its kind. packages/engine/src/marks.js reads them (marksOf); the load check (stages.js checkStages), the accept-time cover check (coverGap) and accept (run/accept.js, which reads the marks from the run's pinned workflow blob) ask it, and accept no longer tests the actor's name, no stages.js code tests the words PASS or FAIL, and accept holds no GitHub or web policy: each ref kind is a checker module under packages/engine/src/refs/ (github-pr.js, web-page.js) that checks a ref and returns the fields it stamps, and STAMPED and HIDDEN are the union the kinds declare. Every model stage of the four repo workflows has its marks, their meta.actors entries are untouched and their prompts are byte-identical to main's. A stage with no entry in meta.marks is read through one function in marks.js exactly as main reads it, so items pinned to older workflows and runs prepared before keep their rules.",
   "why": "Workflow rules in the generic engine are the special-general mixture APOSD warns of and break L-rules-in-spec-not-host (research plan/research/design-books-cleanup.md, finding 5).",
   "serves": [
     "L-rules-in-spec-not-host",
@@ -43,65 +43,73 @@
   "outputs": [
     {
       "ref": "packages/engine/src/marks.js",
-      "what": "MARKS, nodesOf, marked(stage, defs), and marksOf(actor, stage, defs) -> { inferred, verdictAt(), isVerdict(segs), passes(field, value), verdicts(result), briefs(result), kindOf(segs, ref) }: read from the marks, or, for a stage with no mark, inferred as main reads it (the one place that tests the name brief, the words PASS and FAIL, or a ref's url)"
+      "what": "PARTS, pathOf, nodesOf, nodeAt, isRef, marksIn(spec, actor) and marksOf(actor, stage, defs, marks) -> { inferred, verdictAt(), isVerdict(segs), passes(field, value), verdicts(result), briefs(result), kindOf(segs, ref) }: read from the stage's meta.marks entry, or, for a stage with none, inferred as main reads it (the one place that tests the name brief, the words PASS and FAIL, or a ref's url)"
     },
     {
       "ref": "packages/engine/src/refs/index.js, packages/engine/src/refs/github-pr.js, packages/engine/src/refs/web-page.js",
       "what": "REF_KINDS, and each kind's stamps, hidden and check(ref, { path, github, web, worktree, headOf }) -> { stamp } | { refused }; STAMPED and HIDDEN as their union, in main's order"
     },
     {
+      "ref": "packages/engine/src/run/store.js",
+      "what": "pinnedSpec(root, run): the workflow a run was prepared from, parsed from its pinned blob, or null"
+    },
+    {
       "ref": "packages/engine/src/stages.js",
-      "what": "Re-exports STAMPED and HIDDEN; printed leaves out the marks; checkStages checks each mark sits where it means something (checkMarks) and asks marksOf for the verdict and the fields the chart may decide on; coverGap and uncovered take defs and ask marksOf"
+      "what": "Re-exports STAMPED and HIDDEN from refs/; checkStages checks each stage's marks name what its output holds (checkMarks), that meta.marks names only model stages, and that a marked covering stage names its entries' passing value, and asks marksOf for the verdict and the fields the chart may decide on; coverGap and uncovered take a marks reader (default: the reading without marks)"
     },
     {
       "ref": "packages/engine/src/run/accept.js",
-      "what": "accept asks marksOf for briefs and each ref's kind, and runs the kind's checker; refsIn, the reserved check and the order of checks stay"
+      "what": "accept reads the run's marks from its pinned workflow (run/store.js pinnedSpec) and asks them for briefs and each ref's kind, and runs the kind's checker; refsIn, the reserved check and the order of checks stay"
     },
     {
-      "ref": "workflows/quick-fix.json, workflows/research.json, workflows/intake.json",
-      "what": "x-brief on the brief stages' role fields, x-verdict \"PASS\" on verify's and challenge's result and on the line entries' result, x-ref github-pr on prRef and web-page on research's ref; feature.json needs no mark"
+      "ref": "workflows/quick-fix.json, workflows/research.json, workflows/intake.json, workflows/feature.json",
+      "what": "meta.marks for every model stage: the brief stages' briefs, verify's and challenge's result and lines.0.result verdicts (PASS), quick-fix's pr refs (github-pr) and research's sources.0 refs (web-page); feature's brief and intake's shape have empty marks. meta.actors and the stage files do not change"
     },
     {
       "ref": "docs/language.md, packages/engine/README.md, docs/journal.md",
-      "what": "mark, verdict field, ref, ref kind and stamped field in the engine glossary (and verdict where contexts meet); a Marks section in the engine README; the brief.stored row's role is the marked field"
+      "what": "marks, verdict field, ref, ref kind and stamped field in the engine glossary (and verdict where contexts meet); a Marks section in the engine README; the brief.stored row's role is a field the marks name"
     },
     {
       "ref": "packages/engine/test/marks.test.js",
-      "what": "The builder's tests: the repo workflows are marked; prompts print no mark; briefs follow x-brief under any stage name; a verdict of any words; the load check's refusals; each kind's stamps; a web-page ref to a PR url is read as a page; an unmarked stage reads as main"
+      "what": "The builder's tests: every repo stage has marks; briefs follow the marks under any stage name; a stage without marks reads as main; a verdict of any words; the load check's refusals; each kind's stamps; a web-page ref to a PR url is read as a page"
     },
     {
-      "ref": "packages/engine/test/tourney/contract.js, packages/engine/test/tourney/S3.test.js, packages/engine/test/tourney/S5.test.js, verify/harness-glossary/one-meaning.test.mjs",
-      "what": "The only existing tests that change: contract.js's own printed-schema helper leaves out the marks too; S3's two verdict-spelling tests run on the workflows with their marks removed, the reading those spellings test; S5 passes the workflow's defs to uncovered; one-meaning pins the brief.stored writer to accept's loop over marks.briefs(result)"
+      "ref": "packages/engine/test/tourney/S3.test.js, verify/harness-glossary/one-meaning.test.mjs",
+      "what": "The only existing assertions that change: S3's two verdict-spelling tests run on the workflows without meta.marks, the reading those spellings test; one-meaning pins the brief.stored writer to accept's loop over marks.briefs(result)"
+    },
+    {
+      "ref": "verify/fix-refusal-hints/evidence, verify/fix-return-tool-answer/evidence, verify/fix-waiting-lines-owner/evidence, verify/fix-waiting-run-stall/evidence, verify/run-lifecycle-store/evidence",
+      "what": "Done items' snapshots of main's workflow hashes (main-prompts.json, main-scenarios.json, the run-lifecycle-store trace, pre.json and run folders) re-captured for the new quick-fix, research, intake and feature hashes; every changed line is a workflow id or hash, as fix-blocked-retry's decision 9 allows for an item that changes a workflow; no assertion changes"
     }
   ],
   "expect": [
     {
       "id": "no-guessing",
-      "check": "At the head, outside packages/engine/src/marks.js, no file under packages/engine/src tests an actor's name against brief (or any stage name) to decide what to store, tests a value or enum against the words PASS or FAIL (in any case), or calls prRef to choose how a returned ref is checked; accept.js imports nothing from effects/ and holds no GitHub or web-page policy; stages.js's STAMPED and HIDDEN come from refs/index.js",
+      "check": "At the head, outside packages/engine/src/marks.js, no file under packages/engine/src tests an actor's name against brief (or any stage name) to decide what to store, tests a value or enum against the words PASS or FAIL (in any case) to find or judge a verdict, or calls prRef to choose how a returned ref is checked; accept.js imports nothing from effects/ and holds no GitHub or web-page policy; stages.js's STAMPED and HIDDEN come from refs/index.js",
       "how": "The verifier's grep of packages/engine/src for 'brief', PASS, FAIL, pass|fail regexps, prRef and github./web. calls, and reading accept, checkStages, coverGap and the refs modules",
       "proof": "verifier"
     },
     {
       "id": "declared-rules-hold",
-      "check": "Through the real loader and hooks, at the head: a quick-fix copy whose brief stage is renamed keeps storing the marked fields as briefs, with the new actor name; a brief stage with one field unmarked stores only the marked one; a verify stage whose verdict is an enum of other words with x-verdict naming the pass loads, routes, and is held to its covered lines; an unmarked PASS/FAIL field in a marked stage is not held to the lines; a research web-page ref whose url is a GitHub PR is checked as a page; a github-pr ref is checked against GitHub and stamped as on main",
+      "check": "Through the real loader and hooks, at the head: a quick-fix copy whose brief stage is renamed (marks moved with it) keeps storing the named fields as briefs, with the new actor name; a brief stage whose marks name one field stores only that one; a verify stage whose verdict is an enum of other words, its marks naming the pass, loads, routes, and is held to its covered lines; an unmarked PASS/FAIL field in a marked stage is not held to the lines; a research web-page ref whose url is a GitHub PR is checked as a page; a github-pr ref is checked against GitHub and stamped as on main",
       "how": "The verifier's own tests driving the head's engine on workflow copies in temp folders",
       "proof": "verifier"
     },
     {
       "id": "marks-checked",
-      "check": "The head's load check refuses, naming the stage and the output path: an x-verdict whose value is not one of the field's values or on a field with no enum; an x-brief not true or not on a top-level text field; an x-ref naming no kind in refs/ or on a schema that is no { url, at }; a { url, at } schema without x-ref in a stage with marks; a covered list whose entries' result has no x-verdict in a stage with marks",
+      "check": "The head's load check refuses, naming the stage and the path: a marks part other than verdicts, briefs and refs; a verdict path that names no enum (or const) field holding its value; a brief that is no top-level text field; a ref path that names no { url, at } or a kind not in refs/; a { url, at } in a marked stage's output whose kind the marks do not name; a marked covering stage whose marks name no <list>.0.result; a meta.marks entry naming no model stage",
       "how": "The verifier's own tests loading changed copies of the repo workflows",
       "proof": "verifier"
     },
     {
       "id": "unmarked-as-main",
-      "check": "A stage with no mark is read as main reads it: for the repo workflows with every mark removed, and for every workflow blob pinned in the repo's committed journals, the head's load check accepts or refuses exactly as main does with the same message, and accept, given the same run folders and results (brief stage results, verdicts agreeing and disagreeing with their lines in upper and lower case, PR refs and web refs), returns, stamps, stores and journals the same as main apart from times",
+      "check": "A stage with no marks is read as main reads it: for the repo workflows with meta.marks removed, and for every workflow blob pinned in the repo's committed journals, the head's load check accepts or refuses exactly as main does with the same message, and accept, given the same run folders and results (brief stage results, verdicts agreeing and disagreeing with their lines in upper and lower case, PR refs and web refs), returns, stamps, stores and journals the same as main apart from times",
       "how": "The verifier's own test calling loadWorkflow, coverGap and accept at both shas on the same inputs (verify/run-lifecycle-store and verify/fix-refusal-hints show how to drive accept from a checkout)",
       "proof": "verifier"
     },
     {
       "id": "prompts-unchanged",
-      "check": "Every prompt the head renders for every stage of the four repo workflows is byte-identical to main's for the same input, and the stage bench's committed prompts still match",
+      "check": "Every prompt the head renders for every stage of the four repo workflows is byte-identical to main's for the same input, the workflows' meta.actors entries and stage files are main's, and the stage bench's committed prompts still match",
       "how": "The verifier renders sections() at both shas for each stage with fixed inputs and compares; npm test covers verify/stage-bench",
       "proof": "verifier"
     },
@@ -113,13 +121,13 @@
     },
     {
       "id": "marks-tests",
-      "check": "The builder's marks tests go red when accept stores briefs by actor name again, and when coverGap ignores x-verdict and compares the word PASS",
+      "check": "The builder's marks tests go red when accept stores briefs by actor name again, and when coverGap ignores the marks and compares the word PASS",
       "how": "The verifier breaks each and runs packages/engine/test/marks.test.js",
       "proof": "builder"
     },
     {
       "id": "behaviour-unchanged",
-      "check": "Every test that passes on main passes at the head, and the test-file diff changes only the four test files the outputs name, in the ways they name, plus the builder's new tests",
+      "check": "Every test that passes on main passes at the head; the test-file diff changes only the two test files the outputs name, in the ways they name, plus the builder's new tests; and the re-captured done-suite snapshots differ from main's only in workflow ids and hashes",
       "how": "npm test at both shas, and the verifier's reading of the test diff",
       "proof": "verifier"
     },
@@ -132,7 +140,7 @@
   ],
   "concepts": {
     "adds": [
-      "mark (x-verdict, x-brief, x-ref in a stage's output schema)",
+      "marks (a workflow's meta.marks: each model stage's verdicts, briefs and refs)",
       "ref kind (a checker module that declares its stamped fields)"
     ],
     "merges": [
@@ -146,14 +154,14 @@
     "budget": 2
   },
   "non_goals": [
-    "No model-facing text changes: prompts print the output without marks (prompts-unchanged), and every refusal renders the same catalogue entry as on main",
+    "No model-facing text changes: the output schemas are untouched, so prompts are main's (prompts-unchanged), and every refusal renders the same catalogue entry as on main",
     "Stages without marks keep main's reading, in one function of marks.js; retire-pinned-legacy decides when that reading can go",
     "The rebuild's 'input.previous is a PR ref' in actors.js prepare stays: it reads an input, not a result, and is another rule for a later item",
     "The inspector does not yet show why a field is a verdict; inspector-reads-records reads the stage record",
-    "nodeAt, chosen and hostSet keep recognising a ref by its { url, at } shape: in a stage with marks the load check makes every such schema carry x-ref, so the shape and the mark agree"
+    "nodeAt, chosen and hostSet keep recognising a ref by its { url, at } shape: in a stage with marks the load check makes every such schema have a named kind, so the shape and the marks agree"
   ],
   "records": [
-    "brief.stored rows keep their kind and payload; their role is the marked field's name, as before for quick-fix and research"
+    "brief.stored rows keep their kind and payload; their role is the field's name, as before for quick-fix and research"
   ],
   "person_prereqs": [],
   "step_back": {
@@ -163,9 +171,10 @@
   },
   "verifier": "A separate session, not the builder's and not a subagent of it, using the Verifier brief below.",
   "risks": [
-    "A workflow author who marks some fields and forgets a verdict loses the coverage check for an unrouted verdict; decisions() still catches any verdict the chart routes on, and the Marks section of the engine README says what a marked stage must mark",
-    "Changing the workflow files changes their pinned hash; tests that compare item rows across shas strip or re-pin the workflow id, and committed journals replay on their own pinned blobs",
-    "uncovered(schema, input, result) called without defs on a marked stage whose entries' result is a $ref finds no x-verdict; every engine caller passes run.defs, and the one test caller is changed to pass them"
+    "A workflow author who marks a stage and leaves out an unrouted verdict loses the coverage check for it; decisions() still catches any verdict the chart routes on, and the engine README's Marks section says what to mark",
+    "Changing the workflow files changes their pinned hash: done suites that snapshot main's hashes are re-captured (outputs), and committed journals replay on their own pinned blobs",
+    "accept reads marks from the run's pinned blob; a run folder whose root lacks the blob reads its stage without marks, as main does. The engine always stores the blob when it pins (index.js loadWorkflow with a root)",
+    "Marks name paths, not schema nodes, so renaming an output field without its marks is caught only by the load check (marks-checked), which runs on every load"
   ]
 }
 ```
@@ -177,10 +186,16 @@ belong to particular workflows: that the stage named `brief` returns briefs, tha
 are the words PASS or FAIL, and how to check a PR ref against GitHub or a web ref against its page. A workflow whose
 brief stage has another name, or whose verdict uses other words, silently loses the rule.
 
-This item has the stage contract declare them instead, with three marks in the output schema, and moves each ref
-kind's policy into its own checker module. The engine reads the marks through `packages/engine/src/marks.js`.
-A stage with no mark at all, which is every stage of every workflow pinned before this item, is read there exactly
-as main reads it, so in-flight items keep their rules and the existing tests that build specs inline keep passing.
+This item has the workflow declare them instead, in `meta.marks` (each model stage's verdicts, briefs and refs), and
+moves each ref kind's policy into its own checker module. The engine reads the marks through
+`packages/engine/src/marks.js`. A stage with no marks, which is every stage of every workflow pinned before this item,
+is read there exactly as main reads it, so in-flight items keep their rules and the existing tests that build specs
+inline keep passing.
+
+The first ready contract put the marks inside the output schemas (`x-verdict`, `x-brief`, `x-ref`). Building it
+showed that changes every run folder's stored schema and every stage record's Schema line, which done suites pin as
+assertions, not snapshots. `meta.marks` leaves `meta.actors` and every prompt as on main, so only the workflow hashes
+move, and those are snapshots that fix-blocked-retry's decision 9 lets a workflow-changing item re-capture.
 
 The choices made writing this contract are in `plan/decisions/2026-11-07-stage-contract-declares-rules.md`.
 
@@ -196,7 +211,7 @@ reading the builder's tests, write your own under `verify/stage-contract-declare
   and verify/fix-refusal-hints show how; a renamed stage needs its stage file's title changed too). Use a fake GitHub
   (packages/engine/test/tourney/world.js) and a fake web client.
 - **marks-checked:** load changed copies and match each refusal's message.
-- **unmarked-as-main:** strip every key starting `x-` from the repo workflows; load them, and every pinned workflow
+- **unmarked-as-main:** delete `meta.marks` from the repo workflows; load them, and every pinned workflow
   blob under the repo's committed journal roots, at both shas and compare outcomes. Call `coverGap` and `accept` at
   both shas on the same prepared folders and results, and compare returns, run-folder files and journal rows
   (strip times, ids and hook sessions).
@@ -206,7 +221,8 @@ reading the builder's tests, write your own under `verify/stage-contract-declare
   GitHub and compare the stored blob.
 - **marks-tests:** make accept store briefs when `run.actor === 'brief'` again, then separately make `coverGap`
   compare the word PASS instead of asking the marks; run `packages/engine/test/marks.test.js` and show it red.
-- **behaviour-unchanged:** npm test at both shas; read the test diff.
+- **behaviour-unchanged:** npm test at both shas; read the test diff, and diff each re-captured snapshot against
+  main's: only workflow ids and hashes may differ.
 - **ci:** read the ci and gates checks at the head sha.
 
 This container signs commits: commit evidence holding shas with
