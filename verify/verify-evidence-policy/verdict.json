@@ -1,0 +1,65 @@
+{
+  "item": "verify-evidence-policy",
+  "verified_sha": "7f52c6f6e724ab8af45cddf35cbde0847016f05e",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5HnqzWD3aTLUSiQorN",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "evidence-refused",
+      "status": "MET",
+      "command": "node --test verify/verify-evidence-policy/evidence-refused.test.mjs (temp git repos, BASE_SHA=<base> node scripts/gates/pr-gate.mjs evidence); evidence/evidence-refused.md",
+      "excerpt": "8/8 pass. Adds 70 KB verify/x/capture.json: exit 1, 'verify/x/capture.json is 71680 bytes, over the 65536-byte limit'. Adds one-line verify/x/listing.pass: exit 1 naming it. Grows verify/x/notes.md to 65537: exit 1 naming path and 65537. Adds exactly 65536 bytes under verify/x/evidence/: exit 0. 200 KB under docs/: exit 0. Deletes a 200 KB file and a .pass under verify/: exit 0. Rename to .pass refused. Against main: 0 of 8.",
+      "test": "verify/verify-evidence-policy/evidence-refused.test.mjs"
+    },
+    {
+      "id": "policy-written",
+      "status": "MET",
+      "command": "node --test verify/verify-evidence-policy/policy-written.test.mjs and a read of plan/README.md, docs/gates.md, docs/language.md; evidence/policy-written.md",
+      "excerpt": "3/3 pass. plan/README.md How slop is kept out: one evidence file per Expect line under verify/<item>/evidence/ with the command, the excerpt and the inputs to run it again, never a test listing, a journal root or a capture of main; the evidence gate refuses a file under verify/ over 64 KB or named *.pass. docs/gates.md: gate-table row 'verdict | evidence' and an Evidence section saying the same. docs/language.md Plan: evidence file row. Against main: 0 of 3.",
+      "test": "verify/verify-evidence-policy/policy-written.test.mjs"
+    },
+    {
+      "id": "gate-wired",
+      "status": "MET",
+      "command": "node --test verify/verify-evidence-policy/gate-wired.test.mjs (reads verdict.yml; commits this item's verify/ folder onto a temp-repo base without it and runs pr-gate.mjs evidence; no history needed); by hand BASE_SHA=<merge-base> node scripts/gates/pr-gate.mjs evidence on the PR branch; evidence/gate-wired.md",
+      "excerpt": "2/2 pass, also in a depth-1 clone with no origin/main. verdict.yml gates job: step 'evidence under verify/ is small and is not a test listing', if: ${{ !cancelled() }}, run: node scripts/gates/pr-gate.mjs evidence, after the stubs and freeze steps. The 14 files under verify/verify-evidence-policy/, verdict included: 'evidence gate passed', exit 0; on the PR branch against its base, by hand and in the gates job: passed.",
+      "test": "verify/verify-evidence-policy/gate-wired.test.mjs"
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/verify-evidence-policy/tests-bite.test.mjs (temp copy of scripts/, runs node --test scripts/gates/test/lib.test.mjs); evidence/tests-bite.md",
+      "excerpt": "2/2 pass. Size rule removed: green 15/0, broken 14 pass 1 fail, restored 15/0. .pass rule removed: green 15/0, broken 14 pass 1 fail, restored 15/0.",
+      "test": "verify/verify-evidence-policy/tests-bite.test.mjs",
+      "mutation": "scripts/gates/lib.mjs checkEvidence: 'if (size > EVIDENCE_LIMIT)' -> 'if (false)'; then 'if (path.endsWith('.pass'))' -> 'if (false)'",
+      "red_test": "scripts/gates/test/lib.test.mjs (14 pass, 1 fail each time)"
+    },
+    {
+      "id": "plan-passes",
+      "status": "MET",
+      "command": "node --test verify/verify-evidence-policy/plan-passes.test.mjs (node plan/check.mjs; with PR_BRANCH=build/verify-evidence-policy and BASE_SHA, as the verdict job sets them, git diff --name-only <merge-base> HEAD; elsewhere, the outputs list and the files it names); evidence/plan-passes.md",
+      "excerpt": "2/2 pass in both modes. '8 stages, 89 items (78 live), 89 ledger rows, 17 cases / plan ok'. PR mode: 23 files, the 8 output files, plan/items/verify-evidence-policy.md and verify/verify-evidence-policy/ only; no other item's verify/ folder. Shallow mode (ci.yml, depth 1): outputs list equals the allowed files, all present.",
+      "test": "verify/verify-evidence-policy/plan-passes.test.mjs"
+    },
+    {
+      "id": "world-refuses",
+      "status": "MET",
+      "command": "Throwaway PR https://github.com/suredesigntshirts/ccp_xstate/pull/198 (eff1547d609e7d163f5a62621743b9a0377c58a4 on the head), gates job 128692462928 via get_job_logs; closed unmerged; evidence/world-refuses.md",
+      "excerpt": "Step 'evidence under verify/ is small and is not a test listing': evidence gate failed: verify/x/capture.json is 71680 bytes, over the 65536-byte limit for a file under verify/ ... verify/x/listing.pass is a test listing (.pass) ... ##[error]Process completed with exit code 1."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs on PR #197; evidence/ci.md",
+      "excerpt": "test run 42468035197 at 7f52c6f6e724ab8af45cddf35cbde0847016f05e: success on attempt 2 (job 128692863992); attempt 1 had one failure, the timing bound in plugins/harness/test/capture.test.mjs ('p95 319 ms'), a file this PR does not touch. gates job 128692001535: all steps passed but verdict (no verdict.json yet); it reruns on this commit, which changes only verify/verify-evidence-policy/."
+    }
+  ],
+  "observations": [
+    "The gate reads git cat-file -s for each added path, so a symlink under verify/ is measured by its target string, not the target's size; a symlink to a large file elsewhere would pass. Not reachable by any verifier today; worth a line if verify-regression-set touches the gate.",
+    "The .pass rule is a name suffix only: a test listing saved as listing.txt under 64 KB passes the gate. The item says only the two machine-checkable shapes are refused, and the rest is the verifier's job; noted so the done replan does not overstate what the gate guarantees.",
+    "The builder's note that the fix-budget-rule done-suite test fails only in shallow clones: this verifier ran git fetch --unshallow first, as asked, and did not re-check it.",
+    "The ci test job failed once on a timing bound (plugins/harness/test/capture.test.mjs, cheap: hook.run p95 319 ms against 200 ms) and passed on re-run. It is outside this diff, but it is a flaky gate on every PR; a candidate for the regression-set work."
+  ]
+}
