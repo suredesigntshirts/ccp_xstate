@@ -36,7 +36,8 @@ names its item only by an `Item: <id>` line in its body; branch names are for pe
 
 An item file is a fenced `json` head following `item.schema.json`, then prose: the reasoning, the options considered
 and a `## Verifier brief`, which adds only what the Expect lines' `how` fields leave out (setup, traps, what not to
-read). The head is the contract; `check.mjs` refuses a `ready` item that leaves a field open.
+read). The head is the contract; `check.mjs` refuses a `ready` item that leaves open a field the schema's
+`readyRequired` names, and names the field.
 
 | Field | Question it answers | Why v1 taught us to ask |
 |---|---|---|
@@ -49,7 +50,6 @@ read). The head is the contract; `check.mjs` refuses a `ready` item that leaves 
 | `person_prereqs` | What must the person do before the thread starts? | A thread can't add its own allow rules |
 | `step_back` | When does it stop retrying and replan? Two rounds unless `max_rounds` says otherwise | PR #72 ran 5 rounds before anyone stepped back |
 | `module`, `done_on` | Which module does a fix change, and when was it done? | Seven fixes in two days changed `actors.js` before anyone looked at its shape |
-| `reader_effort` | What did the build cost its reader? Read it with `node scripts/reader-effort.mjs --item <id>` | The cleanups passed every gate while the harness grew |
 | `contract_changes` | Did the contract move once the build started, and why? | A build that found a better shape could not take it |
 
 ## How slop is kept out
@@ -76,7 +76,7 @@ A change is one file plus edges. Run `node plan/check.mjs` after it; `--coverage
 
 - **Ids are names, not numbers.** An id is a short slug (`obs-live-journal`). Order comes from `stage` and
   `depends_on`, never from an id, so inserting an item renumbers nothing.
-- **To add an item,** write its file with `depends_on`, and add its id to the `depends_on` of what now needs it.
+- **To add an item,** write it with `depends_on` (none in a later stage), then list it in its dependants' `depends_on`.
 - **To split an item,** mark it `split` with `replaced_by` naming the new ids, and move its dependants to them.
 - **To drop an item,** mark it `dropped` with the reason in `why`. Never delete the file: the reason is theory.
 - **To add a plan stage,** write its file with an `order` between two existing ones (decimals, such as 2.5).

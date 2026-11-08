@@ -113,7 +113,7 @@ for (const it of items.values()) {
 // more line here.
 const PINS = ['as on main', 'as main', 'on main', 'than main', "main's", 'unchanged', 'same as', 'byte', 'bytes', 'both shas']
   .map((p) => [p, new RegExp(`(?<![\\w'])${p.replace(/ /g, '\\s+')}(?![\\w'])`, 'i')]);
-const SHA = /(?<!\w)[0-9a-f]{7,}(?!\w)/i;
+const SHA = /(?<!\w)(?=[a-f]*\d)[0-9a-f]{7,}(?!\w)/i;
 for (const it of items.values()) {
   if (it.status !== 'ready') continue;
   for (const e of it.expect ?? []) {
