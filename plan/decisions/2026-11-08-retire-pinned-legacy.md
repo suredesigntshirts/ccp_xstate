@@ -9,11 +9,19 @@ The research set the cutoff as "every engine item in the project journal finishe
 
 - The project journal, `/mnt/project-files/harness/journal` (the plugin's `harnessDir`), has no `items/` folder: no
   engine item was ever started in it. Its `sessions/` and `blobs/` hold hook captures and pinned bytes only.
-- Every engine item that ever ran sits in a trial root under the shared folder (`first-real-issue/`, `toy-run/`,
-  `toy-run-returns/`, `toy-run-views/`) or in a committed journal in this repo (`bench/`, `tournaments/`). Three of
-  the eleven trial items reached `done`; the other eight stopped where their trial or probe thread ended
-  (`awaitingMerge`, `briefing`, `replanning`; `fri-jsonl-lint` was redone as `fri-jsonl-lint-2`, which merged). This
-  decision drops those eight: they are evidence, and nobody advances them.
+- Every other engine item that ever ran sits in a trial or verifier root under the shared folder, or in a committed
+  journal in this repo (`bench/`, `tournaments/`). None is live; each was a fixture on `o/r` or the scratch repo.
+  - Trial roots, 11 items: `first-real-issue/`, `toy-run/`, `toy-run-returns/`, `toy-run-views/`. Three reached
+    `done`; the other eight stopped where their trial or probe thread ended (`awaitingMerge`, `briefing`,
+    `replanning`; `fri-jsonl-lint` was redone as `fri-jsonl-lint-2`, which merged).
+  - Verifier and tournament roots, 12 items in 9 journal roots: `engine-host-verify/` (run1, run2: own-1), `fix-other-host-verify/`
+    (it-m), `stage-contract-tournament/` (trial, trial2), `verify-runs/fix-finish-closes-waits/` (vfcw-1 to vfcw-3),
+    `verify-runs/fix-rebuild-worktree/` (vfrw-1, vfrw-2), `verify-runs/fix-reminder-wake/` (vfrw-1) and
+    `verify-runs/fix-waiting-wake/` (vfww-1). Each was written by a verifier or tournament thread that has ended.
+
+  This decision drops every one of these items that did not reach `done`: they are evidence, and nobody advances them.
+  (Found by the item's verifier, who listed every `items/*.jsonl` under the shared folder; the first version of this
+  file named only the trial roots.)
 
 So the cutoff is today, and no release has to keep running an item pinned to an older format. An item pinned to one
 is finished on the release that started it.
