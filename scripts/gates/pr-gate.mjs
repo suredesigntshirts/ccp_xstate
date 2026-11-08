@@ -4,7 +4,7 @@
 // .github/workflows/verdict.yml fills from the pull_request event. Prints each reason and exits 1 if there is any.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { checkEvidence, checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem, testRunFault, verdictTests } from './lib.mjs';
+import { checkCutoff, checkDoneOn, checkEvidence, checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem, testRunFault, verdictTests } from './lib.mjs';
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'pipe'] })
   .trimEnd();
@@ -58,7 +58,9 @@ const gates = {
       id, before: show(base, `plan/items/${id}.md`), after: show(head, `plan/items/${id}.md`) ?? '',
       verdict: verified(id) ? verdictFile(id) : null,
     }));
-    return [...named.reasons, ...checkFreeze({ changed, frozen, labels })];
+    const dated = [...itemIds(base)].map((id) => ({ id, before: show(base, `plan/items/${id}.md`), after: show(head, `plan/items/${id}.md`) }))
+      .filter((i) => itemHead(i.before)?.done_on !== undefined);
+    return [...named.reasons, ...checkFreeze({ changed, frozen, labels }), ...checkDoneOn({ changed, items: dated, labels })];
   },
 
   evidence() {
@@ -90,6 +92,8 @@ const gates = {
     if (!known) reasons.push(`verdict.json's verified_sha ${verified ?? '(missing)'} is not a commit here`);
     else {
       try { git('merge-base', '--is-ancestor', verified, head); } catch { reasons.push(`verified_sha ${verified} is not in this PR's history`); }
+      const itemFile = `plan/items/${item}.md`;
+      reasons.push(...checkCutoff({ item, verified, before: show(verified, itemFile), after: show(head, itemFile) }));
       const after = new Set(lines(git('rev-list', '--no-merges', `${verified}..${head}`)));
       afterVerified = commits.filter((c) => after.has(c.sha) && outside(c));
     }

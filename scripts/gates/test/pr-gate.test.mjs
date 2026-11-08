@@ -175,3 +175,45 @@ test('evidence gate: refuses an added or grown file over the limit and a .pass f
   assert.match(out.stderr, /verify\/x\/notes\.md is 65537 bytes/);
   assert.match(out.stderr, /verify\/x\/listing\.pass is a test listing/);
 });
+
+test('verdict gate: a contract reworded on main and merged in after the verified sha is refused; a status-only merge passes', () => {
+  for (const [side, field] of [[itemFile([{ id: 'a', proof: 'world', check: 'reworded' }]), /contract of x moved after the verified sha \w{7} \(expect\)/],
+    [itemFile(expect).replace('Run it.', 'Skim it.'), /\(Verifier brief\)/], [itemFile(expect, 'done'), null]]) {
+    const r = repo();
+    const built = r.commit({ 'packages/a/index.js': 'export const a = 1;\n' }, 'builder');
+    r.commit({ 'verify/x/verdict.json': verdict(built) }, 'verifier');
+    r.git('checkout', '-q', '-b', 'main-later', r.git('rev-list', '--max-parents=0', 'HEAD'));
+    const tip = r.commit({ 'plan/items/x.md': side, 'plan/decisions/d.md': 'chosen\n' });
+    r.git('checkout', '-q', '-');
+    r.git('merge', '-q', '--no-edit', '-m', 'merge main', 'main-later');
+    const out = r.run('verdict', { BASE_SHA: tip });
+    if (field) { assert.equal(out.status, 1); assert.match(out.stderr, field); }
+    else assert.equal(out.status, 0, out.stderr);
+  }
+});
+
+test('verdict gate: a verdict whose verified sha has no item file is refused', () => {
+  const r = repo();
+  const root = r.git('rev-parse', 'HEAD');
+  const empty = r.git('hash-object', '-t', 'tree', '-w', '--stdin');
+  const lonely = r.git('commit-tree', empty, '-m', 'before the item');
+  r.git('merge', '-q', '--allow-unrelated-histories', '--no-edit', '-m', 'take it', lonely);
+  r.commit({ 'verify/x/verdict.json': verdict(lonely) }, 'verifier');
+  const out = r.run('verdict', { BASE_SHA: root });
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /plan\/items\/x.md does not exist at the verified sha/);
+});
+
+test('freeze gate: a set done_on moves only by a plan-only replan that says why', () => {
+  const dated = (date, why = '') => `\`\`\`json\n${JSON.stringify({ id: 'x', status: 'done', done_on: date, expect })}\n\`\`\`\n\n## Verifier brief\n\nRun it.\n${why}`;
+  const r = repo();
+  const base = r.commit({ 'plan/items/x.md': dated('2026-11-01') });
+  r.commit({ 'plan/items/x.md': dated('2026-11-08') });
+  const env = { BASE_SHA: base, PR_BODY: '' };
+  let out = r.run('freeze', { ...env, PR_LABELS: '["replan"]' });
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /changes done_on of x from 2026-11-01 to 2026-11-08/);
+  r.commit({ 'plan/items/x.md': dated('2026-11-08', '\n## Done on change\n\nThe merge date, not the build date.\n') });
+  assert.equal(r.run('freeze', { ...env, PR_LABELS: '["replan"]' }).status, 0);
+  assert.equal(r.run('freeze', { ...env, PR_LABELS: '[]' }).status, 1);
+});
