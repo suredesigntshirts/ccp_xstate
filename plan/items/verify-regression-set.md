@@ -16,7 +16,8 @@
     "verify-regression-engine",
     "verify-regression-plugin",
     "test-fixture-edges",
-    "scope-suite-own-pr"
+    "scope-suite-own-pr",
+    "pinned-fetch-temp-repo"
   ]
 }
 ```
