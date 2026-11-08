@@ -22,9 +22,7 @@
     "expect",
     "concepts",
     "non_goals",
-    "records",
-    "step_back",
-    "verifier"
+    "records"
   ],
   "properties": {
     "id": {
@@ -245,17 +243,19 @@
         },
         "max_tokens": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "description": "Kept for done items; nothing reads it."
         },
         "replan_to": {
           "type": "string",
-          "description": "Who decides after a step-back."
+          "description": "Kept for done items; nothing reads it."
         }
-      }
+      },
+      "description": "Set only to change the default of two build/verify rounds; new heads name max_rounds alone."
     },
     "verifier": {
       "type": "string",
-      "description": "Who verifies, and where the brief is written before the build starts."
+      "description": "Kept for done items. The verifier is always a separate session working from the item's Verifier brief."
     },
     "risks": {
       "type": "array",
