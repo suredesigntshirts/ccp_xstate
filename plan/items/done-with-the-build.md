@@ -94,6 +94,10 @@
     {
       "ref": "verify/plan-reader-effort/rules-written.test.mjs",
       "what": "The README done-step test leaves (there is no done step)"
+    },
+    {
+      "ref": "verify/item-head-trim/lib.mjs, verify/item-head-trim/tests-bite.test.mjs",
+      "what": "The plan copy also makes each module a ready or doing item names, as fix-event-close-tag did for the other plan-copy suites, so the suite passes while a ready item names a module"
     }
   ],
   "expect": [
@@ -186,6 +190,10 @@ The build first found an item's PR as the first merge that set its status to `do
 the done replan for every item built before this rule (`--item plan-reader-effort` read #229, a two-file plan PR,
 instead of #212). The build PR is the one merge that adds `verify/<id>/verdict.json`, under both the old flow and
 this one, so `--item` reads that merge instead; `effort-by-item`, `tests-bite` and the two `reader-effort` outputs say so.
+
+While it built, `item-head-trim` (#230) and `fix-event-close-tag` (#213) merged side by side: the second readied an item
+naming a module and taught the other plan-copy suites to make such modules, and the first's new suite copies `plan/`
+alone, so main went red on it. The same two lines go into its helper here, named as an output.
 
 ## Verifier brief
 
