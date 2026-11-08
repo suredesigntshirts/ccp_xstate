@@ -4,7 +4,7 @@
   "title": "Read rules-said-once's PR scope only on its own PR",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "doing",
+  "status": "done",
   "outcome": "verify/rules-said-once/suite-and-scope.test.mjs reads a PR's file list from git only when PR_BODY names rules-said-once by its Item: line, the way the verdict gate finds a PR's item; in any other run (a local npm test in a full clone of any branch, ci's depth-1 checkout, another item's PR) it checks the same scope from the tree, so it passes wherever rules-said-once's build holds; and rules-said-once's verdict.json is left as the verifier wrote it.",
   "why": "The suite's PR mode diffs merge-base(BASE_SHA or origin/main, HEAD)..HEAD and expects exactly rules-said-once's verify/ changes, so once that PR merged every full clone with origin/main reachable fails it: the main branch itself (an empty diff) and every other branch (its own diff). ci passes only because its depth-1 checkout falls back to tree mode. A red local suite on every branch costs each builder and verifier that runs npm test a look and a rerun (L-attention-is-the-constraint).",
   "serves": [
@@ -104,6 +104,13 @@ Options considered:
 `verify-regression-set` now waits for this item, so it moves or deletes the fixed file
 (`plan/decisions/2026-11-08-parallel-deps.md`, rule 1). Editing a done item's `verify/` test in this PR follows
 `plan/decisions/2026-11-08-done-verify-edits.md`.
+
+## Done
+
+Readied in PR #221 and built in PR #222 (merged e126555). A separate session verified it at 292e303: all four
+Expect lines MET, with ci and gates green at that head. No plugin, journal or engine source changed, so there is no
+release (`release.mjs branch` reported nothing to release). A full clone with `origin/main` reachable now passes
+`verify/rules-said-once/suite-and-scope.test.mjs` in tree mode.
 
 ## Verifier brief
 
