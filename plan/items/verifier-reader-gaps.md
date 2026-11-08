@@ -4,7 +4,7 @@
   "title": "Close the gaps a fresh verifier found in the verdict rules",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A verifier reading only docs/gates.md knows how to run the verdict gate on its own checkout (BASE_SHA and PR_BODY with the Item line, HEAD defaulting to the checkout's HEAD), that a world result needs no test and a line about the PR's checks cites them at verified_sha, and that model is its own model id; plan/README.md step 2 says done_on is set only for an item naming a module; the fresh-reader-gaps suite reads step 2 for what it says rather than its exact sentence; and the three entry texts stay under the 225-line budget.",
   "why": "A fresh headless session asked to verify a build PR (8 Nov, at main cb2456a8) named what it had to guess or dig out of scripts/gates/: which environment the local gate run needs, whether a world line names a test, which sha a ci line cites when its own verdict commit makes a new head, and what model means. The fresh-reader-gaps verifier noted step 2 says done_on is always set, though only an item naming a module needs it (L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-7.md).",
   "serves": [

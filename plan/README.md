@@ -6,7 +6,6 @@ an item is `ready` and a thread picks it up.
 
 ```
 plan/
-  README.md          this file: how an item moves, how it is written, how the plan changes
   item.schema.json   the shape of an item's JSON head
   check.mjs          checks the whole plan (node plan/check.mjs; --order prints build order)
   stages/<id>.md     one file per plan stage: its goal and its exit gate
@@ -25,9 +24,9 @@ names its item only by an `Item: <id>` line in its body; branch names are for pe
 
 1. **Readying replan.** Fill the head until `check.mjs` passes with `ready`. Branch `replan/<topic>`, label `replan`,
    changes under `plan/` only, no `Item:` line.
-2. **Build PR.** Branch `<kind>/<id>` (such as `build/journal-schema`), body with `Item: <id>`, which freezes the
-   contract. Its first commit sets the status to `done` and `done_on` to that day: the PR cannot merge until a
-   verdict proves it. The builder writes nothing under `verify/<id>/`, and asks whoever started it for a verifier.
+2. **Build PR.** Branch `<kind>/<id>` (such as `build/journal-schema`), body `Item: <id>`, which freezes the contract.
+   Its first commit sets status `done` (and `done_on` to that day if the item names a `module`); the PR cannot merge
+   until a verdict proves it. The builder writes nothing under `verify/<id>/` and asks its starter for a verifier.
 3. **Verdict.** A separate session, given the item's Verifier brief and not the builder's tests, writes its tests
    and evidence under `verify/<id>/` and commits `verify/<id>/verdict.json` to the build PR's branch.
 4. **Merge and release.** Merge when `ci` and `verdict` are green at the head sha; to take main after the verdict,
