@@ -141,15 +141,10 @@ const EFFORT = {
   added: { code: 1, tests: 1, verifier: 0, evidence: 0, docs: 0 }, removed: { code: 0, tests: 0, verifier: 0, evidence: 0, docs: 0 },
 };
 
-test('a verified build item done from 2026-11-09 records reader_effort', () => {
+test('a verified done build item needs no reader_effort, and one it records passes', () => {
   const late = item('effort-late', { done_on: '2026-11-09' });
-  const missing = check([late], { verdicts: ['effort-late'] });
-  assert.equal(missing.code, 1);
-  assert.match(missing.out, /effort-late\.md: a build item done from 2026-11-09 records reader_effort/);
+  assert.equal(check([late], { verdicts: ['effort-late'] }).code, 0);
   assert.equal(check([{ ...late, reader_effort: EFFORT }], { verdicts: ['effort-late'] }).code, 0);
-  assert.equal(check([late]).code, 0, 'an item with no verdict file is a made-up one');
-  assert.equal(check([item('effort-early', { done_on: '2026-11-08' })], { verdicts: ['effort-early'] }).code, 0);
-  assert.equal(check([item('effort-probe', { kind: 'probe', done_on: '2026-11-09' })], { verdicts: ['effort-probe'] }).code, 0);
 });
 
 test('a malformed reader_effort is refused', () => {

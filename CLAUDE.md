@@ -21,7 +21,7 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 
 ## Working an item
 
-One plan item per PR. `plan/README.md`, "How an item moves", gives the five steps from ready to done, with each PR's
+One plan item per PR. `plan/README.md`, "How an item moves", gives the four steps from ready to done, with each PR's
 branch, label and `Item:` line; `docs/gates.md` gives what the gates check. Branches carry no `claude/` prefix.
 
 ## Layout

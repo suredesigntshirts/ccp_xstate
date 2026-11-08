@@ -5,14 +5,14 @@ import assert from 'node:assert/strict';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { REPO, node } from './lib.mjs';
+import { REPO, copyPlan, node } from './lib.mjs';
 
 const counts = (out) => ({ pass: Number(out.match(/^# pass (\d+)/m)?.[1]), fail: Number(out.match(/^# fail (\d+)/m)?.[1]) });
 
 test('plan-check.test.mjs goes red with verifier back in readyRequired, green when restored', (t) => {
   const dir = mkdtempSync(join(tmpdir(), 'iht-bite-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
-  cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
+  copyPlan(dir);
   mkdirSync(join(dir, 'test'));
   cpSync(join(REPO, 'test/plan-check.test.mjs'), join(dir, 'test/plan-check.test.mjs'));
   const run = () => node(['--test', '--test-reporter=tap', join(dir, 'test/plan-check.test.mjs')], { cwd: dir });
