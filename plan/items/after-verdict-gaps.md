@@ -4,7 +4,7 @@
   "title": "Close the gaps a fresh builder found after the verdict",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A builder whose PR has a verdict learns from plan/README.md that a NOT MET line sends it back to push a fix and ask its starter for a verifier again, the next verdict.json replacing the last, and that it merges with a merge commit, may merge main in without losing the verdict, and tells its starter what the release command printed; docs/language.md defines starter and round; docs/gates.md's verdict row points at the checks below instead of saying at the head sha; plugins/harness/README.md and the release script's skip reason name RELEASED instead of a partial copy; docs/traps.md says a red test the PR did not touch gets one re-run; the three entry texts stay under the 225-line budget.",
   "why": "A fresh headless session asked what a builder does once a verdict lands (8 Nov, at main 60a2760f) guessed what a NOT MET verdict sets going, the merge method, whether merging main in keeps the verdict, whom to tell, what starter and round mean, which paths a release watches, and what to do with a red test it did not touch (L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-10.md).",
   "serves": [

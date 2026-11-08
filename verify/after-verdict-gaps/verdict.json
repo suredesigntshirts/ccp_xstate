@@ -1,0 +1,60 @@
+{
+  "item": "after-verdict-gaps",
+  "verified_sha": "924f822ee0f1bac754fe1e8edbaf89a3328d6a74",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5JGokDNHLPpwQMDCch", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "after-verdict-steps",
+      "status": "MET",
+      "command": "node --test verify/after-verdict-gaps/after-verdict-steps.test.mjs (README How an item moves steps 3 and 4 and the gates.md verdict row, read by the carrying words)",
+      "excerpt": "5/5 pass. Step 3: 'On a NOT MET line the builder pushes a fix and asks its starter for a verifier again; the next verdict replaces the last.' Step 4: 'Merge with a merge commit ...; merging main in after the verdict keeps it, a rebase does not ... tell your starter what it printed.' Verdict row: 'no complete verdict for the head (below)', no 'at the head sha'. All 5 red with main's texts.",
+      "test": "verify/after-verdict-gaps/after-verdict-steps.test.mjs"
+    },
+    {
+      "id": "terms-defined",
+      "status": "MET",
+      "command": "node --test verify/after-verdict-gaps/terms-defined.test.mjs",
+      "excerpt": "3/3 pass. round: 'One build push and the verdict on it; an item's step_back caps its rounds'. starter: 'The session that started a thread and hears its asks: the coordinator, or the person'. One line each.",
+      "test": "verify/after-verdict-gaps/terms-defined.test.mjs"
+    },
+    {
+      "id": "released-named-once",
+      "status": "MET",
+      "command": "node --test verify/after-verdict-gaps/released-named-once.test.mjs (temp repo, signing off, release/harness-v0.1.0 then a commit touching only unreleased and excluded paths)",
+      "excerpt": "2/2 pass. README Releases: 'a path in `RELEASED` in that script', no released path listed. plan(): release false, changed [], reason 'nothing under plugins/harness, packages/journal, packages/engine/src, packages/engine/messages.md changed since harness-v0.1.0'. Red with main's release.mjs (misses messages.md).",
+      "test": "verify/after-verdict-gaps/released-named-once.test.mjs"
+    },
+    {
+      "id": "flake-trap",
+      "status": "MET",
+      "command": "node --test verify/after-verdict-gaps/flake-trap.test.mjs",
+      "excerpt": "1/1 pass. docs/traps.md 'A red test the PR did not touch': 'Re-run the check once, saying so on the PR; red again, it is a real failure'.",
+      "test": "verify/after-verdict-gaps/flake-trap.test.mjs"
+    },
+    {
+      "id": "fresh-merger",
+      "status": "MET",
+      "command": "claude -p '<the brief's question>' in a clean clone of the head (origin removed, npm ci), empty HOME, CLAUDE_CODE_REMOTE_SESSION_ID and the memory variables unset; evidence/fresh-merger.md holds prompt, verbatim answer and grading; node --test verify/after-verdict-gaps/fresh-merger.test.mjs regrades it",
+      "excerpt": "4/4 points, citing repository files: NOT MET 'push a fix ... ask your starter for a verifier again ... The next verdict replaces the last one' (plan/README.md step 3); 'Merge with a merge commit' (step 4); merging main in 'Yes, you may', quoting step 4 and the gates.md merge rule; starter quoted from docs/language.md Platform.",
+      "test": "verify/after-verdict-gaps/fresh-merger.test.mjs"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "PR_BODY='Item: after-verdict-gaps' BASE_SHA=origin/main node --test verify/after-verdict-gaps/suite-and-scope.test.mjs; the same without PR_BODY; all of verify/after-verdict-gaps/ in a depth-1 clone; ci test job for npm test",
+      "excerpt": "3/3 in both modes; plan ok; test/docs.test.mjs passes (entry texts 223 lines). PR mode: 8 files: the 6 outputs, the item, plan/decisions/2026-11-08-refine-round-10.md. Depth-1 clone 18/18. npm test: ci test job 128761550723, 2144 pass, 0 fail.",
+      "test": "verify/after-verdict-gaps/suite-and-scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #266",
+      "excerpt": "test job 128761550723 at 924f822ee0f1bac754fe1e8edbaf89a3328d6a74: success (2156 tests, 2144 pass, 0 fail, 12 skipped; plan ok); clean-room success. gates job 128761550500 failed before any verdict existed; it runs again on this verdict commit, which changes only verify/after-verdict-gaps/."
+    }
+  ],
+  "observations": [
+    "RELEASED's own doc comment in scripts/release/release.mjs still names items ('since engine-actors', 'plan item prompt-catalogue'); the item asked only that the head comment name none, which holds, but docs/layout.md's Comments rule would have the RELEASED comment drop them too.",
+    "The decisions file plan/decisions/2026-11-08-refine-round-10.md is not among the outputs; it comes from the stacked readying replan #265 and leaves this PR's diff once #265 merges.",
+    "The fresh session read only the repository this time: an empty HOME and the memory variables unset kept container memory out, which the item-writer-gaps verifier had asked for."
+  ]
+}

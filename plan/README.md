@@ -1,8 +1,7 @@
 # The v2 plan
 
-This folder is the plan for building the harness again on XState, in this repo. The plan is data: every item is one
-file with a fixed JSON head, so `check.mjs` can check it and the harness can take work from it. Nothing is built until
-an item is `ready` and a thread picks it up.
+This folder is the plan for building the harness again on XState. The plan is data: every item is one file with a
+fixed JSON head, so `check.mjs` can check it, and a thread takes work from it only once the item is `ready`.
 
 ```
 plan/
@@ -28,9 +27,11 @@ names its item only by an `Item: <id>` line in its body; branch names are for pe
    Its first commit sets status `done` (and `done_on` to that day if the item names a `module`); the PR cannot merge
    until a verdict proves it. The builder writes nothing under `verify/<id>/` and asks its starter for a verifier.
 3. **Verdict.** A separate session, given the item's Verifier brief and not the builder's tests, writes its tests
-   and evidence under `verify/<id>/` and commits `verify/<id>/verdict.json` to the build PR's branch.
-4. **Merge and release.** Merge when `ci` and `verdict` are green at the head sha; to take main after the verdict,
-   merge main in rather than rebase. Then run the release command (`docs/gates.md`, "After the merge"). No PR follows.
+   and evidence under `verify/<id>/` and commits `verify/<id>/verdict.json` to the build PR's branch. On a NOT MET
+   line the builder pushes a fix and asks its starter for a verifier again; the next verdict replaces the last.
+4. **Merge and release.** Merge with a merge commit when `ci` and `verdict` are green at the head sha; merging main in
+   after the verdict keeps it, a rebase does not. Then run the release command (`docs/gates.md`, "After the merge")
+   and tell your starter what it printed. No PR follows.
 
 ## How an item is written
 
