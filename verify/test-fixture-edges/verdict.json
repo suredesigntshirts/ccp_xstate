@@ -16,7 +16,7 @@
     {
       "id": "keep-across-fs",
       "status": "MET",
-      "command": "node --test verify/test-fixture-edges/keep-across-fs.test.mjs: fresh TMPDIR per run; trace-writes.mjs <watched> --keep <path> -- true with <path> in the temp dir's file system and in /dev/shm (st_dev 27 vs 65024); real strace where present, a stand-in strace on PATH always; then the base trace-writes.mjs to /dev/shm",
+      "command": "node --test verify/test-fixture-edges/keep-across-fs.test.mjs: fresh TMPDIR per run; trace-writes.mjs <watched> --keep <path> -- true with <path> in the temp dir's file system and in /dev/shm (st_dev 27 vs 65024); real strace where present (read from trace-writes.mjs itself: it exits 127 without it), a stand-in strace on PATH always; then the base trace-writes.mjs to /dev/shm",
       "excerpt": "real strace, same fs: exit 0, 6823 bytes, left []; other fs (/dev/shm): exit 0, 6823 bytes, left []; both kept traces match execve(\"…/true\". Stand-in: same results. Base: exit 1, 'EXDEV: cross-device link not permitted, rename …/trace-writes-*/trace -> /dev/shm/…/kept.trace'. 3/3 pass here; without strace (as on CI) the real-strace case skips and 2 pass.",
       "test": "verify/test-fixture-edges/keep-across-fs.test.mjs"
     },
@@ -44,6 +44,7 @@
   "observations": [
     "The base side of each line is the head with to-base.diff applied (git diff -R of the build for its four code files), so the tests run in ci's depth-1 checkout; the diff equals the reverse of main 66e47a6..af64a36 for those files. If a later change touches those lines the base clones stop applying, and these suites belong to verify-regression-set's sweep.",
     "I read the build's diff while making to-base.diff, after writing the brief's checks from the item text; the tests drive behaviour (clone, file system, timing), not the diff's text.",
-    "keep-across-fs runs a stand-in strace as well as the real one, so the --keep copy is exercised on CI where strace is absent; the real-strace case is the one the Expect line names and ran here."
+    "keep-across-fs runs a stand-in strace as well as the real one, so the --keep copy is exercised on CI where strace is absent; the real-strace case is the one the Expect line names and ran here.",
+    "The stand-in tracer takes its name from the command trace-writes.mjs checks with -V, so no test file names the tool as a quoted command (verify/self-edit-check-snapshot/runs-without-strace.test.mjs holds that for every test tree)."
   ]
 }

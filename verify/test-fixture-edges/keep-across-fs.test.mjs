@@ -11,7 +11,10 @@ import { HERE, ROOT, cleanup, clone, temp } from './lib.mjs';
 
 after(cleanup);
 const SCRIPT = 'scripts/debug/trace-writes.mjs';
-const realStrace = spawnSync('strace', ['-V']).status === 0;
+// The tracer is whatever command the script checks for with -V; the stand-in takes that name. Whether the real one
+// is here is read from the script itself: it exits 127 when the tracer is missing.
+const TRACER = readFileSync(join(ROOT, SCRIPT), 'utf8').match(/spawnSync\('(\w+)', \['-V'\]\)/)[1];
+const realStrace = spawnSync(process.execPath, [join(ROOT, SCRIPT), ROOT, '--', 'true'], { stdio: 'ignore' }).status !== 127;
 
 // A writable folder whose file system differs from the temp dir's.
 function otherFs(tmp) {
@@ -27,13 +30,13 @@ function otherFs(tmp) {
 }
 
 const stubDir = temp('stub');
-writeFileSync(join(stubDir, 'strace'), `#!/usr/bin/env bash
-if [ "$1" = -V ]; then echo 'strace -- stand-in'; exit 0; fi
+writeFileSync(join(stubDir, TRACER), `#!/usr/bin/env bash
+if [ "$1" = -V ]; then echo 'stand-in tracer'; exit 0; fi
 out=; while [ $# -gt 0 ]; do case "$1" in -o) out=$2; shift 2;; -e|-s) shift 2;; -*) shift;; *) break;; esac; done
 printf '%s execve("%s", ["%s"], 0x0 /* 0 vars */) = 0\\n' $$ "$(type -P "$1")" "$1" > "$out"
 exec "$@"
 `);
-chmodSync(join(stubDir, 'strace'), 0o755);
+chmodSync(join(stubDir, TRACER), 0o755);
 
 function run(root, keep, { stub }) {
   const tmp = mkdtempSync(join(temp('tmpdir'), 't-'));
