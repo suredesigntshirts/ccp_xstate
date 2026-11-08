@@ -24,10 +24,11 @@ export function wakesIn(text) {
   const wakes = [];
   // Only a wake that starts a line counts. The platform writes its envelopes at column zero; text an agent wrote that
   // reaches a prompt (a subagent's report) is indented by the harness, so a wake-shaped line inside it is not read.
-  for (const [, head, body] of String(text).matchAll(/(?:^|\n)<wake ([^>]*)>([\s\S]*?)<\/wake>/g)) {
+  // A wake ends at a </wake> that starts a line, or right after its opening tag (a fired reminder's empty wake), and
+  // never runs into the next wake.
+  for (const [, head, body = ''] of String(text).matchAll(/(?:^|\n)<wake ([^>]*)>(?:((?:(?!\n<wake )[\s\S])*?)\n)?<\/wake>/g)) {
     const { reason = null, 'current-time': currentTime = null } = attrs(head);
-    const github = [...body.matchAll(/<event ([^>]*)>([\s\S]*?)<\/event>/g)]
-      .map(([, eventHead, eventBody]) => ({ ...attrs(eventHead), json: eventBody.replace(/<!--[\s\S]*?-->/g, '').trim() }))
+    const github = eventsIn(body)
       .filter((e) => e.source === 'github')
       .map(({ kind, json }) => {
         try {
@@ -46,6 +47,15 @@ export function wakesIn(text) {
   return wakes;
 }
 
+// The events in a wake's body, each its attributes and its JSON text. An event opens and closes only at a tag that
+// starts a line (after spaces or tabs): the platform puts the JSON on a line of its own, and JSON escapes a newline in
+// a string, so markup inside a field (a check or PR title) neither opens nor closes an event. An event with no close
+// tag ends at the next event or the body's end; its text is then cut and does not parse.
+const eventsIn = (body) =>
+  [...body.matchAll(/(?:^|\n)[ \t]*<event ([^>]*)>([\s\S]*?)(?:\n[ \t]*<\/event>|(?=\n[ \t]*<event )|$)/g)].map(
+    ([, head, json]) => ({ ...attrs(head), json: json.replace(/<!--[\s\S]*?-->/g, '').trim() })
+  );
+
 const tasksIn = (text) =>
   [...String(text).matchAll(/(?:^|\n)\s{0,2}<task-notification>([\s\S]*?)<\/task-notification>/g)].map(([, body]) => ({
     id: body.match(/<task-id>([^<]*)<\/task-id>/)?.[1]?.trim() ?? null,
@@ -56,7 +66,8 @@ const tasksIn = (text) =>
  * The events a wake offers this item, as inputs for applyEvent ({ event, source, run?, at }):
  *
  * - each GitHub event: { type: 'github.<kind>', ...its JSON }, source github and a hash of kind and JSON, so the
- *   same GitHub event delivered twice has one source;
+ *   same GitHub event delivered twice has one source; an unreadable event, whose body is cut or is not a JSON object,
+ *   is { type: 'github.<kind>', unreadable: <its text> } with the same source, which the host refuses;
  * - a card tap on a card one of the item's runs posted: that run's completion, { choice, by }, source hearth and the
  *   card id;
  * - a task notification that a run's worker failed or was stopped: that run's error, source claude-code and the
@@ -73,8 +84,11 @@ export function inputsOfWake(host, text, { now = new Date().toISOString() } = {}
     const stated = Date.parse(wake.currentTime);
     const at = new Date(Number.isNaN(stated) ? Date.parse(now) : Math.min(stated, Date.parse(now))).toISOString();
     for (const { kind, json, data } of wake.github) {
-      if (!kind || !data || typeof data !== 'object') continue;
-      inputs.push({ event: { ...data, type: `github.${kind}` }, source: { system: 'github', ref: `${kind} ${sha16(`${kind}\n${json}`)}` }, at });
+      if (!kind) continue;
+      const source = { system: 'github', ref: `${kind} ${sha16(`${kind}\n${json}`)}` };
+      // An unreadable event is still offered, so the host refuses it on the record instead of it vanishing.
+      const readable = data !== null && typeof data === 'object' && !Array.isArray(data);
+      inputs.push({ event: readable ? { ...data, type: `github.${kind}` } : { type: `github.${kind}`, unreadable: json }, source, at });
     }
     if (wake.reason === 'decision-chosen' && wake.notes.decision_id) {
       const run = runByRef(host, wake.notes.decision_id);

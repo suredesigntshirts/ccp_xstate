@@ -61,6 +61,7 @@ How a workflow carries an item through its states. An engine item is the same id
 | result | What a run's agent returns, checked against its output schema | `result.json`, `result.stored` |
 | return | The one way a result comes back: the return tool, whose call the hook accepts or refuses | `plugins/harness/scripts/return-tool.mjs`, `packages/engine/src/run/accept.js` `accept` |
 | card | A decision put in front of the person by the ask effect | `packages/engine/src/effects/card.js`, `packages/engine/src/names.js` `cardFile` |
+| unreadable event | A GitHub event in a wake whose body is cut or is not a JSON object; the host refuses it on the record, an `engine.transition` row with outcome `refused` whose reason names it unreadable | `packages/engine/src/wake.js` `inputsOfWake`, `packages/engine/src/host.js` `refusal` |
 | catalogue | Every sentence of code the harness hands a model, one entry each | `packages/engine/messages.md`, `packages/engine/src/messages.js` |
 
 ## Platform
