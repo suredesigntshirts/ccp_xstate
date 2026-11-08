@@ -4,7 +4,7 @@
   "title": "Close the gaps a fresh reader found on the path from ready to done",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A thread reading only the repository knows, from plan/README.md, CLAUDE.md and docs/gates.md, that the build PR's first commit sets done_on to that day, that the builder writes nothing under verify/<id>/ and asks whoever started it for a verifier, how to run one verifier suite (node --test with the suite's files named, since a bare folder fails), and that the release command after the merge decides from RELEASED in scripts/release/release.mjs what is released; the three entry texts stay within a line budget lowered to 225.",
   "why": "A fresh headless session asked to build a ready item (8 Nov, at main 6bd859a4) walked the path correctly but named five gaps it filled only from memory or by guessing: who starts the verifier, which date done_on takes, whether the builder writes verifier files, why node --test verify/<d>/ fails, and where the release row goes; docs/gates.md and plan/README.md also listed released paths that miss packages/engine/src. Each gap is a question every builder asks again (L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-6.md).",
   "serves": [

@@ -8,7 +8,7 @@ import { join } from 'node:path';
 
 const REPO = join(import.meta.dirname, '..');
 const ENTRY = ['CLAUDE.md', 'plan/README.md', 'docs/gates.md'];
-const BUDGET = 226;
+const BUDGET = 225;
 const TEXTS = ['CLAUDE.md', 'plan/README.md', ...readdirSync(join(REPO, 'docs')).filter((f) => f.endsWith('.md')).map((f) => `docs/${f}`)];
 
 const read = (path) => readFileSync(join(REPO, path), 'utf8');
