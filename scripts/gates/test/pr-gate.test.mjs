@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,7 +33,7 @@ function repo(first = expect) {
     cwd: dir, encoding: 'utf8',
     env: { ...process.env, BASE_SHA: base, HEAD_SHA: git('rev-parse', 'HEAD'), PR_BRANCH: 'build/x', PR_BODY: 'Item: x\n', PR_LABELS: '[]', ...env },
   });
-  return { commit, run, git };
+  return { commit, run, git, dir };
 }
 
 test('verdict gate: none, then from the builder session, then from a separate session', () => {
@@ -174,6 +174,24 @@ test('evidence gate: refuses an added or grown file over the limit and a .pass f
   assert.equal(out.status, 1);
   assert.match(out.stderr, /verify\/x\/notes\.md is 65537 bytes/);
   assert.match(out.stderr, /verify\/x\/listing\.pass is a test listing/);
+});
+
+test('evidence gate: refuses a committed symlink and a listing saved as .txt under verify/; passes a short excerpt', () => {
+  const r = repo();
+  const env = { BASE_SHA: r.git('rev-parse', 'HEAD') };
+  const tap = (n) => [...Array.from({ length: n }, (_, i) => `ok ${i + 1} - t${i}`), `# pass ${n}`, '# fail 0'].join('\n');
+  r.commit({ 'docs/big.json': 'x'.repeat(65537), 'verify/x/evidence/a.md': `node --test a.test.mjs\n${tap(3)}\n` });
+  assert.equal(r.run('evidence', env).status, 0);
+
+  r.git('rm', '-q', 'verify/x/evidence/a.md');
+  r.git('commit', '-q', '-m', 'drop');
+  mkdirSync(join(r.dir, 'verify/x/evidence'), { recursive: true });
+  symlinkSync('../../../docs/big.json', join(r.dir, 'verify/x/evidence/a.md'));
+  r.commit({ 'verify/x/listing.txt': `${tap(10)}\n` });
+  const out = r.run('evidence', env);
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /verify\/x\/evidence\/a\.md is a symlink/);
+  assert.match(out.stderr, /verify\/x\/listing\.txt is a test listing/);
 });
 
 test('verdict gate: a contract reworded on main and merged in after the verified sha is refused; a status-only merge passes', () => {

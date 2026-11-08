@@ -9,7 +9,7 @@ rules of `plan/README.md`, "How slop is kept out", so the builder isn't the one 
 | `ci` | plan check | `node plan/check.mjs` refuses the plan |
 | `verdict` | no stubs | a file under `packages/` or `plugins/` has TODO, FIXME, "not implemented" or a skipped test, or a line of the harness source or its two READMEs has a history reference (`docs/layout.md`, "Comments") |
 | `verdict` | contract freeze | the PR changes a frozen item's head or Verifier brief and isn't a plan-only replan, or the item already has a verdict file |
-| `verdict` | evidence | the PR adds, changes or renames a file under `verify/` to one larger than 64 KB (65,536 bytes) or named `*.pass` |
+| `verdict` | evidence | the PR adds, changes or renames under `verify/` an entry that is not a regular file (a symlink, a submodule), one larger than 64 KB (65,536 bytes), one named `*.pass`, or a test listing: a node:test pass and fail summary with ten or more result lines; a deletion is never read |
 | `verdict` | verdict | the named item has no complete verdict at the head sha, a test it names fails or is missing, or the verdict came from a builder's session; or the PR names no item and changes files outside `plan/` |
 
 A PR names its item only by an `Item: <id>` line in its body. The checks are in `scripts/gates/lib.mjs`; run one
@@ -49,11 +49,11 @@ The gate checks, against the item head at the PR head sha:
 ## Evidence
 
 For each Expect line the verifier commits one evidence file, `verify/<item>/evidence/<expect-id>.md`: the command it
-ran, the excerpt it saw and the inputs needed to run it again (the sha, the temp files it made, the environment it
-set). It commits no test listing, no journal root and no capture of main.
+ran, the excerpt it saw and the inputs to run it again (the sha, the temp files it made, the environment it set). It
+commits no test listing, no journal root and no capture of main; the gate tells what it can by shape, the brief the rest.
 
-The evidence gate refuses a file a PR adds, changes or renames under `verify/` that is larger than 64 KB at the head
-or named `*.pass`; a deleted file is never read. The limit is `EVIDENCE_LIMIT` in `scripts/gates/lib.mjs`.
+The evidence gate refuses a path a PR adds, changes or renames under `verify/` that is not a regular file (a symlink,
+a submodule), is over 64 KB, is named `*.pass` or reads as a test listing (`isListing` in `scripts/gates/lib.mjs`).
 
 ## Sessions
 
