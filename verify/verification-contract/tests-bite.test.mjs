@@ -5,12 +5,13 @@ import assert from 'node:assert/strict';
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { REPO, node } from './lib.mjs';
+import { REPO, makeLiveModules, node } from './lib.mjs';
 
 function copy(t) {
   const dir = mkdtempSync(join(tmpdir(), 'vc-bite-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   for (const p of ['plan', 'scripts', 'test/plan-check.test.mjs', 'package.json']) cpSync(join(REPO, p), join(dir, p), { recursive: true });
+  makeLiveModules(dir);
   return dir;
 }
 function mutate(dir, file, from, to) {

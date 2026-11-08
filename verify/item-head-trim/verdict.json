@@ -1,0 +1,56 @@
+{
+  "item": "item-head-trim",
+  "verified_sha": "ec2090105e18670277bb2e4f513c909508edef64",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5Gof5hUjWEvLicZVpK", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "lean-ready-passes",
+      "status": "MET",
+      "command": "node --test verify/item-head-trim/lean-ready-passes.test.mjs (temp copy of plan/, item-head-trim's head made ready under a new id with verifier and step_back deleted); evidence/lean-ready-passes.md",
+      "excerpt": "4/4 pass. Lean head: exit 0, 'plan ok'. Emptied: 'iht-no-expect.md: ready, but expect is empty', 'iht-no-outputs.md: ready, but outputs is empty', 'iht-no-why.md: ready, but why is empty', each exit 1. Control on main's schema: the lean head is refused for step_back and verifier.",
+      "test": "verify/item-head-trim/lean-ready-passes.test.mjs"
+    },
+    {
+      "id": "done-heads-pass",
+      "status": "MET",
+      "command": "node --test verify/item-head-trim/done-heads-pass.test.mjs; evidence/done-heads-pass.md",
+      "excerpt": "2/2 pass. Real plan: exit 0 'plan ok'; of 70 done items, 69 carry verifier, 64 step_back.max_tokens, 18 step_back.replan_to. Temp copy: max_rounds 3 exit 0; max_rounds 0 exit 1 'iht-zero.md.step_back.max_rounds: must be at least 1'.",
+      "test": "verify/item-head-trim/done-heads-pass.test.mjs"
+    },
+    {
+      "id": "rule-written",
+      "status": "MET",
+      "command": "env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p '<the Expect line's question>' --allowedTools Read Glob Grep < /dev/null, in a fresh clone detached at ec20901; prompt and answer in evidence/rule-written.md",
+      "excerpt": "Required fields listed: why, serves, inputs, outputs, expect, concepts, non_goals, records (no verifier, no step_back). 'The default is two build/verify rounds.' The brief 'adds only what the Expect lines' how fields leave out: setup, traps, and what not to read'."
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/item-head-trim/tests-bite.test.mjs (temp copy of plan/ and test/plan-check.test.mjs); evidence/tests-bite.md",
+      "excerpt": "green {pass 15, fail 0}, broken {pass 14, fail 1}, restored {pass 15, fail 0}; red: 'a ready head needs no verifier and no step_back; it still needs expect'.",
+      "test": "verify/item-head-trim/tests-bite.test.mjs",
+      "test_name": "plan-check.test.mjs goes red",
+      "mutation": "appended 'verifier' to readyRequired in a temp copy of plan/item.schema.json",
+      "red_test": "test/plan-check.test.mjs: a ready head needs no verifier and no step_back; it still needs expect"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "node --test verify/item-head-trim/scope.test.mjs (trees of ec20901 and base a4e3a59d); npm test locally; ci test job 128711988319; evidence/suite-and-scope.md",
+      "excerpt": "Changed: plan/README.md, plan/item.schema.json, plan/items/item-head-trim.md, test/plan-check.test.mjs, all outputs or the item file. ci npm test at ec20901: success. Local: 1961 pass, 2 fail, both from this shallow clone with origin/main (fix-budget-rule backfill fails at the base too; plan-reader-effort's scope diff reads origin/main).",
+      "test": "verify/item-head-trim/scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #230; evidence/ci.md",
+      "excerpt": "test job 128711988319 at ec2090105e18670277bb2e4f513c909508edef64: success. gates job 128711988178: verdict refused only for 'no verify/item-head-trim/verdict.json at the head sha', and reruns on this commit, which changes only verify/item-head-trim/."
+    }
+  ],
+  "observations": [
+    "Before writing its tests the verifier saw the build's full diff, including the two new tests in test/plan-check.test.mjs; its own tests build the ready head from item-head-trim.md rather than from the builder's fixture.",
+    "verify/plan-reader-effort/plan-and-suite-pass.test.mjs fails in any full clone of a branch other than main, because it diffs against origin/main and checks the result against plan-reader-effort's outputs. It is the same shape scope-suite-own-pr fixed for rules-said-once, and needs its own fix item; ci.yml's depth-1 checkout skips the diff, so CI stays green.",
+    "plan/check.mjs is named as an output but unchanged; the schema drove the whole check change, as its output line allows.",
+    "item-head-trim's own head still carries step_back and verifier, as its prose says it is filed under the rules it changes."
+  ]
+}

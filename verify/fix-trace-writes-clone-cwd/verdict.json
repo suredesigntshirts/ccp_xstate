@@ -1,0 +1,28 @@
+{
+  "item": "fix-trace-writes-clone-cwd",
+  "verified_sha": "82c86117f65646132646540b8006bed66aa2b2a4",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5G12v78ynA2PVrKhSp", "model": "claude-opus-5-5" },
+  "results": [
+    { "id": "child-before-return", "status": "MET",
+      "command": "node --test verify/fix-trace-writes-clone-cwd/child-before-return.test.mjs",
+      "excerpt": "head: with chdir [\"/vroot/p/sub/made\"], without chdir [\"/vroot/p/m2\"], both from child pid 4101 logged before `<... clone resumed>) = 4101`; base e9ed7db (git show into a temp file): with chdir [], without []",
+      "test": "verify/fix-trace-writes-clone-cwd/child-before-return.test.mjs" },
+    { "id": "child-after-return", "status": "MET",
+      "command": "node --test verify/fix-trace-writes-clone-cwd/child-after-return.test.mjs",
+      "excerpt": "clone returns 5201, parent chdirs to /vroot/q, then child mkdir(\"m3\") -> /vroot/p/m3 (parent's own mkdir -> /vroot/q/pm); pid 6300 with no logged clone -> <start>/orphan",
+      "test": "verify/fix-trace-writes-clone-cwd/child-after-return.test.mjs" },
+    { "id": "scope", "status": "MET",
+      "command": "node --test verify/fix-trace-writes-clone-cwd/scope.test.mjs (git diff --name-only e9ed7db 82c8611, leaving out verify/fix-trace-writes-clone-cwd/)",
+      "excerpt": "scripts/debug/trace-writes.mjs, scripts/debug/trace-writes.test.mjs; the item file and the four plan-copy helpers are as main has them",
+      "test": "verify/fix-trace-writes-clone-cwd/scope.test.mjs" },
+    { "id": "ci", "status": "MET",
+      "command": "GitHub check runs for commit 82c8611 (PR #227)",
+      "excerpt": "test: success (run 42475896587); gates: failure only because the verdict on the branch named 6472dc6 (run 42475896509); the verdict check runs again on the commit carrying this file" }
+  ],
+  "observations": [
+    "The three verifier test files pass in a fresh git clone --depth=1 of the build branch with no origin/main (checked at 8ca1269, whose scripts/debug/ is identical to 82c8611's); base and head are fetched at depth 1 there, and only the base half of child-before-return would skip if that fetch failed.",
+    "verify/self-edit-check-snapshot/strace-kept.test.mjs with the real tracer passed 15 of 15 runs at 6472dc6, whose scripts/debug/ is identical to the head's; the race cannot be forced, so this is a smoke check, not proof.",
+    "This replaces the verdict for 6472dc6: since then the item file went back to main's version (draft, the narrow scope line), the four plan-copy helpers went back to main's, and main e9ed7db was merged in; the fix itself did not change.",
+    "The item stays draft at the head, so the done replan sets status as well as done_on."
+  ]
+}

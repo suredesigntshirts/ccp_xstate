@@ -4,7 +4,7 @@
   "title": "Keep a GitHub event whose field holds a closing event tag",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "draft",
+  "status": "done",
   "module": "packages/engine/src/wake.js",
   "outcome": "A wake whose GitHub event carries the literal text </event> or </wake> inside a JSON string (a check title, a PR title, a comment) yields that event from wakesIn with its data parsed, so inputsOfWake offers it like any other; an event whose body is cut or is not a JSON object is offered as an unreadable event, which the host journals as a refused engine.transition row instead of dropping it without a row.",
   "why": "The engine-host suite pinned this as an observed defect: wakesIn ends an event at the first </event>, so anyone who can name a check or a PR can hide an event from the host (plan/decisions/2026-10-30-engine-effects.md, engine-host's open gaps). verify-regression-engine left that test rather than move a bug into the regression set, and its verifier noted the defect had no item of its own (verify/verify-regression-engine/verdict.json, observation 1). A </wake> in a field cuts the wake the same way, so the fix takes both close tags.",
@@ -113,7 +113,29 @@
   "risks": [
     "A wake whose close tag is not at the start of a line stops being read; every real wake and fixture puts it there, and the one-line scheduled wake bin/host.js builds is kept by the empty-body form",
     "A GitHub event JSON with a top-level key named unreadable would be refused; the platform's event keys are its own and none uses it"
-  ]
+  ],
+  "done_on": "2026-11-08",
+  "reader_effort": {
+    "pr": 213,
+    "files": 22,
+    "exports_added": 0,
+    "exports_removed": 0,
+    "reader_lines": 744,
+    "added": {
+      "code": 21,
+      "tests": 102,
+      "verifier": 215,
+      "evidence": 95,
+      "docs": 5
+    },
+    "removed": {
+      "code": 6,
+      "tests": 1,
+      "verifier": 5,
+      "evidence": 0,
+      "docs": 2
+    }
+  }
 }
 ```
 
@@ -128,6 +150,21 @@ wake only there, and an event that still can't be read is offered as an unreadab
 record. The decision is plan/decisions/2026-11-08-fix-event-close-tag.md. The engine-host test that pinned the defect
 (`verify/engine-host/forge.test.mjs` at 3862da5) left with verify-regression-engine; the builder's test asserts the
 opposite.
+
+## Done
+
+Readied in #211 (contract at draft) and built in PR #213 (merged c26dca4), which set the status to ready beside the
+fix to the four test helpers that copy `plan/` alone (decision 4; `verify/plan-reader-effort/plan-rule.test.mjs` got
+the same fix after main brought it in). A separate session verified it at c2e8cba and re-committed the verdict after main was merged in: all five Expect lines MET, each
+verifier line naming its test under `verify/fix-event-close-tag/`. Engine code changed, so it was released as
+harness-v0.1.41 (branch `release/harness-v0.1.41`). The head's `reader_effort` is
+`node scripts/reader-effort.mjs 213 --json`.
+
+The verifier's observations: a GitHub event's transition row carries the wake's current-time, so reading a journal
+by position after a wake misses it (compare by row id); `bin/host.js wake` finishes open effects before offering the
+wake's inputs, so a wake whose only event is refused can still add effect rows; and the system-note and
+task-notification forgeries were already harmless before this fix, the close tags were the live hole. None needs an
+item: the first two describe how the host already works, and the third confirms the scope.
 
 ## Verifier brief
 
