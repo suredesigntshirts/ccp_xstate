@@ -1,10 +1,11 @@
 # scope
 
-`node --test-reporter=tap verify/pinned-fetch-temp-repo/scope.test.mjs` at 3f18736f: 2/2 pass, in the full clone and in
+`node --test-reporter=tap verify/pinned-fetch-temp-repo/scope.test.mjs` at c761824b: 3/3 pass, in the full clone and in
 a `--depth=1` clone whose origin is GitHub (the pinned commits fetched into a temp bare repo; the clone's .git/shallow
-still listed only 3f18736f after, and it has no origin/main).
+still listed only its head after, and it has no origin/main).
 
-git diff --name-only dd5fcc57..3f18736f (build over its readying replan #246):
+git diff --name-only dd5fcc57..3f18736f (the build's own commits over its readying replan #246), and
+1ffab492..c761824b (the head over the main merged into it) give the same six files:
 - docs/traps.md
 - plan/items/pinned-fetch-temp-repo.md
 - verify/fix-trace-writes-clone-cwd/lib.mjs

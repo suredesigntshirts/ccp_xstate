@@ -1,15 +1,11 @@
-# parallel-green: NOT MET
+# parallel-green
 
-`node --test-reporter=tap verify/pinned-fetch-temp-repo/parallel-green.test.mjs` at 3f18736f, same origin and depth-1
-clone as no-checkout-fetch; twelve `node --test --test-concurrency=1 verify/<suite>/*.test.mjs` processes started in
-one Promise.all (three per suite), on a 4-core container.
+`node --test-reporter=tap verify/pinned-fetch-temp-repo/parallel-green.test.mjs` at c761824b, with the same origin and
+depth-1 clone as no-checkout-fetch. Twelve `node --test --test-concurrency=1 verify/<suite>/*.test.mjs` processes
+(three per suite) start in one Promise.all on a 4-core container.
 
-Result: not ok 1, exit 1, 224 s.
+Result: ok 1, exit 0.
 
-# verify/fix-trace-writes-clone-cwd: exit 0, pass 5, fail 0, skipped 0
-# verify/test-fixture-edges: exit 0, pass 12, fail 0, skipped 0
-# verify/map-once-traps-written: exit 0, pass 10, fail 0, skipped 0
-# verify/verify-regression-engine: exit 1, pass 51, fail 1, skipped 0, first fail: moved-bite run: test/regression/run/lifecycle-store.test.mjs goes red when store transition() no longer refuses a transi
 # verify/fix-trace-writes-clone-cwd: exit 0, pass 5, fail 0, skipped 0
 # verify/test-fixture-edges: exit 0, pass 12, fail 0, skipped 0
 # verify/map-once-traps-written: exit 0, pass 10, fail 0, skipped 0
@@ -18,15 +14,20 @@ Result: not ok 1, exit 1, 224 s.
 # verify/test-fixture-edges: exit 0, pass 12, fail 0, skipped 0
 # verify/map-once-traps-written: exit 0, pass 10, fail 0, skipped 0
 # verify/verify-regression-engine: exit 0, pass 52, fail 0, skipped 0
+# verify/fix-trace-writes-clone-cwd: exit 0, pass 5, fail 0, skipped 0
+# verify/test-fixture-edges: exit 0, pass 12, fail 0, skipped 0
+# verify/map-once-traps-written: exit 0, pass 10, fail 0, skipped 0
+# verify/verify-regression-engine: exit 0, pass 52, fail 0, skipped 0
 
-.git/shallow listed only the head at the end. Every fetch-reading test passed in all twelve runs. The failure, also seen
-in 1 of 3 earlier trial runs (another trial without --test-concurrency=1 failed timing tests as well), is
-`moved-bite run` in verify/verify-regression-engine/bite.test.mjs, which runs test/regression/run/lifecycle-store.test.mjs
-in a scratch copy. That test writes fixed paths: `join(tmpdir(), 'regression-rls')` (rmSync'd per world) and
-`join(tmpdir(), 'verify-rls-cont', 'root')`, so copies running at once in separate processes delete each other's roots.
-It is not a fetch collision and is outside this item's outputs.
+At the end, .git/shallow listed only the head.
 
-Reproduced alone: three `node --test-reporter=tap test/regression/run/lifecycle-store.test.mjs` started at once from
-the head checkout (NODE_TEST_CONTEXT removed): exits 1, 0, 1, with "ENOTEMPTY: directory not empty, rmdir
-'/tmp/regression-rls/returned'" and "Command failed: git -C /tmp/regression-rls/returned/repo add -A". Run alone it
-passes 8/8. In plain `npm test` the same file and the bite's scratch copy of it can run at once, so ci can hit this too.
+At 3f18736f, before main was merged in, this was NOT MET. verify/verify-regression-engine/bite.test.mjs "moved-bite
+run" failed in 2 of 3 runs. test/regression/run/lifecycle-store.test.mjs then wrote fixed paths under tmpdir()
+(regression-rls, verify-rls-cont/root): three copies started at once exited 1, 0, 1 with "ENOTEMPTY ... rmdir
+'/tmp/regression-rls/returned'". The main merged in at c761824b (#232) makes those paths per process. No fetch-reading
+test failed in any of the runs.
+
+A second run at c761824b failed: verify/test-fixture-edges/p95-over-bare.test.mjs "a 300 ms start delay on both spawns:
+the cheap test passes at the head" went red on its median/p95 bar ("median 414 ms, of which a bare node start is
+353 ms"). That is a timing test under twelve-way load, not a fetch. So at c761824b the line held in 1 of 2 runs, and no
+verdict is committed while the line asks every test to pass.

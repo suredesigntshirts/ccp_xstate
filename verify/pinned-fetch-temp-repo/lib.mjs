@@ -9,8 +9,12 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const REPO = resolve(join(dirname(fileURLToPath(import.meta.url)), '..', '..'));
-/** The build head the verdict names. */
-export const HEAD = '3f18736fc33c9739f66cee19d20b32af2e4c0bee';
+/** The build head the verdict names: the build's own commit with main merged in. */
+export const HEAD = 'c761824bb4681ec79a7b644c965814cf0f16f191';
+/** The build's own last commit, before main was merged in. */
+export const BUILD = '3f18736fc33c9739f66cee19d20b32af2e4c0bee';
+/** The main merged in at HEAD (its second parent). */
+export const MAIN = '1ffab492544bb465b872930b00d7ad6359b9b465';
 /** The readying replan's head, which the build sits on. */
 export const READY = 'dd5fcc570a908b8fc833dbe9704f96be5957f6a7';
 /** main when the build was rebased: the PR's base, whose four suites still fetch into the checkout. */
@@ -27,7 +31,7 @@ export const git = (cwd, ...a) => execFileSync('git', a, { cwd, encoding: 'utf8'
   env: { ...process.env, ...GIT_ENV }, stdio: ['ignore', 'pipe', 'pipe'], timeout: 300_000 }).trim();
 const hasIn = (dir, sha) => { try { git(dir, 'cat-file', '-e', `${sha}^{commit}`); return true; } catch { return false; } };
 const complete = (dir) => git(dir, 'rev-parse', '--is-shallow-repository') === 'false';
-const PINNED = [HEAD, READY, BASE];
+const PINNED = [HEAD, BUILD, MAIN, READY, BASE];
 const tmp = (prefix) => {
   const d = mkdtempSync(join(tmpdir(), prefix));
   process.on('exit', () => rmSync(d, { recursive: true, force: true }));

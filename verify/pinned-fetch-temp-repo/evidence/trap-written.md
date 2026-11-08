@@ -1,6 +1,6 @@
 # trap-written
 
-`node --test-reporter=tap verify/pinned-fetch-temp-repo/trap-written.test.mjs` at 3f18736f: ok 1.
+`node --test-reporter=tap verify/pinned-fetch-temp-repo/trap-written.test.mjs` at c761824b: ok 1.
 
 The "Clones can be shallow" entry now reads: "A test that needs a pinned commit fetches it at depth 1 into a temp bare
 repo and reads it there, never into the checkout: `npm test` runs suites in parallel, and fetches into one shallow repo
