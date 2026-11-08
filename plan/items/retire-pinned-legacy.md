@@ -5,7 +5,7 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "ready",
-  "outcome": "The cutoff is recorded (plan/decisions/2026-11-08-retire-pinned-legacy.md): no item pinned to an older workflow format runs on this release. loadWorkflow of a pin runs the same load check as a workflow loaded by name, with no relaxation; a pinned workflow it refuses still loads for reading, marked retired with the check's message, so restore replays it and every committed journal still replays and renders. The host refuses to advance an item on a retired workflow: applyEvent turns its events away as refused, runEffects runs none of its effects, and accept refuses a run prepared from it, each naming the pin, the check's message and the release on the item's seq-0 row to finish it on. checkStages has no pinned option, and no engine source keeps a branch or message for workflows pinned before the stage contract or before the asking timer.",
+  "outcome": "The cutoff is recorded (plan/decisions/2026-11-08-retire-pinned-legacy.md): no item pinned to an older workflow format runs on this release. loadWorkflow of a pin runs the same load check as a workflow loaded by name, with no relaxation; a pinned workflow it refuses still loads for reading, marked retired with the check's message, so restore replays it and every committed journal still replays and renders. The host refuses to advance an item on a retired workflow: applyEvent turns its events away as refused, naming the pin, the check's message and the release on the item's seq-0 row to finish it on, and runEffects runs none of its effects, so no run of it starts and a result from a run an earlier release prepared goes nowhere. checkStages has no pinned option, and no engine source keeps a branch or message for workflows pinned before the stage contract or before the asking timer.",
   "why": "Each keep-old-behaviour branch is small and together they are much of the reading cost; nothing is live (research plan/research/design-books-cleanup.md, finding 7).",
   "serves": [
     "L-count-concepts"
@@ -31,8 +31,8 @@
       "what": "checkStages' pinned option and the asking-timer loop it skips; the pre-contract refusal at the invoke check and the 'task part' hint"
     },
     {
-      "ref": "packages/engine/src/host.js, packages/engine/src/run/accept.js, packages/engine/src/actors.js",
-      "what": "restore, applyEvent and runEffects; accept's checks in order; the deliver path that loads a run's workflow by its pin"
+      "ref": "packages/engine/src/host.js, packages/engine/src/actors.js",
+      "what": "restore, applyEvent and runEffects; the deliver path that loads a run's workflow by its pin and offers its result"
     },
     {
       "ref": "test/journals-replay.test.mjs, tournaments/2026-11-04-stage-contract/trials/adopt/journal",
@@ -42,23 +42,15 @@
   "outputs": [
     {
       "ref": "packages/engine/src/index.js",
-      "what": "loadWorkflow of a pin checks the blob's hash and runs checkStages as for a name; when the check refuses, the spec is returned with a non-enumerable retired property holding the check's message. retiredOf(spec) reads it (null for a runnable spec)"
+      "what": "loadWorkflow of a pin checks the blob's hash and runs checkStages as for a name; when the check refuses, the spec is returned marked retired (stages.js retire) and re-exports retiredOf"
     },
     {
       "ref": "packages/engine/src/stages.js",
-      "what": "checkStages(spec, { workflows }) with no pinned option; every ask state's timer is checked for every workflow; the invoke refusal is 'is not a stage (it lacks ...), a host effect (...) or a workflow' with no pre-contract sentence; a stage with a task part lacks input task like any other"
+      "what": "retire(spec, error) and retiredOf(spec): a non-enumerable mark holding the check's message, null for a runnable spec; checkStages(spec, { workflows }) with no pinned option; every ask state's timer is checked for every workflow; the invoke refusal is 'is not a stage (it lacks ...), a host effect (...) or a workflow' with no pre-contract sentence; a stage with a task part lacks input task like any other"
     },
     {
       "ref": "packages/engine/src/host.js",
-      "what": "restore keeps the release on the item's seq-0 row; applyEvent on a retired workflow returns refused with the catalogue's retired text and changes nothing; runEffects on one runs nothing"
-    },
-    {
-      "ref": "packages/engine/src/run/accept.js",
-      "what": "accept refuses a run whose pinned workflow is retired, rule retired-workflow, after unknown-run and before the caller check, not counted toward the refusal cap"
-    },
-    {
-      "ref": "packages/engine/messages.md",
-      "what": "A retired-workflow entry: the item, its pin, why (the check's message) and the release to finish it on"
+      "what": "restore keeps the release on the item's seq-0 row (startedOn); retiredText(host); applyEvent on a retired workflow returns refused with that text, inline like the host's other turned-away reasons, and changes nothing; runEffects on one runs nothing"
     },
     {
       "ref": "packages/engine/src/prompts.js, packages/engine/README.md, docs/language.md",
@@ -66,11 +58,11 @@
     },
     {
       "ref": "packages/engine/test/retired.test.js",
-      "what": "The builder's tests: the adopt trial's pin loads, replays and is refused by applyEvent, runEffects and accept with the release named; a pre-contract copy and a copy whose ask state has no timer, pinned in a temp root, load retired; a current pin is not retired"
+      "what": "The builder's tests: the adopt trial's pin loads and replays, and applyEvent and runEffects refuse it with the release named; a pre-contract copy and a copy whose ask state has no timer, pinned in a temp root, load retired; a current pin is not retired and its item advances"
     },
     {
-      "ref": "packages/engine/test/tourney/S3.test.js, packages/engine/test/waits.test.js",
-      "what": "The only existing assertions that change: S3 (C)'s pre-contract pins load retired and the host refuses them, naming the actor and the parts it lacks, instead of throwing at load; waits.test's item pinned before the timer check loads retired instead of loading runnable"
+      "ref": "packages/engine/test/tourney/S3.test.js, packages/engine/test/tourney/P1.test.js, packages/engine/test/waits.test.js",
+      "what": "The only existing assertions that change, each from a pin that throws at load to a pin that loads with retiredOf matching the same refusal: S3 (C)'s pre-contract and round-2 pins (the round-2 message is now 'stage brief lacks input task', the pre-contract one loses its pinned-before sentence) and S3 (D)'s pinned copy without covers; P1's pinned blob lacking a part; waits.test's pin without a timer, which loaded runnable and now loads retired"
     },
     {
       "ref": "plan/items/retire-unmarked-reading.md",
@@ -86,8 +78,8 @@
     },
     {
       "id": "retired-not-run",
-      "check": "Through the head's real host and hooks, an item pinned to a retired workflow (the adopt trial's pin copied into a temp root with its journal; a pre-contract quick-fix copy; a quick-fix copy whose awaitingGates has no after) is never advanced: applyEvent returns refused with a reason naming the item, its pin, the check's message and the release on its seq-0 row, and writes no applied row; runEffects writes no effect row; accept of a run prepared from it returns refused, rule retired-workflow, its text from the catalogue, and stores no result. An item on a current pin started in the same root advances",
-      "how": "The verifier's own tests driving restore, applyEvent, runEffects and accept at the head (verify/run-lifecycle-store and verify/fix-refusal-hints show how to drive accept)",
+      "check": "Through the head's real host and hooks, an item pinned to a retired workflow (the adopt trial's pin copied into a temp root with its journal; a pre-contract quick-fix copy; a quick-fix copy whose awaitingGates has no after) is never advanced: applyEvent returns refused with a reason naming the item, its pin, the check's message and the release on its seq-0 row, and writes no applied row; runEffects starts no effect and writes no effect row; delivering a result returned from one of its committed runs (actors.js deliver) applies nothing. An item on a current pin started in the same root advances",
+      "how": "The verifier's own tests driving restore, applyEvent, runEffects and deliver at the head",
       "proof": "verifier"
     },
     {
@@ -110,7 +102,7 @@
     },
     {
       "id": "retired-tests",
-      "check": "The builder's retired tests go red when applyEvent stops refusing a retired workflow, and when accept stops refusing a run prepared from one",
+      "check": "The builder's retired tests go red when applyEvent stops refusing a retired workflow, and when runEffects runs its effects",
       "how": "The verifier breaks each and runs packages/engine/test/retired.test.js",
       "proof": "builder"
     },
@@ -139,10 +131,11 @@
     "The inspector's pre-catalogue and pre-stage.json paths: inspector-reads-records rewrites the exporter on this cutoff",
     "Reading old records stays as it is: the journal's v1 upcaster, promptFile's brief.md, and counting a run.json without attempts from the journal",
     "A workflow file with no stage files keeps its file bytes as its pin: that is a current format, not a pinned-legacy path",
-    "No model-facing text other than the new retired-workflow entry changes"
+    "No model-facing text changes and the message catalogue is unchanged: the retired reason is a host row's reason, and verify/prompt-catalogue requires every entry to be reached",
+    "accept does not check the workflow: no run of a retired item starts, and a result from a run an earlier release prepared is turned away when delivered"
   ],
   "records": [
-    "A turned-away engine.transition row, outcome refused, whose reason is the retired text; a refusal row with rule retired-workflow for accept"
+    "A turned-away engine.transition row, outcome refused, whose reason is the retired text"
   ],
   "person_prereqs": [],
   "step_back": {
@@ -182,13 +175,13 @@ reading the builder's tests, write your own under `verify/retire-pinned-legacy/`
   `loadWorkflow` from the journal root and replay it with `restore`; check the adopt trial's pin is the retired one and
   its message names the asking state.
 - **retired-not-run:** copy the adopt trial's journal root to a temp folder and drive it with the head's `restore`,
-  `applyEvent`, `runEffects` and `accept` (prepare a run on it with `prepareRun` if none is open). Pin a pre-contract
+  `applyEvent`, `runEffects` and `deliver` (its run folders hold returned results). Pin a pre-contract
   quick-fix copy and a copy without an `after` on `awaitingGates` in a temp root (write the blob, start the item on
   the pin), and do the same. Start a current quick-fix item in the same root and show it advances.
 - **one-check:** grep `packages/engine/src` and read `loadWorkflow` and `checkStages`.
 - **current-as-main:** npm test at both shas; read the test diff.
 - **cutoff-recorded:** list `/mnt/project-files/*/harness/journal/items/` and `/mnt/project-files/harness/journal/`,
   and compare with the decision file.
-- **retired-tests:** remove the retired check from `applyEvent`, then separately from `accept`; run
+- **retired-tests:** remove the retired check from `applyEvent`, then separately from `runEffects`; run
   `packages/engine/test/retired.test.js` and show it red each time.
 - **ci:** read the ci and gates checks at the head sha.

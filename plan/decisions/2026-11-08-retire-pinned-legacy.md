@@ -30,8 +30,12 @@ So the line is drawn between reading and running:
   the check refuses it, the spec still loads, marked retired with the check's message, so `restore` replays it and
   readers render from it.
 - The host refuses to advance an item whose workflow is retired: `applyEvent` turns every event away as refused,
-  `runEffects` runs nothing, and `accept` refuses a run prepared from it. Each says the item's pin, why the engine
-  no longer runs it, and to finish it on the release that started it (the release on its seq-0 row).
+  saying the item's pin, why the engine no longer runs it, and to finish it on the release that started it (the
+  release on its seq-0 row); `runEffects` runs nothing, so no run of it starts. `accept` does not check the workflow:
+  a result from a run an earlier release prepared goes nowhere, because the event that would deliver it is turned
+  away. That keeps accept free of the engine's loader (the installed plugin bundles no xstate) and the message
+  catalogue unchanged (verify/prompt-catalogue requires every entry be reached by its fixed runs); the reason is a
+  host row's, inline like the host's other turned-away reasons.
 - `checkStages` loses its `pinned` option. Its pre-contract refusal no longer talks about pins: a pin that old is
   retired like any other, and for a workflow loaded by name it is the plain "is not a stage, a host effect or a
   workflow".
