@@ -63,7 +63,7 @@ test('no message, an empty file, or no file: ms is null', () => {
 });
 
 test('the verifier transcript of probe-plugin-agents-thread gives its real 4944', () => {
-  const path = join(PLUGIN, '..', '..', 'verify', 'probe-plugin-agents-thread', 'evidence', 'agent-adda18087b10e0b3a.jsonl');
+  const path = join(PLUGIN, '..', '..', 'test', 'regression', 'fixtures', 'agent-transcript.jsonl');
   assert.equal(ms(path), 4944);
 });
 

@@ -35,3 +35,8 @@ session, such as a fresh reader for an Expect line.
 
 Do not run `npm test` in a checkout and its git worktree at once: the two runs interfere. Run one, then the other.
 The full suite takes minutes; a builder runs the tests near its change locally and leaves the full suite to `ci`.
+
+## A red test the PR did not touch
+
+A `ci` test outside the PR's change can go red for timing or a race in the container that runs it. Re-run the check
+once, saying so on the PR; red again, it is a real failure, fixed in that PR or named as a new item.
