@@ -278,6 +278,107 @@
       "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
       "description": "The date (YYYY-MM-DD) the item became done."
     },
+    "reader_effort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "files",
+        "exports_added",
+        "exports_removed",
+        "reader_lines",
+        "added",
+        "removed"
+      ],
+      "properties": {
+        "pr": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "files": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "exports_added": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "exports_removed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reader_lines": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "added": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "tests",
+            "verifier",
+            "evidence",
+            "docs"
+          ],
+          "properties": {
+            "code": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "tests": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "verifier": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "evidence": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "docs": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "removed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "tests",
+            "verifier",
+            "evidence",
+            "docs"
+          ],
+          "properties": {
+            "code": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "tests": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "verifier": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "evidence": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "docs": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      },
+      "description": "What the build cost its reader, pasted from node scripts/reader-effort.mjs <pr> --json by the done replan. A build item done on or after 2026-11-09 needs it. Not part of the frozen contract."
+    },
     "contract_changes": {
       "type": "integer",
       "minimum": 0,

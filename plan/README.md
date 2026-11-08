@@ -31,8 +31,9 @@ names its item only by an `Item: <id>` line in its body; branch names are for pe
 4. **Merge and release.** Merge when `ci` and `verdict` are green at the head sha; to take main after the verdict,
    merge main in rather than rebase. A merge that changes `plugins/harness/` or `packages/journal/` is released
    (`docs/gates.md`, "After the merge").
-5. **Done replan.** Set the status to `done` (and `done_on` for a fix item), and add a `## Done` section saying where
-   it was built and verified. Branch `replan/<id>-done`, label `replan`, changes under `plan/` only.
+5. **Done replan.** Set the status to `done` and `done_on`; a build item also pastes `node scripts/reader-effort.mjs
+   <pr> --json` into `reader_effort`. Add a `## Done` section saying where it was built and verified. Branch
+   `replan/<id>-done`, label `replan`, changes under `plan/` only.
 
 Every commit ends with a `Claude-Session:` trailer (`docs/gates.md`, "Sessions").
 
@@ -52,6 +53,7 @@ and a `## Verifier brief`. The head is the contract; `check.mjs` refuses a `read
 | `person_prereqs` | What must the person do before the thread starts? | A thread can't add its own allow rules |
 | `step_back` | When does it stop retrying and replan? | PR #72 ran 5 rounds before anyone stepped back |
 | `module`, `done_on` | Which module does a fix change, and when was it done? | Seven fixes in two days changed `actors.js` before anyone looked at its shape |
+| `reader_effort` | What did the build cost its reader? | The cleanups passed every gate while the harness grew |
 | `contract_changes` | Did the contract move once the build started, and why? | A build that found a better shape could not take it |
 | `verifier` | Who checks it, from what brief? | Self-approval is a verification gap, not a judgment call |
 
