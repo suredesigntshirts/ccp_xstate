@@ -1,0 +1,73 @@
+{
+  "item": "verification-contract",
+  "verified_sha": "25dddc9d60b3658e97d46ca9b8981630b73712bd",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5EhjqK5zaB6CkjD7V9",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "behaviour-lines",
+      "status": "MET",
+      "command": "node --test verify/verification-contract/behaviour-lines.test.mjs (temp copy of plan/, phrases from decision 1)",
+      "excerpt": "51/51 pass. Ready and doing: exit 1, e.g. `items/vfy-pins.md: Expect pinned-line pins main with \"main's\"; name the behaviour to show instead (plan/README.md, How slop is kept out)`; shas a575897 and the 40-digit 25dddc9d…12bd refused with the sha named. Draft and done: exit 0. Upper case MAIN'S refused. A check naming plan/README.md, docs/gates.md and scripts/gates/lib.mjs: exit 0. Against main a575897: 25 of 51 fail.",
+      "test": "verify/verification-contract/behaviour-lines.test.mjs"
+    },
+    {
+      "id": "verdict-runs-tests",
+      "status": "MET",
+      "command": "node --test verify/verification-contract/verdict-runs-tests.test.mjs (temp git repo, BASE_SHA=<base> node scripts/gates/pr-gate.mjs verdict)",
+      "excerpt": "12/12 pass. Passing tests, world line with no test: `verdict gate passed (item vfy-toy)`, with and without observations. fail.test.mjs (assert.equal(1, 2)): exit 1, reason names v-line and fail.test.mjs. crash.test.mjs (process.exit(3) after a passing test): exit 1, names v-line and crash.test.mjs. No test on v-line or on b-line: exit 1 naming the id. Missing file, a path outside verify/vfy-toy/, a test_name matching no test: each exit 1. Observations present or absent changes no outcome. Against main: 10 of 12 fail.",
+      "test": "verify/verification-contract/verdict-runs-tests.test.mjs"
+    },
+    {
+      "id": "contract-change-once",
+      "status": "MET",
+      "command": "node --test verify/verification-contract/contract-change-once.test.mjs (temp git repo, pr-gate.mjs freeze with PR_LABELS, and plan/check.mjs)",
+      "excerpt": "7/7 pass. contract_changes 1 + `## Contract change`: freeze gate passed, plan ok. Same without the label: freeze refused. contract_changes 2: plan check exit 1 naming vfy-doing and contract_changes (schema \"must be at most 1\"). 1 with no section: exit 1, \"contract_changes is 1, so the item needs a ## Contract change section\". verdict.json at base, and at head: freeze exit 1, \"changes the contract of vfy-doing ...; verify/vfy-doing/verdict.json exists, so verification has started and nothing may change it\". Status and done_on change with a verdict present: freeze passed. Against main: 3 of 7 fail.",
+      "test": "verify/verification-contract/contract-change-once.test.mjs"
+    },
+    {
+      "id": "rules-written",
+      "status": "MET",
+      "command": "node --test verify/verification-contract/rules-written.test.mjs, and a read of plan/README.md, docs/gates.md, CLAUDE.md, docs/language.md",
+      "excerpt": "5/5 pass. plan/README.md \"How slop is kept out\": \"check.mjs refuses a ready or doing item whose check holds a sha or a phrase that pins main (... the rest of the list in plan/decisions/2026-11-08-verification-swing.md, decision 1)\"; \"names in `test` the file that proves it; the verdict gate runs that file at the head\"; \"`observations`, which never gates\"; \"Once an item's verification starts, nothing changes its head or Verifier brief. Before that, one replan may, with a `## Contract change` section\"; \"once `verify/<item>/verdict.json` exists at the PR's base or head\"; head table row `contract_changes`. docs/gates.md verdict example parses as JSON with `test`, `test_name` and `observations`; freeze section \"Verification has started once ... from then on the gate refuses any head or brief change, label or not\". CLAUDE.md: decision 4's text verbatim, old text gone, 60 lines. docs/language.md rows plan verifier, observation, contract change, regression set; \"Say *plan verifier* wherever the model stage could be meant\". Against main: 5 of 5 fail.",
+      "test": "verify/verification-contract/rules-written.test.mjs"
+    },
+    {
+      "id": "world-refuses",
+      "status": "MET",
+      "command": "Throwaway PR https://github.com/suredesigntshirts/ccp_xstate/pull/191 (commit d40cfd15a6ec432d60ff68cdac442599f9e4cb65 on 25dddc9), ci job 128677782456 log via get_job_logs; closed unmerged",
+      "excerpt": "8 stages, 87 items (76 live), 89 ledger rows, 17 cases items/throwaway-pins-main.md: Expect renders-pinned pins main with \"main's\"; name the behaviour to show instead (plan/README.md, How slop is kept out) items/throwaway-pins-main.md: Expect renders-pinned pins main with \"bytes\"; name the behaviour to show instead (plan/README.md, How slop is kept out) ##[error]Process completed with exit code 1."
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/verification-contract/tests-bite.test.mjs (mutates temp copies, runs node --test test/plan-check.test.mjs and scripts/gates/test/lib.test.mjs)",
+      "test": "verify/verification-contract/tests-bite.test.mjs",
+      "mutation": "plan/check.mjs: const PINS = [...] -> const PINS = []; scripts/gates/lib.mjs: if (TESTED.includes(e.proof)) { -> if (false) {",
+      "red_test": "test/plan-check.test.mjs (10 pass, 1 fail); scripts/gates/test/lib.test.mjs (12 pass, 1 fail)",
+      "excerpt": "Mutation 1: plan/check.mjs `const PINS = [ ...the ten phrases... ]` -> `const PINS = []`; ran `node --test test/plan-check.test.mjs`: green 11/0, broken 10 pass 1 fail, restored 11/0. Mutation 2: scripts/gates/lib.mjs `if (TESTED.includes(e.proof)) {` -> `if (false) {`; ran `node --test scripts/gates/test/lib.test.mjs`: green 13/0, broken 12 pass 1 fail, restored 13/0. (The item names scripts/gates/lib.test.mjs; the file is scripts/gates/test/lib.test.mjs.)"
+    },
+    {
+      "id": "plan-and-suite-pass",
+      "status": "MET",
+      "command": "node plan/check.mjs; node --test verify/verification-contract/plan-and-suite-pass.test.mjs; npm test; git diff --stat origin/main...25dddc9",
+      "excerpt": "plan check \"8 stages, 86 items (75 live), 89 ledger rows, 17 cases / plan ok\". Test 2/2: done items still hold listed phrases and pass; no ready or doing item holds one. CI `test` (npm ci, npm test, plan check) success at 25dddc9. Local npm test: all pass but two that fail in this container for known local reasons, not this diff: copy-not-link (fails locally on main too) and the fix-budget-rule backfill date check (needs a full-history clone). Diff, 12 files: the eight output files, test/plan-check.test.mjs, scripts/gates/test/lib.test.mjs, scripts/gates/test/pr-gate.test.mjs (the gate's own tests) and .github/workflows/verdict.yml (see observations). No verify/ folder of any item.",
+      "test": "verify/verification-contract/plan-and-suite-pass.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs on PR #189",
+      "excerpt": "PR #189 check runs at 25dddc9d60b3658e97d46ca9b8981630b73712bd: `test` 128676525480 success (08:29-08:32Z); `gates` 128676525391 failure, because no verdict existed yet. The gates job reruns on the verdict commit, which changes only verify/verification-contract/; its result is read before the verdict is posted on the PR."
+    }
+  ],
+  "observations": [
+    "npm ci in verdict.yml (builder choice 1): accepted. The outputs do not list the workflow, but the outcome says the verdict gate runs the named tests at the head, and in CI any named test that imports a workspace (xstate, the engine) cannot run without the install. The job already runs the head's own scripts, so the step adds no trust it did not have, and permissions stay contents: read. plan-and-suite-pass is MET on that reading; the done replan's decision file should add verdict.yml to the record.",
+    "done_on left out of the frozen contract (builder choice 3): accepted, and needed. Without it every done replan of a fix item would be refused, since the verdict file exists by then. The side effect: any PR may now change done_on at any time, label or not, and done_on feeds the fix budget's 14-day window; check.mjs checks only its format. A later item could freeze done_on once set (allow only absent to a date).",
+    "The gate runs each named file as the entry point, not with node --test <file> as decision 2 says. Confirmed: under --test a name pattern matching nothing reports 1 test, 1 pass; as the entry point it reports 0, so the gate can refuse it. docs/gates.md states the real command; the decision text now differs and the done replan should say so.",
+    "The verdict-file cutoff sees only the PR's base and head. While the verdict lives on the build branch, a replan PR from main cannot see it, so it may still reword a doing item's Expect checks after verification started. Merging main back into the build branch does not invalidate the verdict either (the replan commit is behind the new merge-base), so the gate would then check the old verdict against the reworded head; only an added or removed Expect id is caught. Worth a line in verify-evidence-policy or a small follow-up (for example, compare the item head at verified_sha with the head).",
+    "The item brief and tests-bite name scripts/gates/lib.test.mjs; the file is scripts/gates/test/lib.test.mjs."
+  ]
+}
