@@ -11,7 +11,11 @@ Everything below is exported from `src/index.js`.
 
 - `loadWorkflow(name, { root, dir })` reads `<dir>/<name>.json` and its stage files and checks it. It returns the spec
   with id `<name>@<sha256>` and stores those bytes under `<root>/blobs`. A pinned name, `<name>@<sha256>`, reads the
-  stored bytes and checks their hash, so an item always runs on the bytes it started on.
+  stored bytes and checks their hash, so an item always runs on the bytes it started on. A pin goes through the same
+  load check as a name. One the check refuses is a retired workflow: it loads, marked with the check's message
+  (`retiredOf(spec)`), so its journal replays and its prompts render, but the host does not advance its item.
+  `applyEvent` turns its events away as refused, saying to finish it on the release that started it, and `runEffects`
+  runs none of its effects, so no run of it is started.
 - `workflowOf(root, item)` is the pinned workflow an item started on, or null when it has not started.
 - `readWorkflow(name, { dir })`, `compose(raw, { dir, name })`, `parseStageFile(text, { file, stage })`,
   `hasStageFiles(raw)`, `pinBytes(spec)` and `locationOf(spec, pointer)` (`src/prompts.js`) read stage files. A model
@@ -203,8 +207,7 @@ url. A path is the output's field names joined by dots, `0` for any entry of a l
 The load check refuses marks that name nothing the output holds. The output schema is untouched, so prompts read as
 before. Accept reads a run's marks from the workflow it was prepared from, pinned in the journal's blobs. A stage
 with no entry in `meta.marks` is read as before marks: its verdict is a field whose values are the words PASS or FAIL,
-the stage named `brief` stores each text field, and a ref is a PR when its url is one. Items pinned to a workflow from
-before marks, and runs prepared from one, keep running that way.
+the stage named `brief` stores each text field, and a ref is a PR when its url is one.
 
 ## Actors
 

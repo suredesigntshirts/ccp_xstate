@@ -481,6 +481,18 @@ function checkMarks(marks, st, defs, bad) {
   }
 }
 
+/** Where a pinned spec the load check refuses is marked: not enumerable, so no copy, blob or hash carries it. */
+const RETIRED = 'retired';
+
+/** Marks a pinned spec the load check refused with `error` as retired: it still loads, and the host does not run it. */
+export const retire = (spec, error) => Object.defineProperty(spec, RETIRED, { value: String(error?.message ?? error), enumerable: false });
+
+/**
+ * Why the engine does not run a spec: the load check's message for a retired workflow (a pinned workflow this release's
+ * check refuses, index.js loadWorkflow), or null. A retired spec still replays and renders.
+ */
+export const retiredOf = (spec) => (spec != null && typeof spec === 'object' && Object.hasOwn(spec, RETIRED) ? spec[RETIRED] : null);
+
 /**
  * The spec, or a throw naming the first breach. `workflows` names the workflows an invoke may start as a child item:
  * a list of names, or { name: its meta.input schema }; without it, an invoke that is no stage and no effect is not
@@ -494,15 +506,15 @@ function checkMarks(marks, st, defs, bad) {
  * - coverage: a stage whose input may hold lines (mayHoldLines) and whose output has a verdict field (marks.js) or
  *   is decided on by the chart (decisions) declares covers, and the chart decides only on the covered field or a
  *   top-level verdict field, which accept holds to the covered lines (uncovered);
- * - every invoke names a stage, a host effect or a workflow (a workflow pinned before the contract is refused here);
+ * - every invoke names a stage, a host effect or a workflow;
  * - every stage invoke gives exactly its declared inputs, and every invoke input (stage, effect or workflow) is a
  *   literal or a context path that something feeds when the invoke's state is entered (shapes); a literal task is
  *   non-empty text, and a wired task may hold text there (mayBeText); a child workflow's invoke gives every input
  *   its item input requires;
  * - every state that invokes ask sets a timer: an after transition whose delay is a number of ms or a positive
- *   meta.delays entry. Not for a `pinned` workflow: an item already running on one keeps its asking states as pinned.
+ *   meta.delays entry.
  */
-export function checkStages(spec, { workflows = null, pinned = false } = {}) {
+export function checkStages(spec, { workflows = null } = {}) {
   const children = Array.isArray(workflows) ? Object.fromEntries(workflows.map((n) => [n, null])) : workflows;
   const actors = spec.meta?.actors ?? {};
   const defs = spec.meta?.schemas ?? {};
@@ -515,7 +527,7 @@ export function checkStages(spec, { workflows = null, pinned = false } = {}) {
     if (!Array.isArray(st.rules) || !st.rules.length || !st.rules.every(text)) bad(src, 'rules are empty');
     if (!isObject(st.inputs)) bad(src, 'inputs are invalid');
     for (const [name, meaning] of Object.entries(st.inputs)) if (!text(meaning)) bad(src, `input ${name} lacks meaning`);
-    if (!Object.hasOwn(st.inputs, TASK)) bad(src, 'task' in st ? `has a task part, the form before this contract: declare an input ${TASK} and wire it in the invoke` : `lacks input ${TASK}`);
+    if (!Object.hasOwn(st.inputs, TASK)) bad(src, `lacks input ${TASK}`);
     if (!isObject(st.properties)) bad(src, 'lacks output schema');
     if (Object.hasOwn(st.properties, BLOCKED)) {
       const b = deref(st.properties[BLOCKED], defs);
@@ -536,14 +548,14 @@ export function checkStages(spec, { workflows = null, pinned = false } = {}) {
     }
     if (EFFECTS.includes(inv.src) || !children || Object.hasOwn(children, inv.src)) continue;
     const lacks = PARTS.filter((p) => !(isObject(st) && p in st)).join(' and ');
-    throw new Error(`${spec.id}: actor ${inv.src}, invoked at ${inv.at}, is not a stage (it lacks ${lacks}), a host effect (${EFFECTS.join(', ')}) or a workflow. A workflow pinned before the stage contract cannot run: finish its items on the engine that started them, or migrate it`);
+    throw new Error(`${spec.id}: actor ${inv.src}, invoked at ${inv.at}, is not a stage (it lacks ${lacks}), a host effect (${EFFECTS.join(', ')}) or a workflow`);
   }
   for (const [name, m] of Object.entries(spec.meta?.marks ?? {})) {
     if (!isStage(actors[name]) || !isObject(m)) throw new Error(`${spec.id}: meta.marks names ${name}, which is no model stage, or its marks are not an object`);
   }
   // A state that asks the person sets a timer, so a wake is scheduled for the item while it waits (case
   // C-waiting-does-not-stall). Its delay is a number of ms or a name in meta.delays.
-  for (const inv of pinned ? [] : wiring.invokes.filter((v) => v.src === 'ask')) {
+  for (const inv of wiring.invokes.filter((v) => v.src === 'ask')) {
     const state = inv.state.join('.');
     const delays = Object.keys(wiring.nodes.get(state)?.after ?? {});
     const named = spec.meta?.delays ?? {};

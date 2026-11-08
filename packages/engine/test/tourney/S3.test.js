@@ -1,5 +1,5 @@
 // Stage-contract cleanup, items C, D and E: the load check refuses, loudly and by name,
-// (C) a workflow pinned before the stage contract, whose agents are plain schemas that no handler would take;
+// (C) a workflow whose agents are plain schemas that no handler would take (pinned, it loads retired: retired.test.js);
 // (D) a stage given lines (an input that may hold a list of text) whose output may say PASS or FAIL, or whose output
 //     the chart decides on (a guard tests a value the stage chose, through its onDone or a context path written from
 //     it, copies followed), but that declares no covers, however the verdict is spelled, typed, nested, copied or
@@ -12,7 +12,8 @@
 //     a write whose source (an output schema, an event schema, a literal, a copy, an error) has no such part, or a
 //     write on a transition out of a state the item can never be in; and a child workflow invoke that lacks an input
 //     the child's item input requires.
-// Every case goes through the real loadWorkflow, pinned or by name.
+// Every case goes through the real loadWorkflow, pinned or by name. A pin the check refuses loads, retired with the
+// check's message (retiredOf), so the pinned cases read that message.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -20,7 +21,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { loadWorkflow } from '../../src/index.js';
-import { decisions, stagesOf, uncovered } from '../../src/stages.js';
+import { decisions, retiredOf, stagesOf, uncovered } from '../../src/stages.js';
 import { WORKFLOWS } from './contract.js';
 
 // A workflow copy as a pinned blob under a fresh root; returns a loader of `name@hash`.
@@ -66,28 +67,25 @@ const preContract = (spec) => {
   }
 };
 
-test('S3 (C): a pre-contract quick-fix pinned in the journal is refused at load, naming the actor and the parts it lacks', () => {
-  assert.throws(pin('quick-fix', preContract), (error) => {
-    assert.match(error.message, /^quick-fix@[0-9a-f]{64}: actor brief, invoked at \/states\/briefing\/invoke, is not a stage \(it lacks rules and inputs\)/);
-    assert.match(error.message, /a host effect \(merge, ask, post\) or a workflow/);
-    assert.match(error.message, /pinned before the stage contract cannot run/);
-    return true;
-  });
+test('S3 (C): a pre-contract quick-fix pinned in the journal loads retired, naming the actor and the parts it lacks', () => {
+  const why = retiredOf(pin('quick-fix', preContract)());
+  assert.match(why, /^quick-fix@[0-9a-f]{64}: actor brief, invoked at \/states\/briefing\/invoke, is not a stage \(it lacks rules and inputs\)/);
+  assert.match(why, /a host effect \(merge, ask, post\) or a workflow$/);
 });
 
 test('S3 (C): the same holds for research and feature, and for one stage stripped of its parts', () => {
-  assert.throws(pin('research', preContract), /actor brief, invoked at \/states\/planning\/invoke, is not a stage \(it lacks rules and inputs\)/);
-  assert.throws(pin('feature', preContract), /actor brief, invoked at \/states\/planning\/invoke, is not a stage/);
+  assert.match(retiredOf(pin('research', preContract)()), /actor brief, invoked at \/states\/planning\/invoke, is not a stage \(it lacks rules and inputs\)/);
+  assert.match(retiredOf(pin('feature', preContract)()), /actor brief, invoked at \/states\/planning\/invoke, is not a stage/);
   assert.throws(changed('quick-fix', (s) => { delete s.meta.actors.verify.rules; delete s.meta.actors.verify.inputs; }),
     /actor verify, invoked at \/states\/verifying\/invoke, is not a stage \(it lacks rules and inputs\)/);
 });
 
-test('S3 (C): a round-2 blob, whose stages carry a task part instead of an input task, is refused naming that form', () => {
+test('S3 (C): a round-2 blob, whose stages carry a task part instead of an input task, loads retired: its stage lacks input task', () => {
   const round2 = (s) => {
     for (const src of stagesOf(s)) { s.meta.actors[src].task = 'x'; delete s.meta.actors[src].inputs.task; }
     for (const inv of [s.states.briefing, s.states.building, s.states.verifying, s.states.reverifying].map((st) => st.invoke)) delete inv.input.task;
   };
-  assert.throws(pin('quick-fix', round2), /quick-fix@[0-9a-f]{64}: stage brief has a task part, the form before this contract: declare an input task and wire it in the invoke$/);
+  assert.match(retiredOf(pin('quick-fix', round2)()), /quick-fix@[0-9a-f]{64}: stage brief lacks input task$/);
 });
 
 test('S3 (C): host effects and child workflows still load; an unknown actor name does not', () => {
@@ -100,7 +98,7 @@ test('S3 (D): a stage given lines whose output the chart decides on, with no cov
   for (const name of ['quick-fix', 'research']) {
     assert.throws(changed(name, (s) => { delete s.meta.actors.verify.properties.lines.covers; }),
       /stage verify output result decides guard \w+ \(at \/meta\/guards\/\w+\/0\) while input issue may hold lines, but no output field declares covers$/, name);
-    assert.throws(pin(name, (s) => { delete s.meta.actors.verify.properties.lines.covers; }), /but no output field declares covers$/, `${name} pinned`);
+    assert.match(retiredOf(pin(name, (s) => { delete s.meta.actors.verify.properties.lines.covers; })()), /but no output field declares covers$/, `${name} pinned`);
   }
   // Stages the chart does not decide on need no covers, though they are given the expect lines: build, brief, write.
   assert.ok(!Object.values(WORKFLOWS['quick-fix'].meta.actors.build.properties).some((p) => 'covers' in p));

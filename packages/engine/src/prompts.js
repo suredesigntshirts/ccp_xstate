@@ -21,7 +21,7 @@
 // task literals), so render(), the chart, the checks and replay are unchanged and every prompt stays byte for byte the
 // same. It adds meta.prompts: each filled JSON pointer -> { file, line }, the file named from the repository root
 // (workflows/...). The pin hashes the composed spec's bytes (pinBytes), so a blob alone replays an item. A workflow
-// that names no stage file keeps its own file bytes as its pin, as every workflow did before this item.
+// that names no stage file, its words inline in the JSON, is pinned as its own file bytes.
 //
 // The parser is strict: anything it would not put in the prompt is refused, naming the file and line, so no text can
 // drop out of a prompt silently.

@@ -20,6 +20,7 @@ import { append, readFile } from '../../journal/src/index.js';
 import { machineOf, hashOf, startRefusal } from './spec.js';
 import { check } from './schema.js';
 import { itemFile, sessionFile } from './names.js';
+import { retiredOf } from './stages.js';
 
 const START = 'xstate.init';
 const DONE = 'xstate.done.actor.'; // + the invoke's id: the actor finished, with event.output
@@ -39,8 +40,9 @@ export class OwnedError extends Error {
 }
 
 /**
- * The item as its journal leaves it: { item, spec, session, release, owner, snapshot, seq, runs, timers, effects,
- * seen, file, root }. owner is the session that started it, or null when it has not started. Throws when an applied
+ * The item as its journal leaves it: { item, spec, session, release, owner, startedOn, snapshot, seq, runs, timers,
+ * effects, seen, file, root }. owner is the session that started it and startedOn the release it started on, or null
+ * when it has not started. Throws when an applied
  * transition replays to another hash than it recorded: the workflow changed under the item.
  */
 export function restore({ root, item, spec, session, release }) {
@@ -55,6 +57,7 @@ export function restore({ root, item, spec, session, release }) {
     root, item, spec, session, release, file,
     machine: machineOf(spec),
     owner: null,
+    startedOn: null,
     snapshot: null,
     seq: 0,
     runs: new Map(), // run effect id -> the run effect: actors started and not yet finished
@@ -67,7 +70,10 @@ export function restore({ root, item, spec, session, release }) {
   for (const row of transitions) host.seen.add(sourceKey(row.source));
   const applied = transitions.filter((r) => r.payload.outcome === 'applied').sort((a, b) => a.payload.seq - b.payload.seq);
   for (const row of applied) {
-    if (row.payload.seq === 0) host.owner = row.session;
+    if (row.payload.seq === 0) {
+      host.owner = row.session;
+      host.startedOn = row.release ?? null;
+    }
     const { hash, effects } = step(host, row.payload.event, row.payload.run, row.at);
     if (hash !== row.payload.hash) {
       throw new Error(`${row.payload.transition} replays to ${hash}, not ${row.payload.hash}: the workflow changed`);
@@ -83,6 +89,17 @@ export function restore({ root, item, spec, session, release }) {
     known.outcome = row.payload.outcome ?? null;
   }
   return host;
+}
+
+/**
+ * Why the host does not run the item, or null: its workflow is retired (stages.js retiredOf), with the release that
+ * started it to finish it on.
+ */
+export function retiredText(host) {
+  const why = retiredOf(host.spec);
+  if (!why) return null;
+  const release = host.startedOn ?? 'none: it has not started';
+  return `${host.item} is pinned to ${host.spec.id}, which this release no longer runs (${why}): finish it on release ${release}, which started it`;
 }
 
 /**
@@ -102,6 +119,9 @@ export function applyEvent(host, { event, source, run = null, at = new Date().to
     return turnedAway('not-owner', `${host.item} is owned by ${host.owner}`, sessionFile(host.root, host.session));
   }
   if (!source?.system || !source?.ref) return turnedAway('refused', 'the event has no source', sessionFile(host.root, host.session));
+  // A retired workflow (stages.js retiredOf) replays, and the host advances it no further.
+  const retired = retiredText(host);
+  if (retired) return turnedAway('refused', retired, host.snapshot ? host.file : sessionFile(host.root, host.session));
   if (!host.snapshot && event?.type !== START) {
     return turnedAway('refused', `${host.item} has not started`, sessionFile(host.root, host.session));
   }
@@ -157,13 +177,14 @@ export function persist(host, rows) {
  * Only the item's owner carries out its effects. A host restored by another session runs none of them and writes
  * nothing to the item's file, so a card, post, run, timer or merge the owner has open is started by the owner alone
  * (case C-two-hosts-one-item). Its events are turned away by applyEvent.
+ * An item on a retired workflow has none carried out either: the host does not run it (retiredText).
  *
  * Returns { rows, follow }: the engine.effect rows written, and the events to apply next (completions with output).
  */
 export async function runEffects(host, handlers = {}) {
   const rows = [];
   const follow = [];
-  if (!ownedHere(host)) return { rows, follow };
+  if (!ownedHere(host) || retiredText(host)) return { rows, follow };
   const write = (effect, phase, extra = {}) => {
     const row = effectRow(host, effect, phase, extra);
     persist(host, row);

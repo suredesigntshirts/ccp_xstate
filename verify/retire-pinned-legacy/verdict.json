@@ -1,0 +1,55 @@
+{
+  "item": "retire-pinned-legacy",
+  "verified_sha": "a8e2dc5dc822043edcf61b2d764d8872bcec17d6",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GUBZ7pq8dHAf5MLWC",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "records-readable",
+      "status": "MET",
+      "command": "node --test verify/retire-pinned-legacy/readable.test.mjs (every git ls-files */items/<item>.jsonl: seq-0 pin loaded with loadWorkflow from its root, replayed with restore, host.seq checked against the applied rows); npm test at the head covers test/journals-replay, verify/stage-bench and verify/trial-fail-path",
+      "excerpt": "files 291, replayed 239 (the other 52 name a workflow without a pin), distinct pins 14, retired 1: tournaments/2026-11-04-stage-contract/trials/adopt/journal/items/trial.jsonl, retiredOf = \"quick-fix@8dc9451a...: state awaitingGates asks the person (invoke ask) and sets no timer: give it an after transition, so a wake is scheduled while it waits\". test/journals-replay.test.mjs is unchanged (git diff empty) and passes at the head with verify/stage-bench and verify/trial-fail-path (npm test: no failure there). At main 6a0dd85 the test fails (retiredOf is not exported)."
+    },
+    {
+      "id": "retired-not-run",
+      "status": "MET",
+      "command": "node --test verify/retire-pinned-legacy/retired.test.mjs: real loadWorkflow, restore, applyEvent, persist, runEffects (recording handlers), offer and actors.deliver; RPL_REPO=<main clone> runs the same file at main as a control; evidence/deliver-main-vs-head.txt",
+      "excerpt": "Adopt trial copy (done, seq-0 release 0.2.0): applyEvent refused, reason \"trial is pinned to quick-fix@8dc9451a..., which this release no longer runs (<check message>): finish it on release 0.2.0, which started it\"; no applied row, state unchanged; runEffects called no handler, wrote no effect row. Adopt copy cut before seq 4 (verify run open, result returned): deliver -> results [refused], applied rows 4 -> 4, waiting []; the same at main -> [applied], state awaitingMerge, 4 -> 5. Pre-contract copy (build actor { prompt, task }) and a copy without awaitingGates.after, each started as release 0.1.20 in a temp root: retired with \"actor build, invoked at /states/building/invoke, is not a stage (it lacks rules and inputs), a host effect (merge, ask, post) or a workflow\" / \"state awaitingGates asks the person ... sets no timer\"; the brief done event refused naming item, pin, message and 0.1.20; no applied or effect row. A current quick-fix item in the same root: offer(start) applied, state briefing, run handler started once. An unstarted item on a retired pin: start refused, nothing in its file. 6/6 pass at the head; all 6 fail at main."
+    },
+    {
+      "id": "one-check",
+      "status": "MET",
+      "command": "node --test verify/retire-pinned-legacy/one-check.test.mjs (greps every .js under packages/engine/src for a pinned option, \"before the stage contract\", \"before this contract\", \"asking states\", \"form before\", \"pinned before\"; reads checkStages' signature and both checkStages calls in index.js); read loadWorkflow and checkStages",
+      "excerpt": "checkStages(spec, { workflows = null } = {}); the ask-timer loop runs over every ask invoke. index.js calls checkStages twice, both with \"{ workflows: workflowNames(dir ?? REPO_WORKFLOWS) }\": the pin's spec in a try (retire on throw), the name's spec directly (throw). Hits left: index.js PINNED and its match (the pin form), and marks.js:14's comment \"every stage of a workflow pinned before marks\" (the unmarked reading, a non-goal kept for retire-unmarked-reading). 2/2 pass; both fail at main."
+    },
+    {
+      "id": "current-as-main",
+      "status": "MET",
+      "command": "npm ci, then GIT_CONFIG_GLOBAL=/dev/null npm test in clean clones at main 6a0dd85 and head a8e2dc5 (one after the other); passing test names compared with comm; git diff of test files and verify/ read",
+      "excerpt": "main: tests 1737, pass 1721, fail 1, skipped 15. head (with this suite): tests 1750, pass 1734, fail 1, skipped 15. The failure is the same at both: \"copy-not-link: with release tags, setup installs the newest release by version, not the HEAD\" (fails in this container on main). Passing at main and not at head: exactly the 4 renamed tests in P1, S3 (C) x2 and waits.test, each passing at the head under its new name with the retiredOf assertion the outputs name (S3 round-2 now \"stage brief lacks input task\", pre-contract without the pinned-before sentence). New: the builder's 5 retired tests and this suite's 8. git diff main..head -- verify/ is empty."
+    },
+    {
+      "id": "cutoff-recorded",
+      "status": "MET",
+      "command": "ls /mnt/project-files/harness/journal and /mnt/project-files/*/harness/journal/items/; find (maxdepth 7, per top-level folder) for */items/*.jsonl; each item replayed by the head on a temp copy (evidence/cutoff.txt); then git show origin/main:plan/decisions/2026-11-08-retire-pinned-legacy.md at d1cbb81 (replan #177) compared root by root and item by item with that listing",
+      "excerpt": "The project journal /mnt/project-files/harness/journal has only blobs/ and sessions/ (no items/). The shared folder holds 23 item journals in 13 roots. The 11 in first-real-issue, toy-run, toy-run-returns and toy-run-views are all pre-pin (seq-0 workflow \"quick-fix\", release 0.1.0); 3 end on a merge (fri-jsonl-lint-2, sa-cards1, toy-v1) and 8 stop earlier, as the decision says. The other 12, in 9 verifier and tournament roots, are engine-host-verify/run1 and run2 (own-1, pre-pin), fix-other-host-verify/run-1793532670 (it-m, pre-pin), stage-contract-tournament/trial and trial2 (done, retired at the head), verify-runs/fix-finish-closes-waits (vfcw-1..3, retired), verify-runs/fix-rebuild-worktree (vfrw-1, vfrw-2, checking), verify-runs/fix-reminder-wake (vfrw-1, awaitingMerge) and verify-runs/fix-waiting-wake (vfww-1, awaitingMerge); all on o/r or ccp_xstate_scratch issue 1. At a8e2dc5 the decision file named only the four trial roots (NOT MET in ac8902e). On main at d1cbb81 (replan #177) it names exactly these 9 roots and 12 items and drops every one that did not reach done. That matches the listing root for root and item for item, so the evidence now holds."
+    },
+    {
+      "id": "retired-tests",
+      "status": "MET",
+      "command": "In a worktree of a8e2dc5: node --test packages/engine/test/retired.test.js intact, then with each mutation of packages/engine/src/host.js",
+      "mutation": "1) applyEvent: the line \"if (retired) return turnedAway('refused', retired, ...)\" removed. 2) runEffects: \"if (!ownedHere(host) || retiredText(host))\" changed to \"if (!ownedHere(host))\".",
+      "red_test": "1) \"the host turns every event to a retired item away, naming the pin, why and the release to finish it on\". 2) \"runEffects carries out none of a retired item's effects\".",
+      "excerpt": "Intact: tests 5, pass 5. Mutation 1: not ok 2, pass 4 fail 1. Mutation 2: not ok 3, pass 4 fail 1."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "mcp__github__pull_request_read get_check_runs on PR 176 at a8e2dc5, and again at this verdict commit",
+      "excerpt": "At ac8902e: test (128606420496) success; gates (128606420602) failure, with only \"Expect cutoff-recorded is NOT MET\". Re-read at this verdict commit (see the PR comment)."
+    }
+  ],
+  "notes": "cutoff-recorded was NOT MET at ac8902e: the decision file then named only the trial roots. Replan #177 (main d1cbb81) added the 9 verifier and tournament roots, and this verdict re-checks the line against that text. The code under test is unchanged (head a8e2dc5); #176 does not touch the decision file. An earlier count in this verdict and the PR comment said 13 items; the correct count is 12. Observation: marks.js:14 still describes the unmarked reading as for \"a workflow pinned before marks\". That is true today (a pre-marks pin that passes the check loads runnable), and retire-unmarked-reading owns it."
+}
