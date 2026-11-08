@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Checks the plan: every head matches item.schema.json, every id it names exists, depends_on has no
-// cycle and never points at a later stage, and a ready item has every readyRequired field filled.
+// cycle and never points at a later stage, a ready item has every readyRequired field filled, and fix items keep to the
+// fix budget.
 // Zero dependencies; it reads only the small part of JSON Schema that item.schema.json uses.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
@@ -102,6 +103,31 @@ for (const it of items.values()) {
     for (const c of brief?.match(/C-[a-z0-9-]+[a-z0-9]/g) ?? [])
       if (!(it.cases ?? []).includes(c)) fail(at, `its Verifier brief names ${c}, which its head doesn't`);
   }
+}
+
+// The fix budget (plan/README.md, Fix budget): a fix item names the module it changes, and three done fix items to one
+// module in 14 days, with no design item for it done after them, refuse a fourth until a design item is done.
+const isFix = (i) => i.id.startsWith('fix-');
+const DAY = 24 * 60 * 60 * 1000;
+const today = Date.parse(new Date().toISOString().slice(0, 10));
+for (const it of items.values()) {
+  const at = it.path;
+  const building = ['ready', 'doing'].includes(it.status);
+  if (isFix(it) && (building || it.status === 'done') && empty(it.module))
+    fail(at, `a ${it.status} fix item names the module it changes (module)`);
+  if (building && !empty(it.module) && !existsSync(join(root, '..', it.module)))
+    fail(at, `module ${it.module} does not exist`);
+  if (it.status === 'done' && !empty(it.module) && empty(it.done_on)) fail(at, 'a done item that names a module needs done_on');
+}
+for (const it of items.values()) {
+  if (!isFix(it) || !['ready', 'doing'].includes(it.status) || empty(it.module)) continue;
+  const done = [...items.values()].filter((i) => i.status === 'done' && i.module === it.module && i.done_on);
+  const redesigned = done.filter((i) => !isFix(i)).map((i) => i.done_on).sort().at(-1) ?? '';
+  const fixes = done.filter((i) => isFix(i) && i.done_on > redesigned && today - Date.parse(i.done_on) <= 14 * DAY);
+  if (fixes.length >= 3)
+    fail(it.path, `is a fourth fix to ${it.module}: ${fixes.map((i) => i.id).join(', ')} were done in the last 14 days ` +
+      'and no design item for it was done since; write a design item that names the recurring concept and designs it ' +
+      'twice instead (plan/README.md, Fix budget)');
 }
 
 // A cycle in depends_on means no order exists.

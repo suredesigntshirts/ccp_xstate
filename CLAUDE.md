@@ -14,7 +14,8 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
   renames and imports its item names.
 - **A working small system first** (Gall's Law), end to end before wide, root cause over symptom.
 - **One word per thing.** Use the terms in `docs/language.md`; add a line there before introducing a new one.
-- **Step back, don't grind.** An item's `step_back` caps its rounds; past that, replan instead of retrying.
+- **Step back, don't grind.** An item's `step_back` caps its rounds; past that, replan instead of retrying. A fourth fix
+  to one module in 14 days becomes a design item (`plan/README.md`, "Fix budget").
 - **Decide two-way doors and write them down** in `plan/decisions/`. One-way doors (settings, secrets,
   anything outside this repo and the scratch repo) go in `plan/decisions/waiting-for-person.md`.
 
