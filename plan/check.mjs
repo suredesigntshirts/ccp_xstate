@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Checks the plan: every head matches item.schema.json, every id it names exists, depends_on has no
 // cycle and never points at a later stage, a ready item has every readyRequired field filled, a ready or doing item's
-// Expect lines name behaviour rather than pinning main, a contract change is written down, fix items keep to the
-// fix budget, and a recently done build item records its reader effort.
+// Expect lines name behaviour rather than pinning main, a contract change is written down, and fix items keep to the
+// fix budget.
 // Zero dependencies; it reads only the small part of JSON Schema that item.schema.json uses.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
