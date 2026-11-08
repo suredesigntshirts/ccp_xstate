@@ -24,6 +24,7 @@ How the work on the harness itself is planned and proved.
 | contract change | The one replan an item's head and Verifier brief may have once its build PR names it, before its verdict file exists, written up under `## Contract change` | `plan/item.schema.json` `contract_changes`, `plan/check.mjs` |
 | done_on change | The replan that moves an item's set `done_on`, saying why under `## Done on change` | `scripts/gates/lib.mjs` `checkDoneOn`, `docs/gates.md` |
 | regression set | The behavioural tests of done items, kept by area under test/regression with one helper; it is what a cleanup must keep passing | `plan/decisions/2026-11-08-verification-swing.md`, decision 4 |
+| serial pass | The second part of `npm test`: after the parallel pass ends, the tests named `cheap: ` (wall-time bars a busy machine would break) run one at a time | `package.json` `test`, `test/test-passes.test.mjs` |
 | ledger row | A lesson the plan is held to, with an `L-` id | `plan/ledger/` |
 | decision | A two-way door decided and written down, or a one-way door waiting for the person | `plan/decisions/`, `plan/decisions/waiting-for-person.md` |
 | replan | A PR that changes only `plan/`, labelled `replan` | `scripts/gates/pr-gate.mjs` |

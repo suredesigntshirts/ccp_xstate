@@ -9,6 +9,11 @@ Tests use `node:test` and `node:assert`, nothing else. Name them `*.test.js` or 
 every test under `test/`, `scripts/`, `packages/`, `plugins/` and `verify/`, so a workspace needs no test script
 of its own to be covered by CI.
 
+`npm test` runs in two passes. The parallel pass runs every file at once. The serial pass runs after it, one test at
+a time, and holds the tests that measure wall time, so no other file shares the machine while they measure. A test
+joins it by a name starting with `cheap: `, in a file the serial pass names; the parallel pass skips such tests by
+the same pattern. `test/test-passes.test.mjs` fails a `cheap: ` test in a file the serial pass does not run.
+
 ## Comments
 
 Comments and READMEs are present tense: they say what holds and why it must hold, such as a platform fact or a race

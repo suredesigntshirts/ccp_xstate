@@ -11,7 +11,7 @@
     "plugins/*"
   ],
   "scripts": {
-    "test": "node --test \"test/**/*.test.mjs\" \"scripts/**/*.test.mjs\" \"packages/**/*.test.{js,mjs}\" \"plugins/**/*.test.{js,mjs}\" \"verify/**/*.test.{js,mjs}\"",
+    "test": "node --test --test-skip-pattern=\"^cheap: \" \"test/**/*.test.mjs\" \"scripts/**/*.test.mjs\" \"packages/**/*.test.{js,mjs}\" \"plugins/**/*.test.{js,mjs}\" \"verify/**/*.test.{js,mjs}\" && node --test --test-concurrency=1 --test-name-pattern=\"^cheap: \" plugins/harness/test/capture.test.mjs",
     "check": "node plan/check.mjs"
   }
 }
