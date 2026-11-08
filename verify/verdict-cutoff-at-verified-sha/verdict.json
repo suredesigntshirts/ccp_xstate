@@ -1,0 +1,64 @@
+{
+  "item": "verdict-cutoff-at-verified-sha",
+  "verified_sha": "5005ddad872eb02941838cd88ceb900dbd7ef49a",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5HnKzdXf4Uh25F2Lof",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "cutoff-refused",
+      "status": "MET",
+      "command": "node --test verify/verdict-cutoff-at-verified-sha/cutoff-refused.test.mjs (temp git repos, side branch merged into build/x, BASE_SHA=<side tip> HEAD_SHA=<merge> PR_BODY='Item: x' node scripts/gates/pr-gate.mjs verdict); evidence/cutoff-refused.md",
+      "excerpt": "7/7 pass. Reworded Expect check: exit 1, 'the contract of x moved after the verified sha 24f360d (expect)'. Reworded brief: exit 1, '(Verifier brief)'. Item absent at verified_sha: exit 1, 'plan/items/x.md does not exist at the verified sha fc9ec5a'. Status-only, done_on-only, other-plan-file-only merges and the no-merge control: exit 0. Against main: the 3 refusals fail.",
+      "test": "verify/verdict-cutoff-at-verified-sha/cutoff-refused.test.mjs"
+    },
+    {
+      "id": "done-on-held",
+      "status": "MET",
+      "command": "node --test verify/verdict-cutoff-at-verified-sha/done-on-held.test.mjs (temp git repos, BASE_SHA=<base> PR_LABELS=<labels> node scripts/gates/pr-gate.mjs freeze); evidence/done-on-held.md",
+      "excerpt": "8/8 pass. Date moved with labels []: exit 1, 'changes done_on of y from 2026-11-01 to 2026-11-05'. replan + src/a.js: exit 1, '... but this one touches src/a.js'. Plan-only replan without section, removing done_on ('to (none)'), or keeping the base's section unchanged: exit 1. Plan-only replan gaining or rewriting ## Done on change: exit 0. Setting done_on on z, with and without replan: exit 0. Against main: the 5 refusals fail.",
+      "test": "verify/verdict-cutoff-at-verified-sha/done-on-held.test.mjs"
+    },
+    {
+      "id": "rules-written",
+      "status": "MET",
+      "command": "node --test verify/verdict-cutoff-at-verified-sha/rules-written.test.mjs and a read of docs/gates.md and docs/language.md; evidence/rules-written.md",
+      "excerpt": "3/3 pass. docs/gates.md verdict checks: 'the item's contract (see below) at verified_sha matches the head's, or the gate names the fields that moved'. The contract freeze: 'A done_on set at the base moves only by such a replan whose item says why under ## Done on change; setting one where there was none is free.' docs/language.md Plan: done_on change row.",
+      "test": "verify/verdict-cutoff-at-verified-sha/rules-written.test.mjs"
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/verdict-cutoff-at-verified-sha/tests-bite.test.mjs (temp copy of scripts/, runs the named builder test file green, broken, restored); evidence/tests-bite.md",
+      "excerpt": "3/3 pass. contractMoves brief dropped: lib.test.mjs 18/0 -> 16 pass 2 fail -> 18/0. checkDoneOn never refusing: lib.test.mjs 18/0 -> 17/1 -> 18/0. Verdict gate reading the item at head instead of verified_sha: pr-gate.test.mjs 12/0 -> 10/2 -> 12/0.",
+      "test": "verify/verdict-cutoff-at-verified-sha/tests-bite.test.mjs",
+      "mutation": "scripts/gates/lib.mjs contractMoves: return a.brief === b.brief ? moved : [...moved, 'Verifier brief'] -> return moved; checkDoneOn: 'if (was === undefined || was === now) continue;' -> 'continue;'; scripts/gates/pr-gate.mjs: 'before: show(verified, itemFile)' -> 'before: show(head, itemFile)'",
+      "red_test": "scripts/gates/test/lib.test.mjs (2 fail, then 1 fail); scripts/gates/test/pr-gate.test.mjs (2 fail)"
+    },
+    {
+      "id": "plan-passes",
+      "status": "MET",
+      "command": "node --test verify/verdict-cutoff-at-verified-sha/plan-passes.test.mjs (node plan/check.mjs; with PR_BODY naming the item and BASE_SHA, git diff --name-only <merge-base> HEAD; elsewhere, the outputs list and the files it names); evidence/plan-passes.md",
+      "excerpt": "2/2 pass in both modes. '8 stages, 96 items (85 live), 90 ledger rows, 17 cases / plan ok'. PR mode: 7 files, the 6 output files and plan/items/verdict-cutoff-at-verified-sha.md, plus this folder; no other item's verify/ folder. All 23 tests here pass in a depth-1 clone.",
+      "test": "verify/verdict-cutoff-at-verified-sha/plan-passes.test.mjs"
+    },
+    {
+      "id": "world-refuses",
+      "status": "MET",
+      "command": "Throwaway PR https://github.com/suredesigntshirts/ccp_xstate/pull/226 (verdict at 5005dda, then bc998b127b98796ac37f7d5c4e1a720d707c6c97 rewording the plan-passes check), gates job 128709844029 via get_job_logs; closed unmerged; evidence/world-refuses.md",
+      "excerpt": "Step 'verdict at the head sha, from a separate session, its named tests run': verdict gate failed (item verdict-cutoff-at-verified-sha): ... the contract of verdict-cutoff-at-verified-sha moved after the verified sha 5005dda (expect); a verdict holds only for the contract it verified, so verify again at the head ... ##[error]Process completed with exit code 1."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs on PR #223 and get_job_logs for the gates job; evidence/ci.md",
+      "excerpt": "test job 128709145689 at 5005ddad872eb02941838cd88ceb900dbd7ef49a: success. gates job 128709145001: stubs, freeze, evidence passed; verdict failed only for 'no verify/verdict-cutoff-at-verified-sha/verdict.json at the head sha'; it reruns on this commit, which changes only verify/verdict-cutoff-at-verified-sha/."
+    }
+  ],
+  "observations": [
+    "The throwaway branch throwaway/verdict-cutoff-world could not be deleted from this session (git push --delete: the remote end hung up); PR #226 is closed, the branch is left for the person.",
+    "The cutoff compares the whole head minus status and done_on, so a merged replan that only adds a field such as a new input or a risk also refuses the verdict. That is what the outcome says: any replan from main that edits a doing item's head beyond status and done_on needs a fresh verdict once merged into the build branch.",
+    "checkDoneOn counts a ## Done on change section as said only when its text differs from the base's, so a second date move must rewrite the section; a replan that moves the date back with the old reason left in place is refused, which reads as intended."
+  ]
+}
