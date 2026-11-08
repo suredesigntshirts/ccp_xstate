@@ -5,7 +5,7 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "ready",
-  "outcome": "Each of the 26 verify/ folders this item names holds only verdict.json; every test file they held is either moved to test/regression/<area>/ (area engine, run or marks, with the Expect id it proves in its first comment) or deleted with its evidence because it read source text, compared a listing or compared a stored capture, and a test that did both is split; test/regression/ has one shared helper, lib.mjs; the item's prose carries a table with one row per test file, its verdict and its reason; and no engine, plugin, workflow or script source changes.",
+  "outcome": "Each of the 26 verify/ folders this item names holds only verdict.json; every test file they held is either moved to test/regression/<area>/ (area one of the eight of decision 4, mostly engine, run or marks, with the Expect id it proves in its first comment) or deleted with its evidence because it read source text, compared a listing or compared a stored capture, and a test that did both is split; test/regression/ has one shared helper, lib.mjs; the item's prose carries a table with one row per test file, its verdict and its reason; and no engine, plugin, workflow or script source changes.",
   "why": "Done suites that assert stored captures let code be added but never removed; the classification is per test, not a deletion pass (L-measure-then-park; research plan/research/verification-swing.md, How to classify a verifier test; decision 4). First of three parts of verify-regression-set, split by suite (plan/decisions/2026-11-08-verify-regression-split.md).",
   "serves": [
     "L-contract-names-behaviour",
@@ -35,7 +35,7 @@
   ],
   "outputs": [
     {
-      "ref": "test/regression/engine/, test/regression/run/, test/regression/marks/",
+      "ref": "test/regression/<area>/: engine/, run/ and marks/ for most, and plan/ or gates/ for a test of a repo rule",
       "what": "The moved tests as *.test.mjs files named for the behaviour they cover (the test files of one suite may merge into one file, so its helper is inlined rather than shared); each opens with a comment `Expect: <item>/<expect-id>` for every Expect line it proves"
     },
     {
@@ -58,7 +58,7 @@
   "expect": [
     {
       "id": "table-complete",
-      "check": "The item file's Regression table has exactly one row for every *.test.mjs file the 26 named verify/ folders held at the PR's base and no row for any other test file; each row's verdict is moved, split or left with a non-empty reason; every test-file path the table names as a destination exists at the head under test/regression/engine/, run/ or marks/",
+      "check": "The item file's Regression table has exactly one row for every *.test.mjs file the 26 named verify/ folders held at the PR's base and no row for any other test file; each row's verdict is moved, split or left with a non-empty reason; every test-file path the table names as a destination exists at the head under test/regression/<area>/ for one of the eight areas of decision 4 (engine, run, marks, journal, plugin, inspector, plan, gates)",
       "how": "The verifier's own test listing the base's verify/ folders with git and parsing the table at the head",
       "proof": "verifier"
     },
@@ -82,7 +82,7 @@
     },
     {
       "id": "moved-bite",
-      "check": "For each of the three area folders, the verifier picks a moved test, breaks the engine, run or marks behaviour it asserts in a scratch copy of the head (a transition, a store state, a mark rule), and that test file goes red; restored, it is green",
+      "check": "For each of engine/, run/ and marks/, the verifier picks a moved test, breaks the engine, run or marks behaviour it asserts in a scratch copy of the head (a transition, a store state, a mark rule), and that test file goes red; restored, it is green",
       "how": "The verifier's own test copying packages/engine and the moved test to a temp folder, editing the source and running node --test",
       "proof": "verifier"
     },
