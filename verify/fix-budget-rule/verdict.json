@@ -1,6 +1,6 @@
 {
   "item": "fix-budget-rule",
-  "verified_sha": "b7305dcba19c233e29bd7e4db3c8c86df1d55c46",
+  "verified_sha": "699541326970049423989eb87c8a33e42a426c34",
   "verifier": {
     "session": "https://claude.ai/code/session_01KfkB5Gzc9JwCs61EsJeTLk",
     "model": "claude-opus-5-5"
@@ -10,36 +10,36 @@
       "id": "rule-written",
       "status": "MET",
       "command": "node --test verify/fix-budget-rule/rule-written.test.mjs (reads plan/README.md, CLAUDE.md, docs/language.md at the head)",
-      "excerpt": "README '## Fix budget': a `fix-` item names the one module its main change lands in, in `module`, and done_on when done; 'When three fix items naming the same module were done in the last 14 days, and no design item for that module was done after them, a fourth fix item there is refused at `ready` or `doing`'; the design item 'names the concept that keeps breaking in `concepts` and designs it twice ... Once it is done, the module's count starts again'. Head table row '`module`, `done_on`' and check list 'a fix item over the fix budget'. CLAUDE.md 59 lines, step-back line points at (`plan/README.md`, \"Fix budget\"). docs/language.md rows 'fix budget' and 'design item' (designs it twice, restarts the budget). 3/3 pass; 3/3 red at main 49c8c55."
+      "excerpt": "README '## Fix budget': a `fix-` item names the one module its main change lands in, in `module`, and done_on when done; 'When three fix items naming the same module were done in the last 14 days, and no design item for that module was done after them, a fourth fix item there is refused at `ready` or `doing`'; the design item 'names the concept that keeps breaking in `concepts` and designs it twice ... Once it is done, the module's count starts again'. Head table row '`module`, `done_on`' and check list 'a fix item over the fix budget'. CLAUDE.md 59 lines, step-back line points at (`plan/README.md`, \"Fix budget\"). docs/language.md rows 'fix budget' and 'design item' (designs it twice, restarts the budget). 3/3 pass at 6995413 (888bc54 only rewords the head-table row: 'Seven fixes in two days changed `actors.js` ...'); 3/3 red at main 49c8c55."
     },
     {
       "id": "names-module",
       "status": "MET",
       "command": "node --test verify/fix-budget-rule/names-module.test.mjs (copies the head's plan/ to an os.tmpdir() folder, adds item heads cloned from fix-finish-closes-waits, runs node <temp>/plan/check.mjs)",
-      "excerpt": "Untouched copy: exit 0. Ready, doing and done fix items without module: exit 1, 'items/fix-vfy-nomodule.md: a <status> fix item names the module it changes (module)'. Ready fix naming packages/no/such.js: exit 1 'module packages/no/such.js does not exist'; passes once the file exists. Done fix and done non-fix item naming a module without done_on: exit 1 'a done item that names a module needs done_on'. Draft fix without module and ready non-fix without module: exit 0. 8/8 pass; 5 red at main."
+      "excerpt": "Untouched copy: exit 0. Ready, doing and done fix items without module: exit 1, 'items/fix-vfy-nomodule.md: a <status> fix item names the module it changes (module)'. Ready fix naming packages/no/such.js: exit 1 'module packages/no/such.js does not exist'; passes once the file exists. Done fix and done non-fix item naming a module without done_on: exit 1 'a done item that names a module needs done_on'. Draft fix without module and ready non-fix without module: exit 0. 8/8 pass; 5 red at main. Re-run at 6995413 (main b85b9f7 with replan #185 merged in, plus 888bc54): same result."
     },
     {
       "id": "budget-refuses",
       "status": "MET",
       "command": "node --test verify/fix-budget-rule/budget-refuses.test.mjs (temp copy of plan/, module packages/vfy/m.js created under the temp root, done_on computed as today minus N days in UTC)",
-      "excerpt": "Three done fixes 1/3/5 days ago + ready fourth: exit 1 'items/fix-vfy-fourth.md: is a fourth fix to packages/vfy/m.js: fix-vfy-a, fix-vfy-b, fix-vfy-c were done in the last 14 days and no design item for it was done since; ... (plan/README.md, Fix budget)'. At doing: refused. Two fixes: pass. Third fix 14 days ago: refused; 15 days ago: pass. Done non-fix naming M 1 day ago (after fixes 3-5 days ago): pass; dated 6 days ago (before fixes 1-3): refused. Ready non-fix naming M: pass. Draft fourth: pass. 9/9 pass; 4 red at main."
+      "excerpt": "Three done fixes 1/3/5 days ago + ready fourth: exit 1 'items/fix-vfy-fourth.md: is a fourth fix to packages/vfy/m.js: fix-vfy-a, fix-vfy-b, fix-vfy-c were done in the last 14 days and no design item for it was done since; ... (plan/README.md, Fix budget)'. At doing: refused. Two fixes: pass. Third fix 14 days ago: refused; 15 days ago: pass. Done non-fix naming M 1 day ago (after fixes 3-5 days ago): pass; dated 6 days ago (before fixes 1-3): refused. Ready non-fix naming M: pass. Draft fourth: pass. 9/9 pass; 4 red at main. Re-run at 6995413 (main b85b9f7 with replan #185 merged in, plus 888bc54): same result."
     },
     {
       "id": "backfill-true",
-      "status": "NOT MET",
-      "command": "node --test verify/fix-budget-rule/backfill-true.test.mjs in a full-history clone (git fetch --unshallow; 555 commits): every done fix- head's done_on vs git log --format=%cs -S'\"status\": \"done\"' -- plan/items/<id>.md | tail -1; module vs the path-shaped tokens of its outputs refs, or the decision file's two exceptions",
-      "excerpt": "16 done fix items all carry module and done_on, and every module is an output or a named exception; run-lifecycle-store names packages/engine/src/actors.js with done_on 2026-11-07 = its first done commit. But 5 done_on values are one day late: fix-finish-closes-waits (first done d9ab632, 2026-11-04T21:02:28Z), fix-other-host-runs-effects (c355300, 2026-11-04T18:09:09Z), fix-verify-issue-echo (d54c1bf, 2026-11-04T20:03:00Z), fix-waiting-wake (516426a, 2026-11-04T22:35:25Z), fix-workflow-pinned (392065d, 2026-11-04T18:43:44Z) all say 2026-11-05. In a shallow clone those first-done commits sit at the shallow boundary and log -S reports 2026-11-05, which is likely how the backfill got them. 3 pass, 1 fail."
+      "status": "MET",
+      "command": "node --test verify/fix-budget-rule/backfill-true.test.mjs in a full-history clone (git fetch --unshallow; not shallow) at 6995413: each done fix- head's done_on vs TZ=UTC git log --date=format-local:%F --format='%H %cd' -S'\"status\": \"done\"' -- plan/items/<id>.md | tail -1 (refused if that commit is a shallow boundary); module vs the path-shaped tokens of its outputs refs, or the decision file's two exceptions",
+      "excerpt": "16 done fix items, all with module and done_on equal to their first done commit's UTC date: 2026-11-04 for fix-finish-closes-waits (d9ab632), fix-other-host-runs-effects (c355300), fix-verify-issue-echo (d54c1bf), fix-waiting-wake (516426a, exception workflows/quick-fix.json), fix-workflow-pinned (392065d, exception packages/engine/src/host.js); 2026-11-05 for the other 11. Seven name packages/engine/src/actors.js, three packages/engine/src/host.js. run-lifecycle-store: done, module packages/engine/src/actors.js, done_on 2026-11-07 = its first done commit. 4/4 pass. At b7305dc (before replan #185) the five 11-04 items said 2026-11-05 and this check failed."
     },
     {
       "id": "world-refuses",
       "status": "MET",
-      "command": "Throwaway PR https://github.com/suredesigntshirts/ccp_xstate/pull/184 (branch throwaway/fix-budget-rule-world, commit 466b65b7c5754b37e74803a5c01894f8f7b30ee6 on b7305dc) adding ready plan/items/fix-throwaway-host-fourth.md with module packages/engine/src/host.js; ci run 42457761047 job 128660327616 log read with get_job_logs; PR closed unmerged 2026-11-08, branch left named throwaway",
-      "excerpt": "ci 'test' failure. Plan check step: '8 stages, 80 items (69 live), 87 ledger rows, 17 cases' / 'items/fix-throwaway-host-fourth.md: is a fourth fix to packages/engine/src/host.js: fix-finish-closes-waits, fix-other-host-runs-effects, fix-workflow-pinned were done in the last 14 days and no design item for it was done since; write a design item that names the recurring concept and designs it twice instead (plan/README.md, Fix budget)' / 'Process completed with exit code 1'. The item otherwise passes the check (it has a Verifier brief), so the budget is the only refusal."
+      "command": "Throwaway PR https://github.com/suredesigntshirts/ccp_xstate/pull/186 (branch throwaway/fix-budget-rule-world-2, commit d012fd6ca196cc3124d9848821da45e5f7fc8a26 on 6995413) adding ready plan/items/fix-throwaway-host-fourth.md with module packages/engine/src/host.js; ci job 128663575491 log read with get_job_logs; closed unmerged 2026-11-08, branch left named throwaway. Earlier the same check on b7305dc: PR #184, job 128660327616, same refusal",
+      "excerpt": "ci 'test' failure. Plan check step: '8 stages, 80 items (69 live), 87 ledger rows, 17 cases' / 'items/fix-throwaway-host-fourth.md: is a fourth fix to packages/engine/src/host.js: fix-finish-closes-waits, fix-other-host-runs-effects, fix-workflow-pinned were done in the last 14 days and no design item for it was done since; write a design item that names the recurring concept and designs it twice instead (plan/README.md, Fix budget)' / 'Process completed with exit code 1'. The item otherwise passes the check (it has a Verifier brief). Shown 2026-11-08, inside the window that now runs through 2026-11-18."
     },
     {
       "id": "tests-bite",
       "status": "MET",
-      "command": "node --test test/plan-check.test.mjs at b7305dc, then with each mutation of plan/check.mjs, then after git checkout plan/check.mjs",
+      "command": "node --test test/plan-check.test.mjs at 6995413, then with each mutation of plan/check.mjs, then after git checkout plan/check.mjs",
       "excerpt": "Before: 7/7. Window 14 -> 0: 'not ok 4 - three done fixes in 14 days refuse a fourth at ready and at doing', 'not ok 6 - a design item done after the fixes restarts the count; one done before them does not' (5 pass, 2 fail). Reset removed: 'not ok 6 - ...' (6 pass, 1 fail). Restored: 7/7.",
       "mutation": "plan/check.mjs: `today - Date.parse(i.done_on) <= 14 * DAY` -> `<= 0 * DAY`; separately, `i.done_on > redesigned && ` removed from the fixes filter",
       "red_test": "test/plan-check.test.mjs: 'three done fixes in 14 days refuse a fourth at ready and at doing' and 'a design item done after the fixes restarts the count; one done before them does not'"
@@ -47,21 +47,21 @@
     {
       "id": "current-as-main",
       "status": "MET",
-      "command": "node plan/check.mjs at the head; node --test test/plan-check, test/workspaces, test/journals-replay, verify/harness-glossary/*, verify/engine-item-views/world, verify/obs-page/live, verify/prompt-catalogue/deps, verify/repo-skeleton/claude-md at head (clean clone, npm ci) and at main 49c8c55; git diff --stat 49c8c55...b7305dc; CI's full suite",
-      "excerpt": "'plan ok' (8 stages, 79 items). Targeted suites: head 621/621, main 614/614; no test passing at main fails at head (+7 = test/plan-check.test.mjs). Diff: CLAUDE.md, docs/language.md, plan/README.md, plan/check.mjs, test/plan-check.test.mjs only (136+, 4-); no verify/ folder changed. CI 'test' job 128660057917 at b7305dc: success (full npm test then plan check)."
+      "command": "node plan/check.mjs at the head; node --test test/plan-check, test/workspaces, test/journals-replay, verify/harness-glossary/*, verify/engine-item-views/world, verify/obs-page/live, verify/prompt-catalogue/deps, verify/repo-skeleton/claude-md at head 6995413 (clean clone, npm ci) and at main 49c8c55; git diff --stat b85b9f7 6995413; CI's full suite",
+      "excerpt": "'plan ok' at 6995413. Targeted suites: head 621/621, main 614/614; no test passing at main fails at head (+7 = test/plan-check.test.mjs). Diff against main b85b9f7: CLAUDE.md, docs/language.md, plan/README.md, plan/check.mjs, test/plan-check.test.mjs, plus this item's own verify/fix-budget-rule; no other verify/ folder changed. CI 'test' job 128663358248 at 6995413: success (full npm test, then plan check)."
     },
     {
       "id": "ci",
       "status": "MET",
-      "command": "mcp__github__pull_request_read get_check_runs PR 183 at b7305dc; gates job 128660057254 log; HEAD_SHA=b7305dc BASE_SHA=49c8c55 PR_BRANCH=build/fix-budget-rule node scripts/gates/pr-gate.mjs stubs|freeze",
-      "excerpt": "'test' (128660057917) success 07:13:16Z. 'gates' (128660057254) failed only at the verdict step: 'verdict gate failed (item fix-budget-rule): no verify/fix-budget-rule/verdict.json at the head sha'. Locally: 'stubs gate passed (item fix-budget-rule)', 'freeze gate passed (item fix-budget-rule)'. This verdict commit is what the gates check waits for."
+      "command": "mcp__github__pull_request_read get_check_runs PR 183 at 6995413; gates job 128663358716 log; HEAD_SHA=<verdict commit> BASE_SHA=b85b9f7 PR_BRANCH=build/fix-budget-rule node scripts/gates/pr-gate.mjs stubs|freeze|verdict",
+      "excerpt": "'test' (128663358248) success 07:29:04Z at 6995413. 'gates' (128663358716) failed only at the verdict step, on the previous verdict: 'Expect backfill-true is NOT MET, not MET' / 'commit 888bc54 changes plan/README.md after the verified sha'. This verdict commit answers both; the stubs, freeze and verdict gates pass locally against it."
     }
   ],
   "notes": [
-    "NOT MET: backfill-true. Fix: a replan PR setting done_on to 2026-11-04 on fix-finish-closes-waits, fix-other-host-runs-effects, fix-verify-issue-echo, fix-waiting-wake and fix-workflow-pinned, and correcting the decision file and this item's world-refuses date (the three host.js fixes leave the window after 2026-11-18, not 2026-11-19). Then merge main into build/fix-budget-rule and ask for a new verdict; the other seven results should carry over unchanged.",
     "The window counts whole UTC days from the day the check runs (today = Date.parse of today's ISO date), and a fix done exactly 14 days ago still counts; the 15th day frees it. A design item done the same day as the last fix does not reset (strict done_on > comparison).",
     "The module-exists rule also applies to non-fix items at ready or doing that name a module, which the outcome allows but does not state.",
     "fix-reminder-wake names packages/engine/bin/host.js, so it counts apart from the three packages/engine/src/host.js fixes (exact path match, as the item's risks say).",
-    "The world check holds until 2026-11-18 with the true dates (2026-11-19 with the backfilled ones); after that the same throwaway would pass, which is the rule working, not a regression."
+    "The world check holds through 2026-11-18; after that the same throwaway would pass, which is the rule working, not a regression.",
+    "First verdict (7e08eef, at b7305dc) found five done_on dates a day late, from a shallow clone's boundary commits; replan #185 fixed them and moved the window to 2026-11-18. The suite reads dates in UTC and will not judge a date at a shallow boundary, so CI's depth-1 checkout skips the date check."
   ]
 }

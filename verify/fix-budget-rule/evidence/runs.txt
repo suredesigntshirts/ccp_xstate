@@ -139,3 +139,35 @@ d54c1bf 2026-11-04T20:03:00+00:00 replan: fix-verify-issue-echo done (PR #79, ve
 392065d 2026-11-04T18:43:44+00:00 replan: stage contract done, fix-workflow-pinned done, ...               done_on says 2026-11-05
 # The other 11 done fix items and run-lifecycle-store match. In the first (shallow, 131-commit) clone these five
 # first-done commits were shallow boundaries and log -S gave 2026-11-05; the suite now refuses to judge a boundary.
+
+# ===== Re-verification at 699541326970049423989eb87c8a33e42a426c34 (main b85b9f7 with replan #185 merged in, plus 888bc54 README wording) =====
+# backfill dates now read with TZ=UTC git log --date=format-local:%F (the brief's command), full-history clone
+# fix-agent-finish-ms 2026-11-05 plugins/harness/scripts/capture-rows.mjs
+# fix-blocked-card-grant 2026-11-05 packages/engine/src/standin.js
+# fix-blocked-retry 2026-11-05 packages/engine/src/actors.js
+# fix-finish-closes-waits 2026-11-04 packages/engine/src/host.js
+# fix-grant-null-repo 2026-11-05 packages/engine/src/standin.js
+# fix-inspector-guard-label 2026-11-05 scripts/inspector/export.mjs
+# fix-other-host-runs-effects 2026-11-04 packages/engine/src/host.js
+# fix-rebuild-worktree 2026-11-05 packages/engine/src/actors.js
+# fix-refusal-hints 2026-11-05 packages/engine/src/actors.js
+# fix-reminder-wake 2026-11-05 packages/engine/bin/host.js
+# fix-return-tool-answer 2026-11-05 packages/engine/src/actors.js
+# fix-verify-issue-echo 2026-11-04 packages/engine/src/actors.js
+# fix-waiting-lines-owner 2026-11-05 packages/engine/src/actors.js
+# fix-waiting-run-stall 2026-11-05 packages/engine/src/actors.js
+# fix-waiting-wake 2026-11-04 workflows/quick-fix.json (exception)
+# fix-workflow-pinned 2026-11-04 packages/engine/src/host.js (exception)
+# run-lifecycle-store 2026-11-07 packages/engine/src/actors.js
+# full verifier suite at 699541326970049423989eb87c8a33e42a426c34
+ℹ tests 24
+ℹ pass 24
+ℹ fail 0
+ℹ skipped 0
+# builder tests at 699541326970049423989eb87c8a33e42a426c34: 7/7; window 14->0: not ok 4, not ok 6 (5/2); reset removed: not ok 6 (6/1); restored 7/7
+# targeted suites at 699541326970049423989eb87c8a33e42a426c34: tests 621 pass 621 fail 0; top-level tests passing at main 49c8c55 and not here: 0
+# world-refuses at 699541326970049423989eb87c8a33e42a426c34: throwaway PR #186 (throwaway/fix-budget-rule-world-2, d012fd6ca196cc3124d9848821da45e5f7fc8a26), ci job 128663575491:
+2026-11-08T07:29:58.0103343Z 8 stages, 80 items (69 live), 87 ledger rows, 17 cases
+2026-11-08T07:29:58.0107736Z items/fix-throwaway-host-fourth.md: is a fourth fix to packages/engine/src/host.js: fix-finish-closes-waits, fix-other-host-runs-effects, fix-workflow-pinned were done in the last 14 days and no design item for it was done since; write a design item that names the recurring concept and designs it twice instead (plan/README.md, Fix budget)
+2026-11-08T07:29:58.0142054Z ##[error]Process completed with exit code 1.
+# same job's npm test: 1784 tests, 1753 pass, 13 fail (tests that copy the real plan, which now holds the over-budget item). PR closed unmerged.

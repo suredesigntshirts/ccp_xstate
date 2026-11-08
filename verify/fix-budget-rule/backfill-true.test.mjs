@@ -17,7 +17,7 @@ const heads = readdirSync(join(REPO, 'plan/items')).filter((f) => f.endsWith('.m
 const shallowFile = join(REPO, git('rev-parse', '--git-path', 'shallow').trim());
 const boundary = new Set(existsSync(shallowFile) ? readFileSync(shallowFile, 'utf8').split('\n').filter(Boolean) : []);
 const firstDone = (file) => {
-  const [hash, date] = git('log', '--format=%H %cs', '-S"status": "done"', '--', file).trim().split('\n').at(-1).split(' ');
+  const [hash, date] = git('log', '--date=format-local:%F', '--format=%H %cd', '-S"status": "done"', '--', file).trim().split('\n').at(-1).split(' ');
   return { hash, date, cut: boundary.has(hash) };
 };
 const rlsFirst = firstDone('plan/items/run-lifecycle-store.md');

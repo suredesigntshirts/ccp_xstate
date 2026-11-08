@@ -47,4 +47,5 @@ export function tempPlan(t) {
   return plan;
 }
 
-export const git = (...args) => execFileSync('git', ['-C', REPO, ...args], { encoding: 'utf8', maxBuffer: 1 << 26 });
+// Dates read in UTC, as the decision file's backfill does.
+export const git = (...args) => execFileSync('git', ['-C', REPO, ...args], { encoding: 'utf8', maxBuffer: 1 << 26, env: { ...process.env, TZ: 'UTC' } });
