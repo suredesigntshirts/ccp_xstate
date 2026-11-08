@@ -32,9 +32,9 @@
     },
     {
       "id": "cutoff-recorded",
-      "status": "NOT MET",
-      "command": "ls /mnt/project-files/harness/journal and /mnt/project-files/*/harness/journal/items/; find (maxdepth 7, per top-level folder) for */items/*.jsonl; each item replayed by the head on a temp copy (evidence/cutoff.txt)",
-      "excerpt": "Holds: /mnt/project-files/harness/journal has only blobs/ and sessions/. The 11 items in first-real-issue, toy-run, toy-run-returns and toy-run-views are all pre-pin (seq-0 workflow \"quick-fix\", release 0.1.0); 3 end on a merge (fri-jsonl-lint-2, sa-cards1, toy-v1) and 8 stop earlier, as the decision says. Does not hold: the decision says every engine item that ever ran sits in those four roots or in a committed journal, but 13 more item journals sit in 9 shared roots it does not name: engine-host-verify/run1 and run2 (own-1, pre-pin), fix-other-host-verify/run-1793532670 (it-m, pre-pin), stage-contract-tournament/trial and trial2 (done, retired at the head), verify-runs/fix-finish-closes-waits (vfcw-1..3, retired), verify-runs/fix-rebuild-worktree (vfrw-1, vfrw-2, state checking), verify-runs/fix-reminder-wake (vfrw-1, awaitingMerge) and verify-runs/fix-waiting-wake (vfww-1, awaitingMerge); the last four load runnable at the head. All are verifier or tournament fixtures on o/r or ccp_xstate_scratch issue 1, none live, so the cutoff itself stands; the decision file should name these roots and drop their items."
+      "status": "MET",
+      "command": "ls /mnt/project-files/harness/journal and /mnt/project-files/*/harness/journal/items/; find (maxdepth 7, per top-level folder) for */items/*.jsonl; each item replayed by the head on a temp copy (evidence/cutoff.txt); then git show origin/main:plan/decisions/2026-11-08-retire-pinned-legacy.md at d1cbb81 (replan #177) compared root by root and item by item with that listing",
+      "excerpt": "The project journal /mnt/project-files/harness/journal has only blobs/ and sessions/ (no items/). The shared folder holds 23 item journals in 13 roots. The 11 in first-real-issue, toy-run, toy-run-returns and toy-run-views are all pre-pin (seq-0 workflow \"quick-fix\", release 0.1.0); 3 end on a merge (fri-jsonl-lint-2, sa-cards1, toy-v1) and 8 stop earlier, as the decision says. The other 12, in 9 verifier and tournament roots, are engine-host-verify/run1 and run2 (own-1, pre-pin), fix-other-host-verify/run-1793532670 (it-m, pre-pin), stage-contract-tournament/trial and trial2 (done, retired at the head), verify-runs/fix-finish-closes-waits (vfcw-1..3, retired), verify-runs/fix-rebuild-worktree (vfrw-1, vfrw-2, checking), verify-runs/fix-reminder-wake (vfrw-1, awaitingMerge) and verify-runs/fix-waiting-wake (vfww-1, awaitingMerge); all on o/r or ccp_xstate_scratch issue 1. At a8e2dc5 the decision file named only the four trial roots (NOT MET in ac8902e). On main at d1cbb81 (replan #177) it names exactly these 9 roots and 12 items and drops every one that did not reach done. That matches the listing root for root and item for item, so the evidence now holds."
     },
     {
       "id": "retired-tests",
@@ -48,8 +48,8 @@
       "id": "ci",
       "status": "MET",
       "command": "mcp__github__pull_request_read get_check_runs on PR 176 at a8e2dc5, and again at this verdict commit",
-      "excerpt": "Read at the verdict commit; see the PR comment. gates fails while cutoff-recorded is NOT MET."
+      "excerpt": "At ac8902e: test (128606420496) success; gates (128606420602) failure, with only \"Expect cutoff-recorded is NOT MET\". Re-read at this verdict commit (see the PR comment)."
     }
   ],
-  "notes": "cutoff-recorded is NOT MET only on the decision file's evidence: it misses 13 shared-folder item journals (listed above and in evidence/cutoff.txt). Adding them to the decision as verifier and tournament fixtures, dropped, makes the evidence hold; nothing in the code needs to change. Observation: marks.js:14 still describes the unmarked reading as for \"a workflow pinned before marks\"; true today (a pre-marks pin that passes the check loads runnable), and retire-unmarked-reading owns it."
+  "notes": "cutoff-recorded was NOT MET at ac8902e: the decision file then named only the trial roots. Replan #177 (main d1cbb81) added the 9 verifier and tournament roots, and this verdict re-checks the line against that text. The code under test is unchanged (head a8e2dc5); #176 does not touch the decision file. An earlier count in this verdict and the PR comment said 13 items; the correct count is 12. Observation: marks.js:14 still describes the unmarked reading as for \"a workflow pinned before marks\". That is true today (a pre-marks pin that passes the check loads runnable), and retire-unmarked-reading owns it."
 }
