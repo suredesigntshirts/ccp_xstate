@@ -1,5 +1,5 @@
-// Expect: obs-live-capture/complete, obs-live-capture/attributed, obs-live-capture/no-content, obs-live-capture/blobs, obs-live-capture/cheap
-// The capture hook, replayed and run for real on a recorded session's hook inputs: one tool.call per call that ran, subagent calls attributed, no raw input or secret on disk, briefs and answers as sha256-named blobs, and cheap.
+// Expect: obs-live-capture/complete, obs-live-capture/attributed, obs-live-capture/no-content, obs-live-capture/blobs
+// The capture hook, replayed and run for real on a recorded session's hook inputs: one tool.call per call that ran, subagent calls attributed, no raw input or secret on disk, and briefs and answers as sha256-named blobs. The cheap bar is held by plugins/harness/test/capture.test.mjs, which runs alone in the plugin's suite.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
@@ -131,32 +131,6 @@ test('the real hook: rows match the replay, blobs are named by sha256 and stored
   pass(); // a second delivery of every event must not change a blob
   assert.deepEqual(read1().blobs, blobs);
   assert.ok(dir);
-});
-
-// "Adds" per the decision plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md: hook.run ms is
-// performance.now() at the end of the hook, so it counts Node's own start. The same figure for a bare `node`
-// (a .mjs that only prints Math.round(performance.now())) is the baseline, measured here on the same machine; the
-// median difference is what capture adds. The 95th percentile is measured over the bare start's 95th percentile too
-// (plan/decisions/2026-11-08-capture-p95-over-bare-start.md).
-test('cheap (fixture run): hook.run ms over a bare node start <= 50 ms at the median and <= 200 ms at p95', () => {
-  const { dir, read1 } = runHook();
-  const ms = read1().rows.filter((r) => r.kind === 'hook.run').map((r) => r.payload.ms).sort((a, b) => a - b);
-  assert.ok(ms.length >= 10);
-  const bare = join(dir, 'bare.mjs');
-  writeFileSync(bare, 'process.stdout.write(String(Math.round(performance.now())));\n');
-  const base = [];
-  for (let i = 0; i < Math.max(ms.length, 15); i++) {
-    const r = spawnSync(process.execPath, [bare], { env: { PATH: process.env.PATH }, encoding: 'utf8' });
-    assert.equal(r.status, 0);
-    base.push(Number(r.stdout));
-  }
-  base.sort((a, b) => a - b);
-  const med = (a) => a[Math.floor(a.length / 2)];
-  const p95 = (a) => a[Math.ceil(0.95 * a.length) - 1];
-  const msg = `hook median ${med(ms)} ms (n=${ms.length}), bare node median ${med(base)} ms (n=${base.length}), adds ${med(ms) - med(base)} ms; hook p95 ${p95(ms)} ms, bare p95 ${p95(base)} ms`;
-  assert.ok(med(ms) - med(base) <= 50, msg);
-  assert.ok(p95(ms) - p95(base) <= 200, msg);
-  console.log(msg);
 });
 
 // SubagentStop's early exit (b95097e): the hook may stop waiting only when the transcript ends with the result of the

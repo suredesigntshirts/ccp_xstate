@@ -19,10 +19,10 @@ const DATED = { GIT_AUTHOR_DATE: '2026-11-07T12:00:00Z', GIT_COMMITTER_DATE: '20
 const rawRows = (file) => readFileSync(file, 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l));
 
 /**
- * A harness folder at a fixed path named by `name`, with one git repo committed at a fixed date.
+ * A harness folder at a path named by `name` and this process, with one git repo committed at a fixed date.
  */
 function world(name) {
-  const base = join(tmpdir(), `verify-hg-${name}`);
+  const base = join(tmpdir(), `verify-hg-${name}-${process.pid}`);
   rmSync(base, { recursive: true, force: true });
   const harness = join(base, 'harness');
   const root = join(harness, 'journal');
