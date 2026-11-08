@@ -5,7 +5,7 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "ready",
-  "outcome": "An item becomes done in its own build PR: the PR's first commit sets status done (and done_on for an item naming a module), the verdict gate proves it before the merge, and no PR follows the merge. plan/README.md's How an item moves has four steps, with no done replan, and names the statuses draft, ready and done; a gate test keeps a build PR that sets done passing the freeze gate; the entry texts' line budget in test/docs.test.mjs drops to 226.",
+  "outcome": "An item becomes done in its own build PR: the PR's first commit sets status done (and done_on for an item naming a module), the verdict gate proves it before the merge, and no PR follows the merge. plan/README.md's How an item moves has four steps, with no done replan, and names the statuses draft, ready and done; a gate test keeps a build PR that sets done passing the freeze gate; the entry texts' line budget in test/docs.test.mjs drops to 226; docs/traps.md says CI checks out at depth 1.",
   "why": "Every item costs three PRs: the readying replan, the build and a done replan whose only content is a status flip and a ## Done paragraph saying what git and verify/<id>/ already say. The done status repeats the verdict, a thread that forgets the done replan leaves main saying an item is open, and each done replan is one more CI wait and merge (L-proof-source, L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-4.md).",
   "serves": [
     "L-proof-source",
@@ -48,6 +48,10 @@
     {
       "ref": "test/docs.test.mjs",
       "what": "BUDGET is 226"
+    },
+    {
+      "ref": "docs/traps.md",
+      "what": "The shallow-clone trap says ci.yml checks out at depth 1, as it does, instead of full history"
     }
   ],
   "expect": [
