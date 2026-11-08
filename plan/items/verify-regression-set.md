@@ -198,11 +198,17 @@ unchanged. No other line moves.
 
 ## Regression table
 
-One row per test file the 34 done folders held at the base, then one row per folder for its other files. `moved` and
+One row per test file the 36 done folders held at the base, then one row per folder for its other files. `moved` and
 `split` name the file under `test/regression/` that holds the moved tests.
 
 | Test file | Verdict | Moved to | Reason |
 |---|---|---|---|
+| `verify/after-verdict-gaps/after-verdict-steps.test.mjs` | left |  | matched plan/README.md's How an item moves and docs/gates.md text with regexes |
+| `verify/after-verdict-gaps/flake-trap.test.mjs` | left |  | matched docs/traps.md text with regexes |
+| `verify/after-verdict-gaps/fresh-merger.test.mjs` | left |  | graded a recorded fresh session's answer under verify/ and matched the cited files' text with regexes |
+| `verify/after-verdict-gaps/released-named-once.test.mjs` | split | `test/regression/plugin/release-reason.test.mjs` | moved: runs release.mjs's plan() on a temp repo with a release and no released change after it and asserts the reason names every RELEASED path; left: one test matched plugins/harness/README.md text with regexes |
+| `verify/after-verdict-gaps/suite-and-scope.test.mjs` | split | `test/regression/plan/real-plan.test.mjs` | moved: runs the plan check on the repo's plan; left: the scope test read its own PR's file list, and one ran test/docs.test.mjs, which npm test runs itself |
+| `verify/after-verdict-gaps/terms-defined.test.mjs` | left |  | matched docs/language.md rows with regexes |
 | `verify/clean-room-install-test/clean-room.test.mjs` | moved | `test/regression/plugin/clean-room.test.mjs` | runs the clean room on a temp repo of the head's tree, whole and with a plugin file deleted, and asserts its steps and self-check line |
 | `verify/comments-present-tense/readme.test.mjs` | left |  | matched packages/engine's README, src/index.js and bin/host.js text with regexes |
 | `verify/comments-present-tense/strip.test.mjs` | left |  | tested the verifier's own comment scanner, strip.mjs in the same folder, not harness code |
@@ -219,6 +225,8 @@ One row per test file the 34 done folders held at the base, then one row per fol
 | `verify/evidence-gate-edges/plan-passes.test.mjs` | split | `test/regression/plan/real-plan.test.mjs` | moved: runs the plan check on the repo's plan; left: the scope test read its own PR's file list |
 | `verify/evidence-gate-edges/rules-written.test.mjs` | left |  | matched docs/gates.md, plan/README.md and docs/language.md text with regexes and counted their lines (the line budget is held by test/docs.test.mjs) |
 | `verify/evidence-gate-edges/tests-bite.test.mjs` | moved | `test/regression/gates/evidence-links-listings.test.mjs` | runs the gate tests on a temp copy of scripts/ with the mode and listing rules broken, red each time, green restored |
+| `verify/finish-ms-transcript-fixture/reads-fixture.test.mjs` | left |  | ran finish-ms.test.mjs in a clone of a pinned commit, which asserts what that commit did, and scanned the tree's text for a path with a regex; plugins/harness/test/finish-ms.test.mjs holds the 4944 test itself |
+| `verify/finish-ms-transcript-fixture/scope.test.mjs` | left |  | read its own PR's file list between two pinned commits |
 | `verify/fix-budget-rule/backfill-true.test.mjs` | left |  | asserted what the repo's plan files and their git history hold (each done fix's module and first done date), running no plan check or script |
 | `verify/fix-budget-rule/budget-refuses.test.mjs` | moved | `test/regression/plan/fix-budget.test.mjs` | runs the plan check on temp plan copies with done fixes inside and outside the 14 days and design items before and after them |
 | `verify/fix-budget-rule/names-module.test.mjs` | moved | `test/regression/plan/fix-budget.test.mjs` | runs the plan check on temp plan copies with a missing module, a made module and done items with and without done_on |
@@ -336,6 +344,7 @@ One row per test file the 34 done folders held at the base, then one row per fol
 
 | Folder | Other files |
 |---|---|
+| `after-verdict-gaps` | `lib.mjs` deleted; 7 evidence files deleted |
 | `clean-room-install-test` | none: the folder held only its test file |
 | `comments-present-tense` | `compare.mjs`, `strip.mjs` deleted; 3 evidence files deleted |
 | `done-with-the-build` | `lib.mjs` inlined into the moved file and deleted; 7 evidence files deleted |
@@ -343,6 +352,7 @@ One row per test file the 34 done folders held at the base, then one row per fol
 | `env-bootstrap` | none: the folder held only its test file |
 | `evidence-gate-edges` | `lib.mjs` inlined into the moved file and deleted; 7 evidence files deleted |
 | `first-real-issue` | 11 evidence files deleted |
+| `finish-ms-transcript-fixture` | `lib.mjs` deleted; 3 evidence files deleted |
 | `fix-budget-rule` | `lib.mjs` inlined into the moved file and deleted; 1 evidence file deleted |
 | `fix-event-close-tag` | `wake-lib.mjs` inlined into the moved file and deleted; 5 evidence files deleted |
 | `fix-trace-writes-clone-cwd` | `lib.mjs` inlined into the moved file and deleted; 4 evidence files deleted |

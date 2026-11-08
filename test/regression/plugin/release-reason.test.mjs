@@ -1,28 +1,15 @@
-// Expect released-named-once: plugins/harness/README.md's Releases names RELEASED and no longer lists the released
-// paths; on a temp repo where a release exists and nothing released changed after it, plan() returns a reason naming
-// every path RELEASED includes. The temp repo is made with the container's signing off (docs/traps.md).
-import test from 'node:test';
+// Expect: after-verdict-gaps/released-named-once
+// On a temp repo where a release exists and nothing released changed after it, plan() refuses a release with a reason
+// naming every path RELEASED includes. The temp repo is made with the container's signing off (docs/traps.md).
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { REPO, flat, read, section } from './lib.mjs';
+import test from 'node:test';
+import { RELEASED, plan } from '../../../scripts/release/release.mjs';
 
-const { RELEASED, plan } = await import(pathToFileURL(join(REPO, 'scripts/release/release.mjs')).href);
 const included = RELEASED.filter((p) => !p.startsWith(':'));
-
-test("plugins/harness/README.md's Releases names RELEASED for what makes a release, and lists no released path", (t) => {
-  const all = flat(section(read('plugins/harness/README.md'), 'Releases'));
-  // What makes a release is said before the thread that merged pushes it; later lines say where the copy bundles
-  // packages, which is not a list of what is released.
-  const releases = all.slice(0, all.indexOf('The thread that merged'));
-  t.diagnostic(releases);
-  assert.ok(releases.length > 40, all);
-  assert.match(releases, /`RELEASED`/);
-  for (const p of included) assert.ok(!releases.includes(`\`${p}`), `Releases still lists ${p}`);
-});
 
 test('plan() on a temp repo with a release and no released change after it names every included path', (t) => {
   const dir = mkdtempSync(join(tmpdir(), 'avg-release-'));

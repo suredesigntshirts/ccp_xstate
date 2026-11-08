@@ -1,4 +1,4 @@
-// Expect: verdict-cutoff-at-verified-sha/plan-passes, evidence-gate-edges/plan-passes, verify-evidence-policy/plan-passes, verification-contract/plan-and-suite-pass, plan-reader-effort/plan-and-suite-pass, rules-said-once/suite-and-scope, verifier-reader-gaps/suite-and-scope, map-once-traps-written/suite-and-scope, fresh-reader-gaps/suite-and-scope, rule-text-tests/suite-and-scope, item-writer-gaps/suite-and-scope
+// Expect: verdict-cutoff-at-verified-sha/plan-passes, evidence-gate-edges/plan-passes, verify-evidence-policy/plan-passes, verification-contract/plan-and-suite-pass, plan-reader-effort/plan-and-suite-pass, rules-said-once/suite-and-scope, verifier-reader-gaps/suite-and-scope, map-once-traps-written/suite-and-scope, fresh-reader-gaps/suite-and-scope, rule-text-tests/suite-and-scope, item-writer-gaps/suite-and-scope, after-verdict-gaps/suite-and-scope
 // The plan check passes on the repo's own plan.
 import test from 'node:test';
 import assert from 'node:assert/strict';
