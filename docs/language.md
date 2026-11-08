@@ -18,6 +18,7 @@ How the work on the harness itself is planned and proved.
 | Expect line | One check the outcome must pass, with its proof (`world`, `verifier` or `builder`) | `plan/item.schema.json` `expect` |
 | verdict | The verifier's MET or NOT MET for every Expect line of an item, at one sha | `verify/<item>/verdict.json`, `scripts/gates/lib.mjs` |
 | plan verifier | The separate session that writes an item's tests under `verify/<item>/` and its verdict; not the `verify` model stage | `verify/<item>/`, `docs/gates.md` |
+| evidence file | What a plan verifier commits for one Expect line: the command, the excerpt and the inputs to run it again; never a listing or a capture | `verify/<item>/evidence/`, `scripts/gates/lib.mjs` `checkEvidence` |
 | observation | A plan verifier's judged note on a verdict (a naming concern, a design smell, a doc gap); it never gates | `scripts/gates/lib.mjs` `checkVerdict`, `docs/gates.md` |
 | contract change | The one replan a doing item's head and Verifier brief may have, before its verdict file exists, written up under `## Contract change` | `plan/item.schema.json` `contract_changes`, `plan/check.mjs` |
 | regression set | The behavioural tests of done items, kept by area under test/regression with one helper; it is what a cleanup must keep passing | `plan/decisions/2026-11-08-verification-swing.md`, decision 4 |
