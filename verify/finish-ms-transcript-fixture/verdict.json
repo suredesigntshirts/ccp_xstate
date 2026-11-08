@@ -1,0 +1,35 @@
+{
+  "item": "finish-ms-transcript-fixture",
+  "verified_sha": "c21887e36730ee64dd83476fcd73fbb510c5889c",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FPT2js6867AJTbr88",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "reads-fixture",
+      "status": "MET",
+      "command": "node --test verify/finish-ms-transcript-fixture/reads-fixture.test.mjs (depth-1 clone of the head in a temp folder, verify/probe-plugin-agents-thread/evidence/ deleted, node --test plugins/harness/test/finish-ms.test.mjs there; then a search of plugins/, packages/, scripts/, test/); evidence/reads-fixture.md",
+      "excerpt": "2/2 pass. The child exits 0, fail 0, 'ok 7 - the verifier transcript of probe-plugin-agents-thread gives its real 4944' among the passes, body still asserting ms(path) 4944 on the fixture path. No file in the four folders names a path under verify/probe-plugin-agents-thread. With the file as at 90aafe8a the same run fails test 7.",
+      "test": "verify/finish-ms-transcript-fixture/reads-fixture.test.mjs"
+    },
+    {
+      "id": "scope",
+      "status": "MET",
+      "command": "node --test verify/finish-ms-transcript-fixture/scope.test.mjs (git diff --name-only 7a1190f1..c21887e3 in a temp bare repo); evidence/scope.md",
+      "excerpt": "1/1 pass: exactly plan/items/finish-ms-transcript-fixture.md and plugins/harness/test/finish-ms.test.mjs.",
+      "test": "verify/finish-ms-transcript-fixture/scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #269; evidence/ci.md",
+      "excerpt": "At c21887e36730ee64dd83476fcd73fbb510c5889c: test job 128766263482 success, clean-room success; gates job 128766263870 failed only for 'no verify/finish-ms-transcript-fixture/verdict.json at the head sha', and reruns on this commit, which changes only verify/finish-ms-transcript-fixture/."
+    }
+  ],
+  "observations": [
+    "The test's name still says 'probe-plugin-agents-thread', as the item asks; it now names where the transcript came from, not a path.",
+    "test/regression/fixtures/agent-transcript.jsonl and test/regression/plugin/agent-finish-ms.test.mjs's comment name the probe item in text, never as a path, so the regression set can delete that evidence folder without touching them.",
+    "The verifier's suite fetches the head and base at depth 1 into a temp bare repo (from GitHub in ci's depth-1 checkout), so the checkout's .git is never written; it passed in a depth-1 clone with GitHub as origin and with a clean HOME."
+  ]
+}
