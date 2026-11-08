@@ -23,8 +23,8 @@
     {
       "id": "gate-wired",
       "status": "MET",
-      "command": "node --test verify/verify-evidence-policy/gate-wired.test.mjs on build/verify-evidence-policy with verdict and evidence committed; evidence/gate-wired.md",
-      "excerpt": "2/2 pass. verdict.yml gates job: step 'evidence under verify/ is small and is not a test listing', if: ${{ !cancelled() }}, run: node scripts/gates/pr-gate.mjs evidence, after the stubs and freeze steps. On the PR branch against its base: 'evidence gate passed', exit 0.",
+      "command": "node --test verify/verify-evidence-policy/gate-wired.test.mjs (reads verdict.yml; commits this item's verify/ folder onto a temp-repo base without it and runs pr-gate.mjs evidence; no history needed); by hand BASE_SHA=<merge-base> node scripts/gates/pr-gate.mjs evidence on the PR branch; evidence/gate-wired.md",
+      "excerpt": "2/2 pass, also in a depth-1 clone with no origin/main. verdict.yml gates job: step 'evidence under verify/ is small and is not a test listing', if: ${{ !cancelled() }}, run: node scripts/gates/pr-gate.mjs evidence, after the stubs and freeze steps. The 14 files under verify/verify-evidence-policy/, verdict included: 'evidence gate passed', exit 0; on the PR branch against its base, by hand and in the gates job: passed.",
       "test": "verify/verify-evidence-policy/gate-wired.test.mjs"
     },
     {
@@ -39,8 +39,8 @@
     {
       "id": "plan-passes",
       "status": "MET",
-      "command": "node --test verify/verify-evidence-policy/plan-passes.test.mjs (node plan/check.mjs; git diff --name-only <merge-base> HEAD); evidence/plan-passes.md",
-      "excerpt": "2/2 pass. '8 stages, 89 items (78 live), 89 ledger rows, 17 cases / plan ok'. Diff: the 8 output files, plan/items/verify-evidence-policy.md and verify/verify-evidence-policy/ only; no other item's verify/ folder.",
+      "command": "node --test verify/verify-evidence-policy/plan-passes.test.mjs (node plan/check.mjs; with PR_BRANCH=build/verify-evidence-policy and BASE_SHA, as the verdict job sets them, git diff --name-only <merge-base> HEAD; elsewhere, the outputs list and the files it names); evidence/plan-passes.md",
+      "excerpt": "2/2 pass in both modes. '8 stages, 89 items (78 live), 89 ledger rows, 17 cases / plan ok'. PR mode: 23 files, the 8 output files, plan/items/verify-evidence-policy.md and verify/verify-evidence-policy/ only; no other item's verify/ folder. Shallow mode (ci.yml, depth 1): outputs list equals the allowed files, all present.",
       "test": "verify/verify-evidence-policy/plan-passes.test.mjs"
     },
     {

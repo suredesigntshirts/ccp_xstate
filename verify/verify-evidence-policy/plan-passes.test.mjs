@@ -3,6 +3,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { REPO, node } from './lib.mjs';
 
 test('node plan/check.mjs passes at the head', (t) => {
@@ -17,14 +19,23 @@ const ALLOWED = ['scripts/gates/lib.mjs', 'scripts/gates/pr-gate.mjs', '.github/
   'docs/gates.md', 'docs/language.md', 'scripts/gates/test/lib.test.mjs', 'scripts/gates/test/pr-gate.test.mjs',
   'plan/items/verify-evidence-policy.md'];
 
+// The diff is read only where this PR is the one under test: the verdict workflow sets PR_BRANCH and BASE_SHA and
+// fetches full history. Elsewhere (a shallow CI checkout, a later PR, main) the PR is gone, and the test checks what
+// holds at any head: the files the item names exist, and its outputs list exactly the allowed code files.
+const OWN_PR = process.env.PR_BRANCH === 'build/verify-evidence-policy' && process.env.BASE_SHA;
+
 test('the PR changes only its outputs, its plan item and its own verify/ folder', (t) => {
-  const base = process.env.BASE_SHA
-    ?? execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { cwd: REPO, encoding: 'utf8' }).trim();
-  const mb = execFileSync('git', ['merge-base', base, 'HEAD'], { cwd: REPO, encoding: 'utf8' }).trim();
-  const files = execFileSync('git', ['diff', '--name-only', mb, 'HEAD'], { cwd: REPO, encoding: 'utf8' })
-    .split('\n').filter(Boolean);
-  const stray = files.filter((f) => !ALLOWED.includes(f) && !f.startsWith('verify/verify-evidence-policy/'));
-  assert.deepEqual(stray, []);
-  assert.deepEqual(files.filter((f) => f.startsWith('verify/') && !f.startsWith('verify/verify-evidence-policy/')), []);
-  t.diagnostic(`${files.length} files: ${files.join(', ')}`);
+  if (OWN_PR) {
+    const git = (...a) => execFileSync('git', a, { cwd: REPO, encoding: 'utf8' }).trim();
+    const files = git('diff', '--name-only', git('merge-base', process.env.BASE_SHA, 'HEAD'), 'HEAD').split('\n').filter(Boolean);
+    const stray = files.filter((f) => !ALLOWED.includes(f) && !f.startsWith('verify/verify-evidence-policy/'));
+    assert.deepEqual(stray, []);
+    t.diagnostic(`${files.length} files: ${files.join(', ')}`);
+    return;
+  }
+  for (const f of ALLOWED) assert.ok(existsSync(join(REPO, f)), `${f} exists`);
+  const head = JSON.parse(readFileSync(join(REPO, 'plan/items/verify-evidence-policy.md'), 'utf8').match(/^```json\n([\s\S]*?)\n```/)[1]);
+  const outputs = head.outputs.flatMap((o) => o.ref.split(/,\s*/));
+  assert.deepEqual([...outputs].sort(), ALLOWED.filter((f) => !f.startsWith('plan/items/')).sort());
+  t.diagnostic('no PR under test here; the outputs list and the files exist');
 });

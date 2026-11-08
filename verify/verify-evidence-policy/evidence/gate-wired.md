@@ -11,3 +11,7 @@ verify/verify-evidence-policy/ (each under 8 KB) added. Also on GitHub: #197's g
 every step but verdict ("no verify/verify-evidence-policy/verdict.json at the head sha").
 
 Against main: 0 of 2 pass.
+
+The test needs no git history: it commits the 14 files of verify/verify-evidence-policy/ onto a temp-repo base that
+lacks them and runs the gate there, so it passes in ci.yml's depth-1 checkout (checked in a `git clone --depth 1`
+with no origin/main: 2/2).

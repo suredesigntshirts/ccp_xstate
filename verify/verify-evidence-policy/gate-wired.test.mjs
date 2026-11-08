@@ -1,9 +1,10 @@
 // Expect gate-wired: the verdict workflow runs the evidence gate as a step that runs after an earlier failure, and
-// the gate passes on this PR's own branch, verdict and evidence included.
+// the gate passes this PR's own verify/ folder, verdict and evidence included.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import { REPO, node, read } from './lib.mjs';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { REPO, gateRepo, read } from './lib.mjs';
 
 test('verdict.yml gates job has a step running pr-gate.mjs evidence with if: !cancelled()', () => {
   const yml = read('.github/workflows/verdict.yml');
@@ -15,18 +16,18 @@ test('verdict.yml gates job has a step running pr-gate.mjs evidence with if: !ca
   assert.ok(first >= 0 && first < i, 'an earlier gate step exists, so the condition matters');
 });
 
-// The PR's base: BASE_SHA when the verdict workflow runs this, else where the checkout leaves origin/main.
-function prBase() {
-  if (process.env.BASE_SHA) return process.env.BASE_SHA;
-  return execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { cwd: REPO, encoding: 'utf8' }).trim();
-}
-
-test('the evidence gate passes on this PR at its head, against its base', (t) => {
-  const base = prBase();
-  const added = execFileSync('git', ['diff', '--name-only', '--diff-filter=d', base, 'HEAD', '--', 'verify/'],
-    { cwd: REPO, encoding: 'utf8' }).split('\n').filter(Boolean);
-  const out = node(['scripts/gates/pr-gate.mjs', 'evidence'], { cwd: REPO, env: { BASE_SHA: base, HEAD_SHA: '' } });
+// The PR's own files under verify/, committed onto a base without them in a temp repo: needs no history, so it holds
+// in a shallow CI checkout and on any later head.
+test('the evidence gate passes this item\'s own verify/ folder, verdict and evidence included', (t) => {
+  const own = 'verify/verify-evidence-policy';
+  const files = readdirSync(join(REPO, own), { recursive: true, withFileTypes: true }).filter((d) => d.isFile())
+    .map((d) => join(d.parentPath ?? d.path, d.name).slice(REPO.length + 1));
+  assert.ok(files.includes(`${own}/verdict.json`), 'the verdict is in the folder');
+  const r = gateRepo(t);
+  r.branch('build/verify-evidence-policy');
+  r.commit(Object.fromEntries(files.map((f) => [f, readFileSync(join(REPO, f))])), 'the verifier folder');
+  const out = r.evidence();
   assert.equal(out.status, 0, out.out);
   assert.match(out.out, /evidence gate passed/);
-  t.diagnostic(`base ${base}; files under verify/ the PR adds or changes: ${added.length}; ${out.out.trim()}`);
+  t.diagnostic(`${files.length} files under ${own}/: ${out.out.trim()}`);
 });
