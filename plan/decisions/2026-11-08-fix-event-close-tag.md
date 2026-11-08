@@ -36,3 +36,12 @@ with no `kind` still offers nothing, since it has no type to journal under.
 The fix lands in `packages/engine/src/wake.js` (the item's `module`), with one check in `host.js`. It touches no file
 the parallel items own (scripts/gates, plan/check.mjs, marks.js, spec.js, the setup and capture tests). It changes
 engine code the plugin ships, so the build is released after it merges.
+
+## 4. The build PR sets the status to ready
+
+This is the first fix item whose contract names a `module`. Three test helpers (`test/plan-check.test.mjs`, and the
+plan copies in `verify/verification-contract/` and `verify/fix-budget-rule/`) copy `plan/` alone and run the plan check
+there, so a ready fix item's module is missing from the copy and the untouched plan fails. A test change needs an
+item, and a readying replan touches only `plan/`. So this replan writes the whole contract and leaves the status at
+draft (nothing checks a draft's module), and the build PR, which the freeze gate lets change `status`, sets it to ready
+beside the helper fix: each copy gets an empty file at every module a ready or doing item names.
