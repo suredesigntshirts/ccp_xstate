@@ -67,7 +67,8 @@ must raise it says why in its prose.
 ## 6. Which done-suite tests leave
 
 `verify/repo-skeleton/claude-md.test.mjs`, `verify/verification-contract/rules-written.test.mjs`,
-`verify/fix-budget-rule/rule-written.test.mjs`, and the `claude-md` test in `verify/harness-glossary/notes.test.mjs`.
-Each matches sentences of the rule texts and would fail on any rewrite. They are on `verify-regression-set`'s and
-`verify-regression-plugin`'s known-deletion lists already; this item removes them first, and those items' tables
-mark them gone.
+`verify/fix-budget-rule/rule-written.test.mjs`, the `claude-md` test in `verify/harness-glossary/notes.test.mjs`, and
+the `plan/README.md` test in `verify/verify-evidence-policy/policy-written.test.mjs` (its `docs/gates.md` test stays,
+since that file is the evidence policy's home). Each matches sentences of the rule texts and would fail on any
+rewrite. They are on `verify-regression-set`'s and `verify-regression-plugin`'s known-deletion lists already; this
+item removes them first, and those items' tables mark them gone.

@@ -30,7 +30,7 @@
       "what": "namedItem and its callers, and the gate tests that pass a branch to name an item"
     },
     {
-      "ref": "verify/repo-skeleton/claude-md.test.mjs, verify/verification-contract/rules-written.test.mjs, verify/fix-budget-rule/rule-written.test.mjs, verify/harness-glossary/notes.test.mjs",
+      "ref": "verify/repo-skeleton/claude-md.test.mjs, verify/verification-contract/rules-written.test.mjs, verify/fix-budget-rule/rule-written.test.mjs, verify/harness-glossary/notes.test.mjs, verify/verify-evidence-policy/policy-written.test.mjs",
       "what": "The done-suite tests that match the rule texts' wording, which leave with that wording"
     }
   ],
@@ -60,8 +60,8 @@
       "what": "Fails when a repo path named in backticks in CLAUDE.md, plan/README.md or a file under docs/ does not exist (placeholders with <...> skipped), or when CLAUDE.md, plan/README.md and docs/gates.md together have 230 lines or more"
     },
     {
-      "ref": "verify/repo-skeleton/claude-md.test.mjs, verify/verification-contract/rules-written.test.mjs, verify/fix-budget-rule/rule-written.test.mjs, verify/harness-glossary/notes.test.mjs",
-      "what": "The first three files are deleted; in the fourth only the claude-md test leaves; test/docs.test.mjs carries the path and length checks they made"
+      "ref": "verify/repo-skeleton/claude-md.test.mjs, verify/verification-contract/rules-written.test.mjs, verify/fix-budget-rule/rule-written.test.mjs, verify/harness-glossary/notes.test.mjs, verify/verify-evidence-policy/policy-written.test.mjs",
+      "what": "The first three files are deleted; in notes.test.mjs only the claude-md test leaves, and in policy-written.test.mjs only the test of plan/README.md's wording (docs/gates.md stays the evidence policy's home and its test stays); test/docs.test.mjs carries the path and length checks they made"
     }
   ],
   "expect": [
@@ -97,7 +97,7 @@
     },
     {
       "id": "suite-and-scope",
-      "check": "node plan/check.mjs and npm test pass at the head; the PR changes only the files the outputs name; the only verify/ changes are the three deletions and the one test removed from verify/harness-glossary/notes.test.mjs",
+      "check": "node plan/check.mjs and npm test pass at the head; the PR changes only the files the outputs name; the only verify/ changes are the three deletions, the claude-md test removed from verify/harness-glossary/notes.test.mjs and the plan/README.md test removed from verify/verify-evidence-policy/policy-written.test.mjs",
       "how": "The verifier runs both at the head and reads the diff's file list",
       "proof": "verifier"
     },
@@ -163,7 +163,7 @@ The homes: `CLAUDE.md` is the map and the principles, each a line with a pointer
 (the item head, splicing, status, the fix budget) and the item path, with the rules of "How slop is kept out" in a
 sentence each. `docs/gates.md` is how the gates check those rules: the verdict file, the freeze, sessions, the release.
 
-The four tests that leave matched sentences of these files by regex; they pinned wording, not behaviour, and would
+The tests that leave matched sentences of these files by regex; they pinned wording, not behaviour, and would
 fail on any rewrite. What they protected that matters (`CLAUDE.md` is short and its paths are real) moves into
 `test/docs.test.mjs`, widened to `plan/README.md` and `docs/`, with a line budget for the three entry texts.
 
