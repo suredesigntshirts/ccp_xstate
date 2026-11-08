@@ -40,7 +40,8 @@ Every commit ends with a `Claude-Session:` trailer (`docs/gates.md`, "Sessions")
 ## How an item is written
 
 An item file is a fenced `json` head following `item.schema.json`, then prose: the reasoning, the options considered
-and a `## Verifier brief`. The head is the contract; `check.mjs` refuses a `ready` item that leaves a field open.
+and a `## Verifier brief`, which adds only what the Expect lines' `how` fields leave out (setup, traps, what not to
+read). The head is the contract; `check.mjs` refuses a `ready` item that leaves a field open.
 
 | Field | Question it answers | Why v1 taught us to ask |
 |---|---|---|
@@ -51,11 +52,10 @@ and a `## Verifier brief`. The head is the contract; `check.mjs` refuses a `read
 | `concepts`, `non_goals` | How much does it add, and what won't it do? | 141 guards grew one reasonable check at a time |
 | `records` | What does it log, so we can see it working? | v1 salvaged its own history after the fact |
 | `person_prereqs` | What must the person do before the thread starts? | A thread can't add its own allow rules |
-| `step_back` | When does it stop retrying and replan? | PR #72 ran 5 rounds before anyone stepped back |
+| `step_back` | When does it stop retrying and replan? Two rounds unless `max_rounds` says otherwise | PR #72 ran 5 rounds before anyone stepped back |
 | `module`, `done_on` | Which module does a fix change, and when was it done? | Seven fixes in two days changed `actors.js` before anyone looked at its shape |
 | `reader_effort` | What did the build cost its reader? | The cleanups passed every gate while the harness grew |
 | `contract_changes` | Did the contract move once the build started, and why? | A build that found a better shape could not take it |
-| `verifier` | Who checks it, from what brief? | Self-approval is a verification gap, not a judgment call |
 
 ## How slop is kept out
 
