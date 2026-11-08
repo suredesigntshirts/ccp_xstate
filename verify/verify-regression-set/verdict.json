@@ -1,0 +1,74 @@
+{
+  "item": "verify-regression-set",
+  "verified_sha": "be4c72126ebb668b9a80272f388d26d93d55e232",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FQ3yuuNjMNzurkkkR"
+  },
+  "results": [
+    {
+      "id": "table-complete",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-set/table.test.mjs",
+      "excerpt": "87 done folders at dcb4c7ef, 36 with tests; 138 rows: 53 moved, 30 split, 55 left; every destination exists under one of the eight areas; 3 pass",
+      "test": "verify/verify-regression-set/table.test.mjs"
+    },
+    {
+      "id": "folders-hold-verdicts",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-set/folders.test.mjs",
+      "excerpt": "87 folders hold verdict.json alone, each naming its folder; folders holding tests: verify-regression-set; 3 pass",
+      "test": "verify/verify-regression-set/folders.test.mjs"
+    },
+    {
+      "id": "moved-pass",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-set/moved-pass.test.mjs",
+      "excerpt": "as is: 76 files at once, 666 tests pass, fewest in one file 1; no Playwright: 76 files at once, 656 tests pass, fewest 1; every header names an Expect id its item has; no file reads the checkout's verify/; 6 pass",
+      "test": "verify/verify-regression-set/moved-pass.test.mjs"
+    },
+    {
+      "id": "one-helper",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-set/one-helper.test.mjs",
+      "excerpt": "lib.mjs is the only non-test code file; 17 exports; fewest importers 2; 3 pass",
+      "test": "verify/verify-regression-set/one-helper.test.mjs"
+    },
+    {
+      "id": "moved-bite",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-set/bite.test.mjs",
+      "excerpt": "plan: status doing back in the schema, no-doing-status 2 red, restored 10 pass; gates: checkCutoff sees no move, verdict-cutoff 5 red, restored 18 pass; engine: wake.js closes at any </event>, event-close-tag 7 red, restored 20 pass",
+      "test": "verify/verify-regression-set/bite.test.mjs"
+    },
+    {
+      "id": "left-reasons-hold",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-set/left-reasons.test.mjs",
+      "excerpt": "every left file and split row has a case, every test of a whole-file left row has one, and each case holds its kind at base dcb4c7e; the control refuses a moved plan-check test; 107 pass",
+      "test": "verify/verify-regression-set/left-reasons.test.mjs"
+    },
+    {
+      "id": "scope",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-set/scope.test.mjs",
+      "excerpt": "outside the retired folders, test/regression/ and the item only docs/traps.md changes, dropping two example names of deleted test files; nothing under packages/, plugins/, workflows/, scripts/ or bench/; 3 pass",
+      "test": "verify/verify-regression-set/scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #267 at be4c72126ebb668b9a80272f388d26d93d55e232",
+      "excerpt": "at be4c72126ebb668b9a80272f388d26d93d55e232: ci test success (job 128773781271); gates failed only for the missing verdict.json (job 128773781004) and run again on this verdict commit"
+    }
+  ],
+  "observations": [
+    "verify/fix-trace-writes-clone-cwd/child-after-return.test.mjs is marked split with a left half (the base test ran the base commit's writesUnder), but at the base that file held only two head tests, both moved to test/regression/plugin/trace-writes-clone.test.mjs; the row should read moved. The base-commit test it describes is in child-before-return.test.mjs.",
+    "verify/verify-evidence-policy/gate-wired.test.mjs's second test drove the evidence gate on the item's own verify/ folder and asserted it passed, which by the letter is a driving test. I count it as a retired path: its input was that folder's evidence, which this item must delete, and the gate's pass on regular small files is still held by test/regression/gates/evidence-size.test.mjs's green runs.",
+    "verify/comments-present-tense/strip.test.mjs tested the verifier's own strip.mjs, which is none of the item's listed leave kinds by name, but it ran no harness code, so it does not fail the line.",
+    "Left halves that ran an earlier commit's code (fix-trace-writes-clone-cwd base, test-fixture-edges via to-base.diff, finish-ms-transcript-fixture's pinned-commit clone) assert what that commit did, not the head; I count them as retired paths.",
+    "Parts 1 and 2's moved-pass left as held by npm test. npm test holds the passes, but ci's lack of Playwright is the only thing that keeps holding the without-Playwright run once this suite retires.",
+    "Under the all-at-once load, test/regression/plugin/person-attention.test.mjs's 'rows: replaying the same wake does not double count a message in the view' went red once at ed38ae1 and was green alone and in both later runs (ed38ae1, be4c721). It may be a load flake in the capture hook's de-duplication; not a fail here.",
+    "This suite's moved-pass runs every regression file at once, twice, about 13 minutes here, inside npm test and the verdict gate. Once this item is done its folder should retire too, as the series intends.",
+    "The Regression table intro says 36 done folders; that is the count of done folders holding test files at the base. The base has 87 done folders in all, and at the head every one holds verdict.json alone."
+  ]
+}
