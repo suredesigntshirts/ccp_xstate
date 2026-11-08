@@ -4,7 +4,8 @@
   "title": "Refuse a verdict whose item contract moved after the verified sha",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "doing",
+  "status": "done",
+  "done_on": "2026-11-08",
   "outcome": "The verdict gate refuses a verdict when the item's contract (head without status and done_on, and Verifier brief) at verified_sha differs from the contract at the PR head, naming the item and the fields that moved; and the freeze gate refuses a PR that changes a set done_on unless it is a plan-only replan whose item gains or rewrites a ## Done on change section saying why.",
   "why": "The freeze's verdict-file cutoff sees only a PR's base and head, so a replan from main can reword a doing item's checks while its verdict lives on the build branch, and merging main back in keeps the old verdict valid against the new head; done_on left the frozen contract so done replans pass, which lets any PR move the fix budget's window (plan/decisions/2026-11-08-verification-contract-build.md).",
   "serves": [
@@ -126,7 +127,28 @@
   "verifier": "A separate session, not the builder's and not a subagent of it, using the Verifier brief below.",
   "risks": [
     "A build branch that merged main after its verdict, where main's replan changed only another item, must still pass: the comparison reads this item's file alone"
-  ]
+  ],
+  "reader_effort": {
+    "pr": 223,
+    "files": 21,
+    "exports_added": 3,
+    "exports_removed": 0,
+    "reader_lines": 995,
+    "added": {
+      "code": 59,
+      "tests": 72,
+      "verifier": 348,
+      "evidence": 147,
+      "docs": 11
+    },
+    "removed": {
+      "code": 6,
+      "tests": 1,
+      "verifier": 0,
+      "evidence": 0,
+      "docs": 11
+    }
+  }
 }
 ```
 
@@ -144,6 +166,20 @@ move a set `done_on`, which feeds the fix budget's 14-day window. The freeze gat
 by a plan-only replan whose item says why under `## Done on change`.
 
 The stand-in choices are in `plan/decisions/2026-11-08-verdict-cutoff.md`.
+
+## Done
+
+Readied by replan #219 and built in PR #223 (merged e9ed7db). A separate session verified it at 5005dda: all seven
+Expect lines MET, each verifier and builder line naming its test under `verify/verdict-cutoff-at-verified-sha/`, the
+world check a throwaway PR (#226) whose verdict step named the item and `expect` as the field that moved. Merging main
+in afterwards conflicted with `plan-reader-effort` in `scripts/gates/lib.mjs` (both keep fields out of the contract;
+the merge keeps `reader_effort` out too) and in `docs/gates.md`, which was trimmed so the three entry texts stay under
+their 230-line budget (main had reached 230). No plugin or engine code changed, so there is no release.
+
+From the verifier's observations: the cutoff compares the whole head but `status`, `done_on` and `reader_effort`, so a
+replan from main that only adds an input or a risk to a doing item also needs a fresh verdict once merged into the
+build branch; and a second move of a set `done_on` must rewrite its `## Done on change` section, not keep the old one.
+The throwaway branch `throwaway/verdict-cutoff-world` is left for the person to delete.
 
 ## Verifier brief
 
