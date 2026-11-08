@@ -113,13 +113,14 @@ test('a ready Expect check that pins main is refused, naming the item, the Expec
   }
 });
 
-test('a sha of seven or more hex digits is refused; a check that names a repo path is not', () => {
+test('a sha of seven or more hex digits is refused; a repo path or a word of hex letters alone is not', () => {
   for (const sha of ['a575897', '6995413269700494239890eb87c8a33e42a426c3']) {
     const r = check([expecting('pinner', 'ready', `The suite passes at ${sha} and at the head`)]);
     assert.equal(r.code, 1, sha);
     assert.ok(r.out.includes(`pinner.md: Expect pins pins main with the sha ${sha}`), r.out);
   }
   assert.equal(check([expecting('reader', 'ready', 'plan/README.md states the rule; scripts/gates/lib.mjs refuses a 6-digit count of 123456')]).code, 0);
+  assert.equal(check([expecting('worded', 'ready', 'A defaced or effaced page is refused, and a deadbeef marker too')]).code, 0);
 });
 
 test('draft and done items keep their wording', () => {

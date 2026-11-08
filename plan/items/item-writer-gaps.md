@@ -4,7 +4,7 @@
   "title": "Close the gaps a fresh reader found in writing a ready item",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A thread writing a new item learns from plan/README.md that the plan check names any field of the schema's readyRequired a ready item leaves open, and that depends_on never points at a later stage; the field table no longer lists reader_effort, which no item writes; CLAUDE.md names the four steps as leading to done rather than starting at ready; and the plan check's sha rule refuses a run of seven or more hex digits only when it holds a digit, so a word such as defaced passes; the three entry texts stay under the 225-line budget.",
   "why": "A fresh headless session asked to turn a one-line idea into a ready item (8 Nov, at main 1c0c9cdd) found which fields a ready item needs only by reading check.mjs, found the later-stage rule only in code, read the reader_effort row as a field to fill, read CLAUDE.md's four steps as starting at ready, and found that the sha rule refuses ordinary words made of the letters a to f (L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-9.md).",
   "serves": [
