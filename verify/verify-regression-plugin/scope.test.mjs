@@ -5,7 +5,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { BASE, ITEM, SUITES, VERIFIED, git, haveCommits, show } from './lib.mjs';
 
-const inScope = (p) => p.startsWith('test/regression/') || p === ITEM || SUITES.some((s) => p.startsWith(`verify/${s}/`));
+// The verifier's own folder is its commits, not the build's.
+const inScope = (p) => p.startsWith('test/regression/') || p === ITEM || p.startsWith('verify/verify-regression-plugin/') || SUITES.some((s) => p.startsWith(`verify/${s}/`));
 
 /** [status, from, to] per changed path, renames found. */
 const changes = () => git(['diff', '-M', '--name-status', BASE, VERIFIED]).split('\n').filter(Boolean).map((l) => l.split('\t'));
