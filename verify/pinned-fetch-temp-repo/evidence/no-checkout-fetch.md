@@ -24,3 +24,8 @@ Result: ok 1, exit 0.
 The fresh clone's .git/shallow listed only 6ff276e3, and still did after each head suite, with no test skipped. With
 the four files put back as they are at 2178cc6c, the same suites fetched eight pinned commits into the clone's
 .git/shallow. Earlier runs at 3f18736f and c761824b gave the same head result.
+
+The run above, unloaded and with every file in, is from the first verdict commit fce872b. In ci, npm test ran this
+test beside every other suite, and verify/test-fixture-edges/p95-over-bare.test.mjs failed its timing bar there
+(94 ms against a 41 ms bare start, job 128747895201) while every fetch-reading test passed. The test now leaves the
+start-timing files (p95-over-bare, moved-pass) out of its suite runs, as parallel-green does.

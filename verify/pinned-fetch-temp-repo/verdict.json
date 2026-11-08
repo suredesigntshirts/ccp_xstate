@@ -9,8 +9,8 @@
     {
       "id": "no-checkout-fetch",
       "status": "MET",
-      "command": "node --test verify/pinned-fetch-temp-repo/no-checkout-fetch.test.mjs (temp full bare origin with allowAnySHA1InWant, git clone --depth=1 file://, each suite in a child node --test with the PR variables removed); evidence/no-checkout-fetch.md",
-      "excerpt": "ok 1. At the head all four suites exit 0 with 0 skipped (5, 12, 10, 52 pass) and .git/shallow lists only 6ff276e3 after each. With the four files as they are at 2178cc6c, .git/shallow lists 9 shas.",
+      "command": "node --test verify/pinned-fetch-temp-repo/no-checkout-fetch.test.mjs (temp full bare origin with allowAnySHA1InWant, git clone --depth=1 file://, each suite in a child node --test with the PR variables removed and the start-timing files left out); evidence/no-checkout-fetch.md",
+      "excerpt": "ok 1. At the head all four suites exit 0 with 0 skipped (5, 12, 10, 52 pass; with the timing files left out 5, 12, 10, 48) and .git/shallow lists only 6ff276e3 after each. With the four files as they are at 2178cc6c, .git/shallow lists 9 shas.",
       "test": "verify/pinned-fetch-temp-repo/no-checkout-fetch.test.mjs"
     },
     {
@@ -46,6 +46,7 @@
     "The suites' children run with --test-concurrency=1. Per contract change #257, the start-timing files (p95-over-bare, moved-pass) are left out of the twelve-way run; with them in, p95-over-bare failed 1 of 2 runs at c761824b under load. They time process starts, not fetches.",
     "A first run at 3f18736f found a separate race: test/regression/run/lifecycle-store.test.mjs used fixed tmpdir paths, and copies running at once deleted each other's roots. #232's per-process paths, merged in at c761824b, cleared it.",
     "In a depth-1 checkout, origin() fetches the five pinned commits in full into a temp bare repo, borrowing actions/checkout's extraheader. The checkout stays shallow and gets no origin/main.",
-    "fix-trace-writes-clone-cwd's ensure(sha) now answers true only for its own BASE and HEAD. Its one caller passes only those, but a new caller with another sha would get false."
+    "fix-trace-writes-clone-cwd's ensure(sha) now answers true only for its own BASE and HEAD. Its one caller passes only those, but a new caller with another sha would get false.",
+    "no-checkout-fetch's test leaves the start-timing files (p95-over-bare, moved-pass) out of its suite runs, as parallel-green does. At fce872b, ci's npm test ran it beside every other suite, and p95-over-bare failed there (94 ms against a 41 ms bare start) while every fetch-reading test passed. Run unloaded at 6ff276e3 with every file in, the four suites passed (5, 12, 10, 52) and .git/shallow stayed at the head."
   ]
 }
