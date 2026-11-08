@@ -5,7 +5,7 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "ready",
-  "outcome": "An item becomes done in its own build PR: the PR's first commit sets status done (and done_on for an item naming a module), the verdict gate proves it before the merge, and no PR follows the merge. Reader effort is read, never stored: node scripts/reader-effort.mjs --item <id> finds the merge that made the item done and reports that PR, so plan/check.mjs no longer asks a done item for reader_effort. plan/README.md's How an item moves has four steps with no done replan; a gate test keeps a build PR that sets done passing the freeze gate; the entry texts' line budget in test/docs.test.mjs drops to 226.",
+  "outcome": "An item becomes done in its own build PR: the PR's first commit sets status done (and done_on for an item naming a module), the verdict gate proves it before the merge, and no PR follows the merge. Reader effort is read, never stored: node scripts/reader-effort.mjs --item <id> finds the merge that added verify/<id>/verdict.json, the item's build PR, and reports that PR, so plan/check.mjs no longer asks a done item for reader_effort. plan/README.md's How an item moves has four steps with no done replan; a gate test keeps a build PR that sets done passing the freeze gate; the entry texts' line budget in test/docs.test.mjs drops to 226.",
   "why": "Every item costs three PRs: the readying replan, the build, and a done replan whose content is a status flip, a ## Done paragraph saying what git and verify/<id>/ already say, and since plan-reader-effort the reader_effort numbers, which git can give at any time. The done status repeats the verdict, a stored derived number repeats git, and each done replan is one more CI wait and merge, or an item left open when a thread forgets it (L-proof-source, L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-4.md).",
   "serves": [
     "L-proof-source",
@@ -73,11 +73,11 @@
     },
     {
       "ref": "scripts/reader-effort.mjs",
-      "what": "--item <id>: the first merge on HEAD's first-parent line whose change sets plan/items/<id>.md's status to done is the item's PR; its report as for that PR, refusing an item no merge made done"
+      "what": "--item <id>: the first merge on HEAD's first-parent line that adds verify/<id>/verdict.json is the item's PR; its report as for that PR, refusing an item no merge added a verdict for"
     },
     {
       "ref": "scripts/reader-effort.test.mjs",
-      "what": "Builder tests for --item on a temp repo: the merge that set done is found; an item never made done is refused"
+      "what": "Builder tests for --item on a temp repo: the merge that added the verdict is found, not a later merge touching the item; an item with no verdict merged is refused"
     },
     {
       "ref": "scripts/gates/test/pr-gate.test.mjs",
@@ -94,6 +94,10 @@
     {
       "ref": "verify/plan-reader-effort/rules-written.test.mjs",
       "what": "The README done-step test leaves (there is no done step)"
+    },
+    {
+      "ref": "verify/item-head-trim/lib.mjs, verify/item-head-trim/tests-bite.test.mjs",
+      "what": "The plan copy also makes each module a ready or doing item names, as fix-event-close-tag did for the other plan-copy suites, so the suite passes while a ready item names a module"
     }
   ],
   "expect": [
@@ -105,7 +109,7 @@
     },
     {
       "id": "effort-by-item",
-      "check": "In a temp repo with two merged PRs, the second of which sets an item's status to done, node scripts/reader-effort.mjs --item <id> --json prints the same numbers as node scripts/reader-effort.mjs <that PR's number> --json, and for an item no merge made done it exits non-zero naming the item",
+      "check": "In a temp repo with three merged PRs, the second of which adds verify/<id>/verdict.json and the third of which changes the item file again, node scripts/reader-effort.mjs --item <id> --json prints the same numbers as node scripts/reader-effort.mjs <the second PR's number> --json, and for an item no merge added a verdict for it exits non-zero naming the item",
       "how": "The verifier's own test on a temp repo",
       "proof": "verifier"
     },
@@ -123,7 +127,7 @@
     },
     {
       "id": "tests-bite",
-      "check": "The new pr-gate test goes red when contract() in scripts/gates/lib.mjs is made to keep status, and the --item test goes red when --item reads the item's last change instead of the merge that set done; each green again when restored",
+      "check": "The new pr-gate test goes red when contract() in scripts/gates/lib.mjs is made to keep status, and the --item test goes red when --item takes the last merge touching the verdict file instead of the first that adds it; each green again when restored",
       "how": "The verifier breaks each and runs the test file",
       "proof": "builder"
     },
@@ -164,7 +168,8 @@
   "step_back": {
     "max_rounds": 2
   },
-  "verifier": "A separate session, using the Verifier brief below."
+  "verifier": "A separate session, using the Verifier brief below.",
+  "contract_changes": 1
 }
 ```
 
@@ -174,10 +179,21 @@ Round 4 of the refine rounds. Rounds 1 to 3 gave each rule one home and shortene
 round takes a step out of the process itself. Main never shows `doing`, because the build PR's first commit is the
 only place it is set, so main sees an item go from `ready` straight to `done` already. Setting `done` in that commit
 instead removes the PR that follows every merge. The one thing a done replan added that git could not already show
-was `reader_effort`, and it is computed from git: the item's PR is the merge that set it done, so the numbers are read
+was `reader_effort`, and it is computed from git: the item's PR is the merge that added its verdict, so the numbers are read
 on demand rather than pasted. The verdict gate is what makes the status true: a build PR whose item
 says `done` cannot merge without a complete verdict from another session. This item is the first built that way. The
 decisions are in `plan/decisions/2026-11-08-refine-round-4.md`.
+
+## Contract change
+
+The build first found an item's PR as the first merge that set its status to `done`. On the real plan that names
+the done replan for every item built before this rule (`--item plan-reader-effort` read #229, a two-file plan PR,
+instead of #212). The build PR is the one merge that adds `verify/<id>/verdict.json`, under both the old flow and
+this one, so `--item` reads that merge instead; `effort-by-item`, `tests-bite` and the two `reader-effort` outputs say so.
+
+While it built, `item-head-trim` (#230) and `fix-event-close-tag` (#213) merged side by side: the second readied an item
+naming a module and taught the other plan-copy suites to make such modules, and the first's new suite copies `plan/`
+alone, so main went red on it. The same two lines go into its helper here, named as an output.
 
 ## Verifier brief
 

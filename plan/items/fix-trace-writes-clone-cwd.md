@@ -4,8 +4,30 @@
   "title": "Give a traced child its parent's folder even when it is logged before its clone returns",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "draft",
+  "status": "done",
+  "done_on": "2026-11-08",
   "module": "scripts/debug/trace-writes.mjs",
+  "reader_effort": {
+    "pr": 227,
+    "files": 11,
+    "exports_added": 0,
+    "exports_removed": 0,
+    "reader_lines": 284,
+    "added": {
+      "code": 12,
+      "tests": 28,
+      "verifier": 132,
+      "evidence": 78,
+      "docs": 0
+    },
+    "removed": {
+      "code": 3,
+      "tests": 0,
+      "verifier": 0,
+      "evidence": 0,
+      "docs": 0
+    }
+  },
   "outcome": "writesUnder resolves a child process's relative paths against the folder it really started in (its parent's working directory at the clone) and the chdirs it made itself, in whatever order strace -f logs the parent's clone return and the child's own calls, so a child that chdirs and makes a relative write before the line that returns its pid is still reported at the right path.",
   "why": "ci on #202 at 1af034e went red once on verify/self-edit-check-snapshot/strace-kept.test.mjs, which missed the mkdir of <folder>/sub/made. writesUnder sets a child's folder from its parent's when the parent's `clone(...) = <pid>` line is read; under strace -f that line can come as <unfinished ...> / <... clone resumed> after the child's own chdir, and then it overwrites the folder the child set. A red that is the parser's ordering bug costs a thread a rerun and a look each time (L-attention-is-the-constraint), and a debugging aid that misnames where a write landed reports a wrong fact (L-facts-from-source).",
   "serves": [
@@ -109,6 +131,9 @@ scheduling rule, not a dependency) its build branches from main after #210 merge
 refuse any real `ready` fix item, because its `module` is not in the copy. The build PR sets it `ready` and makes
 those copies hold the live modules, as `fix-event-close-tag`'s build does; whichever merges second takes the other's
 helper change from main.
+
+**Done.** Built in #227, verified 4 of 4 at 82c8611 (verdict b37d611). The build left the head alone (the freeze gate
+refuses a build PR that changes its own item's head once a verdict exists), so the status went from draft to done here.
 
 ## Verifier brief
 

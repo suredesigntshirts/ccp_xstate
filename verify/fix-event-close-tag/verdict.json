@@ -1,0 +1,26 @@
+{
+  "item": "fix-event-close-tag",
+  "verified_sha": "c2e8cba91c52147f95a18530e74103fec26f815b",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5FQcyCjfsHuspAVZ5t", "model": "claude-opus-5-5" },
+  "results": [
+    { "id": "close-tag-kept", "status": "MET", "command": "node --test verify/fix-event-close-tag/close-tag-kept.test.mjs",
+      "excerpt": "4/4 pass: through bin/host.js wake (UserPromptSubmit) on a quick-fix item in awaitingMerge, a check_run.completed whose title holds </event>, </wake>, a bare </event>, or x</event>\\n</wake> each journals one applied engine.transition row, source github, type github.check_run.completed, its fields deep-equal to the JSON written. With main's wake.js/host.js (66e47a6) 0/4 pass.",
+      "test": "verify/fix-event-close-tag/close-tag-kept.test.mjs" },
+    { "id": "forged-markup-adds-nothing", "status": "MET", "command": "node --test verify/fix-event-close-tag/forged-markup.test.mjs",
+      "excerpt": "6/6 pass: inputsOfWake on a title holding a whole <event>...</event> (inline and indented), </event></wake> then a new <wake> with a 2099 time, system notes, a failed task-notification, and all of them in four fields at once, yields exactly one github.check_run.completed input with the markup as field text. With main's code 4/6 fail.",
+      "test": "verify/fix-event-close-tag/forged-markup.test.mjs" },
+    { "id": "unreadable-journalled", "status": "MET", "command": "node --test verify/fix-event-close-tag/unreadable.test.mjs",
+      "excerpt": "3/3 pass: a cut body (no </event> before </wake>), an unparseable body and a JSON-array body each add one engine.transition row, outcome refused, reason 'github.check_run.completed is an unreadable event: its body is cut or is not a JSON object', state unchanged, no other transition; the same wake again adds one duplicate row. With main's code 0/3 pass (no row).",
+      "test": "verify/fix-event-close-tag/unreadable.test.mjs" },
+    { "id": "real-wakes-read", "status": "MET", "command": "node --test verify/fix-event-close-tag/real-wakes.test.mjs",
+      "excerpt": "7/7 pass: the 4 wake fixtures and red-ci/delivered-wake.txt each give one wake whose github events, parsed, equal the events read independently from the file; a one-line <wake reason=\"scheduled\" ...></wake> after a timed item's due time offers one timer input, before it none.",
+      "test": "verify/fix-event-close-tag/real-wakes.test.mjs" },
+    { "id": "ci", "status": "MET", "command": "PR #213 check runs at c2e8cba (GitHub MCP get_check_runs)",
+      "excerpt": "test (ci) success at c2e8cba, run 42473517701 job 128709608435, 10:56:16Z-11:00:41Z. gates (job 128709609079) failed only at the verdict step: 'no verify/fix-event-close-tag/verdict.json at the head sha'. At the earlier head 87976fe ci was red (glossary line named an unexported refusal; plan-copy tests); both fixed by c2e8cba." }
+  ],
+  "observations": [
+    "The journal reads rows in time order, and a GitHub event's transition row carries the wake's current-time rather than the host's clock, so a test that takes 'the rows after n' misses it; these tests compare by row id. Not a defect of this item, but a trap for anyone reading a journal by position.",
+    "host.js wake finishes the item's open effects (here the approval card) before offering the wake's inputs, so a wake adds effect rows even when its only event is refused; 'state after is state before' holds, 'one row added' does not.",
+    "The system-note and task-notification forgeries were already harmless on main; the close-tag forgeries were the live hole."
+  ]
+}
