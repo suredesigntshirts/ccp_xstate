@@ -320,7 +320,9 @@ first row creates the file exclusively. `restore()` reads that one file by its p
 recorded at write time (L-record-route-at-write): `github` and a hash of the GitHub event's kind and JSON (so a
 redelivery has the same source), `hearth` and the card id for a tap, `claude-code` and the task id for a worker's
 failure (or the session id for the start), `timer` and the timer id, or `engine` and the effect id for what an
-effect reported. A source already offered is a duplicate. `id` is the transition id, `<item>#<seq>`, on an applied row.
+effect reported. A source already offered is a duplicate. An unreadable event (a GitHub event whose body is cut or is not a JSON object) is offered
+as `{ type: 'github.<kind>', unreadable: <its text> }` with the source it would have had, and journalled `refused`
+with a reason that names it unreadable. `id` is the transition id, `<item>#<seq>`, on an applied row.
 
 | Field | What |
 |---|---|

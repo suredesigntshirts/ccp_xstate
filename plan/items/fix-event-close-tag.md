@@ -4,7 +4,7 @@
   "title": "Keep a GitHub event whose field holds a closing event tag",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "draft",
+  "status": "ready",
   "module": "packages/engine/src/wake.js",
   "outcome": "A wake whose GitHub event carries the literal text </event> or </wake> inside a JSON string (a check title, a PR title, a comment) yields that event from wakesIn with its data parsed, so inputsOfWake offers it like any other; an event whose body is cut or is not a JSON object is offered as an unreadable event, which the host journals as a refused engine.transition row instead of dropping it without a row.",
   "why": "The engine-host suite pinned this as an observed defect: wakesIn ends an event at the first </event>, so anyone who can name a check or a PR can hide an event from the host (plan/decisions/2026-10-30-engine-effects.md, engine-host's open gaps). verify-regression-engine left that test rather than move a bug into the regression set, and its verifier noted the defect had no item of its own (verify/verify-regression-engine/verdict.json, observation 1). A </wake> in a field cuts the wake the same way, so the fix takes both close tags.",

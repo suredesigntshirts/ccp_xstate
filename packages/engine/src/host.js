@@ -305,6 +305,7 @@ const stepBack = (effect, ended, error) => ({
 function refusal(host, event, run) {
   const type = event?.type;
   if (typeof type !== 'string') return { why: 'the event has no type' };
+  if (Object.hasOwn(event, 'unreadable')) return { why: `${type} is an unreadable event: its body is cut or is not a JSON object` };
   if (type === START) return host.snapshot ? { why: `${host.item} has started` } : nullOr(startRefusal(host.spec, event.input));
   if (host.snapshot.status === 'done') return { why: `${host.item} is done` };
 

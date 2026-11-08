@@ -21,11 +21,20 @@ const OPEN = new Set(['open', 'openat', 'openat2']);
 /** The write-like calls in a strace -f -y trace whose path is under `root`, as { pid, call, path, line }. */
 export function writesUnder(trace, root, startCwd) {
   root = resolve(root);
+  const lines = trace.split('\n');
+  // Which pid made each child. Under -f a child can log its own calls before the parent's clone returns its pid, so
+  // the child takes its parent's folder when first seen: the parent is still inside the clone, in the folder the
+  // child inherited.
+  const parent = new Map();
+  for (const line of lines) {
+    const m = line.match(/^(\d+)\s+(?:<\.\.\. (?:clone3?|v?fork) resumed>|(?:clone3?|v?fork)\().*\)\s+=\s+(\d+)/);
+    if (m && Number(m[2]) > 0 && !parent.has(m[2])) parent.set(m[2], m[1]);
+  }
   const cwd = new Map();
   const pending = new Map();
   const hits = [];
   const under = (p) => p === root || p.startsWith(root + '/');
-  for (let line of trace.split('\n')) {
+  for (let line of lines) {
     const m0 = line.match(/^(\d+)\s+(.*)$/);
     if (!m0) continue;
     const pid = m0[1];
@@ -33,12 +42,12 @@ export function writesUnder(trace, root, startCwd) {
     if (body.endsWith('<unfinished ...>')) { pending.set(pid, body.slice(0, -'<unfinished ...>'.length)); continue; }
     const res = body.match(/^<\.\.\. \w+ resumed>(.*)$/);
     if (res) { body = (pending.get(pid) ?? '') + res[1]; pending.delete(pid); }
-    if (!cwd.has(pid)) cwd.set(pid, startCwd);
+    if (!cwd.has(pid)) cwd.set(pid, cwd.get(parent.get(pid)) ?? startCwd);
     const m = body.match(/^(\w+)\((.*)\)\s+=\s+(-?\d+)/);
     if (!m) continue;
     const [, call, args, ret] = m;
     const here = cwd.get(pid);
-    if (['clone', 'clone3', 'fork', 'vfork'].includes(call) && Number(ret) > 0) { cwd.set(ret, here); continue; }
+    if (['clone', 'clone3', 'fork', 'vfork'].includes(call) && Number(ret) > 0) { if (!cwd.has(ret)) cwd.set(ret, here); continue; }
     if (Number(ret) < 0) continue;
     if (call === 'chdir') { const p = args.match(/^"([^"]*)"/); if (p) cwd.set(pid, resolve(here, p[1])); continue; }
     if (call === 'fchdir') { const p = args.match(/^\d+<([^>]*)>/); if (p) cwd.set(pid, p[1]); continue; }
