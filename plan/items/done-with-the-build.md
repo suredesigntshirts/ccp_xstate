@@ -5,7 +5,7 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "ready",
-  "outcome": "An item becomes done in its own build PR: the PR's first commit sets status done (and done_on for an item naming a module), the verdict gate proves it before the merge, and no PR follows the merge. Reader effort is read, never stored: node scripts/reader-effort.mjs --item <id> finds the merge that made the item done and reports that PR, so plan/check.mjs no longer asks a done item for reader_effort. plan/README.md's How an item moves has four steps with no done replan; a gate test keeps a build PR that sets done passing the freeze gate; the entry texts' line budget in test/docs.test.mjs drops to 226; docs/traps.md says CI checks out at depth 1.",
+  "outcome": "An item becomes done in its own build PR: the PR's first commit sets status done (and done_on for an item naming a module), the verdict gate proves it before the merge, and no PR follows the merge. Reader effort is read, never stored: node scripts/reader-effort.mjs --item <id> finds the merge that made the item done and reports that PR, so plan/check.mjs no longer asks a done item for reader_effort. plan/README.md's How an item moves has four steps with no done replan; a gate test keeps a build PR that sets done passing the freeze gate; the entry texts' line budget in test/docs.test.mjs drops to 226.",
   "why": "Every item costs three PRs: the readying replan, the build, and a done replan whose content is a status flip, a ## Done paragraph saying what git and verify/<id>/ already say, and since plan-reader-effort the reader_effort numbers, which git can give at any time. The done status repeats the verdict, a stored derived number repeats git, and each done replan is one more CI wait and merge, or an item left open when a thread forgets it (L-proof-source, L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-4.md).",
   "serves": [
     "L-proof-source",
@@ -22,8 +22,8 @@
       "what": "Read first: why done moves into the build PR, why reader effort is read rather than stored, and which suite tests leave"
     },
     {
-      "ref": "plan/README.md, CLAUDE.md, docs/gates.md, docs/language.md, docs/traps.md",
-      "what": "The steps from ready to done, the freeze's unfrozen fields, the words for a contract change and reader effort, the CI depth"
+      "ref": "plan/README.md, CLAUDE.md, docs/gates.md, docs/language.md",
+      "what": "The steps from ready to done, the freeze's unfrozen fields, the words for a contract change and reader effort"
     },
     {
       "ref": "plan/check.mjs, plan/item.schema.json, test/plan-check.test.mjs",
@@ -58,10 +58,6 @@
     {
       "ref": "docs/language.md",
       "what": "contract change reads as the one replan an item's contract may have once its build PR names it; reader effort says it is read from git for an item, never stored"
-    },
-    {
-      "ref": "docs/traps.md",
-      "what": "The shallow-clone trap says ci.yml checks out at depth 1"
     },
     {
       "ref": "plan/check.mjs",
