@@ -1,7 +1,7 @@
 # ci
 
-Command: PR #232 check runs at db2ba7ec736ea81865f13c8833118f992b8dba1f (GitHub MCP get_check_runs, get_job_logs).
+Command: PR #232 check runs at a95b6c80e7d567730376ca743833154514212acf (GitHub MCP get_check_runs, get_job_logs).
 
-Excerpt: test (ci) success, job 128718048633 (run 42476214328), 11:32:42-11:38:31Z. gates job 128718048771 failed only at the verdict step: `no verify/verify-regression-plugin/verdict.json at the head sha`; stubs, freeze and evidence passed. This verdict commit is what gates reads.
+Excerpt: test (ci) success, job 128730533720 (run 42480289250), 12:26:51-12:35:25Z. The gates job 128730533612 failed only at the verdict step, because the verdict on the branch then named db2ba7e and later commits (e9f03d7, 1daa82f, a95b6c8) changed the item. stubs, freeze and evidence passed. This verdict commit is what gates reads.
 
-Earlier: at 142b5ac ci failed (run 42474983356): main's nine 230-line failures, and verify/verify-regression-engine/moved-pass because test/regression/inspector/stage-record.test.mjs passed 0 without Playwright.
+Earlier heads: at 142b5ac ci failed (stage-record passed 0 without Playwright, plus main's 230-line reds). At e79d252 and e9f03d7 it failed on live-capture's cheap timing test inside the moved-pass suites.

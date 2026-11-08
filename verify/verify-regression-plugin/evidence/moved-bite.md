@@ -1,6 +1,6 @@
 # moved-bite
 
-Command: `node --test verify/verify-regression-plugin/bite.test.mjs` at head db2ba7ec736ea81865f13c8833118f992b8dba1f. It copies the head (minus .git and verify/) to a temp folder, makes one edit, runs the test file there, restores and runs it again.
+Command: `node --test verify/verify-regression-plugin/bite.test.mjs` at head a95b6c80e7d567730376ca743833154514212acf. It copies the head (minus .git and verify/) to a temp folder, makes one edit, runs the test file there, restores and runs it again.
 
 Excerpt: 3/3 pass.
 - plugin: plugins/harness/scripts/return-tool.mjs `if (same) {` -> `if (stored) {` (accepted for any result once one is stored): test/regression/plugin/return-tool-answer.test.mjs 2 red (still-refuses), restored 4 pass.

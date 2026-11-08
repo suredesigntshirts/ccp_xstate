@@ -4,7 +4,9 @@
 // line fails only for a left test that drives head code and asserts what came back with no stored capture.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BASE, haveCommits, regressionTable, show } from './lib.mjs';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { BASE, REPO, haveCommits, regressionTable, show } from './lib.mjs';
 
 /** Code with string, template and regex literals blanked, so a name inside a literal is not a call. */
 const bare = (b) => b.replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g, "''").replace(/([(,=!&|:]\s*)\/(?:\\.|\[(?:\\.|[^\]])*\]|[^/\n\\])+\/[gimsuy]*/g, '$1/x/');
@@ -36,6 +38,11 @@ const KINDS = {
   // reads source or doc text and matches it, and runs no head code
   source: (b, f) => /readFileSync\(join\(REPO, '(docs|packages|plugins|scripts)|join\(REPO, 'scripts\/inspector'\)|readFileSync\(\s*join\(REPO, f\)/.test(f) && drives(b, f).length === 0,
   // runs only with a journal or lane checkout at a retired path, or only on a checkout of main
+  // the same assertion on the same code is held by a test outside verify/ that npm test runs (the row names it), and
+  // could not hold under the regression set's parallel runs: checked against that test at the head
+  heldElsewhere: (b) => /hook\.run/.test(b) && /bare/.test(b) && /<= 50/.test(b) &&
+    /test\('cheap: hook\.run rows show at most 50 ms median and 200 ms p95 over a bare node start/.test(readFileSync(join(REPO, 'plugins/harness/test/capture.test.mjs'), 'utf8')) &&
+    /plugins\/harness\/test\/capture\.test\.mjs/.test(regressionTable().find((r) => r.file === 'verify/obs-live-capture/capture.test.mjs').reason),
   retired: (b, f) => (/\{ skip[,}]|skip: wfFiles\.length/.test(b) && /\/home\/user\/lanes|skipReason/.test(f)) || /skip: !process\.env\.VERIFY_MAIN/.test(b)
 };
 
@@ -74,6 +81,7 @@ const LEFT = [
   ['inspector-reads-records/no-guessing.test.mjs', /^no engine source is read as text/, 'source', 'scripts/inspector source'],
   ['obs-journal-vs-world/journal-check.test.mjs', /^fixture sanity/, 'recorded', 'the recorded inputs'],
   ['obs-live-capture/capture.test.mjs', /^fixture sanity/, 'recorded', 'the recorded hook inputs'],
+  ['obs-live-capture/capture.test.mjs', /^cheap \(fixture run\)/, 'heldElsewhere', 'plugins/harness/test/capture.test.mjs cheap'],
   ['obs-page/live.test.mjs', /^(the copied journal|real journal copy|journal with the builder)/, 'recorded', 'a journal copy and the page\'s recorded browser-check output'],
   ['obs-page/live.test.mjs', /^the published page/, 'capture', 'a stored published page'],
   ['obs-person-attention/person.test.mjs', /^fixture sanity/, 'recorded', 'the recorded wake'],
@@ -122,6 +130,6 @@ test('left-reasons-hold: the kinds refuse a moved test that drives the hook and 
   if (!haveCommits()) return t.skip(`base ${BASE} not readable here`);
   const text = show(BASE, 'verify/fix-waiting-run-stall/block.test.mjs');
   for (const [name, body] of testsOf(text)) {
-    assert.ok(!KINDS.recorded(body, text) && !KINDS.source(body, text) && !KINDS.retired(body, text), `block: "${name}" is no left kind`);
+    assert.ok(!KINDS.recorded(body, text) && !KINDS.source(body, text) && !KINDS.retired(body, text) && !KINDS.heldElsewhere(body), `block: "${name}" is no left kind`);
   }
 });

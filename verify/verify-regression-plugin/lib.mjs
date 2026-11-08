@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 
 export const REPO = process.env.VRP_REPO ?? join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 /** The PR's base (main as the build last merged it) and the build head the verdict names. */
-export const BASE = 'e9ed7db2dc1fb0c601583fcd43dd102eb2ba0ea4';
-export const VERIFIED = 'db2ba7ec736ea81865f13c8833118f992b8dba1f';
+export const BASE = '2178cc6c0e9b86456c7dc35fd352b16952356bf1';
+export const VERIFIED = 'a95b6c80e7d567730376ca743833154514212acf';
 export const ITEM = 'plan/items/verify-regression-plugin.md';
 
 export const SUITES = Object.freeze([
