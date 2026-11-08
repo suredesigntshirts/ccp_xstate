@@ -26,11 +26,11 @@
   "outputs": [
     {
       "ref": "plan/README.md",
-      "what": "Step 3: on a NOT MET line the builder pushes a fix and asks again, and the next verdict replaces the last; step 4: a merge commit, merging main in keeps the verdict, the merging thread tells its starter what the release command printed"
+      "what": "The opening in two lines; step 3: on a NOT MET line the builder pushes a fix and asks again, and the next verdict replaces the last; step 4: a merge commit, merging main in keeps the verdict, the merging thread tells its starter what the release command printed"
     },
     {
       "ref": "docs/gates.md",
-      "what": "The verdict row says no complete verdict for the head (below); the second copy of the Item: line rule leaves"
+      "what": "The verdict row says no complete verdict for the head (below); the local-run line joins the opening paragraph, and the second copy of the Item: line rule leaves"
     },
     {
       "ref": "docs/language.md",

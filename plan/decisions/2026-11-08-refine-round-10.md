@@ -22,5 +22,7 @@ Not taken: changing the contract after a NOT MET verdict (the README and the fre
 once a verdict file exists), defining `ci` and `verdict` earlier in `plan/README.md` (it points at `docs/gates.md`,
 whose first table names them), and the merge-of-main case in more words (the gate's own list says it).
 
-The entry texts stay at 224 lines: the two lines steps 3 and 4 gain are paid for by `docs/gates.md` dropping its
-second copy of "A PR names its item only by an `Item: <id>` line", which `plan/README.md` keeps.
+The entry texts go from 224 to 223 lines: the two lines steps 3 and 4 gain are paid for by `docs/gates.md` folding its
+local-run paragraph into its first, which drops its second copy of "A PR names its item only by an `Item: <id>` line"
+(`plan/README.md` keeps it) and the builder-not-enforcing clause (`plan/README.md`, How slop is kept out, says it),
+and by `plan/README.md`'s opening saying in two lines what it said in three.
