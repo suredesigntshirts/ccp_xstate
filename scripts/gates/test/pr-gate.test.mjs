@@ -15,7 +15,7 @@ const verdict = (sha) => JSON.stringify({
   item: 'x', verified_sha: sha, results: [{ id: 'a', status: 'MET', command: 'gh pr checks', excerpt: 'red' }],
 });
 
-function repo() {
+function repo(first = expect) {
   const dir = mkdtempSync(join(tmpdir(), 'gate-'));
   const git = (...a) => execFileSync('git', a, { cwd: dir, encoding: 'utf8' }).trim();
   git('init', '-q', '-b', 'main');
@@ -28,12 +28,12 @@ function repo() {
     git('commit', '-q', '-m', session ? `change\n\nClaude-Session: ${session}` : 'change');
     return git('rev-parse', 'HEAD');
   };
-  const base = commit({ 'plan/items/x.md': itemFile(expect) });
+  const base = commit({ 'plan/items/x.md': itemFile(first) });
   const run = (which, env = {}) => spawnSync('node', [gate, which], {
     cwd: dir, encoding: 'utf8',
     env: { ...process.env, BASE_SHA: base, HEAD_SHA: git('rev-parse', 'HEAD'), PR_BRANCH: 'build/x', PR_BODY: '', PR_LABELS: '[]', ...env },
   });
-  return { commit, run };
+  return { commit, run, git };
 }
 
 test('verdict gate: none, then from the builder session, then from a separate session', () => {
@@ -83,6 +83,57 @@ test('freeze gate: a status-only change passes', () => {
   const r = repo();
   r.commit({ 'plan/items/x.md': itemFile(expect, 'done') });
   assert.equal(r.run('freeze').status, 0);
+});
+
+test('verdict gate: runs the test a verifier line names at the head, and refuses it failing, throwing or missing', () => {
+  const r = repo([{ id: 'a', proof: 'world' }, { id: 'v', proof: 'verifier' }]);
+  const built = r.commit({ 'packages/a/index.js': 'export const a = 1;\n' }, 'builder');
+  const named = (test, extra = {}) => JSON.stringify({ item: 'x', verified_sha: built, observations: ['judged, not run'], results: [
+    { id: 'a', status: 'MET', command: 'gh pr checks', excerpt: 'green' },
+    { id: 'v', status: 'MET', command: 'node --test', excerpt: 'pass 1', ...(test ? { test } : {}), ...extra }] });
+  const testFile = (body) => `import { test } from 'node:test';\nimport assert from 'node:assert/strict';\n${body}\n`;
+
+  r.commit({ 'verify/x/v.test.mjs': testFile("test('holds', () => assert.equal(1, 1));"), 'verify/x/verdict.json': named('verify/x/v.test.mjs') }, 'verifier');
+  let out = r.run('verdict');
+  assert.equal(out.status, 0, out.stderr);
+
+  r.commit({ 'verify/x/verdict.json': named(null) }, 'verifier');
+  out = r.run('verdict');
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /Expect v is verifier-proven, so it names the test that proves it: test is missing/);
+
+  r.commit({ 'verify/x/verdict.json': named('verify/x/v.test.mjs', { test_name: 'nothing matches' }) }, 'verifier');
+  out = r.run('verdict');
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /Expect v: test verify\/x\/v.test.mjs \(nothing matches\) ran no test that passed/);
+
+  r.commit({ 'verify/x/v.test.mjs': testFile("test('holds', () => assert.equal(1, 2));"), 'verify/x/verdict.json': named('verify/x/v.test.mjs') }, 'verifier');
+  out = r.run('verdict');
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /Expect v: test verify\/x\/v.test.mjs fails at the head/);
+
+  r.commit({ 'verify/x/v.test.mjs': "throw new Error('no fixture');\n" }, 'verifier');
+  out = r.run('verdict');
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /Expect v: test verify\/x\/v.test.mjs fails at the head/);
+
+  r.commit({ 'verify/x/verdict.json': named('verify/x/gone.test.mjs') }, 'verifier');
+  out = r.run('verdict');
+  assert.equal(out.status, 1);
+  assert.match(out.stderr, /verify\/x\/gone.test.mjs does not exist at the head/);
+});
+
+test('freeze gate: once the item has a verdict file, even a plan-only replan may not change its contract', () => {
+  const r = repo();
+  r.commit({ 'verify/x/verdict.json': verdict('0000000') });
+  const out = r.run('freeze', { PR_LABELS: '["replan"]' });
+  assert.equal(out.status, 0, out.stderr);
+  const r2 = repo();
+  r2.commit({ 'verify/x/verdict.json': verdict('0000000') });
+  r2.commit({ 'plan/items/x.md': itemFile([{ id: 'a', proof: 'builder' }], 'doing') });
+  const refused = r2.run('freeze', { PR_LABELS: '["replan"]', BASE_SHA: r2.git('rev-parse', 'HEAD~1'), PR_BRANCH: 'replan/x-change' });
+  assert.equal(refused.status, 1);
+  assert.match(refused.stderr, /changes the contract of x .*verify\/x\/verdict.json exists/);
 });
 
 test('stubs gate: a history comment in engine source is red, naming the file, line and rule; the same line in plan/ is not', () => {

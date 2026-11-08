@@ -6,12 +6,13 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
 ## Principles
 
 - **The verifier proves it, not the builder.** An item is done when a separate session shows its outcome holds
-  (`plan/README.md`, "How slop is kept out").
+  (`plan/README.md`, "How slop is kept out"). Expect lines name behaviour, never main's state; a verdict names the
+  tests that prove it.
 - **The why travels with the work.** Every change names its plan item; the item's prose holds the reasoning.
 - **Comments say what holds now.** Item ids, lanes and rounds go in commits, PRs and the plan, never in code
   comments or READMEs (`docs/layout.md`, "Comments").
-- **A cleanup changes structure, not behaviour.** Tests that pass on `main` pass at its head, changed only for the
-  renames and imports its item names.
+- **A cleanup changes structure, not behaviour.** Behaviour is what the glossary names and the regression set asserts.
+  A test that asserts bytes, a listing or a retired path leaves with the code it pinned, named by the item.
 - **A working small system first** (Gall's Law), end to end before wide, root cause over symptom.
 - **One word per thing.** Use the terms in `docs/language.md`; add a line there before introducing a new one.
 - **Step back, don't grind.** An item's `step_back` caps its rounds; past that, replan instead of retrying. A fourth fix
