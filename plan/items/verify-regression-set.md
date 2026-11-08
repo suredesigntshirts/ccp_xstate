@@ -32,8 +32,8 @@ What is known now:
   the `no-guessing` and `one-check` greps). Known moves: `stage-contract-declares-rules`'s `marks-checked` and
   `declared-rules-hold`, `run-lifecycle-store`'s `states` and `answers` scenarios, `retire-pinned-legacy`'s
   `retired-not-run`, `fix-budget-rule`'s `budget-refuses` and `names-module`.
-- The two root fixes from the 8 Nov time audit ride along: the no-self-edit test inherits the environment and
-  overrides `HOME` only; the copy-not-link clone drops inherited tags.
+- The two root fixes from the 8 Nov time audit (the no-self-edit environment and the copy-not-link tags) are their own
+  item, `self-edit-check-snapshot`; when its tests move, they move as that item left them.
 - If the first round shows the table is too large for one PR, split by area at the replan: `engine` and `run`
   first, then `plugin` and `inspector`, then `plan`, `gates` and `journal`. Each part is one item with the same rule.
 - The suite should get faster, not slower; the audit measured 12m51s for the local suite with 661 s in one test.
