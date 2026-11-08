@@ -25,3 +25,5 @@ Draft from the self-edit-check-snapshot verdict and its CI. Edges, each small:
 - `plugins/harness/test/capture.test.mjs` compares p95 (over 5 samples, so the maximum) with an absolute 200 ms.
   Measure it over a bare node start, as the median is
   (`plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md`).
+
+Throwaway line: a prose-only edit to check the verdict gate on a replan branch.
