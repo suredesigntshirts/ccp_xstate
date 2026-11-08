@@ -1,0 +1,39 @@
+{
+  "item": "scope-suite-own-pr",
+  "verified_sha": "37f6dfce1a6cc749ab3d973acbb26f826a8c890c",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5GpwitN3CAfziLLzSJ", "model": "claude-opus-5-5" },
+  "results": [
+    {
+      "id": "full-clone-passes",
+      "status": "MET",
+      "command": "node --test verify/scope-suite-own-pr/full-clone-passes.test.mjs (temp repos with origin/main = 97947de, suite run in a child node --test with PR_BODY, BASE_SHA, HEAD_SHA, NODE_TEST_CONTEXT removed); evidence/full-clone-passes.md",
+      "excerpt": "5/5 pass. Head's file at the head and at origin/main's commit: exit 0, 'tree mode: PR_BODY does not name rules-said-once, checking the scope from the tree'. Base's file at the head: exit 1, 'PR mode: 4 files' (the build's and replan's files); at origin/main: exit 1, 'PR mode: 0 files'.",
+      "test": "verify/scope-suite-own-pr/full-clone-passes.test.mjs"
+    },
+    {
+      "id": "own-pr-reads-git",
+      "status": "MET",
+      "command": "node --test verify/scope-suite-own-pr/own-pr-reads-git.test.mjs (temp repo at #202's last commit 1af034e with the head's suite file, BASE_SHA = 66e47a6); evidence/own-pr-reads-git.md",
+      "excerpt": "3/3 subtests pass. 'Item: rules-said-once': exit 0, 'PR mode: 30 files'. After a commit adding ssop-stray-outside-outputs.txt: exit 1, 'PR mode: 31 files', the stray assertion names p: 'ssop-stray-outside-outputs.txt'. 'Item: another-item' at the stray commit: exit 0, 'tree mode: PR_BODY does not name rules-said-once'.",
+      "test": "verify/scope-suite-own-pr/own-pr-reads-git.test.mjs"
+    },
+    {
+      "id": "scope",
+      "status": "MET",
+      "command": "node --test verify/scope-suite-own-pr/scope.test.mjs (git diff --name-only 9f0cbc5b..37f6dfce and 81fd7a6..37f6dfce); evidence/scope.md",
+      "excerpt": "2/2 pass. Build over its readying replan: plan/items/scope-suite-own-pr.md, verify/rules-said-once/suite-and-scope.test.mjs. Against main 81fd7a6 the rest is the replan's plan/ files; under verify/ only the suite file changes; verify/rules-said-once/verdict.json blob unchanged.",
+      "test": "verify/scope-suite-own-pr/scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #222; evidence/ci.md",
+      "excerpt": "test job 128708329204 at 37f6dfce1a6cc749ab3d973acbb26f826a8c890c: success. gates job 128708329404: verdict refused only for 'no verify/scope-suite-own-pr/verdict.json at the head sha', and reruns on this commit, which changes only verify/scope-suite-own-pr/."
+    }
+  ],
+  "observations": [
+    "The PR's GitHub base is main, so its file list also shows readying replan #221's plan/ files until #221 merges; the scope line was read as the build's own change over that replan, and the test checks both views.",
+    "Before writing its tests the verifier saw the build's diff stat and the new suite's header comment (not its body); the tests were written from the Expect lines and brief.",
+    "In a depth-1 checkout the tests fetch the six pinned commits in full into a temp bare repo (about 13 MB), borrowing actions/checkout's extraheader, so the checkout stays shallow and gains no origin/main."
+  ]
+}
