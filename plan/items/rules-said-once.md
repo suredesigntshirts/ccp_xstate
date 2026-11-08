@@ -56,6 +56,10 @@
       "what": "Principles say each rule in a line with a pointer to its home; Branches and PRs points at How an item moves instead of restating it; under 100 lines"
     },
     {
+      "ref": "docs/selfcheck.md, docs/tournaments.md",
+      "what": "Each path the new test finds missing is corrected: the plugin's install script by its repo path, and the lane's copied workflow named without backticks, since it lives in a lane branch"
+    },
+    {
       "ref": "test/docs.test.mjs",
       "what": "Fails when a repo path named in backticks in CLAUDE.md, plan/README.md or a file under docs/ does not exist (placeholders with <...> skipped), or when CLAUDE.md, plan/README.md and docs/gates.md together have 230 lines or more"
     },
