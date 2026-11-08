@@ -1,0 +1,65 @@
+{
+  "item": "self-edit-check-snapshot",
+  "verified_sha": "595ea2fd3c9634f47c34733a1769b187d138fd9b",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5JtBzGwYtdTdSx3wpG",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "env-inherited",
+      "status": "MET",
+      "command": "node --test verify/self-edit-check-snapshot/env-inherited.test.mjs (a stub bash first on PATH writes env -0 per run, a NODE_OPTIONS --require preload records the env of each node child running notice-behind.mjs or release.mjs; the run sets NODE_EXTRA_CA_CERTS, HTTPS_PROXY, CLAUDE_SECS_X and CCP_SECS_Y); read of no-self-edit.test.mjs: every spawn's env is envFor() or runSetup(), BASE = process.env less /^(CLAUDE|CCP)/",
+      "excerpt": "no-self-edit 6/6 pass under the stub. bash runs 9, hook runs 1, release.mjs runs 2. In every run HOME matches /verify-noself-world-*/home, NODE_EXTRA_CA_CERTS and HTTPS_PROXY equal the test's values, PATH starts with the stub dir, CLAUDE_SECS_X and CCP_SECS_Y absent, and the only CLAUDE*/CCP* names are CCP_SETUP_LOG, CLAUDE_PID, CCP_HARNESS_*, CLAUDE_PLUGIN_ROOT, CCP_REPO (the test's own). 1/1 pass, 47 s."
+    },
+    {
+      "id": "snapshot-detects",
+      "status": "MET",
+      "command": "node --test verify/self-edit-check-snapshot/snapshot-detects.test.mjs (snap() and changed() lifted by regex from the head's no-self-edit.test.mjs into a temp module; each mutation applied 25 ms after the snapshot to a temp folder with files, a subfolder and a link)",
+      "excerpt": "created -> [/sub, /sub/new.txt]; deleted -> [root, /c.txt]; content edited -> [/a.txt]; rewritten with old content -> [/sub/b.txt]; mode change -> [/a.txt]; empty folder -> [/sub, /sub/empty]; symlink retargeted -> [root, /link]; identical copy moved over -> [root, /c.txt]; the moved copy is seen with no wait too (new inode); a walk that stats and reads every file -> []; the root is an entry and rmSync of sub names sub, sub/b.txt and the root. 11/11 pass."
+    },
+    {
+      "id": "runs-without-strace",
+      "status": "MET",
+      "command": "node --test verify/self-edit-check-snapshot/runs-without-strace.test.mjs (every .js/.mjs/.cjs under test/, verify/, packages/, plugins/ searched for the tool's name as a whole quoted string or 'strace -'; the same pattern finds 5 hits in main's no-self-edit.test.mjs; then the file run with PATH = links to every command on PATH except strace)",
+      "excerpt": "no hits in the four trees; the head's no-self-edit.test.mjs does not contain the word. With strace not resolvable on PATH (command -v fails; node, git, bash resolve): tests 6 pass 6 fail 0 skipped 0. This test runs again in CI, which has no strace, at the verdict commit. 2/2 pass."
+    },
+    {
+      "id": "tests-bite",
+      "status": "MET",
+      "command": "node --test verify/self-edit-check-snapshot/tests-bite.test.mjs: in a clone of the head, break one path, commit (the tests clone the repo they sit in), run no-self-edit.test.mjs with --test-name-pattern for the tests that guard it",
+      "excerpt": "(1) setup.sh replaces the plugin right after logging 'plugin not replaced' -> red: 'setup.sh run beside a live Claude Code in the same HOME writes nothing...' and '...newest release only a branch...', failing on 'nothing under the plugin root or its .old changed'. (2) setup.sh only touches plugin.json there (same bytes) -> same two red, the diff names .claude-plugin/plugin.json. (3) notice-behind.mjs writes written.txt beside itself -> red: 'the notice hook ... writes nothing under the plugin root', diff names written.txt. (4) release.mjs writes written.txt at the cwd repo root -> red: 'release.mjs only writes git objects...' and 'release.mjs branch --push writes only git refs...', diff names written.txt. 4/4 pass.",
+      "mutation": "infra/cloud-environment/setup.sh: after the 'plugin not replaced' echo, add rm -rf \"$dest.old\"; mv \"$dest\" \"$dest.old\"; mv \"$work/out\" \"$dest\" (and separately: touch \"$dest/.claude-plugin/plugin.json\"); plugins/harness/scripts/notice-behind.mjs: after the shebang, writeFileSync(new URL('./written.txt', import.meta.url), 'x'); scripts/release/release.mjs: after the shebang, writeFileSync(process.cwd() + '/written.txt', 'x')",
+      "red_test": "verify/self-update-by-version/no-self-edit.test.mjs: 'setup.sh run beside a live Claude Code in the same HOME writes nothing under the plugin root', 'setup.sh beside a live Claude, with the newest release only a branch, leaves the plugin untouched...', 'the notice hook, run from the installed copy while behind, writes nothing under the plugin root', 'release.mjs only writes git objects and refs...', 'release.mjs branch --push writes only git refs...'"
+    },
+    {
+      "id": "tags-dropped",
+      "status": "MET",
+      "command": "node --test verify/self-edit-check-snapshot/tags-dropped.test.mjs: clones of the head with their own release refs removed, then (a) tags harness-v0.1.11, harness-v0.1.40, harness-v2.0.0 at HEAD and a branch release/harness-v3.0.0 at a commit of its own, (b) no release refs; node --test test/setup.test.mjs in each; (c) the tagged clone with the two drop lines taken out of the head's file",
+      "excerpt": "(a) refs heads/release/harness-v3.0.0, tags v0.1.11 v0.1.40 v2.0.0: setup.test.mjs pass 6 fail 0 skipped 0. (b) no release refs: pass 6 fail 0. (c) without the drop: copy-not-link fails (fail 1), so the drop is what makes (a) pass. 3/3 pass. See notes for one edge outside the line."
+    },
+    {
+      "id": "temp-removed",
+      "status": "MET",
+      "command": "node --test verify/self-edit-check-snapshot/temp-removed.test.mjs: each run gets a fresh TMPDIR (os.tmpdir() reads it) holding only node-compile-cache, listed before and after; no-self-edit and setup.test.mjs each run passing and with one assertion made to fail in a clone ('1.2.3' -> '1.2.4' in the different-HOME test; release.tag 'harness-v0.1.10' -> 'harness-v9.9.9')",
+      "excerpt": "no-self-edit pass 6: left []; no-self-edit pass 1 fail 1: left []; setup.test.mjs pass 6: left []; setup.test.mjs pass 5 fail 1: left []. The fresh TMPDIR is seeded with node-compile-cache because setup.sh's npm ci (npm 10.9.9 lib/cli.js enableCompileCache) makes it in os.tmpdir() when missing; it is npm's shared cache, present in /tmp of any machine that has run npm, not a test folder. Also: ls /tmp before and after the whole verifier suite (28 tests): no new entry. 4/4 pass."
+    },
+    {
+      "id": "strace-kept",
+      "status": "MET",
+      "command": "node --test verify/self-edit-check-snapshot/strace-kept.test.mjs (strace 6.x here): node scripts/debug/trace-writes.mjs <watched> -- bash -c 'echo a > <watched>/abs.txt; echo o > <outside>/not-me.txt; (cd <watched>/sub && echo b > rel.txt && mkdir made); node -e \"process.chdir(<watched>); writeFileSync(\\'n.txt\\')\"; exit 3', with a fresh TMPDIR; then with --keep <path>; then with PATH lacking strace",
+      "excerpt": "printed: '21613 openat .../watched/abs.txt | 21614 openat .../watched/sub/rel.txt | 21614 mkdir .../watched/sub/made | 21615 openat .../watched/n.txt' (3 pids, relative writes resolved, not-me.txt absent); exit status 3; TMPDIR empty after. --keep: trace file at the path, mentions abs.txt, TMPDIR empty. No strace: exit 127, stderr 'trace-writes needs strace on PATH', the command did not run. 3/3 pass (the traced two skip where strace is absent, as on CI)."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #192 at 595ea2fd3c9634f47c34733a1769b187d138fd9b (mcp pull_request_read get_check_runs, get_job_logs)",
+      "excerpt": "test (ci): success, 08:42:07-08:44:23Z, '# tests 1786 # pass 1768 # fail 0 # skipped 18', 'plan ok'. gates: failure only for 'verdict gate failed (item self-edit-check-snapshot): no verify/self-edit-check-snapshot/verdict.json at the head sha', which this commit supplies; the gates re-run on this commit decides it."
+    }
+  ],
+  "notes": [
+    "The builder's exception (CCP_SETUP_FETCH=0 not set, so setup.sh's docs-skill npm ci still runs in these tests) is sound: in setup.sh that switch also skips step 0's git fetch origin main (the 'clone fast-forwarded' assertion) and step 2's fetch of release tags and branches (how harness-v9.0.0, v1.2.3, v0.0.9 and release/harness-v9.1.0 made on origin after the first install are seen), so with it set tests 1, 2, 3 and 6 would test nothing. With the inherited environment the npm ci is fast: the whole file runs in 34 s here (was 661 s), and CI's whole test job took 2m16s. The non_goals rule out a new setup.sh switch, so this is the right cut.",
+    "Edge outside the Expect line: if the clone the tests run in has a local release/harness-v* branch at the very commit of a detached HEAD (e.g. after release.mjs branch at a detached checkout of main), git clone checks that branch out, the test then deletes it, and copy-not-link fails with \"fatal: Failed to resolve 'HEAD' as a valid ref\" (seen here). no-self-edit's world() has the same shape (pre-existing). A 'git -C <clone> checkout -q --detach' before deleting the refs would close it; small enough for a later item, not a reason to hold this one.",
+    "trace-writes.mjs --keep uses renameSync from os.tmpdir(), which would fail with EXDEV if the --keep path is on another file system; same file system in this container, so not exercised. A copy-then-remove would close it."
+  ]
+}
