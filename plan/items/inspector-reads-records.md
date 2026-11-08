@@ -4,7 +4,7 @@
   "title": "Have the Workflow Inspector read the engine's records instead of reconstructing them",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "scripts/inspector/export.mjs takes every transition explanation from the engine's explain(spec, snapshot, event) (packages/engine/src/explain.js, built on chart() and the failingOf check the machine's bound guards run), draws the workflow map from chart(), and takes model-ness, prompt and context provenance, the prompt's writers and the host-written fields from stage.json and run.json. The string-literal scanning, the template-code display, the host-field guessing, its own graph walker and the brief.md model test are deleted, and a run without a stage record is refused by name (plan/decisions/2026-11-08-inspector-reads-records.md).",
   "why": "The inspector, the person's main view of each stage, re-derives in 1,282 lines decisions the engine already records, so an engine change silently breaks it (APOSD information leakage; research plan/research/design-books-cleanup.md, finding 6).",
   "serves": [
@@ -182,6 +182,16 @@ its guards run), the map comes from `chart()`, and everything about a model run 
 
 Runs recorded before stage records (the October journals) and the tournament lane engines are no longer shown; the
 decision file has the evidence that every committed model run has a stage record, and which done suite this retires.
+
+## Done
+
+Built in PR #180 (merged 8b33fd6). A separate session verified it at b0d3680: all eight Expect lines MET (verdict
+f30f3f9). Released as harness-v0.1.40.
+
+The verifier noted four things outside the Expect lines, left for a later cleanup: page.html keeps CSS for the
+removed provenance kinds and two help texts that still describe the old engine-template reading; export.mjs has two
+engine-loading section headers in a row; `graphOf` survives as a thin `chart()` wrapper that build.mjs calls; and 51
+committed bench and challenge journals have no `engine.transition` row, so the exporter refuses them (on main too).
 
 ## Verifier brief
 
