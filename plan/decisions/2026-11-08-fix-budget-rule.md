@@ -40,13 +40,13 @@ out of the window, and nothing ages in.
 The replan that readies this item fills `module` and `done_on` on every done fix item, and on `run-lifecycle-store`,
 the item that redesigned `packages/engine/src/actors.js` (finding 4 called it "the module the 11-05 fixes kept
 patching"). Done heads are frozen, so only a replan PR may add them. Each `done_on` is the date of the commit that
-first set the item's status to done (`git log -S'"status": "done"'`). Each `module` is the first source file the
+first set the item's status to done, in UTC, read from a full clone (`TZ=UTC git log --date=format-local:%F -S'"status": "done"'`; a shallow clone puts the oldest commits at its boundary and gives later dates). Each `module` is the first source file the
 item's `outputs` name, except `fix-waiting-wake` (`workflows/quick-fix.json`, where its timer lives) and
 `fix-workflow-pinned`, which names no outputs (`packages/engine/src/host.js`, which records and checks the pin).
 
-What the backfill shows: seven fixes to `packages/engine/src/actors.js` on 11-05, so the rule would have stopped the
+What the backfill shows: seven fixes to `packages/engine/src/actors.js` on 11-04 and 11-05, so the rule would have stopped the
 fourth; `run-lifecycle-store` (done 11-07) is the design item that restarts its count. Three fixes to
-`packages/engine/src/host.js` on 11-05 have had no design item, so until 11-19 a fourth host.js fix is refused, and
+`packages/engine/src/host.js` on 11-04 have had no design item, so through 2026-11-18 a fourth host.js fix is refused, and
 the verifier's world check uses exactly that.
 
 `fix-budget-rule` itself is a `fix-` item by its id; it names `plan/check.mjs`, which no other fix item names.
