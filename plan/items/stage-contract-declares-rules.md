@@ -4,7 +4,7 @@
   "title": "Let the stage contract declare verdicts, stored briefs and ref kinds",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A workflow declares, in meta.marks, the three rules the engine guessed for each model stage's output: \"verdicts\" maps a verdict field's path to the value that means the check passed (a covered list's entries as \"<list>.0.result\"), \"briefs\" lists the top-level text fields stored as their roles' briefs, and \"refs\" maps each ref { url, at } path to its kind. packages/engine/src/marks.js reads them (marksOf); the load check (stages.js checkStages), the accept-time cover check (coverGap) and accept (run/accept.js, which reads the marks from the run's pinned workflow blob) ask it, and accept no longer tests the actor's name, no stages.js code tests the words PASS or FAIL, and accept holds no GitHub or web policy: each ref kind is a checker module under packages/engine/src/refs/ (github-pr.js, web-page.js) that checks a ref and returns the fields it stamps, and STAMPED and HIDDEN are the union the kinds declare. Every model stage of the four repo workflows has its marks, their meta.actors entries are untouched and their prompts are byte-identical to main's. A stage with no entry in meta.marks is read through one function in marks.js exactly as main reads it, so items pinned to older workflows and runs prepared before keep their rules.",
   "why": "Workflow rules in the generic engine are the special-general mixture APOSD warns of and break L-rules-in-spec-not-host (research plan/research/design-books-cleanup.md, finding 5).",
   "serves": [
@@ -198,6 +198,16 @@ assertions, not snapshots. `meta.marks` leaves `meta.actors` and every prompt as
 move, and those are snapshots that fix-blocked-retry's decision 9 lets a workflow-changing item re-capture.
 
 The choices made writing this contract are in `plan/decisions/2026-11-07-stage-contract-declares-rules.md`.
+
+## Done
+
+Built in PR #173 (merged 5a12475). A separate session verified it at cc8de07: all nine Expect lines MET. Released as
+harness-v0.1.38.
+
+The contract was replanned twice before the build PR opened: #171 readied it with the marks inside the output schemas,
+and #172 moved them to the workflows' `meta.marks` once building showed the in-schema shape changes stored run
+schemas and Schema lines that done suites assert. Done suites' snapshots of main's workflow hashes were re-captured
+(only ids and hashes changed), as fix-blocked-retry's decision 9 allows for an item that changes a workflow.
 
 ## Verifier brief
 
