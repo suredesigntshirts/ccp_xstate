@@ -70,7 +70,7 @@ test('verdict gate: a PR with no Item line passes only if it touches plan/ alone
 
 test('freeze gate: softening an Expect line of the named item is red unless a plan-only replan', () => {
   const r = repo();
-  r.commit({ 'plan/items/x.md': itemFile([{ id: 'a', proof: 'builder' }], 'doing') });
+  r.commit({ 'plan/items/x.md': itemFile([{ id: 'a', proof: 'builder' }], 'done') });
   let out = r.run('freeze');
   assert.equal(out.status, 1);
   assert.match(out.stderr, /changes the contract of x/);
@@ -130,7 +130,7 @@ test('freeze gate: once the item has a verdict file, even a plan-only replan may
   assert.equal(out.status, 0, out.stderr);
   const r2 = repo();
   r2.commit({ 'verify/x/verdict.json': verdict('0000000') });
-  r2.commit({ 'plan/items/x.md': itemFile([{ id: 'a', proof: 'builder' }], 'doing') });
+  r2.commit({ 'plan/items/x.md': itemFile([{ id: 'a', proof: 'builder' }], 'done') });
   const refused = r2.run('freeze', { PR_LABELS: '["replan"]', BASE_SHA: r2.git('rev-parse', 'HEAD~1'), PR_BRANCH: 'replan/x-change' });
   assert.equal(refused.status, 1);
   assert.match(refused.stderr, /changes the contract of x .*verify\/x\/verdict.json exists/);

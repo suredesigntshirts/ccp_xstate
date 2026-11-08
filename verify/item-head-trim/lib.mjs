@@ -35,13 +35,13 @@ export function heads(planDir = join(REPO, 'plan')) {
 }
 
 /**
- * Copies plan/ into dir, and makes each module a ready or doing item names, since the copy holds plan/ alone and the
+ * Copies plan/ into dir, and makes each module a ready item names, since the copy holds plan/ alone and the
  * plan check refuses a ready item whose module is missing.
  */
 export function copyPlan(dir) {
   cpSync(join(REPO, 'plan'), join(dir, 'plan'), { recursive: true });
   for (const { head } of heads()) {
-    if (!head.module || !['ready', 'doing'].includes(head.status)) continue;
+    if (!head.module || head.status !== 'ready') continue;
     mkdirSync(dirname(join(dir, head.module)), { recursive: true });
     writeFileSync(join(dir, head.module), '');
   }

@@ -19,9 +19,9 @@ plan/
 
 ## How an item moves
 
-Status runs `draft` → `ready` → `done` (off the path: `split`, `dropped`, `parked`), in four steps. A PR names its
-item only by an `Item: <id>` line in its body; branch names are for people. Every commit ends with a `Claude-Session:`
-trailer (`docs/gates.md`, "Sessions").
+Status runs `draft` → `ready` → `done` (off the path: `split`, `merged`, `dropped`, `parked`), in four steps. A PR
+names its item only by an `Item: <id>` line in its body; branch names are for people. Every commit ends with a
+`Claude-Session:` trailer (`docs/gates.md`, "Sessions").
 
 1. **Readying replan.** Fill the head until `check.mjs` passes with `ready`. Branch `replan/<topic>`, label `replan`,
    changes under `plan/` only, no `Item:` line.
@@ -62,13 +62,13 @@ enforced by something other than the builder (`docs/gates.md`), hold that up.
   (tests the verifier writes) or `builder` (the builder's tests). A ready build item has a `world` line, and at most
   half its lines are `builder`.
 - **The contract names behaviour.** A check says what the harness does, in the words of `docs/language.md`, never what
-  the repository's files equal today: `check.mjs` refuses a ready or doing item whose check holds a sha or a phrase
-  in its `PINS` list (a new way of pinning main is one more entry). `ci` runs `npm test`, so no item repeats it.
+  the repository's files equal today: `check.mjs` refuses a ready item whose check holds a sha or a phrase in its
+  `PINS` list (a new way of pinning main is one more entry). `ci` runs `npm test`, so no item repeats it.
 - **The verdict names its tests.** Each `verifier` or `builder` result names the test file that proves it, and the
   verdict gate runs it at the head. What the verifier judged rather than ran goes in `observations`, which never
   gates. Evidence is what was shown: one small evidence file per Expect line, never a listing or a capture.
-- **The contract changes once, then freezes.** Before its verdict file exists, one replan may change a doing item's
-  contract, with a `## Contract change` section saying what the build tried and why the contract moved.
+- **The contract changes once, then freezes.** After its build PR names it and before its verdict file exists, one
+  replan may change an item's contract, with a `## Contract change` section saying what the build tried and why.
 - **No stubs count as done.** No TODO, FIXME, "not implemented" or skipped test in `packages/` and `plugins/`.
 
 ## Changing the plan
@@ -87,7 +87,7 @@ A change is one file plus edges. Run `node plan/check.mjs` after it; `--coverage
 `step_back` caps the rounds inside one item; the fix budget caps fixes across items, because a module that keeps
 needing patches has the wrong design. A `fix-` item names the module (file or folder) its main change lands in, in
 `module`, and its done date in `done_on`. When three fix items naming one module were done in the last 14 days with
-no design item for it done after them, `check.mjs` refuses a fourth at `ready` or `doing`. The next item there is a
+no design item for it done after them, `check.mjs` refuses a fourth at `ready`. The next item there is a
 design item: not a fix, naming that module in `module`, the concept that keeps breaking in `concepts`, and designing
 it twice with the tournament kit (`docs/tournaments.md`). Once it is done, the count starts again. The reasoning is in
 `plan/decisions/2026-11-08-fix-budget-rule.md`.

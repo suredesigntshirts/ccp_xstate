@@ -1,17 +1,17 @@
-// Expect contract-change-once: a doing item's contract may change once, by a plan-only replan with contract_changes 1
+// Expect contract-change-once: a frozen item's contract may change once, by a plan-only replan with contract_changes 1
 // and a ## Contract change section, before its verdict file exists; the plan check and the freeze gate hold the rest.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import { gateRepo, headOf, itemText, node } from './lib.mjs';
 
-const ID = 'vfy-doing';
-const BRANCH = 'replan/vfy-doing-contract';
+const ID = 'vfy-frozen';
+const BRANCH = 'replan/vfy-frozen-contract';
 const SECTION = '\n## Contract change\n\nThe build tried one shape, compared it with another, and the contract moved to say so.\n';
-const before = itemText(ID, { status: 'doing' });
+const before = itemText(ID, { status: 'done' });
 const changedExpect = (fields = {}) => {
   const head = headOf(before);
-  return itemText(ID, { status: 'doing', expect: [...head.expect, { id: 'added-line', check: 'The gate refuses a second change',
+  return itemText(ID, { status: 'done', expect: [...head.expect, { id: 'added-line', check: 'The gate refuses a second change',
     how: 'run it', proof: 'verifier' }], ...fields });
 };
 const plan = (repo) => node([join(repo.dir, 'plan/check.mjs')]);

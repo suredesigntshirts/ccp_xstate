@@ -1,4 +1,4 @@
-// Expect behaviour-lines: on a temp copy of the head's plan/, check.mjs refuses a ready or doing item whose Expect
+// Expect behaviour-lines: on a temp copy of the head's plan/, check.mjs refuses a ready item whose Expect
 // check holds a phrase decision 1 lists or a sha, naming the item, the Expect id and the phrase; draft and done pass.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -21,7 +21,7 @@ test('the untouched copy of the head plan passes', (t) => {
 });
 
 for (const phrase of DECISION_PHRASES) {
-  for (const status of ['ready', 'doing']) {
+  for (const status of ['ready']) {
     test(`a ${status} item whose check says "${phrase}" is refused, naming item, Expect id and phrase`, (t) => {
       const p = tempPlan(t);
       p.write(ID, withCheck(status, `Every stage renders ${phrase} the record`));
@@ -52,7 +52,7 @@ test('the phrase match ignores case', (t) => {
 });
 
 for (const [label, sha] of [['7-digit', 'a575897'], ['40-digit', '25dddc9d60b3658e97d46ca9b8981630b73712bd']]) {
-  for (const status of ['ready', 'doing']) {
+  for (const status of ['ready']) {
     test(`a ${status} item whose check holds a ${label} sha is refused, naming the item and Expect id`, (t) => {
       const p = tempPlan(t);
       p.write(ID, withCheck(status, `The suite passes at ${sha} and at the head`));

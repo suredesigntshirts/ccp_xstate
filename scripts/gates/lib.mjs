@@ -77,7 +77,7 @@ export function namedItem({ body = '', ids }) {
 }
 
 // Contract freeze: a PR may not change the head or Verifier brief of a frozen item (the one it names, one whose status
-// at base is doing or done, or one with a verdict file). Before verification starts, a PR labelled replan that touches
+// at base is done, or one with a verdict file). Before verification starts, a PR labelled replan that touches
 // only plan/ may; once verify/<id>/verdict.json exists at base or head (`verdict` names it), nothing may.
 export function checkFreeze({ changed, frozen, labels }) {
   const touched = frozen.filter((f) => f.before !== null && contract(f.before) !== contract(f.after));

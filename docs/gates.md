@@ -63,7 +63,7 @@ could forge a verdict commit; a separate identity stays parked until one is seen
 
 ## The contract freeze
 
-An item is frozen when the PR names it, its status at the base is `doing` or `done`, or it has a verdict file. Its head
+An item is frozen when the PR names it, its status at the base is `done`, or it has a verdict file. Its head
 (all but `status`, `done_on` and `reader_effort`) and `## Verifier brief` change only by its one contract change: a PR
 labelled `replan` that changes nothing outside `plan/`, with `contract_changes` 1 and a `## Contract change` section.
 Once `verify/<item>/verdict.json` exists at the PR's base or head, the gate refuses any head or brief change, label or
