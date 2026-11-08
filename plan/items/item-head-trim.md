@@ -4,7 +4,7 @@
   "title": "Let an item's head hold only what changes from item to item",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "doing",
   "outcome": "A ready item needs no `verifier` field and no `step_back`: the verifier is always a separate session working from the item's Verifier brief, and an item without `step_back` gets two rounds, the limit the rework view already assumes; `step_back` holds only `max_rounds` when an item needs another limit; plan/README.md's field table and the Verifier brief rule say so, the brief adding only what the Expect lines' `how` fields leave out; done items keep the fields they have and still pass the plan check.",
   "why": "Every ready item restates two things that never vary: 36 heads carry the same verifier sentence and step_back's max_tokens and replan_to are read by nothing, while each Verifier brief repeats the Expect lines' `how` line by line, so authors write and readers read the contract three times (L-rules-live-in-the-repo, L-count-concepts; decisions plan/decisions/2026-11-08-refine-round-2.md).",
   "serves": [
