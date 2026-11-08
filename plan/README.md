@@ -65,8 +65,8 @@ enforced by something other than the builder (`docs/gates.md`), hold that up.
   the repository's files equal today: `check.mjs` refuses a ready or doing item whose check holds a sha or a phrase
   in its `PINS` list (a new way of pinning main is one more entry). `ci` runs `npm test`, so no item repeats it.
 - **The verdict names its tests.** Each `verifier` or `builder` result names the test file that proves it, and the
-  verdict gate runs it at the head. What the verifier judged rather than ran goes in `observations`, which never
-  gates. Evidence is what was shown: one small evidence file per Expect line, never a listing or a capture.
+  verdict gate runs it at the head. What the verifier judged goes in `observations`, which never gates. Evidence is
+  one small file per Expect line: the gate refuses a link or a test listing, and the brief keeps out other captures.
 - **The contract changes once, then freezes.** Before its verdict file exists, one replan may change a doing item's
   contract, with a `## Contract change` section saying what the build tried and why the contract moved.
 - **No stubs count as done.** No TODO, FIXME, "not implemented" or skipped test in `packages/` and `plugins/`.

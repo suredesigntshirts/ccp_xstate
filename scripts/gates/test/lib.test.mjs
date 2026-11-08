@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { EVIDENCE_LIMIT, checkCutoff, checkDoneOn, checkEvidence, checkFreeze, checkSessions, checkVerdict, contract, contractMoves, findStubs, namedItem, sessionOf, testRunFault, verdictTests } from '../lib.mjs';
+import { EVIDENCE_LIMIT, LISTING_LINES, checkCutoff, checkDoneOn, checkEvidence, checkFreeze, checkSessions, checkVerdict, contract, contractMoves, findStubs, isListing, namedItem, sessionOf, testRunFault, verdictTests } from '../lib.mjs';
 
 const item = (head, brief = 'Run it.') => `\`\`\`json\n${JSON.stringify(head, null, 2)}\n\`\`\`\n\nWhy.\n\n## Verifier brief\n\n${brief}\n`;
 const head = {
@@ -203,4 +203,31 @@ test('evidence: a file under verify/ over the limit is refused with its size; on
 test('evidence: a .pass file under verify/ is refused at any size; files outside verify/ are not read', () => {
   assert.match(checkEvidence([{ path: 'verify/x/suite.pass', size: 12 }])[0], /verify\/x\/suite\.pass is a test listing/);
   assert.deepEqual(checkEvidence([{ path: 'docs/big.json', size: 900000 }, { path: 'test/a.pass', size: 3 }]), []);
+});
+
+// A node:test listing of n results in TAP or spec form, built in code so this file is not one itself.
+const listing = (n, form = 'tap') => form === 'tap'
+  ? ['TAP version 13', ...Array.from({ length: n }, (_, i) => `ok ${i + 1} - t${i}\n  ---\n  duration_ms: 1\n  ...`), `1..${n}`,
+    `# tests ${n}`, `# pass ${n}`, '# fail 0'].join('\n')
+  : [...Array.from({ length: n }, (_, i) => `\u2714 t${i} (1ms)`), `\u2139 tests ${n}`, `\u2139 pass ${n}`, '\u2139 fail 0'].join('\n');
+
+test('evidence: a symlink or submodule under verify/ is refused whatever its size; a regular file passes', () => {
+  assert.match(checkEvidence([{ path: 'verify/x/evidence/a.md', size: 20, mode: '120000' }])[0], /verify\/x\/evidence\/a\.md is a symlink/);
+  assert.match(checkEvidence([{ path: 'verify/x/sub', mode: '160000' }])[0], /verify\/x\/sub is a submodule/);
+  assert.deepEqual(checkEvidence([{ path: 'verify/x/run.sh', size: 20, mode: '100755', text: 'echo\n' }]), []);
+  assert.deepEqual(checkEvidence([{ path: 'test/link', size: 20, mode: '120000' }]), []);
+});
+
+test('evidence: a test listing under verify/ is refused by its text, TAP or spec; a short excerpt passes', () => {
+  assert.equal(LISTING_LINES, 10);
+  for (const form of ['tap', 'spec']) {
+    assert.ok(isListing(listing(10, form)), form);
+    assert.ok(!isListing(listing(9, form)), form);
+    assert.match(checkEvidence([{ path: 'verify/x/listing.txt', size: 900, text: listing(12, form) }])[0],
+      /verify\/x\/listing\.txt is a test listing \(node:test results/);
+  }
+  assert.ok(!isListing(listing(12).replace('# fail 0', '')), 'no fail summary');
+  const excerpt = ['# Command', 'node --test a.test.mjs', ...listing(4).split('\n')].join('\n');
+  assert.deepEqual(checkEvidence([{ path: 'verify/x/evidence/a.md', size: 200, text: excerpt }]), []);
+  assert.deepEqual(checkEvidence([{ path: 'test/listing.txt', size: 900, text: listing(12) }]), []);
 });

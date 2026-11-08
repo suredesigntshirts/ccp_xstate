@@ -15,7 +15,7 @@ import { STATES, TRANSITIONS, state, transition, BUDGET, spent } from '../../../
 import { REFUSAL_CAP } from '../../../packages/engine/src/run/accept.js';
 import { STALL_CAP } from '../../../packages/engine/src/run/supervise.js';
 
-const BASE = join(tmpdir(), 'regression-rls');
+const BASE = join(tmpdir(), `regression-rls-${process.pid}`);
 const LIFECYCLE = ['run.json', 'spawn.json', 'agent.json', 'result.json', 'failed.json', 'sent-back.json'];
 const ISSUE = { url: 'https://github.com/o/r/issues/7', expect: ['x'] };
 const BRIEFS = { builder: 'verify-rls builder brief', verifier: 'verify-rls verifier brief' };
@@ -460,7 +460,7 @@ test('one-budget: BUDGET is { refused: 10, sentBack: 1, stalled: 2 } and the cap
 });
 
 test('one-budget: a root left with 7 refusals and 1 stall block and no attempts in run.json continues from the journal\'s counts', async () => {
-  const root = join(tmpdir(), 'verify-rls-cont', 'root');
+  const root = join(tmpdir(), `verify-rls-cont-${process.pid}`, 'root');
   rmSync(dirname(root), { recursive: true, force: true });
   unpack(JSON.parse(readFileSync(join(OUT, 'pre.json'), 'utf8')), root);
   // The shape a run folder had before run.json counted attempts.

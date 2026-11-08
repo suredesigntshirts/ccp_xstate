@@ -1,0 +1,75 @@
+{
+  "item": "verify-regression-plugin",
+  "verified_sha": "a95b6c80e7d567730376ca743833154514212acf",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5JVmrWobP4TozwazsH"
+  },
+  "results": [
+    {
+      "id": "table-complete",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-plugin/table.test.mjs",
+      "excerpt": "3/3 pass: 50 rows (17 moved, 16 split, 17 left) equal the 50 *.test.mjs files git ls-tree lists for the 19 suites at 2178cc6; every verdict has a reason, every split names moved: and left:; all 16 destinations exist under test/regression/{plugin,inspector,journal,engine}/. Against the base all 3 fail.",
+      "test": "verify/verify-regression-plugin/table.test.mjs"
+    },
+    {
+      "id": "folders-hold-verdicts",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-plugin/folders.test.mjs",
+      "excerpt": "2/2 pass: each of the 19 folders holds only verdict.json, item equal to the folder. Against the base the main test fails.",
+      "test": "verify/verify-regression-plugin/folders.test.mjs"
+    },
+    {
+      "id": "moved-pass",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-plugin/moved-pass.test.mjs (as is, and with Playwright hidden by unshare -m + tmpfs)",
+      "excerpt": "4/4 pass: '49 files, 342 tests pass' as is, '49 files, 332 tests pass' with Playwright hidden (unshare -m, tmpfs over its two install paths), at a95b6c8; also passes with verify/verify-regression-engine/moved-pass running alongside. Each file alone exits 0 with >= 1 pass; every Expect: <item>/<id> header exists in plan/items/; no code file names a verify/ path. Earlier heads failed in CI: stage-record passed 0 without Playwright (fixed 720d09b), and live-capture's cheap timing test failed under parallel runs (left under contract change #245).",
+      "test": "verify/verify-regression-plugin/moved-pass.test.mjs"
+    },
+    {
+      "id": "one-helper",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-plugin/one-helper.test.mjs",
+      "excerpt": "3/3 pass: test/regression/lib.mjs is the only non-test code file under test/regression/; each export is imported by >= 2 test files.",
+      "test": "verify/verify-regression-plugin/one-helper.test.mjs"
+    },
+    {
+      "id": "moved-bite",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-plugin/bite.test.mjs",
+      "excerpt": "3/3 pass. plugin: return-tool.mjs accepts any stored result -> return-tool-answer 2 red, restored 4 pass. inspector: observe/data.js lastFinishes keeps every finish -> item-views 6 red, restored 9 pass. journal: journal/src/check.js counts every call journalled -> journal-check 3 red, restored 10 pass.",
+      "test": "verify/verify-regression-plugin/bite.test.mjs",
+      "mutation": "plugins/harness/scripts/return-tool.mjs answer(); plugins/harness/pages/observe/data.js lastFinishes; packages/journal/src/check.js session diff",
+      "red_test": "test/regression/plugin/return-tool-answer.test.mjs, test/regression/inspector/item-views.test.mjs, test/regression/journal/journal-check.test.mjs"
+    },
+    {
+      "id": "left-reasons-hold",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-plugin/left-reasons.test.mjs",
+      "excerpt": "46/46 pass: 42 cases cover every test of the 17 left files and the left half of all 16 split rows, read at 2178cc6. Each is one of: a comparison with main's or a stored output capture; a recorded-input or recorded-run check that runs no head code; a source or doc text match; a test that ran only at a retired path; or (since #245) obs-live-capture's cheap test, whose bar plugins/harness/test/capture.test.mjs holds on the same hook and the row names. The moved block tests fit none of these kinds (control).",
+      "test": "verify/verify-regression-plugin/left-reasons.test.mjs"
+    },
+    {
+      "id": "scope",
+      "status": "MET",
+      "command": "node --test verify/verify-regression-plugin/scope.test.mjs",
+      "excerpt": "3/3 pass: git diff -M 2178cc6 a95b6c8 touches only test/regression/, the 19 folders and the item file (plus the verifier's own folder), and verify/rules-said-once/suite-and-scope.test.mjs, whose only change drops its read of the deleted verify/harness-glossary/notes.test.mjs; nothing under packages, plugins, workflows, scripts or bench.",
+      "test": "verify/verify-regression-plugin/scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "PR #232 check runs at a95b6c8 (GitHub MCP get_check_runs, get_job_logs)",
+      "excerpt": "test (ci) success, job 128730533720 (run 42480289250, 12:26-12:35Z). gates job 128730533612 failed only at the verdict step, because the verdict on the branch then named db2ba7e and later commits changed the item; stubs, freeze and evidence passed. This verdict commit, naming a95b6c8, is what gates reads."
+    }
+  ],
+  "observations": [
+    "First run at 142b5ac failed moved-pass and ci: CI has no Playwright, so test/regression/inspector/stage-record.test.mjs passed 0 and verify/verify-regression-engine/moved-pass went red. The builder added a browserless test (720d09b). Local runs hide this class of failure because this container has Chromium; a moved test file whose every test needs a browser should be caught by a check that runs without one.",
+    "obs-live-capture's cheap test left under the reason contract change #245 added. In both moved-pass suites' parallel children its median-over-bare bar failed (locally: adds 94 ms against a 50 ms bar), and an interleaved-pairs version failed 4 of 12 runs per the builder. plugins/harness/test/capture.test.mjs keeps the same bars on the same hook in npm test, so the timing claim is still asserted, though only there.",
+    "Running two moved-pass suites at once also exposed fixed temp paths in prompt-kinds and lifecycle-store, which collided. 1daa82f now names those folders with the process id. My moved-pass runs two files at a time (cfcee0a) to cut load.",
+    "workflow-inspector/generic.test.mjs: its exporter test ('draws every state and way out of every workflow file') drives scripts/inspector/export.mjs and checks it against an independent walk, but it gated on seven workflow files including the lanes, so it always skipped. It could have run on the repo's four workflows; leaving it follows the retired-path rule, but the exporter-shape check is lost rather than moved.",
+    "fix-agent-finish-ms/real-agents.test.mjs left whole. Its second test runs the head's finishOf over recorded agent timelines (input) and compares with the ms that run journalled (the harness's own output), so it counts as a capture comparison; a moved version could have asserted the ms against the timeline's own first and last timestamps.",
+    "fix-return-tool-answer/stamped's VERIFY_MAIN test ran only on a checkout of main; I judged it with the retired-path kind.",
+    "Fixtures over 64 KB now sit under test/regression/fixtures/ (journal-vs-world session transcripts, rework/pr-*.json at about 590 KB together). The evidence gate measures only verify/, so nothing refuses them; that is per the item, which puts input data there."
+  ]
+}
