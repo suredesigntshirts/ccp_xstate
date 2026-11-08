@@ -64,8 +64,8 @@
     },
     {
       "id": "p95-over-bare",
-      "check": "Under a CPU load of twice as many busy processes as cores, capture.test.mjs's cheap test passes at the head in 5 runs out of 5; with no load, it fails at the head when the capture hook waits an extra 250 ms on PostToolUse only (the verifier adds the wait in a copy of the head), so capture's own cost still trips the bar",
-      "how": "The verifier's own test running the cheap test in a copy of the head under load, and again with the extra wait; the base under the same load is recorded as an observation",
+      "check": "In a copy of the head where the cheap test starts both the hook and the bare node through node --import of a module that blocks for 300 ms (the same flag on both spawns), the cheap test passes, and the same change at the base fails it on p95; in a copy of the head where the capture hook busy-waits 250 ms on one PostToolUse run only, the cheap test fails on p95",
+      "how": "The verifier's own test copying the base and head to temp clones, making each change there and running the cheap test",
       "proof": "verifier"
     },
     {
@@ -132,10 +132,12 @@ builder's diff first, write your own tests under `verify/test-fixture-edges/`:
   in each, `git branch release/harness-v9.9.9` there, link or install `node_modules`, run the two test files in each.
 - **keep-across-fs:** find a mount with a different `st_dev` from `os.tmpdir()` (`/dev/shm` often is), or run with
   `TMPDIR` on one; run the script with `--keep` into the other one and into the same one.
-- **p95-over-bare:** start `2 × nproc` busy loops, run the cheap test five times at the head (and at the base, as an
-  observation), stop the load; then add a 250 ms wait to the PostToolUse path of `plugins/harness/scripts/capture.mjs`
-  in a copy of the head and show the cheap test red. Both the hook and the bare starts are spawned with `PATH` only,
-  so slowing node through `NODE_OPTIONS` reaches neither.
+- **p95-over-bare:** in temp clones of the base and head, add `--import <a module that blocks 300 ms>` to the hook
+  spawn in `plugins/harness/test/helpers.mjs` (`runHook`) and to the bare start in the cheap test, then run the cheap
+  test (`--test-name-pattern=cheap`): green at the head, red on p95 at the base. Then, at the head without that, make
+  `plugins/harness/scripts/capture.mjs` busy-wait 250 ms on the first PostToolUse run only (a marker file), and show
+  the cheap test red on p95. A CPU load is no substitute: it slows capture's own work too, and the median bar (out of
+  scope here) can go red under it.
 - **scope:** `git diff --name-only <base> <head>`.
 - **ci:** read the ci and verdict checks at the head sha.
 
