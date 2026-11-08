@@ -61,3 +61,15 @@ Recording it is not a contract change: `scripts/gates/lib.mjs` `contract()` leav
 
 The report measures; it refuses nothing. A ceiling (say, reader lines per concept added) is a later decision, once
 a few items' numbers show what normal looks like.
+
+## 7. After the build: the verifier's observations
+
+- **A call in another file reads only exported definitions.** `report()` takes the definition in the calling file
+  when there is one, else the exported ones elsewhere; section 3 did not say exported. That is the rule: a name
+  called from another file must be imported, and only exported names can be. A non-exported helper with the same name
+  in an unrelated file is not what the caller reads.
+- **Verifier lines dominate reader lines.** For #189, #192 and #212, verifier tests are a third or more of the added
+  lines. They stay in `reader_lines`: a reader following a change reads its proof too, and the per-category numbers
+  beside it show where the lines went. If a review finds that misleading, the next decision splits `reader_lines`
+  into product and proof rather than dropping the verifier.
+- **The PR body said the doc lines were still to come.** Fixed in the PR body before the merge.
