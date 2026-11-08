@@ -4,7 +4,7 @@
   "title": "Make verifier evidence say what was shown",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "doing",
+  "status": "done",
   "outcome": "A verifier commits one file per Expect line holding the command, the excerpt and the inputs to run it again; the verdict gate refuses a PR that adds a file under verify/ larger than 64 KB or named *.pass; plan/README.md and docs/gates.md state the policy.",
   "why": "Evidence was 82 percent of the lines the seven cleanups added (full journal roots, .pass listings, captures of main), and nothing read it back (decision 5; research plan/research/verification-swing.md, item 5).",
   "serves": [
@@ -160,6 +160,20 @@ files a PR adds, changes or renames, so a PR deleting them passes. The verifier 
 wrote evidence in the new shape (`verify/verification-contract/evidence/`), and that folder is the model.
 
 The stand-in choices behind the head are in `plan/decisions/2026-11-08-verify-evidence-policy.md`.
+
+## Done
+
+Readied by replan #195 and built in PR #197. A separate session verified it at 7f52c6f: all seven Expect lines MET,
+each verifier and builder line naming its test under `verify/verify-evidence-policy/`, the world check a throwaway PR
+whose verdict run failed at the evidence step naming both files. Its two PR-scoped tests first failed `ci` because
+they looked for `origin/main` in a depth-1 checkout; the verifier fixed them and re-committed the verdict. `ci` also
+failed once on the capture hook's timing bar, which is `test-fixture-edges`. No plugin or engine code changed, so
+there is no release.
+
+What the gate does not refuse, from the verifier's observations: a symlink under `verify/` is measured by its link
+text, and a test listing saved under another name than `*.pass` passes. Both are filed as the draft
+`evidence-gate-edges`; until it lands, the gate refuses only a file over 64 KB and a `.pass` name, and the rest of
+the policy is the verifier's to keep.
 
 ## Verifier brief
 
