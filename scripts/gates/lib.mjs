@@ -20,15 +20,11 @@ export function contract(text) {
   return JSON.stringify({ head: rest, brief });
 }
 
-// Which item a PR names: an `Item: <id>` line in the body, else a branch named <anything>/<id>.
-export function namedItem({ branch = '', body = '', ids }) {
-  const fromBody = body.match(/^Item:\s*([a-z0-9-]+)\s*$/m)?.[1];
-  const fromBranch = branch.split('/').pop();
-  const reasons = [];
-  if (fromBody && !ids.has(fromBody)) reasons.push(`the body names item ${fromBody}, which plan/items/ doesn't have`);
-  if (fromBody && ids.has(fromBranch) && fromBranch !== fromBody)
-    reasons.push(`the body names ${fromBody} but the branch names ${fromBranch}`);
-  return { item: fromBody ?? (ids.has(fromBranch) ? fromBranch : null), reasons };
+// Which item a PR names: the `Item: <id>` line in its body, and nothing else. The branch name is for people.
+export function namedItem({ body = '', ids }) {
+  const item = body.match(/^Item:\s*([a-z0-9-]+)\s*$/m)?.[1] ?? null;
+  if (item && !ids.has(item)) return { item: null, reasons: [`the body names item ${item}, which plan/items/ doesn't have`] };
+  return { item, reasons: [] };
 }
 
 // Contract freeze: a PR may not change the head or Verifier brief of a frozen item (the one it names, one whose status

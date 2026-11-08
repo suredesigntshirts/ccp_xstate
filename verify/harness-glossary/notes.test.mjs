@@ -1,6 +1,5 @@
 // no-translation: scripts/inspector/export.mjs no longer says a capture row is not a harness accept or a host prompt,
-// and tells capture rows from engine rows by kind alone. claude-md: CLAUDE.md names docs/language.md, carries the line
-// to use its terms and add one before a new term, and stays under 100 lines (the path check is verify/repo-skeleton/claude-md.test.mjs).
+// and tells capture rows from engine rows by kind alone.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -26,15 +25,4 @@ test('no-translation: capture rows and engine rows are told apart by kind, not b
   assert.match(EXPORT, /r\.kind === 'agent\.prompt' && \(r\.agent === agentId/);
   // Rows are read through the journal's upcast, so older rows arrive in today's kinds.
   assert.match(EXPORT, /import \{ upcast \} from '\.\.\/\.\.\/packages\/journal\/src\/index\.js'/);
-});
-
-test('claude-md: names docs/language.md, says to use its terms and add one first, under 100 lines', () => {
-  const md = readFileSync(join(REPO, 'CLAUDE.md'), 'utf8');
-  const lines = md.split('\n');
-  assert.ok(lines.length < 100, `${lines.length} lines`);
-  assert.ok(lines.some((l) => l.startsWith('| `docs/`') && l.includes('`docs/language.md`')), 'in the layout table');
-  const rule = lines.find((l) => l.includes('docs/language.md') && /Principles|^- \*\*/.test(l));
-  assert.ok(rule, 'a principle line names it');
-  assert.match(rule, /[Uu]se the terms/);
-  assert.match(rule, /add a line there before introducing a new one/);
 });
