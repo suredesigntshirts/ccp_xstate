@@ -61,7 +61,7 @@
   "expect": [
     {
       "id": "real-prs",
-      "check": "In a full clone of suredesigntshirts/ccp_xstate, the command run on merged PRs 189 and 192 prints, for each, a file count equal to the number of paths git diff --name-only lists between the merge's first and second parents, and added and removed totals across the five categories equal to git diff --numstat's totals for the same range",
+      "check": "In a full clone of suredesigntshirts/ccp_xstate, the command run on merged PRs 189 and 192 prints, for each, a file count equal to the number of paths git diff --no-renames --name-only lists between the merge commit's first parent and the merge commit, and added and removed totals across the five categories equal to git diff --no-renames --numstat's totals for the same pair",
       "how": "The verifier runs the command and git on the real history and compares the numbers",
       "proof": "world"
     },
@@ -175,7 +175,7 @@ your own under `verify/plan-reader-effort/`:
 
 - **real-prs:** `git fetch --unshallow origin` if needed; find the merge commits of PRs 189 and 192 on `main`; run
   `node scripts/reader-effort.mjs 189 --json` and the same for 192; compare files and the category totals with
-  `git diff --name-only` and `git diff --numstat` between each merge's parents. Commit one small evidence file with
+  `git diff --no-renames --name-only` and `--numstat` between each merge's first parent and the merge. Commit one small evidence file with
   the commands and the numbers.
 - **categories, exports, reader-lines:** in temp repos (`git init`, commit a base, branch, commit, merge with
   `--no-ff -m "Merge pull request #7 from x/y"`), run the command with the range and with the PR number. Take the
