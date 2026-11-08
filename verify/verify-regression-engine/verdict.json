@@ -1,0 +1,40 @@
+{
+  "item": "verify-regression-engine",
+  "verified_sha": "ad3d01843e81ae27c3e4f23835d14b6b7b03ebe8",
+  "verifier": { "session": "https://claude.ai/code/session_01KfkB5JQNv9wfUoxBKiBBzp", "model": "claude-opus-5-5" },
+  "results": [
+    { "id": "table-complete", "status": "MET", "command": "node --test verify/verify-regression-engine/table.test.mjs",
+      "excerpt": "3/3 pass: 61 rows (30 moved, 17 split, 14 left) equal the 61 *.test.mjs files git ls-tree lists for the 26 suites at 3862da5; every verdict has a reason; all 33 destinations exist under test/regression/{engine,run,marks,plan,inspector}/. At the base 2 of 3 fail.",
+      "test": "verify/verify-regression-engine/table.test.mjs" },
+    { "id": "folders-hold-verdicts", "status": "MET", "command": "node --test verify/verify-regression-engine/folders.test.mjs",
+      "excerpt": "2/2 pass: each of the 26 folders holds only verdict.json, item equal to the folder. At the base the main test fails.",
+      "test": "verify/verify-regression-engine/folders.test.mjs" },
+    { "id": "moved-pass", "status": "MET", "command": "node --test verify/verify-regression-engine/moved-pass.test.mjs",
+      "excerpt": "4/4 pass: '33 files, 239 tests pass', each file alone exits 0 with >= 1 pass; every first-comment Expect: <item>/<id> exists in plan/items/; no code file under test/regression/ names a verify/ path (control sees each form).",
+      "test": "verify/verify-regression-engine/moved-pass.test.mjs" },
+    { "id": "one-helper", "status": "MET", "command": "node --test verify/verify-regression-engine/one-helper.test.mjs",
+      "excerpt": "3/3 pass: test/regression/lib.mjs is the only non-test code file; its 17 exports each imported by >= 2 test files (fewest 2).",
+      "test": "verify/verify-regression-engine/one-helper.test.mjs" },
+    { "id": "moved-bite", "status": "MET", "command": "node --test verify/verify-regression-engine/bite.test.mjs",
+      "excerpt": "3/3 pass. engine: quick-fix.json verifiedHead without the same-head clause -> quick-fix-cases 2 red, restored 7 pass. run: store.js transition() without its from-state guard -> lifecycle-store 1 red, restored 8 pass. marks: stages.js checkMarks verdict-value check off -> declared-marks 5 red, restored 24 pass.",
+      "test": "verify/verify-regression-engine/bite.test.mjs",
+      "mutation": "workflows/quick-fix.json verifiedHead; packages/engine/src/run/store.js transition guard; packages/engine/src/stages.js checkMarks verdict value",
+      "red_test": "test/regression/engine/quick-fix-cases.test.mjs, test/regression/run/lifecycle-store.test.mjs, test/regression/marks/declared-marks.test.mjs" },
+    { "id": "left-reasons-hold", "status": "MET", "command": "node --test verify/verify-regression-engine/left-reasons.test.mjs",
+      "excerpt": "34/34 pass: 32 cases (14 left files, 18 left halves by title) read at 3862da5 are source-text, capture, recorded-run, listing or child-run checks; every non-moved row has a case; the moved two-hosts test is none of these kinds (control). The engine-host FINDING test is judged left by intent (observations).",
+      "test": "verify/verify-regression-engine/left-reasons.test.mjs" },
+    { "id": "scope", "status": "MET", "command": "node --test verify/verify-regression-engine/scope.test.mjs",
+      "excerpt": "3/3 pass: git diff -M 3862da5 ad3d018 touches only test/regression/, the 26 folders and the item file, plus verify/harness-glossary/lib.mjs, whose only change is the two v1 journal paths to their R100 moves under test/regression/fixtures/v1/; nothing under packages, plugins, workflows, scripts or bench.",
+      "test": "verify/verify-regression-engine/scope.test.mjs" },
+    { "id": "ci", "status": "MET", "command": "PR #199 check runs at ad3d018 (GitHub MCP get_check_runs, get_job_logs)",
+      "excerpt": "test (ci) success, job 128696310684. gates failed only at the verdict step: 'no verify/verify-regression-engine/verdict.json at the head sha'; stubs and freeze passed. This verdict commit is what gates reads." }
+  ],
+  "observations": [
+    "engine-host/forge.test.mjs FINDING drives inputsOfWake and asserts it returns [] for a field holding </event>, which is the shape the left-reasons line fails on. It is titled 'observed, not asserted as good' and plan/decisions/2026-10-30-engine-effects.md keeps the defect open, so moving it would pin a bug as regression behaviour; I judge the row right. The defect has no plan item of its own; one would keep it from being lost when that decision ages.",
+    "The cross-folder edit to verify/harness-glossary/lib.mjs is sound: the two v1 journals moved byte-identical (R100), only their two path strings changed, and that suite's 17 tests pass at the head. But test/regression/fixtures/v1/ is read by no test under test/regression/, only by verify/harness-glossary; when verify-regression-set retires that suite, the journals should go with its tests or be deleted if nothing moved reads them.",
+    "run-lifecycle-store/states.test.mjs: the toy run's run folders under verify/engine-toy-run/evidence were inputs to store.state(); they are the harness's own earlier output, so dropping them follows the item's rule, and the bench run folders still cover the same reading.",
+    "The states row's split reason names its left half in parentheses ('the toy-run folder list left with its evidence') rather than as 'left:' like the other split rows.",
+    "test/regression/engine/retired-pins.test.mjs and bench-prompts.test.mjs scan every committed */items/*.jsonl with git ls-files; none sits under verify/ at the head, but a journal committed there later would be read by them.",
+    "The per-suite quick-fix worlds inlined into each moved file are near-copies, as the builder noted; merging them is a later design item."
+  ]
+}
