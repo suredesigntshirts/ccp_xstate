@@ -4,7 +4,7 @@
   "title": "Measure what a change costs its reader",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "doing",
+  "status": "done",
   "outcome": "For any merged PR, one command reports the files it touched, the exports it added or removed, the lines a reader must open to follow the change (the changed hunks plus the definitions they call), and the verifier lines and evidence lines it added, split code, tests, verifier, evidence and docs; a done build item records that report in a reader_effort head field beside its fix budget fields, the plan check refuses a build item with a verdict file and done on or after 2026-11-09 without one, and recording it is not a contract change.",
   "why": "The 8 Nov review counted by hand what the plan should count, and the cleanups passed every gate while growing (complexity is what the reader experiences; research plan/research/verification-swing.md, item 7).",
   "serves": [
@@ -151,7 +151,29 @@
   "risks": [
     "The verifier's tests run in ci.yml's depth-1 checkout, so they build temp repos; only the world line reads the real history, and needs git fetch --unshallow",
     "rules-said-once (#202) rewrites plan/README.md and docs/gates.md; the build waits for it to merge before touching either"
-  ]
+  ],
+  "done_on": "2026-11-08",
+  "reader_effort": {
+    "pr": 212,
+    "files": 31,
+    "exports_added": 6,
+    "exports_removed": 0,
+    "reader_lines": 1725,
+    "added": {
+      "code": 298,
+      "tests": 135,
+      "verifier": 557,
+      "evidence": 210,
+      "docs": 10
+    },
+    "removed": {
+      "code": 5,
+      "tests": 2,
+      "verifier": 0,
+      "evidence": 0,
+      "docs": 7
+    }
+  }
 }
 ```
 
@@ -165,6 +187,15 @@ the count one command and records it on every done build item, so the next revie
 The choices made while readying it are in `plan/decisions/2026-11-08-plan-reader-effort.md`: a script under
 `scripts/` that reads git, five categories by path, reader lines as hunks plus called top-level definitions, and a
 head field beside `module` and `done_on` that the plan check requires of verified items done from 2026-11-09.
+
+## Done
+
+Readied in #207 and built in PR #212 (merged a4e3a59). A separate session verified it at 314dbde: all ten Expect
+lines MET, each verifier and builder line naming its test under `verify/plan-reader-effort/` (verdict 6339fa5). No
+plugin or engine code changed, so there is no release. The head's `reader_effort` is this item's own report, from
+`node scripts/reader-effort.mjs 212 --json`.
+
+The verifier's observations are answered in `plan/decisions/2026-11-08-plan-reader-effort.md`, section 7.
 
 ## Verifier brief
 
