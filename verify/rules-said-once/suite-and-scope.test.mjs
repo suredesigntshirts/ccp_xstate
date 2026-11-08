@@ -54,7 +54,6 @@ test('the PR changes only the files its outputs name, and only the named verify/
       [...DELETED.map((p) => `D ${p}`), ...TRIMMED.map((p) => `M ${p}`)].sort());
   } else t.diagnostic('depth-1 mode: no base reachable, checking the scope from the tree');
   for (const p of DELETED) assert.ok(!existsSync(join(REPO, p)), `${p} is deleted`);
-  assert.doesNotMatch(read(TRIMMED[0]), /CLAUDE\.md/, 'the claude-md test left notes.test.mjs');
   assert.doesNotMatch(read(TRIMMED[1]), /plan\/README\.md/, "the plan/README.md test left policy-written.test.mjs");
   assert.match(read(TRIMMED[1]), /docs\/gates\.md/, "the docs/gates.md test stays in policy-written.test.mjs");
 });

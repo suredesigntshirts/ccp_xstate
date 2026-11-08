@@ -177,6 +177,85 @@ Known now:
 
 Report the local suite time before and after in the PR, as information.
 
+## Regression table
+
+One row per test file the 19 folders held at the base, then one row per suite for its other files. `moved` and `split` name the file under `test/regression/` that holds the moved tests.
+
+| Test file | Verdict | Moved to | Reason |
+|---|---|---|---|
+| `verify/engine-item-views/item-views.test.mjs` | split | `test/regression/inspector/item-views.test.mjs` | moved: finish-once and spans-sessions drive itemView, tokensByAgent and overhead on the first real run's rows; left: the fixture test asserts only the recorded rows |
+| `verify/engine-item-views/world.test.mjs` | split | `test/regression/inspector/item-views.test.mjs` | moved: view runs itemView on the iv1 rows against hand counts; left: tagged asserts only facts of the recorded iv1 journal, and the page test reads the page's recorded browser-check output |
+| `verify/fix-agent-finish-ms/long-transcript.test.mjs` | moved | `test/regression/plugin/agent-finish-ms.test.mjs` | drives the real capture hook on transcripts over the read cap and the edge cases |
+| `verify/fix-agent-finish-ms/old-entry.test.mjs` | split | `test/regression/plugin/agent-finish-ms.test.mjs` | moved: the hook gives the run's own ms despite old rows; left: main's ms read from evidence/main-scenarios.json |
+| `verify/fix-agent-finish-ms/real-agents.test.mjs` | left |  | asserts facts of a recorded real run; its one head-code check compares the hook's answer with the ms the harness journalled in that run, its own earlier output |
+| `verify/fix-agent-finish-ms/unchanged.test.mjs` | left |  | compares every row with the stored capture evidence/main-scenarios.json |
+| `verify/fix-refusal-hints/cap.test.mjs` | moved | `test/regression/engine/refusal-hints.test.mjs` | drives accept() to the refusal cap on the real engine |
+| `verify/fix-refusal-hints/hint.test.mjs` | split | `test/regression/engine/refusal-hints.test.mjs` | moved: fix.hint lines equal the stage files' Output lines; left: refused compared with evidence/main-refusals.json |
+| `verify/fix-refusal-hints/real-agent.test.mjs` | left |  | asserts facts of recorded agent transcripts and journals |
+| `verify/fix-refusal-hints/restated.test.mjs` | moved | `test/regression/engine/refusal-hints.test.mjs` | drives accept() with restated issues on the real engine |
+| `verify/fix-refusal-hints/unchanged.test.mjs` | left |  | compares render hashes with the stored capture evidence/main-prompts.json |
+| `verify/fix-return-tool-answer/key-order.test.mjs` | moved | `test/regression/plugin/return-tool-answer.test.mjs` | drives the real hook and return-tool server with reordered keys |
+| `verify/fix-return-tool-answer/real-agent.test.mjs` | left |  | asserts facts of a recorded agent transcript and journal |
+| `verify/fix-return-tool-answer/stamped.test.mjs` | split | `test/regression/plugin/return-tool-answer.test.mjs` | moved: the hook accepts and stores stamped, the server answers accepted; left: main's answers from evidence/main-scenarios.json, and a live run against a checkout of main |
+| `verify/fix-return-tool-answer/still-refuses.test.mjs` | moved | `test/regression/plugin/return-tool-answer.test.mjs` | drives the real return-tool server with changed results |
+| `verify/fix-return-tool-answer/unchanged.test.mjs` | left |  | compares renders and rows with stored captures of main |
+| `verify/fix-waiting-lines-owner/lines.test.mjs` | split | `test/regression/plugin/waiting-lines-owner.test.mjs` | moved: each session's lines through the real hook; left: main's lines from evidence/main-scenarios.json |
+| `verify/fix-waiting-lines-owner/real-session.test.mjs` | left |  | asserts facts of a recorded headless session |
+| `verify/fix-waiting-lines-owner/stall.test.mjs` | split | `test/regression/plugin/waiting-lines-owner.test.mjs` | moved: the direct answers of stall(), cannotStart() and the Stop hook; left: their rows and run files compared with evidence/main-scenarios.json |
+| `verify/fix-waiting-lines-owner/unchanged.test.mjs` | left |  | compares renders and spawn answers with stored captures of main |
+| `verify/fix-waiting-run-stall/block.test.mjs` | moved | `test/regression/plugin/waiting-run-stall.test.mjs` | drives the real Stop hook through host.js items |
+| `verify/fix-waiting-run-stall/cannot-start.test.mjs` | moved | `test/regression/plugin/waiting-run-stall.test.mjs` | drives ccp-cannot-start through the real hook |
+| `verify/fix-waiting-run-stall/cap.test.mjs` | moved | `test/regression/plugin/waiting-run-stall.test.mjs` | drives the block cap through the real hook |
+| `verify/fix-waiting-run-stall/measure.test.mjs` | moved | `test/regression/plugin/waiting-run-stall.test.mjs` | runs derive.js stalls over a journal the real hook and engine made |
+| `verify/fix-waiting-run-stall/real-session.test.mjs` | left |  | asserts facts of two recorded headless sessions |
+| `verify/fix-waiting-run-stall/unchanged.test.mjs` | left |  | compares render hashes with the stored capture evidence/main-prompts.json |
+| `verify/harness-glossary/capture.test.mjs` | split | `test/regression/journal/prompt-kinds.test.mjs` | moved: the capture hook writes v2 agent.prompt and agent.final, never brief.stored or result.stored, and spawn carries promptHash; left: rows compared with main's evidence/main/answers.json, and a regex over capture-rows.mjs source |
+| `verify/harness-glossary/glossary.test.mjs` | left |  | reads docs/language.md with regexes and checks the names it lists |
+| `verify/harness-glossary/notes.test.mjs` | left |  | regexes over scripts/inspector/export.mjs source (its claude-md test left with rules-said-once) |
+| `verify/harness-glossary/one-meaning.test.mjs` | left |  | greps engine, journal, plugin and script source for names |
+| `verify/harness-glossary/prompt.test.mjs` | split | `test/regression/journal/prompt-kinds.test.mjs` | moved: the engine writes prompt.md and a prompt.stored row, the Agent hook hands it out and binds, a brief.md-only run folder still starts; left: byte comparisons with main's evidence/main/answers.json |
+| `verify/harness-glossary/v1.test.mjs` | split | `test/regression/journal/prompt-kinds.test.mjs` | moved: readFile maps every v1 journal at v2, derive.js stalls and the inspector export over v1 runs; left: their comparisons with main's evidence/main/answers.json |
+| `verify/inspector-reads-records/explain-tests.test.mjs` | moved | `test/regression/inspector/reads-records.test.mjs` | runs explain.test.js in a worktree with explain.js mutated, red each time |
+| `verify/inspector-reads-records/no-guessing.test.mjs` | split | `test/regression/inspector/reads-records.test.mjs` | moved: a run with stage.json and no prompt file is a model run, and a journal or engine without records is refused by name; left: two greps over scripts/inspector source |
+| `verify/inspector-reads-records/one-path.test.mjs` | moved | `test/regression/inspector/reads-records.test.mjs` | exports a cut item on the checkout and on a mutated copy |
+| `verify/inspector-reads-records/page.test.mjs` | moved | `test/regression/inspector/reads-records.test.mjs` | builds the page from sources.json and checks it in Chromium (skips without Playwright) |
+| `verify/inspector-reads-records/records.test.mjs` | moved | `test/regression/inspector/reads-records.test.mjs` | exports every committed and scenario journal and checks it against its own replay |
+| `verify/inspector-stage-record/flow.test.mjs` | moved | `test/regression/inspector/stage-record.test.mjs` | builds the page and reads the flow strip in Chromium (skips without Playwright) |
+| `verify/inspector-stage-record/true-to-record.test.mjs` | moved | `test/regression/inspector/stage-record.test.mjs` | builds the page for the trial and scenarios Q1 and R1 and checks it against stage.json in Chromium |
+| `verify/journal-schema/journal.test.mjs` | moved | `test/regression/journal/schema-writers.test.mjs` | two writer processes, an older writer and an upcast through the journal library; writer.mjs is inlined as a node -e child |
+| `verify/obs-journal-vs-world/journal-check.test.mjs` | split | `test/regression/journal/journal-check.test.mjs` | moved: journal-check.js over recorded transcripts and GitHub answers; left: the fixture test asserts only the recorded inputs |
+| `verify/obs-live-capture/capture.test.mjs` | split | `test/regression/plugin/live-capture.test.mjs` | moved: the capture hook replayed and run on recorded hook inputs; left: the fixture test asserts only the recorded inputs |
+| `verify/obs-page/live.test.mjs` | left |  | compares hand counts with the page's recorded browser-check output and a stored published page |
+| `verify/obs-person-attention/person.test.mjs` | split | `test/regression/plugin/person-attention.test.mjs` | moved: message, card and tap rows through the real hook and the attention view; left: the fixture test asserts only the recorded wake |
+| `verify/obs-person-attention/rows-real.test.mjs` | split | `test/regression/plugin/person-rows-real.test.mjs` | moved: wakes rebuilt from a real thread's ids run through the real hook; left: the count test asserts only the recorded counts |
+| `verify/obs-refusal-log/refusal.test.mjs` | split | `test/regression/plugin/refusal-log.test.mjs` | moved: a recorded denial through the real hook, and retryOf; left: the fixture test asserts only the probe's recorded event |
+| `verify/obs-time-and-rework/verifier.test.mjs` | moved | `test/regression/journal/time-and-rework.test.mjs` | derive.js rework over GitHub's recorded answers and --append tripwires |
+| `verify/workflow-inspector/generic.test.mjs` | left |  | a regex over scripts/inspector source, and two tests that run only against lane checkouts under /home/user/lanes, a retired path no checkout has |
+| `verify/workflow-inspector/true-to-disk.test.mjs` | left |  | runs only against a journal under /mnt/project-files and lane checkouts under /home/user/lanes, retired paths; it always skips |
+| `verify/workflow-inspector/usable.test.mjs` | left |  | runs only with the same retired journal and lane checkouts; it always skips |
+
+| Suite | Other files |
+|---|---|
+| `engine-item-views` | fixtures/first-real-run.jsonl and evidence/iv1-journal.jsonl moved to test/regression/fixtures/item-views/; evidence/browser-check-iv1.json deleted |
+| `fix-agent-finish-ms` | lib.mjs and scenarios.mjs inlined (longTranscript and the edge cases kept); evidence/real/journal-run1.jsonl and journal-run2.jsonl moved to test/regression/fixtures/v1/ for the v1 reads; the rest of evidence/ deleted; the probe-plugin-agents-thread transcript the lib read is copied to test/regression/fixtures/agent-transcript.jsonl |
+| `fix-inspector-guard-label` | no tests; verdict only |
+| `fix-refusal-hints` | lib.mjs inlined; prompts.mjs and evidence/ (main captures, recorded agent runs) deleted |
+| `fix-return-tool-answer` | lib.mjs inlined; scenarios.mjs and evidence/ deleted |
+| `fix-waiting-lines-owner` | lib.mjs and scenarios.mjs inlined (lines and stalls kept); evidence/ deleted |
+| `fix-waiting-run-stall` | lib.mjs inlined; evidence/ deleted |
+| `harness-glossary` | lib.mjs inlined; evidence/main/run/ moved to test/regression/fixtures/brief-md-run/ (a run folder with brief.md and no prompt.md, input to the fallback test); record.mjs, evidence/main/answers.json and the .pass listings deleted |
+| `inspector-catalogue-entries` | no tests; evidence/ deleted |
+| `inspector-reads-records` | lib.mjs inlined; evidence/ (main comparison, .pass listings, run notes) deleted |
+| `inspector-stage-record` | lib.mjs inlined |
+| `journal-schema` | writer.mjs inlined as a node -e child |
+| `obs-journal-vs-world` | fixture/ moved to test/regression/fixtures/journal-vs-world/ |
+| `obs-live-capture` | fixture/ (hook inputs and transcripts) moved to test/regression/fixtures/live-capture/; fixture/make.mjs, which made them, deleted |
+| `obs-page` | fixtures/ (journal copy, browser-check outputs, published page) deleted |
+| `obs-person-attention` | fixture/ moved to test/regression/fixtures/person-attention/ |
+| `obs-refusal-log` | none; its input is under probes/ |
+| `obs-time-and-rework` | fixtures/ (GitHub answers for PRs 14, 28 and 31) moved to test/regression/fixtures/rework/ |
+| `workflow-inspector` | lib.mjs deleted |
+
 ## Verifier brief
 
 Check out the PR at its head sha in a clean clone, `git fetch --unshallow origin` if shallow, and run `npm ci`.
