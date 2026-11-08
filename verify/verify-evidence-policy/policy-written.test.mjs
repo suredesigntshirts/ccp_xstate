@@ -1,4 +1,4 @@
-// Expect policy-written: plan/README.md, docs/gates.md and docs/language.md state the evidence policy.
+// Expect policy-written: docs/gates.md and docs/language.md state the evidence policy.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { read } from './lib.mjs';
@@ -20,12 +20,6 @@ const POLICY = [
   [/64 KB/, 'the 64 KB limit'], [/\.pass/, 'the .pass rule'], [/evidence gate/i, 'the evidence gate'],
   [/refuses/, 'the gate refuses'], [/verify\//, 'files under verify/'],
 ];
-
-test('plan/README.md "How slop is kept out" states the evidence policy', () => {
-  const s = section(read('plan/README.md'), 'How slop is kept out');
-  for (const [re, what] of POLICY) assert.match(s, re, what);
-  assert.match(s, /verify\/<item>\/evidence\//);
-});
 
 test('docs/gates.md states the evidence policy and lists the evidence step in its gate table', () => {
   const text = read('docs/gates.md');

@@ -4,7 +4,7 @@
   "title": "Say each process rule once, and write a thread's path from ready to done",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "contract_changes": 1,
   "outcome": "A PR names its item only by an `Item: <id>` line in its body, so a branch name never changes what the gates demand; plan/README.md holds, in one section, the path an item takes from ready to done (the readying replan, the build PR, the verdict, the merge and release, the done replan) with each PR's branch, label and body line; every process rule has one home among CLAUDE.md, plan/README.md and docs/gates.md and the others point at it; a repo test fails when a path those texts or docs/ name in backticks does not exist or when CLAUDE.md, plan/README.md and docs/gates.md together reach 230 lines; and the done-suite tests that matched the old wording of these files leave.",
   "why": "Threads followed a working rule from project memory because CLAUDE.md's replan branch name made the gate demand a verdict, and the freeze, verdict and session rules were each written out twice, so a model reads about 270 lines of rules before its item and can find two versions of one (L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-1.md).",
@@ -171,6 +171,16 @@ sentence each. `docs/gates.md` is how the gates check those rules: the verdict f
 The tests that leave matched sentences of these files by regex; they pinned wording, not behaviour, and would
 fail on any rewrite. What they protected that matters (`CLAUDE.md` is short and its paths are real) moves into
 `test/docs.test.mjs`, widened to `plan/README.md` and `docs/`, with a line budget for the three entry texts.
+
+## Done
+
+Built in PR #202 (merged 81fd7a6). A separate session verified it at d6df5a7: seven of seven Expect lines MET, each
+verifier and builder line naming its test under `verify/rules-said-once/`; the world line was throwaway PR #203. One
+contract change (#205) reworded the world line to what a pre-merge PR can show. No released file changed, so no
+release. The three entry texts went from 290 to 227 lines. Verifier observations for later rounds: an item's outputs
+should name a caller it must touch (here `scripts/gates/pr-gate.mjs`); `verdict.yml` still sets `PR_BRANCH`, which no
+gate reads; bare file names in `docs/` are not path-checked. This done replan is itself on a `replan/<id>-done`
+branch with no `Item:` line, the first under the new naming rule.
 
 ## Contract change
 

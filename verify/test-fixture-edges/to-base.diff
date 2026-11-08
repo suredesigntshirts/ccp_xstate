@@ -1,0 +1,86 @@
+diff --git b/plugins/harness/test/capture.test.mjs a/plugins/harness/test/capture.test.mjs
+index 73b9606..f0ec4d0 100644
+--- b/plugins/harness/test/capture.test.mjs
++++ a/plugins/harness/test/capture.test.mjs
+@@ -100,10 +100,9 @@ test('the hook journals the expected rows and stores each blob once, as files na
+ });
+ 
+ // hook.run ms counts from the hook process's start, so it holds Node's own start, which grows when the suite runs
+-// in parallel on a busy runner, and its slowest start most. What capture adds is each quantile minus the same
+-// quantile of a bare node start measured the same way, here and now
+-// (plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md, plan/decisions/2026-11-08-capture-p95-over-bare-start.md).
+-test('cheap: hook.run rows show at most 50 ms median and 200 ms p95 over a bare node start per tool call', () => {
++// in parallel on a busy runner. What capture adds is the median minus a bare node start measured the same way, here
++// and now (plan/decisions/2026-10-30-capture-cheap-measures-what-capture-adds.md); p95 stays an absolute bar.
++test('cheap: hook.run rows show at most 50 ms median over a bare node start and 200 ms p95 per tool call', () => {
+   const dir = project();
+   const all = runFixture(dir).filter((r) => r.kind === 'hook.run');
+   const handled = events().filter((e) => EVENTS.includes(e.hook_event_name));
+@@ -113,15 +112,14 @@ test('cheap: hook.run rows show at most 50 ms median and 200 ms p95 over a bare
+   const rows = all.filter((r) => r.payload.name.startsWith('capture PostToolUse'));
+   assert.equal(rows.length, 5);
+   const ms = rows.map((r) => r.payload.ms).sort((a, b) => a - b);
+-  const quantile = (xs) => (q) => xs[Math.min(xs.length - 1, Math.ceil(q * xs.length) - 1)];
+-  const at = quantile(ms);
++  const at = (q) => ms[Math.min(ms.length - 1, Math.ceil(q * ms.length) - 1)];
+   const bare = join(dir, 'bare.mjs');
+   writeFileSync(bare, 'process.stdout.write(String(Math.round(performance.now())));\n');
+   const starts = Array.from({ length: 15 }, () => Number(execFileSync(process.execPath, [bare], { env: { PATH: process.env.PATH }, encoding: 'utf8' })))
+     .sort((a, b) => a - b);
+-  const node = quantile(starts);
+-  assert.ok(at(0.5) - node(0.5) <= 50, `median ${at(0.5)} ms, of which a bare node start is ${node(0.5)} ms`);
+-  assert.ok(at(0.95) - node(0.95) <= 200, `p95 ${at(0.95)} ms, of which a bare node start is ${node(0.95)} ms`);
++  const node = starts[Math.floor(starts.length / 2)];
++  assert.ok(at(0.5) - node <= 50, `median ${at(0.5)} ms, of which a bare node start is ${node} ms`);
++  assert.ok(at(0.95) <= 200, `p95 ${at(0.95)} ms`);
+ });
+ 
+ test('SubagentStop stops waiting once the transcript ends with the hand-back result, and only then', () => {
+diff --git b/scripts/debug/trace-writes.mjs a/scripts/debug/trace-writes.mjs
+index e0ae710..cb1c5db 100644
+--- b/scripts/debug/trace-writes.mjs
++++ a/scripts/debug/trace-writes.mjs
+@@ -8,7 +8,7 @@
+ // directory fd strace names (-y). The trace is written to a temp file and removed unless --keep names where to put it.
+ // Exits with the command's status; 127 when strace is missing.
+ import { spawnSync } from 'node:child_process';
+-import { copyFileSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
++import { mkdtempSync, readFileSync, renameSync, rmSync } from 'node:fs';
+ import { tmpdir } from 'node:os';
+ import { isAbsolute, join, resolve } from 'node:path';
+ import { pathToFileURL } from 'node:url';
+@@ -82,7 +82,7 @@ function main(argv) {
+     const hits = writesUnder(readFileSync(file, 'utf8'), folder, process.cwd());
+     for (const h of hits) process.stdout.write(`${h.pid} ${h.call} ${h.path}\n`);
+     process.stderr.write(`${hits.length} write-like call(s) under ${resolve(folder)}\n`);
+-    if (keep) copyFileSync(file, resolve(keep));
++    if (keep) renameSync(file, resolve(keep));
+     return r.status ?? 1;
+   } finally {
+     rmSync(dir, { recursive: true, force: true });
+diff --git b/test/setup.test.mjs a/test/setup.test.mjs
+index e5f2d54..5689489 100644
+--- b/test/setup.test.mjs
++++ a/test/setup.test.mjs
+@@ -88,8 +88,6 @@ test('copy-not-link: with release tags, setup installs the newest release by ver
+   // A clone of this repo carries the releases it has seen (a thread's clone has real ones, CI's checkout none), so
+   // drop them: the only releases are the three below.
+   const inherited = execFileSync('git', ['-C', clone, 'for-each-ref', '--format=%(refname)', 'refs/tags/harness-v*', 'refs/remotes/origin/release/', 'refs/heads/release/'], { encoding: 'utf8' }).split('\n').filter(Boolean);
+-  // A clone of a detached HEAD checks out a branch at that commit if one exists, which may be one of these refs.
+-  execFileSync('git', ['-C', clone, 'checkout', '-q', '--detach']);
+   for (const ref of inherited) execFileSync('git', ['-C', clone, 'update-ref', '-d', ref]);
+   for (const t of ['harness-v0.1.9', 'harness-v0.1.10', 'harness-v0.0.20']) execFileSync('git', ['-C', clone, 'tag', '-f', t]);
+   const home = fresh();
+diff --git b/verify/self-update-by-version/no-self-edit.test.mjs a/verify/self-update-by-version/no-self-edit.test.mjs
+index 39be4f1..122910f 100644
+--- b/verify/self-update-by-version/no-self-edit.test.mjs
++++ a/verify/self-update-by-version/no-self-edit.test.mjs
+@@ -57,8 +57,6 @@ function world() {
+   execFileSync('git', ['clone', '-q', '--bare', REPO, origin]);
+   // A clone of this repo carries whatever releases it has seen (a thread's clone has harness-v0.1.0 since 16:45Z,
+   // CI's shallow checkout has none), so drop them: the world's releases are only the ones each test makes.
+-  // A bare clone of a detached HEAD points HEAD at a branch at that commit if one exists, which may be one of these refs.
+-  git(origin, 'update-ref', '--no-deref', 'HEAD', 'HEAD');
+   for (const ref of git(origin, 'for-each-ref', '--format=%(refname)', 'refs/tags/harness-v*', 'refs/heads/release/').split('\n').filter(Boolean)) {
+     git(origin, 'update-ref', '-d', ref);
+   }
