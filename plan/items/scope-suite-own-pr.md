@@ -4,7 +4,7 @@
   "title": "Read rules-said-once's PR scope only on its own PR",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "doing",
   "outcome": "verify/rules-said-once/suite-and-scope.test.mjs reads a PR's file list from git only when PR_BODY names rules-said-once by its Item: line, the way the verdict gate finds a PR's item; in any other run (a local npm test in a full clone of any branch, ci's depth-1 checkout, another item's PR) it checks the same scope from the tree, so it passes wherever rules-said-once's build holds; and rules-said-once's verdict.json is left as the verifier wrote it.",
   "why": "The suite's PR mode diffs merge-base(BASE_SHA or origin/main, HEAD)..HEAD and expects exactly rules-said-once's verify/ changes, so once that PR merged every full clone with origin/main reachable fails it: the main branch itself (an empty diff) and every other branch (its own diff). ci passes only because its depth-1 checkout falls back to tree mode. A red local suite on every branch costs each builder and verifier that runs npm test a look and a rerun (L-attention-is-the-constraint).",
   "serves": [
