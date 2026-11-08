@@ -4,7 +4,8 @@
   "title": "Read the finish-ms transcript from the regression fixtures",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
+  "done_on": "2026-11-08",
   "outcome": "plugins/harness/test/finish-ms.test.mjs reads the recorded agent transcript from test/regression/fixtures/agent-transcript.jsonl, a byte-for-byte copy already on main, and no longer from verify/probe-plugin-agents-thread/evidence/, so it still passes once that folder holds only its verdict.json.",
   "why": "verify-regression-set deletes every done folder's evidence, and its outputs name verify/probe-plugin-agents-thread/evidence/agent-adda18087b10e0b3a.jsonl among them because verify-regression-plugin copied it to test/regression/fixtures/agent-transcript.jsonl. One test outside verify/ still reads the original by path, so the build PR (#267) goes red in ci, and its scope line forbids changing plugins/. Reading the fixture first lets the regression set retire the folder as planned (L-measure-then-park).",
   "serves": [
