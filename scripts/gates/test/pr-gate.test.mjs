@@ -31,7 +31,7 @@ function repo(first = expect) {
   const base = commit({ 'plan/items/x.md': itemFile(first) });
   const run = (which, env = {}) => spawnSync('node', [gate, which], {
     cwd: dir, encoding: 'utf8',
-    env: { ...process.env, BASE_SHA: base, HEAD_SHA: git('rev-parse', 'HEAD'), PR_BRANCH: 'build/x', PR_BODY: '', PR_LABELS: '[]', ...env },
+    env: { ...process.env, BASE_SHA: base, HEAD_SHA: git('rev-parse', 'HEAD'), PR_BRANCH: 'build/x', PR_BODY: 'Item: x\n', PR_LABELS: '[]', ...env },
   });
   return { commit, run, git };
 }
@@ -58,12 +58,12 @@ test('verdict gate: none, then from the builder session, then from a separate se
   assert.match(out.stderr, /after the verified sha/);
 });
 
-test('verdict gate: a PR that names no item passes only if it touches plan/ alone', () => {
+test('verdict gate: a PR with no Item line passes only if it touches plan/ alone, whatever its branch', () => {
   const r = repo();
   r.commit({ 'plan/decisions/d.md': 'chosen\n' });
-  assert.equal(r.run('verdict', { PR_BRANCH: 'docs/d' }).status, 0);
+  assert.equal(r.run('verdict', { PR_BRANCH: 'replan/x', PR_BODY: '' }).status, 0);
   r.commit({ 'docs/d.md': 'notes\n' });
-  const out = r.run('verdict', { PR_BRANCH: 'docs/d' });
+  const out = r.run('verdict', { PR_BRANCH: 'build/x', PR_BODY: '' });
   assert.equal(out.status, 1);
   assert.match(out.stderr, /names no item/);
 });

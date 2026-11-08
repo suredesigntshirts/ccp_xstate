@@ -1,13 +1,12 @@
 # ccp_xstate
 
 The v2 harness, rebuilt on XState. This file is a map, not the manual: standing knowledge lives in `docs/` and
-`plan/`, where it can be checked. Keep this file under 100 lines, and keep every path it names real.
+`plan/`, where it can be checked. `test/docs.test.mjs` keeps this file short and every path it names real.
 
 ## Principles
 
-- **The verifier proves it, not the builder.** An item is done when a separate session shows its outcome holds
-  (`plan/README.md`, "How slop is kept out"). Expect lines name behaviour, never main's state; a verdict names the
-  tests that prove it.
+- **The verifier proves it, not the builder.** An item is done when a separate session's verdict shows its outcome
+  holds (`plan/README.md`, "How slop is kept out").
 - **The why travels with the work.** Every change names its plan item; the item's prose holds the reasoning.
 - **Comments say what holds now.** Item ids, lanes and rounds go in commits, PRs and the plan, never in code
   comments or READMEs (`docs/layout.md`, "Comments").
@@ -15,27 +14,21 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
   A test that asserts bytes, a listing or a retired path leaves with the code it pinned, named by the item.
 - **A working small system first** (Gall's Law), end to end before wide, root cause over symptom.
 - **One word per thing.** Use the terms in `docs/language.md`; add a line there before introducing a new one.
-- **Step back, don't grind.** An item's `step_back` caps its rounds; past that, replan instead of retrying. A fourth fix
-  to one module in 14 days becomes a design item (`plan/README.md`, "Fix budget").
+- **Step back, don't grind.** An item's `step_back` caps its rounds; past that, replan. A fourth fix to one module in
+  14 days becomes a design item (`plan/README.md`, "Fix budget").
 - **Decide two-way doors and write them down** in `plan/decisions/`. One-way doors (settings, secrets,
   anything outside this repo and the scratch repo) go in `plan/decisions/waiting-for-person.md`.
 
-## Branches and PRs
+## Working an item
 
-- Name a branch `<kind>/<item-id>`, where kind is the item's kind: `build/journal-schema`,
-  `probe/probe-platform-baseline`. Other work uses `replan/<item-id>`, `docs/<topic>` or `chore/<topic>`.
-  No `claude/` prefix.
-- One plan item per PR. Put `Item: <item-id>` on its own line in the PR body.
-- Every commit ends with a `Claude-Session:` trailer naming the session that wrote it.
-- Merge into `main` only when `ci` and `verdict` are green at the head sha. See `docs/gates.md`.
-- After merging a plugin change, release it: `node scripts/release/release.mjs branch --push` (`docs/gates.md`).
+One plan item per PR. `plan/README.md`, "How an item moves", gives the five steps from ready to done, with each PR's
+branch, label and `Item:` line; `docs/gates.md` gives what the gates check. Branches carry no `claude/` prefix.
 
 ## Layout
 
 | Path | What |
 |---|---|
 | `plan/` | The plan: items, stages, ledger, cases, decisions. Start at `plan/README.md` |
-| `plan/check.mjs` | Checks the plan; `--order` prints build order |
 | `packages/` | npm workspaces for the harness libraries; `packages/journal/` is the record format, `packages/engine/` loads and hosts workflows and runs their effects; `packages/engine/messages.md` is every text the harness hands a model |
 | `workflows/` | Workflow files as XState JSON; `workflows/quick-fix.json` is the first |
 | `plugins/` | npm workspaces for the Claude Code plugins |
