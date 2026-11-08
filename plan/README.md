@@ -40,7 +40,7 @@ A complete head answers nine questions, and a fix item answers a tenth. The chec
 | `records` | What does it log, so we can see it working? | v1 salvaged its own history after the fact |
 | `person_prereqs` | What must the person do before the thread starts? | A thread can't add its own allow rules |
 | `step_back` | When does it stop retrying and replan? | PR #72 ran 5 rounds before anyone stepped back |
-| `module`, `done_on` | Which module does a fix change, and when was it done? | Seven 11-05 fixes changed `actors.js` before anyone looked at its shape |
+| `module`, `done_on` | Which module does a fix change, and when was it done? | Seven fixes in two days changed `actors.js` before anyone looked at its shape |
 | `verifier` | Who checks it, from what brief, written when? | Self-approval is a verification gap, not a judgment call |
 
 ## Splicing in new work
