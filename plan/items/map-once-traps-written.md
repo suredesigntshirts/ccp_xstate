@@ -4,7 +4,7 @@
   "title": "Keep one map of the repo and write the container traps down",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "doing",
+  "status": "done",
   "outcome": "CLAUDE.md's Layout table is the one map of the repo: it names every top-level folder and every folder under scripts/, docs/layout.md keeps only its rules (tests, comments, dependencies) and points at the map, and test/docs.test.mjs fails when a top-level folder or a scripts/ folder is missing from the map; docs/traps.md names each trap a thread meets in the cloud container (signed commits in evidence, shallow clones, a headless session inheriting the thread's session id, running the suite in a checkout and its worktree at once) with the command that avoids it, and CLAUDE.md points at it; verdict.yml stops setting PR_BRANCH, which no gate reads.",
   "why": "Two maps of the repo disagree (docs/layout.md's tree and CLAUDE.md's table each miss folders the other names, and neither names scripts/release/, scripts/clean-room/ or probes/), and the container traps every builder and verifier meets live only in project memory, so a thread without that memory loses a round to each (L-rules-live-in-the-repo; decisions plan/decisions/2026-11-08-refine-round-3.md).",
   "serves": [
@@ -122,3 +122,9 @@ evidence? (2) a test fails saying a commit is a shallow boundary: what do I do? 
 a thread's session so its rows are not filed under the thread? (4) may I run npm test in a checkout and its git
 worktree at the same time?" Try (1) to (3) in the container; grade (4) against the repo. Commit the prompt, the answer
 and what you tried as the evidence file.
+
+## Done
+
+Built in #220 and verified 5/5 by a separate session (`verify/map-once-traps-written/verdict.json`). The verifier
+found one error left in `docs/traps.md`: it says CI checks out full history, while `ci.yml` checks out at depth 1.
+`done-with-the-build` corrects it.
