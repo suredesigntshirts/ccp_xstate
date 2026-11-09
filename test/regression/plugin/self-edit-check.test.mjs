@@ -10,6 +10,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { leanClone } from '../lib.mjs';
 
 // Helpers for the tests below.
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -30,10 +31,14 @@ function git(cwd, ...args) {
     { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null' } }).trim();
 }
 
-/** A clone of the checkout's HEAD at <dir>/repo. */
+/** A clone of the checkout's HEAD at <dir>/repo, with the checkout's node_modules linked in (and left out of git). */
 function cloneHead(dir) {
   const c = join(dir, 'repo');
-  execFileSync('git', ['clone', '-q', REPO, c], { stdio: 'ignore', env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null' } });
+  leanClone(REPO, c, { env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null' } });
+  if (existsSync(join(REPO, 'node_modules'))) {
+    symlinkSync(join(REPO, 'node_modules'), join(c, 'node_modules'));
+    writeFileSync(join(c, '.git', 'info', 'exclude'), 'node_modules\n', { flag: 'a' });
+  }
   return c;
 }
 
@@ -68,7 +73,7 @@ function pathWithout(dir, drop) {
 const onPath = (cmd, p) => spawnSync('bash', ['-c', `command -v ${cmd}`], { env: { ...process.env, PATH: p } }).status === 0;
 
 {
-const ALLOWED = /^(CCP_SETUP_LOG|CLAUDE_PID|CCP_HARNESS_\w+|CLAUDE_PLUGIN_ROOT|CCP_REPO)$/;
+const ALLOWED = /^(CCP_SETUP_LOG|CCP_SETUP_SKILLS|CLAUDE_PID|CCP_HARNESS_\w+|CLAUDE_PLUGIN_ROOT|CCP_REPO)$/;
 const PROXY_MARK = 'http://secs-proxy.invalid:9';
 const BASH = '/bin/bash';
 
@@ -309,7 +314,6 @@ const releaseRefs = (c) => git(c, 'for-each-ref', '--format=%(refname)', 'refs/t
 
 function clone(t) {
   const c = cloneHead(temp(t, 'tags'));
-  symlinkSync(join(REPO, 'node_modules'), join(c, 'node_modules'));
   for (const ref of releaseRefs(c)) git(c, 'update-ref', '-d', ref);
   return c;
 }
@@ -367,7 +371,6 @@ function run(t, cwd, file, args = []) {
 /** A clone of the head with one assertion in `file` changed to fail. */
 function broken(t, file, from, to) {
   const c = cloneHead(temp(t, 'broken'));
-  symlinkSync(join(REPO, 'node_modules'), join(c, 'node_modules'));
   const p = join(c, file), src = readFileSync(p, 'utf8');
   assert.ok(src.includes(from), `${from} in ${file}`);
   writeFileSync(p, src.replace(from, to));

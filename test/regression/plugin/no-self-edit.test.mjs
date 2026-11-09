@@ -12,6 +12,7 @@ import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSyn
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { leanClone } from '../lib.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const made = [];
@@ -65,11 +66,11 @@ function world() {
   git(origin, 'branch', '-f', 'main', 'HEAD');
   git(origin, 'symbolic-ref', 'HEAD', 'refs/heads/main');
   git(origin, 'tag', 'harness-v0.0.5', 'main');
-  execFileSync('git', ['clone', '-q', origin, clone]);
+  leanClone(origin, clone);
   mkdirSync(home);
   return { t, origin, clone, home, setup: join(clone, 'infra', 'cloud-environment', 'setup.sh'), dest: join(home, '.claude', 'skills', 'ccp-harness') };
 }
-const runSetup = (w, extra = {}) => envFor(w.home, { CCP_SETUP_LOG: join(w.t, 'setup.log'), ...extra });
+const runSetup = (w, extra = {}) => envFor(w.home, { CCP_SETUP_LOG: join(w.t, 'setup.log'), CCP_SETUP_SKILLS: '0', ...extra });
 const manifestVersion = (dest) => JSON.parse(readFileSync(join(dest, '.claude-plugin', 'plugin.json'), 'utf8')).version;
 
 const plugin = (w) => [w.dest, w.dest + '.old'];
@@ -83,7 +84,7 @@ test('no-self-edit: setup.sh run beside a live Claude Code in the same HOME writ
   assert.equal(manifestVersion(w.dest), '0.0.5');
   // A newer release and a newer main appear on origin.
   const other = join(w.t, 'other');
-  execFileSync('git', ['clone', '-q', w.origin, other]);
+  leanClone(w.origin, other);
   git(other, 'commit', '-q', '--allow-empty', '-m', 'advance');
   git(other, 'push', '-q', 'origin', 'HEAD:main');
   git(w.origin, 'tag', 'harness-v9.0.0', 'main');
@@ -145,7 +146,7 @@ test('no-self-edit: the notice hook, run from the installed copy while behind, w
 /** A throwaway clone of the world's origin with a commit that changes the plugin. */
 function pluginChange(w) {
   const c = join(w.t, 'rel');
-  execFileSync('git', ['clone', '-q', w.origin, c]);
+  leanClone(w.origin, c);
   writeFileSync(join(c, 'plugins', 'harness', 'NEW.txt'), 'x');
   git(c, 'add', '-A');
   git(c, 'commit', '-q', '-m', 'plugin change');

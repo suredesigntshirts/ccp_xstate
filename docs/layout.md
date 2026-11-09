@@ -14,6 +14,10 @@ a time, and holds the tests that measure wall time, so no other file shares the 
 joins it by a name starting with `cheap: `, in a file the serial pass names; the parallel pass skips such tests by
 the same pattern. `test/test-passes.test.mjs` fails a `cheap: ` test in a file the serial pass does not run.
 
+A test that needs a working clone of the repo makes a lean clone with `leanClone` from `test/regression/lib.mjs`, so it
+does not check out the recorded bench runs. A test that runs `setup.sh` sets `CCP_SETUP_SKILLS=0`, which skips only the
+docs skill's `npm ci`, unless it tests that install.
+
 A test that reads a rule text (`CLAUDE.md`, `plan/`, `docs/`) matches each word or term that carries the rule on its
 own (for "the first commit sets the status to `done`": `first commit`, `status`, `done`), never a phrase or a whole
 sentence, so a rewording that keeps the rule keeps the test green.

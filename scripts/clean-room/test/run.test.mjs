@@ -7,6 +7,7 @@ import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { REPO, TEST_REF, temp } from '../../../plugins/harness/test/helpers.mjs';
 import { cleanRoom, harnessHook, report } from '../run.mjs';
+import { leanClone } from '../../../test/regression/lib.mjs';
 
 const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, '-c', 'user.email=t@t', '-c', 'user.name=t', ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 
@@ -23,7 +24,7 @@ test('green: the plugin at this commit passes the clean room, with the self-chec
 for (const gone of ['scripts/notice-behind.mjs', 'scripts/fingerprint.mjs']) {
   test(`catches: a commit that deletes ${gone} fails the clean room, and the self-check names the file`, (t) => {
     const clone = join(temp('clean-room-clone'), 'repo');
-    git(REPO, 'clone', '-q', REPO, clone);
+    leanClone(REPO, clone);
     git(clone, 'checkout', '-q', '--detach', execFileSync('git', ['-C', REPO, 'rev-parse', TEST_REF], { encoding: 'utf8' }).trim());
     git(clone, 'rm', '-q', `plugins/harness/${gone}`);
     git(clone, 'commit', '-qm', `delete ${gone}`);

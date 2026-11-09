@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { REPO, RULES, TEST_REF, setup, snapshot, temp as makeTemp } from '../plugins/harness/test/helpers.mjs';
+import { leanClone } from './regression/lib.mjs';
 
 const made = [];
 const temp = (name) => {
@@ -84,7 +85,7 @@ test('no-values-logged: the setup log names environment variables but never thei
 
 test('copy-not-link: with release tags, setup installs the newest release by version, not the HEAD', () => {
   const clone = join(temp('clone'), 'repo');
-  execFileSync('git', ['clone', '-q', REPO, clone]);
+  leanClone(REPO, clone);
   // A clone of this repo carries the releases it has seen (a thread's clone has real ones, CI's checkout none), so
   // drop them: the only releases are the three below.
   const inherited = execFileSync('git', ['-C', clone, 'for-each-ref', '--format=%(refname)', 'refs/tags/harness-v*', 'refs/remotes/origin/release/', 'refs/heads/release/'], { encoding: 'utf8' }).split('\n').filter(Boolean);
@@ -93,7 +94,7 @@ test('copy-not-link: with release tags, setup installs the newest release by ver
   for (const ref of inherited) execFileSync('git', ['-C', clone, 'update-ref', '-d', ref]);
   for (const t of ['harness-v0.1.9', 'harness-v0.1.10', 'harness-v0.0.20']) execFileSync('git', ['-C', clone, 'tag', '-f', t]);
   const home = fresh();
-  execFileSync('bash', [join(clone, 'infra', 'cloud-environment', 'setup.sh')], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: join(home, '..', 'log'), CCP_SETUP_FETCH: '0' } });
+  execFileSync('bash', [join(clone, 'infra', 'cloud-environment', 'setup.sh')], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: join(home, '..', 'log'), CCP_SETUP_FETCH: '0', CCP_SETUP_SKILLS: '0' } });
   const release = JSON.parse(readFileSync(join(home, '.claude', 'skills', 'ccp-harness', 'release.json'), 'utf8'));
   assert.equal(release.tag, 'harness-v0.1.10');
   assert.match(readFileSync(join(home, '..', 'log'), 'utf8'), /plugin ccp-harness \S+ from harness-v0\.1\.10 /);
