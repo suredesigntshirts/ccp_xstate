@@ -1,3 +1,4 @@
+// Expect: fast-test-clones-and-setup/skills-switch
 // setup.sh's CCP_SETUP_SKILLS: with it set to 0 the docs skill is copied without its npm ci; without it, npm ci runs
 // once, in the copied skill folder. A stub npm first on PATH records each call and leaves a marker node_modules, so
 // nothing is downloaded; setup.sh runs from a lean clone of a bare clone, so its fetches stay local.

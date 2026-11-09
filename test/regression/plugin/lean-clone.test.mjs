@@ -1,3 +1,4 @@
+// Expect: fast-test-clones-and-setup/lean-clone
 // leanClone (test/regression/lib.mjs): a working clone of the repo checked out without bench/ and tournaments/, with
 // the refs, HEAD and tracked files a plain clone of the same source has.
 import { test } from 'node:test';

@@ -1,0 +1,43 @@
+{
+  "item": "regression-folder-rules",
+  "verified_sha": "58725ca4e18d35a7b6375b910092dc0d2e753714",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FMvzHCxmFmhwJgtE3",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "rules-bite",
+      "status": "MET",
+      "command": "node --test verify/regression-folder-rules/rules-bite.test.mjs",
+      "excerpt": "7 pass: the guard passes (5 pass) on a copy of the head, and each of the six breaks (no header, header naming fast-test-clones-and-setup/no-such-line, a join(REPO, 'verify', ...) read, a second helper test/regression/plugin/helpers.mjs, a guard running git clone of REPO, a guard running setup.sh without CCP_SETUP_SKILLS) fails exactly the one rule for it, with the broken file named in the output",
+      "test": "verify/regression-folder-rules/rules-bite.test.mjs"
+    },
+    {
+      "id": "static",
+      "status": "MET",
+      "command": "node --test verify/regression-folder-rules/static.test.mjs; five plain runs of node --test test/regression-rules.test.mjs",
+      "excerpt": "2 pass: the guard imports only node:test, node:assert/strict, node:fs and node:path, with no child_process, dynamic import, fetch or write; whole node --test runs 141 to 159 ms on a 4-core container",
+      "test": "verify/regression-folder-rules/static.test.mjs"
+    },
+    {
+      "id": "words",
+      "status": "MET",
+      "command": "node --test verify/regression-folder-rules/words.test.mjs",
+      "excerpt": "2 pass: docs/language.md's guard row names every test under test/, scripts/, packages/ and plugins/, run by npm test on every PR; its proof row names a verifier's test for one Expect line, in verify/<item>/, run by scripts/gates/pr-gate.mjs",
+      "test": "verify/regression-folder-rules/words.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #284",
+      "excerpt": "at aac53ad49488a575c829ca4d430039901e704d5f (58725ca4 plus verify/regression-folder-rules/ only): ci test (job 129078885666) success, npm test and plan check, 09:23:05Z to 09:26:55Z (3m50s); verdict gates (job 129078887045) passed stubs, contract freeze and evidence, and failed only its verdict step, for want of this verdict.json. Both run again on this verdict commit."
+    }
+  ],
+  "observations": [
+    "The six breaks the item names all bite. Other shapes of the same breaks pass the guard, found by probes not committed: a verify/ read through resolve(REPO, 'verify', ...) or a `${REPO}/verify/` template; a clone through a local git(REPO, 'clone', '-q', REPO, dir) helper (the shape lean-clone.test.mjs already uses, there with --bare) or execSync(`git clone ${REPO} ...`); a setup.sh run through helpers.mjs's SETUP constant from a file that never spells setup.sh; and a file that names CCP_SETUP_SKILLS only in a comment, since that rule reads the raw source while the others read code(). The item's risks line names the first kind; each is a one-line widening if wanted.",
+    "The one-helper rule counts .mjs and .js only: a .cjs helper under test/regression/, or a .mjs under test/regression/fixtures/, passes. Fixtures hold no code files today.",
+    "No ci or verdict run fired on the builder's head 58725ca4 (a merge of main pushed after the base PR merged), so the ci line reads the runs on aac53ad, which adds only verify/regression-folder-rules/ on top of 58725ca4; npm test does not run verify/, so the guards ran on the same code.",
+    "The suite needs no git history and no node_modules: it passed in a depth-1 single-branch clone with no npm ci."
+  ]
+}

@@ -4,7 +4,7 @@
   "title": "Guard the regression folder's own rules and the two test-speed rules with one static check",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "One guard under test/, reading files only, fails when a test file under test/regression/ has no first-line Expect: header naming item/expect ids that exist in plan/items, when a file under test/regression/ reads under verify/, when a .mjs or .js file there other than lib.mjs is not a test file, when a guard under test/, scripts/, packages/ or plugins/ makes a working clone of the repo other than through leanClone, or when a guard that runs setup.sh does not set CCP_SETUP_SKILLS unless it tests the skill install; lean-clone.test.mjs and setup-skills-switch.test.mjs carry headers; and docs/language.md names guard and proof.",
   "why": "regression-set-leftovers took verify/ out of npm test on 9 Nov. Its verifier noted that the regression set's own rules (headers, no verify/ reads, one helper) were held by verify/verify-regression-set suites that no longer run, and that the header rule already failed for the two guards that item added; the fast-clones item's clones-through-helper and tests-set-switch rules lost their only checks the same way (verify/regression-set-leftovers/verdict.json observations).",
   "serves": [
