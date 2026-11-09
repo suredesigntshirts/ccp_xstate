@@ -76,3 +76,15 @@ A thread waiting on a CI event may never be woken by it: check the PR's checks w
 ask to be nudged rather than wait. A push that only merges main in may start no `ci` run; read the checks at the new
 head before counting it green. A PR opened before the PR under it merged keeps that older `BASE_SHA` in its
 runs until its branch is updated, so its gates read files that are already on main as its own.
+
+## The checkout's `origin/main` can be days old
+
+The container's clone keeps the `origin/main` it was cloned with, and a thread's designated branch may sit far ahead
+of it. `git checkout -b <branch> origin/main` without a fetch starts the branch on that old main, missing files the
+plan names. Run `git fetch origin main` before branching from `origin/main`.
+
+## A `ci` run that has no jobs
+
+A PR's first `ci` run can conclude `failure` with no jobs and no check run: `get_job_logs` finds no failed job and
+the jobs endpoint answers 404. No test ran, so it is not this PR's failure. Re-run the workflow run once; the re-run
+runs the jobs.
