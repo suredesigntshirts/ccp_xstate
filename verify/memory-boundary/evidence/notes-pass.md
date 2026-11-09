@@ -1,6 +1,6 @@
 # notes-pass
 
-Command: `node --test verify/memory-boundary/notes-pass.test.mjs` at 40dc78dd706dc13ec7a6a08f5a4ba5e52b1e30cf (7 pass, 0 fail).
+Command: `node --test verify/memory-boundary/notes-pass.test.mjs` at 40dc78dd706dc13ec7a6a08f5a4ba5e52b1e30cf and again at f6fbdd5082f549f6c00df7a617d6b6313c01de19 (7 pass, 0 fail).
 
 Inputs: per case a temp repo (`GIT_CONFIG_GLOBAL=/dev/null`, signing off) whose base holds `plan/items/x.md` (ready), `docs/traps.md`, `docs/gates.md`, `docs/layout.md`, `CLAUDE.md` and `scripts/gates/lib.mjs`; one PR commit on top; then the checkout's `scripts/gates/pr-gate.mjs verdict` with `BASE_SHA` the base, `HEAD_SHA` the commit, `PR_BODY` with no `Item:` line (and once empty), `PR_LABELS=[]`.
 

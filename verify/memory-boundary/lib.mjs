@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 export const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(HERE, '..', '..');
 /** The head verified. */
-export const VERIFIED = '40dc78dd706dc13ec7a6a08f5a4ba5e52b1e30cf';
+export const VERIFIED = 'f6fbdd5082f549f6c00df7a617d6b6313c01de19';
 const GATE = join(REPO, 'scripts', 'gates', 'pr-gate.mjs');
 
 const item = '```json\n{"id":"x","status":"ready","expect":[{"id":"a","proof":"world"}]}\n```\n\n## Verifier brief\n\nRun it.\n';

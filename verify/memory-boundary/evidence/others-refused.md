@@ -1,6 +1,6 @@
 # others-refused
 
-Command: `node --test verify/memory-boundary/others-refused.test.mjs` at 40dc78dd706dc13ec7a6a08f5a4ba5e52b1e30cf (15 pass, 0 fail).
+Command: `node --test verify/memory-boundary/others-refused.test.mjs` at 40dc78dd706dc13ec7a6a08f5a4ba5e52b1e30cf and again at f6fbdd5082f549f6c00df7a617d6b6313c01de19 (15 pass, 0 fail).
 
 Inputs: the same temp repo as notes-pass; each PR commit changes `docs/traps.md` (or `docs/verifying.md` with plan/) and one other file; no `Item:` line.
 

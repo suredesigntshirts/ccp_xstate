@@ -1,6 +1,6 @@
 # reader-knows
 
-Command: `claude -p "$(cat prompt)" < /dev/null` in a clean clone of 40dc78dd706dc13ec7a6a08f5a4ba5e52b1e30cf (origin removed, `npm ci`), with `env -u CLAUDE_CODE_REMOTE_SESSION_ID -u CLAUDE_MEMORY_STORES -u CLAUDE_COWORK_MEMORY_PATH_OVERRIDE -u CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD -u CLAUDE_ADDITIONAL_DIRECTORIES CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 HOME=<empty dir>`. Claude Code 2.1.319 (Claude Code). `node --test verify/memory-boundary/reader-knows.test.mjs` regrades the answer below.
+Command: `claude -p "$(cat prompt)" < /dev/null` in a clean clone of 40dc78dd706dc13ec7a6a08f5a4ba5e52b1e30cf (the verified head f6fbdd5082f549f6c00df7a617d6b6313c01de19 differs from it only under plan/ and verify/; CLAUDE.md and docs/ are byte-identical) (origin removed, `npm ci`), with `env -u CLAUDE_CODE_REMOTE_SESSION_ID -u CLAUDE_MEMORY_STORES -u CLAUDE_COWORK_MEMORY_PATH_OVERRIDE -u CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD -u CLAUDE_ADDITIONAL_DIRECTORIES CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 HOME=<empty dir>`. Claude Code 2.1.319 (Claude Code). `node --test verify/memory-boundary/reader-knows.test.mjs` regrades the answer below.
 
 Control: the same prompt in a clean clone of main's 38573a0d2f8be19c1eae60df4f25e3c5efbf6ded, same environment, sent item 2 to `verify/<item>/` and the verdict's observations ("Repo docs don't clearly cover a standing, reusable technique"), and said it "never opened anything in the repo about project memory".
 
