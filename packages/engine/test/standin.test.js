@@ -3,10 +3,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { restore, offer, pending } from '../src/index.js';
 import { handlers, relay, recordCard } from '../src/effects/index.js';
 import { standinInput, repoOf, issueRepoOf, cardRepo } from '../src/standin.js';
@@ -15,6 +15,20 @@ import { workflow, ISSUE, BRIEFS, A, pr, verdict } from './flow.js';
 import { loadWorkflow } from '../src/index.js';
 
 const cli = new URL('../bin/host.js', import.meta.url).pathname;
+
+/**
+ * A git repo of one empty commit in a temp folder, for the host's cwd: the actors' worktrees and run/* branches it
+ * makes go there and beside it, never beside the checkout.
+ */
+const scratchRepo = () => {
+  const parent = mkdtempSync(join(tmpdir(), 'engine-cwd-'));
+  process.on('exit', () => rmSync(parent, { recursive: true, force: true }));
+  const dir = join(parent, 'repo');
+  execFileSync('git', ['init', '-q', dir]);
+  execFileSync('git', ['-C', dir, '-c', 'user.email=t@t', '-c', 'user.name=t', '-c', 'commit.gpgsign=false', 'commit', '-q', '--allow-empty', '-m', 'empty']);
+  return dir;
+};
+const CWD = scratchRepo();
 const CARD = 'cmsg_01CardPostedByTheThread';
 const tap = (card, index = 0, option = 'A') => readFileSync(new URL('../../../plugins/harness/test/fixtures/attention/tap-wake.txt', import.meta.url), 'utf8')
   .replace(/decision_id=[^<]*/, `decision_id=${card}`)
@@ -58,7 +72,7 @@ async function fakeGitHub() {
 // Run asynchronously: the fake GitHub answers from this process, so a blocking spawn would deadlock.
 const hostCli = (root, args, { input = '', env = {} } = {}) => new Promise((ok) => {
   const child = spawn(process.execPath, [cli, ...args, '--item', 'it-1', '--workflow', 'quick-fix', '--root', root, '--release', '0.2.0'],
-    { env: { ...process.env, ...env } });
+    { env: { ...process.env, ...env }, cwd: CWD });
   let stdout = '', stderr = '';
   child.stdout.on('data', (d) => (stdout += d));
   child.stderr.on('data', (d) => (stderr += d));

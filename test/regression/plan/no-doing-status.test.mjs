@@ -3,6 +3,7 @@
 // refuses a contract change without the replan label, and the plan-check test goes red with doing back in the schema.
 // Every run is on a temp copy of plan/ or in a temp repo.
 import assert from 'node:assert/strict';
+import { onlyTests, ranTests } from '../lib.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -208,13 +209,15 @@ test('plan-check.test.mjs goes red with doing back in the schema, green restored
   const dir = mkdtempSync(join(tmpdir(), 'rd-bite-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   for (const p of ['plan', 'test/plan-check.test.mjs']) cpSync(join(REPO, p), join(dir, p), { recursive: true });
-  const run = () => node(['--test', '--test-reporter=tap', join(dir, 'test/plan-check.test.mjs')], { cwd: dir });
+  const NAMES = ['doing is no longer a status: an item holding it is refused'];
+  const run = () => node(['--test', '--test-reporter=tap', onlyTests(NAMES), join(dir, 'test/plan-check.test.mjs')], { cwd: dir });
   const schema = join(dir, 'plan/item.schema.json');
   const text = readFileSync(schema, 'utf8');
   const from = '"ready",\n        "done",';
   assert.ok(text.includes(from), 'the schema enum lists ready then done');
   const green = run();
   assert.equal(green.status, 0, green.out);
+  assert.deepEqual(ranTests(green.out), NAMES, 'the named tests ran');
   writeFileSync(schema, text.replace(from, '"ready",\n        "doing",\n        "done",'));
   const red = run();
   writeFileSync(schema, text);

@@ -4,7 +4,8 @@
   "title": "Make the guards that run other tests, or build big fixtures, do it once and only as much as they check",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
+  "done_on": "2026-11-09",
   "outcome": "The guards flagged in the 9 Nov test speed review run the same test names with the same results, in at most 60% of their summed test time at the base: mutation checks rerun only the tests they name and assert at least one ran; nested node --test runs that differ only in environment run once; fixtures a file rebuilds per test are built once; repo copies leave out bench/, tournaments/ and node_modules; and no test leaves branches or worktrees beside the checkout or edits files in it.",
   "why": "The 9 Nov review (/mnt/project-files/test-perf-review/README.md, six readers over test code at 4f221631) found that after lean clones most of the remaining guard time is tests that run other tests: seven gates and plan files rerun all of plan-check.test.mjs or pr-gate.test.mjs three times to show a check bites (about 140 s), self-edit-check runs no-self-edit three times in environments that differ by one variable (70 to 110 s), no-self-edit's world() rebuilds its bare origin per test, stage-record reruns every tourney file, and two moved-tests-bite files copy the whole 92 MB repo. standin.test.js and bin.test.js also leave worktrees and run/it* branches beside the checkout, which breaks npm test in a worktree, and setup-install edits the real tree while other files run.",
   "serves": [

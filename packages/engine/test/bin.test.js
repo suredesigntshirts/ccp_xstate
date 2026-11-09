@@ -1,15 +1,29 @@
 // bin/host.js wake reads events only from a hook's prompt or a ReadNotifications result's GitHub notifications.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 
 const cli = new URL('../bin/host.js', import.meta.url).pathname;
+
+/**
+ * A git repo of one empty commit in a temp folder, for the host's cwd: the actors' worktrees and run/* branches it
+ * makes go there and beside it, never beside the checkout.
+ */
+const scratchRepo = () => {
+  const parent = mkdtempSync(join(tmpdir(), 'engine-cwd-'));
+  process.on('exit', () => rmSync(parent, { recursive: true, force: true }));
+  const dir = join(parent, 'repo');
+  execFileSync('git', ['init', '-q', dir]);
+  execFileSync('git', ['-C', dir, '-c', 'user.email=t@t', '-c', 'user.name=t', '-c', 'commit.gpgsign=false', 'commit', '-q', '--allow-empty', '-m', 'empty']);
+  return dir;
+};
+const CWD = scratchRepo();
 const checkRun = readFileSync(new URL('./fixtures/wakes/check-run-failed.txt', import.meta.url), 'utf8');
 const host = (root, args, input) => {
-  const out = spawnSync(process.execPath, [cli, ...args, '--item', 'it', '--workflow', 'quick-fix', '--root', root, '--release', '0.2.0'], { input, encoding: 'utf8' });
+  const out = spawnSync(process.execPath, [cli, ...args, '--item', 'it', '--workflow', 'quick-fix', '--root', root, '--release', '0.2.0'], { input, encoding: 'utf8', cwd: CWD });
   assert.equal(out.status, 0, out.stderr);
   return JSON.parse(out.stdout);
 };

@@ -2,6 +2,7 @@
 // The evidence gate refuses a symlink or submodule under verify/ and a saved test listing, and passes a short evidence
 // excerpt; the gate tests that guard it go red when the rule is broken. Every listing is made at run time in a temp repo.
 import assert from 'node:assert/strict';
+import { onlyTests, ranTests } from '../lib.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -184,16 +185,18 @@ const BITES = [
     from: /return has\('pass'\) && has\('fail'\) && results >= LISTING_LINES;/, to: 'return false;' },
   { name: 'pr-gate.test.mjs goes red when the evidence gate stops passing the mode from git ls-tree',
     file: 'scripts/gates/pr-gate.mjs', test: 'scripts/gates/test/pr-gate.test.mjs',
-    from: /const mode = git\('ls-tree', head, '--', path\)\.split\(\/\\s\/\)\[0\];/, to: 'const mode = undefined;' },
+    from: /const mode = git\('ls-tree', head, '--', path\)\.split\(\/\\s\/\)\[0\];/, to: 'const mode = undefined;',
+    names: ['evidence gate: refuses an added or grown file over the limit and a .pass file, never reads a deletion', 'evidence gate: refuses a committed symlink and a listing saved as .txt under verify/; passes a short excerpt'] },
 ];
 
 for (const b of BITES) {
   test(b.name, (t) => {
     const dir = tempDir(t, 'ege-bite-');
     for (const p of ['scripts', 'package.json']) cpSync(join(REPO, p), join(dir, p), { recursive: true });
-    const run = () => node(['--test', '--test-reporter=tap', join(dir, b.test)], { cwd: dir });
+    const run = () => node(['--test', '--test-reporter=tap', ...(b.names ? [onlyTests(b.names)] : []), join(dir, b.test)], { cwd: dir });
     const green = run();
     assert.equal(green.status, 0, green.out);
+    if (b.names) assert.deepEqual(ranTests(green.out), [...b.names].sort(), 'the named tests ran');
     const p = join(dir, b.file);
     const text = readFileSync(p, 'utf8');
     assert.match(text, b.from, `the rule to break is in ${b.file}`);

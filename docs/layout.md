@@ -19,6 +19,12 @@ A test that needs a working clone of the repo makes a lean clone with `leanClone
 does not check out the recorded bench runs. A test that runs `setup.sh` sets `CCP_SETUP_SKILLS=0`, which skips only the
 docs skill's `npm ci`, unless it tests that install.
 
+A test that runs another test file to show a broken rule turns it red runs only the tests that rule turns red, with
+`onlyTests` from `test/regression/lib.mjs`, and checks with `ranTests` that each named test ran, since a name pattern
+that matches nothing passes. Nested runs that differ only in their environment share one run, and independent nested
+runs start together. A copy of the repo links `bench/`, `tournaments/` and `node_modules/` rather than copying them. A
+test writes only under its own temp folder: never in the checkout, and never beside it.
+
 A test that reads a rule text (`CLAUDE.md`, `plan/`, `docs/`) matches each word or term that carries the rule on its
 own (for "the first commit sets the status to `done`": `first commit`, `status`, `done`), never a phrase or a whole
 sentence, so a rewording that keeps the rule keeps the test green.

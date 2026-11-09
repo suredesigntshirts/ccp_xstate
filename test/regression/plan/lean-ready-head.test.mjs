@@ -3,6 +3,7 @@
 // or with no rounds in step_back, passes the done heads that still carry the old fields, and the plan-check test goes
 // red with verifier back among the ready fields. Every edit is on a temp copy of plan/.
 import assert from 'node:assert/strict';
+import { onlyTests, ranTests } from '../lib.mjs';
 import { spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -132,7 +133,8 @@ test('plan-check.test.mjs goes red with verifier back in readyRequired, green wh
   copyPlan(dir);
   mkdirSync(join(dir, 'test'));
   cpSync(join(REPO, 'test/plan-check.test.mjs'), join(dir, 'test/plan-check.test.mjs'));
-  const run = () => node(['--test', '--test-reporter=tap', join(dir, 'test/plan-check.test.mjs')], { cwd: dir });
+  const NAMES = ['a ready head needs no verifier and no step_back; it still needs expect'];
+  const run = () => node(['--test', '--test-reporter=tap', onlyTests(NAMES), join(dir, 'test/plan-check.test.mjs')], { cwd: dir });
 
   const file = join(dir, 'plan/item.schema.json');
   const text = readFileSync(file, 'utf8');
@@ -142,6 +144,7 @@ test('plan-check.test.mjs goes red with verifier back in readyRequired, green wh
 
   const green = run();
   assert.equal(green.status, 0, green.out);
+  assert.deepEqual(ranTests(green.out), NAMES, 'the named tests ran');
   writeFileSync(file, broken);
   const red = run();
   assert.notEqual(red.status, 0, red.out);

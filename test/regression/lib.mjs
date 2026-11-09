@@ -85,3 +85,12 @@ export const agentActors = ({ brief = [BRIEFS], build = [PR(A)], verify = [VERDI
   const q = { brief: [...brief], build: [...build], verify: [...verify] };
   return Object.fromEntries(Object.keys(q).map((name) => [name, { start: async (e) => (q[name].length ? { ref: e.id, output: q[name].shift() } : { ref: e.id }) }]));
 };
+
+/**
+ * The `--test-name-pattern` argument that runs exactly the tests named, each matched whole. A check that a broken rule
+ * turns a test file red runs only the tests that rule turns red, and asserts with `ranTests` that they all ran, since a
+ * pattern that matches nothing runs nothing and passes.
+ */
+export const onlyTests = (names) => `--test-name-pattern=${names.map((n) => `^${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`).join('|')}`;
+/** The names of the tests a TAP output reports, passed or failed, sorted. */
+export const ranTests = (out) => [...out.matchAll(/^\s*(?:not )?ok \d+ - (.*)$/gm)].map((m) => m[1].replace(/ # (SKIP|TODO).*$/, '')).sort();

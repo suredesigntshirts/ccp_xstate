@@ -3,6 +3,7 @@
 // reader-effort.mjs --item reads the PR that added the verdict; the tests that guard both go red when the rule is
 // broken. Every run is in a temp repo or a temp copy of scripts/.
 import assert from 'node:assert/strict';
+import { onlyTests, ranTests } from '../lib.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -168,17 +169,18 @@ test('--item for an item with no merged verdict exits non-zero naming it', (t) =
 const counts = (out) => ({ pass: Number(out.match(/^# pass (\d+)/m)?.[1]), fail: Number(out.match(/^# fail (\d+)/m)?.[1]) });
 const failing = (out) => [...out.matchAll(/^\s*not ok \d+ - (.*)$/gm)].map((m) => m[1]);
 
-function bite(t, { file, testFile, from, to }) {
+function bite(t, { file, testFile, from, to, names }) {
   const dir = mkdtempSync(join(tmpdir(), 'dwtb-bite-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   cpSync(join(REPO, 'scripts'), join(dir, 'scripts'), { recursive: true });
-  const run = () => node(['--test', '--test-reporter=tap', join(dir, testFile)], { cwd: dir });
+  const run = () => node(['--test', '--test-reporter=tap', ...(names ? [onlyTests(names)] : []), join(dir, testFile)], { cwd: dir });
   const path = join(dir, file);
   const text = readFileSync(path, 'utf8');
   const pairs = [].concat(from).map((f, i) => [f, [].concat(to)[i]]);
   for (const [f] of pairs) assert.ok(text.includes(f), `${file} holds the line the mutation changes: ${f}`);
   const green = run();
   assert.equal(green.status, 0, green.out);
+  if (names) assert.deepEqual(ranTests(green.out), [...names].sort(), 'the named tests ran');
   writeFileSync(path, pairs.reduce((s, [f, x]) => s.replace(f, x), text));
   const red = run();
   writeFileSync(path, text);
@@ -192,7 +194,10 @@ function bite(t, { file, testFile, from, to }) {
 test('pr-gate.test.mjs goes red when contract() keeps status', (t) => {
   const red = bite(t, { file: 'scripts/gates/lib.mjs', testFile: 'scripts/gates/test/pr-gate.test.mjs',
     from: 'const { status, done_on, reader_effort, ...rest } = itemHead(text) ?? {};',
-    to: 'const { done_on, reader_effort, ...rest } = itemHead(text) ?? {};' });
+    to: 'const { done_on, reader_effort, ...rest } = itemHead(text) ?? {};',
+    names: ['freeze gate: a status-only change passes',
+      'verdict gate: a contract reworded on main and merged in after the verified sha is refused; a status-only merge passes',
+      'a build PR whose first commit sets its item done passes freeze, and merges on a verdict from another session'] });
   assert.ok(red.includes('a build PR whose first commit sets its item done passes freeze, and merges on a verdict from another session'), red.join(' | '));
 });
 

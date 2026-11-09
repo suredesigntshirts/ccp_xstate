@@ -3,14 +3,19 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { leanClone } from '../lib.mjs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
-const SETUP = join(REPO, 'infra', 'cloud-environment', 'setup.sh');
 const tmp = (n) => mkdtempSync(join(tmpdir(), `verify-envboot-${n}-`));
+// setup.sh runs from a lean clone of the checkout, so the copy-not-link test edits that clone's working tree, never the
+// checkout other test files read while this one runs.
+const CLONE = leanClone(REPO, join(tmp('clone'), 'repo'));
+process.on('exit', () => rmSync(dirname(CLONE), { recursive: true, force: true }));
+const SETUP = join(CLONE, 'infra', 'cloud-environment', 'setup.sh');
 
 function runSetup(home, log) {
   execFileSync('bash', [SETUP], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: log, CCP_SETUP_FETCH: '0', CCP_SETUP_SKILLS: '0', CCP_SETUP_REF: 'HEAD' } });
@@ -59,10 +64,10 @@ test('copy-not-link: no symlinks, and working-tree edits do not reach the instal
   assert.equal(lstatSync(installed).isSymbolicLink(), false);
   const before = tree(installed);
   assert.ok(!Object.values(before).includes('LINK'));
-  // Edit a copy of a plugin file standing in for the working tree is not enough: edit the real one and restore it.
-  const target = join(REPO, 'plugins', 'harness', 'scripts', 'host.mjs');
+  // Edit the working tree setup.sh ran from: a changed plugin file and a new one.
+  const target = join(CLONE, 'plugins', 'harness', 'scripts', 'host.mjs');
   const original = readFileSync(target, 'utf8');
-  const extra = join(REPO, 'plugins', 'harness', 'VERIFY-EXTRA.txt');
+  const extra = join(CLONE, 'plugins', 'harness', 'VERIFY-EXTRA.txt');
   try {
     writeFileSync(target, `${original}\n// verifier edit ${Date.now()}\n`);
     writeFileSync(extra, 'new');
@@ -70,7 +75,7 @@ test('copy-not-link: no symlinks, and working-tree edits do not reach the instal
     assert.ok(!existsSync(join(installed, 'VERIFY-EXTRA.txt')));
   } finally {
     writeFileSync(target, original);
-    spawnSync('rm', ['-f', extra]);
+    rmSync(extra, { force: true });
   }
 });
 
