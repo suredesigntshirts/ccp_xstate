@@ -34,7 +34,7 @@ the thread's session. A reader that must count as its own session is a fresh rea
 
 ## One suite at a time
 
-Do not run `npm test` in a checkout and its git worktree at once: the two runs interfere. Run one, then the other.
+Do not run `npm test` in a checkout and its git worktree at once: the two runs interfere. Run one, then the other one.
 The full suite takes minutes; a builder runs the tests near its change locally and leaves the full suite to `ci`.
 
 ## A red test the PR did not touch
