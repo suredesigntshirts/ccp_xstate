@@ -1,6 +1,6 @@
 // Expect: inspector-reads-records/explained, inspector-reads-records/true-to-record, inspector-reads-records/one-path, inspector-reads-records/no-guessing, inspector-reads-records/page, inspector-reads-records/explain-tests
 // The inspector reads the engine's own records: every step of every committed and scenario journal is the engine's explain, model runs come from run folders, one change to the engine changes machine and page alike, a run without its stage record is refused by name, and the page renders every source.
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, readdirSync, statSync, symlinkSync, writeFileSync, cpSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve, relative } from 'node:path';
@@ -48,12 +48,15 @@ function rootsUnder(dir) {
  * Run tourney scenario <name> of the checkout with TMPDIR at a kept folder; [{ root, item, file, rel }] for every
  * item journal it leaves. The scenario test must pass.
  */
-function scenarioItems(name, repo = REPO) {
+async function scenarioItems(name, repo = REPO) {
   const dir = tempDir(`scn-${name}`);
   const { NODE_TEST_CONTEXT, ...env } = process.env;
-  execFileSync(process.execPath, ['--test', '--test-reporter=dot', `packages/engine/test/tourney/${name}.test.js`], {
-    cwd: repo, env: { ...env, TMPDIR: dir, TMP: dir, TEMP: dir }, stdio: ['ignore', 'pipe', 'pipe'], timeout: 600000
+  const code = await new Promise((done) => {
+    spawn(process.execPath, ['--test', '--test-reporter=dot', `packages/engine/test/tourney/${name}.test.js`], {
+      cwd: repo, env: { ...env, TMPDIR: dir, TMP: dir, TEMP: dir }, stdio: 'ignore', timeout: 600000
+    }).on('close', done);
   });
+  assert.equal(code, 0, `scenario ${name} passes`);
   return rootsUnder(dir).flatMap((root) => readdirSync(join(root, 'items')).filter((n) => n.endsWith('.jsonl')).sort()
     .map((n) => ({ root, item: n.replace(/\.jsonl$/, ''), file: join(root, 'items', n), rel: `${name}:${root.slice(dir.length + 1)}/items/${n}` })));
 }
@@ -75,7 +78,8 @@ const MUTATIONS = {
   'needs skipped': (src) => src.replace(FAILING, 'const failing = failingOf(spec, t.def, null, scope);')
 };
 
-function runIn(name) {
+/** explain.test.js run in a worktree of HEAD with mutation `name` applied to explain.js; the worktrees run at once. */
+async function runIn(name) {
   const dir = join(tempDir('wt'), 'repo');
   execFileSync('git', ['-C', REPO, 'worktree', 'add', '-q', '--detach', dir, 'HEAD'], { stdio: 'ignore' });
   try {
@@ -86,10 +90,15 @@ function runIn(name) {
     if (name !== 'intact') assert.notEqual(mutated, src, `mutation ${name} applied`);
     writeFileSync(file, mutated);
     const { NODE_TEST_CONTEXT, ...env } = process.env;
-    const r = spawnSync(process.execPath, ['--test', '--test-reporter=tap', 'packages/engine/test/explain.test.js'], { cwd: dir, env, encoding: 'utf8', timeout: 600000 });
-    const out = r.stdout ?? '';
+    const r = await new Promise((done) => {
+      const child = spawn(process.execPath, ['--test', '--test-reporter=tap', 'packages/engine/test/explain.test.js'], { cwd: dir, env, timeout: 600000 });
+      let stdout = '';
+      child.stdout.on('data', (b) => { stdout += b; });
+      child.on('close', (code) => done({ code, stdout }));
+    });
+    const out = r.stdout;
     return {
-      code: r.status,
+      code: r.code,
       pass: Number(out.match(/^# pass (\d+)/m)?.[1] ?? NaN),
       fail: Number(out.match(/^# fail (\d+)/m)?.[1] ?? NaN),
       red: out.split('\n').filter((l) => /^not ok \d+ - /.test(l)).map((l) => l.replace(/^not ok \d+ - /, ''))
@@ -99,8 +108,9 @@ function runIn(name) {
   }
 }
 
-test('explain-tests: the builder\'s explain tests pass intact and go red under each mutation', () => {
-  const results = Object.fromEntries(Object.keys(MUTATIONS).map((m) => [m, runIn(m)]));
+test('explain-tests: the builder\'s explain tests pass intact and go red under each mutation', async () => {
+  const names = Object.keys(MUTATIONS);
+  const results = Object.fromEntries((await Promise.all(names.map(runIn))).map((r, i) => [names[i], r]));
   console.log('explain-tests', JSON.stringify(results));
   assert.equal(results.intact.code, 0, 'intact passes');
   assert.equal(results.intact.fail, 0);
@@ -189,7 +199,7 @@ async function offerAndExport(repo, cut, row) {
 }
 
 test('one-path: dropping needs in spec.js changes the machine and the bundle alike, scripts/inspector untouched', async () => {
-  const q3 = scenarioItems('Q3').find((x) => x.item === 'q3');
+  const q3 = (await scenarioItems('Q3')).find((x) => x.item === 'q3');
   assert.ok(q3, 'Q3 leaves item q3');
   const rows = rowsOf(q3.file);
   const at = rows.findIndex((r) => r.kind === 'engine.transition' && r.payload.seq === 2);
@@ -238,6 +248,14 @@ const { build } = await imp(REPO, 'scripts/inspector/build.mjs');
 const out = tempDir('page');
 const conf = JSON.parse(readFileSync(join(REPO, 'scripts/inspector/sources.json'), 'utf8'));
 const built = await build({ config: join(REPO, 'scripts/inspector/sources.json'), out, captureDir: tempDir('cap') });
+// check-page.mjs walks the page in its own browser; started now, it runs beside the tests below and its test awaits it.
+const pageCheck = PW && new Promise((done) => {
+  const child = spawn(process.execPath, [join(REPO, 'scripts/inspector/check-page.mjs'), '--out', out, '--playwright', PW, ...(CHROME ? ['--chrome', CHROME] : [])], { timeout: 900000 });
+  let said = '';
+  child.stdout.on('data', (b) => { said += b; });
+  child.stderr.on('data', (b) => { said += b; });
+  child.on('close', (code) => done({ code, said }));
+});
 
 test('page: every source of sources.json is built, none skipped', () => {
   console.log('built', JSON.stringify({ runs: built.runs, skipped: built.skipped, sources: conf.sources.length }));
@@ -296,9 +314,10 @@ test('page: every run, step, way out and model prompt renders at 1280 and 390 px
   assert.ok(seen.waysOut > 0 && seen.prompts > 0);
 });
 
-test('page: check-page.mjs passes on the build', { skip: PW ? false : 'Playwright is not installed' }, () => {
-  const said = execFileSync(process.execPath, [join(REPO, 'scripts/inspector/check-page.mjs'), '--out', out, '--playwright', PW, ...(CHROME ? ['--chrome', CHROME] : [])], { encoding: 'utf8', timeout: 900000 });
+test('page: check-page.mjs passes on the build', { skip: PW ? false : 'Playwright is not installed' }, async () => {
+  const { code, said } = await pageCheck;
   console.log(said.trim());
+  assert.equal(code, 0, said);
   assert.match(said, /page check: no console errors/);
 });
 
@@ -309,7 +328,7 @@ const xstate = await xstateOf(REPO);
 
 const committed = committedItems();
 const replayable = withTransitions(committed);
-const scenario = SCENARIOS.flatMap((n) => scenarioItems(n));
+const scenario = (await Promise.all(SCENARIOS.map((n) => scenarioItems(n)))).flat();
 const all = [...replayable, ...scenario];
 
 const bundles = new Map();

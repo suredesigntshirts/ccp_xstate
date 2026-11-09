@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -30,9 +30,16 @@ const CASES = [
   }
 ];
 
+const LINKED = ['bench', 'tournaments', 'node_modules'];
+
 function copyHead() {
   const dir = mkdtempSync(join(tmpdir(), 'vre-bite-'));
-  for (const n of readdirSync(REPO)) if (n !== '.git' && n !== 'verify') cpSync(join(REPO, n), join(dir, n), { recursive: true, verbatimSymlinks: true });
+  // The recorded bench runs, the tournaments and node_modules are most of the tree and no case edits them: linked, not copied.
+  for (const n of readdirSync(REPO)) {
+    if (n === '.git' || n === 'verify') continue;
+    if (LINKED.includes(n)) symlinkSync(join(REPO, n), join(dir, n));
+    else cpSync(join(REPO, n), join(dir, n), { recursive: true, verbatimSymlinks: true });
+  }
   return dir;
 }
 
