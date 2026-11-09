@@ -30,7 +30,10 @@ test('a lean clone of a bare clone has every tracked file but bench/ and tournam
   t.after(() => rmSync(d, { recursive: true, force: true }));
   const origin = join(d, 'origin.git');
   git(REPO, 'clone', '-q', '--bare', REPO, origin);
+  // A checkout may hold one branch (CI's depth-1 one does); two more make a dropped branch show.
   git(origin, 'tag', 'lean-check', 'HEAD');
+  git(origin, 'branch', 'lean-a', 'HEAD');
+  git(origin, 'branch', 'lean-b', 'HEAD');
   const lean = leanClone(origin, join(d, 'lean'));
 
   const tracked = sorted(git(origin, 'ls-tree', '-r', '--name-only', 'HEAD'));
