@@ -31,6 +31,8 @@ How the work on the harness itself is planned and proved.
 | proof | A verifier's test that shows one item's Expect line holds at its own PR's head; the verdict gate runs it there, and nothing runs it after | `verify/<item>/`, `scripts/gates/pr-gate.mjs` |
 | ledger row | A lesson the plan is held to, with an `L-` id | `plan/ledger/` |
 | decision | A two-way door decided and written down, or a one-way door waiting for the person | `plan/decisions/`, `plan/decisions/waiting-for-person.md` |
+| notes file | A docs file for what threads meet and how they test, not a rule: `docs/traps.md` and `docs/verifying.md`; a PR that names no item may change it beside `plan/` | `scripts/gates/lib.mjs` `NOTES` |
+| project memory | The platform's store shared by the project's sessions; here it holds the person's directives and coordinator state only, never a learning or a build log | `CLAUDE.md`, `plan/decisions/2026-11-09-memory-into-repo.md` |
 | replan | A PR that changes only `plan/`, labelled `replan` | `scripts/gates/pr-gate.mjs` |
 | fix budget | Three done fix items naming one module in 14 days, with no design item for it done after them, refuse a fourth | `plan/README.md`, `plan/item.schema.json` `module` |
 | design item | An item, not a fix, that names the module it redesigns: it names the recurring concept and designs it twice, and restarts the module's fix budget | `plan/README.md`, `plan/item.schema.json` `module` |

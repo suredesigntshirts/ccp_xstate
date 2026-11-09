@@ -11,7 +11,7 @@ Run one at the checkout's HEAD with `BASE_SHA=origin/main PR_BODY='Item: <id>' n
 | `verdict` | no stubs | a file under `packages/` or `plugins/` has TODO, FIXME, "not implemented" or a skipped test, or a line of the harness source or its two READMEs has a history reference (`docs/layout.md`, "Comments") |
 | `verdict` | contract freeze | the PR changes a frozen item's head or Verifier brief and isn't a plan-only replan, or the item already has a verdict file |
 | `verdict` | evidence | the PR adds, changes or renames under `verify/` an entry that is not a regular file (a symlink, a submodule), one larger than 64 KB (65,536 bytes), one named `*.pass`, or a test listing: a node:test pass and fail summary with ten or more result lines; a deletion is never read |
-| `verdict` | verdict | the named item has no complete verdict for the head (below), a test it names fails or is missing, or the verdict came from a builder's session; or the PR names no item and changes files outside `plan/` |
+| `verdict` | verdict | the named item has no complete verdict for the head (below), a test it names fails or is missing, or the verdict came from a builder's session; or the PR names no item and changes files outside `plan/` and the notes files, `docs/traps.md` and `docs/verifying.md` |
 
 ## The verdict
 

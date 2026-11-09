@@ -1,7 +1,9 @@
 # Container traps
 
 Things a thread in the cloud container meets that the repo's code cannot see. Each says how it shows and what avoids
-it. A trap that code could remove is named here until an item removes it.
+it. A trap that code could remove is named here until an item removes it. This is a notes file: any PR may add or
+correct an entry with no `Item:` line (`docs/gates.md`), so a thread writes a trap here in the PR where it met it,
+never only in project memory.
 
 ## The container signs commits
 

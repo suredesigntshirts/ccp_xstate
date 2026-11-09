@@ -14,8 +14,9 @@ The v2 harness, rebuilt on XState. This file is a map, not the manual: standing 
   A test that asserts bytes, a listing or a retired path leaves with the code it pinned, named by the item.
 - **A working small system first** (Gall's Law), end to end before wide, root cause over symptom.
 - **One word per thing.** Use the terms in `docs/language.md`; add a line there before introducing a new one.
-- **Step back, don't grind.** An item's `step_back` caps its rounds; past that, replan. A fourth fix to one module in
-  14 days becomes a design item (`plan/README.md`, "Fix budget").
+- **Step back, don't grind.** Past an item's `step_back`, replan; a fourth fix to a module in 14 days is a design item.
+- **Memory holds directives and state, not learnings.** A trap goes in `docs/traps.md`, a test technique in
+  `docs/verifying.md`, each in the PR that met it, with no item; a defect in a plan item; never a PR number or sha.
 - **Decide two-way doors and write them down** in `plan/decisions/`. One-way doors (settings, secrets,
   anything outside this repo and the scratch repo) go in `plan/decisions/waiting-for-person.md`.
 
@@ -43,7 +44,7 @@ The one map of the repo; `docs/layout.md` holds the rules for tests, comments an
 | `infra/` | `infra/cloud-environment/` holds the cloud environment's setup script |
 | `vendor/` | Third-party tools copied in verbatim; `vendor/documentation-downloader/` is the docs skill setup installs |
 | `.github/` | `.github/workflows/ci.yml` and `.github/workflows/verdict.yml` run on every PR |
-| `docs/` | Standing knowledge, one file per subject; `docs/language.md` is the glossary, `docs/traps.md` the container traps |
+| `docs/` | Standing knowledge, one file per subject; `docs/language.md` is the glossary, `docs/traps.md` the container traps, `docs/verifying.md` how to write and run a verifier's tests |
 
 ## Commands
 

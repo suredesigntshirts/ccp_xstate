@@ -69,6 +69,15 @@ export function checkDoneOn({ changed, items, labels }) {
   return reasons;
 }
 
+// Notes files: what a thread meets in the container, and how to write a verifier's tests. A PR that names no item may
+// change them beside plan/, because a wrong note costs one round and a note that waits for an item goes nowhere.
+export const NOTES = ['docs/traps.md', 'docs/verifying.md'];
+
+// The files of a PR that names no item which need one: any outside plan/ and the notes files.
+export function needsItem(changed) {
+  return changed.filter((p) => !p.startsWith('plan/') && !NOTES.includes(p));
+}
+
 // Which item a PR names: the `Item: <id>` line in its body, and nothing else. The branch name is for people.
 export function namedItem({ body = '', ids }) {
   const item = body.match(/^Item:\s*([a-z0-9-]+)\s*$/m)?.[1] ?? null;

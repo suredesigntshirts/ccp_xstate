@@ -4,7 +4,7 @@
 // .github/workflows/verdict.yml fills from the pull_request event. Prints each reason and exits 1 if there is any.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { EVIDENCE_LIMIT, checkCutoff, checkDoneOn, checkEvidence, checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem, testRunFault, verdictTests } from './lib.mjs';
+import { EVIDENCE_LIMIT, checkCutoff, checkDoneOn, checkEvidence, checkFreeze, checkSessions, checkVerdict, findStubs, itemHead, namedItem, NOTES, needsItem, testRunFault, verdictTests } from './lib.mjs';
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'pipe'] })
   .trimEnd();
@@ -108,8 +108,10 @@ const gates = {
   verdict() {
     if (named.reasons.length) return named.reasons;
     const { item } = named;
-    if (!item) return changed.every((p) => p.startsWith('plan/')) ? []
-      : ['this PR changes files outside plan/ but names no item (add an "Item: <id>" line to its body)'];
+    if (!item) {
+      const outside = needsItem(changed);
+      return outside.length ? [`this PR changes ${outside.join(', ')} outside plan/ and the notes files (${NOTES.join(', ')}) but names no item (add an "Item: <id>" line to its body)`] : [];
+    }
     const itemHeadNow = itemHead(show(head, `plan/items/${item}.md`));
     let verdict = null;
     const raw = show(head, `verify/${item}/verdict.json`);

@@ -68,6 +68,22 @@ test('verdict gate: a PR with no Item line passes only if it touches plan/ alone
   assert.match(out.stderr, /names no item/);
 });
 
+test('verdict gate: a PR with no Item line may change the notes files beside plan/, and nothing else outside it', () => {
+  for (const notes of [['docs/traps.md'], ['docs/verifying.md'], ['docs/traps.md', 'docs/verifying.md', 'plan/decisions/d.md']]) {
+    const r = repo();
+    r.commit(Object.fromEntries(notes.map((p) => [p, 'a note\n'])));
+    const out = r.run('verdict', { PR_BODY: '' });
+    assert.equal(out.status, 0, `${notes.join(', ')}: ${out.stderr}`);
+  }
+  for (const other of ['docs/gates.md', 'docs/layout.md', 'CLAUDE.md', 'scripts/a.mjs', 'docs/traps.md.bak']) {
+    const r = repo();
+    r.commit({ 'docs/traps.md': 'a note\n', [other]: 'x\n' });
+    const out = r.run('verdict', { PR_BODY: '' });
+    assert.equal(out.status, 1, other);
+    assert.match(out.stderr, new RegExp(`changes ${other.replace(/\./g, '\\.')} outside plan/ and the notes files .*names no item`));
+  }
+});
+
 test('freeze gate: softening an Expect line of the named item is red unless a plan-only replan', () => {
   const r = repo();
   r.commit({ 'plan/items/x.md': itemFile([{ id: 'a', proof: 'builder' }], 'done') });
