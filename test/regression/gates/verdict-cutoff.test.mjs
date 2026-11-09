@@ -3,7 +3,7 @@
 // and the gate tests that guard both go red when the rule they guard is broken. Every gate run is in a temp repo
 // holding a copy of scripts/gates/; every mutation is in a temp copy of scripts/.
 import assert from 'node:assert/strict';
-import { onlyTests, ranTests } from '../lib.mjs';
+import { onlyTests, ranTests, childEnv } from '../lib.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -16,8 +16,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(join(HERE, '..', '..', '..'));
 
 const cleanEnv = () => {
-  const { NODE_TEST_CONTEXT, BASE_SHA, HEAD_SHA, PR_BODY, PR_LABELS, PR_BRANCH, ...env } = process.env;
-  return env;
+  return childEnv({ drop: ['BASE_SHA', 'HEAD_SHA', 'PR_BODY', 'PR_LABELS', 'PR_BRANCH'] });
 };
 
 function node(args, opts = {}) {

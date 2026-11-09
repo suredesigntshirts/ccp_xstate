@@ -30,6 +30,16 @@ export function leanClone(src, dest, { args = [], env = process.env } = {}) {
   return dest;
 }
 
+/**
+ * The environment for a child process a test starts: `from` without NODE_TEST_CONTEXT, which would make a child
+ * node --test report to this runner and run nothing, without the `drop` keys, and with `add` set.
+ */
+export function childEnv({ drop = [], add = {}, from = process.env } = {}) {
+  const env = { ...from };
+  for (const key of ['NODE_TEST_CONTEXT', ...drop]) delete env[key];
+  return { ...env, ...add };
+}
+
 export const fresh = () => mkdtempSync(join(tmpdir(), 'regression-'));
 // Loaded with the root, so the item's pinned workflow bytes are stored where bin/host.js and the hooks read them.
 export const open = (root, { item = 'it-1', session = 'owner', release = '0.2.0' } = {}) => restore({ root, item, spec: loadWorkflow('quick-fix', { root }), session, release });

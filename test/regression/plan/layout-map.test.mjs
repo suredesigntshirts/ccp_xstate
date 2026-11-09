@@ -8,6 +8,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { childEnv } from '../lib.mjs';
 
 // Helpers for the tests below.
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -15,8 +16,8 @@ const REPO = resolve(join(HERE, '..', '..', '..'));
 const read = (p, root = REPO) => readFileSync(join(root, p), 'utf8');
 
 function node(args, opts = {}) {
-  const { NODE_TEST_CONTEXT, BASE_SHA, HEAD_SHA, PR_BODY, PR_LABELS, ...env } = process.env;
-  const r = spawnSync(process.execPath, args, { encoding: 'utf8', env: { ...env, ...opts.env }, cwd: opts.cwd,
+  const env = childEnv({ drop: ['BASE_SHA', 'HEAD_SHA', 'PR_BODY', 'PR_LABELS'], add: opts.env });
+  const r = spawnSync(process.execPath, args, { encoding: 'utf8', env, cwd: opts.cwd,
     maxBuffer: 64 << 20 });
   return { status: r.status, out: `${r.stdout}${r.stderr}` };
 }

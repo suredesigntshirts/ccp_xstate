@@ -3,7 +3,7 @@
 // readyRequired field by name and a dependency in a later stage, and the plan-check test goes red when the sha pattern
 // matches hex letters alone. Every edit is on a temp copy of plan/.
 import assert from 'node:assert/strict';
-import { onlyTests, ranTests } from '../lib.mjs';
+import { onlyTests, ranTests, childEnv } from '../lib.mjs';
 import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -35,8 +35,7 @@ function section(text, heading) {
 }
 
 const cleanEnv = () => {
-  const { NODE_TEST_CONTEXT, BASE_SHA, HEAD_SHA, PR_BRANCH, PR_BODY, PR_LABELS, ...env } = process.env;
-  return env;
+  return childEnv({ drop: ['BASE_SHA', 'HEAD_SHA', 'PR_BRANCH', 'PR_BODY', 'PR_LABELS'] });
 };
 function node(args, { cwd = REPO, env = {} } = {}) {
   const r = spawnSync(process.execPath, args, { encoding: 'utf8', cwd, env: { ...cleanEnv(), ...env },

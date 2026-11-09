@@ -8,13 +8,14 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { childEnv } from '../lib.mjs';
 
 // Helpers for the tests below.
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(join(HERE, '..', '..', '..'));
 const KB64 = 64 * 1024;
 
-const cleanEnv = () => { const { NODE_TEST_CONTEXT, BASE_SHA, HEAD_SHA, ...env } = process.env; return env; };
+const cleanEnv = () => childEnv({ drop: ['BASE_SHA', 'HEAD_SHA'] });
 
 function node(args, opts = {}) {
   const r = spawnSync(process.execPath, args, { encoding: 'utf8', env: { ...cleanEnv(), ...opts.env }, cwd: opts.cwd,

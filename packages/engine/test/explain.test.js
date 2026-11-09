@@ -9,6 +9,7 @@ import { dirname, join } from 'node:path';
 import { initialTransition, transition } from 'xstate';
 import { explain } from '../src/explain.js';
 import { failingOf, hashOf, loadWorkflow, machineOf } from '../src/index.js';
+import { childEnv } from '../../../test/regression/lib.mjs';
 
 const REPO = new URL('../../../', import.meta.url).pathname;
 
@@ -129,7 +130,7 @@ test('explain agrees with XState over the main tourney scenarios Q1, Q3, Q5 and 
   let n = 0;
   for (const name of ['Q1', 'Q3', 'Q5', 'R1']) {
     const tmp = mkdtempSync(join(tmpdir(), `explain-${name}-`));
-    execFileSync(process.execPath, ['--test', join(REPO, 'packages/engine/test/tourney', `${name}.test.js`)], { cwd: REPO, env: { ...Object.fromEntries(Object.entries(process.env).filter(([k]) => k !== 'NODE_TEST_CONTEXT')), TMPDIR: tmp }, stdio: 'ignore' });
+    execFileSync(process.execPath, ['--test', join(REPO, 'packages/engine/test/tourney', `${name}.test.js`)], { cwd: REPO, env: childEnv({ add: { TMPDIR: tmp } }), stdio: 'ignore' });
     const roots = [];
     const walk = (d, depth) => { if (depth > 4) return; for (const e of readdirSync(d, { withFileTypes: true })) if (e.isDirectory()) { const p = join(d, e.name); if (e.name === 'items') roots.push(d); else walk(p, depth + 1); } };
     walk(tmp, 0);

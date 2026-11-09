@@ -3,7 +3,7 @@
 // or with no rounds in step_back, passes the done heads that still carry the old fields, and the plan-check test goes
 // red with verifier back among the ready fields. Every edit is on a temp copy of plan/.
 import assert from 'node:assert/strict';
-import { onlyTests, ranTests } from '../lib.mjs';
+import { onlyTests, ranTests, childEnv } from '../lib.mjs';
 import { spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -17,8 +17,7 @@ const REPO = resolve(join(HERE, '..', '..', '..'));
 const read = (p) => readFileSync(join(REPO, p), 'utf8');
 
 const cleanEnv = () => {
-  const { NODE_TEST_CONTEXT, BASE_SHA, HEAD_SHA, PR_BRANCH, PR_BODY, PR_LABELS, ...env } = process.env;
-  return env;
+  return childEnv({ drop: ['BASE_SHA', 'HEAD_SHA', 'PR_BRANCH', 'PR_BODY', 'PR_LABELS'] });
 };
 
 function node(args, opts = {}) {

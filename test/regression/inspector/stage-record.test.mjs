@@ -9,6 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { runInNewContext } from 'node:vm';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { childEnv } from '../lib.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const TRIAL = join(REPO, 'tournaments/2026-11-04-stage-contract/trials/adopt/journal');
@@ -46,9 +47,8 @@ function journalRoots(dir) {
 /** Runs a tourney scenario on this head with TMPDIR set to a fresh folder; returns the journal roots it made. */
 function scenarioRoots(test, dir) {
   mkdirSync(dir, { recursive: true });
-  const { NODE_TEST_CONTEXT, ...env } = process.env;
   execFileSync(process.execPath, ['--test', join(REPO, 'packages/engine/test/tourney', test)], {
-    cwd: REPO, env: { ...env, TMPDIR: dir, TMP: dir, TEMP: dir }, stdio: 'ignore', timeout: 300000
+    cwd: REPO, env: childEnv({ add: { TMPDIR: dir, TMP: dir, TEMP: dir } }), stdio: 'ignore', timeout: 300000
   });
   return journalRoots(dir);
 }

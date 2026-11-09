@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { childEnv } from '../lib.mjs';
 
 const REPO = new URL('../../../', import.meta.url).pathname;
 // The independent reader of the stage record. For every run folder under a journal root (items/<item>/runs/<n>.<name>/), it decides from the run's pinned
@@ -203,9 +204,7 @@ const TRIAL = join(REPO, 'tournaments/2026-11-04-stage-contract/trials/adopt/jou
 test('stage-record: every model run folder the scenario tests write has a stage.json that reassembles and resolves', () => {
   const tmp = mkdtempSync(join(tmpdir(), 'verify-esc-'));
   const tests = readdirSync(join(REPO, 'packages/engine/test/tourney')).filter((f) => f.endsWith('.test.js')).map((f) => join('packages/engine/test/tourney', f));
-  // A child of node --test inherits NODE_TEST_CONTEXT and would report to this runner instead of running; drop it.
-  const { NODE_TEST_CONTEXT, ...env } = process.env;
-  execFileSync(process.execPath, ['--test', ...tests], { cwd: REPO, env: { ...env, TMPDIR: tmp }, stdio: 'pipe' });
+  execFileSync(process.execPath, ['--test', ...tests], { cwd: REPO, env: childEnv({ add: { TMPDIR: tmp } }), stdio: 'pipe' });
   let runs = 0;
   const problems = [];
   for (const d of readdirSync(tmp)) {
