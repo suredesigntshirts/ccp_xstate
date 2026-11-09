@@ -1,0 +1,50 @@
+{
+  "item": "memory-boundary",
+  "verified_sha": "40dc78dd706dc13ec7a6a08f5a4ba5e52b1e30cf",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GbhW9wz3QyEPgYt59",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "notes-pass",
+      "status": "MET",
+      "command": "node --test verify/memory-boundary/notes-pass.test.mjs (the checkout's pr-gate.mjs verdict over temp repos, no Item line)",
+      "excerpt": "7/7 pass: exit 0 'verdict gate passed' for docs/traps.md changed, docs/verifying.md added, each with plan/ files, both with plan/, docs/traps.md deleted, and an empty body. All 7 red with main's 38573a0d gate. Details in evidence/notes-pass.md",
+      "test": "verify/memory-boundary/notes-pass.test.mjs"
+    },
+    {
+      "id": "others-refused",
+      "status": "MET",
+      "command": "node --test verify/memory-boundary/others-refused.test.mjs",
+      "excerpt": "15/15 pass: exit 1 and the refusal names the file for docs/traps.md beside docs/gates.md, docs/layout.md, CLAUDE.md, scripts/gates/lib.mjs, a new script, packages/, docs/language.md, docs/traps.md.bak, docs/verifying.md/x.md, docs/Traps.md, plans/x.md, verify/, .github/, a deleted docs/layout.md, and docs/verifying.md beside a script (plan/ file not named). Details in evidence/others-refused.md",
+      "test": "verify/memory-boundary/others-refused.test.mjs"
+    },
+    {
+      "id": "reader-knows",
+      "status": "MET",
+      "command": "claude -p in a clean clone of 40dc78dd (npm ci, origin removed), empty HOME, the brief's env -u list and CLAUDE_CODE_DISABLE_AUTO_MEMORY=1; prompt, verbatim answer and grading in evidence/reader-knows.md; node --test verify/memory-boundary/reader-knows.test.mjs regrades it",
+      "excerpt": "5/5 pass. Trap: '`docs/traps.md` ... Don't put it only in project memory', citing CLAUDE.md 'A trap goes in `docs/traps.md`'. Technique: '`docs/verifying.md`', citing 'a test technique in `docs/verifying.md`'. Defect: 'a plan item in `plan/items/`'. PR #301: 'nowhere ... never a PR number or sha'. Control at main sent the technique to verify/<item>/ and observations.",
+      "test": "verify/memory-boundary/reader-knows.test.mjs"
+    },
+    {
+      "id": "world",
+      "status": "NOT MET",
+      "command": "throwaway PRs #289 (docs/traps.md only) and #290 (also docs/layout.md) into main off the build head, no Item line; gates job logs read; both closed",
+      "excerpt": "Both red. #289 gates job 129305556801: 'this PR changes CLAUDE.md, docs/gates.md, docs/language.md, scripts/gates/lib.mjs, scripts/gates/pr-gate.mjs, scripts/gates/test/pr-gate.test.mjs outside plan/ and the notes files ... but names no item'; #290 job 129305599375: the same plus docs/layout.md. The new rule runs on GitHub and never names docs/traps.md, but a PR off an unmerged build head carries the build's own files, so the notes-only PR cannot be green before the merge. The line needs a contract change. Details in evidence/world.md"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs on PR #288 at 40dc78dd706dc13ec7a6a08f5a4ba5e52b1e30cf",
+      "excerpt": "test job 129303303384 success; gates job 129303304527 failed only for the missing verdict, which runs again on the verdict commit (verify/ only)."
+    }
+  ],
+  "observations": [
+    "world as written needs the build merged: verdict.yml runs only for PRs into main and the verdict gate diffs from the merge base with main, so a PR off the unmerged build head always carries CLAUDE.md, docs/gates.md and the gate scripts. A contract change could read: 'a PR into main off the build head with a docs/traps.md line and no item is refused naming only the build's own files, never docs/traps.md, and one that also changes docs/layout.md names docs/layout.md' (what #289 and #290 already show); and move the green notes-only check to memory-learnings-written, whose first notes PR after this merge shows it.",
+    "Rename hole, not new: changed files come from git diff --name-only, which reports a rename by its new name only. A PR with no item that renames docs/gates.md to docs/verifying.md (while the base has none) passes and deletes a rule file; at main a rename into plan/ passes the same way. --no-renames in that diff would close it; worth a fix item.",
+    "Throwaway branches throwaway/memory-boundary-notes-only and throwaway/memory-boundary-notes-and-rule could not be deleted from this container (push --delete disconnects at the proxy); per the brief they belong in plan/decisions/waiting-for-person.md, which a verdict commit cannot touch, so the builder should add them.",
+    "The CLAUDE.md line reads well and the fresh reader quoted it for all four answers. The shortened step-back bullet drops its pointer to plan/README.md 'Fix budget'; the README still holds the rule.",
+    "docs/language.md gains 'notes file' and 'project memory'; the item's concept budget is 1 adds. Project memory is a platform term rather than a harness concept, so this reads within budget."
+  ]
+}
