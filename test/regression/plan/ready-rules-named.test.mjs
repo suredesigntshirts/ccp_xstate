@@ -3,6 +3,7 @@
 // readyRequired field by name and a dependency in a later stage, and the plan-check test goes red when the sha pattern
 // matches hex letters alone. Every edit is on a temp copy of plan/.
 import assert from 'node:assert/strict';
+import { onlyTests, ranTests } from '../lib.mjs';
 import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -180,7 +181,8 @@ test('plan-check.test.mjs goes red with SHA matching hex letters alone, green re
   const dir = mkdtempSync(join(tmpdir(), 'iwg-bite-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   for (const p of ['plan', 'test/plan-check.test.mjs']) cpSync(join(REPO, p), join(dir, p), { recursive: true });
-  const run = () => node(['--test', '--test-reporter=tap', join(dir, 'test/plan-check.test.mjs')], { cwd: dir });
+  const NAMES = ['a sha of seven or more hex digits is refused; a repo path or a word of hex letters alone is not'];
+  const run = () => node(['--test', '--test-reporter=tap', onlyTests(NAMES), join(dir, 'test/plan-check.test.mjs')], { cwd: dir });
   const file = join(dir, 'plan/check.mjs');
   const text = readFileSync(file, 'utf8');
   const line = text.split('\n').find((l) => /^const SHA = /.test(l));
@@ -189,6 +191,7 @@ test('plan-check.test.mjs goes red with SHA matching hex letters alone, green re
   assert.notEqual(line, broken);
   const green = run();
   assert.equal(green.status, 0, green.out);
+  assert.deepEqual(ranTests(green.out), NAMES, 'the named tests ran');
   writeFileSync(file, text.replace(line, broken));
   const red = run();
   writeFileSync(file, text);

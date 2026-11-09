@@ -3,6 +3,7 @@
 // and the gate tests that guard both go red when the rule they guard is broken. Every gate run is in a temp repo
 // holding a copy of scripts/gates/; every mutation is in a temp copy of scripts/.
 import assert from 'node:assert/strict';
+import { onlyTests, ranTests } from '../lib.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -243,7 +244,8 @@ const BITES = [
     from: 'if (was === undefined || was === now) continue;', to: 'continue;' },
   { name: 'pr-gate.test.mjs goes red when the verdict gate stops reading the item at verified_sha',
     code: 'scripts/gates/pr-gate.mjs', test: 'scripts/gates/test/pr-gate.test.mjs',
-    from: 'before: show(verified, itemFile)', to: 'before: show(head, itemFile)' },
+    from: 'before: show(verified, itemFile)', to: 'before: show(head, itemFile)',
+    names: ['verdict gate: a contract reworded on main and merged in after the verified sha is refused; a status-only merge passes', 'verdict gate: a verdict whose verified sha has no item file is refused'] },
 ];
 
 for (const b of BITES) {
@@ -251,9 +253,10 @@ for (const b of BITES) {
     const dir = mkdtempSync(join(tmpdir(), 'vcv-bite-'));
     t.after(() => rmSync(dir, { recursive: true, force: true }));
     for (const p of ['scripts', 'package.json']) cpSync(join(REPO, p), join(dir, p), { recursive: true });
-    const run = () => node(['--test', '--test-reporter=tap', join(dir, b.test)], { cwd: dir });
+    const run = () => node(['--test', '--test-reporter=tap', ...(b.names ? [onlyTests(b.names)] : []), join(dir, b.test)], { cwd: dir });
     const green = run();
     assert.equal(green.status, 0, green.out);
+    if (b.names) assert.deepEqual(ranTests(green.out), [...b.names].sort(), 'the named tests ran');
     const p = join(dir, b.code);
     const text = readFileSync(p, 'utf8');
     assert.ok(text.includes(b.from), `the rule to break is in ${b.code}`);
