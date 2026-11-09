@@ -34,6 +34,10 @@
       "what": "Each build and verify answer from the decision's table"
     },
     {
+      "ref": "test/regression/engine/bench-prompts.test.mjs",
+      "what": "Reads a committed brief run's prompt through promptFile(), so the new run sets, which write prompt.md, replay with the older ones that wrote brief.md"
+    },
+    {
       "ref": "packages/engine/test/tourney/S5.test.js",
       "what": "Its assertion of verify's grading rule follows the new words"
     },
