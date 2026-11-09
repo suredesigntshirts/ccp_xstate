@@ -39,3 +39,25 @@ read the same way.
 The brief stage has a bench (`bench/brief/`), so its change is benched: today's prompt and the changed one, 3 runs
 on each of the 9 cases, scored and compared. build and verify have no bench yet; their changes are word for word the
 answers above, and each removes a contradiction or an undefined name rather than adding a duty.
+
+## The brief trial (added after the bench)
+
+Today's brief prompt and the changed one ran 3 times on each of the 9 cases (claude-opus-5-5) and were scored and
+compared. The changed prompt was worse on six criteria and better on one:
+
+| Criterion | Today | Changed |
+|---|---|---|
+| no-restated-rules | 27/27 | 26/27 |
+| builder-criteria | 14/27 | 9/27 |
+| words-only | 21/27 | 16/27 |
+| runs-as-written | 23/27 | 18/27 |
+| catches-traps | 22/27 | 15/27 |
+| avoids-must-not | 24/27 | 23/27 |
+| methods-private | 10/27 | 13/27 |
+
+The worst case was `planted-after-merge` (catches-traps 3/3 to 0/3): with "each check's commands run on their own",
+verifier briefs stopped running the pre-change code to compare against and fell back to a hand-written expected
+string. A rule that makes a prompt clearer to a reader can still make the stage's output worse; the bench is the
+judge (L-stage-needs-bench). So brief.md stays as it is, the trial is kept in `bench/brief/`, and the build answer
+to the CI-wait conflict lives in build.md alone, which a red check already reaches as failure. Narrower brief changes
+(the CI-wait line alone) can each be benched in a later round.
