@@ -1,0 +1,45 @@
+{
+  "item": "batched-gate-reads",
+  "verified_sha": "188c9b9620b4fa41fbe161cd921ed94bccf89fad",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5Gqv29K9XG62ACvJm9",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "same-answers",
+      "status": "MET",
+      "command": "node --test verify/batched-gate-reads/same-answers.test.mjs; mutations of the head's reader applied in place and restored",
+      "excerpt": "8 pass: base (829fa83b, kept as evidence/base-pr-gate.mjs.txt) and head pr-gate.mjs give the same exit code, stdout and stderr for freeze, stubs, evidence and verdict over PRs that soften a done verified item's Expect and move a done_on, add and delete items (draft, done, verified), delete a verdict file, touch paths with spaces, quotes, non-ASCII and names ending ' missing'/' ambiguous', add binary files, a 70 KB file, a .pass file, a spec-reporter listing, symlinks and gitlinks, a folder named like an item, stubs under scripts/, packages/ and plugins/, a verdict from a separate session then the builder then a late commit, and the PR's own diff. Bites: no trimEnd fails 8/8; non-blob read as missing fails the folder case; latin1 decoding fails the listing case. The endsWith(' missing') mutation is equivalent (git never echoes the name for a present object). Details in evidence/same-answers.md",
+      "test": "verify/batched-gate-reads/same-answers.test.mjs"
+    },
+    {
+      "id": "faster",
+      "status": "MET",
+      "command": "node --test verify/batched-gate-reads/faster.test.mjs; time node --test \"scripts/gates/test/*.test.mjs\" \"test/regression/gates/*.test.mjs\" in fresh clones of 829fa83b and 188c9b96, clean HOME, 3 alternating rounds",
+      "excerpt": "freeze gate over the real plan: base median 3040 ms, head 157 ms; stubs: base 844 ms, head 124 ms (5 alternating runs). Gate guards, 175 tests at both: base user+sys 81, 90 and 85 s per round, head 45, 47 and 45 s; wall 28.9-31.7 s to 17.7-18.2 s. Details in evidence/faster.md",
+      "test": "verify/batched-gate-reads/faster.test.mjs"
+    },
+    {
+      "id": "guards-pass",
+      "status": "MET",
+      "command": "node --test verify/batched-gate-reads/guards-pass.test.mjs (runs scripts/gates/test and test/regression/gates at the checkout)",
+      "excerpt": "175 tests, 175 pass, 0 fail, 0 skipped at the head; the PR changes no guard file (diff is scripts/gates/pr-gate.mjs and its item only)",
+      "test": "verify/batched-gate-reads/guards-pass.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #286 at 188c9b9620b4fa41fbe161cd921ed94bccf89fad",
+      "excerpt": "at 188c9b9620b4fa41fbe161cd921ed94bccf89fad: test (job 129110741497) success in 53 s, plan ok; gates (job 129110739903) failed only with 'no verify/batched-gate-reads/verdict.json at the head sha', which this verdict answers. Both run again on the verdict commit."
+    }
+  ],
+  "observations": [
+    "Quality: the PR keeps every check. The same 175 gate guards run and pass; the CPU saved is git process starts, not test work. The gates still read the same bytes: the reader decodes UTF-8 and trims the end like git show did.",
+    "The item's risk (a path whose name looks like git's 'missing' line) cannot arise: cat-file --batch prints a present object as '<sha> <type> <size>', so the exact-match check is safe but a looser one would be too.",
+    "One small difference not reachable on this repo: git show refused files over 64 MiB (maxBuffer) and read them as null, while the batched reader reads them; no file near that size exists under plan/, scripts/, packages/, plugins/ or verify/.",
+    "The PR body measured freeze 2.6 s to 0.11 s and the guards 56 s to 31 s CPU; this container saw 3.0 s to 0.16 s and about 86 s to 46 s CPU, the same shape.",
+    "Full npm test at 188c9b96 in a fresh clone (clean HOME, 4 cores): 1976 tests, 1967 pass, 170 s; the 9 failures are test/regression/inspector/stage-record.test.mjs's Playwright tests, which fail the same way at main in this container (Playwright present here, absent in ci) and are untouched by the PR. This folder's 11 tests pass in a depth-1 single-branch clone.",
+    "The verdict gate runs this folder's tests, about 2 minutes on 4 cores; faster.test.mjs's absolute bars (head under 0.5 s, base over 2 s) are the Expect line's and could move on a much faster or slower runner."
+  ]
+}
