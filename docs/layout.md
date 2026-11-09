@@ -55,3 +55,5 @@ beside it: `packages/engine/src/vendor/mustache.mjs` is the `mustache` package's
 `vendor/` is outside that rule: it holds tools sessions use (such as the documentation-downloader skill), not
 harness code, and it is neither a workspace nor covered by `npm test`. Its packages install their own dependencies
 where they are installed (`infra/cloud-environment/setup.sh`).
+
+Throwaway line.
