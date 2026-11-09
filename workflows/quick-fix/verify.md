@@ -20,5 +20,5 @@
 
 - result: PASS only if every entry in lines is PASS; otherwise FAIL.
 - pr: Exactly target as { url, at }, with nothing added. The host checks that your worktree HEAD and GitHub's head of that PR both equal at.
-- issue: Your input's issue as { url, expect }, copied exactly, every expect line in order; any other key you add must equal the input's. The host compares it with your input.
+- issue: Your input's issue as { url, expect }, copied exactly, every expect line in order, and no other key. The host compares it with your input.
 - lines: One entry per expect line, in order: { line: the expect line copied exactly, result: PASS or FAIL, evidence: what you ran and what you saw }. PASS means a check you ran at target.at held; FAIL means it did not, or that you could not test it, with the reason as evidence. The host refuses a result that misses an expect line, adds another, puts them out of order, or whose result disagrees with these entries.

@@ -17,6 +17,6 @@
 ## Output
 
 - result: PASS only if every entry in lines is PASS; otherwise FAIL.
-- issue: Your input's issue as { url, expect }, copied exactly, every expect line in order; any other key you add must equal the input's. The host compares it with your input.
+- issue: Your input's issue as { url, expect }, copied exactly, every expect line in order, and no other key. The host compares it with your input.
 - lines: One entry per expect line, in order: { line: the expect line copied exactly, result: PASS or FAIL, evidence: what you checked and what you found }. The host refuses a result that misses an expect line, adds another, puts them out of order, or whose result disagrees with these entries.
 - sources: The pages you checked, as { url, at } with at a short verbatim quote from that page; may be empty. The host fetches each page and refuses a quote it cannot find.
