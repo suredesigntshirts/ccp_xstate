@@ -69,8 +69,8 @@
     },
     {
       "id": "world",
-      "check": "On GitHub, a PR into main that names no item and changes only docs/traps.md is green on the verdict gate, and one that also changes a file outside plan/ and the notes files is red on it",
-      "how": "The verifier opens two throwaway PRs off the build head, reads their gates checks, and closes them",
+      "check": "On GitHub, a throwaway PR off the build head that names no item and changes docs/traps.md is refused by the verdict gate naming only the build's own files outside plan/ and never docs/traps.md, and one that also changes docs/layout.md is refused naming docs/layout.md too",
+      "how": "The verifier opens the two throwaway PRs, reads their gates checks' refusal text, and closes them; a notes-only PR green on main waits for memory-learnings-written, the first PR after this merge",
       "proof": "world"
     },
     {
@@ -106,7 +106,8 @@
   "risks": [
     "The entry texts stand at 223 of a 225-line budget: the CLAUDE.md line must fit in one line or pay for itself by a cut elsewhere",
     "A notes file could be used to slip a rule past the gate; the decision keeps rule files out of the exemption"
-  ]
+  ],
+  "contract_changes": 1
 }
 ```
 
@@ -123,6 +124,15 @@ This item removes that cost and says the rule once, in `CLAUDE.md`, which sessio
 suggested wording, to fit one line: "**Memory holds directives and state, not learnings.** A trap or technique goes in
 `docs/traps.md` or `docs/verifying.md` in the PR that met it (no item needed), a defect in a plan item; never a PR
 number, sha or verdict." The builder may word it otherwise if the reader-knows line holds.
+
+## Contract change
+
+The world line first asked for a notes-only PR into main to be green on the verdict gate before this build merged. It
+cannot be: `verdict.yml` runs only on PRs into main and the gate diffs from the merge base, so a throwaway PR off the
+unmerged build head always carries this build's `CLAUDE.md`, `docs/gates.md` and gate scripts. The verifier's
+throwaway PRs (both red, with the new rule's text) showed it. The line now asks what a PR before the merge can show:
+the refusal names only files that need an item, never `docs/traps.md`, and names `docs/layout.md` when one adds it.
+The green notes-only PR moves to memory-learnings-written, whose PR changes notes files after this one merges.
 
 ## Verifier brief
 
