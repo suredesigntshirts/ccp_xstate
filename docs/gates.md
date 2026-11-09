@@ -6,7 +6,7 @@ Run one at the checkout's HEAD with `BASE_SHA=origin/main PR_BODY='Item: <id>' n
 
 | Workflow | Step | Fails when |
 |---|---|---|
-| `ci` | `npm test` | any test under `test/`, `scripts/`, `packages/` or `plugins/` fails; `verify/` is not run here, the verdict gate runs a PR's own verifier tests |
+| `ci` | guards | a guard fails: on a PR, the guard files under `test/`, `scripts/`, `packages/` or `plugins/` that the change reaches (`scripts/ci/select-tests.mjs`; all of them when it changes a shared file or one no guard reaches); on `main`, all of them by `npm test`. `verify/` is not run here: the verdict gate runs a PR's own verifier tests |
 | `ci` | plan check | `node plan/check.mjs` refuses the plan |
 | `verdict` | no stubs | a file under `packages/` or `plugins/` has TODO, FIXME, "not implemented" or a skipped test, or a line of the harness source or its two READMEs has a history reference (`docs/layout.md`, "Comments") |
 | `verdict` | contract freeze | the PR changes a frozen item's head or Verifier brief and isn't a plan-only replan, or the item already has a verdict file |

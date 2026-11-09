@@ -36,7 +36,7 @@ The one map of the repo; `docs/layout.md` holds the rules for tests, comments an
 | `plugins/` | npm workspaces for the Claude Code plugins; `plugins/harness/` is the one threads install |
 | `verify/<item>/` | The verifier's tests, evidence and `verdict.json` for each item |
 | `test/` | Repo-wide tests, such as the workspace rules and `test/docs.test.mjs` |
-| `scripts/` | `scripts/gates/` the PR gates; `scripts/release/` cuts a plugin release; `scripts/inspector/` the Workflow Inspector (`docs/inspector.md`); `scripts/bench/` the stage bench (`docs/prompts.md`); `scripts/tournament/` the design-tournament kit (`docs/tournaments.md`); `scripts/clean-room/` checks a fresh install in an empty HOME; `scripts/debug/` debugging aids such as `scripts/debug/trace-writes.mjs` |
+| `scripts/` | `scripts/gates/` the PR gates; `scripts/ci/` picks the guards a PR runs; `scripts/release/` cuts a plugin release; `scripts/inspector/` the Workflow Inspector (`docs/inspector.md`); `scripts/bench/` the stage bench (`docs/prompts.md`); `scripts/tournament/` the design-tournament kit (`docs/tournaments.md`); `scripts/clean-room/` checks a fresh install in an empty HOME; `scripts/debug/` debugging aids such as `scripts/debug/trace-writes.mjs` |
 | `bench/` | One folder per benched model stage: rubric, cases, run sets and reports |
 | `tournaments/` | One folder per design tournament, indexed in `tournaments/README.md`; lane code stays in the scratch repo |
 | `probes/` | Throwaway platform probes; `probes/platform/` fed `plan/research/platform-baseline.md` |

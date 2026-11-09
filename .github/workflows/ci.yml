@@ -11,12 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # On a PR the checkout is the merge into the base; its first parent is the base, which pr-tests.mjs diffs.
+          fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: install xstate (the one runtime dependency, pinned in package-lock.json)
         run: npm ci
-      - name: npm test (test, scripts, packages, plugins)
+      - name: guards the PR reaches (scripts/ci/pr-tests.mjs)
+        if: github.event_name == 'pull_request'
+        run: node scripts/ci/pr-tests.mjs
+      - name: npm test, every guard (test, scripts, packages, plugins)
+        if: github.event_name != 'pull_request'
         run: npm test
       - name: plan check
         if: ${{ !cancelled() }}
