@@ -8,6 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { childEnv } from '../lib.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(join(HERE, '..', '..', '..'));
@@ -50,10 +51,9 @@ function rootsUnder(dir) {
  */
 async function scenarioItems(name, repo = REPO) {
   const dir = tempDir(`scn-${name}`);
-  const { NODE_TEST_CONTEXT, ...env } = process.env;
   const code = await new Promise((done) => {
     spawn(process.execPath, ['--test', '--test-reporter=dot', `packages/engine/test/tourney/${name}.test.js`], {
-      cwd: repo, env: { ...env, TMPDIR: dir, TMP: dir, TEMP: dir }, stdio: 'ignore', timeout: 600000
+      cwd: repo, env: childEnv({ add: { TMPDIR: dir, TMP: dir, TEMP: dir } }), stdio: 'ignore', timeout: 600000
     }).on('close', done);
   });
   assert.equal(code, 0, `scenario ${name} passes`);
@@ -89,9 +89,8 @@ async function runIn(name) {
     const mutated = MUTATIONS[name](src);
     if (name !== 'intact') assert.notEqual(mutated, src, `mutation ${name} applied`);
     writeFileSync(file, mutated);
-    const { NODE_TEST_CONTEXT, ...env } = process.env;
     const r = await new Promise((done) => {
-      const child = spawn(process.execPath, ['--test', '--test-reporter=tap', 'packages/engine/test/explain.test.js'], { cwd: dir, env, timeout: 600000 });
+      const child = spawn(process.execPath, ['--test', '--test-reporter=tap', 'packages/engine/test/explain.test.js'], { cwd: dir, env: childEnv(), timeout: 600000 });
       let stdout = '';
       child.stdout.on('data', (b) => { stdout += b; });
       child.on('close', (code) => done({ code, stdout }));

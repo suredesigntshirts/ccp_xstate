@@ -10,7 +10,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { leanClone } from '../lib.mjs';
+import { leanClone, childEnv } from '../lib.mjs';
 
 // Helpers for the tests below.
 /** The passing setup.test.mjs run in a clone with no release refs, with what it left in its TMPDIR. */
@@ -49,9 +49,7 @@ const commitAll = (c, msg) => { git(c, 'add', '-A'); git(c, 'commit', '-q', '-m'
 
 /** node --test on one file in `cwd`, with `env` (defaults to this process's) and extra args; the summary parsed. */
 function nodeTest(cwd, file, { env = process.env, args = [] } = {}) {
-  // A node --test inside a test file runs nothing unless the parent's test context is dropped.
-  const { NODE_TEST_CONTEXT, ...clean } = env;
-  const r = spawnSync(process.execPath, ['--test', '--test-reporter=tap', ...args, file], { cwd, env: clean, encoding: 'utf8', timeout: 540000 });
+  const r = spawnSync(process.execPath, ['--test', '--test-reporter=tap', ...args, file], { cwd, env: childEnv({ from: env }), encoding: 'utf8', timeout: 540000 });
   const n = (k) => Number((r.stdout.match(new RegExp(`^# ${k} (\\d+)$`, 'm')) ?? [])[1] ?? NaN);
   return { status: r.status, out: r.stdout + r.stderr, tests: n('tests'), pass: n('pass'), fail: n('fail'), skipped: n('skipped') };
 }

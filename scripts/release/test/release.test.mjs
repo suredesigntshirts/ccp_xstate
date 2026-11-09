@@ -3,13 +3,14 @@
 // a release/ branch), others don't.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { RELEASED, branch, compare, newestTag, nextVersion, plan, row, tag } from '../release.mjs';
 import { validate } from '../../../packages/journal/src/index.js';
 
+const SCRIPT = join(import.meta.dirname, '..', 'release.mjs');
 const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 
 /** A repo with a plugin manifest at `version`, a journal file and a doc, pushed to a bare origin. */
@@ -87,6 +88,23 @@ test('release: a change a failed run missed is released by the next push, and a 
   const again = plan({ cwd, sha: d.sha });
   assert.equal(again.release, false);
   assert.match(again.reason, /already released as harness-v0\.1\.1/);
+  assert.deepEqual(again.already, ['harness-v0.1.1']);
+});
+
+test('release: branch at a merge the workflow already tagged says it is already released and exits 0', () => {
+  const cwd = repo('0.1.0');
+  const d = merge(cwd, 'plugins/harness/scripts/a.mjs');
+  const quiet = merge(cwd, 'docs/a.md');
+  const cli = (sha) => spawnSync(process.execPath, [SCRIPT, 'branch'], { cwd, env: { ...process.env, RELEASE_SHA: sha }, encoding: 'utf8' });
+  const tagged = cli(d.sha);
+  assert.equal(tagged.status, 0, tagged.stderr);
+  assert.match(tagged.stderr, /^already released: .*harness-v0\.1\.0.*nothing is left to do$/m);
+  assert.doesNotMatch(tagged.stderr, /no release/);
+  assert.equal(JSON.parse(tagged.stdout).payload.result, 'skipped');
+  const none = cli(quiet.sha);
+  assert.equal(none.status, 0, none.stderr);
+  assert.match(none.stderr, /^no release: nothing under/m);
+  assert.doesNotMatch(none.stderr, /already released/);
 });
 
 test('release: the tag is annotated with a valid ci.result row and pushed to origin', () => {

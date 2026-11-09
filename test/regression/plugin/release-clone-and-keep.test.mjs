@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { after, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { leanClone } from '../lib.mjs';
+import { leanClone, childEnv } from '../lib.mjs';
 
 // Helpers for the tests below.
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -49,8 +49,7 @@ function edit(dir, file, from, to) {
 
 /** node --test with the TAP reporter in `dir`; the counts and the failing test names. */
 function nodeTest(dir, files, { pattern, env = process.env, timeout = 600_000 } = {}) {
-  env = { ...env };
-  delete env.NODE_TEST_CONTEXT; // else the child reports to this runner, not as TAP
+  env = childEnv({ from: env });
   const args = ['--test', '--test-reporter=tap', ...(pattern ? [`--test-name-pattern=${pattern}`] : []), ...files];
   const r = spawnSync(process.execPath, args, { cwd: dir, encoding: 'utf8', env, timeout, maxBuffer: 64 << 20 });
   const out = `${r.stdout}\n${r.stderr}`;
@@ -118,8 +117,7 @@ chmodSync(join(stubDir, TRACER), 0o755);
 
 function run(root, keep, { stub }) {
   const tmp = mkdtempSync(join(temp('tmpdir'), 't-'));
-  const env = { ...process.env, TMPDIR: tmp, ...(stub ? { PATH: `${stubDir}:${process.env.PATH}` } : {}) };
-  delete env.NODE_TEST_CONTEXT;
+  const env = childEnv({ add: { TMPDIR: tmp, ...(stub ? { PATH: `${stubDir}:${process.env.PATH}` } : {}) } });
   const watched = temp('watched');
   const r = spawnSync(process.execPath, [join(root, SCRIPT), watched, '--keep', keep, '--', 'true'], { env, encoding: 'utf8' });
   return { ...r, left: readdirSync(tmp).filter((n) => n.startsWith('trace-writes-')), tmp };

@@ -27,6 +27,8 @@ How the work on the harness itself is planned and proved.
 | regression set | The behavioural tests of done items, kept by area under test/regression with one helper; it is what a cleanup must keep passing | `plan/decisions/2026-11-08-verification-swing.md`, decision 4 |
 | serial pass | The second part of `npm test`: after the parallel pass ends, the tests named `cheap: ` (wall-time bars a busy machine would break) run one at a time | `package.json` `test`, `test/test-passes.test.mjs` |
 | lean clone | A test's working clone of the repo, made by `leanClone`: the same refs, HEAD and history as a plain clone, checked out without `bench/` and `tournaments/` | `test/regression/lib.mjs` |
+| fresh reader | A `claude -p` session that knows only the repository it runs in: empty HOME, memory off, its own session and harness folder | `scripts/fresh-reader.mjs` |
+| verdict skeleton | A `verdict.json` with the sha, session and one empty result per Expect line filled from git and the session, for the plan verifier to complete | `scripts/gates/new-verdict.mjs` |
 | guard | A test that runs on every PR to keep a rule or behaviour holding: every test under `test/`, `scripts/`, `packages/` and `plugins/` | `npm test` |
 | proof | A verifier's test that shows one item's Expect line holds at its own PR's head; the verdict gate runs it there, and nothing runs it after | `verify/<item>/`, `scripts/gates/pr-gate.mjs` |
 | ledger row | A lesson the plan is held to, with an `L-` id | `plan/ledger/` |

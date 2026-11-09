@@ -8,6 +8,7 @@ import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, wr
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { childEnv } from '../lib.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
@@ -44,9 +45,7 @@ function copyHead() {
 }
 
 function run(dir, file) {
-  const env = { ...process.env };
-  delete env.NODE_TEST_CONTEXT;
-  const r = spawnSync(process.execPath, ['--test', '--test-reporter=tap', file], { cwd: dir, env, encoding: 'utf8', maxBuffer: 1e8, timeout: 600_000 });
+  const r = spawnSync(process.execPath, ['--test', '--test-reporter=tap', file], { cwd: dir, env: childEnv(), encoding: 'utf8', maxBuffer: 1e8, timeout: 600_000 });
   return { exit: r.status, pass: Number(r.stdout.match(/^# pass (\d+)/m)?.[1] ?? 0), fail: Number(r.stdout.match(/^# fail (\d+)/m)?.[1] ?? 0), red: r.stdout.split('\n').filter((l) => l.startsWith('not ok')) };
 }
 

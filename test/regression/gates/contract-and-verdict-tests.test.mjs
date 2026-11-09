@@ -3,7 +3,7 @@
 // verdict gate runs the tests a verdict names, and the tests that guard these go red when the rule is broken. Every
 // run is on a temp plan copy, a temp repo or a temp copy of plan/, scripts/ and test/.
 import assert from 'node:assert/strict';
-import { onlyTests, ranTests } from '../lib.mjs';
+import { onlyTests, ranTests, childEnv } from '../lib.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -30,7 +30,7 @@ const withHead = (text, head) => text.replace(HEAD_RE, '```json\n' + JSON.string
 const DECISION_PHRASES = ['as on main', 'as main', 'on main', 'than main', "main's", 'unchanged', 'same as',
   'byte', 'bytes', 'both shas'];
 
-const cleanEnv = () => { const { NODE_TEST_CONTEXT, ...env } = process.env; return env; };
+const cleanEnv = () => childEnv();
 
 function node(args, opts = {}) {
   const r = spawnSync(process.execPath, args, { encoding: 'utf8', env: { ...cleanEnv(), ...opts.env }, cwd: opts.cwd,

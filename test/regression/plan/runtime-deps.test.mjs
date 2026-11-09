@@ -9,6 +9,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSyn
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { childEnv } from '../lib.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
@@ -27,12 +28,7 @@ function scratch() {
   }
   return dir;
 }
-// NODE_TEST_CONTEXT is dropped so the child reports on its own stdout and exit code, not to this runner.
-const run = (dir) => {
-  const env = { ...process.env };
-  delete env.NODE_TEST_CONTEXT;
-  return spawnSync(process.execPath, ['--test', 'test/workspaces.test.mjs'], { cwd: dir, encoding: 'utf8', env });
-};
+const run = (dir) => spawnSync(process.execPath, ['--test', 'test/workspaces.test.mjs'], { cwd: dir, encoding: 'utf8', env: childEnv() });
 const setDep = (dir, ws, name, version) => {
   const f = join(dir, ws, 'package.json');
   const pkg = JSON.parse(readFileSync(f, 'utf8'));

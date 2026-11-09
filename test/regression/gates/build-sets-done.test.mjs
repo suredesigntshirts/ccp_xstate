@@ -3,7 +3,7 @@
 // reader-effort.mjs --item reads the PR that added the verdict; the tests that guard both go red when the rule is
 // broken. Every run is in a temp repo or a temp copy of scripts/.
 import assert from 'node:assert/strict';
-import { onlyTests, ranTests } from '../lib.mjs';
+import { onlyTests, ranTests, childEnv } from '../lib.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -17,8 +17,7 @@ const REPO = resolve(join(HERE, '..', '..', '..'));
 const read = (p) => readFileSync(join(REPO, p), 'utf8');
 
 const cleanEnv = () => {
-  const { NODE_TEST_CONTEXT, BASE_SHA, HEAD_SHA, PR_BRANCH, PR_BODY, PR_LABELS, ...env } = process.env;
-  return env;
+  return childEnv({ drop: ['BASE_SHA', 'HEAD_SHA', 'PR_BRANCH', 'PR_BODY', 'PR_LABELS'] });
 };
 
 function node(args, opts = {}) {

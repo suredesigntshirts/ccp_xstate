@@ -4,7 +4,7 @@
   "title": "Remove the traps the harness owns, so no thread has to remember them",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "npm test in a checkout without node_modules stops at once with one line saying to run npm ci; nested node --test runs in guards go through one helper in test/regression/lib.mjs that removes NODE_TEST_CONTEXT, and the regression-rules guard refuses a guard that strips it itself; scripts/fresh-reader.mjs starts claude -p as a repository-only reader (empty HOME, memory off, its own session and CCP_HARNESS_DIR); scripts/gates/new-verdict.mjs writes a verdict skeleton whose verified_sha is the full sha from git and whose session is the thread's own; and release.mjs, when release.yml already released the merge, says so as a normal outcome.",
   "why": "The memory audit of 9 Nov found these traps rewritten in up to 14 memory files each: the missing npm ci, the child node --test that runs nothing, the fresh reader that loads the container's memory or writes into the thread's journal, the mistyped verified_sha and copied trailer, and 'already released' read as an error. Each cause is the harness's own, so code can remove it rather than a note describe it (L-cheap-home-wins; APOSD, define errors out of existence).",
   "serves": [

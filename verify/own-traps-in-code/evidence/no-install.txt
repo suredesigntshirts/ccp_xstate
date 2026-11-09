@@ -1,0 +1,22 @@
+# fresh clone of 46eecfd8b1f053497bc379469f36567409915412, clean HOME
+# before npm ci
+ls: cannot access 'node_modules': No such file or directory
+
+> pretest
+> node scripts/ci/installed.mjs
+
+npm test: node_modules is not installed here; run npm ci first, then npm test again
+exit 1
+wall 216 ms
+# npm ci
+npm ci 0 in 0 s
+# after npm ci: full npm test, clean HOME
+exit 1 in 196 s
+
+> pretest
+> node scripts/ci/installed.mjs
+
+
+> test
+> node --test --test-skip-pattern="^cheap: " "test/**/*.test.mjs" "scripts/**/*.test.mjs" "packages/**/*.test.{js,mjs}" "plugins/**/*.test.{js,mjs}" && node --test --test-concurrency=1 --test-name-pattern="^cheap: " plugins/harness/test/capture.test.mjs
+

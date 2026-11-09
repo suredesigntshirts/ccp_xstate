@@ -9,6 +9,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { childEnv } from '../lib.mjs';
 
 // Helpers for the tests below.
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -34,8 +35,7 @@ function section(text, heading) {
 
 // The environment a gate or plan run inherits, without anything a CI job or an outer node --test sets.
 const cleanEnv = () => {
-  const { NODE_TEST_CONTEXT, BASE_SHA, HEAD_SHA, PR_BRANCH, PR_BODY, PR_LABELS, ...env } = process.env;
-  return env;
+  return childEnv({ drop: ['BASE_SHA', 'HEAD_SHA', 'PR_BRANCH', 'PR_BODY', 'PR_LABELS'] });
 };
 function run(cmd, args, { cwd = REPO, env = {} } = {}) {
   const r = spawnSync(cmd, args, { encoding: 'utf8', cwd, env: { ...cleanEnv(), ...env }, maxBuffer: 64 << 20,

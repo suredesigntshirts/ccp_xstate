@@ -2,7 +2,7 @@
 // The evidence gate refuses a symlink or submodule under verify/ and a saved test listing, and passes a short evidence
 // excerpt; the gate tests that guard it go red when the rule is broken. Every listing is made at run time in a temp repo.
 import assert from 'node:assert/strict';
-import { onlyTests, ranTests } from '../lib.mjs';
+import { onlyTests, ranTests, childEnv } from '../lib.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -16,7 +16,7 @@ const REPO = resolve(join(HERE, '..', '..', '..'));
 const read = (p) => readFileSync(join(REPO, p), 'utf8');
 const KB = 1024;
 
-const cleanEnv = () => { const { NODE_TEST_CONTEXT, BASE_SHA, HEAD_SHA, ...env } = process.env; return env; };
+const cleanEnv = () => childEnv({ drop: ['BASE_SHA', 'HEAD_SHA'] });
 
 function node(args, opts = {}) {
   const r = spawnSync(process.execPath, args, { encoding: 'utf8', env: { ...cleanEnv(), ...opts.env }, cwd: opts.cwd,
