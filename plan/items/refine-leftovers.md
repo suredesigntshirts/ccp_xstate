@@ -37,6 +37,9 @@ From the memory audit of 9 Nov (section D) and the own-traps-in-code verdict, ea
   a clone made through a helper other than `leanClone`, or `setup.sh` reached through an imported constant.
 - **Nested runs in helper files.** The rule that a child's environment comes from `childEnv` is checked in test
   files only; a helper `.mjs` beside them can still drop `NODE_TEST_CONTEXT` itself.
+- **A frozen one-line check.** own-traps-in-code's `docs-point` proof checks that `docs/verifying.md` names
+  `scripts/fresh-reader.mjs` on one line; the file now names it on two, so that frozen suite fails (it is not in
+  `npm test`). Retire the suite into `test/regression/` with a check by meaning, or drop it.
 - **Artifact generators outside the repo.** The scripts that build the person-facing pages (the prompts page, the
   quick-fix machine map, the inspector's source configs) live only in `/mnt/project-files`. Decide whether they move
   into `scripts/`.
