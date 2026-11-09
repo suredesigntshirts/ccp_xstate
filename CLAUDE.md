@@ -48,7 +48,7 @@ The one map of the repo; `docs/layout.md` holds the rules for tests, comments an
 ## Commands
 
 ```
-npm test                 # node:test over test/, scripts/, packages/, plugins/ and verify/
+npm test                 # the guards: node:test over test/, scripts/, packages/ and plugins/
 node plan/check.mjs      # the plan check; CI runs both on every PR
 node --test "verify/<item>/*.test.mjs"   # one suite: name its files, a bare folder fails
 ```
