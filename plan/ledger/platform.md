@@ -121,7 +121,7 @@
 **Fate:** design. The harness binds an agent at SubagentStart when it can and otherwise from its `meta.json` at its first tool call (`agent.spawn` `via`).
 
 ### L-named-agent-tools
-**Lesson:** A named agent with a `tools` list gets no ToolSearch, so a deferred tool it does not list is out of its reach; and `meta.json`'s `pickedEffortModel` names the main session's model, not a named agent's.
+**Lesson:** A named agent with a `tools` list gets no ToolSearch, so a deferred tool it does not list, such as the harness return tool, is out of its reach and a stage agent cannot load it; and `meta.json`'s `pickedEffortModel` names the main session's model, not a named agent's.
 **Evidence:** `plan/research/probe-plugin-agents.md` (5 Nov): the transcript's assistant messages were haiku while `pickedEffortModel` said the main model, in a headless run and in a thread.
 **Fate:** design. A stage role lists the return tool itself, and the served model is read from the transcript (`agent.finish`).
 
