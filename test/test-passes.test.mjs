@@ -7,7 +7,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const REPO = join(import.meta.dirname, '..');
-const ROOTS = ['test', 'scripts', 'packages', 'plugins', 'verify'];
+const ROOTS = ['test', 'scripts', 'packages', 'plugins'];
 const script = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8')).scripts.test;
 const [parallel, serial, ...rest] = script.split(' && ');
 const flag = (cmd, name) => cmd.match(new RegExp(`--${name}=(?:"([^"]*)"|(\\S+))`))?.slice(1).find((v) => v !== undefined);
@@ -38,4 +38,8 @@ test('every test named "cheap: " is in a file the serial pass runs', () => {
   }
   assert.ok(held.length > 0, 'no test is named "cheap: "');
   assert.deepEqual(held.filter((f) => !files(serial).includes(f)), [], 'files with a "cheap: " test the serial pass does not run');
+});
+
+test('neither pass runs a file under verify/: the verdict gate runs a PR\'s own verifier tests', () => {
+  assert.deepEqual([...files(parallel), ...files(serial)].filter((f) => f.startsWith('verify/')), []);
 });

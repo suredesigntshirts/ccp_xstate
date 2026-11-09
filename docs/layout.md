@@ -6,8 +6,9 @@ dependencies.
 ## Tests
 
 Tests use `node:test` and `node:assert`, nothing else. Name them `*.test.js` or `*.test.mjs`. `npm test` runs
-every test under `test/`, `scripts/`, `packages/`, `plugins/` and `verify/`, so a workspace needs no test script
-of its own to be covered by CI.
+the guards, every test under `test/`, `scripts/`, `packages/` and `plugins/`, so a workspace needs no test script
+of its own to be covered by CI. It never runs `verify/`: a verifier's suite proves its own PR, and the verdict gate
+runs it there. A proof of behaviour other code relies on is written again as a guard under `test/regression/`.
 
 `npm test` runs in two passes. The parallel pass runs every file at once. The serial pass runs after it, one test at
 a time, and holds the tests that measure wall time, so no other file shares the machine while they measure. A test
