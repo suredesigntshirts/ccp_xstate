@@ -1,0 +1,60 @@
+{
+  "item": "faster-nested-test-runs",
+  "verified_sha": "ac15e1e95e93fb4c5c0afa47c54f068ed78e3d8f",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FsFrAcLsfctgaweEp",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "same-tests",
+      "status": "MET",
+      "command": "node verify/faster-nested-test-runs/record.mjs <base clone 2009ca7f> <head clone ac15e1e9> <out> 3; node --test verify/faster-nested-test-runs/same-tests.test.mjs",
+      "excerpt": "15 pass: each of the 14 changed test files, run alone with the TAP reporter at base 2009ca7f and head ac15e1e9, reports the same sorted (depth, name) list (177 tests in all), none skipped at either side, exit 0 and fail 0 at both",
+      "test": "verify/faster-nested-test-runs/same-tests.test.mjs"
+    },
+    {
+      "id": "still-bite",
+      "status": "MET",
+      "command": "node --test verify/faster-nested-test-runs/still-bite.test.mjs",
+      "excerpt": "11 pass: the 7 narrowed mutation checks pass intact, fail with every test they name hollowed to always pass, and fail with one named test renamed (pattern matches nothing); self-edit-check's shared-run checks go red when no-self-edit leaves a temp folder (temp-removed), needs strace (runs-without-strace), or passes the thread's CLAUDE*/CCP* on (env-inherited), and temp-removed for setup.test.mjs goes red when setup.test.mjs leaves a temp folder",
+      "test": "verify/faster-nested-test-runs/still-bite.test.mjs"
+    },
+    {
+      "id": "no-leak",
+      "status": "MET",
+      "command": "node --test verify/faster-nested-test-runs/no-leak.test.mjs; record.mjs snapshots around each recorded run",
+      "excerpt": "2 pass: bin, standin and setup-install run in a fresh clone of the head leave its status, branches, worktrees, parent folder and every tracked file's mtime and inode unchanged; in record.mjs's 3 rounds no changed file at the head changed any of status, branches, worktrees or the parent folder. Same test at base 2009ca7f fails: run/it-1/3.brief, run/it-1/3.build, run/it/0.brief left; setup-install rewrote the checkout's plugins/harness/scripts/host.mjs (mtime moved)",
+      "test": "verify/faster-nested-test-runs/no-leak.test.mjs"
+    },
+    {
+      "id": "faster",
+      "status": "MET",
+      "command": "node verify/faster-nested-test-runs/record.mjs (3 rounds, base first, head first, base first, nothing else running); node --test verify/faster-nested-test-runs/faster.test.mjs",
+      "excerpt": "2 pass: summed time of the 14 files, base median 421.0 s, head median 224.6 s, ratio 0.534 (limit 0.6); rounds base/head 418.6/231.9, 421.0/224.6, 429.8/221.6 s",
+      "test": "verify/faster-nested-test-runs/faster.test.mjs"
+    },
+    {
+      "id": "rule-written",
+      "status": "MET",
+      "command": "node --test verify/faster-nested-test-runs/rule-written.test.mjs",
+      "excerpt": "4 pass: docs/layout.md's Tests section says a test that runs another test file runs only the tests it needs with onlyTests and checks with ranTests that each ran, since a pattern that matches nothing passes; a copy of the repo links bench/, tournaments/ and node_modules/ rather than copying them; a test writes only under its own temp folder, never in or beside the checkout",
+      "test": "verify/faster-nested-test-runs/rule-written.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #281 at ac15e1e95e93fb4c5c0afa47c54f068ed78e3d8f",
+      "excerpt": "at ac15e1e95e93fb4c5c0afa47c54f068ed78e3d8f: test (job 129055688432) success in 3m54s; gates (job 129055687974) failed only with 'no verify/faster-nested-test-runs/verdict.json at the head sha', which this verdict answers. Both run again on this verdict commit."
+    }
+  ],
+  "observations": [
+    "Per file (median ms, base -> head): the five plan and gates mutation-check files fell most (evidence-links 33.2 -> 8.7 s, verdict-cutoff 33.9 -> 10.9 s, lean-ready-head 14.0 -> 1.9 s); self-edit-check 68.6 -> 48.9 s; reads-records 82.2 -> 45.8 s; bin and standin 5.5/9.2 -> 1.1/2.7 s. The two moved-tests-bite files did not get faster (8.3 -> 9.8 s, 13.5 -> 13.3 s): copying bench/ is not what they spend time on on this disk, their nested runs are. setup-install is about 1 s slower for its lean clone, a fair price for not editing the checkout.",
+    "Not every mutation check is narrowed: contract-and-verdict-tests' lib.test.mjs bite and build-sets-done's reader-effort bite still rerun whole files with no name list, so they are not covered by the 'fails when the pattern matches nothing' guarantee (they have no pattern). Fine for this item, which names the slow ones.",
+    "The merged no-self-edit run is sound for today's file: no-self-edit no longer calls strace itself, and the stub bash, strace-free PATH and fresh TMPDIR each touch a different check, shown by the three breaks in still-bite. If no-self-edit ever grows a path that depends on strace being present, runs-without-strace's shared run would still catch a failure but no test would cover the strace-present path in self-edit-check.",
+    "temp-removed for setup.test.mjs now reads tags-dropped's run in a lean clone with no release refs, not a run in the checkout; it falls back to its own run in the checkout when tags-dropped is filtered out. The leak break shows it still catches a leftover temp folder.",
+    "reads-records now runs its three git worktree adds on the checkout's .git at once. All three rounds passed, but concurrent worktree adds on one repo can contend for .git locks under load; worth watching for a flake.",
+    "The Expect line says a repo copy 'leaves out' bench/, tournaments/ and node_modules; the code and docs link them into the copy instead. The cost (copying them) is gone either way, so I read it as met.",
+    "The recorded runs here (421 s -> 225 s) are larger than the PR body's 325 s -> 196 s on the builder's container; the ratio is close (0.53 vs 0.60 before the last commit)."
+  ]
+}
