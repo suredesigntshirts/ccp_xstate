@@ -4,7 +4,8 @@
   "title": "Keep verifier suites out of npm test, and keep the two lasting checks of the fast-clones item as guards",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
+  "done_on": "2026-11-09",
   "outcome": "npm test runs no file under verify/, so a PR's ci check runs the guards (test/, scripts/, packages/, plugins/) and the verdict gate alone runs the PR's own verifier suite; the lean-clone and skills-switch checks of fast-test-clones-and-setup run on every PR as guards under test/regression/; the docs and the test that pins npm test's passes say so; and the child-after-return row of verify-regression-set's Regression table reads moved.",
   "why": "On 9 Nov CI's whole run took 9m35s after #278, and the slowest suite left in npm test was verify/verify-regression-set/moved-pass.test.mjs, which reruns all of test/regression/ twice (806 s of a 1,090 s parallel pass on #267). A verifier suite is a proof for one PR: the verdict gate (scripts/gates/pr-gate.mjs runTests) already runs the tests a verdict names at the head of that PR, so rerunning every done item's proofs on every later PR spends CI time re-proving work that no later PR touches. What should keep holding moves to test/regression/ as a guard. The person asked on 9 Nov for CI to run only what a PR needs (thread 'Find why npm test is slow in CI').",
   "serves": [
