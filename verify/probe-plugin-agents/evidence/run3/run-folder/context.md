@@ -1,1 +1,0 @@
-Run verify2-agents-2:0.brief, worktree /home/user/v2wt/verify2-agents-2--0.brief of https://github.com/suredesigntshirts/ccp_xstate, branch run/verify2-agents-2/0.brief.
