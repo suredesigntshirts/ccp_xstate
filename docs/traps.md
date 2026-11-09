@@ -74,6 +74,5 @@ folders on the container's disk.
 
 A thread waiting on a CI event may never be woken by it: check the PR's checks when it wakes for anything else, and
 ask to be nudged rather than wait. A push that only merges main in may start no `ci` run; read the checks at the new
-head before counting it green. A `replan` label added after the PR opens leaves the first `gates` run red, and the
-`labeled` run is the one that counts. A PR opened before the PR under it merged keeps that older `BASE_SHA` in its
+head before counting it green. A PR opened before the PR under it merged keeps that older `BASE_SHA` in its
 runs until its branch is updated, so its gates read files that are already on main as its own.
