@@ -3,6 +3,8 @@
 // settings), auto memory off, none of the thread's memory stores or extra CLAUDE.md folders, its own session rather
 // than the thread's, and an empty CCP_HARNESS_DIR of its own, so it writes nothing into the thread's journal. The
 // prompt goes on stdin, since claude's --allowedTools takes every word after it.
+// It signs in as the container's session does (OAuth): never pass --bare, which needs an API key the container lacks
+// (plan/ledger/platform.md, L-headless-auth-and-memory).
 //
 //   node scripts/fresh-reader.mjs [--cwd <clone>] <prompt> [-- <more claude args>]
 //

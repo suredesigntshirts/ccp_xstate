@@ -8,6 +8,8 @@ learnt it, never only in project memory.
 ## A reader without memory
 
 Start a reader that must answer from the repo alone with `node scripts/fresh-reader.mjs --cwd <clean clone> "<prompt>"`.
+It runs on the session's OAuth sign-in and turns auto memory off; `--bare` would need an API key
+(`plan/ledger/platform.md`, L-headless-auth-and-memory).
 
 ## The verdict file
 
