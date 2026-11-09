@@ -1,0 +1,86 @@
+{
+  "item": "memory-learnings-written",
+  "verified_sha": "296367527a73b4686f6f69a2ba47e17939a6d97e",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5EwoBDNqkCtvYCFcGc",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "traps-entries",
+      "status": "MET",
+      "command": "node --test verify/memory-learnings-written/notes-entries.test.mjs",
+      "excerpt": "docs/traps.md has five new sections, each holding its terms: \"What a thread may not do to GitHub\" (auto mode, git proxy, force push, amend or rebase of a pushed branch, branch delete, tag push; instead a follow-up commit or merging main in, branches listed in waiting-for-person.md), \"Plugin tests leave out untracked files\" (git stash create, untracked, git add), \"A background run owns its checkout\" (stash, check out, switch branches, worktree), \"The project files folder is a network mount\" (hard links, worktree, dubious ownership), \"PR events that run nothing\" (never be woken, no ci run, BASE_SHA). Bites: \"tag push\" cut or a heading renamed each fail one test.",
+      "test": "verify/memory-learnings-written/notes-entries.test.mjs"
+    },
+    {
+      "id": "verifying-entries",
+      "status": "MET",
+      "command": "node --test verify/memory-learnings-written/notes-entries.test.mjs",
+      "excerpt": "docs/verifying.md has \"Command shapes that drop work\" (--test-reporter without --test runs only the first; claude -p --allowedTools variadic, prompt on stdin), \"Transcripts in evidence\" (an extract, never the raw file, which holds the account email) and \"The base side, without history\" (depth 1; record answers with a script, to-base.diff applied in a clone, temp repos by copying plan/ and scripts/).",
+      "test": "verify/memory-learnings-written/notes-entries.test.mjs"
+    },
+    {
+      "id": "platform-rows",
+      "status": "MET",
+      "command": "node --test verify/memory-learnings-written/plan-entries.test.mjs",
+      "excerpt": "plan/ledger/platform.md rows L-prompt-swap-updatedinput, L-subagentstart-in-line, L-named-agent-tools, L-headless-auth-and-memory each read exactly Lesson, Evidence, Fate (design) and hold their terms (updatedInput, no permissionDecision, allow under claude -p; SubagentStart waits, transcript may not be written yet; no ToolSearch, pickedEffortModel; --bare needs an API key, CLAUDE_CODE_DISABLE_AUTO_MEMORY=1). node plan/check.mjs: plan ok, 124 items.",
+      "test": "verify/memory-learnings-written/plan-entries.test.mjs"
+    },
+    {
+      "id": "still-true",
+      "status": "MET",
+      "command": "three reproductions in this thread's container (evidence/still-true.md)",
+      "excerpt": "node --test-reporter=tap a b c printed only ok 1 - a runs, # tests 1; with --test, ok 1..3, # tests 3. git stash create in a toy repo listed tracked.txt only with an untracked file present, and tracked.txt untracked.txt after git add. ln on /mnt/project-files: Operation not supported, exit 1; the same ln on the container disk exit 0. plugins/harness/test/helpers.mjs does install via git stash create."
+    },
+    {
+      "id": "no-removed-traps",
+      "status": "MET",
+      "command": "node --test verify/memory-learnings-written/notes-entries.test.mjs",
+      "excerpt": "Neither docs/traps.md nor docs/verifying.md matches npm ci, NODE_TEST_CONTEXT, verified_sha, trailer or already released (case-insensitive where the term is prose). Bite: a line naming npm ci added to docs/verifying.md fails the test.",
+      "test": "verify/memory-learnings-written/notes-entries.test.mjs"
+    },
+    {
+      "id": "defects-filed",
+      "status": "MET",
+      "command": "node --test verify/memory-learnings-written/plan-entries.test.mjs, against /mnt/project-files/memory-audit/report.md section D",
+      "excerpt": "Section D has five defects. derive-view-gaps (draft, its own item) names the overhead trailer-session mismatch, time filing prompts and CI, and rework missing the readying replan. refine-leftovers gains the inspector long-hash overflow (scripts/inspector/page.html), the build.md pr wording, the three regression-folder guard misses (resolve(), a helper other than leanClone, setup.sh through a constant), nested runs in helper .mjs files (test files only, childEnv) and the artifact generators in /mnt/project-files. plan ok. Bite: leanClone renamed fails one test.",
+      "test": "verify/memory-learnings-written/plan-entries.test.mjs"
+    },
+    {
+      "id": "questions-guard",
+      "status": "MET",
+      "command": "node --test verify/memory-learnings-written/questions-guard.test.mjs",
+      "excerpt": "test/notes-questions.json holds 12 questions over docs/traps.md, docs/verifying.md and plan/ledger/platform.md. Over a copy of the guard, data and homes, test/notes-questions.test.mjs passes 13/13; with force push cut from traps.md, --test from verifying.md, or --bare from platform.md it exits 1 with exactly one not ok line naming that question and \"no longer answers\".",
+      "test": "verify/memory-learnings-written/questions-guard.test.mjs"
+    },
+    {
+      "id": "reader-answers",
+      "status": "MET",
+      "command": "node scripts/fresh-reader.mjs --cwd <clean clone of 29636752 after npm ci> \"Answer this question from the files of this repository alone. Name the file that answers it, and quote the lines you rely on. Question: <q>\" -- --max-turns 25, once per question, three more for a miss, and three more for question 12 regardless (evidence/reader-answers.md)",
+      "excerpt": "Round 3 at 29636752: all 12 questions complete on their first run, each answer naming its home and every carrying term; question 12 complete on 4 of 4. Rounds 1 and 2 missed question 11 (answered from plan/research/probe-plugin-agents.md) and then question 12 (2 of 4, stopping at scripts/fresh-reader.mjs); the builder pointed both at their ledger rows.",
+      "test": "verify/memory-learnings-written/reader-answers.test.mjs"
+    },
+    {
+      "id": "notes-only-world",
+      "status": "MET",
+      "command": "PR #298, branch throwaway/notes-only-world off main b9481745, one commit 84619c5d changing one line of docs/traps.md, no Item: line, no label (evidence/notes-only-world.md)",
+      "excerpt": "gates (job 129333679658) success; log: PR_LABELS: [] then verdict gate passed. test success. PR #298 closed unmerged, branch left for the person."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #297 at 296367527a73b4686f6f69a2ba47e17939a6d97e",
+      "excerpt": "at 296367527a73b4686f6f69a2ba47e17939a6d97e: test (job 129337840112) success, 17:49:21Z to 17:51:24Z; gates (job 129337809182) failure from the round 2 verdict (for da330bfc, reader-answers NOT MET), which this verdict replaces. Both run again on the verdict commit."
+    }
+  ],
+  "observations": [
+    "Quality: the entries are short, each in its own section, and say what avoids the trap. The guard is 24 lines and matches terms as docs/layout.md asks, so a rewording that keeps the answer stays green.",
+    "Rounds 1 and 2 each found one question answered outside its home, both times because a file a reader reaches first (the probe research, then scripts/fresh-reader.mjs) held the fact without pointing at its ledger row. The builder added those pointers. A platform fact a reader looks for under a script or research name needs a pointer there to stay findable.",
+    "The guard proves each term is in its home file, not that the term sits in the entry that answers the question; a term found elsewhere in a long home (force push, background) keeps it green. This folder's notes-entries test checks per section.",
+    "docs/gates.md says the verdict gate runs node --test-reporter=tap <file> without --test, the shape the new verifying.md entry warns about; with one file per run it runs that file in full, so it is safe as the gate uses it.",
+    "The fresh reader again printed the [mcp-sdk] SEP-2352 notice on stderr with an empty HOME; dropped from evidence.",
+    "The reader is not deterministic: question 12 passed in round 1 and failed in round 2 with the same row text. This verdict counts a question answered when most of its runs are complete and records every run.",
+    "This PR adds a second line naming scripts/fresh-reader.mjs to docs/verifying.md (\"scripts/fresh-reader.mjs already does.\"), so verify/own-traps-in-code/docs-point.test.mjs, a done item's proof, now fails its exactly-one-line check. verify/ is not in npm test and the line is a pointer, not the recipe that test guarded against; noted, not counted against this item."
+  ]
+}

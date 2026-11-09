@@ -1,0 +1,118 @@
+{
+  "about": "The questions the memory audit of 9 Nov found threads asking again and again, each with the file that answers it and the terms that carry the answer. test/notes-questions.test.mjs reads them against their homes; a fresh reader is asked them to show a session with memory off finds the answers.",
+  "questions": [
+    {
+      "q": "A thread needs to undo a commit it already pushed, or delete a branch it made. What will be refused, and what does it do instead?",
+      "home": "docs/traps.md",
+      "terms": [
+        "force push",
+        "branch delete",
+        "tag push",
+        "follow-up commit",
+        "merging main",
+        "waiting-for-person.md"
+      ]
+    },
+    {
+      "q": "A change adds a new file and the plugin tests do not see it. Why, and what fixes it?",
+      "home": "docs/traps.md",
+      "terms": [
+        "git stash create",
+        "untracked",
+        "git add"
+      ]
+    },
+    {
+      "q": "A test run is going in the background. May the thread switch branches in that checkout meanwhile?",
+      "home": "docs/traps.md",
+      "terms": [
+        "background",
+        "check out",
+        "worktree"
+      ]
+    },
+    {
+      "q": "What fails when a thread uses /mnt/project-files for links, git repos or shared files?",
+      "home": "docs/traps.md",
+      "terms": [
+        "hard links",
+        "dubious ownership",
+        "new file"
+      ]
+    },
+    {
+      "q": "A thread waits on CI and nothing happens, or its gates read files already on main as the PR's own. What is going on?",
+      "home": "docs/traps.md",
+      "terms": [
+        "never be woken",
+        "merges main",
+        "BASE_SHA"
+      ]
+    },
+    {
+      "q": "A verifier runs node with a tap reporter over three test files and only one runs, or a claude -p reader ignores its prompt. Why?",
+      "home": "docs/verifying.md",
+      "terms": [
+        "--test",
+        "variadic",
+        "stdin"
+      ]
+    },
+    {
+      "q": "May a verifier commit a session transcript as evidence?",
+      "home": "docs/verifying.md",
+      "terms": [
+        "extract",
+        "raw",
+        "email"
+      ]
+    },
+    {
+      "q": "How does a verifier show what the PR's base did when ci checks out at depth 1?",
+      "home": "docs/verifying.md",
+      "terms": [
+        "depth 1",
+        "script",
+        "to-base.diff",
+        "copying"
+      ]
+    },
+    {
+      "q": "How does each stage agent get its brief, and what does the hook need to return in auto mode and under claude -p?",
+      "home": "plan/ledger/platform.md",
+      "terms": [
+        "updatedInput",
+        "permissionDecision",
+        "allow"
+      ]
+    },
+    {
+      "q": "Can the SubagentStart hook always read the agent's brief from its transcript?",
+      "home": "plan/ledger/platform.md",
+      "terms": [
+        "SubagentStart",
+        "background",
+        "meta.json"
+      ]
+    },
+    {
+      "q": "Why can a named stage agent not load the return tool, and where is its served model read from?",
+      "home": "plan/ledger/platform.md",
+      "terms": [
+        "ToolSearch",
+        "return tool",
+        "pickedEffortModel",
+        "transcript"
+      ]
+    },
+    {
+      "q": "How does a headless claude -p sign in from the container, and how is its memory turned off?",
+      "home": "plan/ledger/platform.md",
+      "terms": [
+        "--bare",
+        "API key",
+        "CLAUDE_CODE_DISABLE_AUTO_MEMORY"
+      ]
+    }
+  ]
+}

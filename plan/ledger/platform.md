@@ -109,3 +109,23 @@
 **Lesson:** v1's hooks refuse v2 work done in v1's project (its merge gate refused PR #110, which had no v1 item).
 **Evidence:** 28 Oct 18:50, PR #110 left unmerged.
 **Fate:** setup. v2 runs in its own project, whose environment doesn't load v1's plugin.
+
+### L-prompt-swap-updatedinput
+**Lesson:** A PreToolUse hook's `updatedInput` replaces an Agent call's `prompt`, and the subagent starts on the replaced text. In auto mode it needs no `permissionDecision`; headless `claude -p` denies the call unless the hook also says `allow`.
+**Evidence:** The engine-actors probe (30 Oct, `plan/decisions/2026-10-30-engine-actors.md`) and the plugin-agents spike (5 Nov, `plan/decisions/2026-11-05-plugin-agents-spike.md`), where `-p` denied the call without `allow`.
+**Fate:** design. Every stage agent gets its brief this way: the plugin's PreToolUse hook swaps `ccp-run <run>` for the run's brief.
+
+### L-subagentstart-in-line
+**Lesson:** SubagentStart runs in line: Claude waits for the hook before the subagent runs. For a background agent the transcript may not be written yet when it runs, so the brief cannot always be read from it there.
+**Evidence:** `plan/decisions/2026-10-30-capture-by-hooks.md` (the transcript and `meta.json` present for a foreground agent); the null `promptHash` with a placeholder for background agents in `docs/journal.md`.
+**Fate:** design. The harness binds an agent at SubagentStart when it can and otherwise from its `meta.json` at its first tool call (`agent.spawn` `via`).
+
+### L-named-agent-tools
+**Lesson:** A named agent with a `tools` list gets no ToolSearch, so a deferred tool it does not list, such as the harness return tool, is out of its reach and a stage agent cannot load it; and `meta.json`'s `pickedEffortModel` names the main session's model, not a named agent's.
+**Evidence:** `plan/research/probe-plugin-agents.md` (5 Nov): the transcript's assistant messages were haiku while `pickedEffortModel` said the main model, in a headless run and in a thread.
+**Fate:** design. A stage role lists the return tool itself, and the served model is read from the transcript (`agent.finish`).
+
+### L-headless-auth-and-memory
+**Lesson:** In the container `claude -p` runs on the session's OAuth sign-in, but `claude -p --bare` needs an API key, which the container does not have. `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` turns auto memory off for the child.
+**Evidence:** The stage bench's headless runs (5 Nov) failed under `--bare` and ran without it; fresh readers with the variable set stopped citing project memory.
+**Fate:** design. The stage bench and `scripts/fresh-reader.mjs` start `claude -p` without `--bare`, and the fresh reader sets the variable.

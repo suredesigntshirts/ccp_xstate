@@ -59,7 +59,7 @@ builder and verifier `brief.stored` rows.
 
 - **Its `tools` must name the return tool,** `mcp__plugin_ccp-harness_harness__return`, and every tool its stage uses
   (Bash for build and verify). A named agent with a `tools` list gets no ToolSearch, so a deferred tool it doesn't
-  list is out of reach. `SubagentHandback` is always there.
+  list is out of reach (`plan/ledger/platform.md`, L-named-agent-tools). `SubagentHandback` is always there.
 - **Its version must be tied to the workflow pin.** An agent file loads with the plugin at session start, from the
   installed release, while the workflow pin is the sha256 of the composed workflow (`stage-prompt-files`). The two
   can drift: a session on an old release would start a role whose file no longer matches the stage. The simplest tie
