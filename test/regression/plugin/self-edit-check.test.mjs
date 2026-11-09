@@ -10,6 +10,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { leanClone } from '../lib.mjs';
 
 // Helpers for the tests below.
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -33,7 +34,7 @@ function git(cwd, ...args) {
 /** A clone of the checkout's HEAD at <dir>/repo. */
 function cloneHead(dir) {
   const c = join(dir, 'repo');
-  execFileSync('git', ['clone', '-q', REPO, c], { stdio: 'ignore', env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null' } });
+  leanClone(REPO, c, { env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null' } });
   return c;
 }
 
@@ -68,7 +69,7 @@ function pathWithout(dir, drop) {
 const onPath = (cmd, p) => spawnSync('bash', ['-c', `command -v ${cmd}`], { env: { ...process.env, PATH: p } }).status === 0;
 
 {
-const ALLOWED = /^(CCP_SETUP_LOG|CLAUDE_PID|CCP_HARNESS_\w+|CLAUDE_PLUGIN_ROOT|CCP_REPO)$/;
+const ALLOWED = /^(CCP_SETUP_LOG|CCP_SETUP_SKILLS|CLAUDE_PID|CCP_HARNESS_\w+|CLAUDE_PLUGIN_ROOT|CCP_REPO)$/;
 const PROXY_MARK = 'http://secs-proxy.invalid:9';
 const BASH = '/bin/bash';
 

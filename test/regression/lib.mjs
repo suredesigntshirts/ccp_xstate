@@ -1,5 +1,6 @@
 // What two or more regression tests share: a quick-fix item driven by the real host with stub agents, the effect
 // agents that finish with queued outputs, and the shapes of the results and wakes those tests offer it.
+import { execFileSync } from 'node:child_process';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -15,6 +16,19 @@ export const BRIEFS = { builder: 'b.md', verifier: 'v.md' };
 // line per expect line. A push is CI green on the PR at its new head.
 export const PR = (sha) => ({ pr: { url: 'https://github.com/o/r/pull/1', at: sha, key: 'o/r#1', green: true } });
 export const VERDICT = (result, sha, issue = ISSUE) => ({ result, pr: { url: 'https://github.com/o/r/pull/1', at: sha }, issue, lines: issue.expect.map((line) => ({ line, result, evidence: 'e' })) });
+
+/**
+ * A working clone of `src` (this repo, or a bare clone of it) at `dest`, with the same refs, HEAD and history a plain
+ * git clone gives, checked out without bench/ and tournaments/: their recorded runs are most of the tree's files and
+ * no test run in a clone reads them. `args` go to git clone, `env` to every git call.
+ */
+export function leanClone(src, dest, { args = [], env = process.env } = {}) {
+  const git = (...a) => execFileSync('git', a, { stdio: 'ignore', env });
+  git('clone', '-q', '--no-checkout', ...args, src, dest);
+  git('-C', dest, 'sparse-checkout', 'set', '--no-cone', '/*', '!/bench/', '!/tournaments/');
+  git('-C', dest, 'reset', '-q', '--hard');
+  return dest;
+}
 
 export const fresh = () => mkdtempSync(join(tmpdir(), 'regression-'));
 // Loaded with the root, so the item's pinned workflow bytes are stored where bin/host.js and the hooks read them.

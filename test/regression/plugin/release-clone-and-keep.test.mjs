@@ -9,6 +9,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { after, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { leanClone } from '../lib.mjs';
 
 // Helpers for the tests below.
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -32,7 +33,7 @@ function cleanup() {
 /** A clone of this checkout's HEAD. */
 function clone(name) {
   const dir = join(temp(name), 'repo');
-  execFileSync('git', ['clone', '-q', '--no-hardlinks', ROOT, dir], { env: GENV, stdio: 'ignore' });
+  leanClone(ROOT, dir, { args: ['--no-hardlinks'], env: GENV });
   if (existsSync(join(ROOT, 'node_modules'))) symlinkSync(join(ROOT, 'node_modules'), join(dir, 'node_modules'));
   return dir;
 }
