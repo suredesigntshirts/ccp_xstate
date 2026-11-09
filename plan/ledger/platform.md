@@ -129,3 +129,8 @@
 **Lesson:** In the container `claude -p` runs on the session's OAuth sign-in, but `claude -p --bare` needs an API key, which the container does not have. `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` turns auto memory off for the child.
 **Evidence:** The stage bench's headless runs (5 Nov) failed under `--bare` and ran without it; fresh readers with the variable set stopped citing project memory.
 **Fate:** design. The stage bench and `scripts/fresh-reader.mjs` start `claude -p` without `--bare`, and the fresh reader sets the variable.
+
+### L-memory-delete-shape
+**Lesson:** Project memory sync records a delete only when a Bash command is just `rm` followed by full paths under the memory mount (`/tmp/claude/memory/team/silo/`). A scripted, globbed, looped or relative-path delete is not recorded, and the next pull fetches the file again. A batch that would leave too many synced files missing at once is refused and restored; 30 paths per command were accepted. A recorded delete waits under `deletes` in `.memory-sync-basis` until the store confirms it, about a minute later. The folder syncs during a session, not only at its start.
+**Evidence:** The memory prune of 9 Nov: one scripted rm at 18:23Z left all 151 files in the store at the next pull (18:24Z), while edits synced; batches of plain `rm` with full paths brought the store to 5 entries by 18:33Z, and a running thread's `.memory-sync-basis` dropped to 5 at 18:34Z (`/mnt/project-files/memory-audit/report.md`, section 6).
+**Fate:** setup. Pruning memory is a coordinator step done in plain `rm` batches, each confirmed in `.memory-sync-basis` before the next.
