@@ -4,7 +4,7 @@
   "title": "Check that threads keep build logs out of memory once it is pruned",
   "stage": "s5-parity",
   "kind": "probe",
-  "status": "ready",
+  "status": "done",
   "outcome": "After project memory is pruned to directives and coordinator state, the threads that build and verify the next two items leave no build or verifier log in memory, and each trap they met is in docs/traps.md or docs/verifying.md through their own PR.",
   "why": "memory-boundary, own-traps-in-code and memory-learnings-written changed where a learning can go; only real Projects threads, which get the platform's \"save it in the turn where you learn it\" line, show whether learnings now go there (L-cheap-home-wins).",
   "serves": [
