@@ -94,7 +94,7 @@ test('copy-not-link: with release tags, setup installs the newest release by ver
   for (const ref of inherited) execFileSync('git', ['-C', clone, 'update-ref', '-d', ref]);
   for (const t of ['harness-v0.1.9', 'harness-v0.1.10', 'harness-v0.0.20']) execFileSync('git', ['-C', clone, 'tag', '-f', t]);
   const home = fresh();
-  execFileSync('bash', [join(clone, 'infra', 'cloud-environment', 'setup.sh')], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: join(home, '..', 'log'), CCP_SETUP_FETCH: '0' } });
+  execFileSync('bash', [join(clone, 'infra', 'cloud-environment', 'setup.sh')], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: join(home, '..', 'log'), CCP_SETUP_FETCH: '0', CCP_SETUP_SKILLS: '0' } });
   const release = JSON.parse(readFileSync(join(home, '.claude', 'skills', 'ccp-harness', 'release.json'), 'utf8'));
   assert.equal(release.tag, 'harness-v0.1.10');
   assert.match(readFileSync(join(home, '..', 'log'), 'utf8'), /plugin ccp-harness \S+ from harness-v0\.1\.10 /);

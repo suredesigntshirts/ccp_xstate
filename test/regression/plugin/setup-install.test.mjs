@@ -13,7 +13,7 @@ const SETUP = join(REPO, 'infra', 'cloud-environment', 'setup.sh');
 const tmp = (n) => mkdtempSync(join(tmpdir(), `verify-envboot-${n}-`));
 
 function runSetup(home, log) {
-  execFileSync('bash', [SETUP], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: log, CCP_SETUP_FETCH: '0', CCP_SETUP_REF: 'HEAD' } });
+  execFileSync('bash', [SETUP], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: log, CCP_SETUP_FETCH: '0', CCP_SETUP_SKILLS: '0', CCP_SETUP_REF: 'HEAD' } });
 }
 // path -> content for every file (and symlink target) under dir
 function tree(dir) {

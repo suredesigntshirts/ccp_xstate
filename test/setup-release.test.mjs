@@ -43,7 +43,7 @@ function advance(cwd, tag) {
 function run(cwd, { home = join(temp('home'), 'home'), env = {} } = {}) {
   mkdirSync(home, { recursive: true });
   const log = join(home, '..', `setup-${Math.random()}.log`);
-  execFileSync('bash', [join(cwd, 'infra', 'cloud-environment', 'setup.sh')], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: log, ...env } });
+  execFileSync('bash', [join(cwd, 'infra', 'cloud-environment', 'setup.sh')], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: log, CCP_SETUP_SKILLS: '0', ...env } });
   const dest = join(home, '.claude', 'skills', 'ccp-harness');
   const json = (p) => { try { return JSON.parse(readFileSync(join(dest, p), 'utf8')); } catch { return null; } };
   return { home, dest, log: readFileSync(log, 'utf8'), manifest: json('.claude-plugin/plugin.json'), release: json('release.json') };

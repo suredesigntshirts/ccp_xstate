@@ -32,7 +32,7 @@ export const TEST_REF = (() => {
 /** Runs the real setup script with HOME at `home`, installing TEST_REF without fetching tags. Returns the log text. */
 export function setup(home, extraEnv = {}) {
   const log = join(home, '..', `setup-${Date.now()}-${Math.random()}.log`);
-  execFileSync('bash', [SETUP], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: log, CCP_SETUP_FETCH: '0', CCP_SETUP_REF: TEST_REF, ...extraEnv } });
+  execFileSync('bash', [SETUP], { env: { ...process.env, HOME: home, CCP_SETUP_LOG: log, CCP_SETUP_FETCH: '0', CCP_SETUP_SKILLS: '0', CCP_SETUP_REF: TEST_REF, ...extraEnv } });
   return readFileSync(log, 'utf8');
 }
 

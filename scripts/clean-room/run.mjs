@@ -84,7 +84,7 @@ export function cleanRoom({ repo, ref = null, session = 'auto', env = process.en
 
   // 1. The setup script, as a container build runs it.
   const log = join(room, 'setup.log');
-  const fetch = ref ? { CCP_SETUP_FETCH: '0', CCP_SETUP_REF: ref } : {};
+  const fetch = ref ? { CCP_SETUP_FETCH: '0', CCP_SETUP_SKILLS: '0', CCP_SETUP_REF: ref } : {};
   spawnSync('bash', [join(repo, 'infra', 'cloud-environment', 'setup.sh')], { env: { ...base, CCP_SETUP_LOG: log, ...fetch }, encoding: 'utf8' });
   const setupLog = existsSync(log) ? readFileSync(log, 'utf8') : '';
   const root = join(home, '.claude', 'skills', PLUGIN);
