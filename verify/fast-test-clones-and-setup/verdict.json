@@ -1,0 +1,73 @@
+{
+  "item": "fast-test-clones-and-setup",
+  "verified_sha": "be40cff22a443e1d5be0f9dd0ac1cce00837e00b",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5HqqazMPAcEVNKxczn",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "lean-clone",
+      "status": "MET",
+      "command": "node --test verify/fast-test-clones-and-setup/lean-clone.test.mjs",
+      "excerpt": "2 pass at be40cff, in a depth-1 clone and a full one: from the checkout and from a bare clone of it, the lean clone has the same ls-files (9,794), HEAD, branch -a, tags, every ref and commit count as a plain git clone, 931 files on disk (every tracked file outside bench/ and tournaments/, nothing else), and a clean status",
+      "test": "verify/fast-test-clones-and-setup/lean-clone.test.mjs"
+    },
+    {
+      "id": "clones-through-helper",
+      "status": "MET",
+      "command": "node --test verify/fast-test-clones-and-setup/clones-through-helper.test.mjs",
+      "excerpt": "3 pass: 12 git clone calls in the four trees: the helper's own, 2 bare (no-self-edit's origin of the repo, the bench's case-repo cache), 9 of temp repos their file builds with git init; 7 leanClone calls take REPO, ROOT or no-self-edit's bare origin; a plain clone of REPO would be flagged",
+      "test": "verify/fast-test-clones-and-setup/clones-through-helper.test.mjs"
+    },
+    {
+      "id": "skills-switch",
+      "status": "MET",
+      "command": "node --test verify/fast-test-clones-and-setup/skills-switch.test.mjs",
+      "excerpt": "2 pass: with CCP_SETUP_SKILLS=0, plugin installed, skill copied with its lockfile and no node_modules, no npm call, log says npm ci skipped; without it, one npm ci in the copied vendor/documentation-downloader folder outside the clone, and the installed skill holds that node_modules (a stub npm records the calls)",
+      "test": "verify/fast-test-clones-and-setup/skills-switch.test.mjs"
+    },
+    {
+      "id": "tests-set-switch",
+      "status": "MET",
+      "command": "node --test verify/fast-test-clones-and-setup/tests-set-switch.test.mjs",
+      "excerpt": "1 pass at be40cff: the 17 test files that name setup.sh (directly or by import) run with a recording stub bash and BASH_ENV: 44 setup.sh runs, all with CCP_SETUP_SKILLS=0; none of these tests asserts the skill's npm install. At 2f9f027a 35 of 44 lacked it; fixed in bc71a2d0",
+      "test": "verify/fast-test-clones-and-setup/tests-set-switch.test.mjs"
+    },
+    {
+      "id": "same-tests",
+      "status": "MET",
+      "command": "node --test verify/fast-test-clones-and-setup/same-tests.test.mjs; node verify/fast-test-clones-and-setup/record.mjs <base clone> <head clone> <out> 3",
+      "excerpt": "2 pass: the 7 changed test files keep the same test calls in order and add no skip. record.mjs at base 4f22163 and head be40cff, TAP, each file alone: the same names at both (6, 27, 6, 4, 3, 3, 7), all ok, 0 skipped or todo",
+      "test": "verify/fast-test-clones-and-setup/same-tests.test.mjs"
+    },
+    {
+      "id": "faster",
+      "status": "MET",
+      "command": "node verify/fast-test-clones-and-setup/record.mjs <base clone> <head clone> <out> 3; node --test verify/fast-test-clones-and-setup/faster.test.mjs",
+      "excerpt": "record.mjs, each file alone, base then head, 3 rounds: summed duration_ms of no-self-edit + self-edit-check + setup: base 428.6, 424.5, 430.1 s; head 124.0, 134.1, 126.3 s; medians 428.6 vs 126.3 s, ratio 0.295 (bar 0.60). faster.test.mjs 1 pass: a lean clone checks out 931 of 9,794 files",
+      "test": "verify/fast-test-clones-and-setup/faster.test.mjs"
+    },
+    {
+      "id": "rule-written",
+      "status": "MET",
+      "command": "node --test verify/fast-test-clones-and-setup/rule-written.test.mjs",
+      "excerpt": "1 pass: the Tests section of docs/layout.md names leanClone, test/regression/lib.mjs, setup.sh, CCP_SETUP_SKILLS and npm ci",
+      "test": "verify/fast-test-clones-and-setup/rule-written.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #278 at be40cff22a443e1d5be0f9dd0ac1cce00837e00b",
+      "excerpt": "at be40cff22a443e1d5be0f9dd0ac1cce00837e00b: test (job 128988576548) success, clean-room (job 128988576928) success; gates (jobs 128988576339, 128989361262) failed only on the missing verdict.json. All run again on this verdict commit."
+    }
+  ],
+  "observations": [
+    "At 2f9f027a tests-set-switch did not hold: helpers.mjs setup(), setup.test.mjs copy-not-link, setup-release run(), setup-install and the clean-room ref run set no CCP_SETUP_SKILLS=0, relying on CCP_SETUP_FETCH=0 (or on a clone without vendor/) to skip npm. No time was lost there, but the rule this PR writes asks for the switch itself, so copies of those patterns stay fast. Fixed in bc71a2d0.",
+    "leanClone lives in test/regression/lib.mjs, which imports the engine (xstate) at load. Any file importing it needs node_modules, so a clone that runs such a file must link node_modules in; that broke self-edit-check's nested runs at 2f9f027a and bc71a2d0 (fixed in be40cff). A clone-only module with no engine import would keep the helper usable without node_modules.",
+    "test/regression/inspector/reads-records.test.mjs (and scripts/inspector/build.mjs) make full git worktrees of the repo, which check out bench/ too. A worktree is not a clone, so the check does not cover it, but it costs the same file writes; worth the same sparse treatment in a follow-up.",
+    "tests-set-switch leaves self-edit-check.test.mjs out of its runs for time: its setup.sh runs are nested runs of no-self-edit.test.mjs and test/setup.test.mjs, which it runs directly. It tells runs apart by a stub dir per file on PATH, because cleanRoom passes setup.sh only PATH, HOME, TMPDIR and LANG.",
+    "skills-switch uses a stub npm that writes a marker node_modules, so the without-switch run proves the call and where its folder lands, not a real package install; a real npm ci needs the network.",
+    "self-edit-check is still the longest of the three at the head (about 107 s alone, against 366 s at the base); most of what is left is its nested node --test runs, which the item leaves for the next decision."
+  ]
+}
