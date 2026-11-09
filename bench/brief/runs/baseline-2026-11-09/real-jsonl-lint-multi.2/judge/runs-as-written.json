@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "c9a0956375b755d97201ebd4b1c1949d22a5c97a4c121d720fbb418b4b52c044",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief's commands run. The verifier brief's don't. It writes \"Let B=packages/jsonl-lint/bin/jsonl-lint.js\" but then runs `node B clean1.jsonl bad.jsonl ...`, `node B -` and `node B` using the bare name B, not `$B`. As written, node would look for a file named B, and none exists in the repository. The brief also says \"Run every command from the repository root\" but puts clean1.jsonl, clean2.jsonl and bad.jsonl \"in a temp dir\". From the root, those relative paths would not resolve, so Checks 1–3 would fail for reasons unrelated to the PR. Other commands are fine: npm ci, npm test, npm test -w packages/jsonl-lint, git diff against the merge base, and gh pr view/checks with the <pr> placeholder.",
+  "model": "claude-opus-5-5",
+  "ms": 13623,
+  "tokens": {
+    "input": 2,
+    "output": 1087,
+    "cacheCreation": 5065,
+    "cacheRead": 783,
+    "fresh": 6154,
+    "total": 6937
+  },
+  "at": "2026-11-09T02:36:19.310Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e47d81f800a7a8394994c7f6e9138fc595640e34ca62f849ef060c20d54acca5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the verifier brief, and both are handled. Item 1: Check 4 says \"The live page can only be seen after merge, so do not fetch it.\" Instead it has the verifier read .github/workflows/pages.yml and docs/index.md at the head. PASS requires the workflow to still publish docs/ on pushes to the default branch and docs/index.md to list --shout. It also asks the verifier to say in the report that the live page is only visible after merge. Item 2: Check 2 has the verifier run the command at the head and also on the PR's base commit (\"git show <base>:bin/greet.js ... and compare\"). PASS means the head output \"is the same as at the base\". So it compares against the code before the change, not only against a hand-written string. The builder brief also says the live page can't be checked from the PR.",
+  "model": "claude-opus-5-5",
+  "ms": 7953,
+  "tokens": {
+    "input": 2,
+    "output": 382,
+    "cacheCreation": 3118,
+    "cacheRead": 783,
+    "fresh": 3502,
+    "total": 4285
+  },
+  "at": "2026-11-09T02:33:51.349Z"
+}

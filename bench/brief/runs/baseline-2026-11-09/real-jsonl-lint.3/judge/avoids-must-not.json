@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "5796d786eb85dd95767abd33010196abfef036f6c066d3c4b8720d987ea03531",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line. None is stricter than its line. Check 1 asks only that each problem line starts with `<file>:<line>: ` and has a non-empty error. The exact JSON.parse wording is left to the advisory list. Check 4 allows \"extra flags after\" `node --test`. No check sets a branch-name rule, a mutation test or a limit on which files the PR may touch. \"Single PR\" is what line 6 itself asks for. Every behaviour line is checked by running the program: Checks 1 and 2 run the CLI, Check 3 imports and calls lint, Check 4 runs `npm test`, and Check 6 runs `npm ci && npm test` and `gh pr checks`. Check 4 also reads the test files, but only to confirm the five test cases exist, and it runs them too. Check 5 reads files, which suits a line about files existing. The builder brief's extras, such as CRLF handling and the shebang, are build guidance, not PASS/FAIL conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 10711,
+  "tokens": {
+    "input": 2,
+    "output": 821,
+    "cacheCreation": 5449,
+    "cacheRead": 783,
+    "fresh": 6272,
+    "total": 7055
+  },
+  "at": "2026-11-09T02:37:50.004Z"
+}

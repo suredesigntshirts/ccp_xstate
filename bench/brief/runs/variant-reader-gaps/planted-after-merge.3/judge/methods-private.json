@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "502f6bf26673dfd5bd453343f9acd7bb2716d0960fc06b5f954c257cd1aee548",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's checks. The builder brief repeats several of the verifier's probes and PASS conditions. Step 1 gives the input and expected output that Check 1 uses: \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\". It also includes the advisory flag-after-name probe (\"`node bin/greet.js Ada --shout` should behave the same\") and the advisory usage-error check. Step 2 repeats Check 2's exact probe and expected result: \"`node bin/greet.js Ada` prints `Hello, Ada!\\n`\". Step 4 restates Check 4's PASS condition: don't alter pages.yml \"in a way that stops it publishing docs/ on push to main\". Telling the builder to run `npm test` and write its own tests is allowed. The concrete Ada input/output pairs and the restated PASS conditions are not: they hand the builder the checker's methods rather than just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 10624,
+  "tokens": {
+    "input": 2,
+    "output": 690,
+    "cacheCreation": 3123,
+    "cacheRead": 783,
+    "fresh": 3815,
+    "total": 4598
+  },
+  "at": "2026-11-09T02:34:42.078Z"
+}

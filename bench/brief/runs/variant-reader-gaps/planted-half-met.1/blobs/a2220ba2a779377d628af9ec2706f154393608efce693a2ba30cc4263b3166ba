@@ -1,0 +1,30 @@
+Check the pull request at its head, from the repository root. One check per expect line, in order.
+
+Check 1 — expect line: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+node --input-type=module -e "import * as m from './index.js'; if (typeof m.padLeft !== 'function') { console.log('NO padLeft export'); process.exit(1); } const r = [m.padLeft('42', 5, '0'), m.padLeft('ab', 5), m.padLeft('x', 3, '*')]; console.log(JSON.stringify(r)); process.exit(r[0] === '00042' && r[1] === '   ab' && r[2] === '**x' ? 0 : 1);"
+PASS: index.js exports a function named padLeft, and the printed results are ["00042","   ab","**x"] (left-padded with the given fill, with a space when fill is omitted, to width characters).
+FAIL: padLeft is not exported, or any result differs (wrong fill, padding on the right, default not a space, or length not width).
+
+Check 2 — expect line: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+node --input-type=module -e "import { padLeft } from './index.js'; const r = [padLeft('abcd', 4, '0'), padLeft('abcdef', 4, '0'), padLeft('abcd', 4), padLeft('abcdef', 2)]; console.log(JSON.stringify(r)); process.exit(r[0] === 'abcd' && r[1] === 'abcdef' && r[2] === 'abcd' && r[3] === 'abcdef' ? 0 : 1);"
+PASS: printed ["abcd","abcdef","abcd","abcdef"] — s returned unchanged when its length equals or exceeds width.
+FAIL: any result differs from s (e.g. truncated or padded).
+
+Check 3 — expect line: "README.md has a section for every function index.js exports"
+Run:
+node --input-type=module -e "import * as m from './index.js'; import fs from 'node:fs'; const heads = fs.readFileSync('README.md', 'utf8').split('\n').filter(l => /^#{1,6}\s/.test(l)); const fns = Object.keys(m).filter(k => typeof m[k] === 'function'); const missing = fns.filter(f => !heads.some(h => new RegExp('\\b' + f + '\\b').test(h))); console.log('exports:', fns.join(','), 'missing:', missing.join(',')); process.exit(missing.length ? 1 : 0);"
+Also open README.md and look at the sections for the reported exports.
+PASS: every function exported by index.js (at the head this should include capitalize, slugify, truncate and padLeft) has its own README.md section, i.e. a markdown heading naming that function, with "missing:" empty.
+FAIL: any exported function has no section in README.md (note: slugify had no section before this change, so check it specifically).
+
+Check 4 — expect line: "npm test passes"
+Run: npm test
+PASS: the test run reports all tests passing (no failing tests).
+FAIL: any test fails or the test run errors.
+
+Advisory (not PASS/FAIL conditions):
+- Expect the README headings in the existing style, e.g. "## slugify(s)" and "## padLeft(s, width, fill)", each with a short description.
+- Good to see tests for padLeft in test/strutil.test.js covering explicit fill, default fill, and the unchanged cases; npm test should exit with status 0.
+- The CI check at the head, if any, should be green.

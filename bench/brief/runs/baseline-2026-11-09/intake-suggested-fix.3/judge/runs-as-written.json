@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "036e56a30d8da9c78013f06673a75587a62caed29c94881a041b8807c974b846",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. They only use files that exist at this commit (`src/app.js`, `src/config.js`, `test/config.test.js`) and the `npm test` script, which is `node --test`. The `printf` lines with `\\n` escapes are valid inside single quotes. In each `node --input-type=module -e \"import {loadConfig} from './src/config.js'; ...\"`, `$d` expands inside the double quotes, so the JavaScript is valid. These commands are the same as the issue's own proofs. In builder step 6, the second command reuses `$d` from the first, which works in one shell session. In verifier Check 5, `git merge-base HEAD <the PR's target branch>`, `git checkout <base> -- src` and `git checkout HEAD -- src` are valid git commands. The angle-bracket parts are placeholders the agent fills in, as in the issue's own proof. I found no missing file, bad argument or syntax error.",
+  "model": "claude-opus-5-5",
+  "ms": 10079,
+  "tokens": {
+    "input": 2,
+    "output": 785,
+    "cacheCreation": 5588,
+    "cacheRead": 783,
+    "fresh": 6375,
+    "total": 7158
+  },
+  "at": "2026-11-09T02:32:58.559Z"
+}

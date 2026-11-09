@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "e2f8af4c43e7de6fd8d076e021f216a6048eb096be9f093eb310451bc2d97b33",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its own expect line. Checks 1, 2, 3, 5 and 6 stay within their wording. Stricter items such as stdout-only output, the JSON.parse message, CRLF handling, the lockfile and the shebang are correctly placed under Advisory. Check 4 breaks the criterion. Its expect line only requires a package.json with certain fields, no runtime dependencies, and node:test tests for five subjects. It says nothing about those tests passing. Yet Check 4's PASS requires \"and the workspace tests pass\", and its FAIL includes \"or the tests fail\", after running `npm test -w packages/jsonl-lint`. That is a test line 4's words do not force. Passing tests belong to line 6, which says \"npm test ... green\". So this requirement should have been an Advisory note under Check 4, not a pass/fail condition.",
+  "model": "claude-opus-5-5",
+  "ms": 11125,
+  "tokens": {
+    "input": 2,
+    "output": 1036,
+    "cacheCreation": 4775,
+    "cacheRead": 783,
+    "fresh": 5813,
+    "total": 6596
+  },
+  "at": "2026-11-09T02:37:37.726Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "2bf53fe89019af8d2e87812478881ca3348ebd8338865e9e8add1bdc51e691ed",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Each one would run as written, so the criterion holds.\n\n- **Builder brief:** `npm test` maps to the existing `node --test` script. The builder's step 1 creates clamp, so `node -e \"const m=require('./math.js');console.log(Object.keys(m))\"` names files that exist and has valid JavaScript.\n- **Verifier, check 1:** the `node -e` call to clamp has valid JS. Its double quotes contain no `$`, backticks or `!`, so the shell leaves it alone. The expected output \"0 100 42 0 100 3 -2.5 -10\" matches correct clamp behaviour.\n- **Verifier, check 2:** the try/catch loop with `...a` spread is valid JS. The `&&` sits safely inside the double quotes.\n- **Verifier, check 3:** the `filter(k=>typeof m[k]==='function')` command has no shell problems.\n- **Verifier, check 4:** `npm test` is valid. `npm install` only runs under a condition.\n\nmath.js, README.md, test/math.test.js and package.json all exist at this commit.",
+  "model": "claude-opus-5-5",
+  "ms": 9002,
+  "tokens": {
+    "input": 2,
+    "output": 840,
+    "cacheCreation": 3280,
+    "cacheRead": 783,
+    "fresh": 4122,
+    "total": 4905
+  },
+  "at": "2026-11-09T02:35:32.638Z"
+}

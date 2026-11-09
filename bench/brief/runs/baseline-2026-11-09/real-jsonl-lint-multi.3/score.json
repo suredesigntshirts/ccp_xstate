@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.3",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each check's PASS and FAIL conditions with its expect line. Check 1 asks for argument order (including with the order reversed), the `<file>:<line>: <error>` format, and lines that match the single-file output. All of that comes from \"in order\" and \"as for one file before\". Check 2 asks for a `-:1:` prefix, nothing printed for clean stdin, and exit 2 when - is given twice. Check 3 asks for exits 0/1/2/2, an error on stderr, and c still reported after the missing file. Reading \"(error on stderr…)\" as covering the no-args case too is a fair reading. Check 4 only asks that lint is unchanged. Check 5 asks for the seven node:test cases and a README covering several files and the - argument. That is a fair reading of \"documents the usage\". Check 6 matches its line word for word. The stricter items (exit 2 winning over 1, nothing on stdout when - is given twice, stderr wording) are all under Advisory. None of the conditions requires mutation tests, branch rules or exact wording.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief's commands are fine: `npm test` at the root, and git/PR steps described in plain words. The verifier brief has commands that would not run as written. Check 3 gives `jsonl-lint.js b.jsonl b.jsonl`, `jsonl-lint.js b.jsonl a.jsonl b.jsonl`, `jsonl-lint.js` and `jsonl-lint.js b.jsonl missing.jsonl c.jsonl`. There is no `jsonl-lint.js` on PATH or at the repo root; the script lives at packages/jsonl-lint/bin/jsonl-lint.js, so these fail as given. The paths also clash. The verifier is told to put fixtures in \"a scratch temp directory\", but Checks 1–3 use the repo-relative `node packages/jsonl-lint/bin/jsonl-lint.js` with bare `a.jsonl`. That only works if the fixtures sit in the repo root, and then they are not in a scratch directory. The `<pr>` and merge-base placeholders are acceptable because the brief says how to fill them. The Check 3 commands still break the criterion.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs cover all four must_catch items.\n1. Verifier Check 3 runs `b.jsonl missing.jsonl c.jsonl` with c bad, all in one call. It requires exit 2 and that \"stdout still has c.jsonl's bad-row line(s)\". This tests the combined case, not each case alone.\n2. Check 4 runs `git diff <merge-base with main>..HEAD -- packages/jsonl-lint/src/index.js`, and its PASS condition is \"no diff to it\". That compares the PR head against the base.\n3. Builder step 5 says \"Update packages/jsonl-lint/README.md\", covering the multi-file usage line, `-` for stdin and the exit codes.\n4. Check 6 uses `gh pr view ... --json body,headRefOid` and `gh pr checks`. It requires the body to contain the Closes URL and \"the `test` workflow check for the head commit succeeded\". This reads GitHub at the PR head.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I went through every PASS/FAIL pair in the verifier brief. Checks 1–3 cover behaviour lines, and each one runs the program on fixture files or stdin and records stdout, stderr and the exit code. None of them passes on reading the diff alone. None of the conditions is stricter than its line. Check 1 requires the files' output in argument order, matching the single-file runs. Check 2 requires a `-:1:` prefix and exit 2 for a second `-`. Check 3 requires exits 0/1/2/2 and an error on stderr, with files after the bad one still checked. The brief never fixes stderr wording; the advisory says \"Stderr message wording is not fixed\". It has no branch-name rule, no mutation test and no limit on which files the PR may touch. Check 4's no-diff condition applies only to src/index.js, which is what line 4 asks. The builder's \"e.g.\" wording is guidance for the builder, not a PASS condition.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with each verifier check. Most of the builder brief stays on the bar: it repeats the expect lines, tells the builder to run `npm test`, and asks it to write its own tests. Step 2 breaks the criterion. It says \"Do not touch packages/jsonl-lint/src/index.js at all (git diff on it must be empty)\". That is the verifier's Check 4 probe, `git diff <merge-base>..HEAD -- packages/jsonl-lint/src/index.js`, and its PASS condition, \"no diff to it\". No expect line or issue proof names that git diff command, so the builder is being handed the checker's method. Step 4 also mirrors the shape of the Check 3 fixture: \"put a bad file after the missing one too\", which matches the verifier's run of b.jsonl missing.jsonl c.jsonl where c is bad. Step 3 also repeats verifier advisories: \"2 takes priority over 1\" and print nothing on stdout for two `-` arguments. Advisories are not PASS/FAIL checks, though, so they don't break the criterion on their own. Because a verifier check leaks through, the criterion is not met.",
+      "cached": false
+    }
+  }
+}

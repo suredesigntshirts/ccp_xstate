@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "6a69fd2d7d286715439529d87d5cd3ebe3e8514fff6e3fdeea3eba24ad38000f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief and found several of the verifier's probes repeated in the builder brief. Step 2 gives the README examples \"clamp(-5, 0, 100) // 0, clamp(140, 0, 100) // 100, clamp(42, 0, 100) // 42\". These are the same inputs and expected outputs (0, 100, 42) that Check 1 uses. Step 3 has the builder write `assert.throws(() => clamp(1, 5, 0), RangeError)`, and [1,5,0] is the first input in Check 2's RangeError probe. Step 4 hands over almost the same `node -e` Object.keys script that Check 3 uses to list exports, plus Check 3's pass test that every listed name appears in README.md. No expect line or issue proof names any of these. So the builder is getting the checker's own methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 6843,
+  "tokens": {
+    "input": 2,
+    "output": 534,
+    "cacheCreation": 3272,
+    "cacheRead": 783,
+    "fresh": 3808,
+    "total": 4591
+  },
+  "at": "2026-11-09T02:35:57.253Z"
+}

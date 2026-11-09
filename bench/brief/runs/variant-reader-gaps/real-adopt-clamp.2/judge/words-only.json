@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "288ce4dc781943c1cd0d274ef1faf20f6244c021b7bf68a424b59844d4203442",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check against the words of its expect line. Checks 1, 2 and 4 hold. Check 1 tests only that clamp is exported and that its results stay limited to lo..hi, including edge cases those words cover. Check 2 tests only that lo>hi throws a RangeError. Check 4 tests only that `npm test` exits 0. Check 3 breaks the rule. Its FAIL condition rests on the regex `'\\\\b'+n+'\\\\s*\\\\('`, which fails any exported function whose name is not followed by an opening parenthesis somewhere in README.md. The line \"README.md documents every function math.js exports\" does not require that form. A README could document `clamp` fully under a heading like \"clamp\" or \"`clamp` — returns…\" and still fail with \"MISSING\". That is a wording/format rule inside a FAIL condition when it belongs under Advisory. The output does have an Advisory section, but this stricter test is not in it.",
+  "model": "claude-opus-5-5",
+  "ms": 12222,
+  "tokens": {
+    "input": 2,
+    "output": 879,
+    "cacheCreation": 3304,
+    "cacheRead": 783,
+    "fresh": 4185,
+    "total": 4968
+  },
+  "at": "2026-11-09T02:36:10.547Z"
+}

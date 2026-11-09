@@ -1,0 +1,23 @@
+Check out the pull request head. Run `npm install` if package.json has dependencies (the base has none). Do one check per expect line below, in order, and report PASS or FAIL for each with the evidence.
+
+Check 1. Expect: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run from the repository root: `node --input-type=module -e "import * as m from './index.js'; console.log(typeof m.padLeft, JSON.stringify(m.padLeft('42',5,'0')), JSON.stringify(m.padLeft('ab',4)), JSON.stringify(m.padLeft('x',3,'*')))"`
+PASS: padLeft is an exported function, and the output is `function "00042" "  ab" "**x"`, meaning fill is added on the left until the result is width characters long, and a space is used when fill is omitted. Also read index.js and confirm padLeft takes the parameters (s, width, fill) in that order.
+FAIL: padLeft is not exported, it throws, or any of those results differ (the padding is on the right, the length is wrong, or the default fill is not a space).
+
+Check 2. Expect: "padLeft returns s unchanged when s is already width characters or longer"
+Run: `node --input-type=module -e "import {padLeft} from './index.js'; console.log(JSON.stringify(padLeft('abcd',4,'0')), JSON.stringify(padLeft('abcdef',4,'0')), JSON.stringify(padLeft('abc',3)))"`
+PASS: the output is `"abcd" "abcdef" "abc"`.
+FAIL: any value is padded, truncated or otherwise changed, or the call throws.
+
+Check 3. Expect: "README.md has a section for every function index.js exports"
+Run: `node --input-type=module -e "import * as m from './index.js'; console.log(Object.keys(m).filter(k=>typeof m[k]==='function').join(' '))"` to list the exported functions. Then read README.md at the head.
+PASS: every function in that list (at least capitalize, slugify, truncate and padLeft) has its own README section, meaning a heading that names the function, followed by text describing it.
+FAIL: any exported function has no section. Note that slugify has no section on the base branch, so check it specifically.
+
+Check 4. Expect: "npm test passes"
+Run: `npm test` at the head.
+PASS: the command succeeds and reports no failing tests.
+FAIL: the command fails or any test fails.
+
+Advisory (not pass or fail conditions): check that the tests cover padLeft, including the default fill and the unchanged-input cases; that README headings follow the existing `## name(args)` style; and how a multi-character fill behaves (padStart semantics are reasonable).

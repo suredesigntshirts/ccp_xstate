@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.3",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for e\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 2, 3, 5 and 6 test only what their lines say. Check 1's \"exactly two problem lines\" rule is borderline, but it follows from \"for every row that is not valid JSON\" with \"blank lines skipped\". Check 4 breaks the criterion. Expect line 4 asks only that \"node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes\" exist. Check 4's PASS condition adds that the tests \"pass when run\", and its FAIL condition adds \"the tests fail\". Line 4's words do not require the tests to pass. That requirement belongs to line 6 (\"npm test ... green at its head\"), which Check 6 already covers. So Check 4 has a condition its own expect line does not force, and it is not under Advisory.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "Every command would run. Builder: `npm install`, `npm ci && npm test` (existing root script), and the step-8 `printf ... > /tmp/x.jsonl; node packages/jsonl-lint/bin/jsonl-lint.js` run files that earlier steps create. Verifier: the mktemp/printf/redirect commands in checks 1–2 are valid shell. In check 3, bash turns `\\\"` into `\"` inside the double quotes and `\\n` stays a JS escape, and the import works under `--input-type=module`. In check 4, `require` is valid in a default `node -e` and `(cd packages/jsonl-lint && npm test)` is valid. Check 6's `gh pr view/checks --repo ... --json body,headRefOid,state` uses real flags. Its `<pr>` placeholder would fail if pasted literally, but I read it as the PR number the verifier fills in. No missing files or bad arguments found.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 is met: builder step 7 says to run `npm install` and commit package-lock.json \"because CI runs `npm ci`\". Item 2 is met: step 6 says to \"replace the 'No tools yet…' bullet\". Item 4 is met: verifier check 6 uses `gh pr view` for the body and headRefOid, and `gh pr checks` to require a green test check at the head. Item 3 is not met. Check 4 runs `(cd packages/jsonl-lint && npm test)` inside the package, not under the root script. Check 6 runs the root `npm ci && npm test` but passes as long as it \"exits 0\". The verifier never reads the root test count and never breaks lint() to see a failure. Because the root script uses --if-present, a skipped run would still exit 0 and pass.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every verifier PASS/FAIL condition against its expect line. None is stricter than its line. Check 1 asks only that each problem line starts with `<file>:<line>: ` and has a non-empty error. The exact JSON.parse wording is left to the advisory list. Check 4 allows \"extra flags after\" `node --test`. No check sets a branch-name rule, a mutation test or a limit on which files the PR may touch. \"Single PR\" is what line 6 itself asks for. Every behaviour line is checked by running the program: Checks 1 and 2 run the CLI, Check 3 imports and calls lint, Check 4 runs `npm test`, and Check 6 runs `npm ci && npm test` and `gh pr checks`. Check 4 also reads the test files, but only to confirm the five test cases exist, and it runs them too. Check 5 reads files, which suits a line about files existing. The builder brief's extras, such as CRLF handling and the shebang, are build guidance, not PASS/FAIL conditions.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief carries the verifier's own probes, which the criterion forbids. Step 8 gives an inline script with an expected result: `printf '{\"a\":1}\\n\\nnope\\n{\"b\":2}\\n{\"c\":' > /tmp/x.jsonl; node .../jsonl-lint.js /tmp/x.jsonl` \"should print lines for 3 and 5 and exit 1\". That is nearly the same as the verifier's Check 1 probe (`printf '{\"a\":1}\\n\\nnope\\n  \\n{\"b\":2}\\n{\"c\":'`, expects lines 3 and 6, exit 1). It uses the same fixture pattern, the same torn row and the same kind of expected output. Step 8 also repeats Check 2 word for word in effect: run with no argument and with a missing path, and expect exit 2 with output on stderr. Step 4 adds \"2 on a missing file (with stderr not empty)\", which is Check 2's PASS condition. Neither the expect lines nor the issue name these commands, so they are not allowed exceptions. The builder is getting the checker's methods, not just the bar.",
+      "cached": false
+    }
+  }
+}

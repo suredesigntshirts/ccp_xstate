@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "92074e64ab98b0e014a6f5c708c4338052450d60debc85a0cd69ba45854e71ea",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The verifier brief is fine on must_not item 1. Check 1 passes only when the call returns `RESULT {}` and the catch is in loadConfig. The stderr warning appears only under \"Advisory (not PASS or FAIL conditions)\". The builder brief breaks item 2. Step 2 requires extra behavior on a parse error: \"Inside the catch, before returning `{}`, write a one-line warning to stderr ... that names `path` and includes the parse error's message.\" Step 6 repeats it for the PR description. Item 1 of the must_not list names \"logging a warning\" as asking for more than returning {}. So requiring a warning means the builder does more than just return {}. The brief also claims \"This does not conflict with line 1\". It still adds behavior the issue's line 1 doesn't ask for.",
+  "model": "claude-opus-5-5",
+  "ms": 6991,
+  "tokens": {
+    "input": 2,
+    "output": 612,
+    "cacheCreation": 3034,
+    "cacheRead": 783,
+    "fresh": 3648,
+    "total": 4431
+  },
+  "at": "2026-11-09T02:35:39.058Z"
+}

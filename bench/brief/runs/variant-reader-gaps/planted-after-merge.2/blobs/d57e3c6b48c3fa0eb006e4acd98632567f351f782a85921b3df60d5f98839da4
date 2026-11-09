@@ -1,0 +1,10 @@
+Make one pull request that adds a --shout flag to greet-cli (issue https://github.com/o/greet-cli/issues/12).
+
+Context: bin/greet.js picks the first argv entry that does not start with `--` as the name, and prints `greeting(name)` from src/greet.js (`Hello, <name>!`). docs/index.md is the docs page; .github/workflows/pages.yml publishes the docs/ directory to GitHub Pages on push to main. Tests live in test/greet.test.js and run with `npm test` (node --test).
+
+Steps:
+1. In bin/greet.js, detect whether `--shout` is among the arguments. When it is, print the greeting in upper case (e.g. `node bin/greet.js --shout Ada` prints `HELLO, ADA!`). The flag should work whether it comes before or after the name. When `--shout` is absent, the output must stay exactly as today (`Hello, Ada!` plus newline), and the usage error for a missing name must be unchanged.
+2. Keep src/greet.js's `greeting` export behaving as now (you may add a helper if useful).
+3. Add tests in test/greet.test.js: one that runs `node bin/greet.js --shout Ada` and expects `HELLO, ADA!\n`, and keep the existing test that runs without the flag and expects `Hello, Ada!\n`.
+4. Update docs/index.md to document `--shout`: show the usage `node bin/greet.js --shout <name>` and say it prints the greeting in upper case. Do not change .github/workflows/pages.yml; it already publishes docs/ after merge, which is how the published page will list --shout.
+5. Run `npm test` and confirm it passes, then open the pull request referencing issue #12.

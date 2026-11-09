@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "da36ebbbd744981ba18acb75291ecdbce1ae0299ba76791bc859e1104e324194",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief's commands are fine: `npm test` at the root, and git/PR steps described in plain words. The verifier brief has commands that would not run as written. Check 3 gives `jsonl-lint.js b.jsonl b.jsonl`, `jsonl-lint.js b.jsonl a.jsonl b.jsonl`, `jsonl-lint.js` and `jsonl-lint.js b.jsonl missing.jsonl c.jsonl`. There is no `jsonl-lint.js` on PATH or at the repo root; the script lives at packages/jsonl-lint/bin/jsonl-lint.js, so these fail as given. The paths also clash. The verifier is told to put fixtures in \"a scratch temp directory\", but Checks 1–3 use the repo-relative `node packages/jsonl-lint/bin/jsonl-lint.js` with bare `a.jsonl`. That only works if the fixtures sit in the repo root, and then they are not in a scratch directory. The `<pr>` and merge-base placeholders are acceptable because the brief says how to fill them. The Check 3 commands still break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 11784,
+  "tokens": {
+    "input": 2,
+    "output": 909,
+    "cacheCreation": 5495,
+    "cacheRead": 783,
+    "fresh": 6406,
+    "total": 7189
+  },
+  "at": "2026-11-09T02:36:24.612Z"
+}

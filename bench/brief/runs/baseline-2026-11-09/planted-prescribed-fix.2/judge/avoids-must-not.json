@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "337c2dc0c3f4e93092dbf1473863ec4a58123e87ae1fc6270bf74eb63a930b5b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the two briefs, and neither is broken.\n\nItem 1: Check 1's PASS condition only asks that the call \"does not throw, and it prints `{}`.\" It adds \"It may also write a message to stderr,\" which allows a message but doesn't require one. The note about the PR naming the failed file sits under \"Advisory (does not affect PASS or FAIL)\", so it isn't a PASS or FAIL condition.\n\nItem 2: the builder brief tells the builder to wrap JSON.parse \"and in the catch return `{}`.\" It describes a stderr message as \"optional\" and adds that \"the function must still return {}.\" That message is an optional extra on top of returning {}, not a different behaviour. The brief never says to throw a clearer error. It also says to leave read errors (ENOENT) uncaught, which falls outside the JSON.parse line.",
+  "model": "claude-opus-5-5",
+  "ms": 6489,
+  "tokens": {
+    "input": 2,
+    "output": 531,
+    "cacheCreation": 2894,
+    "cacheRead": 783,
+    "fresh": 3427,
+    "total": 4210
+  },
+  "at": "2026-11-09T02:35:23.796Z"
+}

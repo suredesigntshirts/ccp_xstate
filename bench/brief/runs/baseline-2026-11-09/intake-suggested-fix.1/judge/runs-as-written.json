@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "ea3c8b849bb157295f21cc8da9adc6f81f0da5185a55e50a8ec4f6068f86ed17",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repo. All the files they name exist: `src/app.js`, `src/config.js` and `test/config.test.js`. `npm test` maps to `node --test`, and that finds `test/*.test.js`. The `printf` strings are valid, and so are the redirections (`>$d/out 2>$d/err`) and `echo \"exit $?\"`. The `node --input-type=module -e \"import {loadConfig} from './src/config.js'; ...\"` snippets are valid JS. `$d` expands inside the double quotes and the inner single quotes stay intact. They copy the issue's own proofs, which import the same named export. The builder's regex `/position (\\d+)/` is valid JS. In Check 5, `git checkout <base> -- src` is a clear placeholder for the base commit that the issue's proof also uses, and the brief says to run it in a scratch copy or worktree. No command names a file, script or flag that does not exist, and none has broken syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 10384,
+  "tokens": {
+    "input": 2,
+    "output": 854,
+    "cacheCreation": 5388,
+    "cacheRead": 783,
+    "fresh": 6244,
+    "total": 7027
+  },
+  "at": "2026-11-09T02:32:10.684Z"
+}

@@ -1,0 +1,28 @@
+Run every check at the pull request head, from the repository root. Each command stands alone.
+
+Check 1 — expect line: "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run: `node bin/greet.js --shout Ada`
+PASS: the printed output is the greeting for Ada in upper case (the upper-case form of `Hello, Ada!`, i.e. `HELLO, ADA!`).
+FAIL: the output is not in upper case, does not contain the greeting for Ada, or the command prints nothing / errors instead of a greeting.
+
+Check 2 — expect line: "without --shout the output is unchanged"
+Run: `node bin/greet.js Ada` and compare with the output at the original code, which is `Hello, Ada!` followed by a newline (as also asserted by the existing `cli` test in test/greet.test.js). You may also run `git show HEAD~0:bin/greet.js` vs. the merge base if needed, e.g. `git diff $(git merge-base HEAD origin/HEAD) HEAD -- bin/greet.js` to understand the change, but the test is the program's output.
+PASS: the output of `node bin/greet.js Ada` is the same as before the change (`Hello, Ada!`).
+FAIL: the output differs from `Hello, Ada!` (e.g. upper-cased, extra text, or an error).
+
+Check 3 — expect line: "docs/index.md documents --shout"
+Run: `cat docs/index.md`
+PASS: docs/index.md mentions `--shout` and describes what it does.
+FAIL: docs/index.md does not mention `--shout`, or mentions it with no description of its use.
+
+Check 4 — expect line: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+The live page can only be seen after merge; do not fetch it. Check what the head contains that will produce it.
+Run: `cat .github/workflows/pages.yml` and `grep -n -- '--shout' docs/index.md`
+PASS: the head has a workflow that publishes the docs/ directory to GitHub Pages on push to the default branch, and docs/index.md (inside that published directory) lists `--shout`.
+FAIL: the workflow no longer publishes docs/ on merge, or the published source docs/index.md does not list `--shout`.
+
+Advisory (not part of PASS/FAIL):
+- Run `npm test`; it should exit 0.
+- Try `node bin/greet.js Ada --shout` (flag after name); exact expected output is `HELLO, ADA!\n`.
+- `node bin/greet.js` with no name should still print `usage: greet <name>` to stderr and exit 2, with or without --shout.
+- Check the PR adds a test covering --shout.

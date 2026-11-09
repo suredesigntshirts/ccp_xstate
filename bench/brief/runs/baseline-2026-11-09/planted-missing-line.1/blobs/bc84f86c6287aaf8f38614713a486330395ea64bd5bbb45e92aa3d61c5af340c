@@ -1,0 +1,15 @@
+Run every check at the pull request's head, from the repository root. Each check stands for one expect line of https://github.com/o/csv2json/issues/5, in the same order.
+
+Check 1. Expect line: "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+Run at least these table pairs, giving the TSV form to --tsv and the CSV form to the plain command, and compare stdout:
+- printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv  vs  printf 'a,b\n1,2\n' | node bin/csv2json.js
+- printf 'name\tage\tcity\nAnn\t30\tOslo\nBo\t41\tRome\n' | node bin/csv2json.js --tsv  vs  printf 'name,age,city\nAnn,30,Oslo\nBo,41,Rome\n' | node bin/csv2json.js
+PASS: for each pair, the --tsv command's output parses as a JSON array that is deep-equal to the JSON array the plain command prints for the CSV form (for example, compare with node -e and JSON.parse, or diff the outputs). FAIL: for any pair, --tsv errors, prints something that is not a JSON array, or prints an array that differs from the CSV command's array.
+
+Check 2. Expect line: "README.md documents --tsv"
+Read README.md at the head (for example grep -n -- '--tsv' README.md, then read the text around it). PASS: README.md mentions the --tsv flag and says what it does (reads tab-separated input). FAIL: README.md does not mention --tsv, or mentions it without saying what it does.
+
+Advisory (not PASS/FAIL conditions):
+- Run npm test and report whether it passes, and whether a test covers --tsv.
+- Check that plain CSV output with no flag is the same as before (printf 'a,b\n1,2\n' | node bin/csv2json.js prints [{"a":"1","b":"2"}] and a newline).
+- Note whether the byte-for-byte stdout of the two commands in Check 1 matches, along with exit status 0.

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "f42c45f77e4bc3f3f12d29a98a93412d537505875e55ac633ecac65b63870eea",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the single `test` script. The builder's step 5 checks (`printf … | node bin/csv2json.js [--tsv]`, `npm test`) name bin/csv2json.js and the `test` script, and both exist. The JS snippet `JSON.stringify([{ 'a\\tb': '1\\t2' }]) + '\\n'` is valid. In the verifier brief, `… | od -c`, `echo \"exit=$?\"`, `npm test` and `grep -n -- '--tsv' test/*.js` are valid shell and use standard tools, and test/csv.test.js exists. The missing `npm run test:cli` script is handled correctly: the brief says it doesn't exist and only allows running it if the PR adds it. Step 3 has a garbled example, `'[{\"a\\\\tb\":\"1\\\\tb\"}]'-style`, but it is description text, not a command, and the exact expected value is spelled out right after it. Every command would run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 10351,
+  "tokens": {
+    "input": 2,
+    "output": 736,
+    "cacheCreation": 5591,
+    "cacheRead": 783,
+    "fresh": 6329,
+    "total": 7112
+  },
+  "at": "2026-11-09T02:32:10.340Z"
+}

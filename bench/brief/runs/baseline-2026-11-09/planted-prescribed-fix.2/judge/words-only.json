@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "7d6f97a8ba7e83511eea8c31a621fcb9f4086a20df3c2898a7267fa75aec4f43",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 passes if loadConfig on invalid JSON \"does not throw, and it prints `{}`\". It fails if the call throws, \"returns something other than an empty object\", or \"loadConfig is missing from src/config.js\". The line's words \"catches the JSON.parse error and returns {}\" require each of these. Allowing stderr output keeps the check from being stricter than the line. The step that checks for a try/catch says \"(or similar)\", which matches the word \"catches\". Check 2 passes only on no failing tests and exit 0, which is exactly \"npm test passes\". Everything stricter is listed under Advisory: valid JSON still parsing, a missing file throwing ENOENT, the replaced test, the README, app behaviour and naming the broken file. None of it is in a PASS or FAIL condition. The criterion holds for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 8265,
+  "tokens": {
+    "input": 2,
+    "output": 718,
+    "cacheCreation": 2864,
+    "cacheRead": 783,
+    "fresh": 3584,
+    "total": 4367
+  },
+  "at": "2026-11-09T02:34:57.175Z"
+}

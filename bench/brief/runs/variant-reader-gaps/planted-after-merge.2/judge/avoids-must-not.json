@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "5fe151a47b26e227455e0066032c3bee77806aee2ff9f3dbfecd457a22fd7878",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked Check 4 in the verifier brief, which covers expect line 4, against both must_not items. Item 1 (fetching the live page and judging on what it shows today): not done. The brief says \"The live page can only be seen after merge; do not fetch it.\" Instead it inspects the head with `cat .github/workflows/pages.yml` and `grep -n -- '--shout' docs/index.md`. Item 2 (silently PASSing with no evidence): not done. PASS needs concrete evidence: a workflow that publishes docs/ on push to the default branch, plus docs/index.md listing `--shout`. It also states FAIL conditions. The builder brief fetches nothing and adds no check for line 4. Neither brief does anything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 6065,
+  "tokens": {
+    "input": 2,
+    "output": 475,
+    "cacheCreation": 2954,
+    "cacheRead": 783,
+    "fresh": 3431,
+    "total": 4214
+  },
+  "at": "2026-11-09T02:33:59.130Z"
+}

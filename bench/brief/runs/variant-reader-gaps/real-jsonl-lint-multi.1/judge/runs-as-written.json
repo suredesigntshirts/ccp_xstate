@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "158bb6b46c1a6c1728094a86de300838b4ab6e9b65dc5877bd9e9a749997110e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. Everything they name exists at this commit: packages/jsonl-lint/bin/jsonl-lint.js, the test files, the README, package-lock.json (needed for `npm ci`) and the root and package `npm test` scripts. The setup's printf strings have no % signs, so the fixtures are written as intended and later commands only use files it creates. The checks use only standard shell: `; echo \"exit=$?\"`, `2>/tmp/jv104/err.txt`, pipes and `cd packages/jsonl-lint && node --test 2>&1 | tail -40`. The gh calls use real flags and JSON fields (number, headRefOid, files, body, url) and a valid search. The trailing `--` in `gh pr diff <number> ... --` is harmless, and `<number>` is plainly a placeholder. On the JavaScript side, `readFileSync(0, 'utf8')`, `process.argv.slice(2)` and spawnSync's `input` option are all valid Node. Every command would run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 12469,
+  "tokens": {
+    "input": 2,
+    "output": 1001,
+    "cacheCreation": 6279,
+    "cacheRead": 783,
+    "fresh": 7282,
+    "total": 8065
+  },
+  "at": "2026-11-09T02:36:53.060Z"
+}

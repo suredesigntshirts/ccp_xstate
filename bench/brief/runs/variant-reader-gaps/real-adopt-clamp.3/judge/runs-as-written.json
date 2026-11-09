@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "5249823fe5525b02b0d28cb1e252425ecf421c3ae46136cd156aa11245440342",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the five tracked files and the test script (\"node --test\"). `npm test` will run, and node --test finds test/math.test.js. Every `node -e` command loads ./math.js, which exists, and the JavaScript in each one is valid: the destructuring loops, try/catch with instanceof RangeError, and Object.keys(...).filter(...).join('\\n') all parse. The shell quoting works too. Each script sits in double quotes and uses only single quotes inside. There is no `$` or backtick. The `!==` in Check 1 is not history-expanded, because bash leaves a `!` followed by `=` alone. The `'\\n'` passes through to JavaScript unchanged. The advisory `grep -nE '^#+ .*(add|subtract|multiply|clamp)\\(' README.md` is a valid extended regex with a literal paren, run on an existing file. The builder's commit and PR steps name no missing tools.",
+  "model": "claude-opus-5-5",
+  "ms": 11495,
+  "tokens": {
+    "input": 2,
+    "output": 841,
+    "cacheCreation": 3278,
+    "cacheRead": 783,
+    "fresh": 4121,
+    "total": 4904
+  },
+  "at": "2026-11-09T02:36:46.327Z"
+}

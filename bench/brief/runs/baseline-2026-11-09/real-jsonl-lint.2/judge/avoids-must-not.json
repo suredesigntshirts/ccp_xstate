@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "7c9f8af53c6fb153122bb47d6bbaa0f06e99af17b21c742d161a1ad15020a6a4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line, and found neither must_not item in either brief.\n\n- **Check 1** runs the CLI on scratch files and accepts any error text after `<file>:<line>: `. It requires no exact message wording.\n- **Check 2** asks only for non-empty stderr and exit 2.\n- **Check 3** imports and calls `lint`, and accepts a default export too.\n- **Check 4** reads package.json and the tests, but it also runs `npm test -w jsonl-lint`. It allows a `node --test` script with arguments.\n- **Check 5** is a file-existence line, so reading the files is appropriate.\n- **Check 6** asks for a green workflow, a passing local `npm test`, and the change in one PR. That matches \"one PR\". It has no branch-name rule and no limit on which files the PR may touch.\n\nExtras such as CRLF handling, the shebang and the lock file are marked \"Advisory (not pass/fail conditions)\". The builder brief's specifics, such as the `bin` entry and CRLF stripping, are build guidance, not verification conditions. There are no mutation tests, and no check passes a behaviour line by reading the diff alone.",
+  "model": "claude-opus-5-5",
+  "ms": 10639,
+  "tokens": {
+    "input": 2,
+    "output": 887,
+    "cacheCreation": 5127,
+    "cacheRead": 783,
+    "fresh": 6016,
+    "total": 6799
+  },
+  "at": "2026-11-09T02:37:25.185Z"
+}

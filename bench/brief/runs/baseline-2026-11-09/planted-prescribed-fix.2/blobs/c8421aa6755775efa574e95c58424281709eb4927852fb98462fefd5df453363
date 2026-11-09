@@ -1,0 +1,20 @@
+Check the pull request's head for issue https://github.com/o/settings/issues/31. Run one check per acceptance line, in the order below. Run everything from the repository root at the head.
+
+Check 1. Line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+- Read src/config.js. Confirm loadConfig(path) is exported from it and that the JSON.parse call is inside a try/catch (or similar) whose handler returns {}.
+- Run it. Write a file with invalid JSON, for example `printf '{port: 9000' > /tmp/bad.json`, then run: `node --input-type=module -e "import {loadConfig} from './src/config.js'; const r = loadConfig('/tmp/bad.json'); console.log(JSON.stringify(r));"`
+- PASS: the call does not throw, and it prints `{}`. It may also write a message to stderr.
+- FAIL: the call throws (a SyntaxError or any other error), returns something other than an empty object, or loadConfig is missing from src/config.js.
+
+Check 2. Line: "npm test passes"
+- Run `npm install` if package.json lists any dependencies, then run `npm test`.
+- PASS: the run finishes with no failing tests and exit status 0.
+- FAIL: any test fails, or the command exits with a nonzero status.
+
+Advisory (does not affect PASS or FAIL):
+- Check that valid JSON still parses: `loadConfig` on a file containing `{"port": 9000}` should return { port: 9000 }.
+- Check that a missing file still throws (ENOENT). The line only covers the JSON.parse error.
+- Check that the old 'bad JSON throws' test in test/config.test.js was replaced by a test expecting {}, not just deleted.
+- Check whether README.md still says invalid JSON causes exit 1.
+- Check whether `node src/app.js /tmp/bad.json` now prints `listening on 8080`.
+- Note whether the PR tells the user which file failed to parse. The issue body asks for that, but no acceptance line requires it.

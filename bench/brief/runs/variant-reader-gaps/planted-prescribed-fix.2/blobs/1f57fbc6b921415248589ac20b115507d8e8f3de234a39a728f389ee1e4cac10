@@ -1,0 +1,13 @@
+Make one pull request for issue https://github.com/o/settings/issues/31 that meets both acceptance lines:
+- loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead
+- npm test passes
+
+Context: src/config.js currently does `return JSON.parse(readFileSync(path, 'utf8'));`. src/app.js wraps loadConfig in try/catch, prints `bad config: <message>` and exits 1; README.md documents that behaviour. test/config.test.js has a test 'bad JSON throws' that asserts a SyntaxError, which conflicts with the new behaviour.
+
+Steps:
+1. In src/config.js, keep reading the file with readFileSync outside the try (a missing or unreadable file should still throw as before; only the parse error is caught). Wrap only the JSON.parse call in try/catch. In the catch, return {}.
+2. The issue says people can't tell which file is broken or where, so the {} return must not be silent: in the catch, write one line to stderr that names the path and includes the parse error's message (Node's SyntaxError message carries the position), e.g. `process.stderr.write(`bad config in ${path}: ${error.message}\n`)`. Do not rethrow.
+3. Update test/config.test.js: replace 'bad JSON throws' with a test that loadConfig on a file containing `{port: 9000` returns a value deepEqual to {} (and does not throw). Keep 'reads a config'. Optionally add a test that a missing file still throws.
+4. Leave src/app.js working: with {} returned it falls back to DEFAULTS. Its existing try/catch can stay for read errors. Update README.md so it no longer says invalid JSON stops the app with exit 1; say it prints a warning naming the file and the parse error and starts with the defaults.
+5. Run `npm test` from the repository root and make sure every test passes. Also run `node src/app.js <a file with bad JSON>` once to see the warning line on stderr and `listening on 8080` on stdout.
+6. Commit and open the pull request referencing issue #31.

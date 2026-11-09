@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "42679aea955fabf8fd252fcd1f9556d7b2e9022a9b09d959d7c98b88f72d961a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each PASS and FAIL condition in the verifier brief against the words of its expect line. Check 2's conditions (\"mentions --tsv as a flag of the CLI\") stay within \"README.md documents --tsv\". The extra items are correctly placed under Advisory.\n\nCheck 1 breaks the criterion. The expect line only requires that the --tsv output be \"the same JSON array\" that the CSV run prints. The PASS condition adds \"with one object per data row\", and the script enforces it with `arr.length!==rows.length-1` → FAIL. That row-count rule is a separate requirement on the output's shape. If the CSV path printed something with a different shape and --tsv matched it exactly, the expect line would be met but the check would fail. Because this stricter test is in a PASS/FAIL condition instead of under Advisory, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 8138,
+  "tokens": {
+    "input": 2,
+    "output": 695,
+    "cacheCreation": 2738,
+    "cacheRead": 783,
+    "fresh": 3435,
+    "total": 4218
+  },
+  "at": "2026-11-09T02:34:50.217Z"
+}

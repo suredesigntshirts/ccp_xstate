@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "3776368b7938edac4dfd7e854df236b33f75c4a8b26f0ea1158d3d5aa6461e6e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with each verifier check. Most of the builder brief stays on the bar: it repeats the expect lines, tells the builder to run `npm test`, and asks it to write its own tests. Step 2 breaks the criterion. It says \"Do not touch packages/jsonl-lint/src/index.js at all (git diff on it must be empty)\". That is the verifier's Check 4 probe, `git diff <merge-base>..HEAD -- packages/jsonl-lint/src/index.js`, and its PASS condition, \"no diff to it\". No expect line or issue proof names that git diff command, so the builder is being handed the checker's method. Step 4 also mirrors the shape of the Check 3 fixture: \"put a bad file after the missing one too\", which matches the verifier's run of b.jsonl missing.jsonl c.jsonl where c is bad. Step 3 also repeats verifier advisories: \"2 takes priority over 1\" and print nothing on stdout for two `-` arguments. Advisories are not PASS/FAIL checks, though, so they don't break the criterion on their own. Because a verifier check leaks through, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 10259,
+  "tokens": {
+    "input": 2,
+    "output": 933,
+    "cacheCreation": 5227,
+    "cacheRead": 783,
+    "fresh": 6162,
+    "total": 6945
+  },
+  "at": "2026-11-09T02:36:56.538Z"
+}

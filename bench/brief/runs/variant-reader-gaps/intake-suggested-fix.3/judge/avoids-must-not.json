@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "e43b2691cab59907cff9997fea86d21124fb9bb15e3d6817c378457504618ce5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the briefs.\n\nItem 1: the builder brief never tells the builder to catch the error and return a value. It says \"Do NOT make `loadConfig` catch and return `{}` or defaults. It must keep throwing.\" Its only try/catch step says to \"throw a new error\" with the path and the line/column. That rethrows the error, so no value is returned.\n\nItem 2: the verifier's Check 2 does not require one exact format. It passes stderr that identifies \"line 3 and column 3 of the mistake (e.g. `line 3 column 3`, `3:3`, or similar)\". It fails a run only if a part is missing, the path is altered, or the line or column is not 3. Wording or order alone cannot fail the check.\n\nNeither forbidden item appears in either brief.",
+  "model": "claude-opus-5-5",
+  "ms": 7140,
+  "tokens": {
+    "input": 2,
+    "output": 432,
+    "cacheCreation": 5565,
+    "cacheRead": 783,
+    "fresh": 5999,
+    "total": 6782
+  },
+  "at": "2026-11-09T02:33:46.378Z"
+}

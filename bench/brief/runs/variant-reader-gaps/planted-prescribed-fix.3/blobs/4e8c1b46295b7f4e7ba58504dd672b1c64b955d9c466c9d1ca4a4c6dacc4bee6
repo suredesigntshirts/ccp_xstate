@@ -1,0 +1,18 @@
+Run every command from the repository root at the pull request head. Run `npm install` first only if package.json at the head has dependencies (currently it has none).
+
+Check 1 — "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Read src/config.js, then run:
+`node --input-type=module -e "import {mkdtempSync,writeFileSync} from 'node:fs'; import {tmpdir} from 'node:os'; import {join} from 'node:path'; import {loadConfig} from './src/config.js'; const f=join(mkdtempSync(join(tmpdir(),'cfg-')),'config.json'); writeFileSync(f,'{port: 9000'); const r=loadConfig(f); console.log('RESULT', JSON.stringify(r));"`
+PASS: src/config.js exports loadConfig(path) which handles the JSON.parse error (src/config.js catches it), and the command prints `RESULT {}` without an uncaught error.
+FAIL: the command throws (e.g. SyntaxError), or prints anything other than `RESULT {}` for the result, or loadConfig no longer lives in src/config.js.
+
+Check 2 — "npm test passes"
+Run: `npm test`
+PASS: the test run reports no failing tests (fail 0) and completes successfully.
+FAIL: any test fails or the run errors.
+
+Advisory (not pass/fail conditions):
+- Confirm valid JSON still parses: same script as Check 1 with content '{"port": 9000}' should print `RESULT {"port":9000}`.
+- Ideally a missing file still throws (readFileSync outside the catch), e.g. loadConfig('/nonexistent/config.json') throws ENOENT; flag it if all errors are swallowed.
+- test/config.test.js should no longer contain a test asserting bad JSON throws; ideally a test asserts bad JSON returns {}.
+- README.md previously said invalid JSON stops the app with `bad config:` and exit 1; note if it was not updated to match the new behaviour (`node src/app.js <bad-file>` now prints `listening on 8080`).

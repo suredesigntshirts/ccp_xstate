@@ -1,0 +1,12 @@
+Add a --shout flag to the greet CLI (issue https://github.com/o/greet-cli/issues/12).
+
+Context: bin/greet.js takes the first argument that does not start with `--` as the name and prints `greeting(name)` from src/greet.js (`Hello, <name>!`) followed by a newline. docs/index.md is the docs page; .github/workflows/pages.yml publishes the docs/ directory to GitHub Pages on push to main, so whatever docs/index.md contains is what https://o.github.io/greet-cli/ shows after merge.
+
+Steps:
+1. In bin/greet.js, detect `--shout` in `process.argv.slice(2)`. When it is present, print the greeting in upper case (e.g. `node bin/greet.js --shout Ada` prints `HELLO, ADA!` and a newline). Name detection must still skip `--shout`, so the name is found whether the flag comes before or after it.
+2. Without --shout, leave the output exactly as it is now (`node bin/greet.js Ada` prints `Hello, Ada!` and a newline), and keep the existing usage error when no name is given.
+3. Update docs/index.md to document --shout: show the usage `node bin/greet.js --shout <name>` and say it prints the greeting in upper case (e.g. `HELLO, <NAME>!`). Keep the existing usage text.
+4. Add tests in test/greet.test.js: one that runs `node bin/greet.js --shout Ada` and expects `HELLO, ADA!\n`, and keep the existing test that the output without the flag is `Hello, Ada!\n`.
+5. Run `npm test` and make sure all tests pass.
+6. Leave .github/workflows/pages.yml unchanged so it keeps publishing docs/ on push to main.
+7. Open one pull request with these changes that references issue #12.

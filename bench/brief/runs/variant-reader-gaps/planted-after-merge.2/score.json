@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.2",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4 not quoted word for word in the builder brief: \"node bin/greet.js --shout <name> prints the greeting in upper case\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each of the four verifier checks against its expect line. Check 1's PASS asks only that the output is the greeting for Ada in upper case (\"HELLO, ADA!\"), and its FAIL is the reverse. Check 2 compares `node bin/greet.js Ada` with the original `Hello, Ada!`. The git diff is optional context; \"the test is the program's output.\" Check 3 asks that docs/index.md \"mentions `--shout` and describes what it does,\" which is what \"documents\" means. Check 4 can't fetch the live page, so it checks what the head will publish: the workflow still publishes docs/ on merge, and docs/index.md lists `--shout`. The expect line needs both of those, so this is not stricter than its words. The stricter items are all under \"Advisory (not part of PASS/FAIL)\": npm test, the flag after the name, the usage error, and the test-coverage check. No PASS or FAIL condition goes beyond what its expect line's words require.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each command in both briefs against the tracked files and package.json. `node bin/greet.js --shout Ada`, `node bin/greet.js Ada`, `cat docs/index.md`, `cat .github/workflows/pages.yml` and the advisory node runs all name files that exist at this commit. `npm test` maps to the existing script \"node --test\". `grep -n -- '--shout' docs/index.md` uses `--` correctly so grep does not read `--shout` as an option. `git show HEAD~0:bin/greet.js` and `git diff $(git merge-base HEAD origin/HEAD) HEAD -- bin/greet.js` are valid git syntax. The second depends on origin/HEAD, which comes from how the repo was cloned rather than from this commit, and the brief marks it optional (\"if needed\"). Shell syntax is valid throughout, and no named tool or file is missing.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 is met. Check 4 says \"The live page can only be seen after merge; do not fetch it.\" It then checks pages.yml, which publishes docs/, and greps docs/index.md for --shout at the head. Item 2 is not met. Check 2's PASS line compares `node bin/greet.js Ada` only to the hand-written string `Hello, Ada!`: \"the same as before the change (`Hello, Ada!`)\". The git diff against the merge base is optional and only \"to understand the change, but the test is the program's output.\" The base commit's bin/greet.js is never run to get the real pre-change output, so the comparison rests only on a hand-written expected string.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked Check 4 in the verifier brief, which covers expect line 4, against both must_not items. Item 1 (fetching the live page and judging on what it shows today): not done. The brief says \"The live page can only be seen after merge; do not fetch it.\" Instead it inspects the head with `cat .github/workflows/pages.yml` and `grep -n -- '--shout' docs/index.md`. Item 2 (silently PASSing with no evidence): not done. PASS needs concrete evidence: a workflow that publishes docs/ on push to the default branch, plus docs/index.md listing `--shout`. It also states FAIL conditions. The builder brief fetches nothing and adds no check for line 4. Neither brief does anything on the must_not list.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The criterion is not met: the builder brief contains probes that also appear in the verifier brief. Step 1 gives the exact input and output from verifier Check 1: \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\". It also gives the without-flag output from Check 2 (\"`Hello, Ada!` plus newline\"). Step 1 further requires that the flag work \"before or after the name\" and that the missing-name usage error stay the same, which matches the verifier's advisory probes (`node bin/greet.js Ada --shout` → `HELLO, ADA!\\n`, and the usage/exit-2 check). Step 3 again sets the test to run `node bin/greet.js --shout Ada` and expect `HELLO, ADA!\\n`. Writing its own tests is allowed, but here the brief hands the builder the verifier's own test cases. That gives away the checks, not just the bar.",
+      "cached": false
+    }
+  }
+}

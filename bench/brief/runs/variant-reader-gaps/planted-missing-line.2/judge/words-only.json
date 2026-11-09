@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "55cf8cb2c3de5922618e78cfdfde7112fe7bdd974fc1468e229d7eeb914d6e31",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 passes when the --tsv run \"prints a JSON array that is the same as the array the plain CSV run prints\". The name/age/city values in brackets are just what the given input produces, not an extra requirement. The FAIL cases (it errors, ignores the tabs, or the arrays differ) all break \"reads tab-separated input… prints the same JSON array\". Check 2 asks that README \"mentions the --tsv flag and explains it\". That matches \"documents\": a bare mention that doesn't say what the flag does is not documentation. Everything stricter is under \"Advisory (not pass/fail conditions)\": npm test, test coverage, unchanged output without the flag, and the comma-in-cell case. No PASS or FAIL condition requires exact wording, a mutation test, or a branch or file-scope rule.",
+  "model": "claude-opus-5-5",
+  "ms": 8519,
+  "tokens": {
+    "input": 2,
+    "output": 587,
+    "cacheCreation": 2657,
+    "cacheRead": 783,
+    "fresh": 3246,
+    "total": 4029
+  },
+  "at": "2026-11-09T02:34:59.166Z"
+}

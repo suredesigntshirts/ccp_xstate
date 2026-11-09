@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.3",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 tests only that clamp is exported and returns x limited to lo..hi; every case, including the boundaries and lo===hi, follows from those words. Check 2 tests only that calls with lo>hi throw a RangeError. Check 3 requires an entry for each exported function that \"names it and describes what it does\", which is a fair reading of \"documents\". The note \"(expect at least add, subtract, multiply, clamp)\" is a hint about what the command will print, not an extra test. Check 4 is just \"no failing tests\". The stricter items are all under \"Advisory\": the grep screen, placement under \"## API\", mentioning RangeError in the README, exit status 0, added clamp tests and the error message wording. No PASS or FAIL condition goes beyond its expect line.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the five tracked files and the test script (\"node --test\"). `npm test` will run, and node --test finds test/math.test.js. Every `node -e` command loads ./math.js, which exists, and the JavaScript in each one is valid: the destructuring loops, try/catch with instanceof RangeError, and Object.keys(...).filter(...).join('\\n') all parse. The shell quoting works too. Each script sits in double quotes and uses only single quotes inside. There is no `$` or backtick. The `!==` in Check 1 is not history-expanded, because bash leaves a `!` followed by `=` alone. The `'\\n'` passes through to JavaScript unchanged. The advisory `grep -nE '^#+ .*(add|subtract|multiply|clamp)\\(' README.md` is a valid extended regex with a literal paren, run on an existing file. The builder's commit and PR steps name no missing tools.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each must_catch item against the briefs. Item 1: builder step 3 says \"subtract is exported but currently NOT documented in the README: add a '### subtract(a, b)' entry\", and it also adds a clamp entry. Item 2: verifier Check 3 prints the exported functions (\"expect at least add, subtract, multiply, clamp\") and says FAIL if \"any exported function, e.g. subtract or clamp, is not documented\". Item 3: verifier Check 2 calls clamp with lo greater than hi ([5,10,0] and others) and tests `e instanceof RangeError`. It FAILs if a call \"throws something that is not a RangeError\". All three items are handled.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Criterion met: the briefs do neither thing on the must_not list.\n\nItem 1: Check 3 lists every exported function and fails if \"any exported function, e.g. subtract or clamp, is not documented in README.md\". A README that documents clamp but not subtract therefore fails.\n\nItem 2: no PASS or FAIL condition is stricter than its expect line.\n- Check 1 only needs an exported clamp function with correct limiting results.\n- Check 2 only needs a RangeError. It doesn't check the error message.\n- Check 3 needs \"an entry that names it and describes what it does\", not a particular layout.\n- Check 4 only needs the tests to pass.\n\nThe stricter points (the grep for headings, entries under \"## API\", the message naming lo and hi, exit status 0) all sit under \"Advisory (not pass/fail conditions)\". The builder's \"e.g.\" message and the style guidance are suggestions, not gates.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief's probes, and the builder brief breaks the criterion. Step 2 tells the builder to test exactly these inputs and results: \"clamp(-5, 0, 100) === 0\", \"clamp(140, 0, 100) === 100\", \"clamp(42, 0, 100) === 42\" and \"assert.throws(() => clamp(5, 10, 0), RangeError)\". The same inputs and results appear in the verifier's probes, as the Check 1 cases [-5,0,100,0], [140,0,100,100] and [42,0,100,42], and as the Check 2 case [5,10,0]. Writing its own tests is allowed, but these are the checker's own inputs with expected outputs. Step 4 also gives the builder `node -e \"...Object.keys(m)...\"` to check README coverage. That is nearly the same as the Check 3 probe command, and no expect line or the issue names it. So the builder is handed the checker's methods, not just the bar.",
+      "cached": false
+    }
+  }
+}

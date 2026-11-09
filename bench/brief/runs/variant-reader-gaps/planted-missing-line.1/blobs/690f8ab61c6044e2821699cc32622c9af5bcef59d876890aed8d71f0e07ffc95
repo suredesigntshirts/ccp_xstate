@@ -1,0 +1,17 @@
+Run every check at the pull request head, from the repository root.
+
+Check 1. Expect line: "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+Run this command, which compares the two outputs for several tables:
+node -e "const {execFileSync:x}=require('child_process');const t=[[['a','b'],['1','2']],[['name','age','city'],['ann','30','oslo'],['bob','41','rome']],[['x'],['1'],['2']]];let ok=true;for(const rows of t){const csv=rows.map(r=>r.join(',')).join('\n')+'\n';const tsv=rows.map(r=>r.join('\t')).join('\n')+'\n';const c=x('node',['bin/csv2json.js'],{input:csv,encoding:'utf8'});const s=x('node',['bin/csv2json.js','--tsv'],{input:tsv,encoding:'utf8'});const arr=JSON.parse(s);console.log(JSON.stringify(c),JSON.stringify(s));if(c!==s||!Array.isArray(arr)||arr.length!==rows.length-1)ok=false;}console.log(ok?'PASS':'FAIL')"
+PASS: for every table, `node bin/csv2json.js --tsv` on the tab-separated input prints a JSON array that is the same as what `node bin/csv2json.js` prints for the same table as CSV, with one object per data row. The script prints PASS.
+FAIL: for any table, the --tsv output differs from the CSV output or is not that JSON array (for example, a tab-joined row is left as a single key), or the command errors. The script prints FAIL or throws.
+
+Check 2. Expect line: "README.md documents --tsv"
+Run: grep -n -- '--tsv' README.md
+Then read README.md around the lines it finds.
+PASS: README.md mentions --tsv as a flag of the CLI.
+FAIL: grep finds nothing, or README.md never describes --tsv as part of the tool's use.
+
+Advisory (not pass/fail conditions):
+- Run `npm test` at the head and note whether it passes, and whether a test for --tsv was added.
+- Note whether CSV output with no flag is unchanged; the existing 'cli' test covers this.

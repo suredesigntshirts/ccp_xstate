@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "51a8c358534c42ca80952a9fcd24221beb40404ab573084b7f9e0d967b881a03",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. Most of them run as written. The bin, the test files and the README all exist, the shell quoting in checks 1–3 is valid, `npm test` works at the root, and the workspace script is `node --test`.\n\nTwo verifier commands would not run as written:\n- Check 6 uses `gh pr view <PR> ...` and `gh pr checks <PR> ...`. In bash, `<PR>` is parsed as an input redirect from a file named `PR`. That breaks the command or fails with \"No such file\", and no earlier step creates a PR number to put in its place.\n- Check 5 runs `node --test packages/jsonl-lint/test/`. Since Node 21, `--test` treats its arguments as glob patterns, and a bare directory path gives \"Could not find\" instead of running the tests inside it. So this argument doesn't fit current Node.\n\nThe builder brief's commands are fine.",
+  "model": "claude-opus-5-5",
+  "ms": 14118,
+  "tokens": {
+    "input": 2,
+    "output": 1156,
+    "cacheCreation": 5587,
+    "cacheRead": 783,
+    "fresh": 6745,
+    "total": 7528
+  },
+  "at": "2026-11-09T02:37:04.545Z"
+}

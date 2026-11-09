@@ -1,0 +1,16 @@
+Goal: one pull request that adds padLeft to strutil, documents it, and meets every line below.
+
+Acceptance lines (all must hold at the PR head):
+1. index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+2. padLeft returns s unchanged when s is already width characters or longer
+3. README.md has a section for every function index.js exports
+4. npm test passes
+
+Current state: index.js is an ES module (package.json has "type": "module") and exports capitalize, slugify and truncate. README.md has `## name(args)` sections for capitalize and truncate only. slugify has no section yet, so line 3 is already unmet before your change. Tests are in test/strutil.test.js and run with `node --test` through `npm test`.
+
+Steps:
+1. In index.js, add and export `padLeft(s, width, fill = ' ')` with a short doc comment like the existing ones. It returns s padded on the left with fill until it is width characters long (for example padLeft('42', 5, '0') === '00042' and padLeft('ab', 4) === '  ab'). When s.length >= width it returns s unchanged. `String.prototype.padStart` does this. Do not change the other functions.
+2. In README.md, add a `## padLeft(s, width, fill)` section that says what it does, that fill defaults to a space, and that s comes back unchanged when it is already width or longer. Also add the missing `## slugify(s)` section (it returns s trimmed, in lower case, with runs of non-alphanumeric characters turned into single dashes and no dashes at the start or end). Keep the existing sections. When you are done, every function exported from index.js must have its own section.
+3. In test/strutil.test.js, import padLeft and add tests for: padding with '0' ('42', 5 -> '00042'), the default space fill, s exactly width long, and s longer than width (both unchanged).
+4. Run `npm test` and make sure it passes. Then list the exports in index.js and confirm that each one has a README.md section.
+5. Open the pull request and link https://github.com/o/strutil/issues/7.

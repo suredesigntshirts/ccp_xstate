@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "5bc2c22064068c733d23b200d093e5726de4c14fef54f4e08b46a1d2235fbc86",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line. Checks 1 to 3 run the program, so must_not 2 is avoided. Check 5 reads the test files, but line 5 is not a behaviour line, so that is allowed. The builder brief's exact message wording is a build instruction, not a pass condition. Check 3 breaks must_not 1. Its PASS says \"stderr holds an error that mentions nope.jsonl\", and its FAIL fires if \"the read error does not appear on stderr\". Expect line 3 only asks for an \"error on stderr\". It does not say the message must name the unreadable file. Requiring the file name is a rule on what stderr says, stricter than the line, of the same kind as the forbidden \"exact stderr wording\" rule. A correct build whose stderr error leaves out the file name would fail Check 3.",
+  "model": "claude-opus-5-5",
+  "ms": 12705,
+  "tokens": {
+    "input": 2,
+    "output": 918,
+    "cacheCreation": 4797,
+    "cacheRead": 783,
+    "fresh": 5717,
+    "total": 6500
+  },
+  "at": "2026-11-09T02:36:39.736Z"
+}

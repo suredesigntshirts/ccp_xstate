@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "79e95da70d474ba6d6bf15270879262d8f57e7077a9ab49fc81971a026da03db",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both briefs against the two must_not items. (1) Verifier Check 6 bases PASS/FAIL on `npm test; echo \"exit=$?\"` and the grep plus reading of the test, not on `npm run test:cli`. The only mention of test:cli is in the Advisory section, which is explicitly \"not part of PASS or FAIL\". The builder brief asks for a test:cli script, but that is a builder step, not a verifier check. (2) The builder brief never asks for a general separator option. It says \"Do not add --help, --sep/--delimiter, auto-detection...\" and only adds the --tsv check on process.argv. Neither forbidden item appears anywhere in the output.",
+  "model": "claude-opus-5-5",
+  "ms": 4876,
+  "tokens": {
+    "input": 2,
+    "output": 365,
+    "cacheCreation": 5460,
+    "cacheRead": 783,
+    "fresh": 5827,
+    "total": 6610
+  },
+  "at": "2026-11-09T02:33:00.956Z"
+}

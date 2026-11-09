@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "2b5f422e09b3b795bfd10921f78e0e399c72938e147bf1d4cd520e8f28f19a8b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 2, 3, 5 and 6 test only what their lines say. Check 1's \"exactly two problem lines\" rule is borderline, but it follows from \"for every row that is not valid JSON\" with \"blank lines skipped\". Check 4 breaks the criterion. Expect line 4 asks only that \"node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes\" exist. Check 4's PASS condition adds that the tests \"pass when run\", and its FAIL condition adds \"the tests fail\". Line 4's words do not require the tests to pass. That requirement belongs to line 6 (\"npm test ... green at its head\"), which Check 6 already covers. So Check 4 has a condition its own expect line does not force, and it is not under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 14592,
+  "tokens": {
+    "input": 2,
+    "output": 1170,
+    "cacheCreation": 5413,
+    "cacheRead": 783,
+    "fresh": 6585,
+    "total": 7368
+  },
+  "at": "2026-11-09T02:37:07.165Z"
+}

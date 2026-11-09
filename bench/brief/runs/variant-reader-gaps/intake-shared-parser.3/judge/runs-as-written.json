@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "d782018c34b9dec1a967abceeee118e163ae4cd8a7c7fd7d3f85cf3dafa1f338",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. They name only bin/csv2json.js, test/*.js, README.md and the `npm test` script, and all of these exist at this commit. The builder's `execFileSync('node', ['bin/csv2json.js', '--tsv'], { input, encoding: 'utf8' })` is valid JavaScript. Its expected string `'[{\"a\\\\tb\":\"1\\\\t2\"}]\\n'` correctly gives backslash-t escapes. In the verifier brief, the printf/cmp lines are valid bash: the `<(...)` process substitution works in bash, which is the shell here. `printf '[{\"a\\\\tb\":\"1\\\\t2\"}]\\n'` prints a literal backslash followed by t, as intended. `> /tmp/c1.out; echo \"exit=$?\"` captures node's exit status. `grep -n -- '--tsv' test/*.js` uses `--` correctly. The missing `npm run test:cli` script is flagged as advisory, and the brief only runs it if the PR adds it, so no command fails as written.",
+  "model": "claude-opus-5-5",
+  "ms": 13175,
+  "tokens": {
+    "input": 2,
+    "output": 836,
+    "cacheCreation": 5663,
+    "cacheRead": 783,
+    "fresh": 6501,
+    "total": 7284
+  },
+  "at": "2026-11-09T02:32:45.263Z"
+}

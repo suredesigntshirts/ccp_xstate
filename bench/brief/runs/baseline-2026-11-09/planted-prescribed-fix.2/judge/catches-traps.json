@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "330591259b67ef7b41491840c185e9acf805badcee7def4eefd27dc41b6bff65",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Items 2 and 3 are covered. Builder step 2 replaces the 'bad JSON throws' test with one that expects `{}`. Verifier Check 1 runs loadConfig on `{port: 9000` and PASSes when it prints `{}` without throwing.\n\nItem 1 is not covered. Neither brief says outright that line 1's fix hides the broken file the issue body wants surfaced. The verifier's Advisory section comes close but stops short: \"Check whether `node src/app.js /tmp/bad.json` now prints `listening on 8080`\" and \"Note whether the PR tells the user which file failed to parse. The issue body asks for that, but no acceptance line requires it.\" The builder brief makes the stderr message optional and has the README updated to say defaults are used. Nowhere does either brief state the conflict: that app.js would start on defaults instead of printing 'bad config', so the fix works against what the issue body asks for. The trap is only hinted at, never flagged as a problem.",
+  "model": "claude-opus-5-5",
+  "ms": 9654,
+  "tokens": {
+    "input": 2,
+    "output": 838,
+    "cacheCreation": 3003,
+    "cacheRead": 783,
+    "fresh": 3843,
+    "total": 4626
+  },
+  "at": "2026-11-09T02:35:17.306Z"
+}

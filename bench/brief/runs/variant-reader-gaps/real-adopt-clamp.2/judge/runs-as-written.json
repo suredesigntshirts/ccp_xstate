@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "70a4513023a0f6f79f7372a72170c2aba24944cb9057d41a9885e2d2953d31c0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1, 2 and 4 run as written. Check 3 breaks. Its node -e script is in double quotes, so bash turns `\\\\b` into `\\b`, `\\\\s` into `\\s` and `\\\\(` into `\\(`. Node then gets `new RegExp('\\b'+n+'\\s*\\(')`. In a JS string, '\\b' is a backspace character, '\\s' is a plain 's' and '\\(' is a plain '('. The pattern ends in an unclosed '(', so new RegExp throws a SyntaxError (unterminated group) before anything prints. The builder brief's steps (edit math.js, README.md and test/math.test.js, then run `npm test`) are fine. Because one verifier command fails as written, the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 13598,
+  "tokens": {
+    "input": 2,
+    "output": 1053,
+    "cacheCreation": 3353,
+    "cacheRead": 783,
+    "fresh": 4408,
+    "total": 5191
+  },
+  "at": "2026-11-09T02:36:24.146Z"
+}

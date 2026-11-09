@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-prescribed-fix.3",
+  "case": "planted-prescribed-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in order, checks numbered 1 to 2"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 2 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both verifier checks. Check 1's PASS asks that src/config.js export loadConfig(path), that it \"catches\" the JSON.parse error, and that the probe prints `RESULT {}`. Its FAIL triggers on a throw, any other output, or loadConfig moving out of src/config.js. Each of these comes straight from the expect line's words: catching the parse error, returning {}, and living in src/config.js. Check 2 passes on \"no failing tests (fail 0) and completes successfully\" and fails on any failed test or run error, which is just what \"npm test passes\" means. The stricter tests sit under \"Advisory (not pass/fail conditions)\": valid JSON still parsing, a missing file still throwing, replacing the old test, and the README update. No PASS or FAIL condition needs a mutation test, a branch or file-scope rule, or exact wording beyond what the lines require.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository facts. `npm test` maps to the existing script `node --test`, and test/config.test.js exists. The Check 1 one-liner is valid as written. The JS inside double quotes uses only single quotes, with no `$` or backticks for the shell to expand. The node:fs, node:os and node:path imports are correct. The relative import './src/config.js' resolves from the repository root when run with --eval. The files it names (src/config.js, src/app.js, README.md, test/config.test.js) are all tracked. The builder's steps only edit existing files and run `npm test`. The weakest spots are in the verifier's advisory notes. The valid-JSON check is described in words, not given as a literal command; pasting '{\"port\": 9000}' straight into the double-quoted script would need its quotes escaped. `node src/app.js <bad-file>` uses a placeholder. Both are advisory and not pass/fail, so no required command breaks.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Items 2 and 3 are handled. Builder step 2 replaces the 'bad JSON throws' test with one checking for {}. Verifier Check 1 writes '{port: 9000' and passes only on `RESULT {}` with no thrown error.\n\nItem 1 is not handled. The briefs do say the behaviour changes: the builder says \"invalid JSON yields {} so the app starts with its defaults\", and a verifier advisory says the app \"now prints `listening on 8080`\". But both treat this only as a README update. Neither brief warns that line 1's fix hides the broken file the issue body asks to surface. Nowhere is it flagged as a conflict with the body's intent, or as a reason to pause or escalate. Instead, the builder is told to keep going and rewrite the README to match.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both briefs against the two must_not items and neither is violated.\n\n1. The verifier's Check 1 PASS asks only that loadConfig catches the JSON.parse error in src/config.js and that the command prints \"RESULT {}\" with no uncaught error. FAIL covers a throw, any other output or loadConfig being moved out of src/config.js. Neither condition asks for a file name, a line number or a logged warning. The extra checks (valid JSON, missing file, tests, README) are marked \"Advisory (not pass/fail conditions)\".\n\n2. The builder brief says \"on a parse error (SyntaxError), return {}\" and tells the builder to replace the test expecting a throw with one that expects {}. Keeping readFileSync outside the catch only affects read errors such as a missing file. It doesn't change what happens on a parse error, and nothing tells the builder to throw a clearer error.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's steps against the verifier's checks. Check 1 of the verifier brief is a probe that writes '{port: 9000' to a file, calls loadConfig and expects `RESULT {}`. Step 2 of the builder brief hands the builder that same input and expected output: \"assert.deepEqual(loadConfig(file('{port: 9000')), {})\". The input comes from the repo's existing test, but the brief still gives the builder the verifier's input/expected-output pair rather than leaving the builder to write its own test. The builder's \"missing file still throws\" also overlaps the verifier's advisory missing-file probe, though advisories aren't pass/fail checks. Telling the builder to run `npm test` (step 4) is allowed. Because the Check 1 input and expected output are shared, the builder brief does carry one of the verifier's probes, so the criterion fails.",
+      "cached": false
+    }
+  }
+}

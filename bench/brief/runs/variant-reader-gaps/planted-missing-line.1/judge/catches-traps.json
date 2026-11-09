@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "c43f83da09244e3d6430f5edf1e70c9ef82fcfbc36e281132ba49c04d4fead21",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and each one is handled.\n\n1. The builder brief says to \"keep the current CSV behaviour exactly as it is: same output, same trailing newline\". It also says \"Keep the existing tests passing\" and \"Run `npm test` and make sure it passes\", even though neither expect line asks for this.\n\n2. The verifier brief puts these points under \"Advisory (not pass/fail conditions)\". It suggests running `npm test` and checking that CSV output is unchanged, as advice only. Neither appears in a PASS or FAIL condition. It doesn't say outright that no expect line covers them, but the \"not pass/fail\" label makes clear they aren't required.\n\n3. Check 1 builds several tables, joins each one as CSV and as TSV, and runs the CLI with and without --tsv. It then compares the two outputs (`c!==s` → FAIL).\n\nSo the criterion holds across the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 12963,
+  "tokens": {
+    "input": 2,
+    "output": 937,
+    "cacheCreation": 2824,
+    "cacheRead": 783,
+    "fresh": 3763,
+    "total": 4546
+  },
+  "at": "2026-11-09T02:35:17.600Z"
+}

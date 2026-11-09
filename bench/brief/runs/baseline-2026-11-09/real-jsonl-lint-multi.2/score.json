@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.2",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file name\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2, 4 and 6 stay within their wording. Check 3 breaks the criterion. Its expect line only says \"error on stderr\", but its PASS condition requires that \"stderr holds an error that mentions nope.jsonl\". The words don't force the error to name the file. That stricter test belongs under Advisory, not in PASS. Check 5 is borderline: it requires the README to document \"`-` for stdin\" when the line only says \"documents the usage\". Because Check 3 adds a requirement the words don't force, the criterion does not hold for the whole output.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "The builder brief's commands run. The verifier brief's don't. It writes \"Let B=packages/jsonl-lint/bin/jsonl-lint.js\" but then runs `node B clean1.jsonl bad.jsonl ...`, `node B -` and `node B` using the bare name B, not `$B`. As written, node would look for a file named B, and none exists in the repository. The brief also says \"Run every command from the repository root\" but puts clean1.jsonl, clean2.jsonl and bad.jsonl \"in a temp dir\". From the root, those relative paths would not resolve, so Checks 1–3 would fail for reasons unrelated to the PR. Other commands are fine: npm ci, npm test, npm test -w packages/jsonl-lint, git diff against the merge base, and gh pr view/checks with the <pr> placeholder.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs handle all four must_catch items.\n1. Verifier Check 3 runs `node B clean1.jsonl nope.jsonl bad.jsonl` and requires exit 2, an error on stderr that mentions nope.jsonl, and \"stdout still has bad.jsonl's bad rows\". That is the missing file and the bad file in one run.\n2. Check 4 runs `git diff $(git merge-base HEAD origin/main) HEAD -- packages/jsonl-lint/src/index.js`. It compares the file at the head with the base commit, and an empty diff passes.\n3. Builder step 4 says to \"Update packages/jsonl-lint/README.md\" with the multi-file usage, what `-` means and the exit codes.\n4. Check 6 reads the PR on GitHub with `gh pr view ... --json body,headRefOid` and `gh pr checks`. It requires the body to contain the Closes line for issue 104 and the `test` workflow to pass \"at the head commit\".",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every verifier PASS/FAIL condition against its expect line. Checks 1 to 3 run the program, so must_not 2 is avoided. Check 5 reads the test files, but line 5 is not a behaviour line, so that is allowed. The builder brief's exact message wording is a build instruction, not a pass condition. Check 3 breaks must_not 1. Its PASS says \"stderr holds an error that mentions nope.jsonl\", and its FAIL fires if \"the read error does not appear on stderr\". Expect line 3 only asks for an \"error on stderr\". It does not say the message must name the unreadable file. Requiring the file name is a rule on what stderr says, stricter than the line, of the same kind as the forbidden \"exact stderr wording\" rule. A correct build whose stderr error leaves out the file name would fail Check 3.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with the verifier brief. The builder brief has none of the verifier's fixtures: no clean1.jsonl, clean2.jsonl or bad.jsonl contents, and no `{bad}` or `{\"torn\":` rows. It also has none of its probe commands (`node B clean1.jsonl nope.jsonl bad.jsonl`, printf pipes, git diff merge-base, gh pr checks) and no PASS/FAIL wording. Its list of test cases and exit codes restates expect lines 3 and 5. The `-:` prefix comes from expect line 2. Both are allowed. The tip \"Include a bad file next to the missing one to prove this\" is a design hint for the builder's own tests and follows from \"other files still checked and reported\". It is not the verifier's exact inputs. \"Do this check before reading anything\" matches only the verifier's non-graded advisory. The only command the two briefs share is `npm test`, which is allowed.",
+      "cached": false
+    }
+  }
+}

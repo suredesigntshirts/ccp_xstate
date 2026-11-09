@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "7fb4efa96833ad8e58b85acfa17c8d7027e515b46a23c51a5b441041050764aa",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with each verifier check. The builder brief does not reuse any of the verifier's own probes. It leaves out Check 3's inline `node --input-type=module` try/catch script and Check 4's `assert.deepEqual` one-liner. It also leaves out Check 5's worktree/base-checkout procedure and every PASS/FAIL condition. Step 5's hand checks are the issue's own proof commands, the c.json `printf … node src/app.js` run and the ok.json run, and the rule allows those. The expected results it gives come from the expect lines, which is the bar. The test requirements say what to test, such as `{port: 9000` throwing with the path in the message, and tell the builder to write its own tests, which is allowed. The worked example (position 20 → line 3, column 3) is implementation guidance and does not appear in the verifier brief. The builder brief carries none of the verifier's checks.",
+  "model": "claude-opus-5-5",
+  "ms": 8630,
+  "tokens": {
+    "input": 2,
+    "output": 749,
+    "cacheCreation": 5578,
+    "cacheRead": 783,
+    "fresh": 6329,
+    "total": 7112
+  },
+  "at": "2026-11-09T02:33:55.009Z"
+}

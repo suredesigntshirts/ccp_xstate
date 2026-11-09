@@ -1,0 +1,30 @@
+Run every command from the repository root at the PR head. Each command below is self-contained.
+
+Check 1 — "node bin/greet.js --shout <name> prints the greeting in upper case"
+Run: `node bin/greet.js --shout Ada`
+The greeting for Ada (without the flag) is `Hello, Ada!`, so its upper case is `HELLO, ADA!`.
+PASS: stdout, ignoring a trailing newline, is `HELLO, ADA!`.
+FAIL: stdout is anything else (e.g. `Hello, Ada!`, mixed case, a usage error, or `--shout` treated as the name).
+
+Check 2 — "without --shout the output is unchanged"
+Run: `node bin/greet.js Ada` and also `git show HEAD:bin/greet.js >/dev/null && node -e "process.stdout.write(JSON.stringify(require('child_process').execFileSync('node',['bin/greet.js','Ada'],{encoding:'utf8'})))"`
+Before this change the CLI printed `Hello, Ada!` followed by a newline (see the existing `cli` test in test/greet.test.js, which expects `Hello, Ada!\n`).
+PASS: `node bin/greet.js Ada` prints exactly `Hello, Ada!` followed by a newline (JSON output `"Hello, Ada!\n"`).
+FAIL: the output differs in any way (case, text, extra or missing characters).
+
+Check 3 — "docs/index.md documents --shout"
+Run: `grep -n -- '--shout' docs/index.md` and read docs/index.md.
+PASS: docs/index.md mentions `--shout` and describes what it does (upper-case / louder greeting).
+FAIL: docs/index.md does not mention `--shout`, or mentions it with no description of its effect.
+
+Check 4 — "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout"
+The live page can only be seen after merge; do not fetch it. Check what the head contains that will produce it.
+Run: `cat .github/workflows/pages.yml` and `grep -n -- '--shout' docs/index.md`
+PASS: .github/workflows/pages.yml still publishes the docs directory to GitHub Pages on push to main (upload-pages-artifact with path docs, then deploy-pages), and docs/index.md at the head lists `--shout`.
+FAIL: the workflow no longer publishes docs/ on push to main, or docs/index.md at the head does not list `--shout`.
+
+Advisory
+- Run `npm test`; all tests should pass, and there should be a test covering `--shout`.
+- Also try `node bin/greet.js Ada --shout` (flag after name) — it should print `HELLO, ADA!`.
+- `node bin/greet.js --shout` with no name should still print the usage error and exit with status 2.
+- Exit status of `node bin/greet.js --shout Ada` should be 0.

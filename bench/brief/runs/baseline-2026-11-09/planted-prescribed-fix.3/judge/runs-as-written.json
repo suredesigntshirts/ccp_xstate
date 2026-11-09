@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "3001e84847c276f91f4d9f0ab3e3864af764c3067325a8156437bfceed7aaded",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands hold up. `npm test` maps to `node --test`. The verifier's `printf … && node --input-type=module -e \"import { loadConfig } from './src/config.js' …\"` is valid shell and JS, and the import resolves from the repository root. Its `printf` commands for the good and bad config files are also fine. One advisory command breaks the criterion: `node src/app.js /tmp/bad-config.json`. Nothing the brief stage reported shows that src/app.js reads a config path from argv. The builder brief describes the failure only as \"exiting 1 on a bad config.json\", which points to a fixed config.json file rather than a command-line argument. The verifier brief's own wording, \"now probably starts on defaults\", shows the command wasn't checked against the program. So that argument isn't shown to fit app.js, and if the app starts a server the command may never exit. Not every command is shown to run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 14656,
+  "tokens": {
+    "input": 2,
+    "output": 1142,
+    "cacheCreation": 3061,
+    "cacheRead": 783,
+    "fresh": 4205,
+    "total": 4988
+  },
+  "at": "2026-11-09T02:35:20.776Z"
+}

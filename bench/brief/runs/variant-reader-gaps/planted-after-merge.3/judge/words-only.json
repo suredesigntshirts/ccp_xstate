@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "4e39ab77d4682e13a79f497dfbd2755f664549bf187a63bc9ea4029944ed96da",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1–3 hold. Check 1 passes on `HELLO, ADA!`, which is the upper case of the greeting. Check 2 asks for exactly `Hello, Ada!\\n`, which is today's output, so that is what \"unchanged\" means. Check 3 asks for a mention of `--shout` plus a description of what it does, which \"documents\" reasonably covers. The extras (npm test, flag after the name, exit status) sit under Advisory.\n\nCheck 4 breaks the criterion. Its PASS condition requires the workflow to publish docs/ in one particular way: \"(upload-pages-artifact with path docs, then deploy-pages)\". The expect line only says the published page lists `--shout` after merge. It doesn't name these actions or say how Pages gets deployed. A head that publishes docs/ with a different deploy action would still meet the expect line but fail this PASS condition. That is a structural rule stricter than the words, and it belongs under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 11796,
+  "tokens": {
+    "input": 2,
+    "output": 992,
+    "cacheCreation": 3083,
+    "cacheRead": 783,
+    "fresh": 4077,
+    "total": 4860
+  },
+  "at": "2026-11-09T02:34:06.047Z"
+}

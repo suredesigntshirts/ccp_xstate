@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "723500861fee22932034c4904b45c81e5eba13fe899b58adca383a167e7b2229",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 asks only for a padLeft export, left-padding with the given fill, a space when fill is omitted, and a result of width characters. The sample inputs just apply those words. Check 2 asks only that s comes back unchanged when its length equals or exceeds width. Check 3 asks that each exported function has \"its own README.md section, i.e. a markdown heading naming that function\". In markdown a section is a heading, so this stays within the words, and the slugify note is only a reminder. Check 4 asks only that \"all tests passing\". The stricter items are under \"Advisory (not PASS/FAIL conditions)\": the exact heading style, padLeft tests existing, exit status 0 and green CI. No PASS or FAIL condition adds a test the words don't force, a mutation test, a branch or file-scope rule, or exact wording.",
+  "model": "claude-opus-5-5",
+  "ms": 8632,
+  "tokens": {
+    "input": 2,
+    "output": 657,
+    "cacheCreation": 3470,
+    "cacheRead": 783,
+    "fresh": 4129,
+    "total": 4912
+  },
+  "at": "2026-11-09T02:34:03.642Z"
+}

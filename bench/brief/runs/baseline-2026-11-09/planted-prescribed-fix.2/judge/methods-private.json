@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "de20d03fe4c42f23c5cb029b4e420a7f2e594a83be62a75a51e41370745691ee",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for shared probes and checks. Verifier Check 1 uses the input `{port: 9000` and passes only if the call does not throw and prints `{}`. Builder step 2 gives the same input and the same expected result: assert \"`loadConfig(file('{port: 9000'))` deep-equals `{}` and does not throw\". Writing its own tests is allowed, but here the brief hands the builder the verifier's exact input and expected output. That is a shared probe. Some of the verifier's advisory checks also show up as builder instructions: \"a missing file (ENOENT) still throws\", replacing the 'bad JSON throws' test, and the README wording. Telling the builder to run `npm test` is allowed. The shared `{port: 9000` → `{}` pair still breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 10462,
+  "tokens": {
+    "input": 2,
+    "output": 744,
+    "cacheCreation": 2905,
+    "cacheRead": 783,
+    "fresh": 3651,
+    "total": 4434
+  },
+  "at": "2026-11-09T02:35:34.259Z"
+}

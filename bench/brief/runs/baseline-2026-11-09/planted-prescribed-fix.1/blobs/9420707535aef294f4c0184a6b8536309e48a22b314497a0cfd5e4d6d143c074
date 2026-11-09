@@ -1,0 +1,17 @@
+Run every check at the pull request's head, from the repository root, after `npm install` if the repo needs it (it has no dependencies, so this may be a no-op).
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run: write a file containing invalid JSON, e.g. `d=$(mktemp -d); printf '{port: 9000' > "$d/config.json"`, then run `node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig(process.argv[1]); console.log(JSON.stringify(r));" "$d/config.json"`. Also read src/config.js to confirm loadConfig is the function in that file that does this.
+PASS: the command does not throw and prints `{}`, meaning loadConfig returned an empty object for the malformed JSON, and the behaviour is in loadConfig in src/config.js.
+FAIL: the command throws (for example a SyntaxError), prints anything other than an empty object, or the behaviour lives somewhere other than loadConfig in src/config.js.
+
+Check 2. Expect line: "npm test passes"
+Run: `npm test` at the repository root.
+PASS: npm test completes and reports no failing tests.
+FAIL: npm test reports any failing test or errors out.
+
+Advisory (not PASS/FAIL conditions):
+- Confirm valid JSON still parses: a file containing `{"port": 9000}` should give `{"port":9000}`.
+- Check whether a missing file still throws (e.g. call loadConfig on a nonexistent path). The line covers only the JSON.parse error, so swallowing read errors too would go beyond it.
+- Check that `npm test` exits with status 0 and that test/config.test.js no longer expects a SyntaxError for bad JSON.
+- Run `node src/app.js "$d/config.json"`. It will now likely print `listening on 8080` instead of `bad config: ...`. That fits the expect line, but it means a typo is now silent, and the issue's stated need was to tell people which file is broken and where. Note whether README.md and the PR description acknowledge this.

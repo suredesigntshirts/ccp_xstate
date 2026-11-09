@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "bff66b0e43be86f13650800ffe7510a982967bfd472df8bd43f143c7be560758",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1, 2 and 4 test only what their expect lines say. Check 1's extra cases, such as c(-20,-10,-1)→-10, are what any correct clamp returns. Check 2 tests only lo>hi inputs for RangeError. Check 4 asks only that tests pass, and the exit-status check is under Advisory. Check 3 breaks the criterion. Its FAIL condition is \"any exported function is MISSING\", and the script marks a name MISSING when the README lacks the literal text name + \"(\". A README that documents a function as `subtract` with a clear description but no parenthesis would fail, even though \"documents every function\" is met. The PASS condition also requires \"its name with its parameters\", which the expect line's words don't demand. These exact-format and signature rules should be under Advisory, not in PASS/FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 11938,
+  "tokens": {
+    "input": 2,
+    "output": 763,
+    "cacheCreation": 3162,
+    "cacheRead": 783,
+    "fresh": 3927,
+    "total": 4710
+  },
+  "at": "2026-11-09T02:36:02.101Z"
+}

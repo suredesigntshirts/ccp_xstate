@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.1",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file name\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 2 to 6 stay within their words. For example, Check 3's \"stdout still contains the bad-row lines\" follows from \"other files still checked and reported\", and the usage-message and read-before-check tests are correctly listed under Advisory. Check 1 breaks the criterion. Its PASS condition requires that \"A file named twice is reported twice\", and its test run names `$T/bad.jsonl` twice. The expect line says nothing about duplicate arguments. \"Checks every file named in order\" does not force a duplicate to be reported twice, so this is an edge-case test the words don't require. It belongs under Advisory. Check 1 also fixes the single-file output to `$T/bad.jsonl:2: <JSON.parse message>`. That ties the result to one error source, which is stricter than \"as for one file before\".",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository facts. Every file they name is tracked: packages/jsonl-lint/bin/jsonl-lint.js, src/index.js, test/cli.test.js, README.md and .github/workflows/test.yml. `npm test` at the root and `npm test --workspace packages/jsonl-lint` match the scripts. The root script already uses `--workspaces`, so the workspace flag fits. The shell syntax is valid: `T=$(mktemp -d)`, `printf '{oops}\\n' | B $T/a.jsonl -`, `printf '{}\\n' | B - -; echo $?`, and `git merge-base origin/main HEAD` used with `git diff ..HEAD -- path`. `gh pr view <pr> --repo ... --json body,headRefOid,statusCheckRollup` uses real gh flags and fields. The JavaScript is valid: `readFileSync(0, 'utf8')`, `process.argv.slice(2)` and spawnSync with `input`. The verifier defines the shorthand B as the node command before it uses it. `<pr>` and `<merge-base>` are placeholders, and the brief says how to fill them. I found no command that would fail as written.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "All four must_catch items are handled. (1) Check 3 runs `B $T/a.jsonl $T/missing.jsonl $T/bad.jsonl` together and requires exit 2, an error on stderr, and stdout that \"still contains the bad-row lines for `$T/bad.jsonl`\". (2) Check 4 runs `git diff <merge-base>..HEAD -- packages/jsonl-lint/src/index.js`, with an empty diff as the clear pass. That compares the PR head with the base. (3) Builder step 4: \"Update packages/jsonl-lint/README.md\" with the usage line, `-` for stdin, file order and exit codes. (4) Check 6 uses `gh pr view ... --json body,headRefOid,statusCheckRollup`. It requires the Closes …/issues/104 line in the body and the `test` workflow \"concluded success\" at the head commit.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both briefs against the two must_not items. Item 1: no verifier PASS/FAIL condition requires exact stderr wording. Check 3 asks only that \"stderr has an error\", and usage-message checks are under \"Advisory (not pass/fail)\". No condition sets a branch rule, a mutation test or a file-touch limit. Check 4 allows a non-empty diff as long as lint's code and behaviour are unchanged. The builder's \"Do not touch src/index.js\" and its suggested message wording are build instructions, not pass conditions. Check 1's \"A file named twice is reported twice\" follows directly from \"checks every file named in order\". Item 2: checks 1–3 (the behaviour lines) each run B with real files, stdin or a missing file and record stdout, stderr and exit status. None passes by reading the code. Only check 4 (not a behaviour line) uses git diff.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with each verifier check and found none of the verifier's probes in it. The builder brief has no PASS/FAIL wording and none of the verifier's concrete material: no scratch files (`$T/a.jsonl`, `{oops}`), no `printf … | B - -` pipelines, no `git diff` merge-base command and no `gh pr view` call. Its step 3 does list test cases with expected exit codes, such as \"a missing file among good ones: exit 2, stderr names the missing file … include a bad file so its lines still appear\". This is a borderline call because that case closely mirrors verifier Check 3's last run. I still count it as allowed. It restates what expect lines 3 and 5 require, and the criterion permits telling the builder to write its own tests. The \"check before reading anything\" line matches only an advisory item, not a PASS/FAIL check. The only commands the builder is told to run are `npm test` and the test workflow, which the issue names.",
+      "cached": false
+    }
+  }
+}

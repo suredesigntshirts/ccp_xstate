@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "6022da666fa855a68751eee0b2297a6088d02ddd1a228b2cdcfce8881a18084c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each of the four verifier checks against its expect line. Check 1's PASS asks only that the output is the greeting for Ada in upper case (\"HELLO, ADA!\"), and its FAIL is the reverse. Check 2 compares `node bin/greet.js Ada` with the original `Hello, Ada!`. The git diff is optional context; \"the test is the program's output.\" Check 3 asks that docs/index.md \"mentions `--shout` and describes what it does,\" which is what \"documents\" means. Check 4 can't fetch the live page, so it checks what the head will publish: the workflow still publishes docs/ on merge, and docs/index.md lists `--shout`. The expect line needs both of those, so this is not stricter than its words. The stricter items are all under \"Advisory (not part of PASS/FAIL)\": npm test, the flag after the name, the usage error, and the test-coverage check. No PASS or FAIL condition goes beyond what its expect line's words require.",
+  "model": "claude-opus-5-5",
+  "ms": 10885,
+  "tokens": {
+    "input": 2,
+    "output": 751,
+    "cacheCreation": 2956,
+    "cacheRead": 783,
+    "fresh": 3709,
+    "total": 4492
+  },
+  "at": "2026-11-09T02:33:29.773Z"
+}

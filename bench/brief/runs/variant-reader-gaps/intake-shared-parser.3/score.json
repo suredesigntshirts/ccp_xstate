@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "intake-shared-parser.3",
+  "case": "intake-shared-parser",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 7 lines quoted in order, checks numbered 1 to 7"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6, 7 not quoted word for word in the builder brief: \"`printf 'a\\\\tb\\\\n1\\\\t2\\\\n' | node bin/csv2json.js --tsv` prints exactly `[{\\\"a\\\":\\\"1\\\",\\\"\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared all seven verifier checks with their expect lines, and none asks for more than the line's words. Checks 1–5 use cmp to test only the exact stdout plus a newline, and check 1 also tests \"exits 0\". The expect lines say \"prints exactly\", so a byte-exact comparison is what they require. Check 5 builds the expected text with printf '\\\\t', which gives a literal backslash-t and matches the line. Check 6 passes on npm test exit=0 plus one test that runs bin/csv2json.js with --tsv on input containing tabs and \"asserts on what it outputs\". That is exactly what the line says. Check 7 needs only a mention of --tsv and an example command that uses it. The stricter parts sit under \"Advisory (not part of PASS/FAIL)\": the npm run test:cli mismatch, the README saying the flag means tab-separated input, and the flag-position test. No PASS or FAIL condition adds a mutation test, scope rule or exact-wording rule.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository. They name only bin/csv2json.js, test/*.js, README.md and the `npm test` script, and all of these exist at this commit. The builder's `execFileSync('node', ['bin/csv2json.js', '--tsv'], { input, encoding: 'utf8' })` is valid JavaScript. Its expected string `'[{\"a\\\\tb\":\"1\\\\t2\"}]\\n'` correctly gives backslash-t escapes. In the verifier brief, the printf/cmp lines are valid bash: the `<(...)` process substitution works in bash, which is the shell here. `printf '[{\"a\\\\tb\":\"1\\\\t2\"}]\\n'` prints a literal backslash followed by t, as intended. `> /tmp/c1.out; echo \"exit=$?\"` captures node's exit status. `grep -n -- '--tsv' test/*.js` uses `--` correctly. The missing `npm run test:cli` script is flagged as advisory, and the brief only runs it if the PR adds it, so no command fails as written.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "Item 1: the builder brief keeps the CSV path safe. Its context names test/csv.test.js and the CSV 'cli' test. Step 1 says to call \"parse(text) exactly as today\" when the flag is absent. Step 3 says \"Keep the existing CSV tests.\" Step 5 requires that \"npm test -> exits 0\" and checks the CSV output for `printf 'a,b\\n1,2\\n'`. Together these name the existing CSV tests and behaviour as things that must keep passing. The brief never says outright that parse() is shared with the CSV path, but the criterion accepts either route. Item 2: verifier Check 6 runs \"npm test; echo \\\"exit=$?\\\"\". Its advisory says the proof's `npm run test:cli` is not defined in package.json, so the check follows the expect line and runs `npm test`. Both items are covered.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both briefs against the two must_not items. Item 1: Check 6 in the verifier brief bases PASS/FAIL on \"npm test; echo \\\"exit=$?\\\"\" plus a grep for the test. `npm run test:cli` shows up only under \"Advisory (not part of PASS/FAIL)\", which says the script doesn't exist and makes running it optional, with the result only reported. No verdict depends on it. Item 2: the builder brief asks only for a check for \"--tsv\" in argv, and says outright \"don't add --help, --sep or auto-detection\". It never asks for a general --sep or --delimiter option. Neither brief does anything on the must_not list.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with the verifier brief and found no verifier check carried over. The builder brief has no PASS/FAIL wording. It also leaves out every probe that belongs only to the verifier: the `cmp` and `od -c` byte comparisons, the `/tmp/c1.out` capture, and the advisory `extra --tsv` argument-position probe. Step 5 lists the issue's own proof commands, such as `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \"exit=$?\"`, plus `npm test`. Running commands that the proofs or expect lines name is explicitly allowed. Step 3 tells the builder to write its own tests, which is also allowed. Those tests use only the expect lines' inputs and outputs, not any verifier-specific set of inputs. Step 4 describes what the README must contain, taken from the issue's proof for line 7, not from a verifier check.",
+      "cached": false
+    }
+  }
+}

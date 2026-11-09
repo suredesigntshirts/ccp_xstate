@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "b8473dd4d4acb0fc8bee7cbe677ef1844e403c2de2647954a81b6fa162f11c43",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. The builder only runs `npm test`, and package.json defines it as `node --test`. The verifier runs three `node --input-type=module -e \"...\"` one-liners plus `npm test`. All three import './index.js' from the repo root, and that file is tracked. The shell quoting is valid: the outer double quotes contain only single-quoted JS strings, with no `$`, backticks or `!` that the shell would expand. The JS is valid ESM. For example, `Object.entries(m).filter(([,v])=>typeof v==='function').map(([k])=>k).join(' ')` parses, and the named import `{padLeft}` resolves once step 1 adds the export. `--input-type=module` with `-e` is a valid combination of node flags. Even if index.js were CommonJS, a dynamic ESM import of it would still work through interop. No command names a missing file, script or tool.",
+  "model": "claude-opus-5-5",
+  "ms": 8570,
+  "tokens": {
+    "input": 2,
+    "output": 639,
+    "cacheCreation": 3092,
+    "cacheRead": 783,
+    "fresh": 3733,
+    "total": 4516
+  },
+  "at": "2026-11-09T02:33:50.540Z"
+}

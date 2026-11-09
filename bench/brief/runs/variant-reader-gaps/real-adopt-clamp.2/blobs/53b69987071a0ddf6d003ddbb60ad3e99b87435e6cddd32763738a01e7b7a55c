@@ -1,0 +1,24 @@
+Check the pull request head against each acceptance line of https://github.com/o/r/issues/23, in order. Run every command from the repository root; each command is self-contained.
+
+Check 1 — "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi"
+Run: node -e "const m=require('./math.js'); console.log(typeof m.clamp); const c=m.clamp; console.log(JSON.stringify([c(50,0,100),c(-5,0,100),c(140,0,100),c(0,0,100),c(100,0,100),c(7,3,3),c(-3,-10,-1),c(2.5,1,2)]));"
+PASS: the first line is `function` and the second line is `[50,0,100,0,100,3,-3,2]` (inside values unchanged, below-range values become lo, above-range values become hi).
+FAIL: clamp is not a function exported by math.js, the command errors, or any value differs from that list.
+
+Check 2 — "clamp(x, lo, hi) throws a RangeError when lo is greater than hi"
+Run: node -e "const {clamp}=require('./math.js'); for (const a of [[1,10,0],[5,2,1],[0,0.5,0.4]]) { try { clamp(...a); console.log('NO THROW', a); } catch (e) { console.log(e instanceof RangeError ? 'RangeError' : 'OTHER '+e); } }"
+PASS: all three printed lines are `RangeError`.
+FAIL: any line prints `NO THROW` or `OTHER ...`.
+
+Check 3 — "README.md documents every function math.js exports"
+Run: node -e "const fs=require('fs'); const names=Object.keys(require('./math.js')).filter(k=>typeof require('./math.js')[k]==='function'); const r=fs.readFileSync('README.md','utf8'); for (const n of names) console.log(n, new RegExp('\\b'+n+'\\s*\\(').test(r) ? 'found' : 'MISSING');"
+Then read README.md at the head and, for each exported name listed, confirm the README describes what that function does (not just mentions its name).
+PASS: every exported function (this should include add, subtract, multiply and clamp) prints `found` and the README has a description of each one.
+FAIL: any exported function prints `MISSING`, or a function is named in README.md without any description of what it does.
+
+Check 4 — "npm test passes"
+Run: npm test
+PASS: the command exits with status 0 and reports no failing tests.
+FAIL: the command exits non-zero or reports any failing test.
+
+Advisory (not pass/fail conditions): it is good if test/math.test.js adds tests for clamp, including a RangeError case, and if README.md's clamp entry mentions the RangeError and sits under the `## API` section with a `### clamp(x, lo, hi)` heading matching the existing style. Note that subtract was undocumented before this change, so check 3 needs the PR to document it.

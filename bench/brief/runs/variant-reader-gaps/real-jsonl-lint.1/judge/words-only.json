@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "cf36236bfc94b5d26995bb96bfbf1436a4c043269a19b32cdec423efbba8fc7b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 5 and 6 stay within their words. Check 4 does not. Its expect line only asks for a package.json with certain fields, no runtime dependencies, and node:test tests for five cases. Yet its PASS condition also requires \"the workspace test run passes\", and its FAIL condition lists \"or the test run fails\". Expect line 4 doesn't say that. Passing tests belong to expect 6 (\"npm test ... green\"), so here it is a test the words don't force. Check 3 also goes past its words: its PASS condition requires the `line` property to \"equal to 2\", but expect 3 only says lint returns [{ line, error }]. Check 3's own FAIL list leaves that requirement out. These extra conditions belong under Advisory, not in PASS or FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 12490,
+  "tokens": {
+    "input": 2,
+    "output": 937,
+    "cacheCreation": 5212,
+    "cacheRead": 783,
+    "fresh": 6151,
+    "total": 6934
+  },
+  "at": "2026-11-09T02:37:23.326Z"
+}

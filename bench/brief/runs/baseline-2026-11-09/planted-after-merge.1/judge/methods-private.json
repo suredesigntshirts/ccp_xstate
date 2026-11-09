@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "b69df9546dd06de6d0732e85478b762fc9286a73ccbe17f0a82f2451f96c7855",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion fails because the builder brief repeats probes from the verifier brief. Step 2 of the builder brief gives `HELLO, ADA!` for `Ada` as the example output. Step 4 also tells the builder to test that \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!\\n`\" and that \"`node bin/greet.js Ada --shout` prints the same\". Verifier Check 1 runs `node bin/greet.js --shout Ada` and expects `HELLO, ADA!`. Its advisory section also tries `Ada --shout` and checks that running with no name exits 2, which the builder brief covers too (\"exit 2 when no name is given\"). These are matching inputs with expected outputs, so the builder is handed the checker's probes. They don't count as the builder writing its own tests or running a command named by an expect line, because the brief supplies the exact checked input and output. The rest of the builder brief, such as telling it to run `npm test`, would be allowed.",
+  "model": "claude-opus-5-5",
+  "ms": 8573,
+  "tokens": {
+    "input": 2,
+    "output": 757,
+    "cacheCreation": 3135,
+    "cacheRead": 783,
+    "fresh": 3894,
+    "total": 4677
+  },
+  "at": "2026-11-09T02:33:27.918Z"
+}

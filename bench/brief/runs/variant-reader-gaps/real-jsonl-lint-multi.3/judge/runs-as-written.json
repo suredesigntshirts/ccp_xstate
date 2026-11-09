@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "f2cb7d977779ed4549be836b6dfafb36ba3fbd7233c4dfc060df4bb0882e5cd6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the tracked files and the shell syntax. The builder's `npm test` runs from the root, where the script exists. The files it names (bin/jsonl-lint.js, test/cli.test.js, README.md, src/index.js) are all tracked. Check 1's chained `printf`/`mktemp`/`for f in a c; do ...; done` and Check 3's `J=...; node $J ...` sequence are valid bash and only use paths in the repo or the temp dir. Check 2's piped `printf` commands are fine. `(cd packages/jsonl-lint && node --test)` matches the package's test script. `npm ci` has the package-lock.json it needs. `git diff origin/main...HEAD -- packages/jsonl-lint/src/index.js` and the `gh pr view --json body,headRefOid,state` / `gh pr checks` flags are valid. One caveat: `<PR number>` is a placeholder the verifier has to fill in. Typed literally, bash would read it as a redirect, but it is plainly meant to be substituted, so I didn't count it against the brief. I found no missing files, wrong arguments or syntax errors.",
+  "model": "claude-opus-5-5",
+  "ms": 13380,
+  "tokens": {
+    "input": 2,
+    "output": 1163,
+    "cacheCreation": 5271,
+    "cacheRead": 783,
+    "fresh": 6436,
+    "total": 7219
+  },
+  "at": "2026-11-09T02:37:34.607Z"
+}

@@ -1,0 +1,41 @@
+Run every check at the PR head, from the repository root, on Node v22. Each command block is self-contained.
+
+Check 1. Expect line: "Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`, `  \"port\": 9000,`, `  greeting: \"x\"`, `}`, exits with code 1 and prints nothing on stdout (in particular no `listening on` line)."
+Run:
+`d=$(mktemp -d); printf '{\n  "port": 9000,\n  greeting: "x"\n}\n' > $d/c.json; node src/app.js $d/c.json >$d/out 2>$d/err; echo "exit $?"; echo '--stdout--'; cat $d/out; echo '--stderr--'; cat $d/err; echo "path=$d/c.json"`
+PASS: the exit code is 1 and stdout is empty.
+FAIL: any other exit code, or any stdout output, including a `listening on` line.
+
+Check 2. Expect line: "In that same run, stderr contains `bad config:`, the full path `<tmp>/c.json` exactly as passed on the command line, the line number `3` and the column number `3` of the mistake."
+Use the stderr and `path=` printed by the Check 1 command, or rerun that command.
+PASS: stderr contains all three of:
+- `bad config:`,
+- the exact path string printed as `path=` (the same string passed as the argument),
+- an identification of line 3 and column 3 of the mistake (e.g. `line 3 column 3`, `3:3`, or similar).
+FAIL: any of the three is missing, the path is altered (for example resolved or shortened), or the line or column given is not 3.
+
+Check 3. Expect line: "Calling `loadConfig(path)` on a file containing `{port: 9000` throws instead of returning a value, and the thrown error's `message` contains `path`."
+Run:
+`d=$(mktemp -d); printf '{port: 9000' > $d/b.json; node --input-type=module -e "import {loadConfig} from './src/config.js'; try { const v = loadConfig('$d/b.json'); console.log('RETURNED', JSON.stringify(v)) } catch (e) { console.log(e.message.includes('$d/b.json') ? 'OK' : 'NO PATH: ' + e.message) }"`
+PASS: prints `OK`.
+FAIL: prints `RETURNED ...` or `NO PATH: ...`.
+
+Check 4. Expect line: "Running `node src/app.js <tmp>/ok.json`, where ok.json contains `{\"port\": 9000}`, exits 0 and prints `listening on 9000` on stdout. `loadConfig` on that file returns `{ port: 9000 }`."
+Run:
+`d=$(mktemp -d); printf '{"port": 9000}' > $d/ok.json; node src/app.js $d/ok.json; echo "exit $?"; node --input-type=module -e "import {loadConfig} from './src/config.js'; import assert from 'node:assert/strict'; const v = loadConfig('$d/ok.json'); assert.deepEqual(v, {port: 9000}); console.log('RETURN OK', JSON.stringify(v))"`
+PASS: stdout shows `listening on 9000`, then `exit 0`, then `RETURN OK {"port":9000}`.
+FAIL: any of these differs, or the assert throws.
+
+Check 5. Expect line: "`npm test` passes, and the test suite has at least one test that fails at the current base commit and checks that the error from malformed config JSON includes the file path."
+Run these steps:
+1. Run `npm test` at the PR head and record the result.
+2. Find the PR's base commit, i.e. the commit the PR targets, e.g. `gh pr view --json baseRefOid -q .baseRefOid` or the merge base with the target branch.
+3. In a scratch copy, e.g. `git worktree add /tmp/vbase <head-sha>`, run `git checkout <base-sha> -- src`, then `npm test`. Do not change your PR checkout.
+4. Read `test/` at the head and identify the tests that assert the file path appears in the error from malformed JSON.
+PASS: `npm test` passes at the head, and with base `src/` at least one of the tests from step 4 fails.
+FAIL: `npm test` fails at the head, no test checks the path in the malformed-JSON error, or every such test still passes against base `src/`.
+
+Advisory (not pass/fail conditions):
+- Read `src/config.js` to see whether line and column are computed from the text or only copied from Node's message. Copying only Node's message would break on Node versions that print just a position. Report what you find.
+- Note it if `loadConfig` swallows errors or returns defaults, or if missing-file (ENOENT) handling changed beyond still being an exit-1 `bad config:` failure.
+- Note whether the thrown error is still a `SyntaxError` or carries the original as `cause`.
