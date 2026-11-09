@@ -4,7 +4,7 @@
   "title": "Write the learnings memory held into the repo",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Every durable learning the memory audit harvested that code did not remove is in one home in the repo: container and GitHub traps in docs/traps.md, verifier techniques in docs/verifying.md, platform facts as rows in plan/ledger/platform.md, and each defect it found in a plan item; a guard under test/ holds the harvested questions with each one's home and carrying terms, and goes red when a home loses an answer; and a fresh reader with memory off answers each harvested question from the repo alone.",
   "why": "The audit of 9 Nov found a few dozen durable traps, techniques and platform facts spread across memory logs, some only in decisions or research files a reader of the code never opens (L-cheap-home-wins, L-rules-live-in-the-repo).",
   "serves": [
