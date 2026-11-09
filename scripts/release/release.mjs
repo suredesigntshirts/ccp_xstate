@@ -63,7 +63,8 @@ export function newestTag(refs) {
 /**
  * Decides a release for `sha` in the repo at `cwd`. The base is the newest release when there is one (so a release
  * a missed run would have made is made by the next one), else `before`, else the sha's first parent. Returns
- * { release: bool, reason, sha, base, latest, version, tag, changed }.
+ * { release: bool, reason, sha, base, latest, version, tag, changed }, and `already`, the release names, when a release
+ * ref already points at the sha: release.yml tags each merge, often before the thread that merged runs this.
  */
 export function plan({ cwd = process.cwd(), sha = 'HEAD', before = null } = {}) {
   const git = (...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
@@ -73,7 +74,7 @@ export function plan({ cwd = process.cwd(), sha = 'HEAD', before = null } = {}) 
   const latest = newestTag(refs());
   const at = [...new Set(refs('--points-at', sha).map(releaseName))];
   const out = { release: false, sha, latest: latest?.version ?? null, base: null, version: null, tag: null, changed: [] };
-  if (at.length) return { ...out, reason: `${sha.slice(0, 12)} is already released as ${at.join(', ')}` };
+  if (at.length) return { ...out, already: at, reason: `${sha.slice(0, 12)} is already released as ${at.join(', ')}` };
   let base = latest?.ref ?? (before && !ZERO.test(before) ? before : null);
   if (!base) {
     try { base = git('rev-parse', `${sha}^`); } catch { base = null; }
@@ -164,6 +165,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   } else {
     const r = make(decision, { push: flag === '--push' });
     console.log(JSON.stringify(r));
-    console.error(decision.release ? `released ${decision.tag} at ${decision.sha} as a ${cmd}` : `no release: ${decision.reason}`);
+    console.error(decision.release ? `released ${decision.tag} at ${decision.sha} as a ${cmd}`
+      : decision.already ? `already released: ${decision.sha} is ${decision.already.join(', ')}, so nothing is left to do`
+        : `no release: ${decision.reason}`);
   }
 }

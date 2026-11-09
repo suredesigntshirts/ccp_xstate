@@ -30,8 +30,7 @@ sets it), and otherwise check the scope from the tree.
 ## A headless session inherits the thread's session
 
 `claude -p` started from a thread inherits `CLAUDE_CODE_REMOTE_SESSION_ID`, so its rows and commits are filed under
-the thread's session. Start it with `env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p ...` when it must count as its own
-session, such as a fresh reader for an Expect line.
+the thread's session. A reader that must count as its own session is a fresh reader (`docs/verifying.md`).
 
 ## One suite at a time
 
