@@ -198,7 +198,7 @@ unchanged. No other line moves.
 
 ## Regression table
 
-One row per test file the 36 done folders held at the base, then one row per folder for its other files. `moved` and
+One row per test file the 37 done folders held at the base, then one row per folder for its other files. `moved` and
 `split` name the file under `test/regression/` that holds the moved tests.
 
 | Test file | Verdict | Moved to | Reason |
@@ -209,6 +209,11 @@ One row per test file the 36 done folders held at the base, then one row per fol
 | `verify/after-verdict-gaps/released-named-once.test.mjs` | split | `test/regression/plugin/release-reason.test.mjs` | moved: runs release.mjs's plan() on a temp repo with a release and no released change after it and asserts the reason names every RELEASED path; left: one test matched plugins/harness/README.md text with regexes |
 | `verify/after-verdict-gaps/suite-and-scope.test.mjs` | split | `test/regression/plan/real-plan.test.mjs` | moved: runs the plan check on the repo's plan; left: the scope test read its own PR's file list, and one ran test/docs.test.mjs, which npm test runs itself |
 | `verify/after-verdict-gaps/terms-defined.test.mjs` | left |  | matched docs/language.md rows with regexes |
+| `verify/capture-cheap-serial/green-under-suite.test.mjs` | left |  | ran plugins/harness/test/capture.test.mjs, which npm test runs itself, and read recorded full runs under verify/ |
+| `verify/capture-cheap-serial/others-parallel.test.mjs` | left |  | compared package.json's test script with the base's stored text and read recorded per-test results under verify/ |
+| `verify/capture-cheap-serial/runs-alone.test.mjs` | left |  | matched package.json's test script and the test files' text with regexes, read recorded runs under verify/, and ran the cheap test, a wall-clock bar that plugins/harness/test/capture.test.mjs holds in npm test's serial pass (decision 7) |
+| `verify/capture-cheap-serial/same-bars.test.mjs` | left |  | compared the cheap test's block and three files with the base's stored hashes |
+| `verify/capture-cheap-serial/still-catches-slow.test.mjs` | left |  | ran the cheap test's wall-clock bar against a slowed capture, which cannot hold under the regression set's parallel runs (decision 7), and read a recorded full run under verify/ |
 | `verify/clean-room-install-test/clean-room.test.mjs` | moved | `test/regression/plugin/clean-room.test.mjs` | runs the clean room on a temp repo of the head's tree, whole and with a plugin file deleted, and asserts its steps and self-check line |
 | `verify/comments-present-tense/readme.test.mjs` | left |  | matched packages/engine's README, src/index.js and bin/host.js text with regexes |
 | `verify/comments-present-tense/strip.test.mjs` | left |  | tested the verifier's own comment scanner, strip.mjs in the same folder, not harness code |
@@ -345,6 +350,7 @@ One row per test file the 36 done folders held at the base, then one row per fol
 | Folder | Other files |
 |---|---|
 | `after-verdict-gaps` | `lib.mjs` deleted; 7 evidence files deleted |
+| `capture-cheap-serial` | `lib.mjs`, `record.mjs`, `reporter.mjs`, `summarize.mjs` deleted; 5 evidence files deleted |
 | `clean-room-install-test` | none: the folder held only its test file |
 | `comments-present-tense` | `compare.mjs`, `strip.mjs` deleted; 3 evidence files deleted |
 | `done-with-the-build` | `lib.mjs` inlined into the moved file and deleted; 7 evidence files deleted |
