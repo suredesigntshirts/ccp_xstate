@@ -1,6 +1,6 @@
 // guards-bite: the two new guards go red when the behaviour they guard breaks. Each case makes a lean copy of the
 // checkout (the head), breaks one behaviour there, and runs the guard in the copy: lean-clone.test.mjs when leanClone
-// checks out bench/ or tournaments/, or drops a tag or a branch; setup-skills-switch.test.mjs when setup.sh runs npm
+// checks out bench/ or tournaments/, or drops a tag or a branch (the copy adds no branch of its own, so the guard must bring the branches it checks); setup-skills-switch.test.mjs when setup.sh runs npm
 // with CCP_SETUP_SKILLS=0, or skips it without. An unbroken copy passes both (control).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -44,7 +44,6 @@ function copy(t) {
 
 test('guards-bite: an unbroken lean copy passes both guards (control)', (t) => {
   const c = copy(t);
-  c.git('branch', 'second-branch');
   for (const f of [LEAN, SKILLS]) { const r = c.run(f); assert.equal(r.status, 0, `${f}\n${r.out}`); assert.match(r.out, /# fail 0/); }
 });
 
@@ -57,7 +56,6 @@ const LEAN_BREAKS = [
 for (const [name, from, to] of LEAN_BREAKS) {
   test(`guards-bite: lean-clone fails when ${name}`, (t) => {
     const c = copy(t);
-    c.git('branch', 'second-branch');
     c.edit(LIB, from, to);
     const r = c.run(LEAN);
     assert.equal(r.status, 1, r.out);

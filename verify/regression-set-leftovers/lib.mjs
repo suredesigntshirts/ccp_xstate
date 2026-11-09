@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 export const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 /** The PR's base (main when the build branched) and the build head the verdict names. */
 export const BASE = '23cbd22cf08b5f8ed3de3a248ebc9c94adc9631f';
-export const VERIFIED = 'fa9c1957cd87f55fc4efd30fe24ac07ee2391cf9';
+export const VERIFIED = '204ba01e640d4d01bd8ca4bb9373649cbbc21660';
 export const ROOTS = ['test', 'scripts', 'packages', 'plugins'];
 
 const run = (cwd, args, opts = {}) => execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 1e9, stdio: ['ignore', 'pipe', 'pipe'], ...opts });

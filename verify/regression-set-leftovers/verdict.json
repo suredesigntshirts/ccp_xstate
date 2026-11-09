@@ -1,6 +1,6 @@
 {
   "item": "regression-set-leftovers",
-  "verified_sha": "fa9c1957cd87f55fc4efd30fe24ac07ee2391cf9",
+  "verified_sha": "204ba01e640d4d01bd8ca4bb9373649cbbc21660",
   "verifier": {
     "session": "https://claude.ai/code/session_01KfkB5JQqCF3iYqGh5zWbMt",
     "model": "claude-opus-5-5"
@@ -10,7 +10,7 @@
       "id": "no-verify-in-npm-test",
       "status": "MET",
       "command": "node --test verify/regression-set-leftovers/no-verify-in-npm-test.test.mjs; npm test at base and head with a preload logging each started file",
-      "excerpt": "3 pass: head's passes start 188 files, none under verify/; the base's 200 less its 14 verify/ files all start at the head. Real npm test runs with a start-logging preload: base 200 files (14 verify/), 2114 pass, 725 s; head 188 files (0 verify/), 1963 pass, 318 s",
+      "excerpt": "3 pass: head's passes start 188 files, none under verify/; the base's 200 less its 14 verify/ files all start at the head. Real npm test runs with a start-logging preload: base 200 files (14 verify/), 2114 pass, 725 s; head 188 files (0 verify/), 1963 pass, 318 s (real runs at fa9c1957; 204ba01e changes only lean-clone.test.mjs's body)",
       "test": "verify/regression-set-leftovers/no-verify-in-npm-test.test.mjs"
     },
     {
@@ -24,7 +24,7 @@
       "id": "guards-bite",
       "status": "MET",
       "command": "node --test verify/regression-set-leftovers/guards-bite.test.mjs",
-      "excerpt": "7 pass: unbroken copy passes both guards; lean-clone goes red without !/bench/, without !/tournaments/, with --no-tags, with --single-branch; setup-skills-switch goes red when setup.sh runs npm with CCP_SETUP_SKILLS=0 and when it skips npm without it",
+      "excerpt": "7 pass at 204ba01e, also in a detached depth-1 clone like CI's: unbroken copy passes both guards; lean-clone goes red without !/bench/, without !/tournaments/, with --no-tags, with --single-branch (the copy adds no branch, so the guard's own extra branches carry it); setup-skills-switch goes red when setup.sh runs npm with CCP_SETUP_SKILLS=0 and when it skips npm without it. At fa9c1957 in that clone the --single-branch case stayed green; fixed in 204ba01e",
       "test": "verify/regression-set-leftovers/guards-bite.test.mjs"
     },
     {
@@ -38,17 +38,18 @@
       "id": "table-row",
       "status": "MET",
       "command": "node --test verify/regression-set-leftovers/table-row.test.mjs",
-      "excerpt": "1 pass: between base 23cbd22c and fa9c1957 one Regression table row changed, child-after-return.test.mjs, verdict split -> moved, other cells unchanged",
+      "excerpt": "1 pass: between base 23cbd22c and 204ba01e one Regression table row changed, child-after-return.test.mjs, verdict split -> moved, other cells unchanged",
       "test": "verify/regression-set-leftovers/table-row.test.mjs"
     },
     {
       "id": "ci",
       "status": "MET",
-      "command": "GitHub check runs for PR #280 at fa9c1957cd87f55fc4efd30fe24ac07ee2391cf9",
-      "excerpt": "at fa9c1957cd87f55fc4efd30fe24ac07ee2391cf9: test (job 129041308189) success in 4m01s (main after #278: 9m35s); gates (job 129041308579) failed only on the missing verdict.json. Both run again on this verdict commit."
+      "command": "GitHub check runs for PR #280 at 204ba01e640d4d01bd8ca4bb9373649cbbc21660",
+      "excerpt": "at 204ba01e640d4d01bd8ca4bb9373649cbbc21660: test (job 129049900743) success in 4m52s (4m01s at fa9c1957; main after #278: 9m35s); gates (job 129049899748) failed only on the commit after the old verified sha, which this verdict answers. Both run again on this verdict commit."
     }
   ],
   "observations": [
+    "Round 1 at fa9c1957: in CI's depth-1 checkout (one branch) lean-clone stayed green when leanClone cloned --single-branch, because the guard's origin had one branch and the verifier's bite test added a second branch itself (gates job 129049339718). The builder fixed the guard in 204ba01e (two more branches in its origin); the bite test no longer adds a branch, so it shows the guard's own reach. Rechecked: with fa9c1957's guard in a detached depth-1 clone the case fails, with 204ba01e's it passes.",
     "Lost guard: verify/verify-regression-set/moved-pass.test.mjs held three checks of the regression set that npm test does not repeat by running its files: each test/regression file's first comment names Expect lines the plan has (decision 3 of plan/decisions/2026-11-08-verify-regression-split.md), no file there reads a path under verify/, and every file passes with Playwright out of reach. one-helper.test.mjs held a fourth: lib.mjs is the one helper and each export is used by two files. None of these now runs on any PR. The PR body's table says moved-pass is covered because npm test runs the files, which covers only the pass part.",
     "The header rule already fails at this head: moved-pass's 'each file's first comment names Expect lines the plan has' test, run at fa9c1957, reports test/regression/plugin/lean-clone.test.mjs (and setup-skills-switch.test.mjs) have no Expect line. Either the new guards take a header naming regression-set-leftovers/guards-bite, or the rule is narrowed to moved files; in both cases a cheap guard under test/ (a file read, no nested runs) should hold the header, no-verify-reads and one-helper rules. Suggested as a follow-up item or a step of pr-test-selection, not a block here: no Expect line of this item covers it.",
     "clones-through-helper and tests-set-switch (fast-test-clones-and-setup) are speed rules with no guard now; a new plain clone of the repo or a setup.sh run without CCP_SETUP_SKILLS=0 would only show as slower CI. A cheap static scan like clones-through-helper's would keep them.",
