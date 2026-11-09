@@ -22,6 +22,9 @@ Draft written at the wrap-up on 8 Nov so the verify-regression-set verifier's tw
   `verify/verify-regression-set/` each run every `test/regression/` file, which `npm test` already runs once. The last
   one runs them twice (once with Playwright unreachable), about 13 minutes. Options: retire those suites as their
   items' outcome now holds by npm test itself, or have them run only on their own item's PR.
+- **Suites done after the base.** Any item done after `verify-regression-set`'s base whose `verify/` folder still
+  holds test files when that PR merges: this item retires those suites the same way, a row each in the Regression
+  table and only `verdict.json` left in the folder.
 - **One table row.** `verify/fix-trace-writes-clone-cwd/child-after-return.test.mjs` reads `split`; it had no left
   test, so it should read `moved`. The fix is one word in that row.
 - **A flake to watch.** `test/regression/plugin/person-attention.test.mjs`, "rows: replaying the same wake does not
