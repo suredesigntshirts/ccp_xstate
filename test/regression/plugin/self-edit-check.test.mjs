@@ -13,6 +13,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { leanClone } from '../lib.mjs';
 
 // Helpers for the tests below.
+/** The passing setup.test.mjs run in a clone with no release refs, with what it left in its TMPDIR. */
+let setupPassing;
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(join(HERE, '..', '..', '..'));
 const NO_SELF_EDIT = 'test/regression/plugin/no-self-edit.test.mjs';
@@ -345,7 +347,12 @@ test('tags-dropped: setup.test.mjs passes in a clone with newer harness-v tags a
 test('tags-dropped: setup.test.mjs passes in a clone with no release refs', (t) => {
   const c = clone(t);
   assert.deepEqual(releaseRefs(c), []);
-  const r = nodeTest(c, SETUP_TEST);
+  // The run has a fresh TMPDIR of its own, so temp-removed reads what this passing run left there.
+  const tmp = join(temp(t, 'tmpdir'), 'tmp');
+  mkdirSync(join(tmp, 'node-compile-cache'), { recursive: true });
+  const before = readdirSync(tmp);
+  const r = nodeTest(c, SETUP_TEST, { env: { ...process.env, TMPDIR: tmp } });
+  setupPassing = { r, left: readdirSync(tmp).filter((n) => !before.includes(n)) };
   assert.deepEqual({ fail: r.fail, skipped: r.skipped }, { fail: 0, skipped: 0 }, r.out.slice(-3000));
   assert.ok(r.pass >= 6);
 });
@@ -394,7 +401,8 @@ test('temp-removed: no-self-edit.test.mjs, with a test made to fail midway, leav
 });
 
 test('temp-removed: test/setup.test.mjs, passing, leaves nothing in the temp folder', (t) => {
-  const { r, left } = run(t, REPO, SETUP_TEST);
+  const { r, left } = setupPassing ?? run(t, REPO, SETUP_TEST);
+  t.diagnostic(`left in TMPDIR: ${JSON.stringify(left)}`);
   assert.equal(r.fail, 0, r.out.slice(-2000));
   assert.deepEqual(left, []);
 });
