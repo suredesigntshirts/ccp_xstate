@@ -4,7 +4,7 @@
   "title": "Say what project memory is for, and let any PR add a trap note",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "CLAUDE.md says project memory holds only the person's directives and coordinator state, and that a trap, technique or gotcha goes into docs/traps.md or docs/verifying.md in the PR that met it and a defect into a plan item; docs/verifying.md exists and CLAUDE.md's Layout table names it; and the verdict gate passes a PR that names no item and changes only plan/, docs/traps.md and docs/verifying.md, while still refusing one that changes any other file outside plan/.",
   "why": "On 9 Nov project memory held 147 files, about 98 of them per-item build and verifier logs, because the platform prompt says to save as you learn and the repo's home for a one-line trap note cost an item and a verifier (L-cheap-home-wins). The person authorized the CLAUDE.md change on 9 Nov (decision plan/decisions/2026-11-09-memory-into-repo.md).",
   "serves": [
