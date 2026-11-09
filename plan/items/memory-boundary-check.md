@@ -16,7 +16,7 @@
   "inputs": [
     {
       "ref": "the project memory store",
-      "what": "Its files and their hashes, as each fresh session's synced memory folder and its .memory-sync-basis list them at start"
+      "what": "Its files and their hashes, as each fresh session's synced memory folder and its .memory-sync-basis list them when synced"
     },
     {
       "ref": "/mnt/project-files/memory-audit/archive-2026-11-09/",
@@ -40,7 +40,7 @@
   "expect": [
     {
       "id": "pruned",
-      "check": "A session started after the prune lists only the directive and state files in its synced memory folder: no file the audit report sorts as a builder or verifier log (b) or stale (d) is in the store",
+      "check": "A memory folder synced after the prune lists only the directive and state files in its synced memory folder: no file the audit report sorts as a builder or verifier log (b) or stale (d) is in the store",
       "how": "The first post-prune snapshot's listing and .memory-sync-basis entries, against the archive by hash; the verifier's own thread repeats the listing at its start",
       "proof": "world"
     },
@@ -91,7 +91,7 @@
   "risks": [
     "One clean item could be luck: observe two",
     "A thread that knows it is observed writes less: the second item's threads are not told about this probe",
-    "The memory folder may sync only at session start, so a listing reads the store as of that session's start, not live"
+    "A listing reads the store as of the folder's last sync, so each snapshot records .memory-sync-basis and its pending deletes"
   ]
 }
 ```
@@ -99,7 +99,8 @@
 ## What this is
 
 The live check of L-cheap-home-wins. CI cannot read project memory, so the evidence is what fresh Projects threads see
-when their memory folder syncs at start. Each snapshot is the listing of one fresh session's synced folder
+in their synced memory folder, which syncs at start and again during the session. Each snapshot is the listing of one
+session's synced folder
 (`$CLAUDE_COWORK_MEMORY_PATH_OVERRIDE/team/silo/`) with its `.memory-sync-basis`, which names every store entry with
 an id and a hash.
 
@@ -109,9 +110,10 @@ land; the last is taken by a session that starts after the second item merges, s
 The second item's threads are not told about this probe, because a thread that knows it is watched is the weaker test.
 
 When this item was readied the prune had not reached the store. The builder's folder at 18:24Z still held all 151
-files; only `MEMORY.md` and one feedback file had changed. So deletions made in one session's folder did not reach the
-store the way edits did, and the coordinator's pruning thread is re-doing them. `pruned` holds only once a later
-session's listing shows the deletes landed; how they were made to land goes in `plan/ledger/platform.md`.
+files; only `MEMORY.md` and one feedback file had changed, because the sync records a delete only in one shape
+(`plan/ledger/platform.md`, L-memory-delete-shape). The pruning thread re-did the deletes in that shape, and the
+builder's own folder dropped to 5 entries with no pending deletes at 18:34Z. That listing is the first post-prune
+snapshot.
 
 ## Verifier brief
 
