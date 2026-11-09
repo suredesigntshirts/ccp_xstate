@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "89e7236012ecd8aa483d0990f65391fa51d7932892dfcc674f7504dccbebc156",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with its expect line. Checks 1, 2, 4 and 5 stay close to the words. Check 6 does not. Its expect line only says \"The change is one PR … whose body says Closes …\". The PASS condition instead requires \"exactly one PR … is open for this change\", and the command uses `--state open`. Nothing in the words requires the PR to be open, so a merged or closed PR would wrongly FAIL. That is a stricter test, and it sits in a PASS/FAIL condition rather than under Advisory. Check 3(c) also requires \"exits 2 with a message on stderr\" for the no-argument case. The issue's \"(error on stderr…)\" follows \"can't be read\", so it most likely applies only to unreadable files. Requiring a stderr message for no arguments probably goes beyond the words too. Because of these extra requirements, the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 14016,
+  "tokens": {
+    "input": 2,
+    "output": 947,
+    "cacheCreation": 5970,
+    "cacheRead": 783,
+    "fresh": 6919,
+    "total": 7702
+  },
+  "at": "2026-11-09T02:36:40.559Z"
+}

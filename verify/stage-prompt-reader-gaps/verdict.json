@@ -1,0 +1,57 @@
+{
+  "item": "stage-prompt-reader-gaps",
+  "verified_sha": "e8f430486d3446b068a0c6e3e68026d4d731bb1c",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5Jd9cexvLC348UaaDD",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "build-verify-answers",
+      "status": "MET",
+      "command": "node --test verify/stage-prompt-reader-gaps/build-verify-answers.test.mjs (renders build, quick-fix verify and research verify with scripts/bench/run.mjs --prompt-only on evidence/build-input.json and evidence/verify-input.json; reads each rule by its carrying words)",
+      "excerpt": "8/8 pass. build: 'Return as soon as the PR is pushed, even where task says to wait for CI: the harness watches CI and sends a red check back to you as failure'; 'Push your last commit before you return, and push nothing after'; pr output 'Set no other key in pr'; no gates, green or checkout outside Task and input values. Both verify prompts: 'A condition in task stricter than its line'; no 'the brief'; issue 'as { url, expect }, copied exactly, every expect line in order, and no other key', no 'leave out'. quick-fix verify: 'undo any change you made to tracked files'. All 8 red with SPRG_REPO at main 98959266.",
+      "test": "verify/stage-prompt-reader-gaps/build-verify-answers.test.mjs"
+    },
+    {
+      "id": "brief-unchanged",
+      "status": "MET",
+      "command": "node --test verify/stage-prompt-reader-gaps/brief-unchanged.test.mjs (case real-jsonl-lint: head render vs evidence/brief-base-prompt.md rendered with --rev at the base, and a live --rev origin/main render where reachable); git diff origin/main...HEAD -- workflows/quick-fix/brief.md",
+      "excerpt": "2/2 pass: 5067 chars at the head, byte-equal to the base render, live and recorded. brief.md has no diff.",
+      "test": "verify/stage-prompt-reader-gaps/brief-unchanged.test.mjs"
+    },
+    {
+      "id": "fresh-readers",
+      "status": "MET",
+      "command": "9 sessions, 3 each on build, quick-fix verify and research verify: claude -p --model claude-opus-5-5 in an empty folder, empty HOME, CLAUDE_CODE_REMOTE_SESSION_ID and memory variables unset, given The question from plan/research/stage-prompt-readers.md, the context and the rendered prompt. Each prompt renders byte for byte the same at the head as the one its readers read (build at 5b6ea51b, verify at d95c40d4). Answers and grading in evidence/fresh-readers.md",
+      "excerpt": "No taken gap named. verify (6 readers): 'the brief' 0/6, undo vs node_modules 0/3, issue output 0/6 (it was 6/6 at 5b6ea51b on 'any other key you add must equal the input's', now 'and no other key'). build (3): key/gates/green/checkout 0/3, push-after ban 0/3; all 3 still list Task step 9 against the new rule but quote the rule and follow it ('Rules win, so I return without waiting'), so none has to guess. Gaps named instead are outside the table: who judges stricter, PR search scope, CI polling."
+    },
+    {
+      "id": "bench-recorded",
+      "status": "MET",
+      "command": "node --test verify/stage-prompt-reader-gaps/bench-recorded.test.mjs (no bench rerun: counts runs, checks bench.json workflow versions, re-renders each case's brief prompt with its run id from the claimed workflow, reruns compare.mjs --stage brief over the two sets)",
+      "excerpt": "5/5 pass. Each set: 27 runs, 3 on each of the 9 cases, all with score.json, every bench.json on the set's version. Baseline a1a0bce39fea = quick-fix at 57c9212e (recomputed with --rev); its 9 prompts equal the head's brief render. Variant 0921bd6db65a = workflowVersion of bench/brief/variants/reader-gaps/quick-fix.json; its 9 prompts render from it. compare.mjs output is byte-identical to bench/brief/reports/compare-reader-gaps.md (7 criteria changed: 6 worse, 1 better).",
+      "test": "verify/stage-prompt-reader-gaps/bench-recorded.test.mjs"
+    },
+    {
+      "id": "suite-and-scope",
+      "status": "MET",
+      "command": "PR_BODY='Item: stage-prompt-reader-gaps' BASE_SHA=origin/main node --test verify/stage-prompt-reader-gaps/suite-and-scope.test.mjs; the same without PR_BODY and in a depth-1 clone; node --test test/regression/engine/bench-prompts.test.mjs packages/engine/test/tourney/S5.test.js; ci test job 128956864379 for npm test",
+      "excerpt": "2/2 in both modes; plan ok. PR mode against main 98959266: 1363 files, none outside the outputs (now including test/regression/engine/bench-prompts.test.mjs), the item and the verify folder. Depth-1 clone: all 17 verifier tests pass. bench-prompts + S5: 19/19. npm test: job 128956864379, 2299 tests, 2287 pass, 0 fail, 12 skipped. (At 5b6ea51b bench-prompts failed on the new run sets' missing brief.md; fixed by f664f0fb.)",
+      "test": "verify/stage-prompt-reader-gaps/suite-and-scope.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "pull_request_read get_check_runs and get_job_logs on PR #274",
+      "excerpt": "At e8f430486d3446b068a0c6e3e68026d4d731bb1c: test job 128956864379 success (2287 pass, 0 fail, 12 skipped; plan ok). gates job 128956864659 failed before any verdict existed; it runs again on this verdict commit, which changes only verify/stage-prompt-reader-gaps/."
+    }
+  ],
+  "observations": [
+    "An earlier verdict at 5b6ea51b was NOT MET (fresh-readers: the issue-output clause; suite-and-scope and ci: bench-prompts.test.mjs read brief.md); the builder fixed both (f664f0fb, d95c40d4) and #273 replanned the outputs.",
+    "Build readers still meet Task step 9 (the unchanged brief's 'wait for CI') against the new rule; each follows the rule, and 2/3 ask whether the red check comes back in this run or a later build. The rule could say 'as a later build's failure'.",
+    "build's Rules still say 'Never put anything but the PR's url in pr', while Output asks pr as { url, at }; no reader was stopped by it, but it reads as a contradiction.",
+    "The decision says three engine tests quote a changed rule; only S5.test.js does at the base (P2.test.js's 'Never set key, gates or green on a reference' is another text).",
+    "research's verify has no undo rule (it never checks out), so the tracked-files answer applies to quick-fix's verify only."
+  ]
+}

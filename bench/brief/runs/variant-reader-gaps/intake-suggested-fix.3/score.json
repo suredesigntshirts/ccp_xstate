@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "intake-suggested-fix.3",
+  "case": "intake-suggested-fix",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 5 lines quoted in order, checks numbered 1 to 5"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5 not quoted word for word in the builder brief: \"Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared each check's PASS/FAIL conditions with the words of its expect line. Check 1 requires exit 1 and empty stdout, which is exactly what line 1 says. Check 2 requires `bad config:`, the exact path and line/column 3. Failing it for a \"resolved or shortened\" path follows from \"exactly as passed\". Check 3 requires `OK`, meaning it threw and the message contains the path. Check 4 requires `listening on 9000`, exit 0 and a deepEqual to `{port: 9000}`, all of which line 4 names. Check 5 requires `npm test` to pass at the head and at least one path-asserting test to fail against base `src/`, which matches \"fails at the current base commit\". The stricter items sit under \"Advisory (not pass/fail conditions)\": reading the source to see whether line/column are computed, ENOENT handling, swallowing errors, and SyntaxError/cause. No PASS or FAIL condition goes beyond its expect line.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs. They name only things that exist at this commit or that the PR adds: `src/app.js`, `src/config.js`, `test/config.test.js`, and `npm test` (which runs `node --test`). The shell syntax is valid. The `printf` lines with `\\n` work inside single quotes. In Checks 3 and 4, `$d` expands inside the double-quoted `-e` script, which has no `!` to cause history expansion. The JavaScript is valid ESM. It uses `import {loadConfig} from './src/config.js'`, the same form as the issue's own proofs, and `import assert from 'node:assert/strict'`. Check 5 also holds: `gh pr view --json baseRefOid -q .baseRefOid` uses a real field, and `git worktree add`, `git checkout <base-sha> -- src` and `npm test` are correct. The builder's second step-5 bullet reuses `$d` from the bullet before it, so it works when run in order. I found no command that would fail as written.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 is caught. The builder brief says \"Do NOT make `loadConfig` catch and return `{}` or defaults. It must keep throwing.\"\n\nItem 2 is not fully caught. The builder brief does mention the existing test: \"Keep the thrown error a `SyntaxError`, or attach the original as `cause`. Either way, keep the existing test `bad JSON throws` passing, or update it on purpose.\" But neither brief says that test/config.test.js asserts loadConfig throws a SyntaxError. The brief also offers \"attach the original as `cause`\" as an equal alternative. A plain Error carrying a cause would break a SyntaxError assertion, so the brief doesn't show that wrapping the error changes that test's outcome. The verifier only covers this in an advisory note (\"Note whether the thrown error is still a `SyntaxError`\"), and it doesn't connect that to the test either. So the second must_catch item is only hinted at, not stated.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both must_not items against the briefs.\n\nItem 1: the builder brief never tells the builder to catch the error and return a value. It says \"Do NOT make `loadConfig` catch and return `{}` or defaults. It must keep throwing.\" Its only try/catch step says to \"throw a new error\" with the path and the line/column. That rethrows the error, so no value is returned.\n\nItem 2: the verifier's Check 2 does not require one exact format. It passes stderr that identifies \"line 3 and column 3 of the mistake (e.g. `line 3 column 3`, `3:3`, or similar)\". It fails a run only if a part is missing, the path is altered, or the line or column is not 3. Wording or order alone cannot fail the check.\n\nNeither forbidden item appears in either brief.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with each verifier check. The builder brief does not reuse any of the verifier's own probes. It leaves out Check 3's inline `node --input-type=module` try/catch script and Check 4's `assert.deepEqual` one-liner. It also leaves out Check 5's worktree/base-checkout procedure and every PASS/FAIL condition. Step 5's hand checks are the issue's own proof commands, the c.json `printf … node src/app.js` run and the ok.json run, and the rule allows those. The expected results it gives come from the expect lines, which is the bar. The test requirements say what to test, such as `{port: 9000` throwing with the path in the message, and tell the builder to write its own tests, which is allowed. The worked example (position 20 → line 3, column 3) is implementation guidance and does not appear in the verifier brief. The builder brief carries none of the verifier's checks.",
+      "cached": false
+    }
+  }
+}

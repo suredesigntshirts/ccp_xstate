@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "3ed4241461601ea422c0aa2c07c99cc81dc7014518a2b77d5e7554507a5839b0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. Builder: the `printf '…' | node bin/csv2json.js [--tsv]` pipelines, `; echo \"exit=$?\"` and `npm test` are all valid. bin/csv2json.js exists, and package.json has a `test` script (`node --test`). The JS snippets (`process.argv.slice(2)`, `parse(text, '\\t')`, `execFileSync(...)`) are valid. The expected string `[{\"a\\\\tb\":\"1\\\\t2\"}]\\n` is correct JS-literal notation for the JSON tab escape. Verifier: `node --version`, the pipes into `od -c`, `npm test; echo \"exit=$?\"` and `grep -rn -- '--tsv' test/` would all run as written, and the `--` stops grep from reading `--tsv` as an option. The issue's proof uses `npm run test:cli`, a script that doesn't exist. The verifier brief catches this: it only runs that script \"If the PR adds one\" and says its absence is not a failure. No step relies on a missing file or script, and no argument or syntax is wrong.",
+  "model": "claude-opus-5-5",
+  "ms": 7492,
+  "tokens": {
+    "input": 2,
+    "output": 711,
+    "cacheCreation": 6227,
+    "cacheRead": 783,
+    "fresh": 6940,
+    "total": 7723
+  },
+  "at": "2026-11-09T02:32:07.301Z"
+}

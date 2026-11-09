@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "05b8ec84427647b62e6ca7f6cd52b40a904ab0ff4497ae6fc9f1e87882a89eb1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 3, 5 and 6 stay within their lines. Check 3's \"line equal to 2\" and the empty array for clean text follow from the line semantics in expect line 1, and the stricter items (CRLF, shebang, lockfile) are correctly placed under Advisory. Check 4 breaks the criterion. Its PASS condition requires \"The tests run and pass\" and it runs `npm test --workspace packages/jsonl-lint`, but expect line 4 only asks for a package.json with name, type and test script, no runtime dependencies, and \"node:test tests for\" the listed cases. It does not say those tests must pass; passing belongs to expect line 6 (\"npm test ... green\"). That is a condition the line's words do not force, and it sits in a PASS condition instead of under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 14810,
+  "tokens": {
+    "input": 2,
+    "output": 1186,
+    "cacheCreation": 4840,
+    "cacheRead": 783,
+    "fresh": 6028,
+    "total": 6811
+  },
+  "at": "2026-11-09T02:37:46.792Z"
+}

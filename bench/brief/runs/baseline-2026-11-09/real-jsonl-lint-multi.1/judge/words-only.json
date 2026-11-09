@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "f9e7d20fd6ca121e6b9ce74def69086a463e8a20950982fc6f54f96ffa694c12",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each check's PASS and FAIL conditions with the words of its expect line. Checks 2 to 6 stay within their words. For example, Check 3's \"stdout still contains the bad-row lines\" follows from \"other files still checked and reported\", and the usage-message and read-before-check tests are correctly listed under Advisory. Check 1 breaks the criterion. Its PASS condition requires that \"A file named twice is reported twice\", and its test run names `$T/bad.jsonl` twice. The expect line says nothing about duplicate arguments. \"Checks every file named in order\" does not force a duplicate to be reported twice, so this is an edge-case test the words don't require. It belongs under Advisory. Check 1 also fixes the single-file output to `$T/bad.jsonl:2: <JSON.parse message>`. That ties the result to one error source, which is stricter than \"as for one file before\".",
+  "model": "claude-opus-5-5",
+  "ms": 11806,
+  "tokens": {
+    "input": 2,
+    "output": 919,
+    "cacheCreation": 4833,
+    "cacheRead": 783,
+    "fresh": 5754,
+    "total": 6537
+  },
+  "at": "2026-11-09T02:35:53.019Z"
+}

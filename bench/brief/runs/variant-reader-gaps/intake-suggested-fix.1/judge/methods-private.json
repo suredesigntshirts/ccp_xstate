@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "e37c590054483d2cb64a0d6e044be32a62dca0154b9a509fba19cede1f719996",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief. The builder's step 5 hand checks (`printf '{\\n  \"port\": 9000,...' > $d/c.json; node src/app.js $d/c.json` and the ok.json run) are the issue's own proof commands for expect lines 1 and 4, which the criterion allows. Their stated outcomes (\"exit 1, print nothing on stdout\", \"listening on 9000\") just restate the expect lines, which is the bar. The builder brief has none of the verifier's `--- stdout`/`--- path:` wrapper script, `node --input-type=module` probes, `DEEPEQUAL` assertion, `git checkout <base-sha> -- src` re-run or advisory ENOENT probe. Step 3 asks the builder to write its own tests (the `{port: 9000` and four-line cases) and to make one fail on today's src, which is allowed and taken from the expect lines. Nowhere does it show PASS/FAIL wording or a probe copied from the verifier brief.",
+  "model": "claude-opus-5-5",
+  "ms": 12778,
+  "tokens": {
+    "input": 2,
+    "output": 843,
+    "cacheCreation": 5684,
+    "cacheRead": 783,
+    "fresh": 6529,
+    "total": 7312
+  },
+  "at": "2026-11-09T02:33:18.887Z"
+}

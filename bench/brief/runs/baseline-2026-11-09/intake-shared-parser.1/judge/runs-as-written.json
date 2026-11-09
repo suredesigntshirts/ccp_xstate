@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "891632c4af1138621775c4146f9c7e1ecb2fb39a639143cd257354e28bdebd15",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs, and each one runs as written. The files they name all exist at this commit: bin/csv2json.js, src/parse.js, test/csv.test.js, README.md and package.json. The verifier's `npm run test:cli` would not work today, but builder step 3 adds that script first, and the verifier only runs it \"if package.json defines test:cli\". The JavaScript is valid: `execFileSync('node', ['bin/csv2json.js', '--tsv'], { input, encoding: 'utf8' })`, `parse(text, '\\t')`, and the expected string '[{\"a\\\\tb\":\"1\\\\t2\"}]\\n' correctly encodes the JSON tab escape. The shell commands use valid syntax and fitting arguments: the printf pipes, `printf '%s\\n' '[{\"a\\tb\":\"1\\t2\"}]'` (single quotes with %s keep the backslash-t), `cmp /tmp/out /tmp/exp && echo SAME`, `od -c`, `grep -n -- '--tsv' test/*.js`, `node --version` and `npm test`. I found nothing that would fail to run.",
+  "model": "claude-opus-5-5",
+  "ms": 8267,
+  "tokens": {
+    "input": 2,
+    "output": 827,
+    "cacheCreation": 6049,
+    "cacheRead": 783,
+    "fresh": 6878,
+    "total": 7661
+  },
+  "at": "2026-11-09T02:32:12.684Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "aa326c1e8e6535927b804b05130dcfc3f8afff993721318695458c60e23df89b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Items 1, 2 and 4 are met. Item 1: builder step 7 says to run `npm install` and commit package-lock.json because \"CI runs `npm ci`\". Item 2: builder step 6 says to \"replace the 'No tools yet' bullet\". Item 4: Check 6 uses `gh pr view` with body, headRefOid and statusCheckRollup, and requires the Closes line and a green test workflow at the head commit. Item 3 is not met. Check 6 runs root `npm test` but passes on \"`npm test` succeeds locally\" alone. It never reads the test count or breaks lint() to show the jsonl-lint tests ran under the root `--if-present` script, so a silent skip would go unnoticed. Check 4 runs `npm test --workspace packages/jsonl-lint` directly, which does not test the root script.",
+  "model": "claude-opus-5-5",
+  "ms": 11455,
+  "tokens": {
+    "input": 2,
+    "output": 944,
+    "cacheCreation": 5395,
+    "cacheRead": 783,
+    "fresh": 6341,
+    "total": 7124
+  },
+  "at": "2026-11-09T02:37:46.490Z"
+}

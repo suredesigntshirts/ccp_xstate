@@ -1,0 +1,17 @@
+Goal: one pull request that meets both acceptance lines of issue https://github.com/o/settings/issues/31:
+1. "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+2. "npm test passes"
+
+What the repo has now:
+- src/config.js: `export function loadConfig(path) { return JSON.parse(readFileSync(path, 'utf8')); }`. Nothing catches the error.
+- test/config.test.js has two tests. 'reads a config' checks that a valid file parses. 'bad JSON throws' checks that `{port: 9000` throws a SyntaxError. That second test contradicts line 1 and will fail once you make the fix.
+- src/app.js wraps loadConfig in try/catch, prints `bad config: <message>`, and exits 1. It merges the result over DEFAULTS { port: 8080, greeting: 'hi' }.
+- README.md says a file that is not valid JSON stops the app with `bad config: <message>` and exit 1.
+- `npm test` runs `node --test`.
+
+Steps:
+1. In src/config.js, keep loadConfig(path) as the exported function with the same signature. Read the file with readFileSync as it does now. Wrap only the JSON.parse call in try/catch, and in the catch return `{}`. Leave read errors uncaught, so a missing file (ENOENT) still throws: the line only covers the JSON.parse error. You may write a short message to stderr in the catch that names the path and the parse error. The issue says people can't tell which file is broken, so this helps them. It is optional, and the function must still return {}.
+2. In test/config.test.js, replace the 'bad JSON throws' test with one that asserts `loadConfig(file('{port: 9000'))` deep-equals `{}` and does not throw. Keep 'reads a config' as it is.
+3. Update README.md so it no longer says invalid JSON stops the app with exit 1. Say instead that an invalid JSON file is treated as empty, so the defaults are used. src/app.js's try/catch can stay because it still covers read errors.
+4. Run `npm test` from the repo root and confirm every test passes with exit status 0.
+5. Open the pull request. Its description should quote both acceptance lines and say how each is met.

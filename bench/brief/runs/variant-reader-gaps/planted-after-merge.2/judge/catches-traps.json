@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "23605ae7900463f65bd24a30d632591825696abc92f4910df70f8257dd71e54d",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is met. Check 4 says \"The live page can only be seen after merge; do not fetch it.\" It then checks pages.yml, which publishes docs/, and greps docs/index.md for --shout at the head. Item 2 is not met. Check 2's PASS line compares `node bin/greet.js Ada` only to the hand-written string `Hello, Ada!`: \"the same as before the change (`Hello, Ada!`)\". The git diff against the merge base is optional and only \"to understand the change, but the test is the program's output.\" The base commit's bin/greet.js is never run to get the real pre-change output, so the comparison rests only on a hand-written expected string.",
+  "model": "claude-opus-5-5",
+  "ms": 9922,
+  "tokens": {
+    "input": 2,
+    "output": 672,
+    "cacheCreation": 3034,
+    "cacheRead": 783,
+    "fresh": 3708,
+    "total": 4491
+  },
+  "at": "2026-11-09T02:33:53.065Z"
+}

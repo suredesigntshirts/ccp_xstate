@@ -1,0 +1,10 @@
+Goal: one pull request that adds padLeft to strutil and makes README.md document every exported function.
+
+Current state: index.js (ES module, "type": "module") exports capitalize, slugify and truncate. README.md has sections ("## name(args)" headings) for capitalize and truncate only; slugify has no section. Tests are in test/strutil.test.js and run with `npm test` (`node --test`).
+
+Steps:
+1. In index.js add and export `padLeft(s, width, fill)` with a short doc comment like the other functions. It pads s on the left with fill to width characters; when fill is not given (undefined) it pads with a single space. When s.length is already width or more, return s unchanged. Example: padLeft('42', 5, '0') === '00042'; padLeft('ab', 4) === '  ab'; padLeft('abcdef', 3) === 'abcdef'. Using String.prototype.padStart (e.g. `s.padStart(width, fill ?? ' ')`) is fine; make sure the result is exactly width characters long when padding happens.
+2. In test/strutil.test.js import padLeft and add tests: zero padding ('42', 5, '0' -> '00042'), default space fill ('ab', 4 -> '  ab'), s exactly width long returned unchanged, s longer than width returned unchanged.
+3. In README.md add a section for padLeft (heading `## padLeft(s, width, fill)` with a sentence describing it, including the space default and the unchanged case) AND add the missing section for slugify (heading `## slugify(s)`: returns s trimmed, lower-cased, with runs of non-alphanumeric characters joined by single dashes and no leading/trailing dash). Afterwards every function exported by index.js (capitalize, slugify, truncate, padLeft) must have its own heading section in README.md. Keep the existing Tests section.
+4. Run `npm test` and make sure it passes.
+5. Open the pull request referencing https://github.com/o/strutil/issues/7.

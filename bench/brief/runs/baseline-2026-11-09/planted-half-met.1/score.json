@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.1",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line, and the criterion holds. Check 1 tests only that padLeft is exported, pads on the left to width, uses a space when fill is omitted, and takes (s, width, fill). The sample values (\"00042\", \"  ab\", \"**x\") just apply those words. Check 2 tests only that s comes back unchanged when it is exactly width long or longer. Check 3 asks for a section per exported function, meaning \"a heading that names the function, followed by text describing it\". That is a fair reading of \"section\" rather than an extra rule. Check 4 asks only that npm test succeeds. The stricter items are all under \"Advisory (not pass or fail conditions)\": test coverage of padLeft, the `## name(args)` heading style, and how a multi-character fill behaves. No mutation test, branch rule or exact-wording rule appears in any PASS or FAIL condition.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository facts.\n\n- `npm test` will run: package.json defines `\"test\":\"node --test\"`.\n- `npm install` is only asked for if dependencies exist, and it is a valid command either way.\n- The three `node --input-type=module -e \"...\"` checks are fine. `--input-type=module` works with `-e`, and `'./index.js'` resolves from the repository root, where index.js is tracked.\n- Each check is wrapped in double quotes. Inside them are only single-quoted JS strings and characters the shell leaves alone (`=>`, `===`, `[k]`, parentheses), with no `$`, backticks or `!`. So the shell passes each one through unchanged.\n- The JavaScript is valid: namespace and named imports, `Object.keys(...).filter(...)`, `JSON.stringify`.\n- The builder's files (index.js, README.md, package.json, test/strutil.test.js) all exist at this commit.\n\nOne thing I couldn't confirm from the facts given: the brief says index.js is an ES module. If it were CommonJS instead, the imports would still mostly work through Node's interop.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one. (1) Step 4 of the builder brief says \"README.md has sections for capitalize and truncate but none for slugify\" and tells the builder to \"Add a `## slugify(s)` section\", plus a padLeft section. (2) Verifier Check 3 lists the exported functions at the head and names them: \"at least capitalize, slugify, truncate and padLeft\". It FAILs if \"any exported function has no section\", and it says \"check it specifically\" about slugify. (3) Verifier Check 1 calls `m.padLeft('ab',4)` with no fill argument and expects `\"  ab\"`. It FAILs if \"the default fill is not a space\".",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "Item 1: Check 3 lists exported functions at runtime and requires \"every function in that list (at least capitalize, slugify, truncate and padLeft) has its own README section\", and says to check slugify specifically. A README with no slugify section fails. Item 2: no PASS/FAIL condition goes beyond its line. Check 1 tests a one-character fill but doesn't require fill to be one character. \"confirm padLeft takes the parameters (s, width, fill) in that order\" repeats the signature in the line and doesn't count parameters. Check 3 defines a section loosely as \"a heading that names the function, followed by text describing it\", with no fixed layout. The heading style, test coverage and multi-character fill checks are marked \"Advisory (not pass or fail conditions)\". The builder's `## name(` self-check is a builder step, not a verifier condition.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "The criterion is not met. I compared the builder brief's steps with the verifier brief's checks. In step 3, the builder brief tells the builder to write tests for `padLeft('42', 5, '0') === '00042'`, `padLeft('ab', 4) === '  ab'` and `padLeft('abcdef', 4, '0') === 'abcdef'`. Those are the same inputs and expected outputs as the verifier's PASS conditions: Check 1 expects \"00042\" and \"  ab\", and Check 2 expects \"abcdef\". The builder may write its own tests, but here it is handed the checker's exact probes, so the verifier's checks reach the builder. Step 4 also has the builder confirm that every exported function has a matching README heading, which largely repeats Check 3's method. The builder brief therefore carries verifier probes and does not keep the methods private.",
+      "cached": false
+    }
+  }
+}

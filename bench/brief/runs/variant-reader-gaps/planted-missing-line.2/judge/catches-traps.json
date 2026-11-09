@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "cc18bf09243469ad439a3fa6bf6527f77b7e362d1add091273f90d046612ab48",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is met. The builder brief says runs without the flag should \"behave the same as before\" and says \"Run `npm test` and make sure it passes.\" Item 3 is met. Check 1 pipes the same name/age/city table in as TSV and as CSV and diffs the two outputs. Item 2 is only partly met. The Advisory section sits outside PASS/FAIL. It suggests \"Run `npm test`\" and checks that output without the flag is unchanged. But it never says that no expect line covers CSV behaviour or npm test. Its only label is \"Advisory (not pass/fail conditions),\" which doesn't say why these checks are there or note the gap in the expect lines. Item 2 requires that statement, so the criterion is not met for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 7250,
+  "tokens": {
+    "input": 2,
+    "output": 699,
+    "cacheCreation": 2744,
+    "cacheRead": 783,
+    "fresh": 3445,
+    "total": 4228
+  },
+  "at": "2026-11-09T02:35:13.558Z"
+}

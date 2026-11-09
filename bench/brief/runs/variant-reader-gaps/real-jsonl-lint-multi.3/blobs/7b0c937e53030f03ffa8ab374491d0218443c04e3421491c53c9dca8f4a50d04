@@ -1,0 +1,37 @@
+Check out the pull request head for issue https://github.com/suredesigntshirts/ccp_machine_test/issues/104 and run every command from the repository root. Each check below matches one expect line, in order.
+
+Check 1 — expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before"
+Run:
+`d=$(mktemp -d) && printf '{"a":1}\n{bad}\n' > $d/a.jsonl && printf '{"ok":1}\n' > $d/b.jsonl && printf 'x\n\n{"c":' > $d/c.jsonl && node packages/jsonl-lint/bin/jsonl-lint.js $d/a.jsonl $d/b.jsonl $d/c.jsonl; echo "exit=$?"; for f in a c; do node packages/jsonl-lint/bin/jsonl-lint.js $d/$f.jsonl; done`
+PASS: the multi-file run prints the a.jsonl line(s) (`<dir>/a.jsonl:2: <error>`) followed by the c.jsonl lines (`<dir>/c.jsonl:1: ...` and `<dir>/c.jsonl:3: ...`), nothing for b.jsonl, and those lines equal the concatenation of the two single-file runs' output in argument order.
+FAIL: any file is skipped, lines are out of argument order, a clean file produces output, or a line differs from the single-file `<file>:<line>: <error>` format.
+
+Check 2 — expect: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)"
+Run: `printf '{"a":1}\n{bad}\n' | node packages/jsonl-lint/bin/jsonl-lint.js -; echo "exit=$?"` and `printf '{"a":1}\n' | node packages/jsonl-lint/bin/jsonl-lint.js - -; echo "exit=$?"`
+PASS: the first prints a line starting `-:2: ` (stdin was read and reported as `-`); the second exits 2.
+FAIL: stdin is not read, it is reported under another name, or two `-` arguments do not exit 2.
+
+Check 3 — expect: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)"
+Run:
+`d=$(mktemp -d) && printf '{"a":1}\n' > $d/ok1.jsonl && printf '[1]\n' > $d/ok2.jsonl && printf '{bad}\n' > $d/bad.jsonl && J=packages/jsonl-lint/bin/jsonl-lint.js; node $J $d/ok1.jsonl $d/ok2.jsonl; echo "clean exit=$?"; node $J $d/ok1.jsonl $d/bad.jsonl $d/ok2.jsonl; echo "bad exit=$?"; node $J; echo "none exit=$?"; node $J $d/ok1.jsonl $d/missing.jsonl $d/bad.jsonl 2>$d/err; echo "missing exit=$?"; cat $d/err`
+PASS: clean exit=0; bad exit=1; none exit=2 with a message on stderr; missing exit=2, stderr mentions missing.jsonl, and stdout still includes the `<dir>/bad.jsonl:1: ` line (the other files were checked and reported).
+FAIL: any of those exit codes differ, the missing-file error is not on stderr, or bad.jsonl's row is not reported in the missing-file run.
+
+Check 4 — expect: "lint(text) in src/index.js is unchanged"
+Run: `git fetch origin main && git diff origin/main...HEAD -- packages/jsonl-lint/src/index.js`
+PASS: the diff is empty.
+FAIL: the diff shows any change to the lint function (a change to anything else in that file is also suspicious; report it).
+
+Check 5 — expect: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage"
+Run: `(cd packages/jsonl-lint && node --test)` and read packages/jsonl-lint/test/*.test.js and packages/jsonl-lint/README.md at the head.
+PASS: node:test tests exist that cover each of: two clean files; one bad file among several; stdin via `-` clean; stdin via `-` bad; a missing file among good ones; two `-` arguments; no arguments — and the README documents the multi-file usage (`<file> [<file> ...]`) and `-` for stdin.
+FAIL: any of those seven cases has no test, or the README does not document the usage.
+
+Check 6 — expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head"
+Run: `npm ci && npm test; echo "exit=$?"`, then `gh pr view <PR number> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,state` and `gh pr checks <PR number> --repo suredesigntshirts/ccp_machine_test`.
+PASS: it is one PR on suredesigntshirts/ccp_machine_test, its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`, `npm test` passes, and the `test` workflow check at the head commit is green.
+FAIL: the body lacks that text, npm test fails, or the test workflow check at the head is failing or missing.
+
+Advisory (not pass/fail):
+- Usage/stderr wording, exact error text and whether a usage message is printed for two `-` are free choices.
+- Nice to have: the missing-file error message format `jsonl-lint: cannot read <file>: ...` matches the old one; existing single-file tests still pass unchanged.

@@ -1,0 +1,29 @@
+Check the pull request head against issue https://github.com/o/strutil/issues/7. Run every command from the repository root at the PR head. Report one check per expect line, in this order.
+
+Check 1 — expect: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run:
+node --input-type=module -e "import * as m from './index.js'; const p = m.padLeft; console.log(typeof p); console.log(JSON.stringify([p('42',5,'0'), p('ab',4), p('',3,'x'), p('7',3,'*')]));"
+PASS: the first line is `function` and the second is `["00042","  ab","xxx","**7"]` (left padding with the given fill, a space when fill is omitted, result width characters long).
+FAIL: padLeft is not exported (first line not `function`, or the import errors), or any of those values differs.
+
+Check 2 — expect: "padLeft returns s unchanged when s is already width characters or longer"
+Run:
+node --input-type=module -e "import { padLeft as p } from './index.js'; console.log(JSON.stringify([p('12345',5,'0'), p('123456',5,'0'), p('abc',2), p('abc',0)]));"
+PASS: output is `["12345","123456","abc","abc"]`.
+FAIL: any value differs from the input string, or the command errors.
+
+Check 3 — expect: "README.md has a section for every function index.js exports"
+Run:
+node --input-type=module -e "import * as m from './index.js'; import fs from 'node:fs'; const r = fs.readFileSync('README.md','utf8'); const heads = r.split('\n').filter(l => /^#+ /.test(l)); const fns = Object.keys(m).filter(k => typeof m[k] === 'function'); for (const f of fns) console.log(f, heads.some(h => new RegExp('\\b' + f + '\\b').test(h)) ? 'HAS-SECTION' : 'MISSING');"
+Then read README.md to confirm each such heading starts a section about that function.
+PASS: every exported function (this must include capitalize, slugify, truncate and padLeft) prints HAS-SECTION and its heading starts a section describing it.
+FAIL: any exported function prints MISSING or has no section describing it. Note slugify had no README section before this change; it must have one now.
+
+Check 4 — expect: "npm test passes"
+Run: npm test
+PASS: the test run reports no failing tests.
+FAIL: any test fails or the run errors.
+
+Advisory (not part of PASS/FAIL):
+- npm test should exit with status 0, and ideally the test file contains tests for padLeft covering default fill and the unchanged case.
+- Note whether padLeft handles multi-character fill sensibly (e.g. result still width characters); the expect lines do not require it.

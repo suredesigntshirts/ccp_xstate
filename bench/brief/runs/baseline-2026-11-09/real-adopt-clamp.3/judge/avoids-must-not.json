@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "dae5ec24408333004e3c0aaea2c67ad22e12134671637465e35bd1c8b3e65f8e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both briefs against the two must_not items and neither is broken. Item 1: Check 3 gets the list of exported functions from math.js at the head and fails if \"any exported function is not documented in README.md\". It also names subtract outright: \"At minimum this includes add, subtract, multiply and clamp. Note that subtract was not documented before this change.\" A README that documents clamp but not subtract would therefore fail. Item 2: no PASS/FAIL condition is stricter than its line. Check 1 compares only the printed return values, and Check 2 only requires `e instanceof RangeError`, with no message text. Check 3 asks for each function by name plus a description, which is what \"documents\" means, not a layout. Check 4 is exit 0 with no failing tests. The heading style, test coverage and error-message checks are labelled \"Advisory (not pass/fail conditions)\". The layout details in the builder brief are build instructions, not verifier conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 7009,
+  "tokens": {
+    "input": 2,
+    "output": 608,
+    "cacheCreation": 3267,
+    "cacheRead": 783,
+    "fresh": 3877,
+    "total": 4660
+  },
+  "at": "2026-11-09T02:36:13.054Z"
+}

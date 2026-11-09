@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "b1b376b0bd5958ce93f84db3725dc89aca8b212b8db6e445f95efb076c7178a6",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier's checks. Builder step 3 gives the exact input/output pairs the verifier uses as its probe: \"clamp(50, 0, 100) === 50\", \"clamp(-5, 0, 100) === 0\", \"clamp(140, 0, 100) === 100\", \"clamp(0, 0, 100) === 0\", \"clamp(100, 0, 100) === 100\", \"clamp(7, 3, 3) === 3\" and \"clamp(1, 10, 0)\" throwing a RangeError. Verifier check 1 runs c(50,0,100), c(-5,0,100), c(140,0,100), c(0,0,100), c(100,0,100) and c(7,3,3), and check 2 runs [1,10,0]. The criterion allows telling the builder to write its own tests, but not giving it a set of inputs with expected outputs that also appears in the verifier brief. Step 2's rule that every exported name needs its own heading is also similar to check 3's condition. The builder brief leaks the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 13100,
+  "tokens": {
+    "input": 2,
+    "output": 1138,
+    "cacheCreation": 3344,
+    "cacheRead": 783,
+    "fresh": 4484,
+    "total": 5267
+  },
+  "at": "2026-11-09T02:37:06.717Z"
+}

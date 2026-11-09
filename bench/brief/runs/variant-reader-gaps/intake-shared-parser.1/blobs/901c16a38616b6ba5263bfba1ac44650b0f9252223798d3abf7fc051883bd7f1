@@ -1,0 +1,44 @@
+Check out the pull request head and run every command from the repository root. There is one check per acceptance line, in order. Record PASS or FAIL for each, with the observed output.
+
+Check 1. Expect line: "`printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv` prints exactly `[{"a":"1","b":"2"}]` followed by a newline and exits 0."
+Run: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js --tsv > /tmp/c1.out; echo "exit=$?"; printf '%s\n' '[{"a":"1","b":"2"}]' | cmp - /tmp/c1.out && echo SAME`
+PASS: it prints exit=0 and SAME.
+FAIL: the exit status is not 0, or cmp reports a difference.
+
+Check 2. Expect line: "With --tsv, commas inside a field stay literal: `printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv` prints exactly `[{"name":"x","note":"hello, world"}]` followed by a newline."
+Run: `printf 'name\tnote\nx\thello, world\n' | node bin/csv2json.js --tsv | cmp - <(printf '%s\n' '[{"name":"x","note":"hello, world"}]') && echo SAME`
+PASS: it prints SAME.
+FAIL: cmp reports a difference.
+
+Check 3. Expect line: "With --tsv and several data rows, every row comes out in order: `printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv` prints exactly `[{"a":"1","b":"2"},{"a":"3","b":"4"}]` followed by a newline."
+Run: `printf 'a\tb\n1\t2\n3\t4\n' | node bin/csv2json.js --tsv | cmp - <(printf '%s\n' '[{"a":"1","b":"2"},{"a":"3","b":"4"}]') && echo SAME`
+PASS: it prints SAME.
+FAIL: cmp reports a difference.
+
+Check 4. Expect line: "Without the flag, CSV still works as before: `printf 'a,b\n1,2\n' | node bin/csv2json.js` prints exactly `[{"a":"1","b":"2"}]` followed by a newline."
+Run: `printf 'a,b\n1,2\n' | node bin/csv2json.js | cmp - <(printf '%s\n' '[{"a":"1","b":"2"}]') && echo SAME`
+PASS: it prints SAME.
+FAIL: cmp reports a difference.
+
+Check 5. Expect line: "Without the flag, tabs are not treated as separators: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js` prints exactly `[{"a\tb":"1\t2"}]` followed by a newline, which is the current output."
+Run: `printf 'a\tb\n1\t2\n' | node bin/csv2json.js | cmp - <(printf '%s\n' '[{"a\tb":"1\t2"}]') && echo SAME`
+The expected text contains the literal two-character JSON escape backslash-t, not a real tab. printf '%s' keeps it literal.
+PASS: it prints SAME.
+FAIL: cmp reports a difference.
+
+Check 6. Expect line: "`npm test` exits 0, and test/ contains at least one test that runs bin/csv2json.js with --tsv on tab-separated input and checks its output."
+Run: `npm test; echo "exit=$?"`
+Then run: `grep -n -- '--tsv' test/*.js`
+Read each matching test.
+PASS: npm test reports exit=0, and at least one test in test/ runs bin/csv2json.js with the --tsv argument, gives it input that contains tab characters, and asserts on the output.
+FAIL: npm test exits non-zero, or no test in test/ meets that description.
+
+Check 7. Expect line: "README.md documents the --tsv flag with an example invocation."
+Read README.md at the head.
+PASS: README.md describes the --tsv flag and includes an example command line that uses --tsv.
+FAIL: README.md does not mention --tsv, or it gives no example invocation that uses it.
+
+Advisory (not part of PASS or FAIL):
+- The issue's proof for line 6 runs `npm run test:cli`. If package.json defines that script, run `npm run test:cli; echo "exit=$?"` and note the result. If it does not define it, note that.
+- The issue's proof for line 7 expects an example of the form `node bin/csv2json.js --tsv < file` and wording that the flag means tab-separated input. Note whether README.md matches that.
+- You may also check that the flag works in another position, such as `node bin/csv2json.js --tsv` compared with other arguments placed before it, and that src/parse.js behaviour for commas is unchanged.

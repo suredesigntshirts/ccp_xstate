@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "d9ff4023ac08aadefe7ea8ce7c9b5e90f954adae91bf767f4d5cd01952b7f391",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared every builder step against the verifier's checks. The builder brief contains none of the verifier's probes. It doesn't have the printf inputs for /tmp/jl-bad.jsonl or /tmp/jl-ok.jsonl, the expected \":3:\"/\":5:\" lines, the `node --input-type=module -e` lint call, the `wc -c` stderr byte count, the grep for node:test, or the `gh pr list`/`gh pr checks` commands. It also states no PASS/FAIL conditions. Its requirements restate the expect lines: the output format, exit codes 0/1/2 and the test cases to cover. That is the bar, which the criterion allows. It tells the builder to run `npm ci && npm test` and to write its own node:test tests, both of which are allowed. Some builder items (shebang, chmod, CRLF, package-lock) overlap with the verifier's advisory notes, but those notes are marked \"not pass/fail\" and the builder gets them as build requirements, not probes. So the criterion holds across the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 9342,
+  "tokens": {
+    "input": 2,
+    "output": 721,
+    "cacheCreation": 4880,
+    "cacheRead": 783,
+    "fresh": 5603,
+    "total": 6386
+  },
+  "at": "2026-11-09T02:38:41.331Z"
+}

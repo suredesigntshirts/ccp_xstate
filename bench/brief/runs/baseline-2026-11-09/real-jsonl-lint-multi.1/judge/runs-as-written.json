@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "4a9130adac09c4fb1882b742021ed629e5838f159ccb317425bb45025a3975c2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository facts. Every file they name is tracked: packages/jsonl-lint/bin/jsonl-lint.js, src/index.js, test/cli.test.js, README.md and .github/workflows/test.yml. `npm test` at the root and `npm test --workspace packages/jsonl-lint` match the scripts. The root script already uses `--workspaces`, so the workspace flag fits. The shell syntax is valid: `T=$(mktemp -d)`, `printf '{oops}\\n' | B $T/a.jsonl -`, `printf '{}\\n' | B - -; echo $?`, and `git merge-base origin/main HEAD` used with `git diff ..HEAD -- path`. `gh pr view <pr> --repo ... --json body,headRefOid,statusCheckRollup` uses real gh flags and fields. The JavaScript is valid: `readFileSync(0, 'utf8')`, `process.argv.slice(2)` and spawnSync with `input`. The verifier defines the shorthand B as the node command before it uses it. `<pr>` and `<merge-base>` are placeholders, and the brief says how to fill them. I found no command that would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 9402,
+  "tokens": {
+    "input": 2,
+    "output": 866,
+    "cacheCreation": 5141,
+    "cacheRead": 783,
+    "fresh": 6009,
+    "total": 6792
+  },
+  "at": "2026-11-09T02:36:02.454Z"
+}

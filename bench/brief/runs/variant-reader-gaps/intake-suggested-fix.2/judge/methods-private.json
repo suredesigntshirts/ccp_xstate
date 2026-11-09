@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "df8155081f2dd9b46a3b1095f59c36b08306686834df2f522b15e26d36379e3d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with each verifier check. The builder's hand checks in step 7 are the issue's own proof commands: the c.json run from proofs 1–2 and the ok.json run from proof 4. Their expected results (\"stderr has `bad config:`, `$d/c.json`, line 3 and column 3; exit 1; no stdout\") repeat the expect lines, which is the bar. The remaining check is `npm test`, which is allowed. None of the verifier-only material appears in the builder brief:\n- the Check 3 `node --input-type=module` try/catch script that prints `OK`/`NO PATH`,\n- the Check 4 `assert.deepEqual` script,\n- the Check 5 worktree/merge-base base-src procedure,\n- the verifier's PASS/FAIL wording, such as \"the path is altered (e.g. only the basename)\".\nThe builder's test instructions in step 5 are its own tests to write, which is allowed. The criterion holds for the whole brief.",
+  "model": "claude-opus-5-5",
+  "ms": 9328,
+  "tokens": {
+    "input": 2,
+    "output": 890,
+    "cacheCreation": 5742,
+    "cacheRead": 783,
+    "fresh": 6634,
+    "total": 7417
+  },
+  "at": "2026-11-09T02:34:01.129Z"
+}

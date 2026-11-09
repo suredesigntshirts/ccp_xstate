@@ -1,0 +1,17 @@
+Run every command from the repository root at the PR head.
+
+Check 1. Expect line: "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+Run the two commands below. They give the same table, first as TSV and then as CSV, and compare the JSON arrays the two runs print:
+node -e "const {execFileSync:x}=require('child_process');const t=x('node',['bin/csv2json.js','--tsv'],{input:'name\tage\tcity\nann\t30\tparis\nbob\t41\toslo\n',encoding:'utf8'});const c=x('node',['bin/csv2json.js'],{input:'name,age,city\nann,30,paris\nbob,41,oslo\n',encoding:'utf8'});const a=JSON.parse(t),b=JSON.parse(c);console.log('TSV:',t.trim());console.log('CSV:',c.trim());console.log(Array.isArray(a)&&a.length===2&&JSON.stringify(a)===JSON.stringify(b)?'SAME':'DIFFERENT')"
+node -e "const {execFileSync:x}=require('child_process');const t=x('node',['bin/csv2json.js','--tsv'],{input:'a\tb\n1\t2\n',encoding:'utf8'});const c=x('node',['bin/csv2json.js'],{input:'a,b\n1,2\n',encoding:'utf8'});console.log(JSON.stringify(JSON.parse(t))===JSON.stringify(JSON.parse(c))?'SAME':'DIFFERENT')"
+PASS: both commands print SAME. The first command's TSV output is a JSON array of the two rows keyed by name, age and city.
+FAIL: either command prints DIFFERENT, throws, or prints output that is not a JSON array.
+
+Check 2. Expect line: "README.md documents --tsv"
+Run: grep -n -- '--tsv' README.md, then read the README.md lines around each match.
+PASS: README.md mentions --tsv and says it reads tab-separated input or shows how to use it.
+FAIL: README.md does not mention --tsv, or a mention gives no information on what the flag does or how to use it.
+
+Advisory (does not decide PASS or FAIL):
+- Run npm test. It should exit 0, and a test for --tsv should exist in test/csv.test.js.
+- Without --tsv, CSV output should be unchanged: printf 'a,b\n1,2\n' | node bin/csv2json.js should print [{"a":"1","b":"2"}] followed by a newline.

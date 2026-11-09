@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "5c0e78d894a39e440345d7dd094b252f302629b704f401f8f0648c19346f25ea",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repository. They name only tracked files: bin/greet.js, src/greet.js, test/greet.test.js, docs/index.md and .github/workflows/pages.yml. `npm test` maps to the existing script \"node --test\", which picks up test/greet.test.js. The CLI calls are `node bin/greet.js --shout Ada`, `Ada --shout`, `--shout 'Grace Hopper'` and the bare `node bin/greet.js`. All use valid shell quoting and fit a script that reads a name and flags. `grep -n -- '--shout' docs/index.md` correctly uses `--` to end grep's options. The `git worktree add` step for comparing against the base commit is a valid approach. The words \"`git stash`-free checkout\" describe a method rather than giving a command to run. Neither brief contains JavaScript that has to run as written. Both briefs name only files that exist, use valid syntax and fit their programs.",
+  "model": "claude-opus-5-5",
+  "ms": 7150,
+  "tokens": {
+    "input": 2,
+    "output": 602,
+    "cacheCreation": 3462,
+    "cacheRead": 783,
+    "fresh": 4066,
+    "total": 4849
+  },
+  "at": "2026-11-09T02:33:07.993Z"
+}

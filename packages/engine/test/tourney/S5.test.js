@@ -208,7 +208,7 @@ test('S5 (6): the brief rule keeps stricter checks under Advisory, and the verif
     assert.match(brief, /put (?:anything stricter|the stricter test) .* under a heading Advisory, never into a PASS or FAIL condition\.$/);
     assert.doesNotMatch(brief, /adds no other pass or fail condition/);
     const grade = stageOf(wf, 'verify').rules.find((r) => r.startsWith('Grade only issue.expect'));
-    assert.equal(grade, "Grade only issue.expect, by what each line's words require. A condition in the brief stricter than its line, or anything under Advisory, is advisory: report it in evidence, never as a FAIL.");
+    assert.equal(grade, "Grade only issue.expect, by what each line's words require. A condition in task stricter than its line, or anything under Advisory, is advisory: report it in evidence, never as a FAIL.");
   }
 });
 

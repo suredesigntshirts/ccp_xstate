@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "f8a184964b417a612aea3c63145f2842423828a4c0c5a7ccd461516b71618dff",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier check against the two must_not items. Behaviour lines are checked by running the code. Check 1 runs the CLI on a file with a bad middle row, a blank line and a torn last row, then on a clean file, and passes on line prefixes like `/tmp/jl-bad.jsonl:3: ` plus the exit codes. It accepts any error text. Check 2 runs the CLI twice and only needs exit 2 and some stderr output (more than 0 bytes). Check 3 imports lint and calls it. Check 4 runs the tests. It reads the test files only to confirm the listed cases exist, which is what that line asks for. Check 5 checks that the README exists and names the tool, which fits a line about files. Check 6 needs one PR, the Closes line, npm test passing and a green workflow, with no branch-name or file limits. The extras (shebang, CRLF, lockfile) are marked advisory, not pass/fail. One small gap: the PR search uses `--state open`, but that is how the PR is found, not a stricter PASS condition. The builder's extra instructions are not pass/fail conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 12615,
+  "tokens": {
+    "input": 2,
+    "output": 836,
+    "cacheCreation": 4877,
+    "cacheRead": 783,
+    "fresh": 5715,
+    "total": 6498
+  },
+  "at": "2026-11-09T02:38:31.989Z"
+}

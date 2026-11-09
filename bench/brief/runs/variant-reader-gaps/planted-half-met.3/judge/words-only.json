@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "535bbe7621d55a6e392c306fd596588dad95f4b1bff1a3afe6ddedf60d78099e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 tests export type, zero fill, the default space and a '*' fill. Each case is \"padded on the left with fill… to exactly width characters\", which the words require. Check 2 tests only the equal-length and longer cases. Check 3 requires a heading naming each exported function, followed by some text describing it. That fits a reasonable reading of \"a section for every function\". Its list of the four names comes from the repository facts and adds no test the words don't force. Check 4 only requires passing tests and a successful exit. The test-coverage check and the multi-character fill note are correctly placed under \"Advisory\". No PASS or FAIL condition contains a mutation test, a branch rule, a file-scope rule or an exact-wording requirement.",
+  "model": "claude-opus-5-5",
+  "ms": 15312,
+  "tokens": {
+    "input": 2,
+    "output": 1325,
+    "cacheCreation": 3066,
+    "cacheRead": 783,
+    "fresh": 4393,
+    "total": 5176
+  },
+  "at": "2026-11-09T02:34:24.015Z"
+}

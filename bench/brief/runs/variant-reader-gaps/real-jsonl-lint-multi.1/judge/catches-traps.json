@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "26ee5120dd73db93ec47af2734e206e2083c8a517e9d6d2ab1d1af7a0f213438",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all four must_catch items. Item 1 breaks. Check 3(e) does run a missing file together with a file that has a bad row (`nope.jsonl b2.jsonl`). But its PASS condition only asks for \"an error about nope.jsonl on stderr\" and that the tool \"still prints the `/tmp/jv104/b2.jsonl:1: ` line\". It never asks for exit 2. Instead, the case where an unreadable file and a bad row come together is put under \"Advisory (not pass or fail conditions)\": \"exit 2 wins. Note the behaviour if it differs.\" So a PR that exits 1 here would still pass. Item 3 holds: builder step 4 updates the README. Item 4 mostly holds: Check 6 reads the PR body and the gh checks. Item 2 is diff-based, through the gh pr diff file list. Item 1 fails, so the criterion is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 9353,
+  "tokens": {
+    "input": 2,
+    "output": 607,
+    "cacheCreation": 6151,
+    "cacheRead": 783,
+    "fresh": 6760,
+    "total": 7543
+  },
+  "at": "2026-11-09T02:37:02.413Z"
+}

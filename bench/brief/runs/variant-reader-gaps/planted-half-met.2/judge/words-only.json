@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "12e505816a5b339bc4c3d646b8c107d1b3260a48336c053b719b920e93caf2c2",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Check 1 passes: its values ('00042', '  ab', 'xxx', '**7') all follow from left padding to width characters, with a space as the default fill. Check 2 passes: every case is s at or above width. Check 4 passes: exit status 0 is left as Advisory, which is looser than the words, not stricter. Check 3 breaks the criterion. Its PASS condition says every exported function \"(this must include capitalize, slugify, truncate and padLeft)\" prints HAS-SECTION. The expect line only asks for a section for whatever functions index.js exports. It does not require capitalize, slugify or truncate to stay exported. A PR that dropped one of those exports and still documented every remaining export would meet the words but fail this PASS condition. That fixed list of names is a test the words don't force, so it belongs under Advisory.",
+  "model": "claude-opus-5-5",
+  "ms": 10702,
+  "tokens": {
+    "input": 2,
+    "output": 948,
+    "cacheCreation": 3122,
+    "cacheRead": 783,
+    "fresh": 4072,
+    "total": 4855
+  },
+  "at": "2026-11-09T02:34:11.833Z"
+}

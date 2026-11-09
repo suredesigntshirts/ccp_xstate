@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "f0b5b5c0cff11ce27d6e588d6426446b2e27a6748985b70586e5bdeae8d6958e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Item 1: Check 3 lists exported functions at runtime and requires \"every function in that list (at least capitalize, slugify, truncate and padLeft) has its own README section\", and says to check slugify specifically. A README with no slugify section fails. Item 2: no PASS/FAIL condition goes beyond its line. Check 1 tests a one-character fill but doesn't require fill to be one character. \"confirm padLeft takes the parameters (s, width, fill) in that order\" repeats the signature in the line and doesn't count parameters. Check 3 defines a section loosely as \"a heading that names the function, followed by text describing it\", with no fixed layout. The heading style, test coverage and multi-character fill checks are marked \"Advisory (not pass or fail conditions)\". The builder's `## name(` self-check is a builder step, not a verifier condition.",
+  "model": "claude-opus-5-5",
+  "ms": 13051,
+  "tokens": {
+    "input": 2,
+    "output": 1076,
+    "cacheCreation": 3116,
+    "cacheRead": 783,
+    "fresh": 4194,
+    "total": 4977
+  },
+  "at": "2026-11-09T02:33:58.204Z"
+}

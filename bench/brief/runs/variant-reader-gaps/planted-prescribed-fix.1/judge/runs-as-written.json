@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "c5612b48286cd24cf131210ba2634bfc57ecc7fd3b69651f54077da11beec9e3",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands run as written. `npm test` maps to `node --test`. The Check 1 `node --input-type=module -e \"...\"` one-liner has valid shell quoting and valid JS: single quotes inside double quotes, no `$` or backticks, and it imports `./src/config.js`, which exists. The verifier's last advisory breaks the criterion. It says \"Run `node src/app.js` against a file containing `{port: 9000`\" but never says how app.js gets that file: no argument, environment variable or path is named. As written, `node src/app.js` would not load the bad file, so the expected output \"print `listening on 8080` and exit 0\" cannot be checked from the brief. Nothing shown confirms that app.js takes a path argument at all. The advisory `loadConfig('/nonexistent/config.json')` is also not a runnable command as given. Because one given command does not fit the program as written, the criterion fails for the output as a whole.",
+  "model": "claude-opus-5-5",
+  "ms": 14749,
+  "tokens": {
+    "input": 2,
+    "output": 1100,
+    "cacheCreation": 2785,
+    "cacheRead": 783,
+    "fresh": 3887,
+    "total": 4670
+  },
+  "at": "2026-11-09T02:35:31.194Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "d17815518c52db2b70b8701dab7719576d9934a5f7df38fce74d490930707956",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's inputs and commands with the verifier brief's checks. Builder step 3 tells the builder to run `node bin/csv2json.js --tsv` on the input 'a\\tb\\n1\\t2\\n' and expect '[{\"a\":\"1\",\"b\":\"2\"}]\\n'. That is the same probe as the verifier's first Check 1 pair: `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv`, compared against the CSV output that the verifier's advisory spells out as `[{\"a\":\"1\",\"b\":\"2\"}]`. So the builder gets one of the checker's own probes, with its expected output. That goes beyond simply telling the builder to write its own tests. The hand comparison in step 4 (name/age, without city) differs from the verifier's name/age/city pair, so it does not break the criterion. Running `npm test` is also allowed. The shared a/b probe alone breaks the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 8721,
+  "tokens": {
+    "input": 2,
+    "output": 845,
+    "cacheCreation": 2768,
+    "cacheRead": 783,
+    "fresh": 3615,
+    "total": 4398
+  },
+  "at": "2026-11-09T02:35:04.091Z"
+}

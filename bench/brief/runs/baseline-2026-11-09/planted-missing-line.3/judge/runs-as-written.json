@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "39fa4fbb7e6c1b42426afeb82e9870ad7d3eabd0118eea1779873c8bb8c99897",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Checked each command. `node bin/csv2json.js` names a tracked file. `npm test` maps to the package.json script \"node --test\". The printf pipelines (e.g. `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv`) are valid shell, and printf handles the \\t and \\n escapes inside single quotes. The `--tsv` flag is added by builder step 1 before the builder uses it, and the verifier runs at the PR head, where it exists. `node bin/csv2json.js --tsv < table.tsv` is example text for README.md, not a command either agent is told to run, so the missing table.tsv does not break anything. No bad syntax, missing files or misfit arguments found.",
+  "model": "claude-opus-5-5",
+  "ms": 9850,
+  "tokens": {
+    "input": 2,
+    "output": 760,
+    "cacheCreation": 2788,
+    "cacheRead": 783,
+    "fresh": 3550,
+    "total": 4333
+  },
+  "at": "2026-11-09T02:34:30.190Z"
+}

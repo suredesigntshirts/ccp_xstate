@@ -1,0 +1,29 @@
+Goal: add a new tool, jsonl-lint, as the first npm workspace under packages/ in suredesigntshirts/ccp_machine_test, all in one pull request that closes issue https://github.com/suredesigntshirts/ccp_machine_test/issues/102.
+
+Context: right now packages/ does not exist. The root package.json has workspaces ["packages/*"], and its test script runs `npm test --workspaces --if-present`. The CI workflow .github/workflows/test.yml runs `npm ci` and then `npm test` on Node 22. Tools are plain ES modules on Node 22+, with no build step and no runtime dependencies. Tests use node:test.
+
+Steps:
+1. Create packages/jsonl-lint/package.json with: "name": "jsonl-lint", "type": "module", "scripts": { "test": "node --test" }, and a "bin" entry { "jsonl-lint": "bin/jsonl-lint.js" }. Do not add a "dependencies" field (or leave it empty). Mark it private if you like and set engines node >=22.
+2. Create packages/jsonl-lint/src/index.js and export `lint(text)`. It takes the file's text and returns an array of `{ line, error }`, one entry for each row that is not valid JSON:
+   - Split on "\n" and also strip a trailing "\r" so CRLF files work. Line numbers are 1-based and count every physical line, including blank ones.
+   - Skip blank lines (empty, or only whitespace).
+   - A last line with no newline after it (an unterminated or torn last row) still gets checked with JSON.parse like every other line. The empty string after a final newline is not a row.
+   - `error` is the JSON.parse error message string.
+   - Valid text, empty text, or text with only blank lines returns [].
+3. Create packages/jsonl-lint/bin/jsonl-lint.js, executable (chmod +x, with the `#!/usr/bin/env node` shebang). It imports lint from ../src/index.js. Behaviour:
+   - No argument: print a usage message to stderr and exit 2.
+   - The file is missing or cannot be read: print an error naming the file to stderr and exit 2.
+   - Otherwise, for each problem print `<file>:<line>: <error>` to stdout, where <file> is the argument exactly as the user gave it. Exit 1 if there were any problems and 0 if there were none.
+   - Set process.exitCode instead of calling process.exit straight after writing, so the output is not cut off.
+4. Add node:test tests under packages/jsonl-lint/test/ (for example test/lint.test.js and test/cli.test.js) so that `node --test` finds them when run from packages/jsonl-lint. Cover each of these with its own test:
+   - a clean file → [] / exit 0, nothing on stdout;
+   - a bad middle row → reported with the correct 1-based line;
+   - a torn last row (invalid JSON with no trailing newline) → reported;
+   - blank lines → skipped, and they still count toward the line numbers of later rows;
+   - the exit codes: run the bin with child_process (spawnSync of process.execPath) and check for 0 on a clean file, 1 on a bad file (with stdout matching `<file>:<line>: `), 2 with no argument, and 2 on a missing file (with stderr not empty).
+   Write fixtures to a temp dir (fs.mkdtempSync of os.tmpdir()) or keep them under test/fixtures.
+5. Create packages/jsonl-lint/README.md that explains what the tool does, its usage, the output format, the exit codes (0/1/2) and the lint(text) API.
+6. Update the root README.md: replace the "No tools yet: `packages/` is empty..." bullet with a bullet that lists packages/jsonl-lint (jsonl-lint) and a short description.
+7. Run `npm install` at the root so package-lock.json picks up the new workspace. Commit the updated package-lock.json, because CI runs `npm ci`, and that fails if the lock is out of sync. Then run `npm ci && npm test` at the root and make sure it passes, with the jsonl-lint tests actually running.
+8. Check by hand: `printf '{"a":1}\n\nnope\n{"b":2}\n{"c":' > /tmp/x.jsonl; node packages/jsonl-lint/bin/jsonl-lint.js /tmp/x.jsonl; echo $?` should print lines for 3 and 5 and exit 1. Also try no argument and a missing path, both of which should exit 2 with stderr output.
+9. Open exactly one pull request on suredesigntshirts/ccp_machine_test. Its body must contain the line `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102`. Wait until the `test` workflow check on the PR head is green; if it fails, fix it and push to the same PR.

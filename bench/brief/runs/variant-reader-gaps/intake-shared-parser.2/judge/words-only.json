@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "eb200aaac5ec5a02ae563ec085201dc8ad80b2c680d69bbd7c71488280f60980",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each check's PASS/FAIL against its expect line. Checks 1–4 ask only for exact output plus a newline, using cmp, and Check 1 also asks for exit 0. Check 5 asks only for exact output with JSON backslash-t escapes. Its first printf actually writes two backslashes, but the brief tells the verifier to confirm the expected file and fix it, so this doesn't make the condition stricter. Check 6 asks for \"exit=0\" and at least one test that runs bin/csv2json.js with --tsv on tab-containing input and asserts on its output. That matches the line's words and doesn't ask for the test:cli script. Check 7 asks only that README describe --tsv and include an example that uses it. The proof's stricter README form (\"node bin/csv2json.js --tsv < file\"), the test:cli note, the mutation test, the flag-position check and the parse.js check all sit under \"Advisory\". No PASS/FAIL condition goes beyond what the words require.",
+  "model": "claude-opus-5-5",
+  "ms": 9879,
+  "tokens": {
+    "input": 2,
+    "output": 902,
+    "cacheCreation": 5737,
+    "cacheRead": 783,
+    "fresh": 6641,
+    "total": 7424
+  },
+  "at": "2026-11-09T02:32:33.618Z"
+}

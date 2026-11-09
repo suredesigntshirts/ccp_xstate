@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "8565ec5c2e9a60be6bb5cc644a0a827100b1a76c66e2cc05a4da272e546665b7",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs. Every file the commands use either exists at this commit (package.json, package-lock.json, README.md, .github/workflows/test.yml) or is created in an earlier builder step (packages/jsonl-lint/...). The printf fixtures are quoted correctly and give the expected rows: in bad.jsonl, line 3 is `{bad` and line 5 is the torn `{\"torn\":`. In Check 3's `node --input-type=module -e \"...\"`, the shell turns `\\\"` into a plain quote and leaves `\\n` alone, so the JS string literal is valid; `m.lint ?? m` is also valid syntax. `npm test -w jsonl-lint`, `gh pr view --json body,headRefOid,state`, `gh pr checks`, `gh pr list --search 102`, `mktemp -d` and `test -f` all take the arguments given. Node 22's `node --test` finds `test/*.test.js` by default. One thing I could not confirm: the repository facts don't show a `workspaces` field in the root package.json. The root test script assumes there is one, so I treated it as present.",
+  "model": "claude-opus-5-5",
+  "ms": 12897,
+  "tokens": {
+    "input": 2,
+    "output": 1090,
+    "cacheCreation": 5262,
+    "cacheRead": 783,
+    "fresh": 6354,
+    "total": 7137
+  },
+  "at": "2026-11-09T02:37:08.194Z"
+}

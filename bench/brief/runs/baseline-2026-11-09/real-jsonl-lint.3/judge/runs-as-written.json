@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "88ee4f6ad84e883d3e7a5c93e26ebb683cd1e632fd1120849a19b6f675439a54",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Every command would run. Builder: `npm install`, `npm ci && npm test` (existing root script), and the step-8 `printf ... > /tmp/x.jsonl; node packages/jsonl-lint/bin/jsonl-lint.js` run files that earlier steps create. Verifier: the mktemp/printf/redirect commands in checks 1–2 are valid shell. In check 3, bash turns `\\\"` into `\"` inside the double quotes and `\\n` stays a JS escape, and the import works under `--input-type=module`. In check 4, `require` is valid in a default `node -e` and `(cd packages/jsonl-lint && npm test)` is valid. Check 6's `gh pr view/checks --repo ... --json body,headRefOid,state` uses real flags. Its `<pr>` placeholder would fail if pasted literally, but I read it as the PR number the verifier fills in. No missing files or bad arguments found.",
+  "model": "claude-opus-5-5",
+  "ms": 19694,
+  "tokens": {
+    "input": 2,
+    "output": 1507,
+    "cacheCreation": 5583,
+    "cacheRead": 783,
+    "fresh": 7092,
+    "total": 7875
+  },
+  "at": "2026-11-09T02:37:26.860Z"
+}

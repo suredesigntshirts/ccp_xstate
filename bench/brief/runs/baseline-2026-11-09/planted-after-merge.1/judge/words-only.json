@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "9a2d2435931059a7ad0c163a39d7b34c76fc63acb03218860327b22b90c7d0be",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each of the four verifier checks' PASS and FAIL conditions against its expect line. Check 1 asks only that `--shout Ada` and `--shout 'Grace Hopper'` print the greeting in upper case. It fails on errors, empty output or lower-case text, all of which the words cover. Check 2 compares the output without --shout against the merge base, which is what \"unchanged\" means. Check 3 asks that docs/index.md \"mentions the `--shout` flag and says what it does\". Saying what the flag does is a fair reading of \"documents\". Check 4 can't fetch the live page, so it checks the two things the published page needs: the workflow still publishes docs/ on push, and docs/index.md lists --shout. Both are needed for the expect line to hold after merge. The stricter checks (`npm test` and new tests, the flag placed after the name, the usage error with exit 2) all sit under \"Advisory (not pass/fail)\". No PASS or FAIL condition goes beyond what its expect line's words require.",
+  "model": "claude-opus-5-5",
+  "ms": 11049,
+  "tokens": {
+    "input": 2,
+    "output": 931,
+    "cacheCreation": 3096,
+    "cacheRead": 783,
+    "fresh": 4029,
+    "total": 4812
+  },
+  "at": "2026-11-09T02:32:51.043Z"
+}

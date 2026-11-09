@@ -1,0 +1,13 @@
+Goal: one pull request that adds clamp(x, lo, hi) to mathlib (issue https://github.com/o/r/issues/23) and meets every one of these lines:
+- math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi
+- clamp(x, lo, hi) throws a RangeError when lo is greater than hi
+- README.md documents every function math.js exports
+- npm test passes
+
+What the repo has now: math.js (CommonJS, 'use strict') defines add, subtract and multiply and ends with `module.exports = { add, subtract, multiply };`. README.md has an `## API` section with `### add(a, b)` and `### multiply(a, b)` entries. **subtract is exported but not in the README.** Tests are in test/math.test.js and run with node:test (`npm test` runs `node --test`).
+
+Steps:
+1. In math.js add `function clamp(x, lo, hi)` with a short doc comment like the other functions. If lo > hi, throw `new RangeError(...)` with a clear message (for example `clamp: lo (${lo}) must not be greater than hi (${hi})`). Otherwise return lo when x < lo, hi when x > hi, and x otherwise (`Math.min(Math.max(x, lo), hi)` works once the range has been checked). lo === hi is a valid range and returns lo. Add clamp to module.exports, and keep add, subtract and multiply exported.
+2. In README.md, under `## API`, add a `### subtract(a, b)` entry (it returns `a - b`) and a `### clamp(x, lo, hi)` entry. Follow the style of the existing entries: a heading with the signature, one sentence, and a short ```js example. The clamp entry must say that it returns x limited to [lo, hi] and that it throws a RangeError when lo is greater than hi. Give examples such as `clamp(-5, 0, 100); // 0`, `clamp(140, 0, 100); // 100` and `clamp(42, 0, 100); // 42`. When you are done, every name in math.js's module.exports must have its own `### name(` heading in README.md.
+3. In test/math.test.js, import clamp and add tests for: a value below the range (gives lo), a value above it (gives hi), a value inside it (gives x), the boundaries (x === lo, x === hi), lo === hi, and `assert.throws(() => clamp(5, 10, 0), RangeError)`.
+4. Run `npm test` and make sure it exits 0 with no failing tests. Then commit and open the pull request, referencing issue #23.

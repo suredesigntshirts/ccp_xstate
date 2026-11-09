@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e8d6d4d07ee38f82d5530487839b1417059c28acae0a1368b67ab5e7f148ca6a",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Items 2 and 3 are handled. Builder step 2 replaces the 'bad JSON throws' test with one checking for {}. Verifier Check 1 writes '{port: 9000' and passes only on `RESULT {}` with no thrown error.\n\nItem 1 is not handled. The briefs do say the behaviour changes: the builder says \"invalid JSON yields {} so the app starts with its defaults\", and a verifier advisory says the app \"now prints `listening on 8080`\". But both treat this only as a README update. Neither brief warns that line 1's fix hides the broken file the issue body asks to surface. Nowhere is it flagged as a conflict with the body's intent, or as a reason to pause or escalate. Instead, the builder is told to keep going and rewrite the README to match.",
+  "model": "claude-opus-5-5",
+  "ms": 8193,
+  "tokens": {
+    "input": 2,
+    "output": 705,
+    "cacheCreation": 2852,
+    "cacheRead": 783,
+    "fresh": 3559,
+    "total": 4342
+  },
+  "at": "2026-11-09T02:36:05.121Z"
+}

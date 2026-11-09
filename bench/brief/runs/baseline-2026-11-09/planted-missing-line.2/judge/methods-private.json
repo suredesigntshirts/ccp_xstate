@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "b4ebb971a566aa4f238c373843d19e3a229ae81354451ca0c39242d24e206146",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with every check and probe in the verifier brief. Check 1 uses a name/age/city table that the builder never sees, so that probe is not leaked. Other material is. The verifier's advisory probe feeds 'a,b\\n1,2\\n' to the plain CSV run and expects '[{\"a\":\"1\",\"b\":\"2\"}]\\n' exactly. The builder brief uses that same input, 'a,b\\n1,2\\n', for its CSV comparison and tells the builder to keep the \"same output and same trailing newline\". That is the advisory's byte-exact check. Check 2 passes if README says --tsv \"reads tab-separated input\". The builder brief asks for \"a sentence saying that it reads tab-separated input\", which hands over the PASS condition. The builder's manual printf comparison also has the same structure as check 1's probe. Because the builder brief carries the verifier's probe inputs and PASS conditions, the methods are not kept private.",
+  "model": "claude-opus-5-5",
+  "ms": 11967,
+  "tokens": {
+    "input": 2,
+    "output": 1171,
+    "cacheCreation": 2844,
+    "cacheRead": 783,
+    "fresh": 4017,
+    "total": 4800
+  },
+  "at": "2026-11-09T02:34:59.740Z"
+}

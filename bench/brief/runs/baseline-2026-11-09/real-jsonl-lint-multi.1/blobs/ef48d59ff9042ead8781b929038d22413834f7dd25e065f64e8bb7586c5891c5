@@ -1,0 +1,45 @@
+Check out the pull request's head and run every check from the repository root. Make a scratch directory, for example `T=$(mktemp -d)`, holding:
+- `$T/a.jsonl` containing `{"a":1}\n`
+- `$T/b.jsonl` containing `{"b":2}\n`
+- `$T/bad.jsonl` containing `{"x":1}\n{oops}\n`
+
+B below means `node packages/jsonl-lint/bin/jsonl-lint.js`.
+
+Check 1. Expect line: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before".
+Run `B $T/bad.jsonl $T/a.jsonl $T/bad.jsonl` and also `B $T/bad.jsonl` on its own.
+- PASS: every file named is checked. Each bad row produces one stdout line of the form `<file>:<line>: <error>`, with the file argument as given. The lines appear in the order the files were named. A file named twice is reported twice. The single-file output is in the same format as before (`$T/bad.jsonl:2: <JSON.parse message>`).
+- FAIL: a named file is skipped, the lines are out of argument order, or the format differs from that.
+
+Check 2. Expect line: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)".
+Run `printf '{oops}\n' | B $T/a.jsonl -`, then `printf '{"ok":1}\n' | B -`, then `printf '{}\n' | B - -; echo $?`.
+- PASS: the first prints a line starting `-:1: `. The second prints nothing about a bad row. The third exits with status 2.
+- FAIL: stdin is not read, it is labelled anything other than `-`, or `- -` does not exit 2.
+
+Check 3. Expect line: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)".
+Run these and record each exit status, stdout and stderr:
+- `B $T/a.jsonl $T/b.jsonl`
+- `B $T/a.jsonl $T/bad.jsonl $T/b.jsonl`
+- `B`
+- `B $T/a.jsonl $T/missing.jsonl $T/bad.jsonl`
+PASS: the statuses are 0, 1, 2 and 2. In the last run, stderr has an error, and stdout still contains the bad-row lines for `$T/bad.jsonl`, which shows the other files were checked and reported. FAIL: any status differs, the last run has no stderr error, or the last run stops before reporting `$T/bad.jsonl`.
+
+Check 4. Expect line: "lint(text) in src/index.js is unchanged".
+Run `git diff <merge-base with main>..HEAD -- packages/jsonl-lint/src/index.js` (find the merge base with `git merge-base origin/main HEAD`).
+- PASS: the lint function's code and behaviour are unchanged (an empty diff is the clear pass).
+- FAIL: lint's signature, body or behaviour changed.
+
+Check 5. Expect line: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage".
+Run `npm test --workspace packages/jsonl-lint`, then read the test files under packages/jsonl-lint/test/ and packages/jsonl-lint/README.md.
+- PASS: the tests run under node:test and pass, and between them there are tests for all of these cases: two clean files; one bad file among several; stdin via `-` with clean input; stdin via `-` with bad input; a missing file among good ones; two `-` arguments; no arguments. The README documents the multi-file usage, including `-` for stdin.
+- FAIL: any case has no test, the tests fail, or the README does not document the new usage.
+
+Check 6. Expect line: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head".
+Run `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,statusCheckRollup` and `npm test` at the repository root.
+- PASS: there is one PR on that repo with the change. Its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`. Root `npm test` passes. The `test` workflow check at the head commit has concluded success.
+- FAIL: the body lacks that line, `npm test` fails, or the test workflow is not successful at the head.
+
+Advisory (not pass/fail):
+- Check that stderr for `- -` and for no arguments contains a usage message.
+- Check that the `-` usage error is raised before any file is read.
+- Check that the order of stdout lines inside one file follows row order.
+- Run the existing single-file tests in packages/jsonl-lint/test/cli.test.js to confirm nothing regressed.

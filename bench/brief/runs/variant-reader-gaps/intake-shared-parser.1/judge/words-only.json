@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "dbbfdf3c677c1e0bad7321f361a5cc7cb04e1f489f6d800482af550ac22fe54c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each of the seven verifier checks against its expect line. Checks 1–5 pass only if `cmp` finds a byte-for-byte match with the exact output plus a newline. Check 1 also requires exit=0, which its expect line asks for. Checks 2–5 add no exit-status test, which matches their wording. Check 5 uses `printf '%s\\n'` with single quotes, so the expected text keeps the literal \\t escape. That is exactly what the line requires, nothing more. Check 6 needs \"npm test reports exit=0\" and a test that runs bin/csv2json.js with --tsv on tab input and \"asserts on the output\". This matches \"checks its output\". Check 7 needs README.md to describe --tsv and give an example command line using it, which matches the line. The stricter items sit under \"Advisory (not part of PASS or FAIL)\": `npm run test:cli`, the exact `node bin/csv2json.js --tsv < file` form and wording, and the flag-position and parse.js checks. No PASS or FAIL condition goes beyond the expect line's words.",
+  "model": "claude-opus-5-5",
+  "ms": 8319,
+  "tokens": {
+    "input": 2,
+    "output": 775,
+    "cacheCreation": 5450,
+    "cacheRead": 783,
+    "fresh": 6227,
+    "total": 7010
+  },
+  "at": "2026-11-09T02:32:32.052Z"
+}

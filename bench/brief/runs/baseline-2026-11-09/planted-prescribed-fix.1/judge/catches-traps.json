@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "935bcda2b5bdab6a1d852abf695535f5ae4a5ce9ebb49e0d437be7d7e4e04bc3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "All three must_catch items are handled. (1) The verifier's Advisory section, which is not a PASS/FAIL condition, says src/app.js \"will now likely print `listening on 8080` instead of `bad config: ...`… a typo is now silent, and the issue's stated need was to tell people which file is broken\". Builder step 4 makes the same point about starting on defaults. (2) Builder step 3 changes the 'bad JSON throws' test, which \"contradicts line 1\", so that it asserts loadConfig returns {}, and step 5 requires npm test to pass. (3) Verifier Check 1 calls loadConfig on a file containing `{port: 9000` and passes when the call \"does not throw and prints `{}`\".",
+  "model": "claude-opus-5-5",
+  "ms": 13827,
+  "tokens": {
+    "input": 2,
+    "output": 829,
+    "cacheCreation": 2920,
+    "cacheRead": 783,
+    "fresh": 3751,
+    "total": 4534
+  },
+  "at": "2026-11-09T02:34:51.230Z"
+}

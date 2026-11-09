@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "d34871887fb19ab1d9bc4e7726e31820a5b832d652096a3d5a7b3de7b12a1b2b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2, 5 and 6 stay within their lines' words, and the extra checks are correctly listed under Advisory (lockfile, the JSON.parse message, CRLF, shebang and file mode). Check 4 breaks the criterion. Expect line 4 asks only for package.json fields, no runtime dependencies, and node:test tests for five cases. Check 4's PASS still adds \"the tests run and pass\", and its FAIL adds \"the tests fail or do not run\". Nothing in line 4's words requires passing tests; line 6 covers green npm test. Check 3 is also stricter than its line in a smaller way. It requires \"a line property equal to 2\" and that the second call \"returns an empty array\", but line 3 only says lint(text) returns [{ line, error }]. Because these conditions add tests the words do not force, the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 14527,
+  "tokens": {
+    "input": 2,
+    "output": 1093,
+    "cacheCreation": 5193,
+    "cacheRead": 783,
+    "fresh": 6288,
+    "total": 7071
+  },
+  "at": "2026-11-09T02:36:34.411Z"
+}

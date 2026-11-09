@@ -1,0 +1,1 @@
+Run prompt:0.build, worktree /tmp/bench-prompt-nqVIz5/wt/prompt--0.build of /tmp/bench-prompt-nqVIz5/repo, branch run/prompt/0.build.

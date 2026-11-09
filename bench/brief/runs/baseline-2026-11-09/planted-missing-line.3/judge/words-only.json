@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "2db17594026c8b14712277adac6e9bb7c048e8c48a01488cc71ab7c7916ad40c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared both verifier checks with their expect lines. Check 1 pipes input on stdin and passes only if the --tsv command prints a JSON array that is \"the same as the one the CSV command prints for the same table\". That is just what \"the same JSON array\" means. Its FAIL cases (an error, no array, a different array) are the reverse of that. Matching byte for byte, trailing newline included, is not required to pass and sits under Advisory. Check 2 passes if README.md \"mentions the `--tsv` flag and says what it does\". Documenting a flag reasonably means saying what it does, so this is no stricter than the words. Running npm test, checking for a new test, and checking that CSV output is unchanged are all under Advisory, not in any PASS or FAIL condition. I found no condition stricter than the expect lines.",
+  "model": "claude-opus-5-5",
+  "ms": 12539,
+  "tokens": {
+    "input": 2,
+    "output": 545,
+    "cacheCreation": 2726,
+    "cacheRead": 783,
+    "fresh": 3273,
+    "total": 4056
+  },
+  "at": "2026-11-09T02:34:20.339Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "f4e09678c992aa98cd77bd73b969a442c8fba41a98aacbc21fec9d66d660b542",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. Most would run as written. The printf fixtures are valid. The `node --input-type=module -e \"...\"` quoting gives valid JavaScript (`\\\"` becomes `\"` and `\\n` stays a JS escape). `npm test -w packages/jsonl-lint`, `npm ci`, `gh pr view/list/checks` and `node --test` finding `test/*.test.js` are all fine.\n\nVerifier Check 1 breaks the criterion. The brief says to make the temp files outside the repo (\"e.g. under mktemp -d\") and to run from the repo root. It then gives `node packages/jsonl-lint/bin/jsonl-lint.js clean.jsonl; echo $?` with a bare relative filename. Run as written from the repo root, `clean.jsonl` and `bad.jsonl` don't exist, so the CLI exits 2 and the check fails for a reason that has nothing to do with the PR. The note \"pass the path exactly as you print it below\" only hints that the verifier should swap in the real path; the command itself is wrong.",
+  "model": "claude-opus-5-5",
+  "ms": 13418,
+  "tokens": {
+    "input": 2,
+    "output": 1320,
+    "cacheCreation": 5364,
+    "cacheRead": 783,
+    "fresh": 6686,
+    "total": 7469
+  },
+  "at": "2026-11-09T02:36:47.859Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "5c7dfe920e35a5b7211c71a64073cbf016c98eca2eb5400aaa1cba1f8ccee103",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The verifier brief has exactly two checks, one per expect line and in order (\"Check 1\", \"Check 2\"). It does ask for `npm test` and a check of plain CSV output, but only under \"Advisory (does not decide PASS or FAIL)\", so they are notes to report, not a third check. A stricter reading could count them as extra checks. Check 1's PASS/FAIL depends only on comparing --tsv output with CSV output. Check 2's depends only on README.md mentioning --tsv and what it does. Neither needs npm test or the CSV tests to pass. The builder brief says \"All tests must pass\", but that is a step for the builder, not a PASS/FAIL condition for an expect line. Neither must_not item is broken.",
+  "model": "claude-opus-5-5",
+  "ms": 12686,
+  "tokens": {
+    "input": 2,
+    "output": 882,
+    "cacheCreation": 2743,
+    "cacheRead": 783,
+    "fresh": 3627,
+    "total": 4410
+  },
+  "at": "2026-11-09T02:34:55.370Z"
+}

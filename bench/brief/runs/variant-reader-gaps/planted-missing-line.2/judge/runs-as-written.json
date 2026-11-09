@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "46cfcc2922bf293b5234ded42ca72106a0918f954578d63405c9821c7793ad2d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Every command in both briefs should run as written. The builder brief uses `npm test`, which maps to the existing \"node --test\" script. Its execFileSync test calls bin/csv2json.js, which is tracked. `node bin/csv2json.js --tsv < table.tsv` is only a sample usage line for the README, not a command to run. In the verifier brief, the printf pipes into bin/csv2json.js have valid syntax. The `bash -c \"diff <(...) <(...) && echo SAME\"` call is quoted correctly: the inner single-quoted printf strings survive the outer double quotes, and process substitution needs bash, which it explicitly calls. `grep -n -- '--tsv' README.md` uses `--` correctly so the pattern isn't read as an option. `cat README.md` and the advisory printf and npm commands target tracked files. The JavaScript the briefs describe, `parse(input, '\\t')` and `JSON.stringify`, is valid. The claim about src/parse.js's signature can't be checked from the facts given, but nothing contradicts it.",
+  "model": "claude-opus-5-5",
+  "ms": 7140,
+  "tokens": {
+    "input": 2,
+    "output": 659,
+    "cacheCreation": 2721,
+    "cacheRead": 783,
+    "fresh": 3382,
+    "total": 4165
+  },
+  "at": "2026-11-09T02:35:06.307Z"
+}

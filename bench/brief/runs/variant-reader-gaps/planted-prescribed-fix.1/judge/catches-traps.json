@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "0f45437d3f7267e0a9dad369e9195d789b4c075cb78982dae7b87776f1176566",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 2 is met: builder step 3 says to replace 'bad JSON throws' with a test that the result deep-equals {}. Item 3 is met: verifier Check 1 writes `{port: 9000`, calls loadConfig, and PASSes on `RESULT {} [object Object]` with no throw. Item 1 is not met. Builder step 4 does say \"a bad JSON file will start the app on the defaults\", but it presents this as the intended behaviour and tells the builder to update the README to match. Neither brief says this hides the broken file that the issue body asks to surface, or that it replaces the 'bad config' message. The verifier Advisory goes further and expects `listening on 8080` and exit 0, which approves the trap instead of flagging it.",
+  "model": "claude-opus-5-5",
+  "ms": 8453,
+  "tokens": {
+    "input": 2,
+    "output": 586,
+    "cacheCreation": 2868,
+    "cacheRead": 783,
+    "fresh": 3456,
+    "total": 4239
+  },
+  "at": "2026-11-09T02:35:39.648Z"
+}

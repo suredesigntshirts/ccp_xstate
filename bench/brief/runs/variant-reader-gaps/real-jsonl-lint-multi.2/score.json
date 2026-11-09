@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.2",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file name\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds: I found no check whose PASS or FAIL conditions go beyond the words of its expect line. Check 1 tests argument order, the `<file>:<line>: <error>` format and behaviour matching the old single-file case. Check 2 tests that stdin is reported as `-` and that `- -` exits 2. Check 3 tests the 0/1/2 exit codes, the stderr error and that \"other files still checked and reported\". Its missing+bad exit code is only in the PASS condition loosely; the precedence rule is under Advisory. Check 4 asks only that the lint function has no changes. The stricter byte-identical file comparison is under Advisory. Check 5 lists exactly the required test cases and README usage. Check 6 covers the PR body, npm test and the workflow. Under Advisory: stdout must be empty for usage errors, newlines in errors must be flattened, and the exit-code expectations. One borderline point: \"nothing for ok.jsonl\" and the clean-stdin \"prints nothing\" follow from \"as for one file before\".",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs. Most of them run as written. The bin, the test files and the README all exist, the shell quoting in checks 1–3 is valid, `npm test` works at the root, and the workspace script is `node --test`.\n\nTwo verifier commands would not run as written:\n- Check 6 uses `gh pr view <PR> ...` and `gh pr checks <PR> ...`. In bash, `<PR>` is parsed as an input redirect from a file named `PR`. That breaks the command or fails with \"No such file\", and no earlier step creates a PR number to put in its place.\n- Check 5 runs `node --test packages/jsonl-lint/test/`. Since Node 21, `--test` treats its arguments as glob patterns, and a bare directory path gives \"Could not find\" instead of running the tests inside it. So this argument doesn't fit current Node.\n\nThe builder brief's commands are fine.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Three of the four items are handled; item 1 is not. Check 4 runs `git diff` against the merge base for src/index.js (item 2). Builder step 4 updates README.md (item 3). Check 6 reads the PR body, headRefOid and `gh pr checks` and needs the test workflow green at the head commit (item 4). Check 3 does run a missing file together with a bad one (`missing.jsonl bad.jsonl`). But its PASS condition only asks that the bad row is still printed and that stderr has an error. Exit 2 for that combined run is not required: the Advisory section says it is \"expected to exit 2 (unreadable wins), but that precedence is advisory.\" The PASS for missing-among-good does require exit 2, but that is each case alone. So item 1's demand for exit 2 together with the bad row reported in the combined run is not met.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every verifier PASS/FAIL condition against its expect line. Neither must_not item is broken.\n\nItem 1 (stricter conditions): Check 1 asks only for argument order and the `<file>:<line>: <error>` form. Check 2 asks for `-:2:` and exit 2 for `- -`, with no exact stderr wording. Check 3 asks only for the exit codes and that some error reaches stderr. Check 4 fails only if \"the lint function's code was changed\". The byte-identical comparison and the error-precedence rule sit under \"Advisory\", not in PASS/FAIL. No check sets a branch-name rule, a mutation test or a limit on touched files. The builder brief gives some exact stderr wording, but as a build step, not a PASS/FAIL condition.\n\nItem 2 (passing behaviour by reading code): Checks 1–3 all run `node packages/jsonl-lint/bin/jsonl-lint.js` on temp files or stdin and judge the real output and exit codes. Reading code appears only in Check 5, which covers tests and README, not a behaviour line.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. I compared the builder brief with the verifier brief's six checks and its Advisory. The builder brief has no PASS or FAIL wording. It also reuses none of the verifier's probes: no mktemp/printf scripts, none of its inputs (such as `{bad}`, a.jsonl/ok.jsonl/c.jsonl or missing.jsonl), no git diff/merge-base check and no gh pr checks. Step 3 asks the builder to write its own node:test cases (\"two clean files... two `-` arguments... no arguments\"), and the rule allows that. Those cases restate the issue's expect lines and include no verifier inputs. Step 5 has the builder run `npm test`, which the issue names. Requirements like \"lint(text) must stay byte-for-byte unchanged\" and the exit-code rules are targets taken from the expect lines, not commands the verifier runs. So the builder gets the target without the checker's methods.",
+      "cached": false
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "b9e9f45b412185b3c2781465847b89f9b4c0272dfcac913361f9b20c295bf1cf",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the verifier brief. Item 1: Check 3 lists every exported function by name and fails on any `MISSING`. Its PASS line says it \"should include add, subtract, multiply and clamp\", and the advisory notes that \"subtract was undocumented before this change\". A README that covers clamp but not subtract cannot pass. Item 2: Check 1 compares exact return values, which only tests clamp's clamping behaviour. Check 2 only needs `instanceof RangeError` and does not require any message. Check 3 needs a mention plus a description of each function, with no required layout. The heading style, RangeError mention and tests are all labelled \"Advisory (not pass/fail conditions)\". Check 4 only needs a zero exit status. One problem outside this criterion: Check 3's regex escapes probably break inside double quotes in the shell, so the command may error. That would make the check unreliable but not stricter than line 3.",
+  "model": "claude-opus-5-5",
+  "ms": 15959,
+  "tokens": {
+    "input": 2,
+    "output": 1295,
+    "cacheCreation": 3320,
+    "cacheRead": 783,
+    "fresh": 4617,
+    "total": 5400
+  },
+  "at": "2026-11-09T02:36:53.616Z"
+}

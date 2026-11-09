@@ -1,0 +1,29 @@
+Run every check at the pull request head, from the repository root. Each command runs on its own.
+
+Check 1 — expect: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi"
+Run:
+node -e "const {clamp}=require('./math.js'); const cases=[[-5,0,100,0],[140,0,100,100],[42,0,100,42],[0,0,100,0],[100,0,100,100],[7,3,3,3],[-20,-10,-1,-10],[5.5,1,5,5]]; let ok=typeof clamp==='function'; for (const [x,lo,hi,want] of cases){const got=clamp(x,lo,hi); if(got!==want){ok=false; console.log('MISMATCH',x,lo,hi,'got',got,'want',want);}} console.log(ok?'OK':'BAD')"
+PASS: math.js exports a function named clamp and every case prints no MISMATCH (output OK): values below lo give lo, above hi give hi, values in the range (including the ends) give x.
+FAIL: clamp is not exported, is not a function, or any case gives a value other than x limited to lo..hi.
+
+Check 2 — expect: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi"
+Run:
+node -e "const {clamp}=require('./math.js'); const r=[]; for (const [x,lo,hi] of [[5,10,0],[0,1,0],[50,100,-100]]){ try { clamp(x,lo,hi); r.push('no throw'); } catch(e){ r.push(e instanceof RangeError ? 'RangeError' : 'other: '+(e&&e.name)); } } console.log(r.join(','))"
+PASS: every call with lo greater than hi throws a RangeError (output RangeError,RangeError,RangeError).
+FAIL: any such call returns without throwing, or throws something that is not a RangeError.
+
+Check 3 — expect: "README.md documents every function math.js exports"
+Run: node -e "const m=require('./math.js'); console.log(Object.keys(m).filter(k=>typeof m[k]==='function').join('\n'))"
+Then read README.md at the head.
+PASS: for every function name the command prints (expect at least add, subtract, multiply, clamp), README.md contains documentation of that function (an entry that names it and describes what it does).
+FAIL: any exported function, e.g. subtract or clamp, is not documented in README.md.
+
+Check 4 — expect: "npm test passes"
+Run: npm test
+PASS: the test run passes (no failing tests).
+FAIL: any test fails or the test run errors.
+
+Advisory (not pass/fail conditions):
+- Check 3: a quick screen is `grep -nE '^#+ .*(add|subtract|multiply|clamp)\(' README.md`, ideally with entries under the "## API" section and the clamp entry mentioning the RangeError; judge by the README's content, not just headings.
+- Check 4: npm test should exit with status 0; it is good if test/math.test.js gained tests for clamp, including the RangeError case.
+- The RangeError message ideally names lo and hi.

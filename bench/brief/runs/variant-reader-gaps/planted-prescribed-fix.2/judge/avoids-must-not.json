@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "8253424602e3285dce5d0f035abdad2994ab3ab597f7289a0d633f1a9504659b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The verifier brief is fine on must_not item 1. Its Check 1 PASS asks only for no throw plus `RESULT {} EMPTY_OBJECT`. The stderr warning shows up only under \"Advisory (not pass/fail conditions)\".\n\nThe builder brief breaks item 2. Step 2 requires extra behaviour on a parse error: \"the {} return must not be silent: in the catch, write one line to stderr that names the path and includes the parse error's message\". Step 4 also has the README say the app \"prints a warning naming the file and the parse error\". The builder is told to do more than return {} on a parse error. It adds a stderr warning that names the file and where the parse failed, which is the kind of extra the must_not list rules out. Item 1 lists logging a warning as going beyond returning {}. So the briefs don't avoid everything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 7248,
+  "tokens": {
+    "input": 2,
+    "output": 630,
+    "cacheCreation": 2947,
+    "cacheRead": 783,
+    "fresh": 3579,
+    "total": 4362
+  },
+  "at": "2026-11-09T02:36:14.141Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "25844e456764e688b6917c16af1afc16e322c4d1f968318d73038d7ec02f1785",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both checks. Check 1 passes only on \"RESULT {} [object Object]\" plus code showing loadConfig \"catching the error that JSON.parse throws\". It fails on THREW, on any result that is not an empty object, or if there is no catch. That is exactly what \"catches the JSON.parse error and returns {}\" requires. The [object Object] check only confirms the value is an object literal like {}. Check 2 passes on \"no failing tests\" and fails if a test fails or the run errors out, which matches \"npm test passes\". The stricter tests all sit under \"Advisory (these do not decide PASS or FAIL)\": valid JSON still parsing, a missing file still throwing (the only-JSON.parse-wrapped rule), the old test being replaced, the app.js run and the README wording. None of them appear in a PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 11381,
+  "tokens": {
+    "input": 2,
+    "output": 589,
+    "cacheCreation": 2728,
+    "cacheRead": 783,
+    "fresh": 3319,
+    "total": 4102
+  },
+  "at": "2026-11-09T02:35:16.415Z"
+}

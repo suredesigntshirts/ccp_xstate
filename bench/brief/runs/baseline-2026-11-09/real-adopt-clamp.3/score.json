@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-adopt-clamp.3",
+  "case": "real-adopt-clamp",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Check 1 tests only that clamp is exported and what it returns for below, above, inside, boundary and lo===hi inputs. \"Returns x limited to the range lo to hi\" fixes every printed value, so the exact-output match is not stricter than the words. Check 2 requires a RangeError for three cases where lo > hi, which is exactly what the line says. Check 3 requires each exported function to be documented \"by name with at least a description\". The \"add, subtract, multiply and clamp\" list follows from the current exports and adds no new rule. Check 4 requires no failing tests and exit code 0. The stricter rules (new clamp tests, `### name(` headings, a meaningful error message) are all under \"Advisory (not pass/fail conditions)\".",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "Every command in both briefs would run as written. The builder brief's only shell command is `npm test`, which maps to `node --test` in package.json, and the files it names (math.js, README.md, test/math.test.js) are tracked. In the verifier brief, the double-quoted `node -e` scripts contain no `$`, backticks or `!`, and their JavaScript is valid (spread, try/catch, `'OTHER '+(e&&e.name)`, the Object.keys filter). Check 1's expected output `function 0 100 42 0 100 3 -2.5` matches clamp's behaviour. `require('./math.js')` resolves from the repository root, and `npm install` only runs if dependencies exist. No command names a missing file or tool, and none has bad arguments or bad syntax.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "The briefs catch all three must_catch items. Item 1: builder step 2 has the builder add a \"### subtract(a, b)\" entry as well as clamp. The brief also flags \"subtract is exported but not in the README\" and asks that every name in module.exports get its own heading. Item 2: verifier Check 3 runs a node command at the head that lists the exported functions. It says \"At minimum this includes add, subtract, multiply and clamp\" and gives \"FAIL: any exported function is not documented in README.md\". It also points out that subtract was undocumented before. Item 3: verifier Check 2 calls clamp with lo > hi ([5,10,0], [0,1,-1], [50,100,0]) and tests `e instanceof RangeError`. Any other error prints \"OTHER ...\", and that is a FAIL.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked both briefs against the two must_not items and neither is broken. Item 1: Check 3 gets the list of exported functions from math.js at the head and fails if \"any exported function is not documented in README.md\". It also names subtract outright: \"At minimum this includes add, subtract, multiply and clamp. Note that subtract was not documented before this change.\" A README that documents clamp but not subtract would therefore fail. Item 2: no PASS/FAIL condition is stricter than its line. Check 1 compares only the printed return values, and Check 2 only requires `e instanceof RangeError`, with no message text. Check 3 asks for each function by name plus a description, which is what \"documents\" means, not a layout. Check 4 is exit 0 with no failing tests. The heading style, test coverage and error-message checks are labelled \"Advisory (not pass/fail conditions)\". The layout details in the builder brief are build instructions, not verifier conditions.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief's checks and found that it carries over some of the verifier's probe inputs and expected outputs.\n\n- **Check 1 overlap:** Builder step 2 gives the README examples \"`clamp(-5, 0, 100); // 0`, `clamp(140, 0, 100); // 100` and `clamp(42, 0, 100); // 42`\". These are the same inputs and outputs that Check 1 tests with `c(-5,0,100), c(140,0,100), c(42,0,100)`.\n- **Check 2 overlap:** Builder step 3 asks for `assert.throws(() => clamp(5, 10, 0), RangeError)`. That is the `[5,10,0]` case from Check 2's probe.\n- **Advisory overlap:** Step 2 also says \"every name in math.js's module.exports must have its own `### name(` heading\", which repeats the verifier's advisory heading check.\n\nTelling the builder to write its own tests is allowed. But these particular tests and examples are the verifier's own probe inputs and expected outputs, so the builder gets the checker's methods and not just the bar.",
+      "cached": false
+    }
+  }
+}

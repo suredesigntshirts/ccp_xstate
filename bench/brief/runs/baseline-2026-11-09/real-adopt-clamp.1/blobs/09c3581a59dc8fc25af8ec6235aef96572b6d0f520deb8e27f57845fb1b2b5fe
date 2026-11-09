@@ -1,0 +1,27 @@
+Check the pull request for issue #23 at its head. Do every check from the repository root at the PR head, and run things; reading the diff alone is not enough. Give one verdict per check, in this order.
+
+Check 1. Expect line: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi".
+Run: `node -e "const m=require('./math.js'); console.log(typeof m.clamp, m.clamp(-5,0,100), m.clamp(140,0,100), m.clamp(42,0,100), m.clamp(0,0,100), m.clamp(100,0,100), m.clamp(7,5,5), m.clamp(-3,-10,-1), m.clamp(2.5,0,1))"`.
+PASS: clamp is exported as a function, called with arguments in the order (x, lo, hi), and the printed values are `function 0 100 42 0 100 5 -1 1` (values below the range give lo, above give hi, inside or on the edges give x).
+FAIL: clamp is not exported, is not a function, throws on any of these valid calls, or any printed value differs from the above.
+
+Check 2. Expect line: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi".
+Run: `node -e "const {clamp}=require('./math.js'); for (const a of [[5,10,0],[0,1,-1],[50,100,0]]) { try { clamp(...a); console.log('no throw', a); } catch (e) { console.log(e instanceof RangeError ? 'RangeError' : 'other: '+e, a); } }"`.
+PASS: each of the three calls prints `RangeError`.
+FAIL: any call returns without throwing, or throws something that is not a RangeError.
+
+Check 3. Expect line: "README.md documents every function math.js exports".
+Run: `node -e "console.log(Object.keys(require('./math.js')).filter(k => typeof require('./math.js')[k]==='function'))"` to list the exported functions, then read README.md at the head.
+PASS: for every exported function name listed (this should include add, subtract, multiply and clamp), README.md contains documentation of that function: its name with its signature or a description of what it does.
+FAIL: any exported function is not documented in README.md (note: subtract was undocumented before this change, so check it specifically).
+
+Check 4. Expect line: "npm test passes".
+Run: `npm test` from the repository root.
+PASS: the command finishes and reports the tests passing (no failing tests).
+FAIL: the command reports any failing test, or errors out.
+
+Advisory (not part of any PASS or FAIL above):
+- `npm test` should exit with status 0, and it is good if test/math.test.js includes tests for clamp, including the RangeError case.
+- A clear RangeError message (e.g. naming lo and hi) is nice to have.
+- Mutation idea: temporarily change clamp to drop the lo > hi check and confirm a test fails; revert afterwards and do not commit it.
+- Existing exports add, subtract and multiply should still behave as before.

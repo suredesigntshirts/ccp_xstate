@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "b39d2d0df7f72969ba63c0d7d5cd1762ed5bb1e393b3096494f34a1ee6317483",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs. They name only things that exist at this commit or that the PR adds: `src/app.js`, `src/config.js`, `test/config.test.js`, and `npm test` (which runs `node --test`). The shell syntax is valid. The `printf` lines with `\\n` work inside single quotes. In Checks 3 and 4, `$d` expands inside the double-quoted `-e` script, which has no `!` to cause history expansion. The JavaScript is valid ESM. It uses `import {loadConfig} from './src/config.js'`, the same form as the issue's own proofs, and `import assert from 'node:assert/strict'`. Check 5 also holds: `gh pr view --json baseRefOid -q .baseRefOid` uses a real field, and `git worktree add`, `git checkout <base-sha> -- src` and `npm test` are correct. The builder's second step-5 bullet reuses `$d` from the bullet before it, so it works when run in order. I found no command that would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 8521,
+  "tokens": {
+    "input": 2,
+    "output": 783,
+    "cacheCreation": 5596,
+    "cacheRead": 783,
+    "fresh": 6381,
+    "total": 7164
+  },
+  "at": "2026-11-09T02:33:30.157Z"
+}

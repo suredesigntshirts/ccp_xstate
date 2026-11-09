@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "8a97a41cb4fa0ab0eca9c0c9cd0964de44f42ba32075e862a2f5db78d71e8381",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one. (1) The builder brief says plainly \"subtract is exported and NOT documented, so it must be added too\". Step 2 adds `### subtract(a, b)` and `### clamp(x, lo, hi)` to README.md. (2) Verifier Check 3 lists the exported functions at the head with Object.keys and says \"expect at least add, subtract, multiply, clamp\". It FAILs if \"any exported function is missing from README.md\" and says to \"check it specifically\" for subtract. (3) Verifier Check 2 calls clamp with lo > hi in three cases and uses `e instanceof RangeError`. It prints `OTHER ...` for any other error type, and the FAIL condition covers both `NO THROW` and `OTHER ...`. So any error that isn't a RangeError fails.",
+  "model": "claude-opus-5-5",
+  "ms": 6426,
+  "tokens": {
+    "input": 2,
+    "output": 468,
+    "cacheCreation": 3358,
+    "cacheRead": 783,
+    "fresh": 3828,
+    "total": 4611
+  },
+  "at": "2026-11-09T02:35:39.065Z"
+}

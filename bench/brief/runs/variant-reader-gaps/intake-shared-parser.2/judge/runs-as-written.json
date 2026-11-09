@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "28b7a49ecb00f457085ce8b4e2ea47ec9f23f724ebd094c241eb88a2313ef708",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands are fine. The builder's printf/node pipelines, the JS test strings ('[{\"a\\\\tb\":\"1\\\\t2\"}]\\n' gives a literal backslash-t), `npm test`, the grep, and verifier Checks 1–4 and 6 all run correctly as written. Check 5 does not. In `printf '[{\"a\\\\\\\\tb\":\"1\\\\\\\\t2\"}]\\n' > /tmp/c5.exp`, the single quotes pass four backslashes to printf, which turns them into two. The expected file then holds `a\\\\tb`, not `a\\tb`, so `cmp` would report a difference even against a correct implementation. The brief admits its escaping may be wrong and offers a node fallback that does work. Still, the primary command, as written, does not produce what it claims, so not every command runs as written.",
+  "model": "claude-opus-5-5",
+  "ms": 12632,
+  "tokens": {
+    "input": 2,
+    "output": 973,
+    "cacheCreation": 5802,
+    "cacheRead": 783,
+    "fresh": 6777,
+    "total": 7560
+  },
+  "at": "2026-11-09T02:32:46.252Z"
+}

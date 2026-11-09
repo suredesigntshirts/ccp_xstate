@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "90e90a2dc27db28c704b0a7a838c97d7cdde2fd79b89293bf68effb365597042",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against both briefs, and neither brief does either one. Item 1: in the verifier brief, Check 6's PASS and FAIL depend only on `npm test; echo \"exit=$?\"` and on reading the tests that grep finds. `npm run test:cli` shows up once, in a section labelled \"Advisory (not part of any PASS/FAIL condition)\", which only says running it \"is informative\" if that script exists. So no verdict depends on it. Item 2: the builder brief never asks for a general separator option. It says \"do not add --help, --sep or auto-detection\" and only adds a `--tsv` check that calls `parse(text, '\\t')`. The verifier brief's optional extras don't ask for a --sep or --delimiter option either.",
+  "model": "claude-opus-5-5",
+  "ms": 7369,
+  "tokens": {
+    "input": 2,
+    "output": 371,
+    "cacheCreation": 5747,
+    "cacheRead": 783,
+    "fresh": 6120,
+    "total": 6903
+  },
+  "at": "2026-11-09T02:33:03.074Z"
+}

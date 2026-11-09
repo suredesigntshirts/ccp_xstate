@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.3",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file name\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Checks 1, 2 and 6 stay within their words. Two checks go further:\n- **Check 4:** expect 4 only says \"lint(text) in src/index.js is unchanged\", but PASS requires \"the diff is empty\" for the whole file. A change elsewhere in index.js would fail this check even with lint untouched. That is a file-scope rule, and it sits in PASS instead of under Advisory.\n- **Check 3:** PASS requires \"stderr mentions missing.jsonl\". Expect 3 only asks for an \"error on stderr\", not that the error names the file.\n\nCheck 5 is milder but also tighter than its words: it requires the README to show the literal `<file> [<file> ...]` form, while the expect line only says the README \"documents the usage\".\n\nThese extra requirements should have gone under Advisory, so the criterion fails.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the tracked files and the shell syntax. The builder's `npm test` runs from the root, where the script exists. The files it names (bin/jsonl-lint.js, test/cli.test.js, README.md, src/index.js) are all tracked. Check 1's chained `printf`/`mktemp`/`for f in a c; do ...; done` and Check 3's `J=...; node $J ...` sequence are valid bash and only use paths in the repo or the temp dir. Check 2's piped `printf` commands are fine. `(cd packages/jsonl-lint && node --test)` matches the package's test script. `npm ci` has the package-lock.json it needs. `git diff origin/main...HEAD -- packages/jsonl-lint/src/index.js` and the `gh pr view --json body,headRefOid,state` / `gh pr checks` flags are valid. One caveat: `<PR number>` is a placeholder the verifier has to fill in. Typed literally, bash would read it as a redirect, but it is plainly meant to be substituted, so I didn't count it against the brief. I found no missing files, wrong arguments or syntax errors.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all four must_catch items, and the briefs handle each one. (1) Verifier Check 3 runs `ok1.jsonl missing.jsonl bad.jsonl` together. Its PASS rule requires \"missing exit=2, stderr mentions missing.jsonl, and stdout still includes the `<dir>/bad.jsonl:1: ` line\". (2) Check 4 runs `git diff origin/main...HEAD -- packages/jsonl-lint/src/index.js` and passes only if the diff is empty, so it compares the head against the base. (3) Builder step 3 says to \"Update packages/jsonl-lint/README.md\" with the multi-file usage, stdin via `-` and the exit codes. (4) Check 6 reads GitHub with `gh pr view ... --json body,headRefOid,state` and `gh pr checks`. It requires the body to contain \"Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104\" and \"the `test` workflow check at the head commit is green\".",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every verifier PASS/FAIL condition against the two must_not items. None are stricter than their lines. Check 3 asks only for \"a message on stderr\" and that stderr \"mentions missing.jsonl\". The advisory says \"Usage/stderr wording, exact error text... are free choices\". No check sets a branch-name rule, a mutation test or a file-touch limit. Check 4 reports other edits to index.js only as \"suspicious; report it\", not as a failure. The builder brief lists files and an error format, but those are directions to the builder, not verifier conditions. Checks 1–3 (the behaviour lines) all run the CLI on temp files or stdin and check its output and exit codes. Checks 4 and 5 read the diff and code, but they cover non-behaviour lines 4 and 5. Check 1's expected c.jsonl lines are worked out by hand, but its main test is equality with the single-file runs, so it is not stricter than the line.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with each verifier check. None of the verifier's probes shows up in the builder brief. The builder never gets the verifier's printf fixtures (a/b/c.jsonl, ok1/ok2/bad/missing.jsonl, `{\"a\":1}\\n{bad}`), the \"concatenation of single-file runs\" comparison, the `git diff origin/main...HEAD` command, or the `gh pr view`/`gh pr checks` commands. It also gets no PASS/FAIL wording. What the builder does get is the behaviour from the issue: the exit codes, `-` reported as `-`, other files still reported when one can't be read, and lint unchanged. It is also told to write node:test tests for the cases in expect line 5, run `npm test`, and include the Closes line. The rule allows all of these. Lines like \"stdout lines start with `-:<line>: `\" restate the issue's output format for the builder's own tests. They are not the verifier's concrete `-:2:` probe with its inputs.",
+      "cached": false
+    }
+  }
+}

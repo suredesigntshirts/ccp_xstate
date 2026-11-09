@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "ecbddbbdd783d6b8e94251801712379aa298463561465d2ca43e9b2a5014193f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's checks and found that it carries over some of the verifier's probe inputs and expected outputs.\n\n- **Check 1 overlap:** Builder step 2 gives the README examples \"`clamp(-5, 0, 100); // 0`, `clamp(140, 0, 100); // 100` and `clamp(42, 0, 100); // 42`\". These are the same inputs and outputs that Check 1 tests with `c(-5,0,100), c(140,0,100), c(42,0,100)`.\n- **Check 2 overlap:** Builder step 3 asks for `assert.throws(() => clamp(5, 10, 0), RangeError)`. That is the `[5,10,0]` case from Check 2's probe.\n- **Advisory overlap:** Step 2 also says \"every name in math.js's module.exports must have its own `### name(` heading\", which repeats the verifier's advisory heading check.\n\nTelling the builder to write its own tests is allowed. But these particular tests and examples are the verifier's own probe inputs and expected outputs, so the builder gets the checker's methods and not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 6827,
+  "tokens": {
+    "input": 2,
+    "output": 680,
+    "cacheCreation": 3292,
+    "cacheRead": 783,
+    "fresh": 3974,
+    "total": 4757
+  },
+  "at": "2026-11-09T02:36:19.882Z"
+}

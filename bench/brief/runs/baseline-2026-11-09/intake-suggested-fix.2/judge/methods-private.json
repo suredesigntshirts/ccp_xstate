@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "8e3dc31153fbb69da90b0396cd2c38ad15a9762b8afb01e60838663ffe58f4f0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief's checks. The criterion holds.\n\n- **Probes:** the builder brief's only probes are the step-5 hand checks. Both are commands from the issue's proofs: the printf c.json / `node src/app.js $d/c.json` run (proof 1) and the ok.json run (proof 4). Commands the issue's proofs name are allowed, and so is \"Run `npm test`\".\n- **Tests:** step 3 tells the builder to write its own tests (`{port: 9000`, path in message, must fail on current src). That is allowed and restates expect lines 3 and 5.\n- **Pass/fail conditions:** the builder brief has none of the verifier's. It leaves out the accepted location formats (`3:3`, `line 3, col 3`), the \"RETURNED / NO PATH\" outcomes, the merge-base swap of base src/ with `git checkout`, and the Advisory notes.\n- **Expected results it does state** (\"exit 1\", \"line 3 / column 3\", \"listening on 9000\") come straight from the issue's expect lines. That is the bar, not the checker's method.",
+  "model": "claude-opus-5-5",
+  "ms": 12982,
+  "tokens": {
+    "input": 2,
+    "output": 901,
+    "cacheCreation": 5392,
+    "cacheRead": 783,
+    "fresh": 6295,
+    "total": 7078
+  },
+  "at": "2026-11-09T02:33:21.364Z"
+}

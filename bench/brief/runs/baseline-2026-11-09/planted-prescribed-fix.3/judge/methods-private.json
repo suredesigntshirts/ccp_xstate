@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "96091b72b49dbffd68cf4f698a310cb8842e4f9eaa550720dfcf56b9d0bc0dd2",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked the builder brief for any PASS/FAIL condition or probe that also appears in the verifier brief. Most of it is allowed: step 1 restates expect line 1, and step 5 tells the builder to run `npm test`, which the issue names. The problem is step 3. It tells the builder to assert `loadConfig(file('{port: 9000'))` deep-equals `{}`. That is the same input and expected output as the verifier's Check 1 probe, which writes `printf '{port: 9000'` to a file and passes only if the result is `RESULT {}`. Writing its own tests is allowed, but here the brief dictates the exact assertion the checker will use, so the builder receives the checker's method. The input comes from the repo's existing test, but under a strict reading the criterion still breaks on this overlap.",
+  "model": "claude-opus-5-5",
+  "ms": 20197,
+  "tokens": {
+    "input": 2,
+    "output": 1417,
+    "cacheCreation": 3044,
+    "cacheRead": 783,
+    "fresh": 4463,
+    "total": 5246
+  },
+  "at": "2026-11-09T02:35:59.256Z"
+}

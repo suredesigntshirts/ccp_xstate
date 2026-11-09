@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "15cca98ec27da9a462d06702cef415646bde149ce15f909bc621fa31bc47862e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Checks 1, 2 and 4 hold. Check 1 tests below, above and inside the range, the bounds, and lo === hi, all of which \"returns x limited to the range lo to hi\" forces. Check 2 tests only that lo > hi gives a RangeError. Check 4 tests only exit status 0 with no failing tests. Check 3 breaks the criterion. Its PASS condition requires \"its name and signature plus a description of what it does.\" The expect line says only \"README.md documents every function math.js exports\". A signature is something those words don't force, and it isn't under Advisory. The FAIL condition also doesn't mention a missing signature (\"missing ... or is only named with no description\"), so the PASS rule is stricter than the line. That extra signature requirement fails the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 11004,
+  "tokens": {
+    "input": 2,
+    "output": 998,
+    "cacheCreation": 3231,
+    "cacheRead": 783,
+    "fresh": 4231,
+    "total": 5014
+  },
+  "at": "2026-11-09T02:35:23.636Z"
+}

@@ -1,0 +1,12 @@
+Goal: one pull request that meets every line of https://github.com/o/strutil/issues/7:
+- index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+- padLeft returns s unchanged when s is already width characters or longer
+- README.md has a section for every function index.js exports
+- npm test passes
+
+Steps:
+1. Read index.js, README.md, package.json and test/strutil.test.js. The package is an ES module ("type": "module"), and `npm test` runs `node --test`.
+2. In index.js, add and export `padLeft(s, width, fill = ' ')`. Put a short doc comment on it in the same style as the other functions. It returns `s` with `fill` added on the left until the result is `width` characters long. When `s.length >= width` it returns `s` unchanged. You may use `String.prototype.padStart`, which does this when fill is one character. Don't change the existing functions.
+3. In test/strutil.test.js, import padLeft and add tests for: `padLeft('42', 5, '0') === '00042'`, the default space fill (`padLeft('ab', 4) === '  ab'`), and s unchanged when it is exactly width long and when it is longer (`padLeft('abcdef', 4, '0') === 'abcdef'`).
+4. README.md: the README needs a section for EVERY function that index.js exports, not just the new one. Right now README.md has sections for capitalize and truncate but none for slugify, which index.js exports. Add a `## slugify(s)` section that describes what it does (lower case, with runs of non-alphanumeric characters joined into single dashes and dashes trimmed from the ends). Add a `## padLeft(s, width, fill)` section too, saying that fill defaults to a space and that s comes back unchanged when it is already width characters or longer. Use the same heading style as the existing sections. When you're done, list every `export function` in index.js and confirm each one has a matching `## name(` heading in README.md.
+5. Run `npm test` and make sure it passes. Then open the pull request with these changes, and reference issue #7 in it.

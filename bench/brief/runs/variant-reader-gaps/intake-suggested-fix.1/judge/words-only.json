@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "5544e9a2dbe544bf0d6fc4c30744d54ea9731e0d98b35a10b1d4f12a7d45ca51",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS/FAIL conditions with the words of its expect line. Check 1 requires only `exit 1` and empty stdout. Check 2 requires `bad config:`, the exact path, and line 3 and column 3 \"in any clear form\", so it demands no exact wording. Check 3 requires only `OK`, meaning the call threw and the message contains the path. Check 4 requires `listening on 9000`, exit 0 and a deepEqual to `{ port: 9000 }`. Check 5 requires that `npm test` passes, that a test checking the path exists, and that this test fails against the base `src/`. That last condition just restates \"fails at the current base commit\". The stricter items from the proofs all sit under \"Advisory (not pass/fail)\", not in any PASS or FAIL condition: whether the location depends on Node's own message, ENOENT behaviour, absolute-path resolution and README changes. None of the conditions goes beyond what its expect line says.",
+  "model": "claude-opus-5-5",
+  "ms": 10613,
+  "tokens": {
+    "input": 2,
+    "output": 789,
+    "cacheCreation": 5643,
+    "cacheRead": 783,
+    "fresh": 6434,
+    "total": 7217
+  },
+  "at": "2026-11-09T02:32:34.362Z"
+}

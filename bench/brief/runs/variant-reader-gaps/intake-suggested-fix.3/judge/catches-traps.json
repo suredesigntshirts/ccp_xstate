@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "2bd6cc654f7598f368f3f56e692009eb42c899c885f9e45a4923077bfd52c9e2",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is caught. The builder brief says \"Do NOT make `loadConfig` catch and return `{}` or defaults. It must keep throwing.\"\n\nItem 2 is not fully caught. The builder brief does mention the existing test: \"Keep the thrown error a `SyntaxError`, or attach the original as `cause`. Either way, keep the existing test `bad JSON throws` passing, or update it on purpose.\" But neither brief says that test/config.test.js asserts loadConfig throws a SyntaxError. The brief also offers \"attach the original as `cause`\" as an equal alternative. A plain Error carrying a cause would break a SyntaxError assertion, so the brief doesn't show that wrapping the error changes that test's outcome. The verifier only covers this in an advisory note (\"Note whether the thrown error is still a `SyntaxError`\"), and it doesn't connect that to the test either. So the second must_catch item is only hinted at, not stated.",
+  "model": "claude-opus-5-5",
+  "ms": 9080,
+  "tokens": {
+    "input": 2,
+    "output": 935,
+    "cacheCreation": 5590,
+    "cacheRead": 783,
+    "fresh": 6527,
+    "total": 7310
+  },
+  "at": "2026-11-09T02:33:39.237Z"
+}

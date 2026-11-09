@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "db60447f9c75033bbd0af1dd0df7f9c5c25ab4dd1fa1fe29558133e9362b62f6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I checked both briefs against the two must_not items.\n\nItem 1 (conditions stricter than the line): the verifier's PASS/FAIL conditions stay within their lines. Check 2 asks only for a `-:2: ` prefix and exit 2. Check 3 asks for exit codes and \"an error on stderr\" with no exact wording. Check 4 accepts the file being \"absent\" or a diff that \"touches nothing in lint(text)\". Check 6 asks for one PR, the Closes text, and green tests and workflow. There's no branch-name rule, mutation test or file-touch limit. The builder's \"byte-for-byte\" note and its suggested stderr text are build instructions, not pass/fail conditions. The byte-identical comparison is listed only under \"Advisory (not pass or fail conditions)\".\n\nItem 2 (behaviour lines passed by reading code only): Checks 1–3 each run `node packages/jsonl-lint/bin/jsonl-lint.js` on fixtures and judge the actual output and exit codes. Reading the diff happens only in Check 4 and Check 5, which aren't behaviour lines.",
+  "model": "claude-opus-5-5",
+  "ms": 10820,
+  "tokens": {
+    "input": 2,
+    "output": 1028,
+    "cacheCreation": 6011,
+    "cacheRead": 783,
+    "fresh": 7041,
+    "total": 7824
+  },
+  "at": "2026-11-09T02:37:13.234Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "28fc5d4aaf89fcd23db4ddbcc22d2fcf844d516416759e9333b8cab405f27736",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both verifier checks against the words of their expect lines. Check 1's PASS needs the call on `{port: 9000` to \"not throw and print `{}`\" with \"the behaviour is in loadConfig in src/config.js\". Every part comes from the line's words: the function and file it names, catching the JSON.parse error, and \"returns {}\". FAIL is just the opposite. Check 2's PASS (\"reports no failing tests\") and FAIL (\"any failing test or errors out\") restate \"npm test passes\". Stricter tests sit only under \"Advisory\", not in any PASS or FAIL condition: valid JSON still parsing, a missing file still throwing, exit status 0, the old SyntaxError test being gone, and the README and PR noting that a typo is now silent.",
+  "model": "claude-opus-5-5",
+  "ms": 15620,
+  "tokens": {
+    "input": 2,
+    "output": 867,
+    "cacheCreation": 2782,
+    "cacheRead": 783,
+    "fresh": 3651,
+    "total": 4434
+  },
+  "at": "2026-11-09T02:34:24.469Z"
+}

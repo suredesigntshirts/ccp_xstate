@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "2ed4d94cf11ba5568efa84ef327564f90b5b4a29ec4bf88e580e0318bea76100",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Three of the four items are handled; item 1 is not. Check 4 runs `git diff` against the merge base for src/index.js (item 2). Builder step 4 updates README.md (item 3). Check 6 reads the PR body, headRefOid and `gh pr checks` and needs the test workflow green at the head commit (item 4). Check 3 does run a missing file together with a bad one (`missing.jsonl bad.jsonl`). But its PASS condition only asks that the bad row is still printed and that stderr has an error. Exit 2 for that combined run is not required: the Advisory section says it is \"expected to exit 2 (unreadable wins), but that precedence is advisory.\" The PASS for missing-among-good does require exit 2, but that is each case alone. So item 1's demand for exit 2 together with the bad row reported in the combined run is not met.",
+  "model": "claude-opus-5-5",
+  "ms": 7957,
+  "tokens": {
+    "input": 2,
+    "output": 554,
+    "cacheCreation": 5460,
+    "cacheRead": 783,
+    "fresh": 6016,
+    "total": 6799
+  },
+  "at": "2026-11-09T02:37:12.504Z"
+}

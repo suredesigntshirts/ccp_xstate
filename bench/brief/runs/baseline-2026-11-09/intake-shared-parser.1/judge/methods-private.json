@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "70256cb6d961c1f7c1a163ff7f3199a333240623570b60aaa7b35398ce08f6a0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared the builder brief against each verifier check and advisory. Step 5's hand checks are the issue's proof commands, which the criterion allows. Step 2's test inputs and outputs match the expect-line commands, and the builder is asked to write its own tests, which is also allowed. \"Run `npm test`\" is the repository's own test command. None of the verifier's own methods appear in the builder brief: not the cmp/od byte comparison, not Check 6's FAIL examples (\"--tsv only appears in a comment\", \"calls only parse()\"), and neither advisory probe (`foo --tsv` or CRLF input). The builder's \"The flag may appear anywhere\" restates the issue's assumption and is not a probe. The builder brief has no PASS or FAIL wording.",
+  "model": "claude-opus-5-5",
+  "ms": 7911,
+  "tokens": {
+    "input": 2,
+    "output": 685,
+    "cacheCreation": 6025,
+    "cacheRead": 783,
+    "fresh": 6712,
+    "total": 7495
+  },
+  "at": "2026-11-09T02:32:37.287Z"
+}

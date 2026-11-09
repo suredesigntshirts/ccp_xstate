@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "bd8a26653cea8f7c280214bd1b78af3f9f02f07be3e40eb819698fdcb17ea92b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is met. The builder brief says \"keep the current CSV behaviour exactly\" and \"Run `npm test` and make sure every test passes\". Item 3 is met. Check 1 pipes the same table through `--tsv` as TSV and through the plain command as CSV, then compares the two outputs (\"SAME\"/\"DIFF\"). Item 2 is only partly met. The Advisory section sits outside PASS/FAIL and does advise \"Run `npm test` and report the result\" and confirming the plain CSV output. It never says that no expect line covers CSV behaviour or npm test. It only labels the section \"(not part of PASS or FAIL)\". The must_catch item asks the brief to state that gap, and the brief leaves it unstated. So not every must_catch item is handled.",
+  "model": "claude-opus-5-5",
+  "ms": 6909,
+  "tokens": {
+    "input": 2,
+    "output": 638,
+    "cacheCreation": 2890,
+    "cacheRead": 783,
+    "fresh": 3530,
+    "total": 4313
+  },
+  "at": "2026-11-09T02:34:39.684Z"
+}

@@ -1,0 +1,1 @@
+Run prompt:0.verify, worktree /tmp/bench-prompt-gPs15c/wt/prompt--0.verify of /tmp/bench-prompt-gPs15c/repo, branch run/prompt/0.verify.

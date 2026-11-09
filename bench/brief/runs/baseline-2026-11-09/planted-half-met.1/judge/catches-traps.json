@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "73941744c4bbb2f8afec1839e85ecd36a223b4fd0fce4604cf92cd68927b4026",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked all three must_catch items, and the briefs handle each one. (1) Step 4 of the builder brief says \"README.md has sections for capitalize and truncate but none for slugify\" and tells the builder to \"Add a `## slugify(s)` section\", plus a padLeft section. (2) Verifier Check 3 lists the exported functions at the head and names them: \"at least capitalize, slugify, truncate and padLeft\". It FAILs if \"any exported function has no section\", and it says \"check it specifically\" about slugify. (3) Verifier Check 1 calls `m.padLeft('ab',4)` with no fill argument and expects `\"  ab\"`. It FAILs if \"the default fill is not a space\".",
+  "model": "claude-opus-5-5",
+  "ms": 4595,
+  "tokens": {
+    "input": 2,
+    "output": 410,
+    "cacheCreation": 3183,
+    "cacheRead": 783,
+    "fresh": 3595,
+    "total": 4378
+  },
+  "at": "2026-11-09T02:33:45.152Z"
+}

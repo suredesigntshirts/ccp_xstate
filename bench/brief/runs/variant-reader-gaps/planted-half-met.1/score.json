@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-half-met.1",
+  "case": "planted-half-met",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in the builder brief"
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Check 1 asks only for a padLeft export, left-padding with the given fill, a space when fill is omitted, and a result of width characters. The sample inputs just apply those words. Check 2 asks only that s comes back unchanged when its length equals or exceeds width. Check 3 asks that each exported function has \"its own README.md section, i.e. a markdown heading naming that function\". In markdown a section is a heading, so this stays within the words, and the slugify note is only a reminder. Check 4 asks only that \"all tests passing\". The stricter items are under \"Advisory (not PASS/FAIL conditions)\": the exact heading style, padLeft tests existing, exit status 0 and green CI. No PASS or FAIL condition adds a test the words don't force, a mutation test, a branch or file-scope rule, or exact wording.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked every command in both briefs. `npm test` matches the `node --test` script. The Check 1 and Check 2 one-liners are valid shell and JavaScript and would run as written. Check 3 is broken by its quoting. It is wrapped in shell double quotes, and inside double quotes bash turns `\\\\` into a single `\\`. So `new RegExp('\\\\b' + f + '\\\\b')` reaches JavaScript as `'\\b' + f + '\\b'`, and in a JS string `'\\b'` is a backspace character, not a word boundary. The pattern then looks for backspace characters, which no README heading contains. Every export is reported missing and the check exits 1 even when the README is correct. The syntax parses, but the command does not work as written because its shell escaping doesn't fit the argument it's meant to pass. So the criterion fails.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked all three must_catch items, and the briefs handle each one. (1) Builder step 2 says to \"add a section for slugify (e.g. \"## slugify(s)\" ...) and a section for padLeft\". Its context also says README has \"NO section for slugify\". (2) Verifier Check 3 lists the exports and says \"at the head this should include capitalize, slugify, truncate and padLeft\". Its FAIL condition is \"any exported function has no section in README.md (note: slugify had no section before this change, so check it specifically)\". (3) Check 1 calls `m.padLeft('ab', 5)` with no fill argument and requires the result to be '   ab', so it checks space padding. One side note: in Check 3's command, the shell turns `'\\\\b'` into `'\\b'`, which JS reads as a backspace character. That could make the command report a false FAIL. It doesn't stop the brief from catching the trap: the FAIL criteria are right, and the verifier is also told to open README.md and look.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": false,
+      "why": "Must_not 1 is avoided. Check 3 compares every exported function against the README headings, and its FAIL condition says \"check it [slugify] specifically\", so a README with only a padLeft section can't pass. Checks 1, 2 and 4 don't require a parameter count or a one-character fill, and the layout points are marked \"Advisory (not PASS/FAIL conditions)\". Must_not 2 breaks at Check 3. Its PASS condition requires the command to print \"missing:\" with nothing after it. The command sits inside a double-quoted bash string, and bash turns `'\\\\b'` into `'\\b'`, which JavaScript reads as a backspace character. The regex is then backspace+name+backspace, which never matches a real heading. Every function is reported missing, so the check fails even on a correct pull request. That makes the PASS condition stricter than line 3, which only asks for a section per exported function.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief's examples with the verifier brief's probes. The builder brief's step 1 gives inputs with expected outputs: \"padLeft('42', 5, '0') === '00042'; padLeft('ab', 5) === '   ab'; ... padLeft('abcd', 4) === 'abcd'\". Step 3 repeats '42', 5, '0' -> '00042' and 'ab', 5 -> '   ab'. These same input/output pairs are in the verifier's probes. Check 1's script asserts m.padLeft('42', 5, '0') === '00042' and m.padLeft('ab', 5) === '   ab'. Check 2 asserts padLeft('abcd', 4) === 'abcd'. So the builder brief carries a set of inputs with expected outputs that also appears in the verifier brief. That hands the checker's own tests to the builder, which the criterion forbids. Telling the builder to run npm test and write its own tests is allowed, but copying the verifier's exact cases is not.",
+      "cached": false
+    }
+  }
+}

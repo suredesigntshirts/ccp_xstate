@@ -1,0 +1,17 @@
+Run every check at the pull request's head, from the repository root. Install nothing beyond what the repository needs (it has no dependencies).
+
+Check 1 — expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Read src/config.js at the head to confirm loadConfig is exported from it and catches the error from JSON.parse. Then run this single command:
+node --input-type=module -e "import {mkdtempSync,writeFileSync} from 'node:fs'; import {tmpdir} from 'node:os'; import {join} from 'node:path'; import {loadConfig} from './src/config.js'; const f=join(mkdtempSync(join(tmpdir(),'cfg-')),'config.json'); writeFileSync(f,'{port: 9000'); let r; try { r=loadConfig(f); } catch(e) { console.log('THREW', e && e.name); process.exit(0); } console.log('RESULT', JSON.stringify(r), Object.getPrototypeOf(r)===Object.prototype && Object.keys(r).length===0 ? 'EMPTY_OBJECT' : 'NOT_EMPTY');"
+PASS: the call on the invalid-JSON file does not throw and returns an empty plain object {} (output shows `RESULT {} EMPTY_OBJECT`), and loadConfig is in src/config.js.
+FAIL: loadConfig throws on the invalid JSON (output starts with THREW), returns anything other than {}, or loadConfig is not in src/config.js.
+
+Check 2 — expect line: "npm test passes"
+Run: npm test
+PASS: the test run reports no failing tests (node --test summary shows fail 0).
+FAIL: any test fails or the test run errors out.
+
+Advisory (not pass/fail conditions):
+- The issue body says people need to know which file is broken and where. Note whether the catch writes a stderr line naming the path and the parse error's message; e.g. run `node src/app.js <bad-json-file>` and look at stderr. A silent {} meets the line's words but leaves the issue's need unmet; report it if so.
+- Note whether only the JSON.parse error is caught (a missing file should still throw), whether the old 'bad JSON throws' test was replaced by one asserting {}, and whether README.md was updated to stop promising exit 1 on invalid JSON.
+- Note npm test's exit status (expected 0).

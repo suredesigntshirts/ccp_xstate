@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "c0aaae1518683d50e1b837aefa116599a32a727826abe68d93a4aa84ea165ba2",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's PASS/FAIL checks. Check 1 in the verifier brief probes loadConfig with a file containing `{port: 9000` and passes only if it returns an empty {} without throwing. Builder step 3 gives the builder that same input and expected output: \"a test that loadConfig on a file containing `{port: 9000` returns a value deepEqual to {} (and does not throw)\". The criterion lets the builder write its own tests. It does not let the brief hand over the verifier's exact input and expected result, because then the builder works to the checker's probe. Running `npm test` (step 5) is allowed. The `node src/app.js` run lines up only with the verifier's advisory notes, which are not PASS/FAIL checks. The shared `{port: 9000` → {} probe is enough to fail the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 12400,
+  "tokens": {
+    "input": 2,
+    "output": 778,
+    "cacheCreation": 2958,
+    "cacheRead": 783,
+    "fresh": 3738,
+    "total": 4521
+  },
+  "at": "2026-11-09T02:36:26.542Z"
+}

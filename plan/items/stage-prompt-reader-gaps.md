@@ -4,7 +4,7 @@
   "title": "Close the gaps a fresh reader finds in the model stages' prompts",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "The quick-fix build and verify stage files answer each gap fresh readers of their rendered prompts named: build returns at once even where its task says to wait for CI, since a red check comes back as failure, pushes nothing after it returns and sets no other key in pr; verify (and research's verify, which shares its rules) grades stricter conditions in task as advisory, undoes changes to tracked files and returns issue as { url, expect }. The brief stage file is unchanged: its changed prompt scored worse than today's on six of ten bench criteria, and the two run sets and their compare report are committed as the record of that trial.",
   "why": "Refine rounds 6, 7, 9 and 10 found each unclear rule by giving a fresh session only what it reads and asking where it guessed, but only for the texts builders and verifiers of this repo read; three fresh readers given only a stage agent's context and prompt (9 Nov, at main a63da4cd) named contradictions and undefined names in all three quick-fix stages (L-stage-needs-bench; research plan/research/stage-prompt-readers.md; decisions plan/decisions/2026-11-09-stage-prompt-reader-gaps.md).",
   "serves": [

@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "94e874ebdd80c7dfc7331cdf8db02f68a7b24fc197e0dc8391b65ff4f6c4165b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Checks 1, 2, 3, 5 and 6 test only what their expect lines say. Check 1 asks for the `<file>:<line>: <error>` form, 1-based lines, skipped blanks, the torn last line and exits 0/1. Check 2 asks for stderr output and exit 2. Check 6 asks for one PR, the Closes text and a green workflow and npm test. Stricter items like the lock file, shebang and CRLF handling are correctly under Advisory.\n\nCheck 4 breaks the criterion. Its PASS condition requires that the tests \"pass when run\", and its FAIL condition includes \"the tests fail\". Expect line 4 only asks for node:test tests that cover the five named cases. It says nothing about them passing. That requirement belongs to expect line 6 (\"npm test ... green\"), which Check 6 already tests. So Check 4 adds a condition its own expect line's words do not force, and the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 17431,
+  "tokens": {
+    "input": 2,
+    "output": 1087,
+    "cacheCreation": 5091,
+    "cacheRead": 783,
+    "fresh": 6180,
+    "total": 6963
+  },
+  "at": "2026-11-09T02:36:55.296Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "c16bb52b1e1e43e97bcf0969d94d47b9999b2e63f936a9382e271e46ad773962",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with every verifier check. The builder brief has no PASS or FAIL conditions. It also reuses none of the verifier's probes: not the printf fixtures (bad.jsonl/ok.jsonl with lines 3 and 6 expected), not the `node --input-type=module -e` import of lint('{}\\n{bad\\n'), not the `node -e require(package.json)` field dump, not `test -s`/`grep -n 'jsonl-lint' README.md`, and not the `/nonexistent/nope.jsonl` stderr byte count. What the builder does get is the requirements themselves: the output format, exit codes, blank-line skipping, the torn last row, no phantom row after a trailing newline, and the package.json fields. It is told to write its own node:test tests (the spawnSync advice is about how to write them) and to run `npm ci && npm test`. The criterion allows both, since npm test appears in expect line 6. So the builder gets the bar without the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 7867,
+  "tokens": {
+    "input": 2,
+    "output": 583,
+    "cacheCreation": 4816,
+    "cacheRead": 783,
+    "fresh": 5401,
+    "total": 6184
+  },
+  "at": "2026-11-09T02:38:18.990Z"
+}

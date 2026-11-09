@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "f0590a4c429eb4810a888446f400514786f90e1bca698b1b198bde3727ffb7b6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each of the three must_catch items against the two briefs, and all three are handled.\n\n1. **Builder documents subtract and clamp.** Builder step 3 says: \"Right now subtract is exported but not documented, so add a ### subtract(a, b) section … as well as a ### clamp(x, lo, hi) section\".\n2. **Verifier check 3 covers every export, subtract included.** It reads the function exports of math.js at the PR head and marks each one MENTIONED or MISSING in README.md. Its PASS condition names \"add, subtract, multiply and clamp\". It FAILs if \"any exported function is MISSING from README.md, or is named only\". The wording \"if they are exported\" is a small hedge, but the check still fails on any undocumented export, subtract included.\n3. **Verifier check 2 requires a RangeError specifically.** It calls clamp with lo > hi on three inputs, tests `e instanceof RangeError`, and FAILs on \"NO THROW or OTHER\", so any other error type fails.",
+  "model": "claude-opus-5-5",
+  "ms": 7838,
+  "tokens": {
+    "input": 2,
+    "output": 606,
+    "cacheCreation": 3288,
+    "cacheRead": 783,
+    "fresh": 3896,
+    "total": 4679
+  },
+  "at": "2026-11-09T02:36:18.233Z"
+}

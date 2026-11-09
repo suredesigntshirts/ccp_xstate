@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "4722ac80fac1a04c9004dccc8c9666639691467ebdb4e2d067cc7702bd8cd532",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The builder brief sets the bar without passing on any of the verifier's checks. It shares none of the verifier's fixtures (/tmp/jv104, c1/b1/b2.jsonl) and none of its printf/node command lines, gh pr diff/grep probes or PASS/FAIL wording. Its steps restate the issue's behaviour: usage exit 2, the second `-` as a usage error, file order, the `<file>:<line>: <error>` format, and exit 2 over 1 over 0. Step 3 tells the builder to write its own node:test tests for the seven cases from expect line 5, which the criterion allows. One test idea overlaps check 3(e) in spirit: \"add a bad row to one of them so the test proves its lines still show up\". That is advice on the builder's own test, not the verifier's command or files. The `-:<line>: ` prefix comes from the issue's own spec. The builder is also told to run `npm test`, which is allowed. I found no verifier probe or PASS/FAIL condition copied into the builder brief.",
+  "model": "claude-opus-5-5",
+  "ms": 13366,
+  "tokens": {
+    "input": 2,
+    "output": 975,
+    "cacheCreation": 6012,
+    "cacheRead": 783,
+    "fresh": 6989,
+    "total": 7772
+  },
+  "at": "2026-11-09T02:37:26.600Z"
+}

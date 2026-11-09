@@ -1,0 +1,23 @@
+Check out the PR head. Run every check there, one per expect line, in this order.
+
+Check 1. Expect line: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run from the repo root: `node --input-type=module -e "import * as m from './index.js'; console.log(typeof m.padLeft, JSON.stringify(m.padLeft('42',5,'0')), JSON.stringify(m.padLeft('ab',4)), JSON.stringify(m.padLeft('x',3,'*')))"`
+PASS: padLeft is an exported function, and the results are "00042", "  ab" (two spaces, then ab) and "**x". The padding is on the left, it uses fill (or a space when fill is left out), and the result is width characters long.
+FAIL: padLeft is not exported or not a function, or any result differs (padding on the right, wrong length, no space when fill is left out).
+
+Check 2. Expect line: "padLeft returns s unchanged when s is already width characters or longer"
+Run: `node --input-type=module -e "import {padLeft} from './index.js'; console.log(JSON.stringify(padLeft('abc',3,'0')), JSON.stringify(padLeft('abcdef',3,'0')), JSON.stringify(padLeft('abcdef',3)))"`
+PASS: the output is "abc" "abcdef" "abcdef".
+FAIL: any of these strings is padded, cut or otherwise changed, or the call throws.
+
+Check 3. Expect line: "README.md has a section for every function index.js exports"
+Run: `node --input-type=module -e "import * as m from './index.js'; console.log(Object.entries(m).filter(([,v])=>typeof v==='function').map(([k])=>k).join(' '))"` to list the exported functions. Then read README.md at the head.
+PASS: every function in that list (at least capitalize, slugify, truncate and padLeft) has its own section in README.md, meaning a heading that names it with text about it.
+FAIL: any exported function has no section. Note: the base README has no slugify section, so look for that one in particular.
+
+Check 4. Expect line: "npm test passes"
+Run: `npm test`.
+PASS: the command exits 0 with no failing tests.
+FAIL: it exits non-zero or reports a failing test.
+
+Advisory (not PASS/FAIL conditions): see whether the tests cover padLeft, including the default fill and the unchanged cases. See whether the README headings follow the existing `## name(args)` style. See whether capitalize, slugify and truncate behave as they did before.

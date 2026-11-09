@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "2b29a8789ba693b891cad1a19ba643b642a4ac6f4a9fbf5b0537664c3661edae",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked all four must_catch items against the briefs.\n- Item 1 holds: builder step 7 says to \"Run `npm install` at the repo root so `package-lock.json` includes the new workspace\" and commit the lock file.\n- Item 2 holds: builder step 6 says to \"replace the \"No tools yet\" bullet\".\n- Item 4 holds: Check 6 runs `gh pr view` for the body and headRefOid, then reads the test workflow run at the head SHA.\n- Item 3 fails: Check 4 runs `npm test -w jsonl-lint` directly. Check 6 only requires that \"the local `npm test` passes\" at the root. Because the root script uses `--if-present`, it can pass even when the jsonl-lint tests are skipped. Neither check reads the test count, looks for jsonl-lint tests in the root output, or breaks lint() to see a test fail.",
+  "model": "claude-opus-5-5",
+  "ms": 6350,
+  "tokens": {
+    "input": 2,
+    "output": 565,
+    "cacheCreation": 5273,
+    "cacheRead": 783,
+    "fresh": 5840,
+    "total": 6623
+  },
+  "at": "2026-11-09T02:37:14.545Z"
+}
