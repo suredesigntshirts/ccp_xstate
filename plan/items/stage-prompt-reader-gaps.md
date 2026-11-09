@@ -34,6 +34,14 @@
       "what": "Each gap's answer from the decision's table"
     },
     {
+      "ref": "workflows/research/verify.md",
+      "what": "The same two verify answers (task, not the brief; the issue output as url and expect), since its rules match quick-fix's"
+    },
+    {
+      "ref": "packages/engine/test/prompts.test.js, packages/engine/test/tourney/S5.test.js, test/regression/engine/stage-files.test.mjs",
+      "what": "Tests that quote a changed rule as a fixture or assert its words follow the new words"
+    },
+    {
       "ref": "bench/brief/runs/baseline-2026-11-09/, bench/brief/runs/variant-reader-gaps/",
       "what": "Today's prompt and the changed one, 3 runs per case on all 9 cases, scored"
     },

@@ -26,6 +26,9 @@ name), so the round runs now and those items stay as they are.
 | verify | "undo any local change" against `npm ci`'s node_modules | undo changes to tracked files |
 | verify | issue output: "url and expect ... you may leave out title, body and any other key" | { url, expect }, copied exactly |
 
+`workflows/research/verify.md` shares verify's rules word for word, and its input is task too, so it takes the same
+two verify answers; three engine tests that quote a changed rule follow the new words.
+
 Not taken: gaps about the bench's local repository path and this host's tools (artifacts of reading outside a run);
 the case's own wording (`torn last row`, blank lines), which is the issue's, not the harness's; the return tool's
 name given as a suffix, which `return-line` already explains; and `intake` and `research`, which a later round can
