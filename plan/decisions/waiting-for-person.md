@@ -45,3 +45,5 @@ One line each: what, why, which item waits. Threads add to this; the person clea
 - Delete two leftover branches from comments-present-tense's gate check, `chore/verify-history-gate-src` and
   `chore/verify-history-gate-plan` (PRs #160 and #161, closed unmerged). The git proxy and the auto mode classifier
   refuse branch deletes from threads.
+- Delete two throwaway branches from memory-boundary's world check, `throwaway/memory-boundary-notes-only` and
+  `throwaway/memory-boundary-notes-and-rule` (PRs #289 and #290, closed unmerged).

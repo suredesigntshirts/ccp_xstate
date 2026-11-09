@@ -66,5 +66,5 @@ From the audit: traps A4 (what auto mode and the git proxy refuse, and what work
 while a background run uses the checkout), A7 (`/mnt/project-files` limits), A8 (CI events that never wake a thread,
 a label added after opening, a stale `BASE_SHA`); techniques B2 (CLI shapes), B4 (commit transcript extracts, never
 raw transcripts), B5 (base-side checks without history); platform facts C (prompt swap through `updatedInput`,
-SubagentStart timing, named agents' tools, `--bare` and auto memory). The Expect lines include the reader check: each
+SubagentStart timing, named agents' tools, `--bare` and auto memory). The Expect lines include a world line that the PR's own notes-only part passes the verdict gate with no item once memory-boundary is merged (moved here from memory-boundary's contract change), and the reader check: each
 harvested question answered from the repo by a session with memory off.
