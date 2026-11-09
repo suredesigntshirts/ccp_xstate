@@ -9,8 +9,8 @@ import { fileURLToPath } from 'node:url';
 
 export const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 /** The PR's base (main as the build last merged it) and the build head the verdict names. */
-export const BASE = '57c9212ee74567ee28b59f31f274fa7e12f8fa3f';
-export const VERIFIED = '9765a7792dfa85385f641f8f4f297485d3d25399';
+export const BASE = '210533217518179e5d7d6e811b1352a1f1edd6e0';
+export const VERIFIED = '50295a0c424cfcb7c461ab144148334dbdc132a2';
 export const ID = 'verify-regression-set';
 export const ITEM = `plan/items/${ID}.md`;
 /** Decision 4's eight areas. */

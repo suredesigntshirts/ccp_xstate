@@ -76,6 +76,8 @@ const KINDS = {
   // drives a wall-clock bar (a p95 or ms bound), which cannot hold under the regression set's parallel runs, as the row
   // says by citing decision 7
   timing: ({ body, all, row }) => /p95|cheap|\bms\b|slow/i.test(body) && /p95|ms|median/.test(all) && /decision 7/.test(row.reason),
+  // renders a stage prompt from stored inputs and matches its rule text: a read of the prompt files' words
+  promptText: ({ body, all }) => /assert\.(match|doesNotMatch)|\.test\(/.test(body) && /render|prompt/i.test(all),
   // runs every file under test/regression/, which npm test runs itself, as the row says
   npmTest: ({ body, row }) => /test\/regression|files/.test(body) && /npm test/.test(row.reason),
   // tests the verifier's own helper in its folder, not harness code
@@ -184,6 +186,11 @@ const LEFT = [
   ['capture-cheap-serial/same-bars.test.mjs', null, 'source'],
   ['capture-cheap-serial/still-catches-slow.test.mjs', /^slow capture:/, 'timing'],
   ['capture-cheap-serial/still-catches-slow.test.mjs', /^recorded full npm test/, 'recorded'],
+  ['stage-prompt-reader-gaps/bench-recorded.test.mjs', /27 scored runs/, 'recorded'],
+  ['stage-prompt-reader-gaps/bench-recorded.test.mjs', /variant set names|baseline set ran the base's brief|reproduces the committed report/, 'capture'],
+  ['stage-prompt-reader-gaps/brief-unchanged.test.mjs', null, 'capture'],
+  ['stage-prompt-reader-gaps/build-verify-answers.test.mjs', null, 'promptText'],
+  ['stage-prompt-reader-gaps/suite-and-scope.test.mjs', /PR changes only/, 'scope'],
   ...['verify-regression-engine', 'verify-regression-plugin'].flatMap((s) => [
     [`${s}/folders.test.mjs`, null, 'scope'],
     [`${s}/table.test.mjs`, null, 'scope'],

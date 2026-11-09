@@ -1,6 +1,6 @@
 {
   "item": "verify-regression-set",
-  "verified_sha": "9765a7792dfa85385f641f8f4f297485d3d25399",
+  "verified_sha": "50295a0c424cfcb7c461ab144148334dbdc132a2",
   "verifier": {
     "session": "https://claude.ai/code/session_01KfkB5FQ3yuuNjMNzurkkkR"
   },
@@ -9,14 +9,14 @@
       "id": "table-complete",
       "status": "MET",
       "command": "node --test verify/verify-regression-set/table.test.mjs",
-      "excerpt": "88 done folders at 57c9212e, 37 with tests; 143 rows: 53 moved, 30 split, 60 left; every destination exists under one of the eight areas; 3 pass",
+      "excerpt": "89 done folders at 21053321, 38 with tests; 147 rows: 53 moved, 31 split, 63 left; every destination exists under one of the eight areas; 3 pass",
       "test": "verify/verify-regression-set/table.test.mjs"
     },
     {
       "id": "folders-hold-verdicts",
       "status": "MET",
       "command": "node --test verify/verify-regression-set/folders.test.mjs",
-      "excerpt": "88 folders hold verdict.json alone at 9765a77, each naming its folder; folders holding tests at 9765a77: verify-regression-set; read from the verified commit's tree, so ci's merge with a newer main does not move it; 3 pass",
+      "excerpt": "89 folders hold verdict.json alone at 50295a0, each naming its folder; folders holding tests at 50295a0: verify-regression-set; read from the verified commit's tree, so ci's merge with a newer main does not move it; 3 pass",
       "test": "verify/verify-regression-set/folders.test.mjs"
     },
     {
@@ -44,7 +44,7 @@
       "id": "left-reasons-hold",
       "status": "MET",
       "command": "node --test verify/verify-regression-set/left-reasons.test.mjs",
-      "excerpt": "every left file and split row has a case, every test of a whole-file left row has one, and each case holds its kind at base 57c9212; the control refuses a moved plan-check test; 117 pass",
+      "excerpt": "every left file and split row has a case, every test of a whole-file left row has one, and each case holds its kind at base 2105332; the control refuses a moved plan-check test; 122 pass",
       "test": "verify/verify-regression-set/left-reasons.test.mjs"
     },
     {
@@ -57,8 +57,8 @@
     {
       "id": "ci",
       "status": "MET",
-      "command": "GitHub check runs for PR #267 at 9765a7792dfa85385f641f8f4f297485d3d25399",
-      "excerpt": "at 9765a7792dfa85385f641f8f4f297485d3d25399: ci test (job 128954339328) ran 1969 tests, 1966 pass, 3 fail, all three in this verifier's own suite as committed at d370c5c, still pinned to the earlier base (table-complete, and left-reasons-hold's two case-coverage tests, missing capture-cheap-serial); every builder and regression test passed, moved-pass included. gates (job 128954339213) failed on the stale verdict. Both run again on this verdict commit, whose suite pins base 57c9212 and head 9765a77."
+      "command": "GitHub check runs for PR #267 at 50295a0c424cfcb7c461ab144148334dbdc132a2",
+      "excerpt": "at 50295a0c424cfcb7c461ab144148334dbdc132a2: ci test (job 128970018565) ran 2097 tests, 2084 pass, 3 fail, all three in this verifier's own suite as committed there, still pinned to the earlier base 57c9212 (table-complete, and left-reasons-hold's two case-coverage tests, missing stage-prompt-reader-gaps); every builder and regression test passed, moved-pass included. gates (job 128970018506) failed on the stale verdict. Both run again on this verdict commit, whose suite pins base 2105332 and head 50295a0."
     }
   ],
   "observations": [
@@ -72,6 +72,6 @@
     "The Regression table intro says 36 done folders; that is the count of done folders holding test files at the base. The base has 87 done folders in all, and at the head every one holds verdict.json alone.",
     "moved-pass runs the files in parallel as many at a time as the machine has cores, not all 76 started together. Started together they all passed on this 4-core container, but on ci's 2-core runner at 3586d71 verdict-covers.test.mjs and verify-issue-echo.test.mjs each failed once from load, and both pass alone. I read the check's 'every file run at once' as files run beside each other across the machine's full width, which still shares temp, HOME and git between files. This is a verifier's call; a later item may want to word the check that way.",
     "verify/capture-cheap-serial/still-catches-slow.test.mjs's first test drove the cheap test against a slowed capture and asserted its p95 bar failed. Its row cites decision 7 but names no npm test that holds that assertion, and none does: nothing now shows the cheap bar catches a slow capture. I count it as a wall-clock bar that cannot hold under parallel runs, as with test-fixture-edges/p95-over-bare. Likewise runs-alone's 'the two commands over capture.test.mjs' drove the test script's split and leaves on the same ground.",
-    "stage-prompt-reader-gaps became done on main (#274, 03:31Z on 9 Nov) after this PR's base 57c9212; its four test files stay under verify/ when #267 merges. folders-hold-verdicts reads the verified commit's tree, as its check says 'at the head', so it holds on ci's merge ref too. Retiring that suite, and any done later, is left to regression-set-leftovers rather than another merge-and-retire round here."
+    "verify/stage-prompt-reader-gaps/build-verify-answers.test.mjs rendered the build and verify prompts through the engine's render from stored inputs and matched their rule text. Rendering is head code, but what it asserted is the words of workflows/<wf>/<stage>.md, a rule-text read; I count it as source text. folders-hold-verdicts reads the verified commit's tree, as its check says 'at the head', so an item done on main after the base cannot turn ci's merge-ref run red; such a suite is left for regression-set-leftovers."
   ]
 }

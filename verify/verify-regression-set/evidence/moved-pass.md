@@ -1,6 +1,6 @@
 # moved-pass
 
-Command: `node --test verify/verify-regression-set/moved-pass.test.mjs` at 9765a7792dfa85385f641f8f4f297485d3d25399 (about 13 minutes here).
+Command: `node --test verify/verify-regression-set/moved-pass.test.mjs` at 50295a0c424cfcb7c461ab144148334dbdc132a2 (about 13 minutes here).
 
 Excerpt: `as is: 76 files, 4 at a time, 666 tests pass, fewest in one file 1`; `no Playwright: 76 files, 4 at a time, 656 tests pass, fewest in one file 1`; the control shows the preload hides Playwright by name and by both install paths; every header names an Expect id its item has; no file reads the checkout's verify/. 6 pass, 0 fail.
 

@@ -1,6 +1,6 @@
 # moved-bite
 
-Command: `node --test verify/verify-regression-set/bite.test.mjs` at 9765a7792dfa85385f641f8f4f297485d3d25399, each case on a temp copy of the head.
+Command: `node --test verify/verify-regression-set/bite.test.mjs` at 50295a0c424cfcb7c461ab144148334dbdc132a2, each case on a temp copy of the head.
 
 Excerpt:
 - plan: `"doing"` added to plan/item.schema.json's status enum; test/regression/plan/no-doing-status.test.mjs 2 red, restored 10 pass.
