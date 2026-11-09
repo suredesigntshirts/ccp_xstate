@@ -1,0 +1,45 @@
+{
+  "item": "pr-test-selection",
+  "verified_sha": "5d758cf5b23919552506c30d33dd048b53960603",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5FCZvunLt6eiJS5Zjr",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "selection-holds",
+      "status": "MET",
+      "command": "node --test verify/pr-test-selection/selection-holds.test.mjs; every guard file run at all 31 main first-parent shas from 3ddddce0 to a8cb3fee (PRs #250..#279) in fresh clones, compared per file with the selector's output for each merge; capture.test.mjs rerun alone 3x at the 22 shas where it differed; selector replayed on the 5 guard failures of PR ci runs since 2026-11-08 11:34Z",
+      "excerpt": "5 pass at 5d758cf5 (change, delete, move-away of a file a guard reads; delete of a module a guard imports; plan-only selects none); 3 of these failed at d8cbb6ba. Replay: over 30 merged PRs no guard whose result differs between base and head is left out. The only unselected differences were capture.test.mjs's 50 ms/200 ms timing bar failing under the replay's load; alone it passes 3/3 at all 22 shas. Selected differences: #266 clean-room run.test.mjs, #278's two plugin guards, #267's 27 new guards. Real CI failures: finish-ms.test.mjs at ed38ae1f was missed at d8cbb6ba (a deleted record it reads), selected from 45513e6c on; bench-prompts (5b6ea51b, c9a7d1ba) and self-edit-check (2f9f027a, bc71a2d0) selected. Table in evidence/selection-holds.md",
+      "test": "verify/pr-test-selection/selection-holds.test.mjs"
+    },
+    {
+      "id": "shared-runs-all",
+      "status": "MET",
+      "command": "node --test verify/pr-test-selection/shared-runs-all.test.mjs",
+      "excerpt": "4 pass: package.json, package-lock.json, ci.yml and the selector each select ALL, alone and beside a plan file; new paths no guard names and each of the head's 101 tracked files no guard reaches outside the inert folders select ALL; a plan plus tournaments file does not. PR #282's own ci job 129085475380 printed 'running every guard: shared file changed: .github/workflows/ci.yml, ...'",
+      "test": "verify/pr-test-selection/shared-runs-all.test.mjs"
+    },
+    {
+      "id": "main-runs-all",
+      "status": "MET",
+      "command": "node --test verify/pr-test-selection/main-runs-all.test.mjs",
+      "excerpt": "3 pass: ci triggers on push to main; the one npm test step runs when event != pull_request, the one pr-tests.mjs step only on pull_request, no other test step; npm test's globs cover test/ scripts/ packages/ plugins/ with no name filter and match every guard the selector lists. No main run of this ci.yml exists yet (see observations)",
+      "test": "verify/pr-test-selection/main-runs-all.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #282 at 5d758cf5b23919552506c30d33dd048b53960603",
+      "excerpt": "at 5d758cf5b23919552506c30d33dd048b53960603: test (job 129085475380) success in 3m54s, all guards (shared files changed); gates (job 129085476118) failed only with 'no verify/pr-test-selection/verdict.json at the head sha', which this verdict answers. Both run again on the verdict commit."
+    }
+  ],
+  "observations": [
+    "Round 1 at d8cbb6ba: the selector resolved path literals only against the head's tracked files, so a PR that deletes or moves away a file a guard reads under an inert folder selected nothing for it; this happened for real at ed38ae1f (finish-ms.test.mjs went red in ci run 42491323949). Fixed in 45513e6c.",
+    "The outcome lists test/regression/lib.mjs's dependencies among the shared files; the selector instead reaches lib.mjs through each guard's imports, so a change to it selects the guards that import it, not ALL. That matches the Expect line, which does not name lib.mjs.",
+    "main-runs-all is shown from ci.yml only; the first push to main after this merges is the first run of this ci.yml on main. Worth a glance that it prints npm test's full count.",
+    "A guard that reads a path computed at run time (readdirSync over a folder named elsewhere, a path from an env var) stays invisible to the selector; main's full run is the backstop, as the item's risks say.",
+    "Full npm test at 5d758cf5 in a fresh clone (clean HOME, 4 cores): 1976 tests, 1967 pass, 141 s; the 9 failures are test/regression/inspector/stage-record.test.mjs's Playwright tests, which fail the same way at main a8cb3fee in this container (Playwright present here, absent in ci) and are untouched by the PR.",
+    "capture.test.mjs's cheap timing bar flips under load (12 of 31 shas in a five-at-once replay); it is serial in npm test's second pass, so ci is unaffected, but any parallel replay or local run under load will see it."
+  ]
+}

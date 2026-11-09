@@ -4,7 +4,7 @@
   "title": "Run on a PR only the guards its changed files can reach, and every guard on main",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "A PR's ci check runs the guard files whose imports, or repo paths they name, reach a file the PR changes, and all guards when the PR changes anything they all share (package.json, package-lock.json, the selector, ci.yml, test/regression/lib.mjs's dependencies) or a file the selector cannot place; a push to main runs every guard; and over the last thirty merged PRs, the selection holds every guard file whose result differs between that PR's base and head.",
   "why": "The person asked on 9 Nov that a PR not rerun guards of code it never touched (thread 'Find why npm test is slow in CI'). Most PRs here are plan-only replans or touch one package, yet each runs every guard. Running all of them on main still catches anything the selection misses, one merge later.",
   "serves": [
