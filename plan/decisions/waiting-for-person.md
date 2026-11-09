@@ -47,3 +47,5 @@ One line each: what, why, which item waits. Threads add to this; the person clea
   refuse branch deletes from threads.
 - Delete two throwaway branches from memory-boundary's world check, `throwaway/memory-boundary-notes-only` and
   `throwaway/memory-boundary-notes-and-rule` (PRs #289 and #290, closed unmerged).
+- Delete the throwaway branch from memory-learnings-written's world check, `throwaway/notes-only-world` (PR #298,
+  closed unmerged).
