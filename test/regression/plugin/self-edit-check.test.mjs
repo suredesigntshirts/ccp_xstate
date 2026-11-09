@@ -314,7 +314,6 @@ const releaseRefs = (c) => git(c, 'for-each-ref', '--format=%(refname)', 'refs/t
 
 function clone(t) {
   const c = cloneHead(temp(t, 'tags'));
-  symlinkSync(join(REPO, 'node_modules'), join(c, 'node_modules'));
   for (const ref of releaseRefs(c)) git(c, 'update-ref', '-d', ref);
   return c;
 }
@@ -372,7 +371,6 @@ function run(t, cwd, file, args = []) {
 /** A clone of the head with one assertion in `file` changed to fail. */
 function broken(t, file, from, to) {
   const c = cloneHead(temp(t, 'broken'));
-  symlinkSync(join(REPO, 'node_modules'), join(c, 'node_modules'));
   const p = join(c, file), src = readFileSync(p, 'utf8');
   assert.ok(src.includes(from), `${from} in ${file}`);
   writeFileSync(p, src.replace(from, to));
