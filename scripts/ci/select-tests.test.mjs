@@ -1,6 +1,10 @@
 // select-tests.mjs: the guard files a change reaches, or all of them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { INERT, SHARED, reaches, select } from './select-tests.mjs';
 
 const graph = reaches();
@@ -52,4 +56,17 @@ test('a plan-only change runs the plan and gates guards, and not the engine, plu
 test('docs and CLAUDE.md reach the guards that read them', () => {
   assert.ok(files(['docs/layout.md']).includes('test/docs.test.mjs'));
   assert.ok(files(['CLAUDE.md']).includes('test/docs.test.mjs'));
+});
+
+test('a file the change deletes reaches the guards that name it', (t) => {
+  const repo = mkdtempSync(join(tmpdir(), 'select-deleted-'));
+  t.after(() => rmSync(repo, { recursive: true, force: true }));
+  mkdirSync(join(repo, 'test'));
+  writeFileSync(join(repo, 'test', 'reads.test.mjs'), "const f = join(REPO, 'data', 'gone.json');\n");
+  writeFileSync(join(repo, 'test', 'other.test.mjs'), "const g = 1;\n");
+  execFileSync('git', ['init', '-q', repo]);
+  execFileSync('git', ['-C', repo, 'add', '-A']);
+  // data/gone.json is not tracked: the change deleted it.
+  const picked = select(['data/gone.json'], { repo });
+  assert.deepEqual(picked, { all: false, files: [{ file: 'test/reads.test.mjs', why: 'data/gone.json' }] });
 });

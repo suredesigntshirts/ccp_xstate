@@ -25,9 +25,9 @@ export const INERT = ['plan/', 'docs/', 'bench/', 'tournaments/', 'verify/', 'pr
 const CODE = /\.(m|c)?js$/;
 const git = (cwd, ...a) => execFileSync('git', ['-C', cwd, ...a], { encoding: 'utf8', maxBuffer: 1 << 28 });
 
-/** Every tracked path, and every folder holding one. */
-function tracked(repo) {
-  const files = git(repo, 'ls-files', '-z').split('\0').filter(Boolean);
+/** Every tracked path, and the paths in `also`, and every folder holding one. */
+function tracked(repo, also = []) {
+  const files = [...git(repo, 'ls-files', '-z').split('\0').filter(Boolean), ...also];
   const dirs = new Set();
   for (const f of files) for (let d = dirname(f); d !== '.'; d = dirname(d)) dirs.add(d);
   return { files: new Set(files), dirs };
@@ -67,10 +67,11 @@ function pathsOf(s, file, { files, dirs }) {
 }
 
 /**
- * Each guard file's reach: the set of repo paths (files and folders) it can read, run or import.
+ * Each guard file's reach: the set of repo paths (files and folders) it can read, run or import. Paths in `also` count
+ * as tracked, so a file the change deletes still resolves where a guard names it.
  */
-export function reaches(repo = REPO) {
-  const t = tracked(repo);
+export function reaches(repo = REPO, { also = [] } = {}) {
+  const t = tracked(repo, also);
   const memo = new Map();
   const direct = (file) => {
     if (memo.has(file)) return memo.get(file);
@@ -113,7 +114,7 @@ const holds = (reach, file) => {
 /**
  * The guards to run for `changed` repo paths: { all: true, why } or { all: false, files: [{ file, why }] }.
  */
-export function select(changed, { repo = REPO, graph = reaches(repo) } = {}) {
+export function select(changed, { repo = REPO, graph = reaches(repo, { also: changed }) } = {}) {
   const { guards, reach } = graph;
   const shared = changed.filter((f) => SHARED.includes(f));
   if (shared.length) return { all: true, why: `shared file changed: ${shared.join(', ')}` };
