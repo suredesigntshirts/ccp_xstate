@@ -1,6 +1,6 @@
 {
   "item": "memory-learnings-written",
-  "verified_sha": "da330bfce4997fd002b80a44f8a74e142fc12acb",
+  "verified_sha": "296367527a73b4686f6f69a2ba47e17939a6d97e",
   "verifier": {
     "session": "https://claude.ai/code/session_01KfkB5EwoBDNqkCtvYCFcGc",
     "model": "claude-opus-5-5"
@@ -56,9 +56,9 @@
     },
     {
       "id": "reader-answers",
-      "status": "NOT MET",
-      "command": "node scripts/fresh-reader.mjs --cwd <clean clone of da330bfc after npm ci> \"Answer this question from the files of this repository alone. Name the file that answers it, and quote the lines you rely on. Question: <q>\" -- --max-turns 25, once per question, three more runs for a question whose run was incomplete (evidence/reader-answers.md)",
-      "excerpt": "Round 2 at da330bfc: question 11 now names plan/ledger/platform.md and every term. 10 more questions are complete on their one run, question 8 on 3 of 4. Question 12 (how a headless claude -p signs in from the container, how its memory is turned off) is complete on only 2 of 4: the other two answers read scripts/fresh-reader.mjs alone, say the repository does not describe the sign-in, and never name plan/ledger/platform.md, --bare or API key. In round 1 at b467da6d, question 12 was complete on its one run.",
+      "status": "MET",
+      "command": "node scripts/fresh-reader.mjs --cwd <clean clone of 29636752 after npm ci> \"Answer this question from the files of this repository alone. Name the file that answers it, and quote the lines you rely on. Question: <q>\" -- --max-turns 25, once per question, three more for a miss, and three more for question 12 regardless (evidence/reader-answers.md)",
+      "excerpt": "Round 3 at 29636752: all 12 questions complete on their first run, each answer naming its home and every carrying term; question 12 complete on 4 of 4. Rounds 1 and 2 missed question 11 (answered from plan/research/probe-plugin-agents.md) and then question 12 (2 of 4, stopping at scripts/fresh-reader.mjs); the builder pointed both at their ledger rows.",
       "test": "verify/memory-learnings-written/reader-answers.test.mjs"
     },
     {
@@ -70,16 +70,17 @@
     {
       "id": "ci",
       "status": "MET",
-      "command": "GitHub check runs for PR #297 at da330bfce4997fd002b80a44f8a74e142fc12acb",
-      "excerpt": "at da330bfce4997fd002b80a44f8a74e142fc12acb: test (job 129335847371) success; gates (job 129335846406) failure, which pr-gate.mjs verdict run locally at the same sha puts down to the verdict: it was for b467da6d (round 1) and reader-answers is NOT MET. Both run again on the verdict commit."
+      "command": "GitHub check runs for PR #297 at 296367527a73b4686f6f69a2ba47e17939a6d97e",
+      "excerpt": "at 296367527a73b4686f6f69a2ba47e17939a6d97e: test (job 129337840112) success, 17:49:21Z to 17:51:24Z; gates (job 129337809182) failure from the round 2 verdict (for da330bfc, reader-answers NOT MET), which this verdict replaces. Both run again on the verdict commit."
     }
   ],
   "observations": [
     "Quality: the entries are short, each in its own section, and say what avoids the trap. The guard is 24 lines and matches terms as docs/layout.md asks, so a rewording that keeps the answer stays green.",
-    "Round 1 found question 11 answered from plan/research/probe-plugin-agents.md, never its home; the builder named the return tool in L-named-agent-tools and pointed the research file at the row, and round 2 found it at home. Question 12 now misses half the time for the same kind of reason: the reader goes to scripts/fresh-reader.mjs, which says memory is off but not why it starts claude -p without --bare, and stops there. A line in that script naming --bare and pointing at L-headless-auth-and-memory would likely close it.",
+    "Rounds 1 and 2 each found one question answered outside its home, both times because a file a reader reaches first (the probe research, then scripts/fresh-reader.mjs) held the fact without pointing at its ledger row. The builder added those pointers. A platform fact a reader looks for under a script or research name needs a pointer there to stay findable.",
     "The guard proves each term is in its home file, not that the term sits in the entry that answers the question; a term found elsewhere in a long home (force push, background) keeps it green. This folder's notes-entries test checks per section.",
     "docs/gates.md says the verdict gate runs node --test-reporter=tap <file> without --test, the shape the new verifying.md entry warns about; with one file per run it runs that file in full, so it is safe as the gate uses it.",
     "The fresh reader again printed the [mcp-sdk] SEP-2352 notice on stderr with an empty HOME; dropped from evidence.",
-    "The reader is not deterministic: question 12 passed in round 1 and failed in round 2 with the same row text. This verdict counts a question answered when most of its runs are complete and records every run."
+    "The reader is not deterministic: question 12 passed in round 1 and failed in round 2 with the same row text. This verdict counts a question answered when most of its runs are complete and records every run.",
+    "This PR adds a second line naming scripts/fresh-reader.mjs to docs/verifying.md (\"scripts/fresh-reader.mjs already does.\"), so verify/own-traps-in-code/docs-point.test.mjs, a done item's proof, now fails its exactly-one-line check. verify/ is not in npm test and the line is a pointer, not the recipe that test guarded against; noted, not counted against this item."
   ]
 }
