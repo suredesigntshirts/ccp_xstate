@@ -73,6 +73,9 @@ const KINDS = {
   // runs a test that npm test runs itself (test/docs.test.mjs, plugins/harness/test/capture.test.mjs), which the row names
   heldElsewhere: ({ all, row }) => ['test/docs.test.mjs', 'plugins/harness/test/capture.test.mjs', 'plugins/harness/test/finish-ms.test.mjs']
     .some((p) => all.includes(p.split('/').pop()) && existsSync(join(REPO, p)) && row.reason.includes(p)),
+  // drives a wall-clock bar (a p95 or ms bound), which cannot hold under the regression set's parallel runs, as the row
+  // says by citing decision 7
+  timing: ({ body, all, row }) => /p95|cheap|\bms\b|slow/i.test(body) && /p95|ms|median/.test(all) && /decision 7/.test(row.reason),
   // runs every file under test/regression/, which npm test runs itself, as the row says
   npmTest: ({ body, row }) => /test\/regression|files/.test(body) && /npm test/.test(row.reason),
   // tests the verifier's own helper in its folder, not harness code
@@ -171,6 +174,16 @@ const LEFT = [
   ['finish-ms-transcript-fixture/reads-fixture.test.mjs', /^finish-ms\.test\.mjs passes in a head copy/, 'heldElsewhere'],
   ['finish-ms-transcript-fixture/reads-fixture.test.mjs', /^no file under plugins/, 'source'],
   ['finish-ms-transcript-fixture/scope.test.mjs', null, 'scope'],
+  ['capture-cheap-serial/green-under-suite.test.mjs', /^node --test plugins/, 'heldElsewhere'],
+  ['capture-cheap-serial/green-under-suite.test.mjs', /^recorded:/, 'recorded'],
+  ['capture-cheap-serial/others-parallel.test.mjs', /^the parallel pass is the base's command/, 'source'],
+  ['capture-cheap-serial/others-parallel.test.mjs', /^recorded:/, 'recorded'],
+  ['capture-cheap-serial/runs-alone.test.mjs', /^the test script is|^every test named/, 'source'],
+  ['capture-cheap-serial/runs-alone.test.mjs', /^the two commands over capture/, 'heldElsewhere'],
+  ['capture-cheap-serial/runs-alone.test.mjs', /^three recorded full runs/, 'recorded'],
+  ['capture-cheap-serial/same-bars.test.mjs', null, 'source'],
+  ['capture-cheap-serial/still-catches-slow.test.mjs', /^slow capture:/, 'timing'],
+  ['capture-cheap-serial/still-catches-slow.test.mjs', /^recorded full npm test/, 'recorded'],
   ...['verify-regression-engine', 'verify-regression-plugin'].flatMap((s) => [
     [`${s}/folders.test.mjs`, null, 'scope'],
     [`${s}/table.test.mjs`, null, 'scope'],
