@@ -16,7 +16,7 @@
       "id": "folders-hold-verdicts",
       "status": "MET",
       "command": "node --test verify/verify-regression-set/folders.test.mjs",
-      "excerpt": "88 folders hold verdict.json alone, each naming its folder; folders holding tests: verify-regression-set; 3 pass",
+      "excerpt": "88 folders hold verdict.json alone at 9765a77, each naming its folder; folders holding tests at 9765a77: verify-regression-set; read from the verified commit's tree, so ci's merge with a newer main does not move it; 3 pass",
       "test": "verify/verify-regression-set/folders.test.mjs"
     },
     {
@@ -71,6 +71,7 @@
     "This suite's moved-pass runs every regression file at once, twice, about 13 minutes here, inside npm test and the verdict gate. Once this item is done its folder should retire too, as the series intends.",
     "The Regression table intro says 36 done folders; that is the count of done folders holding test files at the base. The base has 87 done folders in all, and at the head every one holds verdict.json alone.",
     "moved-pass runs the files in parallel as many at a time as the machine has cores, not all 76 started together. Started together they all passed on this 4-core container, but on ci's 2-core runner at 3586d71 verdict-covers.test.mjs and verify-issue-echo.test.mjs each failed once from load, and both pass alone. I read the check's 'every file run at once' as files run beside each other across the machine's full width, which still shares temp, HOME and git between files. This is a verifier's call; a later item may want to word the check that way.",
-    "verify/capture-cheap-serial/still-catches-slow.test.mjs's first test drove the cheap test against a slowed capture and asserted its p95 bar failed. Its row cites decision 7 but names no npm test that holds that assertion, and none does: nothing now shows the cheap bar catches a slow capture. I count it as a wall-clock bar that cannot hold under parallel runs, as with test-fixture-edges/p95-over-bare. Likewise runs-alone's 'the two commands over capture.test.mjs' drove the test script's split and leaves on the same ground."
+    "verify/capture-cheap-serial/still-catches-slow.test.mjs's first test drove the cheap test against a slowed capture and asserted its p95 bar failed. Its row cites decision 7 but names no npm test that holds that assertion, and none does: nothing now shows the cheap bar catches a slow capture. I count it as a wall-clock bar that cannot hold under parallel runs, as with test-fixture-edges/p95-over-bare. Likewise runs-alone's 'the two commands over capture.test.mjs' drove the test script's split and leaves on the same ground.",
+    "stage-prompt-reader-gaps became done on main (#274, 03:31Z on 9 Nov) after this PR's base 57c9212; its four test files stay under verify/ when #267 merges. folders-hold-verdicts reads the verified commit's tree, as its check says 'at the head', so it holds on ci's merge ref too. Retiring that suite, and any done later, is left to regression-set-leftovers rather than another merge-and-retire round here."
   ]
 }
