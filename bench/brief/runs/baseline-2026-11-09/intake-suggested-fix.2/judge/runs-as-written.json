@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "5df6fe0c561e4e777be2c1ac9c6810ea5b19e111202f6010bbad9eb0ffc5c96c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs. Every command names something that exists at this commit or is made by an earlier step: `src/app.js`, `src/config.js` and `test/config.test.js` are tracked, `npm test` maps to `node --test`, and the temp files come from `mktemp -d` and `printf`. The shell is valid. The `printf` format strings sit in single quotes. The `node --input-type=module -e \"...\"` commands use double quotes, so `$d` expands, and they match the issue's own proofs. Check 2 reads `$d/err` from the Check 1 run, which is the step just before it, before Check 3 redefines `d`. The JavaScript snippets parse, using an import plus try/catch, `JSON.stringify` and `process.exit`. `git checkout <base-commit> -- src` is a placeholder whose value is spelled out (\"the PR's merge base\"), and its arguments fit git. `node -v` and `echo $?` are standard. I found no missing file, bad argument or syntax error.",
+  "model": "claude-opus-5-5",
+  "ms": 9144,
+  "tokens": {
+    "input": 2,
+    "output": 742,
+    "cacheCreation": 5409,
+    "cacheRead": 783,
+    "fresh": 6153,
+    "total": 6936
+  },
+  "at": "2026-11-09T02:32:54.654Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "b2aa19dd461ad9e16098fb3694b7ec634cdec5747f96bed85a93d795e98cc8fc",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps against the verifier's checks. Check 1 of the verifier brief is a probe that writes '{port: 9000' to a file, calls loadConfig and expects `RESULT {}`. Step 2 of the builder brief hands the builder that same input and expected output: \"assert.deepEqual(loadConfig(file('{port: 9000')), {})\". The input comes from the repo's existing test, but the brief still gives the builder the verifier's input/expected-output pair rather than leaving the builder to write its own test. The builder's \"missing file still throws\" also overlaps the verifier's advisory missing-file probe, though advisories aren't pass/fail checks. Telling the builder to run `npm test` (step 4) is allowed. Because the Check 1 input and expected output are shared, the builder brief does carry one of the verifier's probes, so the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 10006,
+  "tokens": {
+    "input": 2,
+    "output": 702,
+    "cacheCreation": 2754,
+    "cacheRead": 783,
+    "fresh": 3458,
+    "total": 4241
+  },
+  "at": "2026-11-09T02:36:20.686Z"
+}

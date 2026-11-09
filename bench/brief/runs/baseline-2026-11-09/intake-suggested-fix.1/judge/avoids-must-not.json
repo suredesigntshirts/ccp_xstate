@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "b84e5cd8e3d6a7f0debcbd042b849bdbc259bbf998540aab632ce02ef062ad73",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Item 1: the builder brief has the builder catch the JSON.parse error only to rethrow it: \"On a parse error, throw again. Do not return anything.\" It also rejects the request's fix: \"Do NOT adopt the fix… returning `{}` or the defaults\". So it never says to catch the error and return a value. Item 2: the verifier's Check 2 accepts line 3 and column 3 \"in any clear form (e.g. `line 3 column 3`, `3:3`, `line 3, col 3`)\". It fails only if something is missing, the path is altered, or the line or column is not 3. Wording or order alone never causes a FAIL. Neither brief does anything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 11631,
+  "tokens": {
+    "input": 2,
+    "output": 638,
+    "cacheCreation": 5356,
+    "cacheRead": 783,
+    "fresh": 5996,
+    "total": 6779
+  },
+  "at": "2026-11-09T02:32:34.902Z"
+}

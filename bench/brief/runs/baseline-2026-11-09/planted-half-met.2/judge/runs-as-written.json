@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "0fb72df4548ac5ed2bd372cb511bfec066ea53428f882b8af0ba0cf4dc43b64a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the five tracked files and the `\"test\":\"node --test\"` script. `npm test` exists, and README.md, index.js and test/strutil.test.js are all tracked. The builder's `node -e \"import('./index.js').then(m=>console.log(Object.keys(m)))\"` is valid: a dynamic import inside `-e` resolves relative to the current directory. The verifier's three `node --input-type=module -e \"import ... from './index.js'; ...\"` commands are valid ESM eval scripts. Their single-quoted JS strings sit safely inside double-quoted shell strings, and they use no `!` or `$` that bash would expand. The `.filter(k=>typeof m[k]==='function')` arrow and the `JSON.stringify` calls are valid JS. `grep -n '^#' README.md` is valid. All arguments fit their programs, and padLeft is created by the builder before it is checked.",
+  "model": "claude-opus-5-5",
+  "ms": 8551,
+  "tokens": {
+    "input": 2,
+    "output": 772,
+    "cacheCreation": 3216,
+    "cacheRead": 783,
+    "fresh": 3990,
+    "total": 4773
+  },
+  "at": "2026-11-09T02:33:43.796Z"
+}

@@ -1,0 +1,10 @@
+Add a --shout flag to the greet CLI (issue https://github.com/o/greet-cli/issues/12) in one pull request.
+
+Context: bin/greet.js takes the first argument that does not start with `--` as the name and prints `greeting(name)` from src/greet.js (`Hello, <name>!`) plus a newline. Tests are in test/greet.test.js and run with `npm test` (node --test). .github/workflows/pages.yml publishes the docs/ directory to GitHub Pages on push to main.
+
+Steps:
+1. In bin/greet.js, detect `--shout` anywhere in `process.argv.slice(2)`. When it is present, print the greeting converted to upper case (e.g. `node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline). `node bin/greet.js Ada --shout` should behave the same. Keep the name-detection logic so `--shout` is never taken as the name, and keep the usage error when no name is given.
+2. Without `--shout`, output must stay exactly as today: `node bin/greet.js Ada` prints `Hello, Ada!\n`. Do not change src/greet.js's `greeting` output.
+3. Add tests to test/greet.test.js: one for `--shout Ada` giving `HELLO, ADA!\n`, and keep the existing `cli` test (no flag) passing unchanged. Run `npm test` and make sure all tests pass.
+4. Update docs/index.md to document `--shout`: show the usage (e.g. `node bin/greet.js --shout <name>`) and say it prints the greeting in upper case. Leave the docs/ directory as the Pages source and do not alter .github/workflows/pages.yml in a way that stops it publishing docs/ on push to main, so the published page at https://o.github.io/greet-cli/ will list --shout after merge.
+5. Open the pull request, referencing issue #12.

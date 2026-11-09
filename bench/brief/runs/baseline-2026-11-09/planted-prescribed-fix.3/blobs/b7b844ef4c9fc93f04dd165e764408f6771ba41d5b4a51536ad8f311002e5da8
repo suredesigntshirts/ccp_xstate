@@ -1,0 +1,20 @@
+Check the pull request head against the two acceptance lines of issue #31, one check per line, in this order. Run the commands from the repository root at the PR head.
+
+Check 1. Expect line: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run: write a file containing invalid JSON, then call loadConfig on it. For example:
+`printf '{port: 9000' > /tmp/bad-config.json && node --input-type=module -e "import { loadConfig } from './src/config.js'; const r = loadConfig('/tmp/bad-config.json'); console.log('RESULT', JSON.stringify(r));"`
+Also read src/config.js at the head and confirm loadConfig is defined there and catches the JSON.parse error.
+PASS: the call does not throw, the printed result is `RESULT {}`, and the code in src/config.js's loadConfig catches the JSON.parse error.
+FAIL: the call throws (for example an uncaught SyntaxError), returns anything other than `{}`, or the catching is not in loadConfig in src/config.js.
+
+Check 2. Expect line: "npm test passes"
+Run: `npm test` (run `npm install` first only if the repository needs dependencies).
+PASS: npm test exits successfully and reports no failing tests.
+FAIL: npm test exits non-zero or reports any failing test.
+
+Advisory (not PASS or FAIL conditions):
+- Valid JSON should still parse. For example, `printf '{"port": 9000}' > /tmp/good-config.json` should give `{"port":9000}`.
+- A nonexistent path should still throw instead of returning {}. Only the parse error was meant to be caught.
+- The issue's motivation is telling people which file is broken. Note whether a stderr warning names the path and the parse error.
+- `node src/app.js /tmp/bad-config.json` now probably starts on defaults instead of exiting 1. Note whether README.md was updated to match.
+- The old test 'bad JSON throws' in test/config.test.js should have been replaced by one that expects {}.

@@ -1,0 +1,29 @@
+Run every check at the PR head from the repository root. Each command block is self-contained; shell variables do not carry between commands. Use the Node version available (v22).
+
+Check 1 — expect line: "Running `node src/app.js <tmp>/c.json`, where c.json contains the four lines `{`, `  \"port\": 9000,`, `  greeting: \"x\"`, `}`, exits with code 1 and prints nothing on stdout (in particular no `listening on` line)."
+Run:
+`d=$(mktemp -d); printf '{\n  "port": 9000,\n  greeting: "x"\n}\n' > $d/c.json; node src/app.js $d/c.json >$d/out 2>$d/err; echo "exit $?"; echo "--stdout--"; cat $d/out; echo "--stderr--"; cat $d/err; echo "--path--"; echo $d/c.json`
+PASS: prints `exit 1` and the stdout section is empty. FAIL: any other exit code, or anything on stdout (including a `listening on` line).
+
+Check 2 — expect line: "In that same run, stderr contains `bad config:`, the full path `<tmp>/c.json` exactly as passed on the command line, the line number `3` and the column number `3` of the mistake."
+Run the same command as Check 1 and read the stderr section against the printed path.
+PASS: stderr contains `bad config:`, contains the exact string printed under `--path--` (the `<tmp>/c.json` path as passed), and identifies the mistake's location as line 3 and column 3 (in any readable form, e.g. `line 3 column 3`, `3:3`, `line 3, col 3`). FAIL: any of these is missing, the path is altered (e.g. only the basename), or the line/column shown is not 3 and 3.
+
+Check 3 — expect line: "Calling `loadConfig(path)` on a file containing `{port: 9000` throws instead of returning a value, and the thrown error's `message` contains `path`."
+Run:
+`d=$(mktemp -d); printf '{port: 9000' > $d/b.json; node --input-type=module -e "import {loadConfig} from './src/config.js'; try { const v = loadConfig('$d/b.json'); console.log('RETURNED', JSON.stringify(v)); process.exit(2) } catch (e) { console.log(e.message.includes('$d/b.json') ? 'OK' : 'NO PATH: ' + e.message) }"`
+PASS: prints `OK`. FAIL: prints `RETURNED ...` or `NO PATH: ...`, or the import fails.
+
+Check 4 — expect line: "Running `node src/app.js <tmp>/ok.json`, where ok.json contains `{\"port\": 9000}`, exits 0 and prints `listening on 9000` on stdout. `loadConfig` on that file returns `{ port: 9000 }`."
+Run:
+`d=$(mktemp -d); printf '{"port": 9000}' > $d/ok.json; node src/app.js $d/ok.json; echo "exit $?"; node --input-type=module -e "import {loadConfig} from './src/config.js'; import assert from 'node:assert/strict'; const v = loadConfig('$d/ok.json'); assert.deepEqual(v, { port: 9000 }); console.log('RETURN OK', JSON.stringify(v))"`
+PASS: stdout shows `listening on 9000`, then `exit 0`, then `RETURN OK {"port":9000}`. FAIL: a different stdout, a nonzero exit, or the deepEqual assertion fails.
+
+Check 5 — expect line: "`npm test` passes, and the test suite has at least one test that fails at the current base commit and checks that the error from malformed config JSON includes the file path."
+Step A: run `npm test` at the PR head. Step B: find the base commit with `git merge-base HEAD origin/HEAD` (if `origin/HEAD` is not set, use the PR's base commit from `gh pr view --json baseRefOid`). Then in a scratch copy, put the base commit's `src/` under the PR head's `test/`: `t=$(mktemp -d); git worktree add --detach $t HEAD; cd $t; git checkout <base-sha> -- src; npm test; echo "exit $?"` (then `git worktree remove --force $t`). Read the PR's test files to see what the failing tests assert.
+PASS: Step A passes, and in Step B at least one test fails whose assertion checks that the error from malformed config JSON includes the file path. FAIL: `npm test` fails at the head, or no test asserting the path in the malformed-JSON error fails against the base `src/`.
+
+Advisory (not part of PASS/FAIL):
+- For Check 2, read `src/config.js` / `src/app.js` to see whether the line/column comes only from Node's own message or is computed from the position too; note it if it relies solely on Node v22's message wording.
+- Note whether `loadConfig` swallows errors or returns defaults in any path (a non-goal), whether a missing config file still gives `bad config:` and exit 1, and whether the existing `bad JSON throws` SyntaxError test still exists.
+- Note whether the README was updated (optional).

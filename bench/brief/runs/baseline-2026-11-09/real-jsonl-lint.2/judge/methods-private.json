@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "1ff20761baeb86559e85112ebf762bf7989baff48489e2b5feaf8a51e5db1221",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with the verifier brief's Run lines and its PASS/FAIL conditions. The builder brief leaves out the verifier's concrete probes. It has none of the `printf` inputs for clean.jsonl or bad.jsonl, no expected lines `:3:` or `:5:`, no inline `node --input-type=module -e` lint script, and no `gh pr list --search 102`. It also contains no PASS or FAIL wording. The test cases it asks the builder to write (clean file, bad middle row, torn last row, blank lines, missing file, no argument) restate expect line 4 and the issue's exit codes, and writing its own tests is allowed. It names `npm ci && npm test` and the green test workflow, which expect line 6 names. \"Try the CLI by hand on a clean file, a broken file...\" gives categories only, with no inputs or expected outputs. Some details overlap with the verifier's advisory notes (lock file, trailing newline, CRLF, shebang), but those are not pass/fail conditions or probes. So the builder gets the bar, not the checker.",
+  "model": "claude-opus-5-5",
+  "ms": 13210,
+  "tokens": {
+    "input": 2,
+    "output": 833,
+    "cacheCreation": 5131,
+    "cacheRead": 783,
+    "fresh": 5966,
+    "total": 6749
+  },
+  "at": "2026-11-09T02:37:38.396Z"
+}

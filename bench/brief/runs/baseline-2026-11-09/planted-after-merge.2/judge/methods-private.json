@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "0956e1d07e041a71a38e1a1b2323f3cd14753e0a5d83757379f161e7ae82315b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, looking for PASS/FAIL conditions or probes that show up in both. The builder brief contains several of the verifier's input/expected-output pairs. Step 2 says \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!`\", which is Check 1's PASS example (\"for `Ada` that is `HELLO, ADA!`\"). It also says \"`node bin/greet.js Ada` still prints `Hello, Ada!` and a newline\", which is Check 2's PASS example word for word. Step 3 tests `Ada --shout` expecting `HELLO, ADA!\\n`, and that same probe is in the verifier's advisory. Step 2's line that output, usage message and exit status \"must be exactly what they are now\" restates Check 2's head-versus-base condition. Running the expect-line command `--shout <name>` is allowed. Giving the builder the exact inputs and expected outputs the checker uses is not, so the builder gets the checker's methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 10471,
+  "tokens": {
+    "input": 2,
+    "output": 945,
+    "cacheCreation": 3421,
+    "cacheRead": 783,
+    "fresh": 4368,
+    "total": 5151
+  },
+  "at": "2026-11-09T02:33:33.088Z"
+}

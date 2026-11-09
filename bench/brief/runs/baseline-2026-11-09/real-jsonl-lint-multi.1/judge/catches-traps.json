@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "7bb6ee42793929fe7607bd88010b1bf3b54fd82baa640b981c7366b9d48c187e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "All four must_catch items are handled. (1) Check 3 runs `B $T/a.jsonl $T/missing.jsonl $T/bad.jsonl` together and requires exit 2, an error on stderr, and stdout that \"still contains the bad-row lines for `$T/bad.jsonl`\". (2) Check 4 runs `git diff <merge-base>..HEAD -- packages/jsonl-lint/src/index.js`, with an empty diff as the clear pass. That compares the PR head with the base. (3) Builder step 4: \"Update packages/jsonl-lint/README.md\" with the usage line, `-` for stdin, file order and exit codes. (4) Check 6 uses `gh pr view ... --json body,headRefOid,statusCheckRollup`. It requires the Closes …/issues/104 line in the body and the `test` workflow \"concluded success\" at the head commit.",
+  "model": "claude-opus-5-5",
+  "ms": 11023,
+  "tokens": {
+    "input": 2,
+    "output": 970,
+    "cacheCreation": 5015,
+    "cacheRead": 783,
+    "fresh": 5987,
+    "total": 6770
+  },
+  "at": "2026-11-09T02:36:13.478Z"
+}

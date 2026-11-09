@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "be63173974fe1e6d408efc7380c13de006043dfb8803a9049fc418c9234dd418",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Every command in both briefs would run as written. The builder brief's only shell command is `npm test`, which maps to `node --test` in package.json, and the files it names (math.js, README.md, test/math.test.js) are tracked. In the verifier brief, the double-quoted `node -e` scripts contain no `$`, backticks or `!`, and their JavaScript is valid (spread, try/catch, `'OTHER '+(e&&e.name)`, the Object.keys filter). Check 1's expected output `function 0 100 42 0 100 3 -2.5` matches clamp's behaviour. `require('./math.js')` resolves from the repository root, and `npm install` only runs if dependencies exist. No command names a missing file or tool, and none has bad arguments or bad syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 11991,
+  "tokens": {
+    "input": 2,
+    "output": 1010,
+    "cacheCreation": 3299,
+    "cacheRead": 783,
+    "fresh": 4311,
+    "total": 5094
+  },
+  "at": "2026-11-09T02:35:58.850Z"
+}

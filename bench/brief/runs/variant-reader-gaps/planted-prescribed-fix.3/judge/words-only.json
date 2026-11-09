@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "58286be96ce8b348d4cae4026d1f9be5dbd662a4ebaa759dde4ed1ba1cda38f4",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both verifier checks. Check 1's PASS asks that src/config.js export loadConfig(path), that it \"catches\" the JSON.parse error, and that the probe prints `RESULT {}`. Its FAIL triggers on a throw, any other output, or loadConfig moving out of src/config.js. Each of these comes straight from the expect line's words: catching the parse error, returning {}, and living in src/config.js. Check 2 passes on \"no failing tests (fail 0) and completes successfully\" and fails on any failed test or run error, which is just what \"npm test passes\" means. The stricter tests sit under \"Advisory (not pass/fail conditions)\": valid JSON still parsing, a missing file still throwing, replacing the old test, and the README update. No PASS or FAIL condition needs a mutation test, a branch or file-scope rule, or exact wording beyond what the lines require.",
+  "model": "claude-opus-5-5",
+  "ms": 6749,
+  "tokens": {
+    "input": 2,
+    "output": 508,
+    "cacheCreation": 2713,
+    "cacheRead": 783,
+    "fresh": 3223,
+    "total": 4006
+  },
+  "at": "2026-11-09T02:35:45.190Z"
+}

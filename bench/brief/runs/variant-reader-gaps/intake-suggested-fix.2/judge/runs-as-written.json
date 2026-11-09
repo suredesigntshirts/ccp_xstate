@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "dcbc7b0dbb3ced062eaca1d92962b77c909501eeb7f91e2e9459e14bb26c3a60",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the repo and the shell/JS syntax, and all of them would run. Every file they name exists in the repo or is created by an earlier step: src/app.js, src/config.js, test/config.test.js, and `npm test` → `node --test`. The printf/mktemp setups are valid, and each later command uses a `$d` set earlier in the same block. The `node --input-type=module -e` imports ('./src/config.js', 'node:assert/strict') are valid ESM. `$d` expands because the code is in double quotes. Check 5 uses `git merge-base HEAD origin/HEAD` with a `gh pr view --json baseRefOid` fallback. `git worktree add --detach $t HEAD` works on an empty mktemp directory, and `git checkout <base-sha> -- src` is a placeholder the verifier fills in. One weak spot: builder step 7's second bullet reuses `$d` from the first bullet. That only works if both run in one shell session, which is the natural reading.",
+  "model": "claude-opus-5-5",
+  "ms": 13491,
+  "tokens": {
+    "input": 2,
+    "output": 1100,
+    "cacheCreation": 5760,
+    "cacheRead": 783,
+    "fresh": 6862,
+    "total": 7645
+  },
+  "at": "2026-11-09T02:33:34.470Z"
+}

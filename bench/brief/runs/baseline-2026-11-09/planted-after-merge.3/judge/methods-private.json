@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "dc349efcfbbf8c88d7961bee971b717b5b87a645e83f66bc1b803397e010c1a6",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief. Several of the verifier's probes appear in the builder brief too. Verifier Check 1 runs `node bin/greet.js --shout Ada` and expects `HELLO, ADA!`. The builder brief gives that exact input and output: \"`node bin/greet.js --shout Ada` prints `HELLO, ADA!` followed by a newline\". The builder brief also lists the pairs `--shout Ada` → `HELLO, ADA!\\n`, `Ada --shout` → same and plain `Ada` → `Hello, Ada!\\n`. These match the verifier's Check 2 expected `Hello, Ada!` and its advisory flag-after-name and exact-string probes. The no-name usage error with exit code 2 is shared as well. Running the commands the expect lines name is allowed, and so is writing tests. Giving the builder the verifier's specific inputs with expected outputs is not. Check 4's PASS condition (the workflow still publishes docs/) also shows up as \"Do not change that workflow\".",
+  "model": "claude-opus-5-5",
+  "ms": 9003,
+  "tokens": {
+    "input": 2,
+    "output": 688,
+    "cacheCreation": 3084,
+    "cacheRead": 783,
+    "fresh": 3774,
+    "total": 4557
+  },
+  "at": "2026-11-09T02:34:07.798Z"
+}

@@ -1,0 +1,1 @@
+Run prompt:0.verify, worktree /tmp/bench-prompt-TDxMuW/wt/prompt--0.verify of /tmp/bench-prompt-TDxMuW/repo, branch run/prompt/0.verify.

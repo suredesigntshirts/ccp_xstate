@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "a9c6ab9dba13eb29150e71a70b42dd11fb64cc132bd149014ce0ce8d3173f6ec",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line. Checks 1, 2, 4 and 6 stay within their wording. Check 3 breaks the criterion. Its expect line only says \"error on stderr\", but its PASS condition requires that \"stderr holds an error that mentions nope.jsonl\". The words don't force the error to name the file. That stricter test belongs under Advisory, not in PASS. Check 5 is borderline: it requires the README to document \"`-` for stdin\" when the line only says \"documents the usage\". Because Check 3 adds a requirement the words don't force, the criterion does not hold for the whole output.",
+  "model": "claude-opus-5-5",
+  "ms": 8431,
+  "tokens": {
+    "input": 2,
+    "output": 826,
+    "cacheCreation": 4756,
+    "cacheRead": 783,
+    "fresh": 5584,
+    "total": 6367
+  },
+  "at": "2026-11-09T02:36:05.686Z"
+}

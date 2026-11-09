@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "a8085688ac357bc4474a06ccd310d3f5045822cca25457d3aa5e24a03d7641b0",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared the builder brief with the verifier brief's six checks and its Advisory. The builder brief has no PASS or FAIL wording. It also reuses none of the verifier's probes: no mktemp/printf scripts, none of its inputs (such as `{bad}`, a.jsonl/ok.jsonl/c.jsonl or missing.jsonl), no git diff/merge-base check and no gh pr checks. Step 3 asks the builder to write its own node:test cases (\"two clean files... two `-` arguments... no arguments\"), and the rule allows that. Those cases restate the issue's expect lines and include no verifier inputs. Step 5 has the builder run `npm test`, which the issue names. Requirements like \"lint(text) must stay byte-for-byte unchanged\" and the exit-code rules are targets taken from the expect lines, not commands the verifier runs. So the builder gets the target without the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 8740,
+  "tokens": {
+    "input": 2,
+    "output": 806,
+    "cacheCreation": 5321,
+    "cacheRead": 783,
+    "fresh": 6129,
+    "total": 6912
+  },
+  "at": "2026-11-09T02:37:31.979Z"
+}

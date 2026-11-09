@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "87ae098a9c19ae44202f9c8b234e90381322ce6d30537114c36ae219843fe202",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against the words of its expect line, and the criterion holds. Check 1 tests only that padLeft is exported, pads on the left to width, uses a space when fill is omitted, and takes (s, width, fill). The sample values (\"00042\", \"  ab\", \"**x\") just apply those words. Check 2 tests only that s comes back unchanged when it is exactly width long or longer. Check 3 asks for a section per exported function, meaning \"a heading that names the function, followed by text describing it\". That is a fair reading of \"section\" rather than an extra rule. Check 4 asks only that npm test succeeds. The stricter items are all under \"Advisory (not pass or fail conditions)\": test coverage of padLeft, the `## name(args)` heading style, and how a multi-character fill behaves. No mutation test, branch rule or exact-wording rule appears in any PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 8417,
+  "tokens": {
+    "input": 2,
+    "output": 748,
+    "cacheCreation": 3095,
+    "cacheRead": 783,
+    "fresh": 3845,
+    "total": 4628
+  },
+  "at": "2026-11-09T02:33:29.783Z"
+}

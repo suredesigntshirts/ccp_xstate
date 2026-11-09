@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint.2",
+  "case": "real-jsonl-lint",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for e\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "Checks 1, 2, 3, 5 and 6 test only what their expect lines say. Check 1 asks for the `<file>:<line>: <error>` form, 1-based lines, skipped blanks, the torn last line and exits 0/1. Check 2 asks for stderr output and exit 2. Check 6 asks for one PR, the Closes text and a green workflow and npm test. Stricter items like the lock file, shebang and CRLF handling are correctly under Advisory.\n\nCheck 4 breaks the criterion. Its PASS condition requires that the tests \"pass when run\", and its FAIL condition includes \"the tests fail\". Expect line 4 only asks for node:test tests that cover the five named cases. It says nothing about them passing. That requirement belongs to expect line 6 (\"npm test ... green\"), which Check 6 already tests. So Check 4 adds a condition its own expect line's words do not force, and the criterion fails.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both briefs. Every file the commands use either exists at this commit (package.json, package-lock.json, README.md, .github/workflows/test.yml) or is created in an earlier builder step (packages/jsonl-lint/...). The printf fixtures are quoted correctly and give the expected rows: in bad.jsonl, line 3 is `{bad` and line 5 is the torn `{\"torn\":`. In Check 3's `node --input-type=module -e \"...\"`, the shell turns `\\\"` into a plain quote and leaves `\\n` alone, so the JS string literal is valid; `m.lint ?? m` is also valid syntax. `npm test -w jsonl-lint`, `gh pr view --json body,headRefOid,state`, `gh pr checks`, `gh pr list --search 102`, `mktemp -d` and `test -f` all take the arguments given. Node 22's `node --test` finds `test/*.test.js` by default. One thing I could not confirm: the repository facts don't show a `workspaces` field in the root package.json. The root test script assumes there is one, so I treated it as present.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked all four must_catch items against the briefs.\n- Item 1 holds: builder step 7 says to \"Run `npm install` at the repo root so `package-lock.json` includes the new workspace\" and commit the lock file.\n- Item 2 holds: builder step 6 says to \"replace the \"No tools yet\" bullet\".\n- Item 4 holds: Check 6 runs `gh pr view` for the body and headRefOid, then reads the test workflow run at the head SHA.\n- Item 3 fails: Check 4 runs `npm test -w jsonl-lint` directly. Check 6 only requires that \"the local `npm test` passes\" at the root. Because the root script uses `--if-present`, it can pass even when the jsonl-lint tests are skipped. Neither check reads the test count, looks for jsonl-lint tests in the root output, or breaks lint() to see a test fail.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every verifier PASS/FAIL condition against its expect line, and found neither must_not item in either brief.\n\n- **Check 1** runs the CLI on scratch files and accepts any error text after `<file>:<line>: `. It requires no exact message wording.\n- **Check 2** asks only for non-empty stderr and exit 2.\n- **Check 3** imports and calls `lint`, and accepts a default export too.\n- **Check 4** reads package.json and the tests, but it also runs `npm test -w jsonl-lint`. It allows a `node --test` script with arguments.\n- **Check 5** is a file-existence line, so reading the files is appropriate.\n- **Check 6** asks for a green workflow, a passing local `npm test`, and the change in one PR. That matches \"one PR\". It has no branch-name rule and no limit on which files the PR may touch.\n\nExtras such as CRLF handling, the shebang and the lock file are marked \"Advisory (not pass/fail conditions)\". The builder brief's specifics, such as the `bin` entry and CRLF stripping, are build guidance, not verification conditions. There are no mutation tests, and no check passes a behaviour line by reading the diff alone.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared the builder brief with the verifier brief's Run lines and its PASS/FAIL conditions. The builder brief leaves out the verifier's concrete probes. It has none of the `printf` inputs for clean.jsonl or bad.jsonl, no expected lines `:3:` or `:5:`, no inline `node --input-type=module -e` lint script, and no `gh pr list --search 102`. It also contains no PASS or FAIL wording. The test cases it asks the builder to write (clean file, bad middle row, torn last row, blank lines, missing file, no argument) restate expect line 4 and the issue's exit codes, and writing its own tests is allowed. It names `npm ci && npm test` and the green test workflow, which expect line 6 names. \"Try the CLI by hand on a clean file, a broken file...\" gives categories only, with no inputs or expected outputs. Some details overlap with the verifier's advisory notes (lock file, trailing newline, CRLF, shebang), but those are not pass/fail conditions or probes. So the builder gets the bar, not the checker.",
+      "cached": false
+    }
+  }
+}

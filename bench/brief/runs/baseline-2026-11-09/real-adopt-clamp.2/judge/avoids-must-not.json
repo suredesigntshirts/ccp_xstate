@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "21b86da550c4ec014f8ab8f4fc77604136f9086ea338f0cb846db8d0e5f3a1f1",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 of the must_not list is avoided. Check 3 lists every exported function, names subtract and fails if \"any exported function is missing from README.md\", so documenting clamp alone fails. Check 2 tests only `instanceof RangeError` and does not require a message. Check 1's exact values follow from the clamp definition. Check 3's PASS condition breaks item 2, though. It requires \"its name and signature plus a description of what it does\". Expect line 3 only says README.md \"documents every function\", and nothing in it asks for signatures. A README line such as \"`subtract` returns a minus b\" documents the function but has no signature, so this check would fail it. That is a requirement about parameters and layout that line 3 does not make. The note \"the form and position in the file can be anything\" relaxes the layout but keeps the signature requirement.",
+  "model": "claude-opus-5-5",
+  "ms": 11343,
+  "tokens": {
+    "input": 2,
+    "output": 903,
+    "cacheCreation": 3247,
+    "cacheRead": 783,
+    "fresh": 4152,
+    "total": 4935
+  },
+  "at": "2026-11-09T02:35:50.409Z"
+}

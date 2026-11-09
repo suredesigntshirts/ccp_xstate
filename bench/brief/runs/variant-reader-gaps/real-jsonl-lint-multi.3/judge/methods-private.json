@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "c509985f608770705c5fa80dfb5ba91e8e9a8c9bbbc859b6293f3d7453c69a6c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with each verifier check. None of the verifier's probes shows up in the builder brief. The builder never gets the verifier's printf fixtures (a/b/c.jsonl, ok1/ok2/bad/missing.jsonl, `{\"a\":1}\\n{bad}`), the \"concatenation of single-file runs\" comparison, the `git diff origin/main...HEAD` command, or the `gh pr view`/`gh pr checks` commands. It also gets no PASS/FAIL wording. What the builder does get is the behaviour from the issue: the exit codes, `-` reported as `-`, other files still reported when one can't be read, and lint unchanged. It is also told to write node:test tests for the cases in expect line 5, run `npm test`, and include the Closes line. The rule allows all of these. Lines like \"stdout lines start with `-:<line>: `\" restate the issue's output format for the builder's own tests. They are not the verifier's concrete `-:2:` probe with its inputs.",
+  "model": "claude-opus-5-5",
+  "ms": 10742,
+  "tokens": {
+    "input": 2,
+    "output": 792,
+    "cacheCreation": 5006,
+    "cacheRead": 783,
+    "fresh": 5800,
+    "total": 6583
+  },
+  "at": "2026-11-09T02:38:02.746Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "fe486dd67ffc3b167cef3447794e21a95b3f0df4c98d3f9c78adf4e0f3bbd7ab",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Criterion met: the briefs do neither thing on the must_not list.\n\nItem 1: Check 3 lists every exported function and fails if \"any exported function, e.g. subtract or clamp, is not documented in README.md\". A README that documents clamp but not subtract therefore fails.\n\nItem 2: no PASS or FAIL condition is stricter than its expect line.\n- Check 1 only needs an exported clamp function with correct limiting results.\n- Check 2 only needs a RangeError. It doesn't check the error message.\n- Check 3 needs \"an entry that names it and describes what it does\", not a particular layout.\n- Check 4 only needs the tests to pass.\n\nThe stricter points (the grep for headings, entries under \"## API\", the message naming lo and hi, exit status 0) all sit under \"Advisory (not pass/fail conditions)\". The builder's \"e.g.\" message and the style guidance are suggestions, not gates.",
+  "model": "claude-opus-5-5",
+  "ms": 8705,
+  "tokens": {
+    "input": 2,
+    "output": 593,
+    "cacheCreation": 3246,
+    "cacheRead": 783,
+    "fresh": 3841,
+    "total": 4624
+  },
+  "at": "2026-11-09T02:37:02.432Z"
+}

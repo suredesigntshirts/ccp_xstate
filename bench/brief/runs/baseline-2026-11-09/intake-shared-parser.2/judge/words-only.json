@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "580465097cf92de8ddf9996811d8b17860044f268b88db0c0fee4ef8ed8caca8",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared the PASS and FAIL conditions of all seven verifier checks with the words of their expect lines. Checks 1–5 ask only for the exact stdout plus a newline, and check 1 also asks for \"exit=0\", which its line requires. Check 5 reads the \\t in its line as the JSON escape, which fits \"which is the current output\". Running the commands through `od -c` is only how the output is inspected, not an extra condition. Check 6 asks for npm test to exit 0 and for a test that runs bin/csv2json.js with --tsv on tab input and asserts on the output. Each FAIL example (\"only in a comment\", \"input has no tabs\", \"no assertion\") just spells out those words. Check 7 asks only that --tsv is mentioned with an example. The stricter points from the proofs sit under \"Advisory\": the `test:cli` script, the `--tsv < file` form with its explanation, and the scope notes.",
+  "model": "claude-opus-5-5",
+  "ms": 8139,
+  "tokens": {
+    "input": 2,
+    "output": 743,
+    "cacheCreation": 6310,
+    "cacheRead": 0,
+    "fresh": 7055,
+    "total": 7055
+  },
+  "at": "2026-11-09T02:31:59.988Z"
+}

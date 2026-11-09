@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "bf9778b79591f2cc9026e0253f69793949ad36d8efcd41ee74396105bb22e51b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Neither must_not item shows up in either brief. Item 1: verifier Check 3 lists the exported functions and passes only when \"every function in the list (at least capitalize, slugify, truncate and padLeft) has its own section\". It also says outright that \"a PR that adds only padLeft fails this check\", so a README with only a padLeft section can't pass. Item 2: Check 1 uses a one-character fill ('7',3,'x') and fails only on wrong results. It never requires the fill to be one character or checks the parameter count. Check 3 asks for \"a heading that names the function, with text under it\", which is just what a section is, not a fixed README layout. The `## name(args)` heading style and the multi-character fill behaviour appear only as advisory notes, outside PASS/FAIL. The builder brief's style and test instructions are build guidance, not verification conditions.",
+  "model": "claude-opus-5-5",
+  "ms": 7647,
+  "tokens": {
+    "input": 2,
+    "output": 607,
+    "cacheCreation": 3184,
+    "cacheRead": 783,
+    "fresh": 3793,
+    "total": 4576
+  },
+  "at": "2026-11-09T02:33:56.313Z"
+}

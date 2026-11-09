@@ -1,0 +1,19 @@
+Check out the pull request's head. Run every command from the repository root.
+
+Check 1. Expect line: "node bin/csv2json.js --tsv reads tab-separated input on stdin and prints the same JSON array that node bin/csv2json.js prints for the same table as CSV"
+Run:
+  printf 'name\tage\tcity\nann\t30\tparis\nbob\t25\toslo\n' | node bin/csv2json.js --tsv > /tmp/tsv.out
+  printf 'name,age,city\nann,30,paris\nbob,25,oslo\n' | node bin/csv2json.js > /tmp/csv.out
+  node -e "const fs=require('fs');const a=JSON.parse(fs.readFileSync('/tmp/tsv.out','utf8'));const b=JSON.parse(fs.readFileSync('/tmp/csv.out','utf8'));console.log(JSON.stringify(a)===JSON.stringify(b)&&Array.isArray(a)&&a.length===2?'SAME':'DIFF')"
+PASS: both commands print a JSON array, and the comparison prints SAME. That means the --tsv run on the tab-separated table gives the same array as the plain run on the CSV table: [{"name":"ann","age":"30","city":"paris"},{"name":"bob","age":"25","city":"oslo"}].
+FAIL: either command errors or does not print a JSON array, or the comparison prints DIFF. For example, --tsv returns a single key 'name\tage\tcity', or the flag is ignored.
+
+Check 2. Expect line: "README.md documents --tsv"
+Run: grep -n -- '--tsv' README.md, then read the matching lines in README.md at the head.
+PASS: README.md mentions --tsv and says what it does, that is, that it reads tab-separated input.
+FAIL: README.md does not mention --tsv, or mentions it without any description of its use.
+
+Advisory (not part of PASS or FAIL):
+- Run `npm test` and report the result. Note whether a test for --tsv was added.
+- Confirm that the plain CSV run still prints exactly '[{"a":"1","b":"2"}]\n' for the input 'a,b\n1,2\n'.
+- Note whether the --tsv output matches the CSV output byte for byte, including the trailing newline.

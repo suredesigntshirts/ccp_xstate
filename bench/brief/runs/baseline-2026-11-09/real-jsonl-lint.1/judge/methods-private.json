@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "1afe72905fc690e475f38256f5cdced6c53c04163849bc3993d70d0620aa1c1c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with each verifier check. The builder brief never says PASS or FAIL, and none of the verifier's probes appear in it. The verifier's bad.jsonl input ('{\"a\":1}\\n{oops\\n\\n   \\n{\"b\":2}\\n{\"c\":'), its clean.jsonl input, its inline `lint('{\"a\":1}\\nnope\\n')` script and its exact gh commands are all missing from the builder brief. The builder's example torn row ('{\"a\":1}\\n{\"b\":') is a different input. The builder brief does describe behaviours: exit codes 0/1/2, stderr output, line numbers that count blank lines, and a smoke test where a bad middle row plus a torn last row should give two output lines and exit 1. All of these restate the issue's expect lines, so they set the bar rather than copy the checker. The criterion allows its other instructions: write node:test tests, run `npm ci && npm test`, and watch the test workflow.",
+  "model": "claude-opus-5-5",
+  "ms": 10944,
+  "tokens": {
+    "input": 2,
+    "output": 843,
+    "cacheCreation": 5234,
+    "cacheRead": 783,
+    "fresh": 6079,
+    "total": 6862
+  },
+  "at": "2026-11-09T02:37:25.686Z"
+}

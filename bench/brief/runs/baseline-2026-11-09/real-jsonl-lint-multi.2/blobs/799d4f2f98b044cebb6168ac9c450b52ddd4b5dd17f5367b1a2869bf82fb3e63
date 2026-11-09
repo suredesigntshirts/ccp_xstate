@@ -1,0 +1,38 @@
+Check out the pull request's head. Run every command from the repository root and run `npm ci` first. Create the fixtures in a temp dir: clean1.jsonl (`{"a":1}\n{"b":2}\n`), clean2.jsonl (`[1]\n"x"\n`), and bad.jsonl (`{"a":1}\n{bad}\n{"torn":`). Let B=packages/jsonl-lint/bin/jsonl-lint.js.
+
+Check 1. Expect line: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before".
+Run `node B clean1.jsonl bad.jsonl clean2.jsonl bad.jsonl`. Also run `node B bad.jsonl` by itself.
+PASS: the multi-file run prints the bad rows of the first bad.jsonl and then the same rows again for the second bad.jsonl, in argument order. Each line has the form `<file>:<line>: <error>`, with the file argument as given and lines 2 and 3 reported. The lines for each file match what the single-file run prints for that file. Nothing is printed for the clean files.
+FAIL: a named file is skipped, the output is out of argument order, the line format differs from the single-file format, or rows are missing or extra.
+
+Check 2. Expect line: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)".
+Run `printf '{"a":1}\n{bad}\n' | node B -; echo $?`. Then run `printf '{"a":1}\n' | node B clean1.jsonl -; echo $?`. Then run `printf '{}\n' | node B - -; echo $?`.
+PASS: the first run prints `-:2: <error>`. The second run reads stdin and reports nothing bad. The third run exits 2.
+FAIL: stdin is not read for `-`, rows are not reported under the name `-`, or `- -` does not exit 2.
+
+Check 3. Expect line: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)".
+Run each of these and record the exit status:
+- `node B clean1.jsonl clean2.jsonl` → expect 0
+- `node B clean1.jsonl bad.jsonl clean2.jsonl` → expect 1
+- `node B` → expect 2
+- `node B clean1.jsonl nope.jsonl bad.jsonl` → expect 2
+For the last run, also capture stdout and stderr separately.
+PASS: the four exit codes are 0, 1, 2 and 2. In the last run, stderr holds an error that mentions nope.jsonl, and stdout still has bad.jsonl's bad rows, which shows that files after the unreadable one were checked.
+FAIL: any exit code differs, the read error does not appear on stderr, or checking stops at the unreadable file.
+
+Check 4. Expect line: "lint(text) in src/index.js is unchanged".
+Run `git diff $(git merge-base HEAD origin/main) HEAD -- packages/jsonl-lint/src/index.js`.
+PASS: the lint function is not changed. An empty diff passes.
+FAIL: the diff changes lint's code or signature.
+
+Check 5. Expect line: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage".
+Run `npm test -w packages/jsonl-lint`. Then read the test files under packages/jsonl-lint/test/ and packages/jsonl-lint/README.md at the head.
+PASS: the tests pass, and node:test tests exist for each of these cases: two clean files; one bad file among several; stdin via `-` with clean input; stdin via `-` with bad input; a missing file among good ones; two `-` arguments; no arguments. The README documents the multi-file usage and `-` for stdin.
+FAIL: any listed case has no test, the tests fail, or the README does not document the usage.
+
+Check 6. Expect line: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head".
+Run `npm test` at the root of the head checkout. Read the PR with `gh pr view <pr> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid`, then run `gh pr checks <pr> --repo suredesigntshirts/ccp_machine_test`.
+PASS: npm test passes; the PR is on suredesigntshirts/ccp_machine_test; its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`; and the `test` workflow check at the head commit is successful.
+FAIL: npm test fails, the body is missing that text, or the test workflow failed or did not run at the head.
+
+Advisory (not pass/fail): see whether stdin is read only once, whether the usage message names the `<file> [<file> ...]` form, and whether `- -` is rejected before anything is read. Also note what exit code a missing file plus a bad file gives (2 is expected), and whether newlines inside errors are still flattened.

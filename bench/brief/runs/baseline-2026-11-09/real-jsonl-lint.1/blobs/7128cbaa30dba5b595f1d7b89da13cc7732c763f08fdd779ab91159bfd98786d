@@ -1,0 +1,24 @@
+Goal: one pull request on suredesigntshirts/ccp_machine_test that adds a new workspace packages/jsonl-lint and meets every acceptance line of https://github.com/suredesigntshirts/ccp_machine_test/issues/102. Today packages/ does not exist; the root package.json already declares workspaces packages/* and its test script runs npm test --workspaces --if-present; .github/workflows/test.yml runs npm ci then npm test on Node 22.
+
+Steps:
+1. Create packages/jsonl-lint/package.json: name "jsonl-lint", "type": "module", "scripts": { "test": "node --test" }, a "bin": { "jsonl-lint": "bin/jsonl-lint.js" }, engines node >=22, and no "dependencies" (no runtime dependencies; avoid devDependencies too, node:test needs none).
+2. Create packages/jsonl-lint/src/index.js (plain ES module, no deps) exporting lint(text) that returns an array of { line, error } objects, one per row that is not valid JSON:
+   - split the text on \n (also strip a trailing \r so CRLF files work);
+   - line numbers are 1-based and count every physical line, including blank ones;
+   - skip lines that are empty or whitespace only;
+   - a trailing newline at the end of the file does not create an extra row, but a last line with no terminating newline is still a row and is checked (a torn/truncated last row must be reported);
+   - error is the JSON.parse error message string;
+   - return [] when every row is valid.
+3. Create packages/jsonl-lint/bin/jsonl-lint.js with a #!/usr/bin/env node shebang (make it executable, chmod +x, and commit the mode). Behaviour: with no argument, print a usage message to stderr and exit 2. If the file cannot be read (missing, ENOENT, or other read error), print a message to stderr and exit 2. Otherwise read the file as utf8, call lint, print one line per finding to stdout in exactly the form <file>:<line>: <error> (the file argument as given), exit 1 if there was any finding and 0 if none. Nothing goes to stdout for a clean file.
+4. Create packages/jsonl-lint/test/ with node:test tests (e.g. test/lint.test.js; make sure `node --test` run from packages/jsonl-lint discovers them — files under test/ ending .test.js are found by default). Cover, at minimum, both through lint() and through the CLI (spawn process.execPath with bin/jsonl-lint.js via node:child_process, using temp files from node:fs/os):
+   - a clean file: lint returns [], CLI exits 0 with empty stdout;
+   - a bad middle row: e.g. 3 rows with row 2 broken, reported as line 2, CLI prints <file>:2: ... and exits 1;
+   - a torn last row with no trailing newline (e.g. '{"a":1}\n{"b":' ), reported at its line number;
+   - blank lines: blank/whitespace lines are skipped and do not shift numbering (a bad row after blanks keeps its physical 1-based line number);
+   - exit codes: 0 clean, 1 findings, 2 for a missing file and 2 for no argument, and that the exit-2 cases write to stderr.
+5. Create packages/jsonl-lint/README.md: what the tool does, usage (node packages/jsonl-lint/bin/jsonl-lint.js <file>), the output format, exit codes 0/1/2, and the lint(text) API.
+6. Update the root README.md: replace the "No tools yet: packages/ is empty" bullet under "What is here" with a bullet listing packages/jsonl-lint and a one-line description.
+7. Run `npm install` at the repo root so package-lock.json records the new workspace, and commit the updated package-lock.json — otherwise `npm ci` in the test workflow fails. Then run `npm ci && npm test` at the root and confirm it passes and that the jsonl-lint tests actually ran.
+8. Manually smoke-test the CLI: a clean file (exit 0), a file with a bad middle row and a torn last row (two lines of output, exit 1), a missing path (stderr, exit 2), no argument (stderr, exit 2).
+9. Commit everything on your branch, push, and open one pull request to the default branch whose body contains the line: Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102
+10. Wait for the test workflow (the "test" check from .github/workflows/test.yml) to finish on the PR head; if it fails, read the log, fix, push again, until it is green. Do not open a second PR.

@@ -1,0 +1,7 @@
+Add a --tsv flag to the CLI so tab-separated input on stdin gives the same JSON array that CSV input gives for the same table, and document it.
+
+1. Read bin/csv2json.js, src/parse.js, test/csv.test.js and README.md. src/parse.js already exports `parse(text, sep = ',')`, so it can split on any separator.
+2. In bin/csv2json.js, check process.argv for `--tsv`. If it is there, call `parse(input, '\t')`. If not, keep calling `parse(input)` (comma). Read stdin and print output exactly as the script does now (`JSON.stringify(...)` plus a newline), so runs without the flag behave the same as before.
+3. In test/csv.test.js, add a test that runs `node bin/csv2json.js --tsv` through execFileSync with input like 'a\tb\n1\t2\n'. Assert that its stdout equals the stdout of `node bin/csv2json.js` given the same table as CSV ('a,b\n1,2\n'). Keep the existing tests.
+4. In README.md, document the --tsv flag: give a usage line such as `node bin/csv2json.js --tsv < table.tsv` and one sentence saying it reads tab-separated input and prints the same JSON array as CSV.
+5. Run `npm test` and make sure it passes. Then open one pull request with these changes.

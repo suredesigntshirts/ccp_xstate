@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "8877d0537e9fce3c75b9158aef1cfc7d076f82ab172d5d9fea8fb6d04e9f9dda",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The builder brief has no PASS or FAIL condition, and it doesn't include the verifier's probes. The Check 3 inline `node --input-type=module -e \"import {loadConfig}...\"` script is not in it. Neither is the Check 4 loadConfig one-liner, the `git merge-base`/`git checkout <base> -- src` steps from Check 5, or the advisory `missing.json` probe. Step 6 does give the `printf ... c.json; node src/app.js $d/c.json` and ok.json commands, but those are the issue's own proof commands, which the criterion allows. Step 5 tells the builder to write its own tests that fail on current src/, which is also allowed. Step 2 says to compute line and column from the source text, and the advisory says the same. That advice comes from the issue's proof 2, and it is a design instruction, not a probe or a pass/fail condition. The same goes for the SyntaxError/cause preference. So the builder gets the bar, and none of the checker's methods.",
+  "model": "claude-opus-5-5",
+  "ms": 12829,
+  "tokens": {
+    "input": 2,
+    "output": 899,
+    "cacheCreation": 5571,
+    "cacheRead": 783,
+    "fresh": 6472,
+    "total": 7255
+  },
+  "at": "2026-11-09T02:33:21.264Z"
+}

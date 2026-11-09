@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "d45fe6d8bb0c6f767217fd5d9971b52f9640645a09ccb674f05e389827b4baa6",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the briefs, and neither brief breaks them.\n\n1. The builder brief does wrap `JSON.parse` in try/catch, but it says to \"throw a new error\" that keeps it a `SyntaxError`. It doesn't return a value. It also says outright: \"Do NOT take the issue's suggested fix of catching the parse error and returning `{}` or the defaults.\"\n\n2. The verifier's Check 2 doesn't demand one exact format. It passes if stderr shows the path and \"states line 3 and column 3 of the mistake (any clear form, e.g. `line 3 column 3`, `3:3`, `line 3, col 3`)\". It fails only if a piece is missing or the line or column isn't 3. So a run with different wording or order would not fail.\n\nNothing else in either brief does anything on the must_not list.",
+  "model": "claude-opus-5-5",
+  "ms": 7823,
+  "tokens": {
+    "input": 2,
+    "output": 417,
+    "cacheCreation": 5672,
+    "cacheRead": 783,
+    "fresh": 6091,
+    "total": 6874
+  },
+  "at": "2026-11-09T02:33:06.108Z"
+}

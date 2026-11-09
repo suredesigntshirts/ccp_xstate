@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "8b30d9d63a315fe1ea5c78e2889e5ac7c84ff8292e059411bce705ecf12915ab",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files and the scripts in package.json. `node bin/csv2json.js` runs a file that exists. `npm test` maps to `node --test`. The `printf` pipelines use valid escapes, and the `> /tmp/...` redirects are valid. The verifier's `node -e \"...\"` snippet is valid JavaScript: it uses single quotes inside double quotes and has no `$`, backtick or `!` that bash would expand. `grep -n -- '--tsv' README.md` puts `--` before the pattern so grep doesn't read it as an option, and README.md exists. The README usage example `node bin/csv2json.js --tsv < table.tsv` is text the builder writes into the README, not a command it is told to run. The files to read or edit (bin/csv2json.js, src/parse.js, test/csv.test.js, README.md) are all tracked. No command names a missing file, script or tool, and none uses bad syntax.",
+  "model": "claude-opus-5-5",
+  "ms": 8230,
+  "tokens": {
+    "input": 2,
+    "output": 651,
+    "cacheCreation": 2868,
+    "cacheRead": 783,
+    "fresh": 3521,
+    "total": 4304
+  },
+  "at": "2026-11-09T02:34:32.774Z"
+}

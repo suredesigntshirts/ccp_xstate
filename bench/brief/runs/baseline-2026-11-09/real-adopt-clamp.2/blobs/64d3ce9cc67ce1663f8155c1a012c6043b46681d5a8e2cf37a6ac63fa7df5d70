@@ -1,0 +1,26 @@
+Check the pull request at its head commit. Run every command from the repository root. Run `npm install` first only if package.json has dependencies (today it has none). Do exactly one check per expect line, in the order below.
+
+Check 1. Expect line: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi"
+Run: node -e "const {clamp}=require('./math.js'); console.log(typeof clamp, clamp(-5,0,100), clamp(140,0,100), clamp(42,0,100), clamp(0,0,100), clamp(100,0,100), clamp(7,3,3), clamp(-2.5,-10,-1), clamp(-20,-10,-1))"
+PASS: typeof is `function`, and the values are 0 100 42 0 100 3 -2.5 -10. That means x below lo gives lo, x above hi gives hi, and x inside the range (bounds included) gives x.
+FAIL: clamp is not exported (typeof is not function, or the require throws), or any of the values differs.
+
+Check 2. Expect line: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi"
+Run: node -e "const {clamp}=require('./math.js'); for (const a of [[1,5,0],[50,100,0],[0,1,-1]]) { try { const r=clamp(...a); console.log('NO THROW', a, r); } catch(e) { console.log(e instanceof RangeError ? 'RangeError' : 'OTHER '+(e&&e.constructor&&e.constructor.name), a); } }"
+PASS: all three lines print `RangeError`.
+FAIL: any line prints `NO THROW` or `OTHER ...`.
+
+Check 3. Expect line: "README.md documents every function math.js exports"
+Run: node -e "const m=require('./math.js'); console.log(Object.keys(m).filter(k=>typeof m[k]==='function').join(' '))" to list the exported functions. Then read README.md at the head.
+PASS: for every listed function (expect at least add, subtract, multiply, clamp), README.md has documentation for it: its name and signature plus a description of what it does. The form and position in the file can be anything.
+FAIL: any exported function is missing from README.md or is only named with no description. Note that subtract was undocumented before this change, so check it specifically.
+
+Check 4. Expect line: "npm test passes"
+Run: npm test
+PASS: the command exits with status 0 and reports no failing tests.
+FAIL: non-zero exit status, or any test fails.
+
+Advisory (not part of PASS/FAIL):
+- Check whether test/math.test.js has tests for clamp, including the RangeError case.
+- Check that clamp(5, 5, 5) returns 5 and does not throw (lo equal to hi is a valid range).
+- Note whether the RangeError message is clear, and whether add, subtract and multiply are still exported and unchanged.

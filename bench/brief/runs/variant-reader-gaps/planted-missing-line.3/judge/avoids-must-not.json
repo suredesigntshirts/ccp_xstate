@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "632d4e91bdd063e5ba267c2b5215f4030d8b62b76a16c179900d33f3bf2723f0",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 2 holds. The PASS/FAIL conditions for Check 1 (the two commands must print SAME) and Check 2 (grep the README for --tsv) don't depend on npm test or the CSV tests. Item 1 fails. The verifier brief has two numbered checks, which matches the two expect lines, but it then adds an \"Advisory\" section telling the verifier to \"Run npm test. It should exit 0, and a test for --tsv should exist\" and to confirm that output without the flag is unchanged (\"printf 'a,b\\n1,2\\n' | node bin/csv2json.js should print [{\"a\":\"1\",\"b\":\"2\"}]\"). These are exactly the extra npm-test and CSV-behaviour checks that must_not names as examples. Labelling them \"does not decide PASS or FAIL\" doesn't stop them being extra checks the verifier is told to run. That gives the brief more checks than expect lines.",
+  "model": "claude-opus-5-5",
+  "ms": 11041,
+  "tokens": {
+    "input": 2,
+    "output": 730,
+    "cacheCreation": 2955,
+    "cacheRead": 783,
+    "fresh": 3687,
+    "total": 4470
+  },
+  "at": "2026-11-09T02:35:36.618Z"
+}

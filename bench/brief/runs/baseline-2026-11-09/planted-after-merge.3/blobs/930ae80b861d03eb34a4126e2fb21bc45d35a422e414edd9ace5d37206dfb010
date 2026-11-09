@@ -1,0 +1,27 @@
+Run every check at the pull request's head. Run `npm install` first if it is needed (there are no dependencies). There is one check per expect line, in the issue's order.
+
+Check 1. Expect line: "node bin/greet.js --shout <name> prints the greeting in upper case".
+Run `node bin/greet.js --shout Ada` and `node bin/greet.js Ada` from the repository root.
+PASS: the output of the --shout run is the greeting from the plain run converted to upper case (expected `HELLO, ADA!`).
+FAIL: the command errors, or its output is not the upper-case form of the greeting (for example it is unchanged, only partly upper case, or missing the name).
+
+Check 2. Expect line: "without --shout the output is unchanged".
+Run `node bin/greet.js Ada` at the PR head. Also run it on the PR's base commit (for example `git show <base>:bin/greet.js` and `git show <base>:src/greet.js` into a temporary directory, or a separate checkout of the base) and compare.
+PASS: the output at the head without --shout is the same as at the base (`Hello, Ada!`).
+FAIL: the output without --shout differs from the base output.
+
+Check 3. Expect line: "docs/index.md documents --shout".
+Read docs/index.md at the head.
+PASS: the file mentions `--shout` and says what it does (upper-case / louder greeting).
+FAIL: docs/index.md does not mention --shout, or mentions it without saying what it does.
+
+Check 4. Expect line: "after merge, the published docs page at https://o.github.io/greet-cli/ lists --shout".
+The live page can only be seen after merge, so do not fetch it. Instead read what the head contains that will produce it: read .github/workflows/pages.yml and docs/index.md at the head.
+PASS: the pages workflow still publishes the docs/ directory (the published page comes from docs/index.md) on pushes to the default branch, and docs/index.md at the head lists --shout. State in your report that the live page itself can only be seen after merge.
+FAIL: the workflow no longer publishes docs/ (removed, path changed, trigger removed), or docs/index.md at the head does not list --shout.
+
+Advisory (not pass/fail conditions):
+- Run `npm test` and report whether it passes; check whether tests cover --shout.
+- Try `node bin/greet.js Ada --shout` (flag after the name) and report the output.
+- Check that `node bin/greet.js` with no name still prints the usage message and exits with status 2.
+- Exact expected strings: `HELLO, ADA!\n` with --shout, `Hello, Ada!\n` without.

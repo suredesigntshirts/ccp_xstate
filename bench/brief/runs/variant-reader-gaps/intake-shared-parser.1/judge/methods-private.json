@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "0bc7ef27207b936dd484330cce6f0323ad9b7b1774e0f263c9c0deb89f6d9ba3",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds. I compared the builder brief against the verifier's checks. Builder step 2 lists the five printf commands with their expected outputs. Those commands and outputs come straight from expect lines 1–5, which the criterion allows. The verifier's own probes are different: they wrap the output in `cmp - <(printf '%s\\n' ...)`, compare it to a saved file, and look for \"SAME\". None of that appears in the builder brief. The builder brief also has no PASS/FAIL wording and doesn't include the verifier's `grep -n -- '--tsv' test/*.js` step. Step 3 tells the builder to write its own tests, which is allowed. Step 4 names `npm test` and `npm run test:cli`, both commands named in the expect lines and proofs, so that is allowed too. Step 5's README guidance repeats the proof 7 wording rather than any verifier condition. The note that `\\t` is the two-character JSON escape clarifies the expect line and is not a check.",
+  "model": "claude-opus-5-5",
+  "ms": 8593,
+  "tokens": {
+    "input": 2,
+    "output": 647,
+    "cacheCreation": 5491,
+    "cacheRead": 783,
+    "fresh": 6140,
+    "total": 6923
+  },
+  "at": "2026-11-09T02:33:09.549Z"
+}

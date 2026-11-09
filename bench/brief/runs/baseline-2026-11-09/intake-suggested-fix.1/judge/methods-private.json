@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "2e79bd08a822ff2433537cd7c62242a607928e1e00f3c7035d36986e2d1bdb5f",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the builder brief against each verifier check. It has no PASS/FAIL wording. It never uses the verifier's Check 3 inline `loadConfig` script, Check 4's script, or the Check 5 step of restoring the base `src/` and rerunning tests. Step 4 gives a hand check (`printf '{\\n  \"port\": 9000,\\n  greeting: \"x\"\\n}\\n' > $d/c.json; node src/app.js ...`) that comes from the issue's proof 1, which is allowed. It also says to run `npm test` and the ok.json case, both named by expect lines. Step 3 asks the builder to write its own tests on the `{port: 9000` and four-line inputs. Writing its own tests is allowed, and those inputs come from the expect lines, not from verifier-only probes. The advice to compute line and column from the position is implementation guidance, not the verifier's advisory check. The criterion holds throughout.",
+  "model": "claude-opus-5-5",
+  "ms": 10751,
+  "tokens": {
+    "input": 2,
+    "output": 725,
+    "cacheCreation": 5371,
+    "cacheRead": 783,
+    "fresh": 6098,
+    "total": 6881
+  },
+  "at": "2026-11-09T02:32:45.654Z"
+}

@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "planted-after-merge.1",
+  "case": "planted-after-merge",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 4 lines quoted in order, checks numbered 1 to 4"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4 not quoted word for word in the builder brief: \"node bin/greet.js --shout <name> prints the greeting in upper case\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked the PASS and FAIL conditions of all four checks against the wording of their expect lines. Check 1 only requires the upper-case greeting. Its FAIL cases (\"wrong name, or the literal `--shout`\") are just examples of output that isn't the upper-case greeting. Check 2 requires output matching the pre-PR `Hello, <name>!`, which is what \"unchanged\" means. Check 3 requires that docs/index.md mentions `--shout` and says what it does, which is a fair reading of \"documents\". Check 4 requires that the workflow still publishes docs/ and that docs/index.md lists `--shout`. That is the head-side mechanism that produces the published page, not an extra requirement. The stricter items are all under \"Advisory (not pass/fail conditions)\": `npm test` and a test for --shout, exact trailing newline and exit 0, the flag placed after the name, and the usage error with exit 2. No check's PASS or FAIL conditions demand exact wording, a mutation test, or a branch or file-scope rule.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds for both briefs. I checked every command they give against the 8 tracked files and the package.json scripts. Every node command (`node bin/greet.js --shout Ada`, `'Grace Hopper'`, `Ada --shout`) targets bin/greet.js, which exists. `npm test` maps to the existing script \"node --test\". `cat docs/index.md`, `cat .github/workflows/pages.yml` and `grep -n -- '--shout' docs/index.md` name tracked files, and the `--` keeps grep from reading the pattern as an option. `git show HEAD~1:bin/greet.js > /dev/null && git log --oneline -5` is valid shell and git syntax. HEAD~1 exists at a PR head that has a parent commit, and the brief gives a fallback (the known prior output). The quoting in `'Grace Hopper'` is correct. test/greet.test.js exists for the builder's test step. None of the commands use JavaScript syntax beyond `process.argv.slice(2)`, which is valid.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "Item 1 is handled. Check 4 says \"The live page can only be seen after merge; do not fetch it\", and it checks .github/workflows/pages.yml and docs/index.md at the head.\n\nItem 2 is not handled. Check 2 never runs the pre-change code. It writes `git show HEAD~1:bin/greet.js > /dev/null`, which throws the old file away instead of running it. It also offers a fallback: \"or compare against the known prior behaviour: the program printed `Hello, <name>!`\". That lets the verifier compare only against a hand-written expected string, which is exactly what the must_catch item rules out. Also, HEAD~1 is not reliably the base commit if the PR has more than one commit. Because Check 2 never actually compares against the output from before the change, the briefs miss one must_catch item.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "I compared Check 4 in the verifier brief with both must_not items. Item 1: the check does not fetch the live page. It says \"The live page can only be seen after merge; do not fetch it,\" and works only from what is at the PR head. Item 2: it does not pass silently without evidence. It requires running `cat .github/workflows/pages.yml` and `grep -n -- '--shout' docs/index.md`. PASS needs both proofs: the workflow still publishes docs/ on push to main, and docs/index.md lists --shout. It also sets explicit FAIL conditions (workflow path or trigger changed or removed, or docs missing --shout). Calling the result PASS rather than \"deferred\" could be argued, but it rests on stated evidence, which both items allow. The builder brief has no line-4 check. Neither must_not item occurs anywhere in the output.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared the builder brief with the verifier brief, and the builder brief repeats several of the verifier's checks. Step 1 gives the probe `node bin/greet.js --shout Ada` → `HELLO, ADA!`. Step 4 asks for a test with that same input and the expected output `HELLO, ADA!\\n`. Both match the input and expected output in Check 1's PASS condition and the advisory. Step 2 gives `node bin/greet.js Ada` → `Hello, Ada!`, which is Check 2's probe and PASS output. Step 6 (\"Leave .github/workflows/pages.yml unchanged so it keeps publishing docs/ on push to main\") restates Check 4's PASS condition. Step 1's \"whether the flag comes before or after it\" and Step 2's usage-error clause repeat probes from the advisory. The expect line does name `node bin/greet.js --shout <name>`, so running that command is allowed. But handing the builder the verifier's own inputs with their expected outputs goes beyond that, so the builder gets the checker's methods and not just the bar.",
+      "cached": false
+    }
+  }
+}

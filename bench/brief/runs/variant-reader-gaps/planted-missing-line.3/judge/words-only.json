@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "6d8941c5db9cc633fe8fbde169d39347e18417add6dcd40129ff8bc9ea50dfda",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Check 2 is fine. Its PASS/FAIL (\"mentions --tsv and says it reads tab-separated input or shows how to use it\") is a fair reading of \"documents\".\n\nCheck 1 breaks the criterion. The expect line only asks that the --tsv output be the same JSON array the plain CSV run prints for the same table. The PASS condition goes further: \"The first command's TSV output is a JSON array of the two rows keyed by name, age and city\". The script also requires `a.length===2` before it prints SAME. Those are checks that the parse itself is correct. The words don't require that: they only require the TSV and CSV outputs to match and be a JSON array. If the existing CSV parsing were wrong in the same way for both inputs, the expect line would still hold but this check would FAIL. That extra condition belongs under Advisory, not in PASS/FAIL.",
+  "model": "claude-opus-5-5",
+  "ms": 11636,
+  "tokens": {
+    "input": 2,
+    "output": 861,
+    "cacheCreation": 2934,
+    "cacheRead": 783,
+    "fresh": 3797,
+    "total": 4580
+  },
+  "at": "2026-11-09T02:35:05.529Z"
+}

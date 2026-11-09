@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "d702500f9ff5137d13930825779f9f1ad31a3668825356d77bc47085f0565a73",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared all seven verifier checks with their expect lines, and none asks for more than the line's words. Checks 1–5 use cmp to test only the exact stdout plus a newline, and check 1 also tests \"exits 0\". The expect lines say \"prints exactly\", so a byte-exact comparison is what they require. Check 5 builds the expected text with printf '\\\\t', which gives a literal backslash-t and matches the line. Check 6 passes on npm test exit=0 plus one test that runs bin/csv2json.js with --tsv on input containing tabs and \"asserts on what it outputs\". That is exactly what the line says. Check 7 needs only a mention of --tsv and an example command that uses it. The stricter parts sit under \"Advisory (not part of PASS/FAIL)\": the npm run test:cli mismatch, the README saying the flag means tab-separated input, and the flag-position test. No PASS or FAIL condition adds a mutation test, scope rule or exact-wording rule.",
+  "model": "claude-opus-5-5",
+  "ms": 8346,
+  "tokens": {
+    "input": 2,
+    "output": 718,
+    "cacheCreation": 5600,
+    "cacheRead": 783,
+    "fresh": 6320,
+    "total": 7103
+  },
+  "at": "2026-11-09T02:32:32.086Z"
+}

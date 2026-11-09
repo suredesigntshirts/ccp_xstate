@@ -1,0 +1,44 @@
+Check the pull request for issue https://github.com/suredesigntshirts/ccp_machine_test/issues/104 at its head commit. Run every command from the repository root of a checkout of the PR head. Each command below runs on its own (no shell variable carries over from one command to the next). It writes its fixtures under /tmp/jv104 and recreates them each time. Report PASS or FAIL for each check, in order, with the output that backs it up.
+
+Setup command, run first: `rm -rf /tmp/jv104 && mkdir -p /tmp/jv104 && printf '{"a":1}\n{"b":2}\n' > /tmp/jv104/c1.jsonl && printf '{"c":3}\n' > /tmp/jv104/c2.jsonl && printf '{"a":1}\n{bad}\n{"x":' > /tmp/jv104/b1.jsonl && printf '{oops}\n' > /tmp/jv104/b2.jsonl && ls /tmp/jv104`
+
+Check 1. Expect line: "packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file named in order and prints <file>:<line>: <error> for each bad row, as for one file before"
+Run: `node packages/jsonl-lint/bin/jsonl-lint.js /tmp/jv104/b1.jsonl /tmp/jv104/c1.jsonl /tmp/jv104/b2.jsonl; echo "exit=$?"` and `node packages/jsonl-lint/bin/jsonl-lint.js /tmp/jv104/b1.jsonl; echo "exit=$?"`
+PASS: the multi-file run prints `/tmp/jv104/b1.jsonl:2: <error>` and `/tmp/jv104/b1.jsonl:3: <error>` lines, then a `/tmp/jv104/b2.jsonl:1: <error>` line, in that order, and nothing for c1.jsonl. The one-file run prints lines in the same `<file>:<line>: <error>` form for b1.jsonl's rows 2 and 3.
+FAIL: a named file isn't checked, the files are reported out of order, a bad row is missing, or the line format differs from `<file>:<line>: <error>`.
+
+Check 2. Expect line: "A file named - is read from stdin and reported as -; a second - is a usage error (exit 2)"
+Run: `printf '{"a":1}\n{bad}\n' | node packages/jsonl-lint/bin/jsonl-lint.js /tmp/jv104/c1.jsonl -; echo "exit=$?"` and `printf '{"a":1}\n' | node packages/jsonl-lint/bin/jsonl-lint.js - -; echo "exit=$?"`
+PASS: the first run prints a line starting with `-:2: ` for stdin's bad row. The second run exits 2.
+FAIL: stdin isn't read when `-` is given, its row is reported under some other name, or two `-` arguments give an exit status other than 2.
+
+Check 3. Expect line: "Exit 0 if every file is clean, 1 if any row in any file is bad, 2 if no file is named or any file can't be read (error on stderr, other files still checked and reported)"
+Run each of these:
+(a) `node packages/jsonl-lint/bin/jsonl-lint.js /tmp/jv104/c1.jsonl /tmp/jv104/c2.jsonl; echo "exit=$?"`
+(b) `node packages/jsonl-lint/bin/jsonl-lint.js /tmp/jv104/c1.jsonl /tmp/jv104/b2.jsonl /tmp/jv104/c2.jsonl; echo "exit=$?"`
+(c) `node packages/jsonl-lint/bin/jsonl-lint.js; echo "exit=$?"`
+(d) `node packages/jsonl-lint/bin/jsonl-lint.js /tmp/jv104/c1.jsonl /tmp/jv104/nope.jsonl /tmp/jv104/c2.jsonl 2>/tmp/jv104/err.txt; echo "exit=$?"; echo '--stderr--'; cat /tmp/jv104/err.txt`
+(e) `node packages/jsonl-lint/bin/jsonl-lint.js /tmp/jv104/nope.jsonl /tmp/jv104/b2.jsonl 2>/tmp/jv104/err2.txt; echo "exit=$?"; echo '--stderr--'; cat /tmp/jv104/err2.txt`
+PASS: (a) exits 0; (b) exits 1; (c) exits 2 with a message on stderr; (d) exits 2 with an error on stderr; (e) has an error about nope.jsonl on stderr and still prints the `/tmp/jv104/b2.jsonl:1: ` line on stdout, so the other file was still checked and reported.
+FAIL: any of these exit statuses differs, an unreadable file gives no error on stderr, or the tool stops at the unreadable file without checking and reporting the files that remain.
+
+Check 4. Expect line: "lint(text) in src/index.js is unchanged"
+Run: `gh pr list --repo suredesigntshirts/ccp_machine_test --search 'https://github.com/suredesigntshirts/ccp_machine_test/issues/104' --state all --json number,headRefOid,files` (or `gh pr view <number> --repo suredesigntshirts/ccp_machine_test --json files` for this PR), then `gh pr diff <number> --repo suredesigntshirts/ccp_machine_test -- 2>/dev/null | grep -n '^diff --git' ` to list the changed files.
+PASS: the lint function in packages/jsonl-lint/src/index.js is unchanged. Either the file is absent from the PR's changed files, or the diff touches nothing in lint(text).
+FAIL: the PR diff changes the lint function in packages/jsonl-lint/src/index.js.
+
+Check 5. Expect line: "node:test tests cover two clean files, one bad among several, stdin via - (clean and bad), a missing file among good ones, two - arguments and no arguments; the package README documents the usage"
+Run: `cd packages/jsonl-lint && node --test 2>&1 | tail -40`, then read packages/jsonl-lint/test/*.test.js and packages/jsonl-lint/README.md at the head.
+PASS: the package's node:test tests include tests that run the CLI with each of these cases: two clean files; one bad file among several; stdin via `-` with clean input; stdin via `-` with bad input; a missing file among good ones; two `-` arguments; no arguments. The README documents the multi-file usage (`<file> [<file> ...]`) and `-` for stdin.
+FAIL: any of those seven cases has no test, or the README doesn't document the usage with several files and `-`.
+
+Check 6. Expect line: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104, and npm test and the test workflow are green at its head"
+Run: `gh pr list --repo suredesigntshirts/ccp_machine_test --state open --search '104 in:body' --json number,body,headRefOid,url`, then `gh pr checks <number> --repo suredesigntshirts/ccp_machine_test`, then at the repository root `npm ci && npm test; echo "exit=$?"`.
+PASS: exactly one PR on suredesigntshirts/ccp_machine_test is open for this change, and its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`; `npm test` passes at the head; the `test` workflow check is green for the head commit.
+FAIL: there is no such PR or more than one, the body lacks that text, `npm test` fails, or the test workflow check at the head is failing, missing or still pending.
+
+Advisory (not pass or fail conditions):
+- Check that one file gives byte-identical output to before. To do that, compare with the base's bin run against b1.jsonl.
+- If a file can't be read and another file has a bad row, the builder was told that exit 2 wins. Note the behaviour if it differs.
+- See whether two `-` arguments print nothing on stdout and a clear message on stderr, and whether the no-argument usage message lists `<file> [<file> ...]`.
+- See whether the tests are clearly named for each case and whether the README's exit code section mentions the second `-` case.

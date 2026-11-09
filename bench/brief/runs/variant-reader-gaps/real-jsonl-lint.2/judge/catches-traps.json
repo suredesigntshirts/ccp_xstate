@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "ab84183394d9c730194f2f535ca72099db42ddc8c5f29517a3e76686d782285e",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked each of the four must_catch items against the briefs. Item 3 is not handled, so the criterion fails.\n\n1. Handled: builder step 7 says to \"Run `npm install` at the root so `package-lock.json` includes the new workspace (CI uses `npm ci`…)\" and to commit the lockfile.\n2. Handled: builder step 6 says to \"replace the \"No tools yet\" line\".\n3. Missed: Check 4 runs `npm test -w packages/jsonl-lint` directly in the workspace. Check 6 only asks that root `npm test` \"passes\". Because the root script uses `--if-present`, it could pass while skipping the jsonl-lint tests. The verifier never reads the test count from the root run and never breaks `lint()` to see a test fail.\n4. Handled: Check 6 uses `gh pr view` for the body and headRefOid and `gh pr checks` for the `test` workflow at the head.",
+  "model": "claude-opus-5-5",
+  "ms": 9595,
+  "tokens": {
+    "input": 2,
+    "output": 631,
+    "cacheCreation": 4958,
+    "cacheRead": 783,
+    "fresh": 5591,
+    "total": 6374
+  },
+  "at": "2026-11-09T02:38:01.243Z"
+}

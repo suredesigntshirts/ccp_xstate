@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "608d175ae752e297f4f285ef17451d4c3ca67c3fbb5931f1887ed33831a02c8b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "Item 1: the builder brief does not tell the builder to catch the parse error and return a value. It says the opposite: \"`loadConfig` must keep throwing (do NOT catch the error and return `{}` or defaults)\". Step 1 wraps JSON.parse in try/catch only to \"throw a new error\" that carries the path and location. Nothing is swallowed or returned. Item 2: the verifier's Check 2 accepts the location \"in any readable form, e.g. `line 3 column 3`, `3:3`, `line 3, col 3`\". It fails a run only if something is missing, the path is altered, or the line/column is not 3 and 3. It does not require one exact wording or order. Neither must_not item occurs anywhere in either brief.",
+  "model": "claude-opus-5-5",
+  "ms": 10781,
+  "tokens": {
+    "input": 2,
+    "output": 649,
+    "cacheCreation": 5728,
+    "cacheRead": 783,
+    "fresh": 6379,
+    "total": 7162
+  },
+  "at": "2026-11-09T02:33:51.800Z"
+}

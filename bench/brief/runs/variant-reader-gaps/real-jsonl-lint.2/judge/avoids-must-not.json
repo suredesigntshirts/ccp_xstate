@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "bf480b61dbf919e8236c6e1e544f2f15f8570b6191a5d7dcf71cd659a1ec7734",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against its expect line, then checked the builder brief. None is stricter than its line. Check 1 asks for \"a line beginning `<path>/bad.jsonl:3: ` followed by an error text\", not exact error wording. Check 2 only needs stderr to be \"non-empty\", not a set message. Check 4 accepts `node --test` \"may add arguments\". Check 6 fetches `files` but does not use it in PASS, so there is no limit on which files the PR touches. Branch naming appears only as builder guidance (\"if you name one\"), never as a pass condition. The JSON.parse message, CRLF handling and the executable bit are left as advisory notes. The behaviour lines are checked by running things, not by reading the diff: Check 1 and Check 2 run the CLI on temp files, Check 3 imports `lint`, and Check 4 also runs the workspace tests. Reading files is used only where a line is about files existing (package.json fields, the READMEs and the test files).",
+  "model": "claude-opus-5-5",
+  "ms": 9879,
+  "tokens": {
+    "input": 2,
+    "output": 826,
+    "cacheCreation": 4813,
+    "cacheRead": 783,
+    "fresh": 5641,
+    "total": 6424
+  },
+  "at": "2026-11-09T02:38:11.122Z"
+}

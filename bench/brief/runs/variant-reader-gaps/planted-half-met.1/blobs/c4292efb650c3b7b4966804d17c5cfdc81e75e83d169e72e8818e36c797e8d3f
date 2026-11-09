@@ -1,0 +1,15 @@
+Goal: one pull request for issue https://github.com/o/strutil/issues/7 (padLeft for invoice numbers) that meets every expect line:
+1. index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters
+2. padLeft returns s unchanged when s is already width characters or longer
+3. README.md has a section for every function index.js exports
+4. npm test passes
+
+Context: the repo is an ES module (package.json "type": "module", test script "node --test"). index.js currently exports capitalize, slugify and truncate. test/strutil.test.js tests those three. README.md has sections "## capitalize(s)" and "## truncate(s, n)" but NO section for slugify, so line 3 is not met today even before padLeft is added.
+
+Steps:
+1. In index.js add, in the same style as the existing functions (with a one-line JSDoc comment):
+   export function padLeft(s, width, fill = ' ') — return s unchanged when s.length >= width; otherwise return s padded on the left with fill until it is exactly width characters long (String.prototype.padStart(width, fill) does this). Examples: padLeft('42', 5, '0') === '00042'; padLeft('ab', 5) === '   ab'; padLeft('abcdef', 4) === 'abcdef'; padLeft('abcd', 4) === 'abcd'.
+2. In README.md add a section for slugify (e.g. "## slugify(s)" describing: lower case, words joined by dashes) and a section for padLeft (e.g. "## padLeft(s, width, fill)" describing that it pads s on the left with fill, a space by default, to width characters, returns s unchanged when it is already width characters or longer, and an example such as padLeft('42', 5, '0') -> '00042'). Keep the existing capitalize, truncate and Tests sections. Afterwards, every function exported from index.js must have its own heading in README.md.
+3. In test/strutil.test.js import padLeft and add tests covering: padding with an explicit fill ('42', 5, '0' -> '00042'), default space fill ('ab', 5 -> '   ab'), and the unchanged cases (length equal to width and longer than width).
+4. Run npm test from the repo root and make sure it passes.
+5. Commit and open the pull request referencing the issue (e.g. "Closes #7").

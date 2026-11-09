@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "01383a313ce317ec3b8f2b38faab5bcdd4f7f532426c700255292c26861a454b",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Most commands work as written. The verifier's printf/mktemp pipelines are valid shell, the `node --input-type=module -e` import is valid (the `\\n` inside double quotes becomes a newline in the JS string), the `require` one-liner, `npm test -w packages/jsonl-lint`, `git update-index --chmod=+x` and the `gh` calls are all fine. The failure is in builder step 4, which tells the builder to make temp files with `fs.mkdtempSync(os.tmpdir())`. mkdtempSync treats its argument as a prefix and adds random characters to it, so this tries to create a sibling such as `/tmpAbC123` in `/` rather than a directory inside `/tmp`. On a non-root CI runner like GitHub Actions, `/` is not writable, so this throws EACCES and the tests fail. The intended call is `fs.mkdtempSync(path.join(os.tmpdir(), 'x-'))`. Because the brief's call does not do what it is meant to do, the criterion does not hold.",
+  "model": "claude-opus-5-5",
+  "ms": 13919,
+  "tokens": {
+    "input": 2,
+    "output": 1144,
+    "cacheCreation": 4946,
+    "cacheRead": 783,
+    "fresh": 6092,
+    "total": 6875
+  },
+  "at": "2026-11-09T02:37:51.646Z"
+}

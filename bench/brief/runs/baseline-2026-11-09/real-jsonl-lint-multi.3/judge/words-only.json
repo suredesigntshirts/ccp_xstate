@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "4c28d93f647a814699adffd75ad14d2fd5a0b01f65c5542604c0838eb281bbcd",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each check's PASS and FAIL conditions with its expect line. Check 1 asks for argument order (including with the order reversed), the `<file>:<line>: <error>` format, and lines that match the single-file output. All of that comes from \"in order\" and \"as for one file before\". Check 2 asks for a `-:1:` prefix, nothing printed for clean stdin, and exit 2 when - is given twice. Check 3 asks for exits 0/1/2/2, an error on stderr, and c still reported after the missing file. Reading \"(error on stderr…)\" as covering the no-args case too is a fair reading. Check 4 only asks that lint is unchanged. Check 5 asks for the seven node:test cases and a README covering several files and the - argument. That is a fair reading of \"documents the usage\". Check 6 matches its line word for word. The stricter items (exit 2 winning over 1, nothing on stdout when - is given twice, stderr wording) are all under Advisory. None of the conditions requires mutation tests, branch rules or exact wording.",
+  "model": "claude-opus-5-5",
+  "ms": 13570,
+  "tokens": {
+    "input": 2,
+    "output": 1124,
+    "cacheCreation": 5186,
+    "cacheRead": 783,
+    "fresh": 6312,
+    "total": 7095
+  },
+  "at": "2026-11-09T02:36:12.827Z"
+}

@@ -1,0 +1,33 @@
+Run every check at the PR head, from the repository root. Each command stands alone.
+
+Check 1 — expect: "packages/jsonl-lint/bin/jsonl-lint.js <file> prints <file>:<line>: <error> for every row that is not valid JSON (1-based lines, blank lines skipped, an unterminated last line checked) and exits 1 if any, 0 if none"
+Run: `d=$(mktemp -d); printf '{"a":1}\n\n{bad\n  \n[1,2]\n{"torn":' > $d/bad.jsonl; node packages/jsonl-lint/bin/jsonl-lint.js $d/bad.jsonl; echo "exit=$?"; printf '{"a":1}\n\n[2]\n"x"' > $d/ok.jsonl; node packages/jsonl-lint/bin/jsonl-lint.js $d/ok.jsonl; echo "exit=$?"`
+PASS: for bad.jsonl the output has a line beginning `<path>/bad.jsonl:3: ` followed by an error text and a line beginning `<path>/bad.jsonl:6: ` followed by an error text, no line is reported for rows 1, 2, 4 or 5, and exit=1; for ok.jsonl no row is reported and exit=0.
+FAIL: either bad row is missing or reported with a wrong line number, a blank row or valid row is reported, the unterminated last row is not reported, or either exit code differs.
+
+Check 2 — expect: "A missing file or no argument prints to stderr and exits 2"
+Run: `node packages/jsonl-lint/bin/jsonl-lint.js /nonexistent/nope.jsonl 2>/tmp/e1 >/tmp/o1; echo "exit=$?"; wc -c </tmp/e1` and separately `node packages/jsonl-lint/bin/jsonl-lint.js 2>/tmp/e2 >/tmp/o2; echo "exit=$?"; wc -c </tmp/e2`
+PASS: both cases exit=2 and both write something non-empty to stderr.
+FAIL: either case exits with another code or writes nothing to stderr.
+
+Check 3 — expect: "packages/jsonl-lint/src/index.js exports lint(text) returning [{ line, error }]"
+Run: `node --input-type=module -e "import { lint } from './packages/jsonl-lint/src/index.js'; console.log(JSON.stringify(lint('{}\n{bad\n')), JSON.stringify(lint('{}\n')))"`
+PASS: the first value is an array whose element(s) are objects with a `line` (2 for the bad row) and an `error` field, and the second is an empty array.
+FAIL: import fails, `lint` is not an exported function, or the return value is not an array of `{ line, error }` objects.
+
+Check 4 — expect: "The workspace has its own package.json (jsonl-lint, type module, test script node --test), no runtime dependencies, and node:test tests for a clean file, a bad middle row, a torn last row, blank lines and the exit codes"
+Run: `node -e "const p=require('./packages/jsonl-lint/package.json'); console.log(p.name, p.type, p.scripts&&p.scripts.test, JSON.stringify(p.dependencies||{}))"`, then `ls -R packages/jsonl-lint`, read the test files, and run `npm test -w packages/jsonl-lint`.
+PASS: name is `jsonl-lint`, type is `module`, test script is `node --test` (it may add arguments such as a path), dependencies is empty or absent; the tests import from `node:test` and include cases for a clean file, a bad middle row, a torn (unterminated) last row, blank lines, and the exit codes; and the workspace tests pass.
+FAIL: any of those fields differs, a runtime dependency is listed, any of the five test subjects has no test, tests do not use `node:test`, or the tests fail.
+
+Check 5 — expect: "packages/jsonl-lint/README.md exists and the root README lists the tool"
+Run: `test -s packages/jsonl-lint/README.md && echo exists; grep -n 'jsonl-lint' README.md`
+PASS: the package README exists and the root `README.md` mentions jsonl-lint as a tool in the repo.
+FAIL: the package README is missing, or the root README does not list the tool.
+
+Check 6 — expect: "The change is one PR on suredesigntshirts/ccp_machine_test whose body says Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102, and npm test and the test workflow are green at its head"
+Run: `gh pr view <PR> --repo suredesigntshirts/ccp_machine_test --json body,headRefOid,files`; `npm ci && npm test` at the root; `gh pr checks <PR> --repo suredesigntshirts/ccp_machine_test`.
+PASS: the PR is on suredesigntshirts/ccp_machine_test, its body contains `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/102`, root `npm test` passes at the head, and the `test` workflow check at the head commit is successful.
+FAIL: the body lacks that text, `npm test` fails, or the `test` check is failing, missing or still pending at the head.
+
+Advisory (not pass/fail): note whether the error text after `<line>: ` is the JSON.parse message, whether CRLF files are handled, whether bin output goes to stdout, whether `package-lock.json` includes the new workspace, and whether the bin has a shebang and executable bit.

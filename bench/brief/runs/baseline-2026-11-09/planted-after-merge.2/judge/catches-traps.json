@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "28a09331da30c1c8d9f2e6f50c9449b804c2aa31bc9f3314f00d24f6ffd2495b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the verifier brief. Item 1 holds: check 4 says \"The live page can only be seen after merge, so do not fetch or read https://o.github.io/greet-cli/.\" It then has the verifier read .github/workflows/pages.yml at the head to confirm it still publishes docs/ on push to the default branch, and confirm that docs/index.md lists --shout. Item 2 holds: check 2 runs `node bin/greet.js Ada`, the 'Grace Hopper' case and the no-name case at both the head and the PR's base commit (using a worktree). It passes only if \"stdout and stderr at the head match the base exactly.\" So the comparison is against the base's output, not just a hand-written string. Both items are covered.",
+  "model": "claude-opus-5-5",
+  "ms": 6222,
+  "tokens": {
+    "input": 2,
+    "output": 427,
+    "cacheCreation": 3456,
+    "cacheRead": 783,
+    "fresh": 3885,
+    "total": 4668
+  },
+  "at": "2026-11-09T02:33:14.216Z"
+}

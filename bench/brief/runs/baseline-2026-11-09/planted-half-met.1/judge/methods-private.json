@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "51980124535e5dcfc46240fdd7fc9ebfb1a75cc5f37904eb57e78215cb031f00",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The criterion is not met. I compared the builder brief's steps with the verifier brief's checks. In step 3, the builder brief tells the builder to write tests for `padLeft('42', 5, '0') === '00042'`, `padLeft('ab', 4) === '  ab'` and `padLeft('abcdef', 4, '0') === 'abcdef'`. Those are the same inputs and expected outputs as the verifier's PASS conditions: Check 1 expects \"00042\" and \"  ab\", and Check 2 expects \"abcdef\". The builder may write its own tests, but here it is handed the checker's exact probes, so the verifier's checks reach the builder. Step 4 also has the builder confirm that every exported function has a matching README heading, which largely repeats Check 3's method. The builder brief therefore carries verifier probes and does not keep the methods private.",
+  "model": "claude-opus-5-5",
+  "ms": 5753,
+  "tokens": {
+    "input": 2,
+    "output": 512,
+    "cacheCreation": 3138,
+    "cacheRead": 783,
+    "fresh": 3652,
+    "total": 4435
+  },
+  "at": "2026-11-09T02:34:03.958Z"
+}

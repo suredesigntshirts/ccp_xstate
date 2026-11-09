@@ -1,0 +1,64 @@
+{
+  "stage": "brief",
+  "run": "real-jsonl-lint-multi.1",
+  "case": "real-jsonl-lint-multi",
+  "judgeModel": "claude-opus-5-5",
+  "rubricSha": "97a93bc89f512698cdaf9c5d161123f3b9988bc6ad082fedfaf5adf17d76e889",
+  "criteria": {
+    "returned": {
+      "by": "mechanical",
+      "met": true,
+      "why": "first return accepted"
+    },
+    "changes-nothing": {
+      "by": "mechanical",
+      "met": true,
+      "why": "worktree clean"
+    },
+    "one-check-per-line": {
+      "by": "mechanical",
+      "met": true,
+      "why": "all 6 lines quoted in order, checks numbered 1 to 6"
+    },
+    "no-restated-rules": {
+      "by": "mechanical",
+      "met": true,
+      "why": "no branch, base, branch-name rule or return mechanics named"
+    },
+    "builder-criteria": {
+      "by": "mechanical",
+      "met": false,
+      "why": "expect line 1, 2, 3, 4, 5, 6 not quoted word for word in the builder brief: \"packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...] checks every file name\""
+    },
+    "words-only": {
+      "by": "judge",
+      "met": false,
+      "why": "I compared each check's PASS and FAIL conditions with its expect line. Checks 1, 2, 4 and 5 stay close to the words. Check 6 does not. Its expect line only says \"The change is one PR … whose body says Closes …\". The PASS condition instead requires \"exactly one PR … is open for this change\", and the command uses `--state open`. Nothing in the words requires the PR to be open, so a merged or closed PR would wrongly FAIL. That is a stricter test, and it sits in a PASS/FAIL condition rather than under Advisory. Check 3(c) also requires \"exits 2 with a message on stderr\" for the no-argument case. The issue's \"(error on stderr…)\" follows \"can't be read\", so it most likely applies only to unreadable files. Requiring a stderr message for no arguments probably goes beyond the words too. Because of these extra requirements, the criterion fails.",
+      "cached": false
+    },
+    "runs-as-written": {
+      "by": "judge",
+      "met": true,
+      "why": "I checked every command in both briefs against the repository. Everything they name exists at this commit: packages/jsonl-lint/bin/jsonl-lint.js, the test files, the README, package-lock.json (needed for `npm ci`) and the root and package `npm test` scripts. The setup's printf strings have no % signs, so the fixtures are written as intended and later commands only use files it creates. The checks use only standard shell: `; echo \"exit=$?\"`, `2>/tmp/jv104/err.txt`, pipes and `cd packages/jsonl-lint && node --test 2>&1 | tail -40`. The gh calls use real flags and JSON fields (number, headRefOid, files, body, url) and a valid search. The trailing `--` in `gh pr diff <number> ... --` is harmless, and `<number>` is plainly a placeholder. On the JavaScript side, `readFileSync(0, 'utf8')`, `process.argv.slice(2)` and spawnSync's `input` option are all valid Node. Every command would run as written.",
+      "cached": false
+    },
+    "catches-traps": {
+      "by": "judge",
+      "met": false,
+      "why": "I checked all four must_catch items. Item 1 breaks. Check 3(e) does run a missing file together with a file that has a bad row (`nope.jsonl b2.jsonl`). But its PASS condition only asks for \"an error about nope.jsonl on stderr\" and that the tool \"still prints the `/tmp/jv104/b2.jsonl:1: ` line\". It never asks for exit 2. Instead, the case where an unreadable file and a bad row come together is put under \"Advisory (not pass or fail conditions)\": \"exit 2 wins. Note the behaviour if it differs.\" So a PR that exits 1 here would still pass. Item 3 holds: builder step 4 updates the README. Item 4 mostly holds: Check 6 reads the PR body and the gh checks. Item 2 is diff-based, through the gh pr diff file list. Item 1 fails, so the criterion is not met.",
+      "cached": false
+    },
+    "avoids-must-not": {
+      "by": "judge",
+      "met": true,
+      "why": "The criterion holds. I checked both briefs against the two must_not items.\n\nItem 1 (conditions stricter than the line): the verifier's PASS/FAIL conditions stay within their lines. Check 2 asks only for a `-:2: ` prefix and exit 2. Check 3 asks for exit codes and \"an error on stderr\" with no exact wording. Check 4 accepts the file being \"absent\" or a diff that \"touches nothing in lint(text)\". Check 6 asks for one PR, the Closes text, and green tests and workflow. There's no branch-name rule, mutation test or file-touch limit. The builder's \"byte-for-byte\" note and its suggested stderr text are build instructions, not pass/fail conditions. The byte-identical comparison is listed only under \"Advisory (not pass or fail conditions)\".\n\nItem 2 (behaviour lines passed by reading code only): Checks 1–3 each run `node packages/jsonl-lint/bin/jsonl-lint.js` on fixtures and judge the actual output and exit codes. Reading the diff happens only in Check 4 and Check 5, which aren't behaviour lines.",
+      "cached": false
+    },
+    "methods-private": {
+      "by": "judge",
+      "met": true,
+      "why": "The builder brief sets the bar without passing on any of the verifier's checks. It shares none of the verifier's fixtures (/tmp/jv104, c1/b1/b2.jsonl) and none of its printf/node command lines, gh pr diff/grep probes or PASS/FAIL wording. Its steps restate the issue's behaviour: usage exit 2, the second `-` as a usage error, file order, the `<file>:<line>: <error>` format, and exit 2 over 1 over 0. Step 3 tells the builder to write its own node:test tests for the seven cases from expect line 5, which the criterion allows. One test idea overlaps check 3(e) in spirit: \"add a bad row to one of them so the test proves its lines still show up\". That is advice on the builder's own test, not the verifier's command or files. The `-:<line>: ` prefix comes from the issue's own spec. The builder is also told to run `npm test`, which is allowed. I found no verifier probe or PASS/FAIL condition copied into the builder brief.",
+      "cached": false
+    }
+  }
+}

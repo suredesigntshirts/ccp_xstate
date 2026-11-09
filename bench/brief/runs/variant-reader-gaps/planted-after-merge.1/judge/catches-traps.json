@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "e365b4028fc39ae71c1d2661607df3a951380df4e22cbfd9767efadad78bad0c",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is handled. Check 4 says \"The live page can only be seen after merge; do not fetch it\", and it checks .github/workflows/pages.yml and docs/index.md at the head.\n\nItem 2 is not handled. Check 2 never runs the pre-change code. It writes `git show HEAD~1:bin/greet.js > /dev/null`, which throws the old file away instead of running it. It also offers a fallback: \"or compare against the known prior behaviour: the program printed `Hello, <name>!`\". That lets the verifier compare only against a hand-written expected string, which is exactly what the must_catch item rules out. Also, HEAD~1 is not reliably the base commit if the PR has more than one commit. Because Check 2 never actually compares against the output from before the change, the briefs miss one must_catch item.",
+  "model": "claude-opus-5-5",
+  "ms": 7734,
+  "tokens": {
+    "input": 2,
+    "output": 545,
+    "cacheCreation": 3166,
+    "cacheRead": 783,
+    "fresh": 3713,
+    "total": 4496
+  },
+  "at": "2026-11-09T02:33:36.646Z"
+}

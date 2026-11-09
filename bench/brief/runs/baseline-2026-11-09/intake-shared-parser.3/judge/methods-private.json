@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "527395409e604e9b072c1f84e34f039f6ed572d52d39858fa14cc9358674c36c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion is met. Nothing in the builder brief exists only in the verifier brief. Its step 4 commands are the issue's proof commands, such as `printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv; echo \"exit=$?\"`, and the criterion allows those. The input/output pairs in step 2 copy the issue's expect lines 1, 2, 3 and 5, which the builder may see. It also tells the builder to write its own tests, which is allowed. The builder brief leaves out every verifier-only method: no `od -c` or `cmp` byte checks, no `grep -rn -- '--tsv' test/`, no `node --version`, and none of the advisory probes (`foo --tsv`, CRLF input, the `npm run test:cli` note). It has no PASS/FAIL wording either, such as \"A test that only calls parse() directly… does not count.\" Its scope limits (\"Do not add quoting rules…\") restate the issue's non-goals, not the verifier's checks.",
+  "model": "claude-opus-5-5",
+  "ms": 10512,
+  "tokens": {
+    "input": 2,
+    "output": 839,
+    "cacheCreation": 6205,
+    "cacheRead": 783,
+    "fresh": 7046,
+    "total": 7829
+  },
+  "at": "2026-11-09T02:32:36.876Z"
+}

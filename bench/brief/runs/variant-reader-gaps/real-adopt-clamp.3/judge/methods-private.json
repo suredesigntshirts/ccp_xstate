@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "4f7c6c900ef856912822cf69f135ca41cce1af07f146713f102e81e5b25e18d9",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's probes, and the builder brief breaks the criterion. Step 2 tells the builder to test exactly these inputs and results: \"clamp(-5, 0, 100) === 0\", \"clamp(140, 0, 100) === 100\", \"clamp(42, 0, 100) === 42\" and \"assert.throws(() => clamp(5, 10, 0), RangeError)\". The same inputs and results appear in the verifier's probes, as the Check 1 cases [-5,0,100,0], [140,0,100,100] and [42,0,100,42], and as the Check 2 case [5,10,0]. Writing its own tests is allowed, but these are the checker's own inputs with expected outputs. Step 4 also gives the builder `node -e \"...Object.keys(m)...\"` to check README coverage. That is nearly the same as the Check 3 probe command, and no expect line or the issue names it. So the builder is handed the checker's methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 8402,
+  "tokens": {
+    "input": 2,
+    "output": 649,
+    "cacheCreation": 3270,
+    "cacheRead": 783,
+    "fresh": 3921,
+    "total": 4704
+  },
+  "at": "2026-11-09T02:37:10.835Z"
+}

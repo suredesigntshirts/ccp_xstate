@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "493a7bd1c0dee2ebf86860d188fffc13cdd883c232c3534c6d4721b5bdc056fa",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, and the builder brief repeats several of the verifier's checks. Step 1 gives the probe `node bin/greet.js --shout Ada` → `HELLO, ADA!`. Step 4 asks for a test with that same input and the expected output `HELLO, ADA!\\n`. Both match the input and expected output in Check 1's PASS condition and the advisory. Step 2 gives `node bin/greet.js Ada` → `Hello, Ada!`, which is Check 2's probe and PASS output. Step 6 (\"Leave .github/workflows/pages.yml unchanged so it keeps publishing docs/ on push to main\") restates Check 4's PASS condition. Step 1's \"whether the flag comes before or after it\" and Step 2's usage-error clause repeat probes from the advisory. The expect line does name `node bin/greet.js --shout <name>`, so running that command is allowed. But handing the builder the verifier's own inputs with their expected outputs goes beyond that, so the builder gets the checker's methods and not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 10132,
+  "tokens": {
+    "input": 2,
+    "output": 914,
+    "cacheCreation": 3131,
+    "cacheRead": 783,
+    "fresh": 4047,
+    "total": 4830
+  },
+  "at": "2026-11-09T02:33:54.250Z"
+}

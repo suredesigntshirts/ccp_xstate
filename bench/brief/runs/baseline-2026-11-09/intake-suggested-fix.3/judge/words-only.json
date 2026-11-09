@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "f2b65f1319ca4aec1671ced7b11b8c51a1a33edfc02aafb006de293d0c0de21c",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 requires only exit 1 and empty stdout. Check 2 requires `bad config:`, the literal `$d/c.json` and line 3 / column 3 \"in any readable form\", so it doesn't force an exact format. Check 3 passes on `OK`, meaning the call threw and the message contains the path. Check 4 requires exit 0, `listening on 9000` and `{\"port\":9000}`. Check 5 requires `npm test` to pass at the head and at least one test that checks for the path to fail against the base `src/`. That matches the expect line, and reading the test is only a way to confirm it. The stricter items are all under \"Advisory (not a PASS/FAIL condition)\": computing the location from the source text, not returning `{}`, ENOENT handling, and keeping `SyntaxError` with a `cause`. No PASS or FAIL condition goes beyond what the expect lines say.",
+  "model": "claude-opus-5-5",
+  "ms": 11191,
+  "tokens": {
+    "input": 2,
+    "output": 761,
+    "cacheCreation": 5530,
+    "cacheRead": 783,
+    "fresh": 6293,
+    "total": 7076
+  },
+  "at": "2026-11-09T02:32:48.479Z"
+}

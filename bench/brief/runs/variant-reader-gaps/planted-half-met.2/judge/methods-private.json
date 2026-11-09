@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "593741248fa17a308422857d8e4a57dd793e1e4447c17a67eb90dbdefdf68b01",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief's checks. The builder brief gives the same inputs and expected outputs that the verifier's Check 1 probe runs: \"padLeft('42', 5, '0') === '00042', padLeft('ab', 4) === '  ab'\". The verifier's script tests p('42',5,'0') and p('ab',4) and requires \"00042\" and \"  ab\". Step 4 repeats these as test cases ('42', 5, '0' -> '00042'; 'ab', 4 -> '  ab'). Step 5's \"check by hand that every `export function` name in index.js appears as a README.md section heading\" also restates Check 3's PASS condition (each exported name has a heading). The criterion lets the builder write its own tests. It does not let the builder brief carry a probe, meaning inputs with expected outputs, that also appears in the verifier brief. So the builder brief contains part of the checker's bar.",
+  "model": "claude-opus-5-5",
+  "ms": 10004,
+  "tokens": {
+    "input": 2,
+    "output": 601,
+    "cacheCreation": 3164,
+    "cacheRead": 783,
+    "fresh": 3767,
+    "total": 4550
+  },
+  "at": "2026-11-09T02:34:53.892Z"
+}

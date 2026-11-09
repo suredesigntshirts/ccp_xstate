@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "0c82301633c95f525e715464489258aea9257fd139221ef991c19dd4a00c4ea2",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_not items against the verifier brief. Item 1: Check 3 loops over every exported function and prints MISSING for any that has no README heading. Its PASS says the list \"must include capitalize, slugify, truncate and padLeft\" and adds \"slugify had no README section before this change; it must have one now\". A README with a padLeft section but none for slugify therefore fails. Item 2: Check 1 uses only single-character fills and expects values that follow from line 1. Check 2's values ('abc',0 → 'abc') follow from line 2. Check 3 matches the function name in any markdown heading at any level, which is not a fixed layout. Check 4 needs only no failing tests. No check counts parameters or requires a one-character fill; the multi-character fill note is advisory. The builder's `## name(args)` format is a build instruction, not a PASS/FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 12173,
+  "tokens": {
+    "input": 2,
+    "output": 833,
+    "cacheCreation": 3142,
+    "cacheRead": 783,
+    "fresh": 3977,
+    "total": 4760
+  },
+  "at": "2026-11-09T02:34:43.887Z"
+}

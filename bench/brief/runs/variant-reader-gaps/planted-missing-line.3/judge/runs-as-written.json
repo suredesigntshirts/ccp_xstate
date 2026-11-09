@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "1357a856e811959fd0c09fb68a1ef0d8d8a87662c15ecfad47924c01b969db8a",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs, and all of them would run as written. Builder: the files it names (bin/csv2json.js, src/parse.js, test/csv.test.js, README.md) are tracked at this commit. `npm test` maps to `node --test`. The `printf ... | node bin/csv2json.js [--tsv]` lines are valid shell. The `execFileSync('node', ['bin/csv2json.js','--tsv'], {input, encoding})` call is valid JavaScript. Verifier: the two `node -e \"...\"` scripts are in bash double quotes with no `$`, backtick or `!`, so the `\\t` and `\\n` reach JavaScript unchanged and become tab and newline inside single-quoted strings. Their JavaScript (destructured require, execFileSync with input, JSON.parse, ternary) is valid. `grep -n -- '--tsv' README.md` correctly uses `--` so grep does not read the pattern as an option. The advisory `npm test` and `printf` commands are also valid. Nothing depends on a missing file or script.",
+  "model": "claude-opus-5-5",
+  "ms": 9418,
+  "tokens": {
+    "input": 2,
+    "output": 808,
+    "cacheCreation": 2999,
+    "cacheRead": 783,
+    "fresh": 3809,
+    "total": 4592
+  },
+  "at": "2026-11-09T02:35:14.948Z"
+}

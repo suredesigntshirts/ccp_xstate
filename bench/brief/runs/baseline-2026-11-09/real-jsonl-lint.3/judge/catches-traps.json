@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "7e6eb9b9c4b747ea07f699b758c8d393221ad34e4230d19842bb0040ef3bd47f",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Item 1 is met: builder step 7 says to run `npm install` and commit package-lock.json \"because CI runs `npm ci`\". Item 2 is met: step 6 says to \"replace the 'No tools yet…' bullet\". Item 4 is met: verifier check 6 uses `gh pr view` for the body and headRefOid, and `gh pr checks` to require a green test check at the head. Item 3 is not met. Check 4 runs `(cd packages/jsonl-lint && npm test)` inside the package, not under the root script. Check 6 runs the root `npm ci && npm test` but passes as long as it \"exits 0\". The verifier never reads the root test count and never breaks lint() to see a failure. Because the root script uses --if-present, a skipped run would still exit 0 and pass.",
+  "model": "claude-opus-5-5",
+  "ms": 12431,
+  "tokens": {
+    "input": 2,
+    "output": 902,
+    "cacheCreation": 5595,
+    "cacheRead": 783,
+    "fresh": 6499,
+    "total": 7282
+  },
+  "at": "2026-11-09T02:37:39.293Z"
+}

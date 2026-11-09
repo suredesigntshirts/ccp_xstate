@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "0f702f1d039b17f4db441d1f5be3e4f8e53c238668efabe9840bfc8a9b87331e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for all four verifier checks. Check 1 tests only what \"exports clamp(x, lo, hi), which returns x limited to the range\" requires: clamp is exported, the argument order matches the signature, and the outputs are correct for values below, above, inside and on the edges of the range. Check 2 only asks that lo>hi throws a RangeError. Check 3 only asks that each exported function is documented (\"its name with its signature or a description\"). It names no headings and requires no exact wording. Check 4 only asks that the tests pass with no failures. Everything stricter sits under \"Advisory (not part of any PASS or FAIL above)\": the exit status 0 requirement, clamp tests existing, a clear RangeError message, the mutation idea, and existing exports behaving as before. No PASS or FAIL condition adds a branch rule, file-scope rule, exact message text or mutation test.",
+  "model": "claude-opus-5-5",
+  "ms": 8140,
+  "tokens": {
+    "input": 2,
+    "output": 636,
+    "cacheCreation": 3358,
+    "cacheRead": 783,
+    "fresh": 3996,
+    "total": 4779
+  },
+  "at": "2026-11-09T02:35:12.232Z"
+}

@@ -1,0 +1,19 @@
+Check the pull request head against each expect line of issue #31, in this order. Run every command from the repository root.
+
+Check 1: "loadConfig(path) in src/config.js catches the JSON.parse error and returns {} instead"
+Run:
+node --input-type=module -e "import {mkdtempSync,writeFileSync} from 'node:fs'; import {tmpdir} from 'node:os'; import {join} from 'node:path'; import {loadConfig} from './src/config.js'; const f=join(mkdtempSync(join(tmpdir(),'cfg-')),'config.json'); writeFileSync(f,'{port: 9000'); let r; try { r=loadConfig(f); } catch(e) { console.log('THREW', e && e.name, e && e.message); process.exit(0); } console.log('RESULT', JSON.stringify(r), Object.prototype.toString.call(r));"
+Also read loadConfig in src/config.js at the head.
+PASS: the output is `RESULT {} [object Object]`, meaning loadConfig returned an empty plain object without throwing, and src/config.js shows loadConfig catching the error that JSON.parse throws.
+FAIL: the output starts with THREW, the result is anything other than an empty object, or loadConfig does not catch the JSON.parse error.
+
+Check 2: "npm test passes"
+Run: npm test
+PASS: the test run reports no failing tests.
+FAIL: any test fails, or the test run errors out.
+
+Advisory (these do not decide PASS or FAIL):
+- Make sure valid JSON still parses. Write `{"port": 9000}` to a temp file the same way as in Check 1. loadConfig should return {port: 9000}.
+- Make sure a missing file still throws rather than returning {}, which would mean only JSON.parse is wrapped. Run loadConfig('/nonexistent/config.json').
+- Make sure the old test 'bad JSON throws' in test/config.test.js was replaced by a test for the {} result, not just deleted.
+- Run `node src/app.js` against a file containing `{port: 9000`. It should print `listening on 8080` and exit 0. README.md should no longer say that invalid JSON exits with `bad config`.

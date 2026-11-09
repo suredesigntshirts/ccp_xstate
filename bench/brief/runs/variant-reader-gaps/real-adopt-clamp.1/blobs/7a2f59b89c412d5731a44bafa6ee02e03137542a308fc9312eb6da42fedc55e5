@@ -1,0 +1,28 @@
+Run every check from the repository root at the pull request head.
+
+Check 1 — expect line: "math.js exports clamp(x, lo, hi), which returns x limited to the range lo to hi"
+Run: node -e "const m=require('./math.js'); const c=m.clamp; if(typeof c!=='function'){console.log('NOT EXPORTED');process.exit(1)} const r=[c(-5,0,100),c(140,0,100),c(50,0,100),c(0,0,100),c(100,0,100),c(7,3,3),c(-20,-10,-1),c(2.5,0,1)]; console.log(JSON.stringify(r));"
+PASS: math.js exports clamp as a function and the printed results are [0,100,50,0,100,3,-10,1] (the value below the range gives lo, above gives hi, inside is unchanged).
+FAIL: clamp is not exported as a function, the command throws, or any printed result differs from that list.
+
+Check 2 — expect line: "clamp(x, lo, hi) throws a RangeError when lo is greater than hi"
+Run: node -e "const {clamp}=require('./math.js'); for (const a of [[5,10,0],[0,1,0.5],[-3,-1,-2]]) { try { clamp(...a); console.log('NO THROW', JSON.stringify(a)); } catch(e) { console.log(e instanceof RangeError ? 'RangeError' : 'OTHER '+(e&&e.name), JSON.stringify(a)); } }"
+PASS: every line printed starts with RangeError.
+FAIL: any line starts with NO THROW or OTHER, or the command fails to run.
+
+Check 3 — expect line: "README.md documents every function math.js exports"
+Run: node -e "const m=require('./math.js'); const fs=require('fs'); const r=fs.readFileSync('README.md','utf8'); const fns=Object.keys(m).filter(k=>typeof m[k]==='function'); console.log('exports:', fns.join(',')); for (const f of fns) console.log(f, r.includes(f+'(') ? 'MENTIONED' : 'MISSING');"
+Then read README.md at the head for each exported name listed.
+PASS: for every function math.js exports (this includes add, subtract, multiply and clamp if they are exported), README.md contains documentation of it — at minimum its name with its parameters and a description of what it does.
+FAIL: any exported function is MISSING from README.md, or is named only without saying what it does.
+
+Check 4 — expect line: "npm test passes"
+Run: npm test
+PASS: npm test completes with all tests passing (no failing tests reported).
+FAIL: any test fails or npm test errors.
+
+Advisory (not part of any PASS or FAIL condition):
+- Note whether test/math.test.js gains tests for clamp, including the RangeError case.
+- Note whether npm test exits with status 0 (echo $? right after it, in the same command).
+- Note whether the README documents that clamp throws a RangeError when lo is greater than hi, and whether the docs sit under the ## API section.
+- Note how clamp handles NaN or non-number inputs; the issue does not specify this.

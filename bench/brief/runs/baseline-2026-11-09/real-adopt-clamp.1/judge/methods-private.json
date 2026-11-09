@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "935a3946f9cfb08a69dbafb73011dcb5ac29a4eeb3b319d577261fe2bc12b1a9",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief with the verifier brief, and the builder brief contains the verifier's probes. Step 4 tells the builder to run an inline script: `node -e \"const m=require('./math.js'); ... m.clamp(-5,0,100), m.clamp(140,0,100), m.clamp(42,0,100))\"` and confirm the output is `... 0 100 42`. These are the same inputs with the same expected outputs as Check 1's probe and PASS line. Step 2 also gives the builder Check 1's input/output pairs (clamp(0,0,100)===0, clamp(100,0,100)===100, clamp(7,5,5)===5). It also gives Check 2's `clamp(5, 10, 0)` throws RangeError case. They are framed as tests the builder writes, but they are still the verifier's exact checks. Step 3's instruction to compare the keys of `require('./math.js')` against the README headings repeats Check 3's method. Telling the builder to run `npm test` is allowed, but the shared inline script and input sets break the criterion.",
+  "model": "claude-opus-5-5",
+  "ms": 5921,
+  "tokens": {
+    "input": 2,
+    "output": 552,
+    "cacheCreation": 3397,
+    "cacheRead": 783,
+    "fresh": 3951,
+    "total": 4734
+  },
+  "at": "2026-11-09T02:35:41.211Z"
+}

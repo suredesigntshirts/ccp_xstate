@@ -1,7 +1,7 @@
 // Expect: stage-bench/same-prompt, stage-bench/edit-safe
 // The stage bench and pinned replay: the prompt bench --prompt-only prints equals render() for the same workflow version
 // and input, for each quick-fix model stage, a trial's pinned blob and every brief case; and with one brief rule edited in
-// workflows/, every committed journal still replays on the blob it pinned and renders its brief.md from that pin.
+// workflows/, every committed journal still replays on the blob it pinned and renders its prompt from that pin.
 import { execFileSync } from 'node:child_process';
 import { cpSync, mkdtempSync, readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -13,6 +13,7 @@ import { test } from 'node:test';
 import { loadWorkflow } from '../../../packages/engine/src/index.js';
 import { render, stagesOf } from '../../../packages/engine/src/stages.js';
 import { restore } from '../../../packages/engine/src/host.js';
+import { promptFile } from '../../../packages/engine/src/names.js';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const ADOPT = join(REPO, 'tournaments/2026-11-04-stage-contract/trials/adopt/journal');
@@ -115,14 +116,14 @@ test('every committed journal replays on its pinned blob with a brief rule edite
       const applied = rows.filter((x) => x.kind === 'engine.transition' && x.payload.outcome === 'applied').length;
       assert.ok(applied >= 1 && host.snapshot, `${r}/${item} restored`);
       items++; transitions += applied;
-      // The pin is what decides the prompt: a brief run's committed brief.md is render() on the pinned blob, and the
+      // The pin is what decides the prompt: a brief run's committed prompt is render() on the pinned blob, and the
       // edited spec renders it differently (so the edit is real and replay did not silently read the edited file).
       const bdir = join(root, 'items', item, 'runs');
       const briefRun = existsSync(bdir) ? readdirSync(bdir).find((n) => n.endsWith('.brief')) : null;
       if (briefRun) {
         const rj = JSON.parse(readFileSync(join(bdir, briefRun, 'run.json'), 'utf8'));
         const args = (s) => ({ actor: 'brief', schema: s.meta.actors.brief, input: rj.input, defs: s.meta.schemas ?? {}, run: rj.run });
-        assert.equal(render(args(spec)), readFileSync(join(bdir, briefRun, 'brief.md'), 'utf8'), `${r}/${item} brief.md`);
+        assert.equal(render(args(spec)), readFileSync(promptFile(root, rj.run), 'utf8'), `${r}/${item} prompt`);
         assert.notEqual(render(args(edited)), render(args(spec)), `${r}/${item}: edited rule changes the prompt`);
         onCurrentPin++;
       }

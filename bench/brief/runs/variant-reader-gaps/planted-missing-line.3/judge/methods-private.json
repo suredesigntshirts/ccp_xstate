@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "2f5ff65a4a1e4d91149f2cae5b352bc5962ba37239a878591ddf2fb153272547",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "Not met: the builder brief repeats one of the verifier's PASS probes. Check 1's second command feeds 'a\\tb\\n1\\t2\\n' to --tsv and 'a,b\\n1,2\\n' to the plain CLI, and passes only if the outputs are the same (SAME). Builder step 5 says \"printf 'a\\tb\\n1\\t2\\n' | node bin/csv2json.js --tsv and printf 'a,b\\n1,2\\n' | node bin/csv2json.js must print identical output\". That is the same inputs with the same expected result. Step 3 also gives the expected output '[{\"a\":\"1\",\"b\":\"2\"}]\\n', which matches the verifier's advisory check. The exception for commands an expect line names doesn't cover this, because the expect line names only the bare command, not these inputs or the comparison.",
+  "model": "claude-opus-5-5",
+  "ms": 13544,
+  "tokens": {
+    "input": 2,
+    "output": 1054,
+    "cacheCreation": 2976,
+    "cacheRead": 783,
+    "fresh": 4032,
+    "total": 4815
+  },
+  "at": "2026-11-09T02:35:50.162Z"
+}

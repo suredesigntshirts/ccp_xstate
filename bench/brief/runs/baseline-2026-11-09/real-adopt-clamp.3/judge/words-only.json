@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "17963a6b3a5ba6b4d36b3997161952a56bb3585f27216caeb28329ec383b9d1d",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked each verifier check's PASS and FAIL conditions against its expect line. Check 1 tests only that clamp is exported and what it returns for below, above, inside, boundary and lo===hi inputs. \"Returns x limited to the range lo to hi\" fixes every printed value, so the exact-output match is not stricter than the words. Check 2 requires a RangeError for three cases where lo > hi, which is exactly what the line says. Check 3 requires each exported function to be documented \"by name with at least a description\". The \"add, subtract, multiply and clamp\" list follows from the current exports and adds no new rule. Check 4 requires no failing tests and exit code 0. The stricter rules (new clamp tests, `### name(` headings, a meaningful error message) are all under \"Advisory (not pass/fail conditions)\".",
+  "model": "claude-opus-5-5",
+  "ms": 12598,
+  "tokens": {
+    "input": 2,
+    "output": 926,
+    "cacheCreation": 3250,
+    "cacheRead": 783,
+    "fresh": 4178,
+    "total": 4961
+  },
+  "at": "2026-11-09T02:35:46.858Z"
+}

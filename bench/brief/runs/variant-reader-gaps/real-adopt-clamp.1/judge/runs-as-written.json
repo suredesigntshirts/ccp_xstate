@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "d5b7cffa302ee14beef156ef68fe4959b45e6c7467f5f2f74d5112e0b0b61dae",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds for both briefs. Every file the commands name exists at this commit: math.js, README.md and test/math.test.js. `npm test` maps to the existing \"node --test\" script. The three `node -e` one-liners in Checks 1–3 are wrapped in double quotes and use only single quotes inside. They contain no `$` or backticks, so the shell will not expand anything. The JavaScript is valid: `require('./math.js')`, the spread in `clamp(...a)`, `e&&e.name`, and `Object.keys(m).filter(...)` with `r.includes(f+'(')`. Check 1's expected list, [0,100,50,0,100,3,-10,1], matches what a correct clamp returns. Calling `require` on math.js fits the CommonJS `module.exports` form the builder brief keeps. The advisory `echo $?` after npm test is valid shell. The builder brief's npm test step and its node:test / node:assert/strict tests are valid too. I found no command that would fail as written.",
+  "model": "claude-opus-5-5",
+  "ms": 8269,
+  "tokens": {
+    "input": 2,
+    "output": 706,
+    "cacheCreation": 3211,
+    "cacheRead": 783,
+    "fresh": 3919,
+    "total": 4702
+  },
+  "at": "2026-11-09T02:36:10.393Z"
+}

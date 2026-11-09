@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "4d73caac81a882d659b6ac17b7de703e31a9290e6ee1456e8249ec5fee40ea1e",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every verifier PASS/FAIL condition against the two must_not items. None are stricter than their lines. Check 3 asks only for \"a message on stderr\" and that stderr \"mentions missing.jsonl\". The advisory says \"Usage/stderr wording, exact error text... are free choices\". No check sets a branch-name rule, a mutation test or a file-touch limit. Check 4 reports other edits to index.js only as \"suspicious; report it\", not as a failure. The builder brief lists files and an error format, but those are directions to the builder, not verifier conditions. Checks 1–3 (the behaviour lines) all run the CLI on temp files or stdin and check its output and exit codes. Checks 4 and 5 read the diff and code, but they cover non-behaviour lines 4 and 5. Check 1's expected c.jsonl lines are worked out by hand, but its main test is equality with the single-file runs, so it is not stricter than the line.",
+  "model": "claude-opus-5-5",
+  "ms": 11706,
+  "tokens": {
+    "input": 2,
+    "output": 985,
+    "cacheCreation": 5003,
+    "cacheRead": 783,
+    "fresh": 5990,
+    "total": 6773
+  },
+  "at": "2026-11-09T02:37:52.002Z"
+}

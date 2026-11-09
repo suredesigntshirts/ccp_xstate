@@ -1,0 +1,18 @@
+{
+  "criterion": "words-only",
+  "promptSha": "2a8ecc64f3a6384d68915763504e0290aa4bf59ddde5505d2a9bc2dd4e1f7077",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared each verifier check's PASS and FAIL conditions with the words of its expect line. Check 1 passes only if the call \"does not throw and returns an empty plain object {}\" and \"loadConfig is in src/config.js\". Both come straight from \"catches the JSON.parse error and returns {} instead\" in src/config.js. The plain-prototype test is a little strict but is a fair reading of \"{}\". Check 2 passes only if \"no failing tests (fail 0)\" and fails if \"any test fails or the test run errors out\", which is just \"npm test passes\". Everything the words don't force is under \"Advisory (not pass/fail conditions)\": the stderr warning naming the path, catching only the parse error, replacing the old test, updating the README, and npm's exit status. No stricter test, mutation test, branch or file-scope rule, or exact-wording rule appears in any PASS or FAIL condition.",
+  "model": "claude-opus-5-5",
+  "ms": 8761,
+  "tokens": {
+    "input": 2,
+    "output": 696,
+    "cacheCreation": 2917,
+    "cacheRead": 783,
+    "fresh": 3615,
+    "total": 4398
+  },
+  "at": "2026-11-09T02:35:44.321Z"
+}

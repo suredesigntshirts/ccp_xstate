@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "6d77a92655707fc6bb12c9e920822398b97d18a1ab3f7bf73618aaa05e968431",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I compared the builder brief with each verifier check. The builder brief has no PASS/FAIL conditions. It also reuses none of the verifier's probes: not the printf fixtures (bad.jsonl, ok.jsonl, lastok.jsonl), not the inline `node --input-type=module -e \"import { lint } ...\"` script, not the `node -e require(package.json)` field dump, and not the grep or `gh pr list` commands. What it does give is the requirements, which is the bar: the output format, blank lines skipped, the torn last row checked, exit codes 0/1/2, and the package.json fields. It tells the builder to write its own node:test tests, which is allowed. The only commands it names are `npm install`, `npm ci && npm test` and `node --test`. `npm test` comes from the expect lines and `node --test` is the repository's own test script, so these are allowed too. Some advisory points also show up as builder requirements (CRLF, shebang, lockfile), but the verifier marks those as advisory, not pass/fail checks or probes.",
+  "model": "claude-opus-5-5",
+  "ms": 11441,
+  "tokens": {
+    "input": 2,
+    "output": 667,
+    "cacheCreation": 5254,
+    "cacheRead": 783,
+    "fresh": 5923,
+    "total": 6706
+  },
+  "at": "2026-11-09T02:38:08.357Z"
+}

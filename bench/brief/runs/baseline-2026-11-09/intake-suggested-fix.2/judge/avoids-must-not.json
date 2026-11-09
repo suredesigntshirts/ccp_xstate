@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "d962e51f306f47988004ebbeae68a02bdcbe2a4c1ef163e97995795b1da79d1b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The briefs do neither thing on the must_not list. First, the builder brief says to call JSON.parse \"inside a try/catch\" and then \"Re-throw an error whose `message` includes\" the path and location. It also says outright: \"Do NOT adopt the suggested fix of catching the error and returning `{}` or defaults.\" It catches the error only to throw again and never tells the builder to return a value. Second, the verifier's Check 2 passes any clear form of the location (\"any clear form, e.g. `line 3 column 3`, `3:3`, `line 3, col 3`\"). It fails a run only if a part is missing, the path is changed, or the location is not line 3 / column 3. It never ties PASS to one exact wording or order. If the code relies only on Node's own message, that goes under Advisory and does not fail the check.",
+  "model": "claude-opus-5-5",
+  "ms": 4809,
+  "tokens": {
+    "input": 2,
+    "output": 398,
+    "cacheCreation": 5378,
+    "cacheRead": 783,
+    "fresh": 5778,
+    "total": 6561
+  },
+  "at": "2026-11-09T02:33:08.381Z"
+}

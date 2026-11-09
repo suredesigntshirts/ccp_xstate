@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "dc1ca3b5201fac7bd681e096d5d40e54875aa8518ec137e74f1b67e655f0296b",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "The criterion holds: Check 4 does neither item on the must_not list. On item 1, the brief says \"The live page can only be seen after merge; do not fetch it.\" Check 4 never fetches https://o.github.io/greet-cli/. It looks at what the PR head contains instead: `cat .github/workflows/pages.yml` and `grep -n -- '--shout' docs/index.md`. On item 2, it does not pass silently. Its PASS needs evidence from those commands: the workflow still publishes docs/ on push to main through upload-pages-artifact and deploy-pages, and docs/index.md lists --shout. Its FAIL conditions are spelled out. The builder brief contains no check that breaks either item.",
+  "model": "claude-opus-5-5",
+  "ms": 6145,
+  "tokens": {
+    "input": 2,
+    "output": 391,
+    "cacheCreation": 3081,
+    "cacheRead": 783,
+    "fresh": 3474,
+    "total": 4257
+  },
+  "at": "2026-11-09T02:34:31.453Z"
+}

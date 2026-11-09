@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "74bbe62e3b2242c5ebff02b65982d344afb4852de0afe39338d09c7e4ec59031",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked the verifier brief against both must_not items. It has exactly two checks, and each one matches an expect line in order. Check 1 covers --tsv versus the CSV output. Check 2 covers README documenting --tsv. The npm test and plain-CSV regression items appear only under \"Advisory (not PASS/FAIL conditions)\", so they are reporting notes, not a third graded check. Neither PASS/FAIL condition mentions npm test or the CSV tests. Check 1 passes when \"the --tsv command's output parses as a JSON array that is deep-equal\" to the CSV output. Check 2 passes when README \"mentions the --tsv flag and says what it does\". The builder brief tells the builder to run npm test, which neither must_not item forbids. Neither item is broken.",
+  "model": "claude-opus-5-5",
+  "ms": 5898,
+  "tokens": {
+    "input": 2,
+    "output": 525,
+    "cacheCreation": 2700,
+    "cacheRead": 783,
+    "fresh": 3227,
+    "total": 4010
+  },
+  "at": "2026-11-09T02:34:37.561Z"
+}

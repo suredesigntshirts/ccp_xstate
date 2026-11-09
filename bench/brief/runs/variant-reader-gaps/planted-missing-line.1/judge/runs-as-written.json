@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "64dd41b38582782c14bd1cb4ed5a12e665572662d43dd0c796457690d51c45e5",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked every command in both briefs against the six tracked files. The builder brief names `bin/csv2json.js`, `src/parse.js`, `test/csv.test.js` and `README.md`, and all of them exist. `npm test` maps to `node --test`, which picks up `csv.test.js` by its default `*.test.js` pattern. The test's `execFileSync('node', ['bin/csv2json.js','--tsv'])` call is valid JavaScript and runs from the repository root. The verifier's `node -e \"...\"` script is valid JavaScript inside double quotes: it has no `$` or backticks, and bash passes `\\n` and `\\t` through unchanged for JavaScript to read. The `!` characters in it only matter in an interactive shell with history expansion on, which an agent's non-interactive shell doesn't have. `grep -n -- '--tsv' README.md` is correct, since `--` stops grep reading the pattern as an option. The README line `node bin/csv2json.js --tsv < table.tsv` is example text for the docs, not a command the briefs ask anyone to run. Every command would run as written.",
+  "model": "claude-opus-5-5",
+  "ms": 14393,
+  "tokens": {
+    "input": 2,
+    "output": 992,
+    "cacheCreation": 2800,
+    "cacheRead": 783,
+    "fresh": 3794,
+    "total": 4577
+  },
+  "at": "2026-11-09T02:35:04.636Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "catches-traps",
+  "promptSha": "ab8903b4d349223c88a729443ca69c93cffe7979c60c6fa9cb067b8f7a35dfeb",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both must_catch items against the briefs, and both are covered. Item 1: the builder brief's Goal states the non-goal: \"`loadConfig` must keep throwing (do NOT catch the error and return `{}` or defaults)\". Item 2: under `test/config.test.js`, the builder brief says \"One existing test asserts `loadConfig` on `{port: 9000` throws a `SyntaxError`; keep it passing (or update it consistently) — throwing a SyntaxError still is the simplest option.\" Step 1 repeats \"a SyntaxError is fine\". It names the file and the SyntaxError assertion, and it tells the builder to keep that type when wrapping the error. That covers the risk that a wrapped error of another type would change the test's outcome, even though the brief never says so in those words. The verifier advisory also checks that the existing SyntaxError test still exists.",
+  "model": "claude-opus-5-5",
+  "ms": 6548,
+  "tokens": {
+    "input": 2,
+    "output": 589,
+    "cacheCreation": 5753,
+    "cacheRead": 783,
+    "fresh": 6344,
+    "total": 7127
+  },
+  "at": "2026-11-09T02:33:41.018Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "eb5d53d9ca83518f74409370b16ddbb99c7707d6f476b894f9622ebc91b64eef",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I compared the builder brief's steps with the verifier's checks. In step 3, the builder brief tells the builder to run `execFileSync('node', ['bin/csv2json.js', '--tsv'])` on the input 'a\\tb\\n1\\t2\\n' and expect '[{\"a\":\"1\",\"b\":\"2\"}]\\n'. That input is the first table in the verifier's Check 1 script, `[['a','b'],['1','2']]`, which joins with tabs to exactly 'a\\tb\\n1\\t2\\n'. Step 3 also tells the builder to test that \"the same table as CSV and as TSV gives identical output\", which is the verifier's own comparison and PASS condition. So the builder brief hands over a probe input, with its expected output, that the verifier also uses. The builder brief can tell the builder to write its own tests, but writing out the verifier's probe as a test gives away the checker's method. The README step is fine: it doesn't repeat the verifier's grep. The criterion fails because of step 3.",
+  "model": "claude-opus-5-5",
+  "ms": 11494,
+  "tokens": {
+    "input": 2,
+    "output": 812,
+    "cacheCreation": 2779,
+    "cacheRead": 783,
+    "fresh": 3593,
+    "total": 4376
+  },
+  "at": "2026-11-09T02:35:35.559Z"
+}

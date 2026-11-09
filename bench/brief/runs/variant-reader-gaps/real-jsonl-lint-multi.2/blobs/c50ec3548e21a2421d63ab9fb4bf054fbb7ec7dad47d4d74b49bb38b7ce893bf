@@ -1,0 +1,16 @@
+Goal: extend the jsonl-lint CLI to take several files (issue https://github.com/suredesigntshirts/ccp_machine_test/issues/104), in one pull request.
+
+Context: packages/jsonl-lint/bin/jsonl-lint.js currently reads one file (process.argv[2]), prints `<file>:<line>: <error>` per bad row (newlines in the error replaced by spaces), and exits 0/1/2. packages/jsonl-lint/src/index.js exports lint(text). Tests are in packages/jsonl-lint/test/cli.test.js (spawns the bin with spawnSync) and packages/jsonl-lint/test/lint.test.js. CI is .github/workflows/test.yml (npm ci, npm test).
+
+Steps:
+1. Do not touch packages/jsonl-lint/src/index.js at all; lint(text) must stay byte-for-byte unchanged.
+2. Rewrite packages/jsonl-lint/bin/jsonl-lint.js:
+   - Take all arguments process.argv.slice(2). If none: print a usage line to stderr (e.g. `usage: jsonl-lint <file> [<file> ...]`, mentioning `-` for stdin) and exit 2.
+   - If `-` appears more than once: usage error on stderr, exit 2 (check this up front, before reading anything).
+   - Check each file in the order given. For `-`, read stdin (readFileSync(0, 'utf8')) and report it with the name `-`, i.e. `-:<line>: <error>`. For other names read the file; print `<file>:<line>: <error>` per bad row exactly as the single-file case does today, using the argument exactly as given.
+   - If a file can't be read, write `jsonl-lint: cannot read <file>: <message>` to stderr, remember it, and continue with the remaining files (their bad rows are still printed).
+   - Exit 2 if any file could not be read; otherwise 1 if any row in any file was bad; otherwise 0. Keep the single-file behaviour identical to before.
+3. Extend packages/jsonl-lint/test/cli.test.js (node:test, keep existing tests passing) with tests for: two clean files (exit 0, no output); one bad file among several clean ones (exit 1, only the bad file's lines printed, in order); stdin via `-` clean (exit 0) and bad (exit 1, lines prefixed `-:`) using spawnSync's `input` option; a missing file among good ones (exit 2, error on stderr naming the missing file, and a bad row in another file still reported on stdout); two `-` arguments (exit 2, usage on stderr); no arguments (exit 2, usage on stderr). Also check order of output across multiple bad files.
+4. Update packages/jsonl-lint/README.md: usage `node packages/jsonl-lint/bin/jsonl-lint.js <file> [<file> ...]`, `-` reads stdin and is reported as `-`, only one `-` allowed, files checked in order, and the new exit-code rules (0 all clean, 1 any bad row in any file, 2 no file / two `-` / any unreadable file, with other files still checked and reported).
+5. Run `npm test` at the repo root and make sure it passes.
+6. Commit, push and open one PR on suredesigntshirts/ccp_machine_test whose body contains the line `Closes https://github.com/suredesigntshirts/ccp_machine_test/issues/104`.

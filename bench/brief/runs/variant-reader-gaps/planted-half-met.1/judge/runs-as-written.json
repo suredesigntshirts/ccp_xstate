@@ -1,0 +1,18 @@
+{
+  "criterion": "runs-as-written",
+  "promptSha": "592ef977d424615d818379fc10ee55b266aed902d8c524f84287130d4bf71eaa",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "I checked every command in both briefs. `npm test` matches the `node --test` script. The Check 1 and Check 2 one-liners are valid shell and JavaScript and would run as written. Check 3 is broken by its quoting. It is wrapped in shell double quotes, and inside double quotes bash turns `\\\\` into a single `\\`. So `new RegExp('\\\\b' + f + '\\\\b')` reaches JavaScript as `'\\b' + f + '\\b'`, and in a JS string `'\\b'` is a backspace character, not a word boundary. The pattern then looks for backspace characters, which no README heading contains. Every export is reported missing and the check exits 1 even when the README is correct. The syntax parses, but the command does not work as written because its shell escaping doesn't fit the argument it's meant to pass. So the criterion fails.",
+  "model": "claude-opus-5-5",
+  "ms": 12536,
+  "tokens": {
+    "input": 2,
+    "output": 840,
+    "cacheCreation": 3522,
+    "cacheRead": 783,
+    "fresh": 4364,
+    "total": 5147
+  },
+  "at": "2026-11-09T02:34:16.201Z"
+}

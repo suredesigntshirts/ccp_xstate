@@ -1,0 +1,26 @@
+Check the pull request's head checkout for issue https://github.com/o/strutil/issues/7. There is one check per acceptance line, in order. Run each command from the repository root. Report PASS or FAIL for each check and include the output you saw.
+
+Check 1. Expect line: "index.js exports padLeft(s, width, fill), which pads s on the left with fill (a space when fill is not given) to width characters"
+Run: `node --input-type=module -e "import * as m from './index.js'; console.log(typeof m.padLeft, JSON.stringify(m.padLeft('42',5,'0')), JSON.stringify(m.padLeft('ab',4)), JSON.stringify(m.padLeft('7',3,'x')))"`
+PASS: the output is `function "00042" "  ab" "xx7"`. That means padLeft is exported, pads on the left with the given fill, uses a space when no fill is given, and the result is width characters long.
+FAIL: padLeft is not exported or is not a function, the import throws, or any of the three results is different.
+
+Check 2. Expect line: "padLeft returns s unchanged when s is already width characters or longer"
+Run: `node --input-type=module -e "import {padLeft} from './index.js'; console.log(JSON.stringify(padLeft('abcde',5,'0')), JSON.stringify(padLeft('abcdef',3)), JSON.stringify(padLeft('abcdef',3,'0')))"`
+PASS: the output is `"abcde" "abcdef" "abcdef"`. Both the equal-length input and the longer input come back unchanged.
+FAIL: any result differs from its input (padded, cut or otherwise changed), or the call throws.
+
+Check 3. Expect line: "README.md has a section for every function index.js exports"
+Run: `node --input-type=module -e "import * as m from './index.js'; console.log(Object.keys(m).filter(k=>typeof m[k]==='function').join(' '))"` to list the exported functions at the head. Then read README.md at the head, or run `grep -n '^#' README.md`.
+PASS: every function in the list (at least capitalize, slugify, truncate and padLeft) has its own section in README.md, meaning a heading that names the function, with text under it describing it.
+FAIL: any exported function has no README.md section. Note that the base README has no slugify section, so a PR that adds only padLeft fails this check.
+
+Check 4. Expect line: "npm test passes"
+Run: `npm test`.
+PASS: the run finishes with no failing tests and npm reports success.
+FAIL: any test fails, or the command errors.
+
+Advisory (not part of PASS or FAIL):
+- Check whether the PR adds padLeft tests to test/strutil.test.js.
+- See how padLeft handles a multi-character fill, for example padLeft('1', 4, 'ab'). padStart returns 'aba1'.
+- Check whether the README headings follow the existing `## name(args)` style and whether the padLeft section mentions the default space fill.

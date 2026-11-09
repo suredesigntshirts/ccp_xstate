@@ -1,0 +1,18 @@
+{
+  "criterion": "methods-private",
+  "promptSha": "590898330b58d9ac325f09e549ba5b444db65ff94506f5ad4cd790fd33e98edd",
+  "asked": "claude-opus-5-5",
+  "met": false,
+  "why": "The builder brief carries the verifier's own probes, which the criterion forbids. Step 8 gives an inline script with an expected result: `printf '{\"a\":1}\\n\\nnope\\n{\"b\":2}\\n{\"c\":' > /tmp/x.jsonl; node .../jsonl-lint.js /tmp/x.jsonl` \"should print lines for 3 and 5 and exit 1\". That is nearly the same as the verifier's Check 1 probe (`printf '{\"a\":1}\\n\\nnope\\n  \\n{\"b\":2}\\n{\"c\":'`, expects lines 3 and 6, exit 1). It uses the same fixture pattern, the same torn row and the same kind of expected output. Step 8 also repeats Check 2 word for word in effect: run with no argument and with a missing path, and expect exit 2 with output on stderr. Step 4 adds \"2 on a missing file (with stderr not empty)\", which is Check 2's PASS condition. Neither the expect lines nor the issue name these commands, so they are not allowed exceptions. The builder is getting the checker's methods, not just the bar.",
+  "model": "claude-opus-5-5",
+  "ms": 14005,
+  "tokens": {
+    "input": 2,
+    "output": 995,
+    "cacheCreation": 5453,
+    "cacheRead": 783,
+    "fresh": 6450,
+    "total": 7233
+  },
+  "at": "2026-11-09T02:38:04.010Z"
+}

@@ -1,0 +1,18 @@
+{
+  "criterion": "avoids-must-not",
+  "promptSha": "4bb6a19e3aeeb5234abe0e53a62d0b70d4cc3dc4ded57b9bfe52b1f425139d64",
+  "asked": "claude-opus-5-5",
+  "met": true,
+  "why": "I checked both briefs against the two must_not items and neither is violated.\n\n1. The verifier's Check 1 PASS asks only that loadConfig catches the JSON.parse error in src/config.js and that the command prints \"RESULT {}\" with no uncaught error. FAIL covers a throw, any other output or loadConfig being moved out of src/config.js. Neither condition asks for a file name, a line number or a logged warning. The extra checks (valid JSON, missing file, tests, README) are marked \"Advisory (not pass/fail conditions)\".\n\n2. The builder brief says \"on a parse error (SyntaxError), return {}\" and tells the builder to replace the test expecting a throw with one that expects {}. Keeping readFileSync outside the catch only affects read errors such as a missing file. It doesn't change what happens on a parse error, and nothing tells the builder to throw a clearer error.",
+  "model": "claude-opus-5-5",
+  "ms": 5557,
+  "tokens": {
+    "input": 2,
+    "output": 475,
+    "cacheCreation": 2744,
+    "cacheRead": 783,
+    "fresh": 3221,
+    "total": 4004
+  },
+  "at": "2026-11-09T02:36:10.679Z"
+}
