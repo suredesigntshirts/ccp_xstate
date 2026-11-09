@@ -1,0 +1,72 @@
+{
+  "item": "own-traps-in-code",
+  "verified_sha": "46eecfd8b1f053497bc379469f36567409915412",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5GnbqoPkWY5EPvBtkH",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "no-install",
+      "status": "MET",
+      "command": "node --test verify/own-traps-in-code/no-install.test.mjs; and npm test in a fresh clone of the head, clean HOME, before and after npm ci (evidence/no-install.txt)",
+      "excerpt": "Fresh clone, no node_modules: npm test ran only '> node scripts/ci/installed.mjs', printed the one line 'npm test: node_modules is not installed here; run npm ci first, then npm test again', exit 1, wall 216 ms, no test file reported. After npm ci the pretest passed and the test script ran: 1984 tests, 1983 pass in 196 s (the one failure is the clean-room green test, which fails the same way at main in this container). The proof copies the tracked tree without node_modules (stops in under 10 s with that one line and no TAP), then links node_modules in and sees test files report. Bites: dropping the exit, dropping the pretest script, or a check that always fails each turn one test red.",
+      "test": "verify/own-traps-in-code/no-install.test.mjs"
+    },
+    {
+      "id": "one-nested-helper",
+      "status": "MET",
+      "command": "node --test verify/own-traps-in-code/one-nested-helper.test.mjs",
+      "excerpt": "Inside node --test, a child node --test on a two-test file reports 'ok 1 - toy one' and '# pass 2' with childEnv() and neither with the parent's environment. On a copy of the head, test/regression-rules.test.mjs passes, then goes red naming test/regression/plan/layout-map.test.mjs for each of three inline shapes (delete process.env.X; {...process.env, X: undefined}; delete e['X']), and names scripts/gates/test/new-verdict.test.mjs and packages/engine/test/explain.test.js when the drop is added there. grep: outside test/regression/lib.mjs and the rules guard, only tools (pr-gate.mjs, inspector build, bench lib, tournament measure, fresh-reader.mjs) name the variable. Bites: childEnv keeping the variable fails 2/2; deleting the rule's assertion fails the guard test.",
+      "test": "verify/own-traps-in-code/one-nested-helper.test.mjs"
+    },
+    {
+      "id": "fresh-reader-env",
+      "status": "MET",
+      "command": "node --test verify/own-traps-in-code/fresh-reader-env.test.mjs (stub claude first on PATH records argv, stdin, env, cwd)",
+      "excerpt": "Caller sets HOME (with a CLAUDE.md), CCP_HARNESS_DIR, CLAUDE_CODE_DISABLE_AUTO_MEMORY=0 and all five thread keys. The stub sees argv ['-p'] (extra args after -- follow it), the prompt with backticks and $HOME literal on stdin, cwd the --cwd folder, none of CLAUDE_CODE_REMOTE_SESSION_ID, CLAUDE_MEMORY_STORES, CLAUDE_COWORK_MEMORY_PATH_OVERRIDE, CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD, CLAUDE_ADDITIONAL_DIRECTORIES, NODE_TEST_CONTEXT, CLAUDE_CODE_DISABLE_AUTO_MEMORY=1, and HOME and CCP_HARNESS_DIR new empty folders, different per run; the caller's harness folder is untouched. Bites: keeping the session key, keeping CLAUDE_ADDITIONAL_DIRECTORIES, memory not off, keeping the caller's CCP_HARNESS_DIR, prompt as an argument: each fails.",
+      "test": "verify/own-traps-in-code/fresh-reader-env.test.mjs"
+    },
+    {
+      "id": "fresh-reader-real",
+      "status": "MET",
+      "command": "codeword planted in /root/.claude/CLAUDE.md (absent before, removed after); node scripts/fresh-reader.mjs --cwd <clean clone of the head> \"What is the deployment codeword? ...\" -- --max-turns 3 with CCP_HARNESS_DIR=<empty caller folder>; control env -u CLAUDE_CODE_REMOTE_SESSION_ID claude -p ... < /dev/null in the same clone (evidence/fresh-reader-real.txt)",
+      "excerpt": "fresh reader answered 'NONE'; plain claude -p answered 'PELICAN-4417'. The caller harness folder held no file before, after the reader and after the control. A second reader run with CCP_HARNESS_DIR unset changed no file under /mnt/project-files/harness/. /root/.claude/CLAUDE.md is gone again."
+    },
+    {
+      "id": "verdict-skeleton",
+      "status": "MET",
+      "command": "node --test verify/own-traps-in-code/verdict-skeleton.test.mjs; and this verdict itself was started with node scripts/gates/new-verdict.mjs own-traps-in-code --model claude-opus-5-5",
+      "excerpt": "In a temp repo with a ready item then a build commit: verified_sha equals git rev-parse HEAD (40 hex), session https://claude.ai/code/session_01Verifier from cse_01Verifier, results seen/tested/mutated with empty status, command and excerpt, no test slot on the world line, test on the verifier line, test, mutation and red_test on the builder line; stdout prints 'Claude-Session: ...'. It exits 1 naming CLAUDE_CODE_REMOTE_SESSION_ID when unset or empty and writes nothing, and exits 1 with 'exists' leaving a present verdict's bytes alone. Committed with the printed trailer, pr-gate.mjs verdict exits 1 naming all three ids, not for session or sha. Bites: --short sha, no session check, no overwrite check, status prefilled MET: each fails.",
+      "test": "verify/own-traps-in-code/verdict-skeleton.test.mjs"
+    },
+    {
+      "id": "already-released",
+      "status": "MET",
+      "command": "node --test verify/own-traps-in-code/already-released.test.mjs (temp origin + thread clone; release.mjs branch run as a CLI with RELEASE_SHA)",
+      "excerpt": "A tag harness-v0.1.0 pushed to origin by another clone (as release.yml would), unseen by the thread clone: release.mjs branch exits 0, last line 'already released: <sha> is harness-v0.1.0, so nothing is left to do', no 'no release', journal row result skipped, no release/ branch made. Same for a release branch on origin with --push. An untagged plugin merge is released; a docs-only merge then says 'no release: nothing under ...' and not 'already released'. Bites: the old message, or 'already released' for every skip, each fail.",
+      "test": "verify/own-traps-in-code/already-released.test.mjs"
+    },
+    {
+      "id": "docs-point",
+      "status": "MET",
+      "command": "node --test verify/own-traps-in-code/docs-point.test.mjs",
+      "excerpt": "docs/verifying.md has exactly one line naming scripts/fresh-reader.mjs and one naming scripts/gates/new-verdict.mjs. Neither docs/verifying.md nor docs/traps.md contains 'env -u' or CLAUDE_MEMORY_STORES, CLAUDE_COWORK_MEMORY_PATH_OVERRIDE, CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD, CLAUDE_ADDITIONAL_DIRECTORIES or CLAUDE_CODE_DISABLE_AUTO_MEMORY (traps.md keeps the heading's CLAUDE_CODE_REMOTE_SESSION_ID, which names the trap, not the recipe).",
+      "test": "verify/own-traps-in-code/docs-point.test.mjs"
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub check runs for PR #295 at 46eecfd8b1f053497bc379469f36567409915412",
+      "excerpt": "at 46eecfd8b1f053497bc379469f36567409915412: test (job 129320017753) success in 3 m 40 s; gates (job 129320017400) failed only with 'no verify/own-traps-in-code/verdict.json at the head sha', which this verdict answers. Both run again on the verdict commit."
+    }
+  ],
+  "observations": [
+    "Quality: each trap is removed where it starts. The install check costs one node start (216 ms) and ci already installs first; the 22 moved guards now share childEnv, and the tools that cannot import from test/ keep their own drop, as the item says.",
+    "The rules guard covers test files only, by design: a non-test helper such as plugins/harness/test/helpers.mjs may still drop the variable inline without the guard noticing; none does today. A drop spelt by building the name at run time (as this folder does) also passes the guard.",
+    "The skeleton's test slot is the folder verify/<item>/, a placeholder: left as is the gate would try to run a folder, so the verifier must name a file. The gate refuses an unfilled skeleton either way.",
+    "The fresh reader prints a '[mcp-sdk] SEP-2352 stored OAuth credential' notice on stderr even with an empty HOME, so some credential or MCP config reaches it from outside HOME; it did not let the reader see the planted CLAUDE.md. That line is dropped from evidence/fresh-reader-real.txt.",
+    "Full npm test at the head in a fresh clone, clean HOME: 1984 tests, 1983 pass, 196 s. The failure is scripts/clean-room/test/run.test.mjs's green test (the self-check sees 0.1.40 out against a 0.1.0 build); it fails the same way at main 8a1e04b0 in this container and passed in ci.",
+    "This verdict was started with the new script; its sha and Claude-Session line came from it."
+  ]
+}

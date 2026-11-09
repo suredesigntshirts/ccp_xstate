@@ -1,0 +1,17 @@
+## before: caller harness
+/tmp/caller-harness-1D4W
+## fresh reader
+NONE
+exit 0
+## after fresh: caller harness
+/tmp/caller-harness-1D4W
+## plain claude -p control
+PELICAN-4417
+exit 0
+## after control: caller harness
+/tmp/caller-harness-1D4W
+## caller CCP_HARNESS_DIR unset (default /mnt/project-files/harness/)
+ok
+exit 0
+## files under /mnt/project-files/harness/ changed during the run:
+(end)
