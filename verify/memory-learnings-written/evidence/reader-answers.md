@@ -1,32 +1,22 @@
 # reader-answers
 
-Clean clone of b467da6d5b029de53461e9d8ce479a0ad03fae71, `npm ci`, then per question, one run each, four at a time:
-`node scripts/fresh-reader.mjs --cwd <clone> "Answer this question from the files of this repository alone. Name the file that answers it, and quote the lines you rely on.\n\nQuestion: <q>" -- --max-turns 25`. The prompt names no file and no term. Match: the answer text holds the question's home path and each carrying term, case and whitespace ignored.
+Clean clone of da330bfce4997fd002b80a44f8a74e142fc12acb, `npm ci`, then per question:
+`node scripts/fresh-reader.mjs --cwd <clone> "Answer this question from the files of this repository alone. Name the file that answers it, and quote the lines you rely on.\n\nQuestion: <q>" -- --max-turns 25`.
+The prompt names no file and no term. A run is complete when its answer holds the question's home path and every carrying term, case and whitespace ignored. Each question ran once, four at a time; a question whose run was not complete ran three more times, and counts as answered when most of its runs are complete.
 
-| # | home | home named | terms missing | first file the answer names |
+| # | home | runs | complete | what the incomplete runs lacked |
 |---|---|---|---|---|
-| 1 | docs/traps.md | yes | none | docs/traps.md |
-| 2 | docs/traps.md | yes | none | docs/traps.md |
-| 3 | docs/traps.md | yes | none | docs/traps.md |
-| 4 | docs/traps.md | yes | none | docs/traps.md |
-| 5 | docs/traps.md | yes | none | docs/traps.md |
-| 6 | docs/verifying.md | yes | none | docs/verifying.md |
-| 7 | docs/verifying.md | yes | none | docs/verifying.md |
-| 8 | docs/verifying.md | yes | none | docs/verifying.md |
-| 9 | plan/ledger/platform.md | yes | none | plan/ledger/platform.md |
-| 10 | plan/ledger/platform.md | yes | none | plan/ledger/platform.md |
-| 11 | plan/ledger/platform.md | **no** | none | plan/research/probe-plugin-agents.md |
-| 12 | plan/ledger/platform.md | yes | none | plan/ledger/platform.md |
+| 1 | docs/traps.md | 1 | 1 | - |
+| 2 | docs/traps.md | 1 | 1 | - |
+| 3 | docs/traps.md | 1 | 1 | - |
+| 4 | docs/traps.md | 1 | 1 | - |
+| 5 | docs/traps.md | 1 | 1 | - |
+| 6 | docs/verifying.md | 1 | 1 | - |
+| 7 | docs/verifying.md | 1 | 1 | - |
+| 8 | docs/verifying.md | 4 | 3 | copying |
+| 9 | plan/ledger/platform.md | 1 | 1 | - |
+| 10 | plan/ledger/platform.md | 1 | 1 | - |
+| 11 | plan/ledger/platform.md | 1 | 1 | - |
+| 12 | plan/ledger/platform.md | 4 | 2 | its home, --bare, API key; its home, --bare, API key |
 
-Question 11 was asked twice more: both answers again named only `plan/research/probe-plugin-agents.md`, never `plan/ledger/platform.md`. The first answer, cut:
-
-```
-**File:** `plan/research/probe-plugin-agents.md`
-
-**Why a named stage agent can't load the return tool.** The file says:
-
-> "**Its `tools` must name the return tool,** `mcp__plugin_ccp-harness_harness__return`, and every tool its stage uses (Bash for build and verify). A named agent with a `tools` list gets no ToolSearch, so a deferred tool it doesn't list is out of reach. `SubagentHandback` is always there."
-
-So the agent has no ToolSearch to load the deferred return tool. The only way it can reach the tool is if the agent file's `tools` line lists it. The probe showed this failing:
-
-```
+At b467da6d (round 1) question 11 named only `plan/research/probe-plugin-agents.md` in three of three runs; at da330bf its one run names `plan/ledger/platform.md` and every term. The incomplete run of question 12 read `scripts/fresh-reader.mjs` and said the repo does not describe the sign-in; the incomplete run of question 8 left out the temp-repo sentence.
