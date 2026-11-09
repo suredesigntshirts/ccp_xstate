@@ -4,7 +4,7 @@
   "title": "The PR gates read files at a revision in one git call, not one per file",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "scripts/gates/pr-gate.mjs reads the files a gate needs at the base and head with one git cat-file --batch call per gate instead of one git show per file, so the freeze gate on this repo's plan (117 items) runs in well under half a second where it took about 2.6 s, and the stubs gate likewise; every gate gives the same exit code and the same reasons as before for the same PR.",
   "why": "The final speed review after pr-test-selection (9 Nov) profiled npm test: the gate guards spend most of their time in the freeze gate, which spawned git show about six times per plan item. Each gate guard test builds a temp repo with the real plan and runs the gate, so about 25 s of the 56 s of CPU in scripts/gates/test and test/regression/gates was git process starts. Batching the reads keeps every check and only removes the process starts.",
   "serves": [

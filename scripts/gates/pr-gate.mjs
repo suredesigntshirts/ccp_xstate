@@ -8,7 +8,34 @@ import { EVIDENCE_LIMIT, checkCutoff, checkDoneOn, checkEvidence, checkFreeze, c
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'pipe'] })
   .trimEnd();
-const show = (rev, path) => { try { return git('show', `${rev}:${path}`); } catch { return null; } };
+const blobs = new Map();
+/**
+ * Reads every `rev:path` in `specs` with one git cat-file --batch: a file's text, null when the rev has no such path,
+ * undefined for anything but a file, which show() hands to git show.
+ */
+function readAll(specs) {
+  const want = [...new Set(specs)].filter((s) => !blobs.has(s));
+  if (!want.length) return;
+  const out = execFileSync('git', ['cat-file', '--batch'], { input: `${want.join('\n')}\n`, maxBuffer: 1 << 30, stdio: ['pipe', 'pipe', 'pipe'] });
+  let at = 0;
+  for (const spec of want) {
+    const end = out.indexOf(10, at);
+    const header = out.toString('utf8', at, end);
+    at = end + 1;
+    if (header === `${spec} missing` || header === `${spec} ambiguous`) { blobs.set(spec, null); continue; }
+    const [, type, size] = header.split(' ');
+    if (type !== 'blob') { blobs.set(spec, undefined); at += Number(size) + 1; continue; }
+    blobs.set(spec, out.toString('utf8', at, at + Number(size)).trimEnd());
+    at += Number(size) + 1;
+  }
+}
+/** A file's text at rev, or null when the rev has no such file. */
+const show = (rev, path) => {
+  const spec = `${rev}:${path}`;
+  readAll([spec]);
+  if (blobs.get(spec) !== undefined) return blobs.get(spec);
+  try { return git('show', spec); } catch { return null; }
+};
 const lines = (s) => s.split('\n').filter(Boolean);
 
 const env = process.env;
@@ -44,13 +71,15 @@ function runTests(runs) {
 
 const gates = {
   stubs() {
-    const files = lines(git('ls-tree', '-r', '--name-only', head, 'packages/', 'plugins/', 'scripts/'))
-      .map((path) => ({ path, text: show(head, path) ?? '' }));
+    const paths = lines(git('ls-tree', '-r', '--name-only', head, 'packages/', 'plugins/', 'scripts/'));
+    readAll(paths.map((path) => `${head}:${path}`));
+    const files = paths.map((path) => ({ path, text: show(head, path) ?? '' }));
     return findStubs(files);
   },
 
   freeze() {
     const verdictFile = (id) => `verify/${id}/verdict.json`;
+    readAll([...itemIds(base)].flatMap((id) => [base, head].flatMap((rev) => [`${rev}:plan/items/${id}.md`, `${rev}:${verdictFile(id)}`])));
     const verified = (id) => show(base, verdictFile(id)) !== null || show(head, verdictFile(id)) !== null;
     const frozenIds = new Set([...itemIds(base)].filter((id) => id === named.item || verified(id) ||
       itemHead(show(base, `plan/items/${id}.md`))?.status === 'done'));
