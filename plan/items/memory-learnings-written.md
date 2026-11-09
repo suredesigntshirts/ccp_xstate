@@ -45,7 +45,7 @@
   "expect": [
     {
       "id": "traps-entries",
-      "check": "docs/traps.md has an entry for each of: what auto mode and the git proxy refuse from a thread (force push, a rewrite of a pushed branch, branch delete, tag push) and what works instead; that the plugin tests install the working tree without its untracked files, so a new file is added to the index first; no stash, checkout or branch switch in a checkout a background run is using, and a worktree instead; /mnt/project-files refusing hard links and git worktrees; and the PR events that start no run or wake no thread, the replan label added after opening, and a stale BASE_SHA",
+      "check": "docs/traps.md has an entry for each of: what auto mode and the git proxy refuse from a thread (force push, a rewrite of a pushed branch, branch delete, tag push) and what works instead; that the plugin tests install the working tree without its untracked files, so a new file is added to the index first; no stash, checkout or branch switch in a checkout a background run is using, and a worktree instead; /mnt/project-files refusing hard links and git worktrees; and the PR events that start no run or wake no thread, and a stale BASE_SHA",
       "how": "The verifier reads docs/traps.md for each entry's carrying terms",
       "proof": "verifier"
     },
