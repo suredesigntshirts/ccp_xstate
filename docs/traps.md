@@ -42,3 +42,7 @@ The full suite takes minutes; a builder runs the tests near its change locally a
 
 A `ci` test outside the PR's change can go red for timing or a race in the container that runs it. Re-run the check
 once, saying so on the PR; red again, it is a real failure, fixed in that PR or named as a new item.
+
+## Throwaway
+
+A test note from the memory-boundary verifier; this PR closes unmerged.
