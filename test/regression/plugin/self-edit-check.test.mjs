@@ -31,10 +31,14 @@ function git(cwd, ...args) {
     { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null' } }).trim();
 }
 
-/** A clone of the checkout's HEAD at <dir>/repo. */
+/** A clone of the checkout's HEAD at <dir>/repo, with the checkout's node_modules linked in (and left out of git). */
 function cloneHead(dir) {
   const c = join(dir, 'repo');
   leanClone(REPO, c, { env: { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null' } });
+  if (existsSync(join(REPO, 'node_modules'))) {
+    symlinkSync(join(REPO, 'node_modules'), join(c, 'node_modules'));
+    writeFileSync(join(c, '.git', 'info', 'exclude'), 'node_modules\n', { flag: 'a' });
+  }
   return c;
 }
 
