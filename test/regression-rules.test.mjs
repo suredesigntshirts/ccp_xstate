@@ -1,6 +1,7 @@
 // The regression folder's rules and two test-speed rules, read from source text only: every regression test file names
 // the Expect lines it holds; none reads under verify/; lib.mjs is its one helper; guards clone the repo only through
-// leanClone; and a guard that runs setup.sh skips the docs skill's npm ci unless it tests that install.
+// leanClone; a guard that runs setup.sh skips the docs skill's npm ci unless it tests that install; and a test file
+// gets a child's environment from childEnv, never dropping NODE_TEST_CONTEXT itself.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -87,4 +88,11 @@ test('a guard that runs setup.sh sets CCP_SETUP_SKILLS, unless it tests the docs
   const runners = GUARDS.filter((f) => { const c = code(read(f)); return RUNS.test(c) && /setup\.sh/.test(c); });
   assert.ok(runners.length >= 5, `files that run setup.sh: ${runners.join(', ')}`);
   assert.deepEqual(runners.filter((f) => !/\bCCP_SETUP_SKILLS\b/.test(read(f))), []);
+});
+
+const STRIP = new RegExp(`\\b${'NODE_TEST'}_CONTEXT\\b`);
+test('a test file starts a child with the runner environment only through childEnv: none drops the test context variable itself', () => {
+  assert.match(code(read('test/regression/lib.mjs')), STRIP, 'childEnv drops the variable');
+  const tests = GUARDS.filter((f) => /\.test\.m?js$/.test(f));
+  assert.deepEqual(tests.filter((f) => STRIP.test(code(read(f)))), []);
 });
