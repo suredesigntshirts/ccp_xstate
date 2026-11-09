@@ -124,3 +124,15 @@ an item id") in project memory. The contract-freeze rule was written out in full
 `docs/gates.md`, and the session-identity caveat twice; the steps from ready to done lived nowhere in the repo.
 **Fate:** design. Each process rule has one home and the others point at it; the gate is changed where a rule needed
 memory to follow (item rules-said-once).
+
+### L-cheap-home-wins
+**Lesson:** A learning goes where writing it costs least. If the repo's home for it costs an item and a verifier, it
+goes to project memory, where it has no single home, no check and no expiry.
+**Evidence:** On 9 Nov project memory held 147 files (271 KB). About 98 were one builder or verifier log per item;
+their few dozen traps and techniques had been rewritten up to 14 times (the `npm ci` step, `NODE_TEST_CONTEXT` in
+nested runs, the fresh-reader environment), and about 10 were stale but still read as current. Nothing in the repo
+asks for memory; the platform's thread prompt does ("save it in the turn where you learn it"), and the verdict gate
+asked an item and a verdict of any one-line note in `docs/traps.md` (`/mnt/project-files/memory-audit/report.md`).
+**Fate:** design. Traps the harness owns are removed in code; the rest go to `docs/traps.md` or `docs/verifying.md`,
+which any PR may change with no item; `CLAUDE.md` says what memory is for (items memory-boundary,
+own-traps-in-code, memory-learnings-written, memory-boundary-check).
