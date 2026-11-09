@@ -76,12 +76,20 @@ const onPath = (cmd, p) => spawnSync('bash', ['-c', `command -v ${cmd}`], { env:
 const ALLOWED = /^(CCP_SETUP_LOG|CCP_SETUP_SKILLS|CLAUDE_PID|CCP_HARNESS_\w+|CLAUDE_PLUGIN_ROOT|CCP_REPO)$/;
 const PROXY_MARK = 'http://secs-proxy.invalid:9';
 const BASH = '/bin/bash';
+const TOOL = 'str' + 'ace';
 
-test('env-inherited: setup.sh, the hook and release.mjs get the test environment, HOME the temp home, no foreign CLAUDE*/CCP*', (t) => {
-  const d = temp(t, 'env');
-  const bin = join(d, 'bin'), seen = join(d, 'seen');
-  mkdirSync(bin);
-  mkdirSync(seen);
+let shared;
+/**
+ * One passing run of no-self-edit.test.mjs that three checks read: a stub bash first on PATH and a node preload record
+ * the environment of every setup.sh, hook and release.mjs run; the rest of PATH holds every command but strace; TMPDIR
+ * is a fresh folder. Each condition is one the others leave alone, so one run answers all three.
+ */
+function sharedRun() {
+  if (shared) return shared;
+  const d = realpathSync(mkdtempSync(join(tmpdir(), 'secs-shared-')));
+  process.on('exit', () => rmSync(d, { recursive: true, force: true }));
+  const bin = join(d, 'bin'), seen = join(d, 'seen'), rest = join(d, 'rest'), tmp = join(d, 'tmp');
+  for (const x of [bin, seen, rest, join(tmp, 'node-compile-cache')]) mkdirSync(x, { recursive: true });
   // Where no real proxy is set (CI), a marker is recorded, then dropped before the real bash runs, so npm ci is not
   // sent to a host that does not exist.
   const proxy = process.env.HTTPS_PROXY || PROXY_MARK;
@@ -98,23 +106,32 @@ if (/notice-behind\\.mjs$|release\\.mjs$/.test(s)) {
     Object.entries(process.env).map(([k, v]) => k + '=' + v).join('\\0') + '\\0ARGV1=' + s);
 }
 `);
+  pathWithout(rest, [TOOL]);
+  const path = `${bin}:${rest}`;
   const env = {
     ...process.env,
-    PATH: `${bin}:${process.env.PATH}`,
+    PATH: path,
+    TMPDIR: tmp,
     NODE_EXTRA_CA_CERTS: ca,
     HTTPS_PROXY: proxy,
     CLAUDE_SECS_X: 'from-the-thread',
     CCP_SECS_Y: 'from-the-thread',
     NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --require ${join(d, 'preload.cjs')}`.trim(),
   };
+  const before = readdirSync(tmp);
   const r = nodeTest(REPO, NO_SELF_EDIT, { env });
-  assert.equal(r.fail, 0, r.out.slice(-3000));
-  assert.equal(r.pass, 6);
-
+  const left = readdirSync(tmp).filter((n) => !before.includes(n));
   const runs = readdirSync(seen).map((f) => ({
     f,
     vars: Object.fromEntries(readFileSync(join(seen, f), 'utf8').split('\0').filter(Boolean).map((l) => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1)])),
   }));
+  return (shared = { r, left, runs, bin, path, proxy, ca });
+}
+
+test('env-inherited: setup.sh, the hook and release.mjs get the test environment, HOME the temp home, no foreign CLAUDE*/CCP*', (t) => {
+  const { r, runs, bin, proxy, ca } = sharedRun();
+  assert.equal(r.fail, 0, r.out.slice(-3000));
+  assert.equal(r.pass, 6);
   const setups = runs.filter((x) => x.f.startsWith('bash-'));
   const hooks = runs.filter((x) => /notice-behind\.mjs$/.test(x.vars.ARGV1 ?? ''));
   const releases = runs.filter((x) => /release\.mjs$/.test(x.vars.ARGV1 ?? ''));
@@ -131,29 +148,20 @@ if (/notice-behind\\.mjs$|release\\.mjs$/.test(s)) {
     assert.equal(vars.PATH?.split(':')[0], bin, `${f}: PATH inherited`);
   }
 });
-}
-
-{
-const TOOL = 'str' + 'ace';
-
-function testFiles(dir) {
-  const out = [];
-  for (const e of readdirSync(dir, { withFileTypes: true })) {
-    if (e.name === 'node_modules' || e.name === '.git') continue;
-    const p = join(dir, e.name);
-    if (e.isDirectory()) out.push(...testFiles(p));
-    else if (/\.(m|c)?js$/.test(e.name)) out.push(p);
-  }
-  return out;
-}
 
 test('runs-without-strace: with no strace on PATH all six no-self-edit tests run and pass', (t) => {
-  const bin = pathWithout(temp(t, 'bin'), [TOOL]);
-  assert.equal(onPath(TOOL, bin), false, 'the tool is not on the PATH the run gets');
-  assert.equal(onPath('node', bin) && onPath('git', bin) && onPath('bash', bin), true);
-  const r = nodeTest(REPO, NO_SELF_EDIT, { env: { ...process.env, PATH: bin } });
+  const { r, path } = sharedRun();
+  assert.equal(onPath(TOOL, path), false, 'the tool is not on the PATH the run gets');
+  assert.equal(onPath('node', path) && onPath('git', path) && onPath('bash', path), true);
   t.diagnostic(`tests ${r.tests} pass ${r.pass} fail ${r.fail} skipped ${r.skipped}`);
   assert.deepEqual({ tests: r.tests, pass: r.pass, fail: r.fail, skipped: r.skipped }, { tests: 6, pass: 6, fail: 0, skipped: 0 }, r.out.slice(-3000));
+});
+
+test('temp-removed: no-self-edit.test.mjs, passing, leaves nothing in the temp folder', (t) => {
+  const { r, left } = sharedRun();
+  t.diagnostic(`left in TMPDIR: ${JSON.stringify(left)}`);
+  assert.deepEqual({ pass: r.pass, fail: r.fail }, { pass: 6, fail: 0 }, r.out.slice(-2000));
+  assert.deepEqual(left, []);
 });
 }
 
@@ -377,12 +385,6 @@ function broken(t, file, from, to) {
   commitAll(c, 'make one assertion fail');
   return c;
 }
-
-test('temp-removed: no-self-edit.test.mjs, passing, leaves nothing in the temp folder', (t) => {
-  const { r, left } = run(t, REPO, NO_SELF_EDIT);
-  assert.deepEqual({ pass: r.pass, fail: r.fail }, { pass: 6, fail: 0 }, r.out.slice(-2000));
-  assert.deepEqual(left, []);
-});
 
 test('temp-removed: no-self-edit.test.mjs, with a test made to fail midway, leaves nothing in the temp folder', (t) => {
   const c = broken(t, NO_SELF_EDIT, "assert.equal(manifestVersion(w.dest), '1.2.3');", "assert.equal(manifestVersion(w.dest), '1.2.4');");
