@@ -4,7 +4,7 @@
   "title": "Make test clones of the repo leave out the bench runs, and let tests skip the docs skill's npm ci",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "Every working clone of the repo that a test under test/, scripts/, packages/ or plugins/ makes comes from one helper that checks out the tree without bench/ and tournaments/; setup.sh skips only the docs skill's npm ci when CCP_SETUP_SKILLS=0 (still copying the skill) and is otherwise unchanged; every test that runs setup.sh sets it, except the tests of the skill install itself; docs/layout.md's Tests section names both, so new tests reuse them; and the same tests run and pass as before.",
   "why": "On 9 Nov a profile of the tests that run on every PR (test/, scripts/, packages/, plugins/ at #267's head 50295a0c, three files at a time on a four-core container) took 9m12s wall for 1,024 s of test time, with 7m28s of system time. A working clone of the repo checks out 9,793 files, 8,575 of them recorded bench runs under bench/*/runs (80 MB): 4.6 s per clone, against 0.76 s for a sparse checkout without bench/ and tournaments/. Each setup.sh run spends about 2 of its 2.5 s in the docs skill's npm ci; CCP_SETUP_FETCH=0 brings a run to 0.25 s but also skips the git fetches the setup tests need. The no-self-edit, setup and self-edit-check files make these clones and runs dozens of times, and self-edit-check (351 s) is the run's straggler (thread 'Find why npm test is slow in CI').",
   "serves": [
