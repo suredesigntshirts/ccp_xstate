@@ -198,7 +198,7 @@ unchanged. No other line moves.
 
 ## Regression table
 
-One row per test file the 37 done folders held at the base, then one row per folder for its other files. `moved` and
+One row per test file the 38 done folders held at the base, then one row per folder for its other files. `moved` and
 `split` name the file under `test/regression/` that holds the moved tests.
 
 | Test file | Verdict | Moved to | Reason |
@@ -301,6 +301,10 @@ One row per test file the 37 done folders held at the base, then one row per fol
 | `verify/self-edit-check-snapshot/temp-removed.test.mjs` | moved | `test/regression/plugin/self-edit-check.test.mjs` | runs the no-self-edit suite and test/setup.test.mjs, passing and made to fail, in a fresh TMPDIR and asserts nothing is left |
 | `verify/self-edit-check-snapshot/tests-bite.test.mjs` | moved | `test/regression/plugin/self-edit-check.test.mjs` | breaks setup.sh, the notice hook and release.mjs in clones so each writes under the plugin root and asserts the no-self-edit tests guarding it go red |
 | `verify/self-update-by-version/no-self-edit.test.mjs` | moved | `test/regression/plugin/no-self-edit.test.mjs` | runs setup.sh, the notice hook and release.mjs beside a live and a foreign Claude and snapshots the plugin root before and after |
+| `verify/stage-prompt-reader-gaps/bench-recorded.test.mjs` | left |  | asserted facts of committed bench run sets, and compared re-rendered brief prompts and compare.mjs's output with the prompt.md files and report committed beside them |
+| `verify/stage-prompt-reader-gaps/brief-unchanged.test.mjs` | left |  | compared the head's brief prompt with one rendered at the base and stored under verify/, and rendered the base commit's prompt where git reached it |
+| `verify/stage-prompt-reader-gaps/build-verify-answers.test.mjs` | left |  | rendered the build and verify prompts from stored inputs under verify/ and matched their rule text with regexes |
+| `verify/stage-prompt-reader-gaps/suite-and-scope.test.mjs` | split | `test/regression/plan/real-plan.test.mjs` | moved: runs the plan check on the repo's plan; left: the scope test read its own PR's file list |
 | `verify/test-fixture-edges/detached-release-clone.test.mjs` | split | `test/regression/plugin/release-clone-and-keep.test.mjs` | moved: runs copy-not-link and no-self-edit in a clone detached at a commit only a release branch points at; left: the other test applied a stored reverse diff of the build (to-base.diff) and ran that earlier code |
 | `verify/test-fixture-edges/keep-across-fs.test.mjs` | split | `test/regression/plugin/release-clone-and-keep.test.mjs` | moved: runs trace-writes.mjs --keep on the same and another file system with the real and a stand-in strace; left: the other test applied the stored reverse diff of the build and ran that earlier code |
 | `verify/test-fixture-edges/p95-over-bare.test.mjs` | left |  | timed process starts against wall-clock bars, which cannot hold under the regression set's parallel runs; the p95-over-bare bar is held by plugins/harness/test/capture.test.mjs's cheap test, which npm test runs (decision 7), and one test ran the build's change reverted from a stored diff |
@@ -378,6 +382,7 @@ One row per test file the 37 done folders held at the base, then one row per fol
 | `scope-suite-own-pr` | `lib.mjs` deleted; 4 evidence files deleted |
 | `self-edit-check-snapshot` | `lib.mjs` inlined into the moved file and deleted |
 | `self-update-by-version` | none: the folder held only its test file |
+| `stage-prompt-reader-gaps` | `lib.mjs` deleted; 11 evidence files deleted |
 | `test-fixture-edges` | `lib.mjs` inlined into the moved file and deleted; 5 evidence files deleted; `to-base.diff` deleted (the reverse diff of the build, used only by the left halves) |
 | `tournament-kit` | `toy/2026-11-04-readme-structure/` moved to `test/regression/fixtures/tournament/` (input) |
 | `tournament-scoring-floors` | `toy/2026-11-04-recipe-cards/` and `rescore/` moved to `test/regression/fixtures/tournament/` (input) |
