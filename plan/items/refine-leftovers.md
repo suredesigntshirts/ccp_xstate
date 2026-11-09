@@ -27,6 +27,20 @@ Draft written at the end of the refine rounds (8 Nov) so their leftovers live in
   but a two-word term such as `first commit` wrapped across a line fails a plain regex. The rule gains: collapse
   whitespace before matching.
 
+From the memory audit of 9 Nov (section D) and the own-traps-in-code verdict, each still present on main then:
+
+- **Long hashes in the inspector.** `scripts/inspector/page.html` wraps `.panel p` and `td` but not a section's
+  paragraphs (`details.sec>.inner p`), so a long hash overflows and every artifact refresh patches the published copy.
+- **The build stage's pr wording.** `workflows/quick-fix/build.md` says "Never put anything but the PR's url in pr",
+  while its output section makes pr `{ url, at }`.
+- **Regression-folder guard misses.** The guard does not see a `verify/` path built with `resolve()` or a template,
+  a clone made through a helper other than `leanClone`, or `setup.sh` reached through an imported constant.
+- **Nested runs in helper files.** The rule that a child's environment comes from `childEnv` is checked in test
+  files only; a helper `.mjs` beside them can still drop `NODE_TEST_CONTEXT` itself.
+- **Artifact generators outside the repo.** The scripts that build the person-facing pages (the prompts page, the
+  quick-fix machine map, the inspector's source configs) live only in `/mnt/project-files`. Decide whether they move
+  into `scripts/`.
+
 Considered with these and not taken yet, each noted in its round's decision file:
 
 - `plan/README.md` says a contract cannot change once any verdict file exists; the freeze gate checks the PR's own

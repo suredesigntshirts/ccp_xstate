@@ -41,3 +41,39 @@ The full suite takes minutes; a builder runs the tests near its change locally a
 
 A `ci` test outside the PR's change can go red for timing or a race in the container that runs it. Re-run the check
 once, saying so on the PR; red again, it is a real failure, fixed in that PR or named as a new item.
+
+## What a thread may not do to GitHub
+
+Auto mode and the session's git proxy refuse a thread a force push, an amend or rebase of a pushed branch, a branch
+delete (`git push --delete` hangs up), a tag push, and at times `release.mjs --push`, read as a production deploy.
+A refusal is not reproduced to check it: retrying reads as a bypass (`plan/ledger/platform.md`,
+L-retries-look-like-bypass). Fix a pushed branch with a follow-up commit or by merging main in, and list branches
+left to delete in `plan/decisions/waiting-for-person.md`.
+
+## Plugin tests leave out untracked files
+
+The plugin tests install the working tree as a commit made with `git stash create`, so an uncommitted change is
+tested, but `git stash create` leaves untracked files out. A new file the change adds is missing from the install
+until it is in the index: run `git add` on it before the tests. A clean-room run with `--ref` installs only that
+commit, so commit first.
+
+## A background run owns its checkout
+
+A test or trial left running in the background reads the checkout as it goes. Do not stash, check out or switch
+branches in that checkout until it ends; it then tests a tree that changed under it. Do other work in a git worktree,
+or in a fresh clone.
+
+## The project files folder is a network mount
+
+`/mnt/project-files` refuses hard links (`ln` fails, "Operation not supported" or "Invalid cross-device link"), and
+git refuses a worktree or repo there as "dubious ownership". Another thread may hold the same file, and the last
+write wins, so write a new file with a version in its name rather than rewrite a shared one. Keep clones and test
+folders on the container's disk.
+
+## PR events that run nothing
+
+A thread waiting on a CI event may never be woken by it: check the PR's checks when it wakes for anything else, and
+ask to be nudged rather than wait. A push that only merges main in may start no `ci` run; read the checks at the new
+head before counting it green. A `replan` label added after the PR opens leaves the first `gates` run red, and the
+`labeled` run is the one that counts. A PR opened before the PR under it merged keeps that older `BASE_SHA` in its
+runs until its branch is updated, so its gates read files that are already on main as its own.
