@@ -5,12 +5,14 @@
   "stage": "s5-parity",
   "kind": "build",
   "status": "draft",
-  "outcome": "A real item of another kind (feature or research) runs through its own workflow, picked at filing, and the journal shows which workflow ran and what it cost compared with the first.",
-  "why": "Different workflows for different work is the person's goal for v2. One workflow running doesn't prove the swap works.",
+  "outcome": "The fixes derive-view-gaps named run as one real item through the feature workflow, picked at filing: overhead attributes a session's tokens to the PRs whose Claude-Session trailer names it, whatever form the trailer's session takes; time counts only the person's own prompts as waiting on the person and CI results as waiting on CI; rework counts an item's readying replan against that item's build PR. The journal shows which workflow ran and who picked it, and the fixed views show what it cost next to quick-fix's first real item.",
+  "why": "Different workflows for different work is the person's goal for v2, and only quick-fix has run real work. On 11 Nov the person picked feature and proposed derive-view-gaps as the item (plan/decisions/2026-11-11-v1-out-of-scope.md): its three view fixes are natural slices, and they are the views that make the run's cost visible (L-harness-overhead, L-rework-invisible). One workflow running doesn't prove the swap works.",
   "serves": [
     "L-rules-in-spec-not-host",
     "L-builder-supplies-gate-inputs",
-    "L-measure-then-park"
+    "L-measure-then-park",
+    "L-harness-overhead",
+    "L-rework-invisible"
   ],
   "depends_on": [
     "retro-first-item",
@@ -62,9 +64,7 @@
   "records": [
     "engine.transition with workflow id and hash"
   ],
-  "person_prereqs": [
-    "Pick the second item and its workflow with the thread"
-  ],
+  "person_prereqs": [],
   "step_back": {
     "max_rounds": 2,
     "max_tokens": 4000000
@@ -73,3 +73,9 @@
   "risks": []
 }
 ```
+
+The item and workflow were picked on 11 Nov (`plan/decisions/2026-11-11-v1-out-of-scope.md`): feature, on the work `derive-view-gaps` held, which is
+merged here. The readying replan carries that item's prose over: each bug is checked again against
+`packages/journal/src/derive/`, and it says how a replan with no `Item:` line is tied to its item and which wake
+reasons are the person's. The item runs in this repo, so the feature workflow's PRs meet this repo's gates; that is
+part of what the run tests.

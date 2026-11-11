@@ -35,11 +35,6 @@ One line each: what, why, which item waits. Threads add to this; the person clea
 - Add an allow rule for the product repo the stand-in works in (ccp_machine_test): with none, a thread's `gh api`
   write there was refused while the GitHub MCP tool and the headless builder were not (ledger L-allow-rules-per-repo,
   `plan/research/retro-first-item.md` finding 5). A settings change.
-- second-workflow: pick the second real item and the workflow it runs through (feature or research). It stays a
-  draft until you choose, and parity-compare waits on it (plan item second-workflow).
-- Export v1's numbers (concepts, refusals, person taps, time and tokens per item, rework) from the ccp_machine
-  project as a file in this project: a thread there can do it, but no thread here can read that project's Library.
-  parity-compare waits on it, and s5's `measured` gate waits on parity-compare (`2026-11-04-s5-parity-gate.md`).
 - Delete two leftover branches from comments-present-tense's gate check, `chore/verify-history-gate-src` and
   `chore/verify-history-gate-plan` (PRs #160 and #161, closed unmerged). The git proxy and the auto mode classifier
   refuse branch deletes from threads.
