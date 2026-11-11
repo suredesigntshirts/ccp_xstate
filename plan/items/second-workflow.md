@@ -4,7 +4,7 @@
   "title": "Run a second kind of work through a different workflow",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "ready",
+  "status": "done",
   "outcome": "The three view fixes run as one real item through the feature workflow, picked by the person and recorded as their pick when the item is filed: overhead attributes a session's tokens to the PRs whose Claude-Session trailer names it, whatever form the trailer's session takes; time counts only the person's own messages and taps as waiting on the person and GitHub check results as waiting on CI; rework counts an item's readying replan against that item's build PR. The host runs an item whose state invokes a workflow, child items included, from the command line, so a feature item is driven the way quick-fix items are.",
   "why": "Different workflows for different work is the person's goal for v2, and only quick-fix has run real work. On 11 Nov the person picked feature and proposed derive-view-gaps as the item (plan/decisions/2026-11-11-v1-out-of-scope.md): its three view fixes are natural slices, and they are the views that make the run's cost visible (L-harness-overhead, L-rework-invisible). One workflow running doesn't prove the swap works. Reading the host for this replan found that bin/host.js never runs a child item: the effect library has the item handler and pump(), but the command wires neither, so a feature item started from a session stops at its first slice. The selection is the other gap: the start row's source is the session that filed the item, which is not who picked the workflow (L-builder-supplies-gate-inputs).",
   "serves": [
