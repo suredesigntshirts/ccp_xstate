@@ -16,12 +16,13 @@ export function isHarness(path, config) {
 }
 
 /**
- * One key for any form of a session: a cloud session's URL (`https://claude.ai/code/session_X`), that URL with a
- * fragment (`...#agent=<name>`) and the bare `session_X` all give `session_X`; a local session id stays as it is.
+ * One key for any form of a session: a cloud session's URL (`https://claude.ai/code/session_X`, or any URL ending in
+ * the id), that URL with a fragment (`...#agent=<name>`) and the bare `session_X` all give `session_X`; a local
+ * session id stays as it is.
  */
 export function sessionKey(session) {
   if (typeof session !== 'string') return session;
-  return session.trim().replace(/^https:\/\/claude\.ai\/code\//, '').replace(/#.*$/, '');
+  return session.trim().replace(/^[a-z][a-z0-9+.-]*:\/\/[^#]*\//i, '').replace(/#.*$/, '');
 }
 
 const tokensOf = (t) => (t ? (t.input ?? 0) + (t.output ?? 0) + (t.cacheRead ?? 0) + (t.cacheCreation ?? 0) : 0);

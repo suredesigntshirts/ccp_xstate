@@ -78,5 +78,6 @@ test('a session meets its PRs whatever form the rows and the trailers name it in
 
 test('sessionKey reads every form to one key', () => {
   for (const s of ['https://claude.ai/code/session_X', 'session_X', 'https://claude.ai/code/session_X#agent=v']) assert.equal(sessionKey(s), 'session_X');
+  assert.equal(sessionKey('http://localhost:8080/code/session_X#agent=v'), 'session_X');
   assert.equal(sessionKey('3f2a-local'), '3f2a-local');
 });
