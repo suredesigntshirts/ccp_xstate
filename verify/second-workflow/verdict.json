@@ -1,0 +1,64 @@
+{
+  "item": "second-workflow",
+  "verified_sha": "46c5a010c6af19b6f20b0a9a97377c3a3900cddb",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5G8B2nZqVrB1ejkvwU",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "selected",
+      "status": "MET",
+      "command": "Read /mnt/project-files/harness/journal/items/second-workflow.jsonl (read only), its seq-0 row; node --test verify/second-workflow/selected.test.mjs (bin/host.js start on items of my own in temp roots)",
+      "excerpt": "Real first row: applied xstate.init, workflow feature@b173324eb089f3c703a484fec5767a7a8c7b84fbe26381091a7b50c950425fca, selection { workflow: same id, by: \"Sure Team, the person\", how: \"proposed running derive-view-gaps through feature in the triage thread, 2026-11-11 06:45Z (plan/decisions/2026-11-11-v1-out-of-scope.md)\" }; every later row on the same id. Suite: 7 pass. --selected-by/--how land on the start row with feature@<64 hex>; none gives by \"claude-code <session>\", how null; --how alone and a blank picker start nothing. A second start naming quick-fix, feature or research, with a new picker or none, or from another session, applies nothing: one applied row, the first hash, the first picker, state planning. 0 of 7 pass at main 5630fbd5.",
+      "test": "verify/second-workflow/selected.test.mjs"
+    },
+    {
+      "id": "children",
+      "status": "MET",
+      "command": "node --test verify/second-workflow/children.test.mjs (bin/host.js start/wake/card/closed/show/answer in a temp root, stub agents started and bound by the real spawn() and bind() with result.json written as the return hook stores it, GitHub REST stub via CCP_GITHUB_API)",
+      "excerpt": "1 pass. The plan result starts feat:1.s1..s3 on quick-fix in the same call, waiting naming each brief run with its item. One wake hands each child its result; a check_suite wake is offered to the top item (refused) and every child (only the PR's child applies). Two PASSes: each child merges on the feature's grant and the top takes done.actor.s1 and s2 (source item) in that call; s3's end moves the feature to finishing and starts feat:4.final in that call. The final child's ask run is listed under children; card on an effect outside the tree exits 2; card, then a new head stops the ask, closed finishes the stop, show lists none; answer before the card is refused, after it applies ask, merge and top done.actor.final in one call, state done, merge PUT at the new head. 0 of 1 at main.",
+      "test": "verify/second-workflow/children.test.mjs"
+    },
+    {
+      "id": "overhead",
+      "status": "MET",
+      "command": "node --test verify/second-workflow/overhead.test.mjs (real prFacts over a stubbed REST get, rows appended with the journal append(), derive.js overhead --journal --facts --config)",
+      "excerpt": "11 pass. Trailer as URL, bare session_ id, URL#agent=builder-2 or local id, with rows keyed by URL or by id: trailer kept as written, unattributed 0, split 750/250, inputs.prs [o/r#7]. One session in three forms over two PRs plus an agent.finish: one session, both PRs, share 0.5. Old facts with only session_X still attribute. An unnamed session stays unattributed, and an id that only starts with another is not matched. 1 of 11 at main.",
+      "test": "verify/second-workflow/overhead.test.mjs"
+    },
+    {
+      "id": "time",
+      "status": "MET",
+      "command": "node --test verify/second-workflow/time.test.mjs (rows made by capture() from capture-rows.mjs out of UserPromptSubmit and Stop hook inputs, stamped a minute apart, derive.js time --journal)",
+      "excerpt": "10 pass. Mention with a human message and a decision tap -> person; external-event check_run.completed and check_suite.completed -> ci; a coordinator relay, a ccp-run driver prompt, a pull_request.closed event and a status wake with no person -> wake (person 0, ci 0); old reason-prompt rows with no checkEvent -> wake; relay, mention, check_run in a row -> [wake, person, ci], parts sum to wall time. 5 of 10 at main.",
+      "test": "verify/second-workflow/time.test.mjs"
+    },
+    {
+      "id": "rework",
+      "status": "MET",
+      "command": "node --test verify/second-workflow/rework.test.mjs (real prFacts over a stubbed REST get, derive.js rework --facts)",
+      "excerpt": "5 pass. A replan on replan/ready-the-second-kind with no Item: line changing plan/items/second-workflow.md (plus non-item files) gets item second-workflow and the build PR shows replans 1; Item: wins; two such count 2; two item files, none, a nested path, or no replan label fall back to the branch: replans 0; old facts count as before. 3 of 5 at main.",
+      "test": "verify/second-workflow/rework.test.mjs"
+    },
+    {
+      "id": "ran",
+      "status": "MET",
+      "command": "Read (never wrote) items/second-workflow.jsonl and its children :1.s1, :1.s2, :1.s3, :4.final in /mnt/project-files/harness/journal; GitHub MCP pull_request_read get on PRs 307, 308, 309; git log of build/second-workflow",
+      "excerpt": "Filed on feature (seq 0), planning -> slicing on the brief's result, then done.actor.s1, s2, s3 from the children's ends, finishing at s3. Each slice on quick-fix with base build/second-workflow and decision { approve, by feature }: briefing -> building -> checking -> verifying (github check_suite wake) -> merging -> done with no ask. s1 PR 307 merged as 6706a29c, s2 PR 309 as 70391f9b, s3 PR 308 as 783425d3: GitHub shows each merged into build/second-workflow and the commits are on the branch. Applied sources over the item and slices: claude-code 1 (start), harness 10 (each a return toolUseId with a result.stored row for that run), item 6, github 3, engine 3 (merges). The PRs carry the overhead, time and rework fixes, which the three suites above prove at the head. Checked up to the slices, as the item says."
+    },
+    {
+      "id": "ci",
+      "status": "MET",
+      "command": "GitHub MCP pull_request_read get_check_runs on PR 306 at 46c5a010c6af19b6f20b0a9a97377c3a3900cddb",
+      "excerpt": "At 46c5a010c6af19b6f20b0a9a97377c3a3900cddb: check run test (ci) completed success at 10:23:49Z; clean-room success; gates failure before this verdict, as expected."
+    }
+  ],
+  "observations": [
+    "A start refused before it applies (a blank --selected-by, or an input the workflow refuses) writes its refused row to the item's own file and marks its source seen. A corrected start from the same session is then a duplicate, and one from another session is not-owner, so the item id can never start. This was already true on main for a bad input; the new selection check adds one more way in. It belongs in a plan item.",
+    "The real run's rows say release 0.1.0: bin/host.js was run from the checkout with no --release, so it read the repo's plugin.json (0.1.0), not the installed 0.1.42.",
+    "The final child started at 10:07:30Z, as soon as the last slice ended, before this verdict, though the item's text expected it to start after. finishing has no hold, so the order the item planned isn't something the builder can choose. Nothing broke: the final child's builder pushed one commit, 46c5a010 (sessionKey reads any URL ending in the id), and returned the PR. I verified at that head.",
+    "sessionKey now strips any scheme://.../ prefix, so a URL from another host that ends in session_X keys the same as the Claude session. That's harmless for trailers and capture rows, but broader than the forms the item names.",
+    "time's ci label reads only UserPromptSubmit wakes. A GitHub event read through ReadNotifications makes no wake row, so it can't be counted as CI waiting."
+  ]
+}

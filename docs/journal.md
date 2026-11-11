@@ -130,7 +130,7 @@ sha256 and a size. The only text kept is a subagent's prompt and final answer, e
 | PostToolUse of the Agent tool | `agent.prompt` | `agentId` (from the call's result), `hash`, `bytes` of the prompt it was given; `source.ref` is `blobs/<hash>` |
 | SubagentStop | `agent.finish` | `agentId`, `type`, `model`, `ms` (from its prompt, the first line of its transcript, to its last user or assistant row; other rows and rows stamped before the prompt do not count), `tokens` (`input`, `output`, `cacheRead`, `cacheCreation`, summed over its messages), `resultHash` |
 | SubagentStop | `agent.final` | `agentId`, `hash`, `bytes`: its SubagentHandback message, else its last text |
-| UserPromptSubmit | `wake` | `reason` (the hearth wake's reason, `agent-message`, `task-notification` or `prompt`), `source` (`hearth`, `subagent`, `claude-code` or `user`), `hash`, `bytes` |
+| UserPromptSubmit | `wake` | `reason` (the hearth wake's reason, `agent-message`, `task-notification` or `prompt`), `source` (`hearth`, `subagent`, `claude-code` or `user`), `checkEvent` (true when the wake brings a GitHub `check_run` or `check_suite` event of any action, such as `check_run.completed`; false for every other wake, other GitHub events included), `hash`, `bytes` |
 | Stop | `turn.usage` | `tokens` (as above, for the main transcript's messages since the last Stop), `messages`, `models`, and `cost`, `fiveHour`, `sevenDay` as null with a `placeholder`: no hook receives them |
 | each of the above | `hook.run` | `name` (`capture <event>`), `ms` (since the hook's process started; on tool calls capture runs async, so there this is not time added to the call), `timedOut` |
 
@@ -247,17 +247,29 @@ output came from. `packages/journal/bin/derive.js time|rework|overhead|stalls` r
 counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
 
 - **`time.js`**: per session, working time (a turn from its wake to its Stop row, a tool call or hook run for its
-  `ms`, a subagent from spawn to finish) and every gap between, labelled by the wake whose turn ends it: `person`
-  (`mention`, `decision-chosen`, `prompt`), `ci` (`external-event`), `wake` (any other reason), `rebuild` (from a
-  SessionStart inside the gap to that wake) or `unknown` (no wake, no reason, or the turn before never closed). A gap
-  is never working, and working plus each waiting kind plus unknown is the session's wall-clock time.
+  `ms`, a subagent from spawn to finish) and every gap between, labelled by the wake whose turn ends it. Each label
+  counts:
+  - `person`: gaps whose wake came with the person's own `person.message` or `person.tap` row in the same session
+    (the rows capture writes in the same UserPromptSubmit run as the wake). The wake's reason alone, `mention`,
+    `decision-chosen` or `prompt`, does not make a gap person. The gap's `inputs` name the wake and the person row.
+  - `ci`: gaps whose wake row records `checkEvent: true`, a GitHub `check_run` or `check_suite` event. An
+    `external-event` wake with any other event, or from before capture recorded `checkEvent`, is not ci.
+  - `wake`: gaps whose wake has any other reason, `prompt` included (a coordinator's relay, a driver's prompt, a
+    typed prompt with no person row), and `agent-message`, `task-notification`, `spawn` and the like.
+  - `rebuild`: the tail of a gap from a SessionStart inside it to the wake that ends it.
+  - `unknown`: gaps no wake ends, whose wake has no reason, or after a turn that never closed.
+
+  A gap is never working, and working plus each waiting kind plus unknown is the session's wall-clock time.
 - **`rework.js`**: per PR, pushes (commits CI ran on), red pushes, red runs, rounds (a new one at each push after a red
-  one, a merge commit staying in its round) and replans (other PRs labelled `replan` naming the same item), from
-  `ci.result` rows. `tripwires()` gives the `tripwire` rows to append: one per PR and limit, when rounds pass the
-  item's `step_back.max_rounds` (default 2). Before the engine, rounds are per PR, not per item.
+  one, a merge commit staying in its round) and replans (other PRs labelled `replan` attributed to the same item),
+  from `ci.result` rows. A replan PR with no `Item:` line is attributed to the one item file under `plan/items/` it
+  changes. `tripwires()` gives the `tripwire` rows to append: one per PR and limit, when rounds pass the item's
+  `step_back.max_rounds` (default 2). Before the engine, rounds are per PR, not per item.
 - **`overhead.js`**: tokens (`turn.usage` and `agent.finish`) on harness work against product work. A session's
   tokens split by the share of changed lines, over the PRs its commits name it on, in the paths
-  `packages/journal/harness-paths.json` lists (`<owner>/<repo>/<glob>`). A session with no PR is unattributed.
+  `packages/journal/harness-paths.json` lists (`<owner>/<repo>/<glob>`). A session with no PR is unattributed. Rows'
+  `session` and the PRs' Claude-Session trailers are both read to one key by `sessionKey()`: a session URL, that URL
+  with `#agent=<name>` and the bare `session_` id are one session; a local session id stays as it is.
 
 - **`stalls.js`** (plan item fix-waiting-run-stall): how often a session ended a turn with one of its runs prepared
   and no agent. `prepared` (runs with a `prompt.stored` row), `blocked` (runs with a `stall` row), `blocks`,
@@ -269,8 +281,9 @@ counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
 `derive.js rework` reads each PR from GitHub REST (the PR, its commits, each commit's check runs, its files) and makes
 one `ci.result` row per completed check run, `id` `github-check-run-<run id>`, `at` the run's completion, `source`
 `github` and the run id. `payload`: `workflow` (the check's name), `repo`, `pr`, `sha`, `merge` (the commit has two
-parents), `result` (the run's conclusion), `startedAt`, `completedAt`, `item` (the PR's `Item:` line, else its
-branch's last segment) and `labels`. With `--append` it adds the rows the journal file lacks, and the new tripwires.
+parents), `result` (the run's conclusion), `startedAt`, `completedAt`, `item` (the PR's `Item:` line; else, for a PR
+labelled `replan` that changes exactly one `plan/items/<id>.md`, that `<id>`; else its branch's last segment) and
+`labels`. With `--append` it adds the rows the journal file lacks, and the new tripwires.
 
 `tripwire` payload: `repo`, `pr`, `rounds`, `limit`, `item` and `inputs` (the `ci.result` row ids counted). The
 tripwire row only records. The engine acts on it (plan item engine-item-views): `--append` it to the item's own file
@@ -336,6 +349,7 @@ with a reason that names it unreadable. `id` is the transition id, `<item>#<seq>
 | from | The state before (as JSON), on an applied row |
 | hash | `hashOf` the snapshot after, on an applied row; restore checks each one |
 | writes | On an applied row: the context paths the step wrote, in order, each `{ path, from, set }`. `from` is the source as the workflow wrote it (`event.output.pr`, `context.built`, `{ "value": x }`); `set` is the JSON pointer of the set action in the workflow file (null for the start, which writes the item's input as `event.input.<key>`). The stage record (below) traces every input's producer from these |
+| selection | On the start's row only: `{ workflow, by, how }`, the pinned workflow id, who picked it and how, as the filing gave them (`bin/host.js start --selected-by --how`); without them `by` is the start's source and `how` null. A child item's start names its parent's run. A selection on any other event is refused |
 
 A `not-owner` row, and a `refused` row for an item that hasn't started, go to the offering session's own file
 (`sessions/<session>.jsonl`), since only the owner writes the item's file.

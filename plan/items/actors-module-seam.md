@@ -11,12 +11,13 @@
   "serves": [
     "L-count-concepts"
   ],
-  "depends_on": [
-    "run-message-and-budget"
-  ]
+  "depends_on": []
 }
 ```
 
 Draft from `plan/research/verification-swing.md`, item 8. Names `packages/engine/src/actors.js` as its module. The
 README length is a target in the outcome, not an Expect line; the Expect lines will say what the README must
 explain, and the verifier reads it.
+
+It waited on `run-message-and-budget` only because both touch the run modules; that item is parked, so this one stands
+alone (`plan/decisions/2026-11-11-triage.md`).

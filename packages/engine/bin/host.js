@@ -1,13 +1,18 @@
 #!/usr/bin/env node
-// The host from the command line, one item per call. See packages/engine/README.md.
+// The host from the command line, one item and its child items per call. See packages/engine/README.md.
 //
-//   host.js start --item <id> --workflow <name> --input <json> --session <id> [--root <dir>] [--release x.y.z]
+//   host.js start --item <id> --workflow <name> --input <json> --session <id> [--selected-by <who> [--how <text>]] [--root <dir>] [--release x.y.z]
 //   host.js wake  --item <id> --workflow <name> [--root <dir>] [--release x.y.z]   < hook input JSON
 //   host.js show  --item <id> --workflow <name> [--root <dir>]
 //   host.js card  --item <id> --workflow <name> --effect <ask run id> --ref <card id> [--root <dir>]
 //   host.js closed --item <id> --workflow <name> --effect <ask run id> [--root <dir>]
 //   host.js answer --item <id> --workflow <name> --effect <ask run id> --choice <c> --by <session> [--why <text>] [--grants <file>]
 //   start and wake also take [--repo <git clone>] [--worktrees <dir>] for the actors' worktrees.
+//
+// --item names the top item. An invoke whose actor is a workflow starts a child item, and every command drives the
+// whole tree: each open item is offered the call's inputs, and a child's end reaches its parent in the same call.
+// card, closed and answer take a child's ask run in --effect. start's --selected-by and --how say who picked the
+// workflow and how; its row records them with the pinned workflow id.
 //
 // wake reads a Claude Code hook's input on stdin: UserPromptSubmit (the wake is its prompt) or PostToolUse of
 // ReadNotifications, where only notifications GitHub's webhook delivered and fired reminders (origin trigger_fire, read
@@ -35,8 +40,10 @@ import { parseArgs } from 'node:util';
 import { loadWorkflow, workflowOf } from '../src/index.js';
 import { restore, offer, pending } from '../src/host.js';
 import { inputsOfWake } from '../src/wake.js';
-import { github, handlers, recordCard, recordClosed, relay } from '../src/effects/index.js';
-import { actors, resultsOf, waiting } from '../src/actors.js';
+import { github, handlers, recordCard, recordClosed, relay, pump, openItems } from '../src/effects/index.js';
+import { actors, waiting } from '../src/actors.js';
+import { runOf } from '../src/names.js';
+import { isStage, EFFECTS } from '../src/stages.js';
 import { tripwiresOf } from '../src/tripwire.js';
 import { grantsFileFor, readGrants, standinInput } from '../src/standin.js';
 
@@ -56,7 +63,9 @@ const { positionals: [command], values: opts } = parseArgs({
     choice: { type: 'string' },
     by: { type: 'string' },
     grants: { type: 'string' },
-    why: { type: 'string' }
+    why: { type: 'string' },
+    'selected-by': { type: 'string' },
+    how: { type: 'string' }
   }
 });
 
@@ -99,7 +108,7 @@ const spec = workflowOf(opts.root, opts.item) ?? loadWorkflow(opts.workflow, { r
 const release = opts.release ?? process.env.CCP_HARNESS_RELEASE ?? manifestRelease();
 
 let session = opts.session;
-let inputs = [];
+let inputs = () => [];
 if (command === 'wake') {
   const hook = JSON.parse(readFileSync(0, 'utf8'));
   session = hook.session_id;
@@ -111,49 +120,91 @@ if (!session && !['show', 'card', 'closed', 'answer'].includes(command)) fail('n
 // A refusal from the journal (an older writer, say) is printed as one line, not a stack.
 process.on('uncaughtException', (error) => fail(error.message));
 process.on('unhandledRejection', (error) => fail(error?.message ?? String(error)));
-let host = restore({ root: opts.root, item: opts.item, spec, session: session ?? command, release });
+
+// The item tree: the item named, and the child items its open runs started, each on its own pinned workflow. An
+// --effect names its run's item, which is the item named or one of its children.
+const top = opts.item;
+const target = opts.effect ? (runOf(opts.effect)?.item ?? top) : top;
+if (target !== top && !openItems(opts.root, top).includes(target)) fail(`${opts.effect} is not a run of ${top} or of an open child item of it`);
+const restoreAs = (item, as) => {
+  const pinned = item === top ? spec : workflowOf(opts.root, item);
+  if (!pinned) fail(`${item} has not started`);
+  return restore({ root: opts.root, item, spec: pinned, session: as, release });
+};
+let host = restoreAs(target, session ?? command);
+const owner = host.owner;
 if (command === 'answer') {
   // Applied as the item's owner: the answer is the run's completion, as a tap read by the owner's hook would be.
-  if (!host.owner) fail(`${opts.item} has not started`);
-  host = restore({ root: opts.root, item: opts.item, spec, session: host.owner, release });
+  if (!owner) fail(`${target} has not started`);
+  host = restoreAs(target, owner);
   const grants = readGrants(opts.grants ?? grantsFileFor(opts.root));
   // Read after the open effects run, so a card recorded since the last call is up before the answer is checked.
-  inputs = (h) => [standinInput(h, { effect: opts.effect, choice: opts.choice, by: opts.by, why: opts.why, grants })];
+  const answer = (h) => [standinInput(h, { effect: opts.effect, choice: opts.choice, by: opts.by, why: opts.why, grants })];
+  inputs = (h) => (h.item === target ? answer(h) : []);
 }
 let card = null;
 if (command === 'card') {
   // A record of which card was put up; the card effect then finishes with it now, as the owner, so the item's file
   // holds the card's id from the moment it is up (the item view joins the card's rows by it).
   card = recordCard({ host, effect: opts.effect, ref: opts.ref });
-  if (host.owner) host = restore({ root: opts.root, item: opts.item, spec, session: host.owner, release });
 }
 if (command === 'closed') {
   // The card was withdrawn in the thread; the stop effect then finishes with it now, as the owner.
   card = recordClosed({ host, effect: opts.effect });
-  if (host.owner) host = restore({ root: opts.root, item: opts.item, spec, session: host.owner, release });
 }
+// card, closed and answer act as the owner of the tree, as the owner's hook would; start and wake as the session.
+const as = ['card', 'closed', 'answer'].includes(command) ? (owner ?? session ?? command) : session;
+
+// Each item's handlers: its agents' runs prepared in worktrees, its workflow actors started as child items, merges
+// over GitHub REST, cards and posts through the relay.
+const gh = github(process.env.CCP_GITHUB_API ? { api: process.env.CCP_GITHUB_API } : {});
+const workflowsOf = (h) => Object.keys(h.spec.meta?.actors ?? {}).filter((name) => !isStage(h.spec.meta.actors[name]) && !EFFECTS.includes(name));
+const handlersFor = (h) => {
+  const all = handlers({
+    github: gh,
+    hearth: relay({ root: opts.root }),
+    actors: actors({ host: h, repo: opts.repo ?? process.cwd(), ...(opts.worktrees ? { worktrees: opts.worktrees } : {}) }),
+    host: h,
+    workflows: workflowsOf(h),
+    load: loadWorkflow,
+    handlersFor
+  });
+  // timer and cancel have no clock here: a timer ends with its due time, still listed under pending.timers for the
+  // session to schedule its wake, and a cancel ends at once.
+  return { run: all.run, stop: all.stop, timer: all.timer, cancel: all.cancel };
+};
+
+const results = [];
 if (command === 'start') {
   if (!opts.input) fail('start needs --input');
-  inputs = [{ event: { type: 'xstate.init', input: JSON.parse(opts.input) }, source: { system: 'claude-code', ref: session } }];
+  const selection = opts['selected-by'] ? { by: opts['selected-by'], how: opts.how ?? null } : null;
+  if (!selection && opts.how) fail('--how goes with --selected-by');
+  const started = restoreAs(top, session);
+  for (const r of await offer(started, [{ event: { type: 'xstate.init', input: JSON.parse(opts.input) }, source: { system: 'claude-code', ref: session }, ...(selection ? { selection } : {}) }], handlersFor(started))) {
+    results.push({ item: top, ...r });
+  }
 }
-const agents = actors({ host, repo: opts.repo ?? process.cwd(), ...(opts.worktrees ? { worktrees: opts.worktrees } : {}) });
-const all = handlers({ github: github(process.env.CCP_GITHUB_API ? { api: process.env.CCP_GITHUB_API } : {}), hearth: relay({ root: opts.root }), actors: agents });
-// timer and cancel have no clock here: a timer ends with its due time, still listed under pending.timers for the
-// session to schedule its wake, and a cancel ends at once.
-const effects = { run: all.run, stop: all.stop, timer: all.timer, cancel: all.cancel };
-// Effects left open (a card now put up) run first, so the wake's inputs are read against the item as they leave it.
-const before = command === 'show' ? [] : await offer(host, [], effects);
-const offered = typeof inputs === 'function' ? inputs(host) : inputs;
-const results = command === 'show' ? [] : [...before, ...(await offer(host, [...offered, ...(host.snapshot ? [...resultsOf(host), ...tripwiresOf(host)] : [])], effects))];
+// Every command but show then offers, to the item and each open child item, the wake's inputs (or the answer), the
+// results the return hook accepted, tripwire rows and finished children, until nothing more applies. Effects left open
+// (a card now put up) run first, so the inputs are read against each item as they leave it.
+if (command !== 'show' && (command !== 'start' || results.some((r) => r.outcome === 'applied'))) {
+  results.push(...(await pump({
+    root: opts.root, top, session: as, release, handlersFor,
+    inputsFor: (h) => [...inputs(h), ...(h.snapshot ? tripwiresOf(h) : [])]
+  })));
+}
 if (card) {
   console.log(JSON.stringify(card, null, 2));
   process.exit(0);
 }
+const tree = openItems(opts.root, top).map((item) => restoreAs(item, as ?? command));
+const topHost = tree[0] ?? restoreAs(top, as ?? command);
 console.log(JSON.stringify({
-  item: opts.item,
-  owner: host.owner,
-  state: host.snapshot?.value ?? null,
-  results: results.map(({ outcome, row }) => ({ outcome, reason: row.payload.reason, event: row.payload.event?.type, source: row.source })),
-  pending: pending(host),
-  waiting: waiting(opts.root, opts.item)
+  item: top,
+  owner: topHost.owner,
+  state: topHost.snapshot?.value ?? null,
+  results: results.map(({ item, outcome, row }) => ({ ...(item !== top ? { item } : {}), outcome, reason: row.payload.reason, event: row.payload.event?.type, source: row.source })),
+  pending: pending(topHost),
+  children: tree.slice(1).map((h) => ({ item: h.item, workflow: h.spec.id, state: h.snapshot?.value ?? null, pending: pending(h) })),
+  waiting: tree.flatMap((h) => waiting(opts.root, h.item).map((w) => ({ ...w, ...(h.item !== top ? { item: h.item } : {}) })))
 }, null, 2));

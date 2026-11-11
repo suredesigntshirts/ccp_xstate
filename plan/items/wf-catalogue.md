@@ -4,9 +4,9 @@
   "title": "Write the first workflows as data, from the research",
   "stage": "s4b-widen",
   "kind": "build",
-  "status": "parked",
+  "status": "dropped",
   "outcome": "quick-fix, feature, research and long-build exist as validated workflow files built from the fragments, each with a one-paragraph why and the research it follows.",
-  "why": "Parked by retro-first-item (finding 6): the first real item ran on quick-fix unchanged, and nothing in it needed a schema, fragment or new workflow. It comes back when a real item needs a workflow quick-fix can't run. The person picks from real options, not descriptions. Writing them also shows whether the schema can express what the research found.",
+  "why": "Dropped 2026-11-11: done in practice: workflows/ holds quick-fix, feature, research and intake (plan/decisions/2026-11-11-triage.md). Parked by retro-first-item (finding 6): the first real item ran on quick-fix unchanged, and nothing in it needed a schema, fragment or new workflow. It comes back when a real item needs a workflow quick-fix can't run. The person picks from real options, not descriptions. Writing them also shows whether the schema can express what the research found.",
   "serves": [
     "L-build-for-next-real-item",
     "L-issues-state-problems",

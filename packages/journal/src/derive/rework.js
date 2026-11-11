@@ -10,7 +10,7 @@ export const RED = Object.freeze(['failure', 'timed_out', 'action_required', 'st
 export const DEFAULT_LIMIT = 2;
 
 /**
- * `ci.result` rows from one PR's GitHub facts, as `prFacts` in bin/rework.js reads them from REST: one row per
+ * `ci.result` rows from one PR's GitHub facts, as `prFacts` in bin/derive.js reads them from REST: one row per
  * completed check run on any of the PR's commits. `envelope` gives each row's session and release.
  */
 export function ciRows(facts, envelope) {
@@ -75,7 +75,8 @@ export function rework(rows, { checks = null } = {}) {
       shas: pushes.map(({ sha, merge, runs, red }) => ({ sha, merge, runs, red })),
     });
   }
-  // A replan of an item is a PR labelled replan that names that item; it counts against every other PR of the item.
+  // A replan of an item is a PR labelled replan attributed to that item (by its `Item:` line or its one changed item
+  // file); it counts against every other PR of the item.
   for (const pr of out) {
     if (!pr.item) continue;
     pr.replans = out.filter((o) => o !== pr && o.item === pr.item && o.labels.includes('replan')).length;

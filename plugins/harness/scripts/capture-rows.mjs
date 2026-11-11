@@ -371,13 +371,23 @@ function finish(input, { read, refused, newId }) {
   return { rows, blobs };
 }
 
-// What woke the session, from the opening of the prompt text; the text itself is never kept.
+// What woke the session, from the opening of the prompt text; the text itself is never kept. `checkEvent` says
+// whether a hearth wake brings a GitHub check_run or check_suite event (any action), which the time view reads as
+// waiting on CI; every other wake brings none.
 export function wakeOf(prompt) {
   const reason = prompt.match(/<wake reason="([^"]+)"/)?.[1];
-  if (reason) return { reason, source: 'hearth' };
-  if (/^\s*<agent-message from=/.test(prompt)) return { reason: 'agent-message', source: 'subagent' };
-  if (/<task-notification>/.test(prompt)) return { reason: 'task-notification', source: 'claude-code' };
-  return { reason: 'prompt', source: 'user' };
+  if (reason) return { reason, source: 'hearth', checkEvent: checkEventIn(prompt) };
+  if (/^\s*<agent-message from=/.test(prompt)) return { reason: 'agent-message', source: 'subagent', checkEvent: false };
+  if (/<task-notification>/.test(prompt)) return { reason: 'task-notification', source: 'claude-code', checkEvent: false };
+  return { reason: 'prompt', source: 'user', checkEvent: false };
+}
+
+// Whether any <event source="github"> in a wake has a kind of check_run.<action> or check_suite.<action>.
+export function checkEventIn(prompt) {
+  return [...prompt.matchAll(/<event ([^>]*)>/g)].some(([, head]) => {
+    const a = attrs(head);
+    return a.source === 'github' && /^check_(?:run|suite)(?:\.|$)/.test(a.kind ?? '');
+  });
 }
 
 function wake(input) {

@@ -4,9 +4,9 @@
   "title": "Compare v1 and v2 on the same numbers",
   "stage": "s5-parity",
   "kind": "research",
-  "status": "draft",
+  "status": "dropped",
   "outcome": "A comparison page puts v1 and v2 side by side: concepts (states, guards, context fields, host rules), refusals, person asks, time and tokens per item, and rework.",
-  "why": "'Works better' has to be measured, and the decision on v1 needs the numbers.",
+  "why": "Dropped 2026-11-11: the person chose not to compare with v1 or import its numbers, so there is no v1 side to measure (plan/decisions/2026-11-11-v1-out-of-scope.md). 'Works better' has to be measured, and the decision on v1 needs the numbers.",
   "serves": [
     "L-count-concepts",
     "L-harness-overhead",
@@ -15,7 +15,6 @@
   ],
   "depends_on": [
     "parity-cases",
-    "second-workflow",
     "fix-finish-closes-waits",
     "fix-waiting-wake",
     "fix-workflow-pinned",
@@ -74,3 +73,6 @@
   ]
 }
 ```
+
+It no longer waits on `second-workflow` (`plan/decisions/2026-11-11-triage.md`): v1 and v2 compare on the quick-fix items both have run,
+and a second workflow adds its own column when it has run.
