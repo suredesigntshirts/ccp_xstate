@@ -261,9 +261,10 @@ counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
 
   A gap is never working, and working plus each waiting kind plus unknown is the session's wall-clock time.
 - **`rework.js`**: per PR, pushes (commits CI ran on), red pushes, red runs, rounds (a new one at each push after a red
-  one, a merge commit staying in its round) and replans (other PRs labelled `replan` naming the same item), from
-  `ci.result` rows. `tripwires()` gives the `tripwire` rows to append: one per PR and limit, when rounds pass the
-  item's `step_back.max_rounds` (default 2). Before the engine, rounds are per PR, not per item.
+  one, a merge commit staying in its round) and replans (other PRs labelled `replan` attributed to the same item),
+  from `ci.result` rows. A replan PR with no `Item:` line is attributed to the one item file under `plan/items/` it
+  changes. `tripwires()` gives the `tripwire` rows to append: one per PR and limit, when rounds pass the item's
+  `step_back.max_rounds` (default 2). Before the engine, rounds are per PR, not per item.
 - **`overhead.js`**: tokens (`turn.usage` and `agent.finish`) on harness work against product work. A session's
   tokens split by the share of changed lines, over the PRs its commits name it on, in the paths
   `packages/journal/harness-paths.json` lists (`<owner>/<repo>/<glob>`). A session with no PR is unattributed. Rows'
@@ -280,8 +281,9 @@ counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
 `derive.js rework` reads each PR from GitHub REST (the PR, its commits, each commit's check runs, its files) and makes
 one `ci.result` row per completed check run, `id` `github-check-run-<run id>`, `at` the run's completion, `source`
 `github` and the run id. `payload`: `workflow` (the check's name), `repo`, `pr`, `sha`, `merge` (the commit has two
-parents), `result` (the run's conclusion), `startedAt`, `completedAt`, `item` (the PR's `Item:` line, else its
-branch's last segment) and `labels`. With `--append` it adds the rows the journal file lacks, and the new tripwires.
+parents), `result` (the run's conclusion), `startedAt`, `completedAt`, `item` (the PR's `Item:` line; else, for a PR
+labelled `replan` that changes exactly one `plan/items/<id>.md`, that `<id>`; else its branch's last segment) and
+`labels`. With `--append` it adds the rows the journal file lacks, and the new tripwires.
 
 `tripwire` payload: `repo`, `pr`, `rounds`, `limit`, `item` and `inputs` (the `ci.result` row ids counted). The
 tripwire row only records. The engine acts on it (plan item engine-item-views): `--append` it to the item's own file
