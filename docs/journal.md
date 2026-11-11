@@ -130,7 +130,7 @@ sha256 and a size. The only text kept is a subagent's prompt and final answer, e
 | PostToolUse of the Agent tool | `agent.prompt` | `agentId` (from the call's result), `hash`, `bytes` of the prompt it was given; `source.ref` is `blobs/<hash>` |
 | SubagentStop | `agent.finish` | `agentId`, `type`, `model`, `ms` (from its prompt, the first line of its transcript, to its last user or assistant row; other rows and rows stamped before the prompt do not count), `tokens` (`input`, `output`, `cacheRead`, `cacheCreation`, summed over its messages), `resultHash` |
 | SubagentStop | `agent.final` | `agentId`, `hash`, `bytes`: its SubagentHandback message, else its last text |
-| UserPromptSubmit | `wake` | `reason` (the hearth wake's reason, `agent-message`, `task-notification` or `prompt`), `source` (`hearth`, `subagent`, `claude-code` or `user`), `hash`, `bytes` |
+| UserPromptSubmit | `wake` | `reason` (the hearth wake's reason, `agent-message`, `task-notification` or `prompt`), `source` (`hearth`, `subagent`, `claude-code` or `user`), `checkEvent` (true when the wake brings a GitHub `check_run` or `check_suite` event of any action, such as `check_run.completed`; false for every other wake, other GitHub events included), `hash`, `bytes` |
 | Stop | `turn.usage` | `tokens` (as above, for the main transcript's messages since the last Stop), `messages`, `models`, and `cost`, `fiveHour`, `sevenDay` as null with a `placeholder`: no hook receives them |
 | each of the above | `hook.run` | `name` (`capture <event>`), `ms` (since the hook's process started; on tool calls capture runs async, so there this is not time added to the call), `timedOut` |
 
@@ -247,10 +247,19 @@ output came from. `packages/journal/bin/derive.js time|rework|overhead|stalls` r
 counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
 
 - **`time.js`**: per session, working time (a turn from its wake to its Stop row, a tool call or hook run for its
-  `ms`, a subagent from spawn to finish) and every gap between, labelled by the wake whose turn ends it: `person`
-  (`mention`, `decision-chosen`, `prompt`), `ci` (`external-event`), `wake` (any other reason), `rebuild` (from a
-  SessionStart inside the gap to that wake) or `unknown` (no wake, no reason, or the turn before never closed). A gap
-  is never working, and working plus each waiting kind plus unknown is the session's wall-clock time.
+  `ms`, a subagent from spawn to finish) and every gap between, labelled by the wake whose turn ends it. Each label
+  counts:
+  - `person`: gaps whose wake came with the person's own `person.message` or `person.tap` row in the same session
+    (the rows capture writes in the same UserPromptSubmit run as the wake). The wake's reason alone, `mention`,
+    `decision-chosen` or `prompt`, does not make a gap person. The gap's `inputs` name the wake and the person row.
+  - `ci`: gaps whose wake row records `checkEvent: true`, a GitHub `check_run` or `check_suite` event. An
+    `external-event` wake with any other event, or from before capture recorded `checkEvent`, is not ci.
+  - `wake`: gaps whose wake has any other reason, `prompt` included (a coordinator's relay, a driver's prompt, a
+    typed prompt with no person row), and `agent-message`, `task-notification`, `spawn` and the like.
+  - `rebuild`: the tail of a gap from a SessionStart inside it to the wake that ends it.
+  - `unknown`: gaps no wake ends, whose wake has no reason, or after a turn that never closed.
+
+  A gap is never working, and working plus each waiting kind plus unknown is the session's wall-clock time.
 - **`rework.js`**: per PR, pushes (commits CI ran on), red pushes, red runs, rounds (a new one at each push after a red
   one, a merge commit staying in its round) and replans (other PRs labelled `replan` naming the same item), from
   `ci.result` rows. `tripwires()` gives the `tripwire` rows to append: one per PR and limit, when rounds pass the
