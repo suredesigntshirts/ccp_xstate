@@ -44,13 +44,23 @@ export async function prFacts(repo, number, { get = restGet } = {}) {
   }
   const sessions = [...new Set(commits.flatMap((c) => [...c.commit.message.matchAll(/^Claude-Session:\s*\S*?(session_[A-Za-z0-9]+)\s*$/gm)].map((m) => m[1])))];
   return {
-    repo, number, head: pr.head.ref, merged: !!pr.merged_at, item: itemOf(pr), labels: pr.labels.map((l) => l.name),
+    repo, number, head: pr.head.ref, merged: !!pr.merged_at, item: itemOf(pr, files), labels: pr.labels.map((l) => l.name),
     sessions, files: files.map((f) => ({ path: f.filename, changes: f.changes })), commits: out,
   };
 }
 
-// The item a PR names, as the PR gates read it: an `Item: <id>` line in the body, else the branch's last segment.
-const itemOf = (pr) => pr.body?.match(/^Item:\s*([a-z0-9-]+)\s*$/m)?.[1] ?? pr.head.ref.split('/').pop();
+// The item a PR is attributed to: an `Item: <id>` line in the body; else, for a PR labelled replan that changes
+// exactly one item file `plan/items/<id>.md`, that id; else the branch's last segment.
+const ITEM_FILE = /^plan\/items\/([^/]+)\.md$/;
+function itemOf(pr, files) {
+  const named = pr.body?.match(/^Item:\s*([a-z0-9-]+)\s*$/m)?.[1];
+  if (named) return named;
+  if (pr.labels.some((l) => l.name === 'replan')) {
+    const ids = files.map((f) => f.filename.match(ITEM_FILE)?.[1]).filter(Boolean);
+    if (ids.length === 1) return ids[0];
+  }
+  return pr.head.ref.split('/').pop();
+}
 
 async function restGet(path) {
   const res = await fetch(`https://api.github.com${path}`, { headers: { accept: 'application/vnd.github+json' } });
