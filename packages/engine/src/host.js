@@ -103,12 +103,14 @@ export function retiredText(host) {
 }
 
 /**
- * Offer one event to the item: { event, source, run?, at? }. source is { system, ref } from where the event came:
- * the wake envelope, the timer the host set, or the effect that finished (see wake.js). Returns { outcome, row,
+ * Offer one event to the item: { event, source, run?, at?, selection? }. source is { system, ref } from where the event
+ * came: the wake envelope, the timer the host set, or the effect that finished (see wake.js). selection, on the start
+ * only, is { by, how }: who picked the item's workflow and how, as the filing gives them; the start's row records it
+ * with the pinned workflow id, and any other event carrying one is refused. Returns { outcome, row,
  * effects }: outcome is applied, duplicate, stale, refused or not-owner, row is the engine.transition row to
  * persist, and effects are what an applied transition asks for. Changes the host only when applied.
  */
-export function applyEvent(host, { event, source, run = null, at = new Date().toISOString() }) {
+export function applyEvent(host, { event, source, run = null, at = new Date().toISOString(), selection = null }) {
   const turnedAway = (outcome, reason, file = host.file) => ({
     outcome,
     effects: [],
@@ -126,6 +128,8 @@ export function applyEvent(host, { event, source, run = null, at = new Date().to
     return turnedAway('refused', `${host.item} has not started`, sessionFile(host.root, host.session));
   }
   if (host.seen.has(sourceKey(source))) return turnedAway('duplicate', `${source.system} ${source.ref} was already offered`);
+  const badSelection = selectionRefusal(event, selection);
+  if (badSelection) return turnedAway('refused', badSelection);
 
   const reason = refusal(host, event, run);
   if (reason) {
@@ -139,8 +143,19 @@ export function applyEvent(host, { event, source, run = null, at = new Date().to
   for (const effect of effects) host.effects.set(effect.id, { effect, phase: null, outcome: null });
   if (seq === 0) host.owner = host.session;
   host.seen.add(sourceKey(source));
-  const row = transitionRow(host, { outcome: 'applied', event, source, run, at, seq, from, hash, writes, file: host.file });
+  const picked = seq === 0 ? { workflow: host.spec.id, by: selection?.by ?? `${source.system} ${source.ref}`, how: selection?.how ?? null } : null;
+  const row = transitionRow(host, { outcome: 'applied', event, source, run, at, seq, from, hash, writes, file: host.file, selection: picked });
   return { outcome: 'applied', row, effects };
+}
+
+// Why a selection cannot go with this event, or null. Only the start picks the workflow: a selection on a later event
+// would let whoever sends it claim to repick, so it is refused rather than ignored.
+function selectionRefusal(event, selection) {
+  if (selection == null) return null;
+  if (event?.type !== START) return 'only the start names who picked the workflow';
+  if (typeof selection.by !== 'string' || !selection.by.trim()) return 'the selection names no one who picked the workflow';
+  if (selection.how != null && typeof selection.how !== 'string') return 'the selection says how it was picked as text, or not at all';
+  return null;
 }
 
 /**
@@ -394,7 +409,7 @@ function effectsOf(host, { type, params }, seq, at) {
   return [];
 }
 
-function transitionRow(host, { outcome, reason = null, event, source, run, at, seq, from = null, hash = null, writes = null, file }) {
+function transitionRow(host, { outcome, reason = null, event, source, run, at, seq, from = null, hash = null, writes = null, file, selection = null }) {
   const applied = outcome === 'applied';
   return {
     file,
@@ -416,7 +431,8 @@ function transitionRow(host, { outcome, reason = null, event, source, run, at, s
       run,
       from: from === null ? null : JSON.stringify(from),
       hash,
-      ...(applied ? { writes } : {})
+      ...(applied ? { writes } : {}),
+      ...(selection ? { selection } : {})
     }
   };
 }
