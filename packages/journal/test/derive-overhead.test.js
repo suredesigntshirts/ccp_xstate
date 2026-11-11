@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { globRegex, isHarness, overhead } from '../src/derive/overhead.js';
+import { globRegex, isHarness, overhead, sessionKey } from '../src/derive/overhead.js';
 
 const facts = JSON.parse(readFileSync(new URL('./fixtures/derive/ccp_xstate-prs.json', import.meta.url), 'utf8'));
 const config = JSON.parse(readFileSync(new URL('../harness-paths.json', import.meta.url), 'utf8'));
@@ -44,4 +44,39 @@ test('changing the config moves the split', () => {
   assert.equal(view.harness, Math.round(2000 * share));
   assert.equal(view.harness + view.product + view.unattributed, 2100);
   assert.notEqual(view.harness, overhead(rows, [pr28], config).harness);
+});
+
+// Rows key a session by its cloud URL or by its id, and trailers name it in four forms: all meet on one key.
+test('a session meets its PRs whatever form the rows and the trailers name it in', () => {
+  const url = (id) => `https://claude.ai/code/${id}`;
+  const pr = (number, sessions) => ({ repo: 'acme/shop', number, sessions, files: [{ path: 'src/a.js', changes: 3 }, { path: 'CLAUDE.md', changes: 1 }] });
+  const view = overhead([
+    usage(url('session_A'), 'r1', { input: 10 }),
+    usage('session_B', 'r2', { input: 20 }),
+    usage(url('session_C'), 'r3', { input: 30 }),
+    usage('session_C', 'r4', { input: 5 }),
+    usage('local-1234-abcd', 'r5', { input: 40 }),
+    usage(url('session_D'), 'r6', { input: 50 }),
+    usage('session_E', 'r7', { input: 60 }),
+  ], [
+    pr(1, ['session_A']),
+    pr(2, [url('session_B')]),
+    pr(3, [`${url('session_C')}#agent=verifier`, 'session_C']),
+    pr(4, ['local-1234-abcd']),
+    pr(5, [`${url('session_D')}#agent=builder`]),
+  ], config);
+  const ids = ['session_A', 'session_B', 'session_C', 'local-1234-abcd', 'session_D'];
+  assert.deepEqual(Object.keys(view.sessions).sort(), [...ids, 'session_E'].sort());
+  ids.forEach((id, i) => {
+    assert.deepEqual(view.sessions[id].inputs.prs, [`acme/shop#${i + 1}`], id);
+    assert.equal(view.sessions[id].harnessShare, 1 / 4, id);
+  });
+  assert.deepEqual(view.sessions.session_C.inputs.rows, ['r3', 'r4']);
+  assert.equal(view.sessions.session_E.harnessShare, null);
+  assert.equal(view.unattributed, 60);
+});
+
+test('sessionKey reads every form to one key', () => {
+  for (const s of ['https://claude.ai/code/session_X', 'session_X', 'https://claude.ai/code/session_X#agent=v']) assert.equal(sessionKey(s), 'session_X');
+  assert.equal(sessionKey('3f2a-local'), '3f2a-local');
 });
