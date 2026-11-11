@@ -156,10 +156,39 @@ test('turn.usage reads the transcript only from where the last Stop stopped', ()
 });
 
 test('wakes are told apart without keeping their text', () => {
-  assert.deepEqual(wakeOf('<system-reminder>\n<wake reason="mention" current-time="x">'), { reason: 'mention', source: 'hearth' });
-  assert.deepEqual(wakeOf('<agent-message from="a1">\nreport'), { reason: 'agent-message', source: 'subagent' });
-  assert.deepEqual(wakeOf('<task-notification>\n...'), { reason: 'task-notification', source: 'claude-code' });
-  assert.deepEqual(wakeOf('fix the bug'), { reason: 'prompt', source: 'user' });
+  assert.deepEqual(wakeOf('<system-reminder>\n<wake reason="mention" current-time="x">'), { reason: 'mention', source: 'hearth', checkEvent: false });
+  assert.deepEqual(wakeOf('<agent-message from="a1">\nreport'), { reason: 'agent-message', source: 'subagent', checkEvent: false });
+  assert.deepEqual(wakeOf('<task-notification>\n...'), { reason: 'task-notification', source: 'claude-code', checkEvent: false });
+  assert.deepEqual(wakeOf('fix the bug'), { reason: 'prompt', source: 'user', checkEvent: false });
+});
+
+// GitHub wakes in the shape the platform delivers them (packages/engine/test/wake.test.js).
+const githubWake = (...kinds) => `<wake reason="external-event" current-time="2026-10-30T17:02:44Z">\n${kinds
+  .map((kind) => `  <event source="github" kind="${kind}" from="system" trust="relay">\n    {"check":"test","conclusion":"success"}\n  </event>`)
+  .join('\n')}\n</wake>\n`;
+
+test('the wake row a UserPromptSubmit writes records whether the wake brings a GitHub check_run or check_suite event', () => {
+  const cases = [
+    [githubWake('check_run.completed'), true],
+    [githubWake('check_suite.completed'), true],
+    [githubWake('check_run.created'), true],
+    [githubWake('issues.edited', 'check_suite.requested'), true],
+    [githubWake('issues.edited'), false],
+    [githubWake('pull_request.closed', 'pr.pushed'), false],
+    ['<wake reason="external-event" current-time="x">\n  <event source="slack" kind="check_run.completed">{}</event>\n</wake>', false],
+    ['<wake reason="mention" current-time="x"><project id="p"><thread ts="t1"><message id="m1" from="human" trigger="true">check_run.completed</message></thread></project></wake>', false],
+    ['<agent-message from="a1">\nreport', false],
+    ['<task-notification>\n...', false],
+    ['check_run.completed is red, fix it', false],
+  ];
+  for (const [prompt, checkEvent] of cases) {
+    const { rows } = capture({ hook_event_name: 'UserPromptSubmit', session_id: 's', prompt_id: 'p1', prompt }, { read: reader(), state: {} });
+    const wakes = rows.filter((r) => r.kind === 'wake');
+    assert.equal(wakes.length, 1, prompt);
+    assert.equal(wakes[0].payload.checkEvent, checkEvent, prompt);
+    assert.ok(!JSON.stringify(rows).includes('"conclusion"'), 'the prompt text stays out of the rows');
+    assert.ok(!JSON.stringify(wakes[0]).includes('fix it'), 'the prompt text stays out of the wake row');
+  }
 });
 
 test('hooks.json runs capture on every event it handles, in the background (async) on tool calls and subagent stops', () => {
