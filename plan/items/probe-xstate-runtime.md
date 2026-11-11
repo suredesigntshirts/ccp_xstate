@@ -4,9 +4,9 @@
   "title": "Pick XState 5 or 6 by testing persistence, restore and stale completions",
   "stage": "s3-engine-skeleton",
   "kind": "probe",
-  "status": "parked",
+  "status": "dropped",
   "outcome": "A short report says which XState version the engine uses, from tests of snapshot persistence, restore across a process restart, and dropping a completion from a replaced actor run.",
-  "why": "Parked: pin xstate 5.33.3, which PR #110 already ran end to end with restore and stale-run refusal. Revisit as a spike if v6 durable execution is needed (plan-review finding 3).",
+  "why": "Dropped 2026-11-11: the engine pins xstate 5.33.3 and has run on it end to end, so no version choice is left to probe (plan/decisions/2026-11-11-triage.md). Parked: pin xstate 5.33.3, which PR #110 already ran end to end with restore and stale-run refusal. Revisit as a spike if v6 durable execution is needed (plan-review finding 3).",
   "serves": [
     "L-xstate-version",
     "L-replay-facts-not-rules"

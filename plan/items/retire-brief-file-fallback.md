@@ -4,9 +4,9 @@
   "title": "Retire the engine's brief.md fallback for a run's prompt file",
   "stage": "s5-parity",
   "kind": "build",
-  "status": "draft",
+  "status": "dropped",
   "outcome": "promptFile() names prompt.md and nothing else; every committed run folder holds prompt.md; no engine or plugin source reads or names brief.md.",
-  "why": "The fallback is a special case kept alive by six tests that assert it; 313 committed brief.md files (293 bench, 14 tournaments, 6 verify) move with git mv (define errors out of existence; research plan/research/verification-swing.md, item 4).",
+  "why": "Dropped 2026-11-11: moving 314 committed history files to delete a fallback of about ten lines that nothing new writes costs more than the special case (plan/decisions/2026-11-11-triage.md). The fallback is a special case kept alive by six tests that assert it; 313 committed brief.md files (293 bench, 14 tournaments, 6 verify) move with git mv (define errors out of existence; research plan/research/verification-swing.md, item 4).",
   "serves": [
     "L-count-concepts"
   ],
