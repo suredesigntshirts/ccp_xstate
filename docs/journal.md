@@ -257,7 +257,9 @@ counts, and why, is in `plan/decisions/2026-10-30-obs-time-and-rework.md`.
   item's `step_back.max_rounds` (default 2). Before the engine, rounds are per PR, not per item.
 - **`overhead.js`**: tokens (`turn.usage` and `agent.finish`) on harness work against product work. A session's
   tokens split by the share of changed lines, over the PRs its commits name it on, in the paths
-  `packages/journal/harness-paths.json` lists (`<owner>/<repo>/<glob>`). A session with no PR is unattributed.
+  `packages/journal/harness-paths.json` lists (`<owner>/<repo>/<glob>`). A session with no PR is unattributed. Rows'
+  `session` and the PRs' Claude-Session trailers are both read to one key by `sessionKey()`: a session URL, that URL
+  with `#agent=<name>` and the bare `session_` id are one session; a local session id stays as it is.
 
 - **`stalls.js`** (plan item fix-waiting-run-stall): how often a session ended a turn with one of its runs prepared
   and no agent. `prepared` (runs with a `prompt.stored` row), `blocked` (runs with a `stall` row), `blocks`,
