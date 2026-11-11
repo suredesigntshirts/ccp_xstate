@@ -13,6 +13,7 @@ Each snapshot under `memory-boundary-check/` lists one session's synced memory f
 |---|---|---|---|---|---|
 | 1 | `1-2026-11-09T1824Z-before-prune.json` | builder, `session_01KfkB5JV6vrEnQts7qCrK4X` | 18:24:06Z | 151 | none |
 | 2 | `2-2026-11-09T1834Z-after-prune.json` | builder, same session | 18:34:06Z | 5 | none |
+| 3 | `3-2026-11-11T1044Z-after-second-item.json` | builder, same session, resumed | 11 Nov 10:44:17Z | 5 | none |
 
 ## The prune
 
@@ -56,6 +57,41 @@ replan and this build PR.
     `plan/ledger/platform.md` as L-memory-delete-shape.
 - **Verifier thread:** to be added once it has run; the verifier lists its own folder.
 
-### 2. The next item built after this one
+### 2. second-workflow
 
-To be added when it merges. Its builder and verifier threads are not told about this probe.
+Builder thread "Build the second workflow" (`cmsg_01VhYV3jhQ9s4qrrh2th12sNWnUTYuH9V5sYfU3qRE4N7M`) and verifier thread
+"Verify the second workflow" (`cmsg_01VhYV3jhQ9s4qrrh2th12sNBALxb61puq7VezRGda1a9D`), 11 Nov 09:22Z to 10:44Z. Its PRs:
+the readying replan, the build PR with three slice PRs merged into its branch, and a plan-only follow-up that files
+what the run left.
+
+- **Memory written:** none by either thread. Between snapshots 2 and 3 no file was added or removed, and the only
+  changed file is `MEMORY.md`, which the coordinator keeps. Its new lines are directives with the person's message ids
+  and state as thread pointers; they name no PR number, sha, verdict or release time. A listing shows the store at its
+  sync times only, so a file written and deleted between two snapshots would not show.
+- **Traps met and their homes:**
+  - GitHub refuses to merge a draft PR, so the engine's merge effect failed on the build PR. The follow-up PR adds
+    "A draft PR stops the engine's merge" to `docs/traps.md` and files `fix-merge-draft-pr` as a plan item.
+  - The release command was refused as a production deploy. `docs/traps.md`, "What a thread may not do to GitHub",
+    already says so.
+  - Auto mode refused, as self-modification, a widening of the stand-in's grant. The follow-up PR records this in its
+    decision file (`plan/decisions/2026-11-11-second-workflow-run.md`), which is a history record, not in either notes
+    file. It is a refusal a later thread can meet, so it is a trap that missed its notes file; this PR adds it to
+    `docs/traps.md` so the next thread finds it.
+  - The verifier's finding (a refused start leaves its item id unstartable) is a defect, and it went into a plan item,
+    `fix-refused-start-poisons-item`, through the follow-up PR.
+- **Blinding did not hold.** The coordinator's `MEMORY.md` state line describes this probe and asks that the observed
+  item's threads not be told. `MEMORY.md` is loaded into every session in the project, and the index in snapshot 3
+  dates that state to 10:08Z, so the verifier thread (started 10:08Z) and the builder after its next sync could have
+  seen it. Neither thread's replies mention it.
+
+## Result
+
+Across both items, no builder or verifier thread wrote to memory, and the coordinator's own writes stayed directives
+and state. Every trap but one went to a notes file or the ledger through the item's own PRs. The one that missed went
+into a decision file instead, which is still the repo and not memory. The cheap home in this project is now the repo:
+none of the three observed threads so far used memory as a lab notebook, though before 9 Nov about 98 of 147 memory files were such
+logs.
+
+Two limits. The second item was not blind, because the coordinator wrote the probe into the memory index that every
+session loads; a later probe that needs blind threads keeps its notes out of `MEMORY.md`. And a snapshot sees only
+what the store holds when it syncs.

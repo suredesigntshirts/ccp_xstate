@@ -50,6 +50,9 @@ A refusal is not reproduced to check it: retrying reads as a bypass (`plan/ledge
 L-retries-look-like-bypass). Fix a pushed branch with a follow-up commit or by merging main in, and list branches
 left to delete in `plan/decisions/waiting-for-person.md`.
 
+Auto mode also refuses, as self-modification, a thread's edit that widens its own harness permissions, such as
+the stand-in's grant. Retrying does not help; ask the coordinator, or take the repo's own path for the step.
+
 ## Plugin tests leave out untracked files
 
 The plugin tests install the working tree as a commit made with `git stash create`, so an uncommitted change is
