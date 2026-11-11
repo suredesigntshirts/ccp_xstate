@@ -15,7 +15,6 @@
   ],
   "depends_on": [
     "parity-cases",
-    "second-workflow",
     "fix-finish-closes-waits",
     "fix-waiting-wake",
     "fix-workflow-pinned",
@@ -74,3 +73,6 @@
   ]
 }
 ```
+
+It no longer waits on `second-workflow` (`plan/decisions/2026-11-11-triage.md`): v1 and v2 compare on the quick-fix items both have run,
+and a second workflow adds its own column when it has run.
