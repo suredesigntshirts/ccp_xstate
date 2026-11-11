@@ -336,6 +336,7 @@ with a reason that names it unreadable. `id` is the transition id, `<item>#<seq>
 | from | The state before (as JSON), on an applied row |
 | hash | `hashOf` the snapshot after, on an applied row; restore checks each one |
 | writes | On an applied row: the context paths the step wrote, in order, each `{ path, from, set }`. `from` is the source as the workflow wrote it (`event.output.pr`, `context.built`, `{ "value": x }`); `set` is the JSON pointer of the set action in the workflow file (null for the start, which writes the item's input as `event.input.<key>`). The stage record (below) traces every input's producer from these |
+| selection | On the start's row only: `{ workflow, by, how }`, the pinned workflow id, who picked it and how, as the filing gave them (`bin/host.js start --selected-by --how`); without them `by` is the start's source and `how` null. A child item's start names its parent's run. A selection on any other event is refused |
 
 A `not-owner` row, and a `refused` row for an item that hasn't started, go to the offering session's own file
 (`sessions/<session>.jsonl`), since only the owner writes the item's file.

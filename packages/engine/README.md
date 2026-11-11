@@ -99,7 +99,7 @@ file.
 `bin/host.js` runs the host from a shell or a hook, one item per call:
 
 ```
-node packages/engine/bin/host.js start --item <id> --workflow quick-fix --input '<json>' --session <id>
+node packages/engine/bin/host.js start --item <id> --workflow quick-fix --input '<json>' --session <id> [--selected-by <who> --how <text>]
 node packages/engine/bin/host.js wake --item <id> --workflow quick-fix < <hook input JSON>
 node packages/engine/bin/host.js show --item <id> --workflow quick-fix
 node packages/engine/bin/host.js card --item <id> --workflow quick-fix --effect <ask run id> --ref <card id>
@@ -107,14 +107,20 @@ node packages/engine/bin/host.js closed --item <id> --workflow quick-fix --effec
 node packages/engine/bin/host.js answer --item <id> --workflow quick-fix --effect <ask run id> --choice <c> --by <session> [--why <text>] [--grants <file>]
 ```
 
-- `start` starts the item with its input, owned by `--session`.
+- `start` starts the item with its input, owned by `--session`. `--selected-by` and `--how` say who picked the
+  workflow and how; the start's row records them with the pinned workflow id (`docs/journal.md`, `selection`).
 - `wake` reads a Claude Code hook input on stdin (UserPromptSubmit, or PostToolUse of ReadNotifications) and offers
   the events its wake carries. The session is the hook input's `session_id`.
 - `show` prints the item's state, `pending` and `waiting` without offering anything.
 - `card` records which card the session put up for an ask run. `closed` records that the session withdrew it.
 - `answer` is a stand-in's answer to an open ask (see Stand-in answers).
 
-Every command but `show` also offers the results the return hook accepted and any tripwire rows. `start` and `wake`
+Every command acts on the item and its child items: an invoke whose actor names a workflow starts a child item
+(`src/effects/item.js`), and each command but `show` offers its inputs to every open item of that tree, with the
+results the return hook accepted, tripwire rows and the ends of finished children, until nothing more applies
+(`pump`). The output lists each child's workflow, state and pending under `children`, and `waiting` names each run's
+`item` when it is a child's. `card`, `closed` and `answer` take a child's ask run in `--effect` as they take the
+item's own. `start` and `wake`
 take `--repo <git clone>` and `--worktrees <dir>` for the actors' worktrees. `--root` defaults to `$CCP_JOURNAL_DIR` or
 `/mnt/project-files/harness/journal`. `CCP_GITHUB_API` points GitHub calls at another server, for tests.
 
