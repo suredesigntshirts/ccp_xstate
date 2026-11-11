@@ -23,7 +23,7 @@ CI went green, the child's verify passed, and its merge ask came up.
   grant to `replan` was refused twice by auto mode [Self-Modification], and a tap cannot carry the written why that
   replan needs, so the engine had no way left to merge it.
 - **The builder merged #306** by the repo's own rule (`plan/README.md`, step 4: ci and verdict green at the head),
-  with `expectedHeadSha` d2fce814, at 10:44Z. Actions made `harness-v0.1.43` for the merge; the thread's own
+  with `expectedHeadSha` d2fce814, at 10:41Z. Actions made `harness-v0.1.43` for the merge; the thread's own
   release command was refused [Production Deploy] and was not needed.
 
 So the feature item stops at `finishing`, its final child at `replanning` with an ask nobody will answer. It is left
