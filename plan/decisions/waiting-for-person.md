@@ -42,3 +42,4 @@ One line each: what, why, which item waits. Threads add to this; the person clea
   `throwaway/memory-boundary-notes-and-rule` (PRs #289 and #290, closed unmerged).
 - Delete the throwaway branch from memory-learnings-written's world check, `throwaway/notes-only-world` (PR #298,
   closed unmerged).
+- second-workflow's feature item stops at its final child's replan ask: the merge was refused because the PR was a draft, and widening the stand-in grant to `replan` or `drop` was refused [Self-Modification]. The fixes are merged (#306). Say if you want it dropped; a thread needs a grant entry you add for that (`2026-11-11-second-workflow-run.md`).

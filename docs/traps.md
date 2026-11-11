@@ -76,3 +76,10 @@ A thread waiting on a CI event may never be woken by it: check the PR's checks w
 ask to be nudged rather than wait. A push that only merges main in may start no `ci` run; read the checks at the new
 head before counting it green. A PR opened before the PR under it merged keeps that older `BASE_SHA` in its
 runs until its branch is updated, so its gates read files that are already on main as its own.
+
+## A draft PR stops the engine's merge
+
+The merge effect merges over REST at the verified sha, and GitHub refuses a draft PR ("Pull Request is still a draft").
+The item then goes to its replan ask, not back to the merge. A builder that opens its build PR as a draft marks it ready
+(`update_pull_request` with `draft: false`) before the item reaches its merge ask; marking it ready runs no new checks
+and moves no head.
