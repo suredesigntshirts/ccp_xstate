@@ -14,6 +14,12 @@ Each snapshot under `memory-boundary-check/` lists one session's synced memory f
 | 1 | `1-2026-11-09T1824Z-before-prune.json` | builder, `session_01KfkB5JV6vrEnQts7qCrK4X` | 18:24:06Z | 151 | none |
 | 2 | `2-2026-11-09T1834Z-after-prune.json` | builder, same session | 18:34:06Z | 5 | none |
 | 3 | `3-2026-11-11T1044Z-after-second-item.json` | builder, same session, resumed | 11 Nov 10:44:17Z | 5 | none |
+| 4 | `4-2026-11-12T0644Z-closing.json` | builder, same session, resumed | 12 Nov 06:44:28Z | 5 | none |
+
+Snapshot 4 is the closing one, taken after second-workflow's follow-up PR merged. Between snapshots 3 and 4 only
+`MEMORY.md` changed again: its state lines now point at this item's verifier threads and the setup-script thread, and
+name no PR number, sha or verdict. The first verifier's own listing at 12 Nov 06:40Z held the same five entries, with
+an earlier `MEMORY.md` of the same kind (sha-256 starting `956d4f48`).
 
 ## The prune
 
@@ -55,7 +61,8 @@ replan and this build PR.
     `docs/traps.md`, "A `ci` run that has no jobs".
   - The delete shape that kept the first prune from landing is a platform fact, so it went into
     `plan/ledger/platform.md` as L-memory-delete-shape.
-- **Verifier thread:** to be added once it has run; the verifier lists its own folder.
+- **Verifier threads:** the first verifier (12 Nov) wrote nothing to memory; its listing matched snapshot 4 apart
+  from the coordinator's `MEMORY.md`. It found one second-workflow trap this report had missed, now below.
 
 ### 2. second-workflow
 
@@ -77,6 +84,9 @@ what the run left.
     decision file (`plan/decisions/2026-11-11-second-workflow-run.md`), which is a history record, not in either notes
     file. It is a refusal a later thread can meet, so it is a trap that missed its notes file; this PR adds it to
     `docs/traps.md` so the next thread finds it.
+  - A host run from the checkout records the repo's release, `0.1.0`, unless it is given `--release`. The follow-up
+    PR's decision file names it, but neither notes file did, so it missed its notes file like the self-modification
+    refusal. This PR adds "A host run from the checkout records release 0.1.0" to `docs/traps.md`.
   - The verifier's finding (a refused start leaves its item id unstartable) is a defect, and it went into a plan item,
     `fix-refused-start-poisons-item`, through the follow-up PR.
 - **Blinding did not hold.** The coordinator's `MEMORY.md` state line describes this probe and asks that the observed
@@ -87,10 +97,11 @@ what the run left.
 ## Result
 
 Across both items, no builder or verifier thread wrote to memory, and the coordinator's own writes stayed directives
-and state. Every trap but one went to a notes file or the ledger through the item's own PRs. The one that missed went
-into a decision file instead, which is still the repo and not memory. The cheap home in this project is now the repo:
-none of the three observed threads so far used memory as a lab notebook, though before 9 Nov about 98 of 147 memory files were such
-logs.
+and state. Every trap but two went to a notes file or the ledger through the item's own PRs. The two that missed, both
+from second-workflow, went into its decision file instead, which is still the repo and not memory; this PR moves them
+to `docs/traps.md`. A decision file records what happened, so a trap written only there is a trap the next thread does
+not find. The cheap home in this project is now the repo: none of the four observed threads (two builders, two
+verifiers) used memory as a lab notebook, though before 9 Nov about 98 of 147 memory files were such logs.
 
 Two limits. The second item was not blind, because the coordinator wrote the probe into the memory index that every
 session loads; a later probe that needs blind threads keeps its notes out of `MEMORY.md`. And a snapshot sees only

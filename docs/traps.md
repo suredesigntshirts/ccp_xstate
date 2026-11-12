@@ -80,6 +80,25 @@ ask to be nudged rather than wait. A push that only merges main in may start no 
 head before counting it green. A PR opened before the PR under it merged keeps that older `BASE_SHA` in its
 runs until its branch is updated, so its gates read files that are already on main as its own.
 
+## A draft PR stops the engine's merge
+
+The merge effect merges over REST at the verified sha, and GitHub refuses a draft PR ("Pull Request is still a draft").
+The item then goes to its replan ask, not back to the merge. A builder that opens its build PR as a draft marks it ready
+(`update_pull_request` with `draft: false`) before the item reaches its merge ask; marking it ready runs no new checks
+and moves no head.
+
+## New threads resume an old container
+
+A new thread does not get a fresh container: the environment boots it from a snapshot made when the setup script last
+ran (`/tmp/env-manager.log` says `session_mode: resume-cached`), refreshes only the repo clones, and skips `setup.sh`.
+So `~/.claude/skills/ccp-harness` holds the release that was newest at that snapshot, and a release cut later reaches
+no thread. It shows as the SessionStart self-check failing with "runs release X but Y is out" in thread after thread,
+and as `/tmp/ccp-xstate-setup.log` having only one `setup start` line, older than the session. The self-check's advice
+to start a new thread does not help here. What helps is a re-save of the environment's setup script (any change, such
+as the trailing `# date` comment), which makes the next thread build a fresh container and run `setup.sh`; it is a
+setting, so it is the person's (`plan/decisions/waiting-for-person.md`). Check with `grep "setup start"
+/tmp/ccp-xstate-setup.log` against the session's start time.
+
 ## The checkout's `origin/main` can be days old
 
 The container's clone keeps the `origin/main` it was cloned with, and a thread's designated branch may sit far ahead
@@ -91,3 +110,10 @@ plan names. Run `git fetch origin main` before branching from `origin/main`.
 A PR's first `ci` run can conclude `failure` with no jobs and no check run: `get_job_logs` finds no failed job and
 the jobs endpoint answers 404. No test ran, so it is not this PR's failure. Re-run the workflow run once; the re-run
 runs the jobs.
+
+## A host run from the checkout records release 0.1.0
+
+`packages/engine/bin/host.js` takes the release for a run's rows from `--release`, then `CCP_HARNESS_RELEASE`, then
+the `plugins/harness/.claude-plugin/plugin.json` beside it. Run from the repo checkout, that file says the repo's own
+`0.1.0`, not the release the thread runs, so the rows mislead every view that groups by release. A thread that drives
+an item with `bin/host.js` from the checkout passes `--release` with the release its SessionStart line names.

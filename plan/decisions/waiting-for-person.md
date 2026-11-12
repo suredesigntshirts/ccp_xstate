@@ -26,6 +26,9 @@ One line each: what, why, which item waits. Threads add to this; the person clea
   (`plan/research/probe-plugin-agents.md`); a re-save puts the next thread on the newest release.
   Done again on 2026-11-05 07:15Z: the next thread started on harness-v0.1.24 (plan item
   probe-plugin-agents-thread).
+  Again on 2026-11-12: new threads resumed a snapshot built 2026-11-11 09:22Z that holds 0.1.42, so 0.1.43 (tagged
+  10:41Z) reached none of three verifier threads. Re-saved 2026-11-12 06:1xZ with your approval. Standing ask: re-save
+  the setup script after every harness release that threads must run (the trap "New threads resume an old container").
 - Open the observe page (https://claude.ai/artifact/GEVcccpqcToRUb7EhTG4B3) after the re-save and a thread or two, press
   Refresh, and say whether any answer is missing. That is s1's `answers` check, and obs-page's after-landing step.
 - Add the allow rule engine-effects names: "The host may merge a PR at the verified head (`expectedHeadSha` = the
@@ -42,3 +45,4 @@ One line each: what, why, which item waits. Threads add to this; the person clea
   `throwaway/memory-boundary-notes-and-rule` (PRs #289 and #290, closed unmerged).
 - Delete the throwaway branch from memory-learnings-written's world check, `throwaway/notes-only-world` (PR #298,
   closed unmerged).
+- second-workflow's feature item stops at its final child's replan ask: the merge was refused because the PR was a draft, and widening the stand-in grant to `replan` or `drop` was refused [Self-Modification]. The fixes are merged (#306). Say if you want it dropped; a thread needs a grant entry you add for that (`2026-11-11-second-workflow-run.md`).
