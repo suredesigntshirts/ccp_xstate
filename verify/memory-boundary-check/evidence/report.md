@@ -1,15 +1,10 @@
 # report
 
-`node --test verify/memory-boundary-check/report.test.mjs` from a checkout of 32f515f9.
+`node --test verify/memory-boundary-check/*.test.mjs` at 70a380c9: 9 pass, 0 fail. The test file is the previous
+verifier's, unchanged by the builder since.
 
-Passes: every listing in `plan/research/memory-boundary-check/` carries only name, size, sha-256 and entry id, its
-`store_entries` equals its file count, and its report row names it with its session, sync time and entry count;
-both observed items and their threads are named; five traps are named with homes that hold them; the delete-shape
-fact is in the ledger.
-
-Fails: the report does not name the `--release` trap from `plan/decisions/2026-11-11-second-workflow-run.md`, so it
-does not name each trap with its home; and the draft-PR trap's home is on main but not on the branch.
-
-Read by hand against my own listing: snapshot 3 is the last listing in the PR, taken 10:44:17Z, before PR 310 merged
-(10:46:44Z) and before the coordinator's `MEMORY.md` edit stamped 10:48Z. My listing (`pruned.md`) covers that
-window; the report should name it as the closing snapshot or say the verifier's listing closes it.
+Read `plan/research/memory-boundary-check.md` against the four committed listings and my own. Its table names four
+snapshots with session, sync time, entry count and pending deletes; snapshot 4 (06:44:28Z) is taken after
+second-workflow's follow-up merged and equals my listing byte for byte by hash. It names both observed items with
+their threads and PRs, each changed memory file by kind (only `MEMORY.md`, the coordinator's), and each trap with
+its home, the `--release` trap included. Also ran `node plan/check.mjs` (plan ok) and `npm test` (2014 pass, 0 fail).

@@ -1,22 +1,22 @@
 # traps-homed
 
-Read with `read_thread` (full bodies): the memory-boundary-check builder
-(`cmsg_01VhYV3jhQ9s4qrrh2th12sN59jNc3V68fd2ZLV6KULdk9`), the second-workflow builder
-(`cmsg_01VhYV3jhQ9s4qrrh2th12sNWnUTYuH9V5sYfU3qRE4N7M`) and verifier
-(`cmsg_01VhYV3jhQ9s4qrrh2th12sNBALxb61puq7VezRGda1a9D`). Read the bodies and diffs of the build PRs 301 and 306 and
-the follow-up PR 310 (`git show 87bcdebd --stat`, `plan/decisions/2026-11-11-second-workflow-run.md`).
+Read the PR at 70a380c9 (`git diff main...pr301`), the builder thread's latest replies with `read_thread`
+(cmsg_01VhYV3jhQ9s4qrrh2th12sN59jNc3V68fd2ZLV6KULdk9), and the previous verifier's trap table, which read all three
+observed threads.
 
-| Trap | Named in | Home |
-|---|---|---|
-| Stale `origin/main` in the clone | PR 301 | `docs/traps.md` at the PR head |
-| `ci` run with no jobs | PR 301 | `docs/traps.md` at the PR head |
-| Delete shape for memory sync | PR 301 | `plan/ledger/platform.md`, L-memory-delete-shape (platform fact) |
-| Draft PR stops the engine's merge | builder reply, PR 310 | `docs/traps.md` on main; not yet on the build branch, which has not merged main since PR 310 |
-| Self-modification refusal on widening the grant | builder reply, PR 310 | `docs/traps.md` at the PR head |
-| Release command refused | PR 310 decision file | `docs/traps.md`, "What a thread may not do to GitHub" |
-| `bin/host.js` run from the checkout records the repo's release unless given `--release` | PR 310 decision file, "What it left" | **none**: not in `docs/traps.md`, `docs/verifying.md` or any plan item (`git grep -- --release origin/main -- docs plan/items plan/ledger`), and the report does not name it |
+| Trap | Home at the head |
+|---|---|
+| Stale `origin/main` in the clone | `docs/traps.md`, "The checkout's `origin/main` can be days old" |
+| `ci` run with no jobs | `docs/traps.md`, "A `ci` run that has no jobs" |
+| Delete shape for memory sync | `plan/ledger/platform.md`, L-memory-delete-shape |
+| Draft PR stops the engine's merge | `docs/traps.md`, now on the branch since main was merged in |
+| Self-modification refusal on widening the grant | `docs/traps.md`, "What a thread may not do to GitHub" |
+| Release command refused | `docs/traps.md`, "What a thread may not do to GitHub" |
+| `bin/host.js` from the checkout records 0.1.0 without `--release` | `docs/traps.md`, "A host run from the checkout records release 0.1.0" |
 
-Defects went to plan items: `fix-refused-start-poisons-item`, `fix-merge-draft-pr`, `fix-time-ci-from-notifications`.
+Checked the new entry against the code: `packages/engine/bin/host.js` line 108 reads
+`opts.release ?? process.env.CCP_HARNESS_RELEASE ?? manifestRelease()`, and `plugins/harness/.claude-plugin/plugin.json`
+says `"version": "0.1.0"`, as the entry says. Defects are plan items: `fix-refused-start-poisons-item`,
+`fix-merge-draft-pr`, `fix-time-ci-from-notifications`.
 
-`node --test verify/memory-boundary-check/report.test.mjs` at 32f515f9: 7 pass, 2 fail ("draft PR stops the merge",
-"host.js from the checkout needs --release").
+`node --test verify/memory-boundary-check/*.test.mjs` at 70a380c9: 9 pass, 0 fail.
