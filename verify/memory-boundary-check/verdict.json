@@ -1,0 +1,42 @@
+{
+  "item": "memory-boundary-check",
+  "verified_sha": "70a380c954bd2b334e7f6780545bccf5624449c8",
+  "verifier": {
+    "session": "https://claude.ai/code/session_01KfkB5Ebkg2BH5NDENj7QYQ",
+    "model": "claude-opus-5-5"
+  },
+  "results": [
+    {
+      "id": "pruned",
+      "status": "MET",
+      "command": "List /tmp/claude/memory/team/silo/ and .memory-sync-basis at 2026-11-12T06:46:50Z before any write (session_01KfkB5Ebkg2BH5NDENj7QYQ, harness 0.1.43); sha256sum each file; compare with snapshots 2-4 and the archive's sums",
+      "excerpt": "5 entries, deletes []: equal in name, size, sha-256 and entry id to snapshot 4. Three hashes equal archived (c) files; MEMORY.md and feedback-refusals-find-alternatives.md are trimmed (c) files. No hash matches an archived (b) or (d) file. Listing in evidence/pruned.md."
+    },
+    {
+      "id": "no-logs",
+      "status": "MET",
+      "command": "Diff my listing against snapshots 2, 3 and 4 by sha-256; read MEMORY.md in my own folder; grep -nE '#[0-9]+|\\b[0-9a-f]{7,40}\\b|\\bMET\\b|verdict|merged|releas|round' MEMORY.md",
+      "excerpt": "No file added or deleted; only MEMORY.md changed (9807264a -> 9b7e5ec3 -> 956d4f48 -> 17ab602d), the coordinator's. Grep hits are two directives. State lines name thread ids and the held batch; no PR number, sha, verdict, merge or release time or round account."
+    },
+    {
+      "id": "traps-homed",
+      "status": "MET",
+      "command": "git diff main...70a380c9; read_thread on the builder thread; grep docs/traps.md and packages/engine/bin/host.js; node --test verify/memory-boundary-check/*.test.mjs",
+      "excerpt": "All seven traps have a home: six in docs/traps.md (the --release entry and the draft-PR entry now on the branch), the delete shape in plan/ledger/platform.md. host.js line 108 and plugin.json version 0.1.0 match the --release entry. Test: 9 pass, 0 fail.",
+      "test": "verify/memory-boundary-check/report.test.mjs"
+    },
+    {
+      "id": "report",
+      "status": "MET",
+      "command": "node --test verify/memory-boundary-check/*.test.mjs at 70a380c9; read plan/research/memory-boundary-check.md against the four committed listings and my own",
+      "excerpt": "9 pass, 0 fail. The report names four snapshots (session, time, entries), the closing one after the second item's follow-up merged and equal to my listing; both items and their threads; each changed memory file by kind; each trap with its home, --release included.",
+      "test": "verify/memory-boundary-check/report.test.mjs"
+    }
+  ],
+  "observations": [
+    "The PR body is stale: it says three snapshot listings and names the self-modification trap as the only one re-homed, but the head has four listings and also re-homes the --release trap. The builder should refresh it before merging.",
+    "The --release trap could also be filed as a defect: host.js could read the installed release rather than the checkout's plugin.json. The builder chose a trap entry, which the outcome allows.",
+    "The gates check at 70a380c9 failed because the verdict then on the branch named the earlier head; this verdict commit runs the gates again. The test check passed at 70a380c9.",
+    "Two kept memory files still name shas or a PR number from before the rule (the report says so); unchanged in the window, the coordinator's to trim."
+  ]
+}

@@ -50,6 +50,9 @@ A refusal is not reproduced to check it: retrying reads as a bypass (`plan/ledge
 L-retries-look-like-bypass). Fix a pushed branch with a follow-up commit or by merging main in, and list branches
 left to delete in `plan/decisions/waiting-for-person.md`.
 
+Auto mode also refuses, as self-modification, a thread's edit that widens its own harness permissions, such as
+the stand-in's grant. Retrying does not help; ask the coordinator, or take the repo's own path for the step.
+
 ## Plugin tests leave out untracked files
 
 The plugin tests install the working tree as a commit made with `git stash create`, so an uncommitted change is
@@ -95,3 +98,22 @@ to start a new thread does not help here. What helps is a re-save of the environ
 as the trailing `# date` comment), which makes the next thread build a fresh container and run `setup.sh`; it is a
 setting, so it is the person's (`plan/decisions/waiting-for-person.md`). Check with `grep "setup start"
 /tmp/ccp-xstate-setup.log` against the session's start time.
+
+## The checkout's `origin/main` can be days old
+
+The container's clone keeps the `origin/main` it was cloned with, and a thread's designated branch may sit far ahead
+of it. `git checkout -b <branch> origin/main` without a fetch starts the branch on that old main, missing files the
+plan names. Run `git fetch origin main` before branching from `origin/main`.
+
+## A `ci` run that has no jobs
+
+A PR's first `ci` run can conclude `failure` with no jobs and no check run: `get_job_logs` finds no failed job and
+the jobs endpoint answers 404. No test ran, so it is not this PR's failure. Re-run the workflow run once; the re-run
+runs the jobs.
+
+## A host run from the checkout records release 0.1.0
+
+`packages/engine/bin/host.js` takes the release for a run's rows from `--release`, then `CCP_HARNESS_RELEASE`, then
+the `plugins/harness/.claude-plugin/plugin.json` beside it. Run from the repo checkout, that file says the repo's own
+`0.1.0`, not the release the thread runs, so the rows mislead every view that groups by release. A thread that drives
+an item with `bin/host.js` from the checkout passes `--release` with the release its SessionStart line names.
