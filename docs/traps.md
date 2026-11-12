@@ -83,3 +83,15 @@ The merge effect merges over REST at the verified sha, and GitHub refuses a draf
 The item then goes to its replan ask, not back to the merge. A builder that opens its build PR as a draft marks it ready
 (`update_pull_request` with `draft: false`) before the item reaches its merge ask; marking it ready runs no new checks
 and moves no head.
+
+## New threads resume an old container
+
+A new thread does not get a fresh container: the environment boots it from a snapshot made when the setup script last
+ran (`/tmp/env-manager.log` says `session_mode: resume-cached`), refreshes only the repo clones, and skips `setup.sh`.
+So `~/.claude/skills/ccp-harness` holds the release that was newest at that snapshot, and a release cut later reaches
+no thread. It shows as the SessionStart self-check failing with "runs release X but Y is out" in thread after thread,
+and as `/tmp/ccp-xstate-setup.log` having only one `setup start` line, older than the session. The self-check's advice
+to start a new thread does not help here. What helps is a re-save of the environment's setup script (any change, such
+as the trailing `# date` comment), which makes the next thread build a fresh container and run `setup.sh`; it is a
+setting, so it is the person's (`plan/decisions/waiting-for-person.md`). Check with `grep "setup start"
+/tmp/ccp-xstate-setup.log` against the session's start time.
