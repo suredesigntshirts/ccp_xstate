@@ -111,8 +111,9 @@ From the checkout, in a temp journal root, with `CCP_HARNESS_RELEASE` unset:
 ## Options for the build
 
 - **Read the installed copy's release.** `plugins/harness/scripts/host.mjs` `release()` already tells an installed
-  copy from the checkout (`installed`). The host could read `~/.claude/skills/ccp-harness`'s `release.json`. Simple,
-  but it names a path the setup script owns.
+  copy from the checkout (`installed`). The host could read the installed copy's release (`~/.claude/skills/ccp-harness`:
+  setup stamps it into both `.claude-plugin/plugin.json` and `release.json`). Simple, but it names a path the setup
+  script owns.
 - **Read the session's fingerprint row.** The fingerprint is the fact at its source (L-facts-from-source): the release
   this session actually loaded. The host knows its session, but `start` takes `--session` and `wake` the hook's local
   id, and the fingerprint file is named by the cloud session URL; the build has to join them.
@@ -126,4 +127,5 @@ The first two can fall back to the third. The build picks and records the choice
 Run `npm ci` first: `bin/host.js` needs `xstate`. Run every host call from a scratch git repo as cwd (as
 `packages/engine/test/bin.test.js` does), never from the checkout, so the actors' worktrees land beside the scratch
 repo. A wake only writes a row when it carries an event; `packages/engine/test/fixtures/wakes/check-run-failed.txt`
-as a `UserPromptSubmit` prompt does. Do not read the builder's tests before writing yours.
+as a `UserPromptSubmit` prompt does; the hook input also needs `session_id`, or the wake exits 2 with `host: no
+session` before it reaches the journal. Do not read the builder's tests before writing yours.
