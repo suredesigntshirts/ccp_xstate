@@ -115,5 +115,7 @@ runs the jobs.
 
 `packages/engine/bin/host.js` takes the release for a run's rows from `--release`, then `CCP_HARNESS_RELEASE`, then
 the `plugins/harness/.claude-plugin/plugin.json` beside it. Run from the repo checkout, that file says the repo's own
-`0.1.0`, not the release the thread runs, so the rows mislead every view that groups by release. A thread that drives
-an item with `bin/host.js` from the checkout passes `--release` with the release its SessionStart line names.
+`0.1.0`, not the release the thread runs, so the rows mislead every view that groups by release. Once a writer at
+the real release has appended to the item's file, a later run without the flag is refused outright: "this writer's
+release 0.1.0 is older than release 0.1.43". A thread that drives an item with `bin/host.js` from the checkout passes
+`--release` with the release its SessionStart line names, on every call.
